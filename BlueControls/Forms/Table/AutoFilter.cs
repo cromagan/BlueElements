@@ -5,7 +5,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;

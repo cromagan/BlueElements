@@ -4,7 +4,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

@@ -5,7 +5,6 @@ using System.Drawing.Imaging;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace BlueScript.Variables;

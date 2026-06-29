@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using static BlueBasics.ClassesStatic.Converter;
-
 namespace BlueTable.AdditionalScriptMethods;
 
 internal class Method_AutoCorrect : Method_TableGeneric {

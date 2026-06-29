@@ -5,12 +5,11 @@ using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IComparable, ISimpleEditor {
+public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IComparable, ISimpleEditor, IJsonParseable {
 
     #region Fields
 
@@ -274,7 +273,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 }
 
                 if (positionControl is { Width: < 1, Height: < 1 }) {
-                    gr.DrawEllipse(TinyItemPen, positionControl.Left - 5, positionControl.Top + 5, 10, 10);
+                    gr.DrawEllipse(TinyItemPen, positionControl.Left - 5, positionControl.Top - 5, 10, 10);
                     gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right));
                 }
 
@@ -369,6 +368,29 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return result;
     }
 
+    /// <summary>
+    /// Implementiert <see cref="IJsonStringable.ParseableJson" />. Subklassen
+    /// überschreiben diese Methode, rufen <c>base.ParseableJson()</c> auf und
+    /// ergänzen ihre eigenen Keys.
+    /// </summary>
+    public virtual JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json["type"] = MyClassId;
+        json["key"] = KeyName;
+        json["enabled"] = _enabled;
+        json["print"] = _beiExportSichtbar;
+        json["quickInfo"] = QuickInfo;
+        json["page"] = Page;
+
+        json.SetArrayIfNotEmpty("points", MovablePoint);
+        json.SetArrayIfNotEmpty("jointPoints", JointPoints);
+        json.SetArrayIfNotEmpty("tags", Tags);
+
+        return json;
+    }
+
+    public virtual void ParseFinishedJson(JsonElement parsed) { }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "type":
@@ -446,6 +468,78 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return false;
     }
 
+    /// <summary>
+    /// Default-Implementation für <see cref="IJsonParseable" />. Subklassen
+    /// überschreiben diese Methode, rufen <c>base.ParseThisJson</c> auf und
+    /// ergänzen ihre eigenen Keys. So bleibt die Dispatch-Logik zentral.
+    /// </summary>
+    public virtual bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "type":
+                // Klassenkennung - nur formal prüfen (wie bei ParseThis("classid"))
+                return value.ValueKind == JsonValueKind.String;
+
+            case "key":
+                KeyName = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "enabled":
+                _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "print":
+                _beiExportSichtbar = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "quickinfo":
+                QuickInfo = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "page":
+                Page = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "points":
+                if (value.ValueKind == JsonValueKind.Array) {
+                    foreach (var item in value.EnumerateArray()) {
+                        if (item.ValueKind != JsonValueKind.Object) { continue; }
+                        var name = item.GetString("name");
+                        if (string.IsNullOrEmpty(name)) { continue; }
+
+                        foreach (var thisPoint in MovablePoint) {
+                            if (string.Equals(thisPoint.KeyName, name, StringComparison.Ordinal)) {
+                                thisPoint.ParseJson(item);
+                                break;
+                            }
+                        }
+                    }
+                }
+                return true;
+
+            case "jointpoints":
+                if (value.ValueKind == JsonValueKind.Array) {
+                    foreach (var item in value.EnumerateArray()) {
+                        if (item.ValueKind != JsonValueKind.Object) { continue; }
+                        var jp = new PointM(this, string.Empty, 0f, 0f);
+                        jp.ParseJson(item);
+                        JointPoints.Add(jp);
+                    }
+                }
+                return true;
+
+            case "tags":
+                Tags.Clear();
+                if (value.ValueKind == JsonValueKind.Array) {
+                    foreach (var item in value.EnumerateArray()) {
+                        if (item.ValueKind == JsonValueKind.String) { Tags.Add(item.GetString() ?? string.Empty); }
+                    }
+                }
+                return true;
+        }
+
+        return false;
+    }
+
     //    ParseFinished(parsestring);
     //}
     public virtual void PointMoved(object? sender, MoveEventArgs e) {
@@ -473,7 +567,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 scale *= 0.8f;
             } else if (r.Height.CanvasToControl(scale) > 15000) {
                 scale *= 0.8f;
-            } else if (r.Height.CanvasToControl(scale) * r.Height.CanvasToControl(scale) > 90000000) {
+            } else if (r.Width.CanvasToControl(scale) * r.Height.CanvasToControl(scale) > 90000000) {
                 scale *= 0.8f;
             } else {
                 break;

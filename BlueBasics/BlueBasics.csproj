@@ -232,9 +232,14 @@
     <Using Include="System.Text" />
     <Using Include="System.Reflection" />
     <Using Include="System.Globalization" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Nodes" />
     <Using Include="BlueBasics.ClassesStatic" />
     <Using Include="BlueBasics.Enums" />
     <Using Include="BlueBasics.Interfaces" />
     <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,6 @@
 using BlueControls.EventArgs;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BluePaint;

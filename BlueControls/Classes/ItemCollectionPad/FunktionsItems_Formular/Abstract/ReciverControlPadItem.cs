@@ -7,8 +7,6 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -400,7 +398,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
         Pru.X = xpos + wi;
         Pr.X = xpos + wi;
-        Pru.X = xpos + wi;
+        Pro.X = xpos + wi;
 
         base.PointMoved(sender, e);
     }

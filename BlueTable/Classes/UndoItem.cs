@@ -1,8 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Generic;
-
 namespace BlueTable.Classes;
 
 public class UndoItem : IParseable {

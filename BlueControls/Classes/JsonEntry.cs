@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Text;
-using System.Text.Json;
 
 namespace BlueControls.Classes;
 
@@ -33,8 +32,11 @@ public sealed class JsonEntry : IHasKeyName {
         var name = element.GetString("name");
         if (string.IsNullOrEmpty(name)) { return null; }
 
+        // Clone ist Pflicht: das JsonElement stammt aus einem JsonDocument,
+        // das der Aufrufer per using-disposed. Ohne Clone wäre JsonData nach
+        // Rückkehr invalid (ObjectDisposedException bei jedem späteren Zugriff).
         var data = element.GetJson("data");
-        return new JsonEntry(name, data ?? default);
+        return new JsonEntry(name, data.HasValue ? data.Value.Clone() : default);
     }
 
     #endregion

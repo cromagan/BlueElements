@@ -60,6 +60,8 @@
     <Using Include="System.Diagnostics" />
     <Using Include="System.Reflection" />
     <Using Include="System.ComponentModel" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Nodes" />
     <Using Include="BlueBasics.ClassesStatic" />
     <Using Include="BlueBasics" />
     <Using Include="BlueBasics.Enums" />
@@ -68,5 +70,8 @@
     <Using Include="BlueControls.Forms" />
     <Using Include="BlueControls.Enums" />
     <Using Include="BlueControls.Interfaces" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
   </ItemGroup>
 </Project>

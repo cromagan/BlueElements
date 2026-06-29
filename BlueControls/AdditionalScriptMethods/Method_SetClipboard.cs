@@ -3,7 +3,6 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
-using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 

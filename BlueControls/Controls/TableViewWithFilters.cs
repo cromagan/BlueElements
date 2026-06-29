@@ -9,8 +9,6 @@ using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -1044,7 +1042,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var entry = savedViews.Find(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
         if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return; }
 
-        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.JsonData);
+        if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } viewObj) { return; }
         SetView(viewObj);
         QuickNote.Show(NoteSymbols.Ok, "Geladen");
     }

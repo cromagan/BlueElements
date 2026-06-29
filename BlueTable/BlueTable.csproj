@@ -56,6 +56,8 @@
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
     <Using Include="System.Linq" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Nodes" />
     <Using Include="BlueScript.Variables" />
     <Using Include="BlueScript.Classes" />
     <Using Include="BlueScript.Enums" />
@@ -69,6 +71,9 @@
     <Using Include="BlueTable.Interfaces" />
     <Using Include="BlueBasics.Extensions" Static="true" />
     <Using Include="BlueScript.Methods" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
   </ItemGroup>
 
 </Project>

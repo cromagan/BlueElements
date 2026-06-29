@@ -61,6 +61,36 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
+    /// JSON-Pendant zu <see cref="NewByParsing{T}" />. Erzeugt anhand des
+    /// <c>type</c>- bzw. <c>classid</c>-Feldes im JSON-Element über die
+    /// <c>ClassId</c>-Registry die passende Instanz und parst anschließend das Element.
+    /// Gibt <c>null</c> zurück, wenn der Typ nicht ermittelt werden konnte oder kein
+    /// JSON-Objekt übergeben wurde.
+    /// </summary>
+    public static T? NewByParsingJson<T>(JsonElement element, params object[] args) where T : ParseableItem, IJsonParseable {
+        if (element.ValueKind != JsonValueKind.Object) { return null; }
+
+        var typeName = string.Empty;
+
+        foreach (var prop in element.EnumerateObject()) {
+            switch (prop.Name.ToLowerInvariant()) {
+                case "type":
+                case "classid":
+                    if (prop.Value.ValueKind == JsonValueKind.String) {
+                        typeName = prop.Value.GetString() ?? string.Empty;
+                    }
+                    break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(typeName)) { return null; }
+
+        if (NewByTypeName<T>(typeName, args) is not { } ni) { return null; }
+        ni.ParseJson(element);
+        return ni;
+    }
+
+    /// <summary>
     /// Erstellt eine neue Instanz anhand des Typnamens.
     /// </summary>
     /// <typeparam name="T">Der Zieltyp, muss von ParseableItem erben.</typeparam>

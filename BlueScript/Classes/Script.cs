@@ -3,7 +3,6 @@
 using BlueBasics.Enums;
 using BlueScript.ClassesStatic;
 using System.Diagnostics;
-using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Classes;
 

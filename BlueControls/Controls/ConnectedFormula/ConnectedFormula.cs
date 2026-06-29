@@ -12,7 +12,6 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -20,7 +19,7 @@ namespace BlueControls.Controls.ConnectedFormula;
 
 [FileSuffix(".cfo")]
 [FileSuffix(".bcr")]
-public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable, INotifyPropertyChanged {
+public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -287,111 +286,143 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     }
 
     /// <summary>
+    /// Neue JSON-basierte Serialisierung. Implementiert <see cref="IJsonStringable.ParseableJson" />
+    /// und löst das alte <see cref="ParseableItems" /> langfristig ab.
+    /// Schema-Vereinheitlichung gegenüber dem alten Format:
+    /// <list type="bullet">
+    ///   <item><description><c>CreateName</c> → <c>creator</c></description></item>
+    ///   <item><description><c>CreateDate</c> → <c>createDate</c></description></item>
+    ///   <item><description><c>NotAllowedChilds</c> als JSON-Array statt \r-getrennter String</description></item>
+    ///   <item><description><c>Page</c> als echtes JSON-Sub-Objekt (über <see cref="ItemCollectionPadItem" />)</description></item>
+    /// </list>
+    /// </summary>
+    public JsonObject ParseableJson() {
+        var json = new JsonObject()
+            .Set("type", Type)
+            .Set("version", Version)
+            .Set("createDate", CreateDate)
+            .Set("creator", Creator);
+
+        json.SetArrayIfNotEmpty("notAllowedChilds", _notAllowedChilds);
+
+        if (Pages is { IsDisposed: false } pages) {
+            json.Set("page", pages.ParseableJson());
+        }
+
+        return json;
+    }
+
+    /// <summary>
     /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
     /// </summary>
     public void ParseFinished(string parsed) {
         _finishingParse = true;
         IsParsed = true;
 
-        #region Sicherstellen, das Pages initialisiert ist
+        try {
 
-        if (Pages is null) {
-            Pages = [];
-            Pages.Breite = 100;
-            Pages.Höhe = 100;
+            #region Sicherstellen, das Pages initialisiert ist
 
-            AddPage("Head");
-        }
+            if (Pages is null) {
+                Pages = [];
+                Pages.Breite = 100;
+                Pages.Höhe = 100;
 
-        Pages.Parent = this;
-
-        Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
-
-        #endregion
-
-        #region Sicherstellen, dass in Pages auch nur Seiten sind
-
-        var tmpPages = new List<AbstractPadItem>();
-        tmpPages.AddRange(Pages);
-
-        var moveToOtherPage = new List<AbstractPadItem>();
-
-        foreach (var thisIt in tmpPages) {
-            if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
-                icpi.Parent = Pages;
-            } else {
-                Pages.Remove(thisIt);
-                moveToOtherPage.Add(thisIt);
+                AddPage("Head");
             }
-        }
 
-        #endregion
+            Pages.Parent = this;
 
-        #region Items, die irgendwie in den Pages waren, zu der richtigen Page schieben
+            Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
-        foreach (var thisIt in moveToOtherPage) {
+            #endregion
 
-            #region Sicherstellen, dass die Page  vorhanden ist
+            #region Sicherstellen, dass in Pages auch nur Seiten sind
 
-            var pagen = thisIt.Page;
-            if (string.IsNullOrEmpty(pagen)) { pagen = "Head"; }
-            var mypage = GetPage(pagen);
+            var tmpPages = new List<AbstractPadItem>();
+            tmpPages.AddRange(Pages);
 
-            if (mypage is null) {
-                mypage = new ItemCollectionPadItem {
-                    Caption = pagen,
-                    Breite = Pages.Breite,
-                    Höhe = Pages.Höhe,
-                    SheetStyle = Pages.SheetStyle,
-                    RandinMm = Pages.RandinMm,
-                    GridShow = Pages.GridShow,
-                    GridSnap = Pages.GridSnap,
-                    Parent = Pages
-                };
-                Pages.Add(mypage);
+            var moveToOtherPage = new List<AbstractPadItem>();
+
+            foreach (var thisIt in tmpPages) {
+                if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                    if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
+                    icpi.Parent = Pages;
+                } else {
+                    Pages.Remove(thisIt);
+                    moveToOtherPage.Add(thisIt);
+                }
             }
 
             #endregion
 
-            mypage.Add(thisIt);
-        }
+            #region Items, die irgendwie in den Pages waren, zu der richtigen Page schieben
 
-        #endregion
+            foreach (var thisIt in moveToOtherPage) {
 
-        RepairReciver(Pages);
+                #region Sicherstellen, dass die Page  vorhanden ist
 
-        #region Sicherstellen, dass jede Page ein RowEntryItem hat
+                var pagen = thisIt.Page;
+                if (string.IsNullOrEmpty(pagen)) { pagen = "Head"; }
+                var mypage = GetPage(pagen);
 
-        foreach (var thisP in Pages) {
-            if (thisP is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                if (icpi.IsHead() || icpi.Any()) {
-                    var found = icpi.GetRowEntryItem();
+                if (mypage is null) {
+                    mypage = new ItemCollectionPadItem {
+                        Caption = pagen,
+                        Breite = Pages.Breite,
+                        Höhe = Pages.Höhe,
+                        SheetStyle = Pages.SheetStyle,
+                        RandinMm = Pages.RandinMm,
+                        GridShow = Pages.GridShow,
+                        GridSnap = Pages.GridSnap,
+                        Parent = Pages
+                    };
+                    Pages.Add(mypage);
+                }
 
-                    if (found is null) {
-                        found = new RowEntryPadItem();
-                        icpi.Add(found);
+                #endregion
+
+                mypage.Add(thisIt);
+            }
+
+            #endregion
+
+            RepairReciver(Pages);
+
+            #region Sicherstellen, dass jede Page ein RowEntryItem hat
+
+            foreach (var thisP in Pages) {
+                if (thisP is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                    if (icpi.IsHead() || icpi.Any()) {
+                        var found = icpi.GetRowEntryItem();
+
+                        if (found is null) {
+                            found = new RowEntryPadItem();
+                            icpi.Add(found);
+                        }
+
+                        found.SetCoordinates(new RectangleF(icpi.CanvasUsedArea.Width / 2 - 150, -30, 300, 30));
+                        found.Bei_Export_sichtbar = false;
                     }
-
-                    found.SetCoordinates(new RectangleF(icpi.CanvasUsedArea.Width / 2 - 150, -30, 300, 30));
-                    found.Bei_Export_sichtbar = false;
                 }
             }
-        }
 
-        #endregion
+            #endregion
 
-        if (Pages is not null) {
-            foreach (var page in Pages) {
-                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
-                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+            if (Pages is not null) {
+                foreach (var page in Pages) {
+                    if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
+                        icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                        icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                    }
                 }
             }
+        } finally {
+            _finishingParse = false;
         }
-
-        _finishingParse = false;
     }
+
+    public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());
 
     /// <summary>
     /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
@@ -429,6 +460,42 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             case "lastusedid":
             case "events":
             case "variables":
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "type":
+            case "version":
+                // Wird formal akzeptiert - keine Aktion notwendig.
+                return true;
+
+            case "createdate":
+                CreateDate = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "creator":
+                Creator = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "notallowedchilds":
+                _notAllowedChilds.Clear();
+                if (value.ValueKind == JsonValueKind.Array) {
+                    foreach (var item in value.EnumerateArray()) {
+                        if (item.ValueKind == JsonValueKind.String) { _notAllowedChilds.Add(item.GetString() ?? string.Empty); }
+                    }
+                }
+                return true;
+
+            case "page":
+                if (value.ValueKind == JsonValueKind.Object) {
+                    var tmp = new ItemCollectionPadItem();
+                    tmp.ParseJson(value);
+                    Pages = tmp;
+                }
                 return true;
         }
 

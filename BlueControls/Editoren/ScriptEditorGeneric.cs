@@ -10,8 +10,6 @@ using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

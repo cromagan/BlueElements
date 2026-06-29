@@ -8,7 +8,6 @@ using BlueControls.Extended_Text;
 using BlueScript.Classes;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
 

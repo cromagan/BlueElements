@@ -250,3 +250,10 @@ Irgendwie gehen Daten verloren
 ##Aufgabe
 ConnectedFormula, Wird eine Zeile in einem TabelViewWithFilters angeklickt, wird die Ausgehende Zeile an andere Felder weitergegeben.
 DaS klappt nicht, wenn ein Zeilenfilter vorhanden ist! normale Filter funktionieren. Die Melduing ist: Kein Bezug zu einer Zeile
+
+##Aufgabe
+Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern.
+
+##Aufgabe
+Alls Json convertierungen in ParseThisJson    wie   _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+in value.GetBoolean() direkt abändern

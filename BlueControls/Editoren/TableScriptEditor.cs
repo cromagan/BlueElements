@@ -10,9 +10,7 @@ using BlueScript.Variables;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

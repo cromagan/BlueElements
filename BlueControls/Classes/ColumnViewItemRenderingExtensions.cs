@@ -3,7 +3,6 @@
 using BlueControls.Classes.TableItems;
 using BlueControls.Controls;
 using BlueControls.Renderer;
-using BlueTable.Enums;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls.Classes;

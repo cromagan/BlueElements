@@ -3,7 +3,6 @@
 using BlueControls.Classes;
 using BlueControls.Designer_Support;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;

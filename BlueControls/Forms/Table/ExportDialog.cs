@@ -9,7 +9,6 @@ using BlueTable.Interfaces;
 using System.Collections.Specialized;
 using System.Drawing.Printing;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using ComboBox = BlueControls.Controls.ComboBox;

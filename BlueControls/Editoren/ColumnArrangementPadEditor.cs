@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -10,8 +9,6 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -417,7 +414,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tb.RepairAfterParse();
             ShowOrder();
 
-            if (view is not null) { Pad.ParseView(JsonSerializer.Deserialize<JsonObject>(view.ToJsonString())); }
+            if (view is not null) { Pad.ParseView(view); }
         }
     }
 

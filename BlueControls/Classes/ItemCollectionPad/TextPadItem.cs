@@ -7,7 +7,6 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueScript.Variables;
 using System.Globalization;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;

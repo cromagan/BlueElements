@@ -13,9 +13,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueScript.Classes.Script;
 

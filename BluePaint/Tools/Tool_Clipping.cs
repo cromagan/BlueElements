@@ -2,7 +2,6 @@
 
 using BlueControls.EventArgs;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Generic;
 
 namespace BluePaint;
 

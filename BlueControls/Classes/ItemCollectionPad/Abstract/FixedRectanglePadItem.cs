@@ -2,7 +2,6 @@
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
@@ -142,6 +141,22 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         return base.ParseThis(key, value);
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.SetSizeF("size", _canvassize);
+        return json;
+    }
+
+    public override bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "size":
+                _canvassize = value.AsSizeF();
+                return true;
+        }
+
+        return base.ParseThisJson(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {

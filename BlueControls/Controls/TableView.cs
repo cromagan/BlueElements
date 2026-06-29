@@ -14,10 +14,7 @@ using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Classes.Table;
@@ -365,7 +362,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } catch {
                 _tableDrawError = DateTime.UtcNow;
                 Invalidate_AllViewItems(false);
-                return AllViewItems;
+                return _allViewItems;
             }
         }
     }
@@ -2960,7 +2957,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // Alle Kapitel, deren Vorgänger-Pfad eingeklappt ist, ebenfalls verbergen.
             if (HasCollapsedAncestor(rcli.ChapterText, collapsedParents)) {
-                l.Add(rcli.ChapterText);
+                l.Add(rcli.ChapterText.ToUpperInvariant());
             }
         }
 

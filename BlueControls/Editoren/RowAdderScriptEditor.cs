@@ -4,7 +4,6 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;

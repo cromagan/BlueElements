@@ -6,7 +6,6 @@ using static BlueBasics.ClassesStatic.Develop;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes.FileSystemCaching;

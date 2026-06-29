@@ -3,7 +3,6 @@
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using System.Reflection;
-using System.Text.Json;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes;
@@ -440,9 +439,9 @@ public static class Skin {
 
                         _styleData[styleName] = formats;
                     }
-                } catch { }
+                } catch (Exception ex) { Develop.DebugPrint("Fehler beim Laden der Style-Ressourcen aus " + assembly.GetName().Name, ex); }
             }
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Initialisieren der Styles", ex); }
     }
 
     public static void LoadSkin() {
@@ -452,7 +451,7 @@ public static class Skin {
             GraphicsPaths.ClearAll();
             _fontCache.Clear();
             LoadSkin("Win11");
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Laden des Win11-Skins", ex); }
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;

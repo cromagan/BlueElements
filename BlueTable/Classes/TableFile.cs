@@ -6,8 +6,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Develop;
-using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
@@ -605,28 +603,21 @@ public class TableFile : Table {
     private static void TableUpdater(object? state) {
         if (Ending) { return; }
 
-        lock (AllFilesLocker) {
-            foreach (var thisTb in AllFiles) {
-                if (thisTb is TableFile { IsDisposed: false } tbf) {
-                    //if (!thisTb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                    if (string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
-                }
-
-                if (!thisTb.MainChunkLoadDone) { return; }
-            }
-        }
-
         List<Table> filtered = [];
         lock (AllFilesLocker) {
             foreach (var thisTb in AllFiles) {
                 if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
 
+                // Tabelle wird aktuell noch geladen — kein Reload anstoßen,
+                // aber andere Tabellen davon nicht ausschließen (früher `return`).
+                if (!thisTb.MainChunkLoadDone) { continue; }
+                if (string.IsNullOrEmpty(tbf.Filename)) { continue; }
+
                 // Tabelle befindet sich in einem kritischen Bereich (z.B. SaveInternal),
                 // dessen Instanz-Timer pausiert ist — kein Reload anstoßen.
                 if (thisTb.IsTimerPaused) { continue; }
 
-                if (string.IsNullOrEmpty(tbf.Filename) ||
-                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !tbf.MasterNeeded)) { continue; }
+                if (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !tbf.MasterNeeded) { continue; }
 
                 filtered.Add(thisTb);
             }

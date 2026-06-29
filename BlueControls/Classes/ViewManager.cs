@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace BlueControls.Classes;
 
@@ -16,6 +14,7 @@ public static class ViewManager {
     private static readonly object _lock = new();
     private static readonly Dictionary<string, bool> _settings = [];
     private static readonly Dictionary<string, List<JsonEntry>> _views = [];
+    private static bool _initialized;
 
     #endregion
 
@@ -55,7 +54,8 @@ public static class ViewManager {
 
     public static void InitializeIfNeeded() {
         lock (_lock) {
-            if (_views.Count > 0) { return; }
+            if (_initialized) { return; }
+            _initialized = true;
 
             if (IO.FileExists(_filename)) {
                 var json = IO.ReadAllText(_filename, Encoding.UTF8);
@@ -128,7 +128,7 @@ public static class ViewManager {
 
     private static void ParseJson(string json) {
         try {
-            var doc = JsonDocument.Parse(json);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
             if (!root.IsObject()) { return; }
 
@@ -153,25 +153,24 @@ public static class ViewManager {
             var settingsObj = root.GetJson("settings");
             if (settingsObj is not null && settingsObj.Value.IsObject()) {
                 foreach (var settingEntry in settingsObj.Value.EnumerateObject()) {
-                    if (settingEntry.Value.ValueKind == JsonValueKind.True || settingEntry.Value.ValueKind == JsonValueKind.False) {
+                    if (settingEntry.Value.ValueKind is JsonValueKind.True or JsonValueKind.False) {
                         _settings[settingEntry.Name] = settingEntry.Value.GetBoolean();
                     }
                 }
             }
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Parsen der View-Konfiguration", ex); }
     }
 
     private static void Save() {
         try {
             var viewsObj = new JsonObject();
             foreach (var kvp in _views) {
-                var arr = new JsonArray();
+                JsonArray arr = [];
                 foreach (var view in kvp.Value) {
-                    var viewObj = new JsonObject {
-                        { "name", view.KeyName },
-                        { "data", JsonSerializer.Deserialize<JsonNode>(view.JsonData) },
-                        { "modified", view.Modified.ToString("o") }
-                    };
+                    var viewObj = new JsonObject()
+                        .Set("name", view.KeyName)
+                        .Set("data", view.JsonData.ToJsonNode())
+                        .Set("modified", view.Modified.ToString("o"));
                     arr.Add(viewObj);
                 }
                 viewsObj.Add(kvp.Key, arr);
@@ -182,13 +181,12 @@ public static class ViewManager {
                 settingsObj.Add(kvp.Key, kvp.Value);
             }
 
-            var json = new JsonObject {
-                ["views"] = viewsObj,
-                ["settings"] = settingsObj
-            };
+            var json = new JsonObject()
+                .Set("views", viewsObj)
+                .Set("settings", settingsObj);
 
             _ = IO.WriteAllBytes(_filename, Encoding.UTF8.GetBytes(json.ToJsonString()));
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Speichern der View-Konfiguration", ex); }
     }
 
     #endregion

@@ -4,9 +4,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueControls.Controls;
 

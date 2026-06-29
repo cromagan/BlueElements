@@ -3,13 +3,11 @@
 using BlueControls.EventArgs;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes;
 
-public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged {
+public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParseable, IJsonParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -211,7 +209,26 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         return result;
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject()
+            .Set("name", KeyName)
+            .Set("x", _x)
+            .Set("y", _y)
+            .Set("distance", _distance)
+            .Set("angle", _angle);
+
+        // Parent wird nur für Diagnose serialisiert, beim Parsen aber ignoriert
+        // (Parent muss vom Aufrufer gesetzt werden, da PointM die Hierarchie nicht kennt).
+        if (_parent is IHasKeyName hasKeyName && !string.IsNullOrEmpty(hasKeyName.KeyName)) {
+            json.Set("parentName", hasKeyName.KeyName);
+        }
+
+        return json;
+    }
+
     public void ParseFinished(string parsed) { }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -252,6 +269,36 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
                 return true;
 
             case "primarygridsnappoint": // TODO: Entfernt, 24.05.2021
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "name":
+                KeyName = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "parentname":
+                // Parent kann nicht wiederhergestellt werden - wird vom Parent-Objekt gesetzt.
+                return true;
+
+            case "x":
+                _x = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
+                return true;
+
+            case "y":
+                _y = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
+                return true;
+
+            case "distance":
+                _distance = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
+                return true;
+
+            case "angle":
+                _angle = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
                 return true;
         }
 

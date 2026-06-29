@@ -8,7 +8,6 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

@@ -9,7 +9,6 @@ using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Classes.ColumnErrorConstants;
 

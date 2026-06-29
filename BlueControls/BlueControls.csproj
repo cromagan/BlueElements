@@ -82,6 +82,8 @@
   <Using Include="System.Drawing.Drawing2D" />
   <Using Include="System.Drawing.Imaging" />
   <Using Include="System.ComponentModel" />
+  <Using Include="System.Text.Json" />
+  <Using Include="System.Text.Json.Nodes" />
   <Using Include="BlueBasics" />
   <Using Include="BlueBasics.ClassesStatic" />
   <Using Include="BlueTable.Classes" />
@@ -94,6 +96,9 @@
   <Using Include="BlueControls.Interfaces" />
   <Using Include="BlueBasics.Enums" />
   <Using Include="BlueScript.Methods" />
+  <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+  <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+  <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
 </ItemGroup>
 
 <ItemGroup>

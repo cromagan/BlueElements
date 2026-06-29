@@ -2,7 +2,6 @@
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
@@ -141,6 +140,21 @@ public abstract class RectanglePadItem : AbstractPadItem {
                 return true;
         }
         return base.ParseThis(key, value);
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["rotation"] = _drehwinkel;
+        return json;
+    }
+
+    public override bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "rotation":
+                _drehwinkel = value.TryGetInt32(out var ri) ? ri : 0;
+                return true;
+        }
+        return base.ParseThisJson(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {

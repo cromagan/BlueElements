@@ -622,7 +622,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (tb.Column.SysRowCreateDate is { } srcd) {
             foreach (var thisR2 in l) {
-                if (thisR2.CellGetDateTime(srcd).Subtract(toDel.CellGetDateTime(srcd)).TotalDays < 0) {
+                // Jüngste Zeile = höchstes Erstelldatum. Subtrahieren wir toDel von thisR2
+                // und das Ergebnis ist > 0, ist thisR2 jünger und wird zur neuen Lösch-Zeile.
+                if (thisR2.CellGetDateTime(srcd).Subtract(toDel.CellGetDateTime(srcd)).TotalDays > 0) {
                     toDel = thisR2;
                 }
             }

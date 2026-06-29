@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace BlueControls.Classes;
 
@@ -14,6 +12,7 @@ public static class EditorVariablesManager {
     private static readonly object _lock = new();
     private static readonly Dictionary<string, List<JsonEntry>> _sets = [];
     private static readonly Dictionary<string, bool> _settings = [];
+    private static bool _initialized;
 
     #endregion
 
@@ -46,7 +45,8 @@ public static class EditorVariablesManager {
 
     public static void InitializeIfNeeded() {
         lock (_lock) {
-            if (_sets.Count > 0) { return; }
+            if (_initialized) { return; }
+            _initialized = true;
 
             if (IO.FileExists(_filename)) {
                 var json = IO.ReadAllText(_filename, Encoding.UTF8);
@@ -81,7 +81,7 @@ public static class EditorVariablesManager {
 
     private static void ParseJson(string json) {
         try {
-            var doc = JsonDocument.Parse(json);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
             if (!root.IsObject()) { return; }
 
@@ -106,25 +106,24 @@ public static class EditorVariablesManager {
             var settingsObj = root.GetJson("settings");
             if (settingsObj is not null && settingsObj.Value.IsObject()) {
                 foreach (var settingEntry in settingsObj.Value.EnumerateObject()) {
-                    if (settingEntry.Value.ValueKind == JsonValueKind.True || settingEntry.Value.ValueKind == JsonValueKind.False) {
+                    if (settingEntry.Value.ValueKind is JsonValueKind.True or JsonValueKind.False) {
                         _settings[settingEntry.Name] = settingEntry.Value.GetBoolean();
                     }
                 }
             }
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Parsen der Editor-Variablen", ex); }
     }
 
     private static void Save() {
         try {
             var setsObj = new JsonObject();
             foreach (var kvp in _sets) {
-                var arr = new JsonArray();
+                JsonArray arr = [];
                 foreach (var set in kvp.Value) {
-                    var setObj = new JsonObject {
-                        { "name", set.KeyName },
-                        { "data", JsonSerializer.Deserialize<JsonNode>(set.JsonData) },
-                        { "modified", set.Modified.ToString("o") }
-                    };
+                    var setObj = new JsonObject()
+                        .Set("name", set.KeyName)
+                        .Set("data", set.JsonData.ToJsonNode())
+                        .Set("modified", set.Modified.ToString("o"));
                     arr.Add(setObj);
                 }
                 setsObj.Add(kvp.Key, arr);
@@ -135,13 +134,12 @@ public static class EditorVariablesManager {
                 settingsObj.Add(kvp.Key, kvp.Value);
             }
 
-            var json = new JsonObject {
-                ["sets"] = setsObj,
-                ["settings"] = settingsObj
-            };
+            var json = new JsonObject()
+                .Set("sets", setsObj)
+                .Set("settings", settingsObj);
 
             _ = IO.WriteAllBytes(_filename, Encoding.UTF8.GetBytes(json.ToJsonString()));
-        } catch { }
+        } catch (Exception ex) { Develop.DebugPrint("Fehler beim Speichern der Editor-Variablen", ex); }
     }
 
     #endregion

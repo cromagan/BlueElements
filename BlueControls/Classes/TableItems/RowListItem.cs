@@ -149,7 +149,7 @@ public sealed class RowListItem : RowBackground {
 
         ColumnBackGround(gr, viewItem, positionControl);
 
-        if (rowcolor is { }) {
+        if (rowcolor is not null) {
             gr.FillRectangle(rowcolor, positionControl);
         }
 

@@ -7,10 +7,8 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

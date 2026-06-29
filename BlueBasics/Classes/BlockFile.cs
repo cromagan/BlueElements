@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Text.Json.Nodes;
-using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes;
@@ -109,13 +107,13 @@ public sealed class BlockFile {
     }
 
     private static void WriteBlockFile(string blkName) {
-        var json = new JsonObject {
-            ["user"] = UserName,
-            ["timeUtc"] = DateTime.UtcNow,
-            ["machineName"] = Environment.MachineName,
-            ["app"] = Develop.AppExe(),
-            ["id"] = MyId
-        }.ToJsonString();
+        var json = new JsonObject()
+            .Set("user", UserName)
+            .Set("timeUtc", DateTime.UtcNow)
+            .Set("machineName", Environment.MachineName)
+            .Set("app", Develop.AppExe())
+            .Set("id", MyId)
+            .ToJsonString();
 
         WriteAllBytes(blkName, Encoding.UTF8.GetBytes(json));
     }

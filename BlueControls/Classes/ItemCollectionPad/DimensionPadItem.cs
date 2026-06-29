@@ -3,7 +3,6 @@
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes.ItemCollectionPad;

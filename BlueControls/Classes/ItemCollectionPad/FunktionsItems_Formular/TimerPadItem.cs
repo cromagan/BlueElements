@@ -7,7 +7,6 @@ using BlueScript.Classes;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 

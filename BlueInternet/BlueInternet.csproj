@@ -60,10 +60,15 @@
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
     <Using Include="System.Reflection" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Nodes" />
     <Using Include="BlueScript.Enums" />
     <Using Include="BlueScript.Variables" />
     <Using Include="BlueScript.Classes" />
     <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
   </ItemGroup>
 
 </Project>

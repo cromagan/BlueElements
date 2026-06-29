@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueTable.Classes.Table;
 using static BlueTable.Classes.TableFile;
 

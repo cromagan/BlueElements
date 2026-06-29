@@ -362,7 +362,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
                     }
                 }
                 Brush? backcolor = null;
-                if (this is RowListItem rli && rli.Row is { } r && r.Table is { ChangesRowColor: true } tb) {
+                if (this is RowListItem rli && rli.Row is { IsDisposed: false } r && r.Table is { ChangesRowColor: true } tb) {
                     backcolor = r.CheckRow().RowColor;
                 }
 

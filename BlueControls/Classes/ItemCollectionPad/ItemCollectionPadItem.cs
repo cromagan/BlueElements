@@ -11,13 +11,10 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, IJsonParseable, ICanHaveVariables, IStyleable {
 
     #region Fields
 
@@ -751,6 +748,31 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+
+        if (!HasItems) { return json; }
+
+        json.Set("caption", Caption)
+            .Set("sheetStyle", SheetStyle)
+            .Set("backColor", BackColor.ToArgb())
+            .Set("endless", Endless)
+            .Set("autoZoomFit", AutoZoomFit)
+            .Set("showAlways", ShowAlways)
+            .Set("showJointPoints", ShowJointPoints)
+            .Set("snapMode", (int)SnapMode)
+            .Set("gridShow", GridShow)
+            .Set("gridSnap", GridSnap)
+            .Set("editMode", (int)EditMode)
+            .SetPadding("printArea", RandinMm)
+            .Set("width", Breite)
+            .Set("height", Höhe);
+
+        json.SetArrayIfNotEmpty("items", _internal.Where(it => it is not { IsDisposed: true }));
+
+        return json;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "sheetsize":
@@ -826,6 +848,83 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return base.ParseThis(key, value);
+    }
+
+    public override bool ParseThisJson(string key, JsonElement value) {
+        switch (key) {
+            case "caption":
+                Caption = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "sheetstyle":
+                SheetStyle = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
+                return true;
+
+            case "backcolor":
+                if (value.TryGetInt32(out var argb)) {
+                    BackColor = Color.FromArgb(argb);
+                }
+                return true;
+
+            case "endless":
+                Endless = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "autozoomfit":
+                AutoZoomFit = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "showalways":
+                ShowAlways = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "showjointpoints":
+                ShowJointPoints = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
+                return true;
+
+            case "snapmode":
+                SnapMode = value.TryGetInt32(out var sm) ? (SnapMode)sm : SnapMode.SnapToGrid;
+                return true;
+
+            case "gridshow":
+                GridShow = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
+                return true;
+
+            case "gridsnap":
+                GridSnap = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
+                return true;
+
+            case "editmode":
+                EditMode = value.TryGetInt32(out var em) ? (EditMode)em : EditMode.Editable;
+                return true;
+
+            case "printarea":
+                RandinMm = value.AsPadding();
+                return true;
+
+            case "width":
+                if (value.ValueKind == JsonValueKind.Number) {
+                    Breite = value.GetSingle();
+                }
+                return true;
+
+            case "height":
+                if (value.ValueKind == JsonValueKind.Number) {
+                    Höhe = value.GetSingle();
+                }
+                return true;
+
+            case "items":
+                if (value.ValueKind == JsonValueKind.Array) {
+                    foreach (var item in value.EnumerateArray()) {
+                        if (item.ValueKind != JsonValueKind.Object) { continue; }
+                        if (NewByParsingJson<AbstractPadItem>(item) is { } created) { Add(created); }
+                    }
+                }
+                return true;
+        }
+
+        return base.ParseThisJson(key, value);
     }
 
     public override string ReadableText() => BestCaption();
