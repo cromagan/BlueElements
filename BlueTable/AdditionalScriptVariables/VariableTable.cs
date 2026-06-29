@@ -7,6 +7,7 @@ public class VariableTable : Variable {
     #region Fields
 
     private string _lastText = string.Empty;
+    private string? _pendingTableKey;
     private Table? _table;
 
     #endregion
@@ -32,7 +33,7 @@ public class VariableTable : Variable {
     public static string ShortName_Variable => "*tbl";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _table is null;
+    public override bool IsNullOrEmpty => _table is null && _pendingTableKey is not { Length: > 0 };
 
     /// <summary>
     /// Gibt den Text "Table: Caption" zurück.
@@ -42,9 +43,16 @@ public class VariableTable : Variable {
     public override string SearchValue => ReadableText;
 
     public Table? Table {
-        get => _table;
+        get {
+            if (_table is null && _pendingTableKey is { Length: > 0 } key) {
+                _table = Table.Get(key, null);
+                _pendingTableKey = null;
+            }
+            return _table;
+        }
         private set {
             if (ReadOnly) { return; }
+            _pendingTableKey = null;
             _table = value;
 
             GetText();
@@ -53,26 +61,42 @@ public class VariableTable : Variable {
 
     public override bool ToStringPossible => true;
     public override string ValueForCell => string.Empty;
-    public override string ValueForReplace => _table is not { IsDisposed: false } tb ? "{TBL:?}" : "{TBL:" + tb.KeyName + "}";
+
+    public override string ValueForReplace {
+        get {
+            if (_table is { IsDisposed: false } tb) { return "{TBL:" + tb.KeyName + "}"; }
+            if (_pendingTableKey is { Length: > 0 } key) { return "{TBL:" + key + "}"; }
+            return "{TBL:?}";
+        }
+    }
 
     #endregion
 
     #region Methods
 
-    public override void DisposeContent() => _table = null;
+    public override void DisposeContent() {
+        _table = null;
+        _pendingTableKey = null;
+    }
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableTable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
-        Table = v.Table;
+        _pendingTableKey = v._pendingTableKey;
+        _table = v._table;
+        GetText();
         return string.Empty;
     }
 
     protected override void SetValue(object? x) {
+        _pendingTableKey = null;
         if (x is null) {
             _table = null;
-        } else if (x is Table db) {
-            _table = db;
+        } else if (x is Table tb) {
+            _table = tb;
+        } else if (x is string key) {
+            _table = null;
+            _pendingTableKey = key;
         } else {
             Develop.DebugError("Variablenfehler!");
         }
@@ -87,16 +111,22 @@ public class VariableTable : Variable {
 
             if (t == "?") { return true; }
 
-            if (Table.Get(t, null) is not { IsDisposed: false } tb) { return false; }
-
-            result = tb;
+            result = t;
             return true;
         }
 
         return false;
     }
 
-    private void GetText() => _lastText = _table is null ? "Table: [NULL]" : "Table: " + _table.KeyName;
+    private void GetText() {
+        if (_table is not null) {
+            _lastText = "Table: " + _table.KeyName;
+        } else if (_pendingTableKey is { Length: > 0 } key) {
+            _lastText = "Table: " + key;
+        } else {
+            _lastText = "Table: [NULL]";
+        }
+    }
 
     #endregion
 }
