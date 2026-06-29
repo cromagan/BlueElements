@@ -360,8 +360,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 OnVisibleRowsChanged();
                 return _allViewItems;
             } catch {
+                // Cooldown aktivieren (DrawControl zeigt 5s Wait-Screen),
+                // aber KEIN Invalidate_AllViewItems — sonst entsteht eine
+                // Dauerschleife: Exception → Recalc → gleiche Exception → ...
+                // _mustDoAllViewItems bleibt false; der Retry erfolgt nach
+                // Ablauf der Cooldown (siehe DrawControl).
                 _tableDrawError = DateTime.UtcNow;
-                Invalidate_AllViewItems(false);
                 return _allViewItems;
             }
         }
@@ -1501,6 +1505,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return;
             }
             _tableDrawError = null;
+            Invalidate_AllViewItems(true);// Nach Cooldown: Recalc erzwingen, damit der Retry echte Daten liefert
         }
 
         //// Listboxen bekommen keinen Focus, also Tabellen auch nicht. Basta.
@@ -1554,7 +1559,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (teli is not TableEndListItem || !teli.Visible) {
                 DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
-                Invalidate_AllViewItems(false);
+                _tableDrawError = DateTime.UtcNow; // Cooldown aktivieren statt Invalidate-Loop
                 return;
             }
 
@@ -1563,7 +1568,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 if (rcli is not ColumnsHeadListItem rowcap || !rowcap.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
                     DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
-                    Invalidate_AllViewItems(false);
+                    _tableDrawError = DateTime.UtcNow; // Cooldown aktivieren statt Invalidate-Loop
                     return;
                 }
             }
