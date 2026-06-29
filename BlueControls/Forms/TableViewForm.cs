@@ -665,11 +665,33 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return null; }
         if (string.IsNullOrEmpty(text)) { return null; }
 
+        // Spaltenanordnungen liegen im Master-/Headchunk. Ist dieser nicht
+        // bearbeitbar, schlägt das Anlegen fehl -> Dropdown offen lassen.
+        if (tb.IsValueEditable(TableDataType.ColumnArrangement, TableChunk.Chunk_Master) is { Length: > 0 }) {
+            QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
+            return null;
+        }
+
         var tcvc = ColumnViewCollection.ParseAll(tb);
-        var newCvc = new ColumnViewCollection(tb, tcvc[0].ParseableItems().FinishParseable(), text);
-        tcvc.Add(newCvc);
+
+        // Die AKTIVE Ansicht als Vorlage verwenden - nicht tcvc[0].
+        var vorlage = tcvc.GetByKey(TableView.Arrangement) ?? tcvc[0];
+        tcvc.Add(new ColumnViewCollection(tb, vorlage.ParseableItems().FinishParseable(), text));
         tb.ColumnArrangements = tcvc.AsReadOnly();
-        return ItemOf((IReadableTextWithKey)newCvc);
+
+        //null zurückgeben, damit AddAndRaise keine weiteren Aktionen ausführt.
+        //Umschalten, Melden und Schließen asynchron, damit der Call-Stack von
+        //btnPlus_Click sicher zu Ende läuft, bevor das Dropdown disposed wird.
+        BeginInvoke(new Action(() => ActivateNewArrangement(text)));
+
+        return null;
+    }
+
+    private void ActivateNewArrangement(string keyName) {
+        if (IsDisposed) { return; }
+        TableView.Arrangement = keyName;
+        QuickNote.Show(NoteSymbols.Ok, "Erstellt");
+        FloatingForm.Close(cbxColumnArr);
     }
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
