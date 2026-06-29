@@ -452,7 +452,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (sc.NeedRow) {
-            DoScript(RowsFromContext(row, rows), false, sc, $"Skript: {sc.KeyName}");
+            DoScript(RowsFromContext(row, rows), false, sc, sc.KeyName);
             return;
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
@@ -1497,7 +1497,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (_tableDrawError is { } dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 5) {
-                DrawWaitScreen(gr, string.Empty);
+                DrawWaitScreen(gr, "5 Sekunden Sperre");
                 return;
             }
             _tableDrawError = null;
@@ -2199,8 +2199,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 t = $"\r\n<i>(geschätzte Dauer: {tm} Minuten)<i>";
             }
 
-            if (Forms.MessageBox.Show($"'{info}' für {rows.Count} Zeilen ausführen?{t}", ImageCode.Skript, "Ja", "Nein") != 0) {
-                Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
+            if (Forms.MessageBox.Show($"<b>{info}</b>\r\nfür {rows.Count} Zeilen ausführen?{t}", ImageCode.Information, "Ja", "Nein") != 0) {
+                //Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
+                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
                 return;
             }
