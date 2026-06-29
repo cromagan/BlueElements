@@ -1794,11 +1794,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 _dragSourceRowItem = null;
                 _dragSourceColumn = null;
 
-                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca)) {
-                    if (_mouseOverColumn?.Column == Table.Column.SysRowSortIndex
+                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca) && _mouseOverColumn?.Column is { } mc) {
+                    if (mc == Table.Column.SysRowSortIndex
                         && _mouseOverRow is RowListItem dragRli
                         && !PinnedRows.Contains(dragRli.Row)
-                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(_mouseOverColumn.Column, dragRli.Row, dragRli.Row.ChunkValue))) {
+                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRli.Row, dragRli.Row.ChunkValue))) {
                         _dragSourceRowItem = dragRli;
                         _dragMouseDownX = e.ControlX;
                         _dragMouseDownY = e.ControlY;
@@ -3931,6 +3931,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private RowBackground? ItemAtPosition(int controlY, bool ignoreYOffset) {
+
+        if(_sortedViewItems.Count == 0) { return null; }
+
         for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
             var thisItem = _sortedViewItems[i];
             if (thisItem is { Visible: true } && thisItem.IgnoreYOffset == ignoreYOffset &&
