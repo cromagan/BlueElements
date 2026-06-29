@@ -42,8 +42,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
         }
     } = string.Empty;
 
-    public override string Description => string.Empty;
-
     public ColumnHeaderMode ColumnHeaderMode {
         get;
         set {
@@ -53,14 +51,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
         }
     }
 
-    public ScaleToFitMode ScaleToFit {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = ScaleToFitMode.Normal;
+    public override string Description => string.Empty;
 
     public ReadOnlyCollection<string> Filter_immer_Anzeigen {
         get;
@@ -97,6 +88,15 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             OnPropertyChanged();
         }
     } = string.Empty;
+
+    public ScaleToFitMode ScaleToFit {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = ScaleToFitMode.Normal;
 
     public bool ShowHead {
         get;
@@ -144,6 +144,24 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             }
         }
 
+        var filterCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
+            () => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns,
+            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+        filterCtrl.RemoveAllowed = true;
+        filterCtrl.MoveAllowed = true;
+
+        var scriptCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
+            () => Ausführbare_Skripte, "Ausführbare Skripte", 6, scriptAll,
+            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+        scriptCtrl.RemoveAllowed = true;
+        scriptCtrl.MoveAllowed = true;
+
+        var contextCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
+            () => Kontextmenu_Skripte, "Kontextmenu ersetzen mit", 6, scriptRow,
+            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+        contextCtrl.RemoveAllowed = true;
+        contextCtrl.MoveAllowed = true;
+
         List<GenericControl> result =
         [
             new FlexiControlForDelegate(tb),
@@ -154,9 +172,9 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns, CheckBehavior.AllSelected, AddType.OnlySuggests, false ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, scriptAll, CheckBehavior.AllSelected,AddType.OnlySuggests, false ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Kontextmenu_Skripte, "Kontextmenu ersetzen mit",6, scriptRow, CheckBehavior.AllSelected,AddType.OnlySuggests, false ),
+            filterCtrl,
+            scriptCtrl,
+            contextCtrl,
             ];
 
         return result;

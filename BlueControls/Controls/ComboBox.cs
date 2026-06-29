@@ -209,7 +209,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
 
-        var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, AddAllowed, AddMethod, MoveAllowed, CustomContextMenuItems);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, AddAllowed, AddMethod, MoveAllowed, ItemEditAllowed, CustomContextMenuItems);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         dropDownMenu.ItemRemoved += DropDownMenu_ItemRemoved;

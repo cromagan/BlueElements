@@ -107,10 +107,44 @@ public static class Develop {
     }
 
     /// <summary>
-    /// Den Pfad aus dem die Executable stammt, mit abschließenenden \
+    /// Den Pfad aus der die Executable stammt, mit abschließenenden \
     /// </summary>
     /// <returns></returns>
     public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
+
+    /// <summary>
+    /// Sammelt zusätzliche Kontext-Informationen über ein beliebiges Objekt,
+    /// um bei Fehlern die Quelle (Typ, Schlüssel, Text, Tabelle, Datei) im Log zu identifizieren.
+    /// </summary>
+    public static string ContextInfo(object? obj) {
+        if (obj is null) { return "<br>Typ: <null>"; }
+
+        var info = "<br>Typ: " + obj.GetType().Name;
+
+        if (obj is IHasKeyName hkn && hkn.KeyName is { Length: > 0 } key) {
+            info += ", Key: " + key;
+        }
+
+        if (obj is IReadableText rt && rt.ReadableText() is { Length: > 0 } text) {
+            info += ", Text: " + text;
+        }
+
+        var type = obj.GetType();
+
+        var table = type.GetProperty("Table")?.GetValue(obj);
+        if (table is IHasKeyName tk && tk.KeyName is { Length: > 0 } tkey) { info += ", Table: " + tkey; }
+        else if (table?.ToString() is { Length: > 0 } tts) { info += ", Table: " + tts; }
+
+        var filename = type.GetProperty("Filename")?.GetValue(obj);
+        if (filename is IHasKeyName fk && fk.KeyName is { Length: > 0 } fkey) { info += ", Filename: " + fkey; }
+        else if (filename?.ToString() is { Length: > 0 } fts) { info += ", Filename: " + fts; }
+
+        var fileName = type.GetProperty("FileName")?.GetValue(obj);
+        if (fileName is IHasKeyName fnk && fnk.KeyName is { Length: > 0 } fnkey) { info += ", FileName: " + fnkey; }
+        else if (fileName?.ToString() is { Length: > 0 } fnts) { info += ", FileName: " + fnts; }
+
+        return info;
+    }
 
     public static Exception DebugError(string message) {
         DebugPrint(ErrorType.Error, message);

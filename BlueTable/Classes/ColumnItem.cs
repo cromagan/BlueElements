@@ -1179,9 +1179,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public bool CanBeCheckedByRules() => true;
 
     /// <summary>
-    ///
+    /// Liefert den Gruppen-Überschriftentext der angegebenen Ebene (nullbasiert).
     /// </summary>
-    /// <param name="number">Muss 1, 2 oder 3 sein</param>
+    /// <param name="number">Muss 0, 1 oder 2 sein (0 = CaptionGroup1, 1 = CaptionGroup2, 2 = CaptionGroup3).</param>
     /// <returns></returns>
     public string CaptionGroup(int number) {
         switch (number) {

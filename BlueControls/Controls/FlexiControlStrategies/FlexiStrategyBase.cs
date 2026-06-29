@@ -145,6 +145,15 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
+    public bool MoveAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    }
+
     public int ParentHeight {
         get;
         set {

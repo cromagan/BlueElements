@@ -422,6 +422,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool MoveAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.MoveAllowed = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.MoveAllowed = value;
+        }
+    }
+
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RemoveAllowed {
         get;
         set {
@@ -630,6 +648,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.CheckBehavior = CheckBehavior;
             _strategy.MaxTextLength = MaxTextLength;
             _strategy.MultiLine = MultiLine;
+            _strategy.MoveAllowed = MoveAllowed;
             _strategy.RegexCheck = RegexCheck;
             _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
             _strategy.TextFormatingAllowed = TextFormatingAllowed;

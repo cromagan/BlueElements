@@ -126,17 +126,30 @@ public sealed class CaptionBarListItem : RowBackground {
     internal void EditCaptionGroup(ColumnViewItem viewItem, TableView tableView) {
         if (viewItem.Column is not { IsDisposed: false } col) { return; }
         if (tableView.Table is not { IsDisposed: false }) { return; }
+        if (Arrangement is null) { return; }
 
         var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
         var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
         var colW = viewItem.ControlColumnWidth();
 
-        var bt = tableView.BTB;
+        // Alle Überschriften-Texte aller Ebenen sammeln (für die Dropdown-Auswahl).
+        // Auch die Werte der anderen Ebenen werden angeboten.
+        List<string> suggestions = [];
+        foreach (var thisC in Arrangement) {
+            if (thisC.Column is not { IsDisposed: false } c) { continue; }
+            for (var z = 0; z < 3; z++) {
+                if (c.CaptionGroup(z) is { Length: > 0 } g) { suggestions.AddIfNotExists(g); }
+            }
+        }
+
+        var bt = tableView.BTS;
         bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
         bt.MultiLine = true;
+        bt.Suggestions = suggestions.AsReadOnly();
         bt.Text = col.CaptionGroup(Caption).Replace("\r", "\r\n");
+        bt.TextboxSize = new Size(colW, headPos.Height);
         bt.Location = new Point(colX, headPos.Y);
-        bt.Size = new Size(colW, headPos.Height);
+        bt.Size = new Size(colW, bt.GetEstimatedHeight(colW, headPos.Height));
         bt.Tag = (List<object?>)[viewItem, this, "CaptionGroupEdit", Caption];
         bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         bt.Visible = true;

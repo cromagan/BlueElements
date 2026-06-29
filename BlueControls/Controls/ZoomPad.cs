@@ -456,6 +456,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     protected void UpdateSliderBounds() {
         if (IsDisposed) { return; }
 
+        if (InvokeRequired) {
+            Invoke(new Action(UpdateSliderBounds));
+            return;
+        }
+
         var tmpCanvasMaxBounds = CanvasMaxBounds;
 
         var freiraumNoSliders = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
