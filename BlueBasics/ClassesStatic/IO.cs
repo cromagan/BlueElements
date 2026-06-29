@@ -307,6 +307,8 @@ public static class IO {
     public static string[] GetFiles(string directory)
                          => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
 
+    public static DateTime? GetFolderWriteTimeUtc(string directory) => ProcessFile(TryGetFolderWriteTimeUtc, [directory], false, 5).Value as DateTime?;
+
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
     /// </summary>
@@ -582,6 +584,31 @@ public static class IO {
         } catch (UnauthorizedAccessException ex) {
             return OperationResult.Failed(ex);
         } catch (FileNotFoundException ex) {
+            return OperationResult.Failed(ex);
+        } catch (DirectoryNotFoundException ex) {
+            return OperationResult.Failed(ex);
+        } catch (Exception ex) {
+            return OperationResult.FailedRetryable(ex);
+        }
+    }
+
+    /// <summary>
+    /// Liest den UTC-LastWriteTime eines Verzeichnisses. Auf Windows aktualisiert
+    /// das Dateisystem diesen Zeitstempel bei jeder Datei-Erstellung/Löschung/
+    /// Umbenennung innerhalb des Ordners (nicht rekursiv).
+    /// </summary>
+    /// <param name="affectingFiles">Liste mit dem zu prüfenden Verzeichnis.</param>
+    /// <param name="args">Keine.</param>
+    /// <returns>OperationResult mit <see cref="DateTime"/> (UTC) als Value bei Erfolg.</returns>
+    public static OperationResult TryGetFolderWriteTimeUtc(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
+
+        if (string.IsNullOrWhiteSpace(directory)) { return OperationResult.Failed("Kein Verzeichnis angegeben"); }
+
+        try {
+            var di = new DirectoryInfo(directory);
+            return new(di.LastWriteTimeUtc);
+        } catch (UnauthorizedAccessException ex) {
             return OperationResult.Failed(ex);
         } catch (DirectoryNotFoundException ex) {
             return OperationResult.Failed(ex);

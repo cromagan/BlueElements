@@ -299,6 +299,8 @@ public class TableFile : Table {
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if (type == TableDataType.Command_AddRow && string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
+
         if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
 
         if (InitialSavePending) { return string.Empty; }

@@ -58,7 +58,7 @@ public class Method_RowUpdate : Method_TableGeneric {
         if ((age >= minage && age <= maxage) || age > 10000) {
             if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
             if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-            var f = Table.AcquireWriteAccess(srs, row, row.ChunkValue, 120, false);
+            var f = Table.IsCellEditable(srs, row, row.ChunkValue, false);
             if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
             row.InvalidateRowState(coment);
             var sce = row.UpdateRow(true, coment);

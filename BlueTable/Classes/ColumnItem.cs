@@ -1362,7 +1362,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.AcquireWriteAccess(TableDataType.ColumnKey);
+        return tb.IsValueEditable(TableDataType.ColumnKey, string.Empty);
     }
 
     public bool IsSystemColumn() =>

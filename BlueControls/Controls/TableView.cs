@@ -833,13 +833,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnArrangementSelector.Text = showingKey;
     }
 
-    public string AcquireWriteAccess(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string newChunkVal) {
-        var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
-        return !string.IsNullOrWhiteSpace(f)
-            ? f
-            : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
-    }
-
     public (ColumnViewItem? column, RowBackground? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), RowItemAtPosition(MouseDownData?.ControlY ?? 0));
 
     public void CheckView() {
@@ -2413,7 +2406,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.AcquireWriteAccess(cellInThisTableColumn, null, newChunkVal);
+            var fe = table.IsCellEditable(cellInThisTableColumn, null, newChunkVal, true);
+            if (string.IsNullOrWhiteSpace(fe)) {
+                fe = Table.IsCellEditable(cellInThisTableColumn?.Column, null, newChunkVal, false);
+            }
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var nr = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
@@ -2445,7 +2441,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 newChunkVal = newValue;
             }
 
-            var check1 = table.AcquireWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal);
+            var check1 = table.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
+            if (string.IsNullOrWhiteSpace(check1)) {
+                check1 = Table.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, false);
+            }
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             var cellResult = contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
@@ -3931,8 +3930,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private RowBackground? ItemAtPosition(int controlY, bool ignoreYOffset) {
-
-        if(_sortedViewItems.Count == 0) { return null; }
+        if (_sortedViewItems.Count == 0) { return null; }
 
         for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
             var thisItem = _sortedViewItems[i];

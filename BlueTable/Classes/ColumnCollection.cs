@@ -426,7 +426,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
         if (!reason.HasFlag(Reason.IgnoreFreeze)) {
-            if (tb.AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
+            if (tb.IsValueEditable(type, string.Empty) is { Length: > 0 } f) { return f; }
         }
 
         if (type == TableDataType.Command_AddColumnByName) {

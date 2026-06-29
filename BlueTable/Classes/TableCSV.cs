@@ -61,18 +61,6 @@ public class TableCSV : TableFile {
 
     #region Methods
 
-    public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.AcquireWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        // Nicht-Zell-Änderungen markieren, damit die hbdb-Begleitdatei gespeichert wird
-        if (type != TableDataType.UTF8Value_withoutSizeData) {
-            _headDirty = true;
-        }
-
-        return string.Empty;
-    }
-
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (IsDisposed) { return false; }
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }

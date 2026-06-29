@@ -106,22 +106,6 @@ public class TableFragments : TableFile {
     #region Methods
 
     /// <summary>
-    /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
-    /// </summary>
-    public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.AcquireWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (InitialSavePending) { return string.Empty; }
-
-        if (_writer is null) { StartWriter(); }
-
-        if (_writer is null) { return "Schreib-Objekt nicht erstellt."; }
-
-        return string.Empty;
-    }
-
-    /// <summary>
     /// Prüft, ob die aktuelle Instanz als temporärer Master fungieren darf.
     /// </summary>
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {

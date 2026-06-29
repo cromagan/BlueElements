@@ -48,7 +48,7 @@ public class Method_CellSetRow : Method_TableGeneric {
 
         if (columnToSet == tb.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var f = Table.AcquireWriteAccess(columnToSet, row, newchunkval, 120, false);
+        var f = Table.IsCellEditable(columnToSet, row, newchunkval, false);
         if (!string.IsNullOrEmpty(f)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {

@@ -546,18 +546,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Methods
 
-    /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// </summary>
-    /// <param name="column">Die Spalte</param>
-    /// <param name="row">Die Zeile</param>
-    /// <param name="newChunkValue">Der neue Zellwert</param>
-    /// <param name="waitforSeconds"></param>
-    /// <param name="onlyTopLevel"></param>
-    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
-    public static string AcquireWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        ProcessFile(TryAcquireWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel).FailedReason;
-
     public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {
             return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
@@ -727,6 +715,52 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             // Rekursion im catch entfernt, um StackOverflow bei permanenten Fehlern zu vermeiden
             return null;
         }
+    }
+
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// Prüft bei verknüpften Zellen (RelationType.CellValues) auch die
+    /// Zielzelle in der verknüpften Tabelle.
+    /// </summary>
+    /// <param name="column">Die Spalte</param>
+    /// <param name="row">Die Zeile</param>
+    /// <param name="newChunkValue">Der neue Zellwert</param>
+    /// <param name="onlyTopLevel">Wenn true, wird nur die eigene Zelle geprüft (nicht die verknüpfte)</param>
+    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
+    public static string IsCellEditable(ColumnItem? column, RowItem? row, string newChunkValue, bool onlyTopLevel) {
+        if (column.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
+
+        var f = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (row is not null) {
+            f = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+        } else {
+            if (column.RelationType == RelationType.CellValues) {
+                return "Verknüpfte Tabelle kann keine Initialzeile erstellt werden.";
+            }
+        }
+
+        if (onlyTopLevel) { return string.Empty; }
+
+        if (column.RelationType == RelationType.CellValues && row is not null) {
+            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
+            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
+
+            if (lcolumn?.Table is not { IsDisposed: false } tb2) { return "Verknüpfte Tabelle verworfen."; }
+
+            tb2.PowerEdit = tb.PowerEdit;
+
+            if (lrow is null) { return "Interner Fehler: verknüpfte Zeile nicht ermittelbar."; }
+
+            f = IsCellEditable(lcolumn, lrow, lrow.ChunkValue, true);
+            return !string.IsNullOrEmpty(f)
+                ? $"Die verlinkte Zelle kann nicht bearbeitet werden: {f}"
+                : string.Empty;
+        }
+
+        return string.Empty;
     }
 
     public static bool IsValidTableName(string tablename) {
@@ -1002,13 +1036,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             savedVariables = null;
         }
 
-        var onlyTimeAndCountUpdates = keyname is null && scriptContent is null && image is null && quickInfo is null && adminInfo is null && eventTypes is null && needRow is null && userGroups is null && isDisposed == false && readOnly is null;
-
-        if (onlyTimeAndCountUpdates) {
-            if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
-        } else {
-            if (!string.IsNullOrEmpty(tb.AcquireWriteAccess(TableDataType.EventScript))) { return false; }
-        }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
 
         lock (tb._eventScriptLock) {
             var found = false;
@@ -1097,15 +1125,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public virtual string AcquireWriteAccess(TableDataType type, string? chunkValue) => IsValueEditable(type, chunkValue);
-
-    public string AcquireWriteAccess(RowItem row) => AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-
-    public string AcquireWriteAccess(TableDataType type) {
-        if (type == TableDataType.Command_AddRow) { return string.Empty; }
-        return AcquireWriteAccess(type, string.Empty);
-    }
-
     public virtual string[]? AllAvailableTables(List<Table>? allreadychecked) => null;
 
     /// <summary>
@@ -1175,9 +1194,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (row is not null) {
             var cv = row.ChunkValue;
             if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(changedTo)) { cv = changedTo; }
-            if (AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
+            if (IsValueEditable(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
         } else {
-            if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
+            if (IsValueEditable(type, string.Empty) is { Length: > 0 } f) { return f; }
         }
 
         var colName = column?.KeyName ?? string.Empty;
@@ -1680,10 +1699,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
+    /// Prüft, ob die Tabelle aktuell bearbeitet werden kann.
     /// </summary>
     /// <returns></returns>
-    string IEditable.IsNowEditable() => AcquireWriteAccess(TableDataType.Command_AddRow);
+    string IEditable.IsNowEditable() => IsGenericEditable(false);
 
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
@@ -2560,59 +2579,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
         }
         return nu;
-    }
-
-    private static OperationResult TryAcquireWriteAccess(List<string> affectingFiles, params object?[] args) {
-        if (args.Length < 5 ||
-            args[0] is not string newChunkValue ||
-            args[1] is not ColumnItem column ||
-            args[3] is not int waitforseconds ||
-             args[4] is not bool onlyTopLevel) {
-            return OperationResult.FailedInternalError;
-        }
-
-        var row = args[2] as RowItem;
-
-        try {
-            if (column.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Es ist keine Spalte ausgewählt."); }
-
-            var f = tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
-
-            if (row is not null) {
-                f = tb.AcquireWriteAccess(row);
-                if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
-            } else {
-                if (column.RelationType == RelationType.CellValues) {
-                    return OperationResult.Failed("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.");
-                }
-            }
-
-            if (onlyTopLevel) { return OperationResult.Success; }
-
-            if (column.RelationType == RelationType.CellValues && row is not null) {
-                var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) { return OperationResult.Failed(info); }
-
-                if (lcolumn?.Table is not { IsDisposed: false } tb2) { return OperationResult.Failed("Verknüpfte Tabelle verworfen."); }
-
-                tb2.PowerEdit = tb.PowerEdit;
-
-                if (lrow is not null) {
-                    waitforseconds = Math.Max(1, waitforseconds / 2);
-
-                    f = AcquireWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(f)) { return new OperationResult(waitforseconds > 10, $"Die verlinkte Zelle kann nicht bearbeitet werden: {f}"); }
-                    return OperationResult.Success;
-                }
-
-                return OperationResult.FailedInternalError;
-            }
-
-            return OperationResult.Success;
-        } catch (Exception ex) {
-            return OperationResult.FailedRetryable(ex); // Retry bei Exceptions
-        }
     }
 
     private void Column_ColumnChanged(object? sender, ColumnEventArgs e) {

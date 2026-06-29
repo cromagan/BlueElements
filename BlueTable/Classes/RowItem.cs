@@ -447,7 +447,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     string IEditable.IsNowEditable() {
         if (IsDisposed) { return "Zeile verworfen"; }
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue);
+        return tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue);
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
@@ -504,7 +504,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 if (oldvalue != newvalue) {
                     var chunkValue = ChunkValue;
-                    var f = AcquireWriteAccess(inputColumn, this, chunkValue, 2, true);
+                    var f = IsCellEditable(inputColumn, this, chunkValue, true);
                     if (!string.IsNullOrEmpty(f)) { return (targetColumn, targetRow, f, false); }
 
                     //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
@@ -753,7 +753,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
         if (Table is not { IsDisposed: false } tb || column is null) { return; }
 
-        if (!string.IsNullOrEmpty(tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
 
         var columnVar = vars.GetByKey(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }
