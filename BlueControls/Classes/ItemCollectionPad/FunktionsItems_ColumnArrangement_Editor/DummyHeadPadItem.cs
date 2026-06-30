@@ -146,19 +146,19 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
         var filterCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
             () => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns,
-            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+            CheckBehavior.AllSelected, AddType.Suggestions, false);
         filterCtrl.RemoveAllowed = true;
         filterCtrl.MoveAllowed = true;
 
         var scriptCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
             () => Ausführbare_Skripte, "Ausführbare Skripte", 6, scriptAll,
-            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+            CheckBehavior.AllSelected, AddType.Suggestions, false);
         scriptCtrl.RemoveAllowed = true;
         scriptCtrl.MoveAllowed = true;
 
         var contextCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
             () => Kontextmenu_Skripte, "Kontextmenü ersetzen mit", 6, scriptRow,
-            CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
+            CheckBehavior.AllSelected, AddType.Suggestions, false);
         contextCtrl.RemoveAllowed = true;
         contextCtrl.MoveAllowed = true;
 

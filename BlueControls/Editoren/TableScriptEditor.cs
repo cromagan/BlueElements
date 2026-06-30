@@ -493,7 +493,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
-    private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
+    private void lstEventScripts_AddClicked(object sender, AddItemEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         var newitem = new TableScriptDescription(Table);
@@ -509,6 +509,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         UpdateList();
         lstEventScripts.Check(newitem.KeyName);
+        e.Cancel = true;
     }
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {

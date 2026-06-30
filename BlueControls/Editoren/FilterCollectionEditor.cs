@@ -14,7 +14,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
 
     public FilterCollectionEditor() {
         InitializeComponent();
-        lstFilterItems.AddMethod = AddFilter;
+        lstFilterItems.AddClicked += LstFilterItems_AddClicked;
     }
 
     #endregion
@@ -44,7 +44,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
 
     protected override void SetEnabledState(bool enabled) {
         base.SetEnabledState(enabled);
-        lstFilterItems.AddAllowed = enabled ? AddType.UserDef_NoText : AddType.None;
+        lstFilterItems.AddAllowed = enabled ? AddType.Suggestions : AddType.None;
         lstFilterItems.RemoveAllowed = enabled;
         filterItemEditor.Mode = enabled ? EditorMode.EditCopy : EditorMode.OnlyShow;
     }
@@ -58,18 +58,19 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         return true;
     }
 
-    private ReadableListItem? AddFilter(string text) {
+    private void LstFilterItems_AddClicked(object? sender, AddItemEventArgs e) {
         WriteCurrentFilterBack();
-        if (InputItem is not FilterCollection fc) { return null; }
-        if (Table is not { IsDisposed: false } tb) { return null; }
+        if (InputItem is not FilterCollection fc) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
         var col = tb.Column.FirstOrDefault(c => !c.IsSystemColumn());
-        if (col is null) { return null; }
+        if (col is null) { return; }
 
         var newFi = new FilterItem(col, FilterType.Istgleich, string.Empty);
         fc.Add(newFi);
 
-        return ItemOf(newFi, string.Empty);
+        lstFilterItems.AddAndCheck(ItemOf(newFi, string.Empty));
+        e.Cancel = true;
     }
 
     private FilterItem? GetSelectedFilter() {

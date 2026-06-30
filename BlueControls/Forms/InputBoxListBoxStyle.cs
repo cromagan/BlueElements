@@ -27,7 +27,6 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         txbText.MoveAllowed = false;
         txbText.RemoveAllowed = false;
         txbText.AddAllowed = addNewAllowed;
-        txbText.AddAllowed = addNewAllowed;
         txbText.AutoSort = autosort;
 
         if (closeOnItemClick) {

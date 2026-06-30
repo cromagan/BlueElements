@@ -2,6 +2,7 @@
 
 namespace BlueControls.Enums;
 
+[Flags]
 public enum AddType {
 
     /// <summary>
@@ -10,31 +11,19 @@ public enum AddType {
     None = 0,
 
     /// <summary>
-    /// Hinzu-Button wird angezeigt, und auf einen Klick dessen wird ein Item mittels einer Input-Box erstellt.
+    /// Hinzu-Button wird mit Texteingabefeld angezeigt.
+    /// Der Text wird beim Klick an <see cref="Controls.ListBox.AddClicked"/> übergeben.
     /// </summary>
     Text = 1,
 
-    ///// <summary>
-    ///// Hinzu-Button wird angezeigt, und auf einen Klick dessen wird  ein Item mittels einer File-Select-Box erstellt.
-    /////Die Original-Dateien werden nicht verändert.
-    ///// </summary>
-    //BinarysFromFileSystem = 2,
+    /// <summary>
+    /// Hinzu-Button wird angezeigt und öffnet ein Dropdown mit Vorschlägen.
+    /// Ist <see cref="Text"/> ebenfalls gesetzt, wird eine ComboBox verwendet.
+    /// </summary>
+    Suggestions = 2,
 
     /// <summary>
-    /// Hinzu-Button wird angezeigt, und auf einen Klick dessen wird ein Item mittels einer List-Box erstellt.
+    /// Kombination aus <see cref="Text"/> und <see cref="Suggestions"/>.
     /// </summary>
-    OnlySuggests = 3,
-
-    /// <summary>
-    /// Hinzu-Button wird angezeigt, und auf einen Klick dessen der Delegate AddMethode ausgeführt.
-    /// </summary>
-    UserDef = 4,
-
-    /// <summary>
-    /// Hinzu-Button wird als vollflächige Schaltfläche "Hinzufügen" ohne Texteingabe angezeigt.
-    /// Bei Klick wird der Delegate AddMethod direkt (mit leerem Text) ausgeführt.
-    /// Sind Suggestions vorhanden, öffnet sich stattdessen ein Floating-Menü zur Auswahl;
-    /// nach der Auswahl wird AddMethod mit dem Schlüssel des gewählten Vorschlags aufgerufen.
-    /// </summary>
-    UserDef_NoText = 5
+    TextAndSuggestions = Text | Suggestions
 }

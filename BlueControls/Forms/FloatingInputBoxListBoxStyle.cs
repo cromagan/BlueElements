@@ -13,15 +13,16 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Constructors
 
-    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, BlueControls.Controls.ListBox.dAddMethod? addMethod, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems, object? hotItem) : base(connectedControl, (Design)controlDesign) {
+    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems, object? hotItem) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
-        Generate_ListBox1(items, checkBehavior, check, steuerWi, addAllowed, addMethod, moveAllowed, itemEditAllowed, translate, controlDesign, itemDesign, autosort, removeAllowed, customContextMenuItems);
+        Generate_ListBox1(items, checkBehavior, check, steuerWi, addAllowed, moveAllowed, itemEditAllowed, translate, controlDesign, itemDesign, autosort, removeAllowed, customContextMenuItems);
 
         lstbx.HotItemForClick = hotItem;
         lstbx.UpDownClicked += ListBox1_UpDownClicked;
         lstbx.ItemAddedByClick += ListBox1_ItemAddedByClick;
+        lstbx.AddClicked += ListBox1_AddClicked;
 
         if (ConnectedControl is IContextMenu cm) {
             lstbx.ContextMenuConnectedControl = cm;
@@ -40,6 +41,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Events
 
     public event EventHandler? Cancel;
+
+    public event EventHandler<AddItemEventArgs>? AddClicked;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
@@ -63,24 +66,24 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Methods
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
-                translate, controlDesign, itemDesign, autosort, false, AddType.None, null, false, false, null, null);
+                translate, controlDesign, itemDesign, autosort, false, AddType.None, false, false, null, null);
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort, false, AddType.None, null, false, false, null, null);
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort, false, AddType.None, false, false, null, null);
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
-            translate, controlDesign, itemDesign, autosort, removeAllowed, AddType.None, null, false, false, null, null);
+            translate, controlDesign, itemDesign, autosort, removeAllowed, AddType.None, false, false, null, null);
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, object? hotItem) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
-            translate, controlDesign, itemDesign, autosort, removeAllowed, AddType.None, null, false, false, null, hotItem);
+            translate, controlDesign, itemDesign, autosort, removeAllowed, AddType.None, false, false, null, hotItem);
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, BlueControls.Controls.ListBox.dAddMethod? addMethod, bool moveAllowed) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
-            translate, controlDesign, itemDesign, autosort, removeAllowed, addAllowed, addMethod, moveAllowed, false, null, null);
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
+            translate, controlDesign, itemDesign, autosort, removeAllowed, addAllowed, moveAllowed, false, null, null);
 
-    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, null, false, false, customContextMenuItems, null);
+    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, false, false, customContextMenuItems, null);
 
-    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, BlueControls.Controls.ListBox.dAddMethod? addMethod, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, addMethod, moveAllowed, itemEditAllowed, customContextMenuItems, null);
+    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, moveAllowed, itemEditAllowed, customContextMenuItems, null);
 
-    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, BlueControls.Controls.ListBox.dAddMethod? addMethod, bool moveAllowed, bool itemEditAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
+    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool moveAllowed, bool itemEditAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 26; }
         lstbx.Appearance = controlDesign;
@@ -88,7 +91,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         lstbx.AutoSort = autosort;
         lstbx.RemoveAllowed = removeAllowed;
         lstbx.AddAllowed = addNewAllowed;
-        lstbx.AddMethod = addMethod;
         lstbx.MoveAllowed = moveAllowed;
         lstbx.ItemEditAllowed = itemEditAllowed;
         lstbx.CustomContextMenuItems = customContextMenuItems;
@@ -137,13 +139,15 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));
     }
 
+    private void ListBox1_AddClicked(object? sender, AddItemEventArgs e) => AddClicked?.Invoke(this, e);
+
     private void ListBox1_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) {
         RecalcFormSize();
         ItemAddedByClick?.Invoke(this, e);
     }
 
     private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
+        // Selectet Chanched bringt nix, da es ja darum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!
         // Ob sie Checked wird, ist egal!
 

@@ -471,7 +471,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         abortItem.RemoveLocked = true;
         items.Add(abortItem);
 
-        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, true, AddType.None, null, false);
+        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, true, AddType.None, false);
         dropDown.ItemRemoved += DropDown_ItemRemoved;
     }
 

@@ -255,7 +255,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     private BlueControls.Controls.ListBox Childs() {
         var childs = new BlueControls.Controls.ListBox {
-            AddAllowed = AddType.OnlySuggests,
+            AddAllowed = AddType.Suggestions,
             RemoveAllowed = true,
             MoveAllowed = true,
             AutoSort = false,

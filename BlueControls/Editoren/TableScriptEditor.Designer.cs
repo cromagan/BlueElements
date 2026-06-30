@@ -466,7 +466,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // lstEventScripts
             // 
-            lstEventScripts.AddAllowed = AddType.UserDef;
+            lstEventScripts.AddAllowed = AddType.Suggestions;
             lstEventScripts.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lstEventScripts.Location = new Point(8, 16);
             lstEventScripts.Name = "lstEventScripts";

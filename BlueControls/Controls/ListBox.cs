@@ -29,23 +29,20 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     public ListBox() {
         InitializeComponent();
+        lstBox.AddAreaVisible = AddAllowed != AddType.None;
     }
-
-    #endregion
-
-    #region Delegates
-
-    public delegate AbstractListItem? dAddMethod(string text);
 
     #endregion
 
     #region Events
 
     /// <summary>
-    /// Wird direkt nach dem Klicken ausgelöst, sobald die Eingaben validiert sind
-    /// und bevor das eigentliche Item erzeugt wird. Damit können z.B. Items zurückgeschrieben werden.
+    /// Wird beim Klick auf den Hinzufügen-Button ausgelöst, sobald der Text
+    /// feststeht. Der Handler kann <see cref="AddItemEventArgs.Cancel"/> setzen,
+    /// um die automatische Item-Erstellung zu unterbinden und selbst zu reagieren.
+    /// Wird nicht gecancelt, wird das Item automatisch hinzugefügt.
     /// </summary>
-    public event EventHandler? AddClicked;
+    public event EventHandler<AddItemEventArgs>? AddClicked;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
@@ -63,18 +60,16 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     [DefaultValue(AddType.Text)]
     public AddType AddAllowed {
-        get => lstBox.AddAllowed;
-        set => lstBox.AddAllowed = value;
-    }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public dAddMethod? AddMethod {
-        get => lstBox.AddMethod;
-        set => lstBox.AddMethod = value;
-    }
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (lstBox is { IsDisposed: false }) {
+                lstBox.AddAreaVisible = value != AddType.None;
+            }
+            UpdateAddArea();
+        }
+    } = AddType.Text;
 
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
@@ -252,12 +247,10 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         UpdateAddArea();
     }
 
-    private void AddAndRaise(string text) => AddAndRaise(AddMethod?.Invoke(text), autoEdit: true);
-
-    private void AddAndRaise(AbstractListItem? ali, bool autoEdit) {
+    private void AddAndRaise(AbstractListItem? ali) {
         if (ali is not { } item) { return; }
         lstBox.AddAndCheck(item);
-        if (autoEdit && ItemEditAllowed && item is ReadableListItem { Item: IEditable ie }) { ie.Edit(); }
+        if (ItemEditAllowed && item is ReadableListItem { Item: IEditable ie }) { ie.Edit(); }
         OnItemAddedByClick(new AbstractListItemEventArgs(item));
     }
 
@@ -305,29 +298,23 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
     }
 
     private void btnPlus_Click(object? sender, System.EventArgs e) {
-        if (AddAllowed == AddType.UserDef_NoText) {
-            HandleUserDefNoTextClick();
-            return;
-        }
-
-        if (AddAllowed == AddType.OnlySuggests && AvailableSuggestions().Count == 0) {
-            QuickNote.Show(NoteSymbols.Warning, "Keine Vorschläge mehr", btnPlus);
+        if (AddAllowed == AddType.Suggestions) {
+            HandleSuggestionsClick();
             return;
         }
 
         var text = CurrentAddText();
         if (string.IsNullOrEmpty(text) || !IsAddTextValid(text)) { return; }
 
-        OnAddClicked();
-        var (toAdd, autoEdit) = AddAllowed switch {
-            AddType.UserDef => (AddMethod?.Invoke(text), true),
-            AddType.Text => (ItemOf(text), false),
-            AddType.OnlySuggests => (Suggestions.GetByKey(text), false),
-            _ => (null, false)
-        };
+        var args = new AddItemEventArgs(text);
+        OnAddClicked(args);
+        if (args.Cancel) {
+            ClearAddInput();
+        } else {
+            AddAndRaise(Suggestions.GetByKey(text) ?? ItemOf(text));
+            ClearAddInput();
+        }
 
-        AddAndRaise(toAdd, autoEdit);
-        ClearAddInput();
         lstBox.DoMouseMovement(-1, -1);
         UpdateAddArea();
     }
@@ -357,24 +344,19 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
     }
 
     private void DropDownItemClicked(object? sender, AbstractListItemEventArgs e) {
-        AddAndRaise(e.Item.KeyName);
+        var args = new AddItemEventArgs(e.Item.KeyName);
+        OnAddClicked(args);
+        if (!args.Cancel) {
+            AddAndRaise(e.Item);
+            ClearAddInput();
+        }
         UpdateAddArea();
     }
 
-    private void HandleUserDefNoTextClick() {
-        if (AddMethod is null) { return; }
+    private void HandleSuggestionsClick() {
+        var available = AvailableSuggestions();
 
-        OnAddClicked();
-
-        // Mit Suggestions: Auswahl in einem Floating-Menü, danach AddMethod
-        // mit dem Schlüssel des gewählten Vorschlags aufrufen.
-        if (Suggestions.Count > 0) {
-            var available = AvailableSuggestions();
-            if (available.Count == 0) {
-                QuickNote.Show(NoteSymbols.Warning, "Keine Vorschläge mehr", btnPlus);
-                return;
-            }
-
+        if (available.Count > 0) {
             var dropDown = FloatingInputBoxListBoxStyle.Show(
                 available,
                 CheckBehavior.NoSelection,
@@ -389,8 +371,11 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
             return;
         }
 
-        // Ohne Suggestions: AddMethod direkt (mit leerem Text) ausführen.
-        AddAndRaise(string.Empty);
+        // Keine Vorschläge vorhanden: AddClicked direkt feuern,
+        // damit der Handler das Item selbst erstellen kann.
+        var args = new AddItemEventArgs(string.Empty);
+        OnAddClicked(args);
+        lstBox.DoMouseMovement(-1, -1);
         UpdateAddArea();
     }
 
@@ -399,12 +384,12 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
     private bool IsAddTextValid(string text) {
         if (string.IsNullOrEmpty(text)) { return false; }
         if (lstBox[text] is not null) { return false; }
-        if (AddAllowed == AddType.OnlySuggests && Suggestions.GetByKey(text) is null) { return false; }
-        if (AddAllowed == AddType.UserDef && AddMethod is null) { return false; }
+        if (AddAllowed.HasFlag(AddType.Suggestions) && !AddAllowed.HasFlag(AddType.Text)
+            && Suggestions.GetByKey(text) is null && Suggestions.Count > 0) { return false; }
         return true;
     }
 
-    private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
+    private void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
 
     private void OnCoreButtonUpdate(object? sender, ButtonUpdateEventArgs e) {
         UpdateAddArea();
@@ -479,8 +464,8 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         var padding = 2;
         var tbHeight = Math.Max(20, btnSize + 4);
 
-        // Modus ohne Texteingabe: vollflächige Schaltfläche "Hinzufügen".
-        if (AddAllowed == AddType.UserDef_NoText) {
+        // Suggestions ohne TextEdit: vollflächige Schaltfläche ohne Texteingabe.
+        if (AddAllowed == AddType.Suggestions) {
             txtAdd.Visible = false;
             cbxAdd.Visible = false;
 
@@ -489,12 +474,13 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
             btnPlus.Top = top;
             btnPlus.Left = padding;
             btnPlus.Width = Math.Max(20, availableWidth - (padding * 2));
-            btnPlus.Enabled = AddMethod is not null;
+            btnPlus.Enabled = Suggestions.Count == 0 || AvailableSuggestions().Count > 0;
             btnPlus.Visible = true;
             btnPlus.BringToFront();
             return;
         }
 
+        // TextEdit (mit oder ohne Suggestions): Text-/ComboBox + Button
         var useComboBox = Suggestions.Count > 0;
         if (useComboBox) { SyncCbxAddSuggestions(); }
 

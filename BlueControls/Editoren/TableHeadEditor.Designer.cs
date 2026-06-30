@@ -565,7 +565,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // lstUniqueValues
             // 
-            lstUniqueValues.AddAllowed = AddType.UserDef;
+            lstUniqueValues.AddAllowed = AddType.Suggestions;
             lstUniqueValues.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lstUniqueValues.FilterText = null;
             lstUniqueValues.Location = new Point(8, 80);

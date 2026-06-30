@@ -68,21 +68,18 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public static Renderer_Abstract Renderer => Renderer_Abstract.Default;
 
-    [DefaultValue(AddType.Text)]
-    public AddType AddAllowed {
+    /// <summary>
+    /// Wenn <c>true</c>, reserviert <see cref="CalculateCanvasMaxBounds"/> zusätzlichen Platz
+    /// am unteren Rand für den Add-Bereich des äußeren <see cref="ListBox"/>-Controls.
+    /// </summary>
+    internal bool AddAreaVisible {
         get;
         set {
             if (field == value) { return; }
             field = value;
             DoMouseMovement(-1, -1);
         }
-    } = AddType.Text;
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ListBox.dAddMethod? AddMethod { get; set; }
+    }
 
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
@@ -543,14 +540,12 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         var areaControl = AvailableControlPaintArea;
         var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
         var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestX, heightAdded, orientation, Renderer);
-        return new RectangleF(0, 0, s.Width, s.Height + (AddAllowed != AddType.None ? 26 : 0));
+        return new RectangleF(0, 0, s.Width, s.Height + (AddAreaVisible ? 26 : 0));
     }
 
     protected override void Dispose(bool disposing) {
         try {
-            if (disposing) {
-                AddMethod = null;
-            }
+            if (disposing) { }
             _item.Clear();
         } finally {
             base.Dispose(disposing);

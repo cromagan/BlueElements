@@ -248,6 +248,16 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
+    /// <summary>
+    /// Schaltet die Ansicht auf die übergebene Spaltenanordnung.
+    /// Wird z.B. vom ColumnArrangementPadEditor aufgerufen, wenn eine neue
+    /// Ansicht erstellt wurde und sofort aktiviert werden soll.
+    /// </summary>
+    public void SwitchToArrangement(string keyName) {
+        if (IsDisposed || keyName is not { Length: > 0 }) { return; }
+        TableView.Arrangement = keyName;
+    }
+
     public TabPage? TabExists(string tablename) {
         tablename = tablename.FileNameWithoutSuffix();
 
@@ -500,6 +510,13 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         return SwitchTabToTable(tablename); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
+    private void ActivateNewArrangement(string keyName) {
+        if (IsDisposed) { return; }
+        TableView.Arrangement = keyName;
+        QuickNote.Show(NoteSymbols.Ok, "Erstellt");
+        FloatingForm.Close(cbxColumnArr);
+    }
+
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => TableView.ExpandAll();
 
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
@@ -611,16 +628,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         BlueControls.Controls.TableView.RepairColumnArrangements(tb);
     }
 
-    /// <summary>
-    /// Schaltet die Ansicht auf die übergebene Spaltenanordnung.
-    /// Wird z.B. vom ColumnArrangementPadEditor aufgerufen, wenn eine neue
-    /// Ansicht erstellt wurde und sofort aktiviert werden soll.
-    /// </summary>
-    public void SwitchToArrangement(string keyName) {
-        if (IsDisposed || keyName is not { Length: > 0 }) { return; }
-        TableView.Arrangement = keyName;
-    }
-
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
 
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplaceInCells();
@@ -661,37 +668,30 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnZoomOut_Click(object sender, System.EventArgs e) => TableView.DoZoom(false);
 
-    private ReadableListItem? CbxColumnArr_AddMethod(string text) {
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return null; }
-        if (string.IsNullOrEmpty(text)) { return null; }
+    private void cbxColumnArr_AddClicked(object? sender, AddItemEventArgs e) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
+        if (string.IsNullOrEmpty(e.Text)) { return; }
 
         // Spaltenanordnungen liegen im Master-/Headchunk. Ist dieser nicht
         // bearbeitbar, schlägt das Anlegen fehl -> Dropdown offen lassen.
         if (tb.IsValueEditable(TableDataType.ColumnArrangement, TableChunk.Chunk_Master) is { Length: > 0 }) {
             QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
-            return null;
+            e.Cancel = true;
+            return;
         }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
         // Die AKTIVE Ansicht als Vorlage verwenden - nicht tcvc[0].
         var vorlage = tcvc.GetByKey(TableView.Arrangement) ?? tcvc[0];
-        tcvc.Add(new ColumnViewCollection(tb, vorlage.ParseableItems().FinishParseable(), text));
+        tcvc.Add(new ColumnViewCollection(tb, vorlage.ParseableItems().FinishParseable(), e.Text));
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        //null zurückgeben, damit AddAndRaise keine weiteren Aktionen ausführt.
+        e.Cancel = true;
+
         //Umschalten, Melden und Schließen asynchron, damit der Call-Stack von
         //btnPlus_Click sicher zu Ende läuft, bevor das Dropdown disposed wird.
-        BeginInvoke(new Action(() => ActivateNewArrangement(text)));
-
-        return null;
-    }
-
-    private void ActivateNewArrangement(string keyName) {
-        if (IsDisposed) { return; }
-        TableView.Arrangement = keyName;
-        QuickNote.Show(NoteSymbols.Ok, "Erstellt");
-        FloatingForm.Close(cbxColumnArr);
+        BeginInvoke(new Action(() => ActivateNewArrangement(e.Text)));
     }
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
@@ -769,8 +769,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         cbxColumnArr.ItemEditAllowed = combi;
         cbxColumnArr.RemoveAllowed = combi;
         cbxColumnArr.MoveAllowed = combi;
-        cbxColumnArr.AddAllowed = combi ? AddType.UserDef : AddType.None;
-        cbxColumnArr.AddMethod = combi ? CbxColumnArr_AddMethod : null;
+        cbxColumnArr.AddAllowed = combi ? AddType.Text : AddType.None;
         MessageBoxOnError = combi;
         grpAdminAllgemein.Enabled = combi;
 

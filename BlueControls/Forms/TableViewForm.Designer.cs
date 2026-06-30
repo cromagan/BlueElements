@@ -415,6 +415,7 @@ namespace BlueControls.Forms {
             cbxColumnArr.TabIndex = 2;
             cbxColumnArr.ItemClicked += cbxColumnArr_ItemClicked;
             cbxColumnArr.ItemRemoved += cbxColumnArr_ItemRemoved;
+            cbxColumnArr.AddClicked += cbxColumnArr_AddClicked;
             cbxColumnArr.UpDownClicked += cbxColumnArr_UpDownClicked;
             // 
             // grpHilfen

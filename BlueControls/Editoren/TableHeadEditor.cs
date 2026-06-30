@@ -3,6 +3,7 @@
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
+using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueScript.Variables;
 using BlueTable.EventArgs;
@@ -482,7 +483,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    private void lstUniqueValues_AddClicked(object sender, System.EventArgs e) {
+    private void lstUniqueValues_AddClicked(object sender, AddItemEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         var newitem = new UniqueValueDefinition(tb, []);
@@ -493,6 +494,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         lstUniqueValues.UpdateList(tb.UniqueValues);
         lstUniqueValues.Check(newitem.KeyName);
+        e.Cancel = true;
     }
 
     private void lstUniqueValues_ItemCheckedChanged(object sender, System.EventArgs e) {

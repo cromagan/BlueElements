@@ -57,6 +57,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public event EventHandler? DropDownShowing;
 
+    public event EventHandler<AddItemEventArgs>? AddClicked;
+
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
@@ -71,12 +73,6 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     [DefaultValue(AddType.None)]
     public AddType AddAllowed { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ListBox.dAddMethod? AddMethod { get; set; }
 
     [DefaultValue(true)]
     public bool AutoSort {
@@ -209,11 +205,12 @@ public partial class ComboBox : TextBox, ITranslateable {
             y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
 
-        var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, AddAllowed, AddMethod, MoveAllowed, ItemEditAllowed, CustomContextMenuItems);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, AddAllowed, MoveAllowed, ItemEditAllowed, CustomContextMenuItems);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         dropDownMenu.ItemRemoved += DropDownMenu_ItemRemoved;
         dropDownMenu.ItemAddedByClick += DropDownMenu_ItemAddedByClick;
+        dropDownMenu.AddClicked += DropDownMenu_AddClicked;
         dropDownMenu.UpDownClicked += DropDownMenu_UpDownClicked;
         _btnDropDownIsIn = false;
     }
@@ -335,6 +332,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
+    protected virtual void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
+
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     protected virtual void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
@@ -432,6 +431,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (e.Item is { } ali) { _items.Add(ali); }
         OnItemAddedByClick(e);
     }
+
+    private void DropDownMenu_AddClicked(object? sender, AddItemEventArgs e) => OnAddClicked(e);
 
     private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (e.Item is { } bli) {

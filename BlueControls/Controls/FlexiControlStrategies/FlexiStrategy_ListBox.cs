@@ -43,8 +43,8 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.CheckBehavior = CheckBehavior;
         _control.AutoSort = AutoSort;
 
-        if (AddAllowed == AddType.UserDef_NoText) {
-            // UserDef_NoText: ListItems sind Vorschläge für das Hinzufügen-Menü,
+        if (AddAllowed == AddType.Suggestions) {
+            // Suggestions-Modus: ListItems sind Vorschläge für das Hinzufügen-Menü,
             // keine direkten Listeneinträge. Die ausgewählten Werte bleiben als
             // Listeneinträge erhalten und werden mit den passenden Suggestions-Items aktualisiert.
             var currentKeys = _control.Items.Select(i => i.KeyName).ToList();
@@ -55,8 +55,6 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
                 if (AutoSort) { suggestions.Sort(); }
                 _control.Suggestions.AddRange(suggestions);
             }
-
-            _control.AddMethod = SuggestionAddMethod;
 
             _control.ItemClear();
             foreach (var key in currentKeys) {
@@ -97,8 +95,6 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         }
         _control.Check(values, true);
     }
-
-    private AbstractListItem? SuggestionAddMethod(string key) => _control?.Suggestions.GetByKey(key);
 
     private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(string.Join('\r', _control.Checked));
 
