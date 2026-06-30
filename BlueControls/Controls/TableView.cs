@@ -1344,20 +1344,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return result;
     }
 
-    internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem, string style) {
-        if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
-            if (renderer is null) { return RendererOf(columnViewItem.Column, style); }
-
-            renderer.Parse(columnViewItem.RendererSettings);
-            renderer.SheetStyle = style;
-
-            return renderer;
-        }
-
-        return RendererOf(columnViewItem.Column, style);
-    }
-
     internal static void RepairColumnArrangements(Table tb) {
         if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 

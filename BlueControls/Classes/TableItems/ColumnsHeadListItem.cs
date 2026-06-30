@@ -214,10 +214,10 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
-    public BlueFont Font_Head_Colored(ColumnViewItem column) {
-        if (column is not null) {
+    public BlueFont Font_Head_Colored(ColumnViewItem viewItem) {
+        if (viewItem?.Column is { } column) {
             var baseFont = Font_Head_Default;
-            return BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, column.FontColor_Caption, Color.Transparent, Color.Transparent);
+            return BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, column.ForeColor, Color.Transparent, Color.Transparent);
         } else {
             return Font_Head_Default;
         }
