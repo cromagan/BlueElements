@@ -33,7 +33,7 @@ public sealed class CollapesBarListItem : RowBackground {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.CollapsableEnabled()) {
+        if (viewItem.CollapsableEnabled(SheetStyle)) {
             // Anpassen der Reduce-Button-CanvasPosition
 
             var p14 = CollapseButtonSize.CanvasToControl(scale);
@@ -53,7 +53,7 @@ public sealed class CollapesBarListItem : RowBackground {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CollapseButtonSize;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => cvi.CollapsableEnabled() ? "Spalte auf-/zuklappen" : string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => cvi.CollapsableEnabled(SheetStyle) ? "Spalte auf-/zuklappen" : string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CollapseButtonSize, CollapseButtonSize);
 

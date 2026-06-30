@@ -18,17 +18,17 @@ public static class ColumnViewItemRenderingExtensions {
 
     #region Methods
 
-    public static int CanvasContentWidth(this ColumnViewItem cvi) {
+    public static int CanvasContentWidth(this ColumnViewItem cvi, string style) {
         if (cvi.IsDummyColumn) { return ColumnsHeadListItem.DummyColumnWidth; }
         if (_renderingData.TryGetValue(cvi, out var data) && data.CanvasContentWidth is { } v) { return v; }
 
-        var renderer = cvi.GetRenderer(cvi.SheetStyle);
+        var renderer = cvi.GetRenderer(style);
         v = CalculateCanvasContentWith(cvi.Column, renderer);
         _renderingData.GetOrCreateValue(cvi).CanvasContentWidth = v;
         return v;
     }
 
-    public static bool CollapsableEnabled(this ColumnViewItem cvi) => !cvi.IsDummyColumn && (cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded);
+    public static bool CollapsableEnabled(this ColumnViewItem cvi, string style) => !cvi.IsDummyColumn && (cvi.CanvasContentWidth(style) > 40 || !cvi.IsExpanded);
 
     public static void ComputeAllColumnPositions(this ColumnViewCollection cvc, int tableviewWith, float zoom) {
         var collData = _collectionRenderingData.GetOrCreateValue(cvc);
@@ -141,9 +141,12 @@ public static class ColumnViewItemRenderingExtensions {
         if (!cvi.IsExpanded) {
             cw = minw;
         } else {
+            // SheetStyle des Parents verwenden, damit der Renderer mit dem korrekten
+            // Style erzeugt wird (solange er noch nicht gecacht ist).
+            var sheetStyle = parent?.SheetStyle ?? Win11;
             cw = cvi.ViewType == ViewType.PermanentColumn
-                ? Math.Min(cvi.CanvasContentWidth().CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.3))
-                : Math.Min(cvi.CanvasContentWidth().CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
+                ? Math.Min(cvi.CanvasContentWidth(sheetStyle).CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.3))
+                : Math.Min(cvi.CanvasContentWidth(sheetStyle).CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
         }
 
         cw = Math.Max(cw, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom));

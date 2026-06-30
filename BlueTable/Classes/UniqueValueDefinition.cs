@@ -9,7 +9,6 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     #region Fields
 
     private readonly List<ColumnItem> _internal = [];
-    private string? _keyName;
 
     #endregion
 
@@ -18,6 +17,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     public UniqueValueDefinition(Table table, string toParse) {
         Table = table;
         this.Parse(toParse);
+        KeyName = RebuildKeyName();
     }
 
     public UniqueValueDefinition(Table table, List<ColumnItem> columns) {
@@ -25,6 +25,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         foreach (var thisColumn in columns) {
             if (thisColumn is { IsDisposed: false }) { _internal.Add(thisColumn); }
         }
+        KeyName = RebuildKeyName();
     }
 
     #endregion
@@ -34,7 +35,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     public string CaptionForEditor => "Unique-Wert-Definition";
 
     public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
-    public string KeyName => _keyName ??= RebuildKeyName();
+    public string KeyName { get; private set; }
 
     public string QuickInfo => string.Empty;
     public Table Table { get; }
@@ -75,7 +76,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
-        _keyName = null;
+        KeyName = RebuildKeyName();
     }
 
     public override bool ParseThis(string key, string value) {
@@ -117,7 +118,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.
         _internal.RemoveAll(c => c.RelationType != RelationType.None);
 
-        _keyName = null;
+        KeyName = RebuildKeyName();
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Schloss, 16);

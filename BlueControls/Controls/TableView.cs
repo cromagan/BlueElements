@@ -1902,7 +1902,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     return;
                 }
 
-                if (isRealColumn && _mouseOverRowItem is CollapesBarListItem && _mouseOverColumn.CollapsableEnabled()) {
+                if (isRealColumn && _mouseOverRowItem is CollapesBarListItem && _mouseOverColumn.CollapsableEnabled(SheetStyle)) {
                     _mouseOverColumn.IsExpanded = !_mouseOverColumn.IsExpanded;
                     Invalidate_AllViewItems(false);
                     return;
@@ -2648,7 +2648,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var headX = columnviewitem.ControlColumnLeft(OffsetX);
         //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
-        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(), columnviewitem.GetRenderer(SheetStyle));
+        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(SheetStyle), columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;

@@ -2,7 +2,6 @@
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;

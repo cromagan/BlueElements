@@ -224,7 +224,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     }
 
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (!Arrangement?.Table.IsAdministrator() ?? true) { return false; }
+        if (!ca.Table?.IsAdministrator() ?? true) { return false; }
 
         if (clickedColumn?.IsDummyColumn == true && (ca?.Ansichtbearbeitung ?? false)) {
             ShowDummyColumnDropDown(ca, tableView, null);
@@ -232,7 +232,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
         }
 
         if (clickedColumn?.Column is { IsDisposed: false } col) {
-            if (!string.IsNullOrEmpty(col.ErrorReason()) && (Arrangement?.Table.IsAdministrator() ?? false)) {
+            if (!string.IsNullOrEmpty(col.ErrorReason())) {
                 var bs = HeadButtonSize.CanvasToControl(zoom);
                 var btnX = (int)((clickedColumn.ControlColumnWidth() - bs) / 2.0);
                 if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {

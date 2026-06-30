@@ -94,13 +94,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public Table? TableInput {
         get {
             var g = GetFilterFromGet();
-
-            if (g.Count > 0) {
-                if (g[0].TableOutput is { IsDisposed: false } tb) {
-                    return tb;
-                }
-            }
-            return null;
+            return g.Count > 0 ? g[0].TableOutput : null;
         }
     }
 
@@ -254,10 +248,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             // Die _internal, die man noch wählen könnte
             foreach (var thisR in icpi) {
-                if (thisR is ReciverSenderControlPadItem rfp) {
-                    if (rfp != this) {
-                        x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
-                    }
+                if (thisR is ReciverSenderControlPadItem rfp && rfp != this) {
+                    x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                 }
             }
 
@@ -478,6 +470,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     protected static void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
+        _ = edittype;
         Point cap;
         var uc = positionControl.ToRect();
 
