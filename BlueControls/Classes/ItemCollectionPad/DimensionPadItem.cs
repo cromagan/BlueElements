@@ -310,7 +310,9 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (_style != PadStyles.Undefined) {
-            var geszoom = _textScale.CanvasToControl(zoom);
+            var geszoom = (float)Math.Round(_textScale * zoom, 2, MidpointRounding.AwayFromZero); 
+            
+
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;
