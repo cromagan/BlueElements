@@ -64,20 +64,20 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
         [
             new FlexiControlForDelegate(tb),
             new FlexiControlForDelegate(col),
-            new FlexiControl(),
+            //new FlexiControl(),
             new FlexiControlForProperty<bool>(() => cvi.Permanent),
             new FlexiControlForProperty<bool>(() => cvi.Horizontal),
-            new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnHead),
-            new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnCell),
-            new FlexiControlForProperty<Color>(() => cvi.FontColor_Caption),
-            new FlexiControl(),
+            //new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnHead),
+            //new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnCell),
+            //new FlexiControlForProperty<Color>(() => cvi.FontColor_Caption),
             //new FlexiControl(),
-            //new FlexiControlForProperty<string>(() => Column.CaptionGroup1),
-            //new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
-            //new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
-            new FlexiControl(),
-            new FlexiControlForProperty<string>(() => col.QuickInfo, 5),
-            new FlexiControlForProperty<string>(() => col.AdminInfo, 5)
+            ////new FlexiControl(),
+            ////new FlexiControlForProperty<string>(() => Column.CaptionGroup1),
+            ////new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
+            ////new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
+            //new FlexiControl(),
+            //new FlexiControlForProperty<string>(() => col.QuickInfo, 5),
+            //new FlexiControlForProperty<string>(() => col.AdminInfo, 5)
         ];
 
         return result;
@@ -107,7 +107,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
 
         var bmp = new Bitmap((int)CanvasSize.Width, (int)CanvasSize.Height);
         using var gr = Graphics.FromImage(bmp);
-        gr.Clear(CVI.BackColor_ColumnHead);
+        gr.Clear(col.BackColor);
 
         for (var z = 0; z < 3; z++) {
             var n = col.CaptionGroup(z);

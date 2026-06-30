@@ -89,7 +89,7 @@ public static class ColumnViewItemRenderingExtensions {
         var data = GetRenderingData(cvi);
         if (data.Renderer is not null) { return data.Renderer; }
 
-        data.Renderer = TableView.RendererOf(cvi, style);
+        data.Renderer = TableView.RendererOf(cvi.Column, style);
         return data.Renderer;
     }
 

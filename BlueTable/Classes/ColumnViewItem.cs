@@ -21,7 +21,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public ColumnViewItem(ColumnItem column) : this(column.Table) {
         Column = column;
         ViewType = ViewType.Column;
-        Renderer = string.Empty;
+        //Renderer = string.Empty;
     }
 
     public ColumnViewItem(Table? table, string toParse) : this(table) => this.Parse(toParse);
@@ -31,8 +31,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         ViewType = ViewType.None;
         Column = null;
         IsExpanded = true;
-        Renderer = string.Empty;
-        RendererSettings = string.Empty;
+        //Renderer = string.Empty;
+        //RendererSettings = string.Empty;
     }
 
     #endregion
@@ -56,27 +56,27 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     } = Color.Transparent;
 
-    public Color BackColor_ColumnHead {
-        get => Column is not null && field.IsMagentaOrTransparent()
-                ? Column.BackColor.MixColor(Color.LightGray, 0.6)
-                : field;
+    //public Color BackColor_ColumnHead {
+    //    get => Column is not null && field.IsMagentaOrTransparent()
+    //            ? Column.BackColor.MixColor(Color.LightGray, 0.6)
+    //            : field;
 
-        set {
-            if (field.ToArgb() == value.ToArgb()) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = Color.Transparent;
+    //    set {
+    //        if (field.ToArgb() == value.ToArgb()) { return; }
+    //        field = value;
+    //        OnPropertyChanged();
+    //    }
+    //} = Color.Transparent;
 
-    public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
+    //public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
 
     public string Caption => IsDummyColumn ? "Neue Spalte" : Column?.Caption ?? "[Spalte]";
 
-    public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
+    //public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
-    public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
+    //public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
 
-    public string CaptionGroup3 => Column?.CaptionGroup3 ?? string.Empty;
+    //public string CaptionGroup3 => Column?.CaptionGroup3 ?? string.Empty;
 
     public ColumnItem? Column {
         get;
@@ -90,14 +90,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public Color FontColor_Caption {
-        get => Column is not null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
-        set {
-            if (field.ToArgb() == value.ToArgb()) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = Color.Transparent;
+    //public Color FontColor_Caption {
+    //    get => Column is not null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
+    //    set {
+    //        if (field.ToArgb() == value.ToArgb()) { return; }
+    //        field = value;
+    //        OnPropertyChanged();
+    //    }
+    //} = Color.Transparent;
 
     public bool Horizontal {
         get;
@@ -130,33 +130,33 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
     }
 
-    public string Renderer {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
+    //public string Renderer {
+    //    get;
+    //    set {
+    //        if (field == value) { return; }
+    //        field = value;
+    //        OnPropertyChanged();
+    //    }
+    //} = string.Empty;
 
-    public string RendererSettings {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
+    //public string RendererSettings {
+    //    get;
+    //    set {
+    //        if (field == value) { return; }
+    //        field = value;
+    //        OnPropertyChanged();
+    //    }
+    //} = string.Empty;
 
-    [DefaultValue(Win11)]
-    public string SheetStyle {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = Win11;
+    //[DefaultValue(Win11)]
+    //public string SheetStyle {
+    //    get;
+    //    set {
+    //        if (field == value) { return; }
+    //        field = value;
+    //        OnPropertyChanged();
+    //    }
+    //} = Win11;
 
     public Table? Table { get; }
 
@@ -194,19 +194,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
 
-        if (Column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
-            result.ParseableAdd("Renderer", Renderer);
-            result.ParseableAdd("RendererSettings", RendererSettings);
-        }
+        //if (Column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+        //    result.ParseableAdd("Renderer", Renderer);
+        //    result.ParseableAdd("RendererSettings", RendererSettings);
+        //}
 
-        if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != BackColor_ColumnHead.ToArgb || !BackColor_ColumnCell.IsMagentaOrTransparent()) {
-            result.ParseableAdd("BackColorColumnHead", BackColor_ColumnHead);
-            result.ParseableAdd("BackColorColumnCell", BackColor_ColumnCell);
-        }
+        //if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != BackColor_ColumnHead.ToArgb || !BackColor_ColumnCell.IsMagentaOrTransparent()) {
+        //    result.ParseableAdd("BackColorColumnHead", BackColor_ColumnHead);
+        //    result.ParseableAdd("BackColorColumnCell", BackColor_ColumnCell);
+        //}
 
-        if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != FontColor_Caption.ToArgb || !FontColor_Caption.IsMagentaOrTransparent()) {
-            result.ParseableAdd("FontColorCaption", FontColor_Caption);
-        }
+        //if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != FontColor_Caption.ToArgb || !FontColor_Caption.IsMagentaOrTransparent()) {
+        //    result.ParseableAdd("FontColorCaption", FontColor_Caption);
+        //}
 
         result.ParseableAdd("FontHorizontal", Horizontal);
 
@@ -237,23 +237,23 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 return true;
 
             case "renderer":
-                Renderer = value;
+                //Renderer = value;
                 return true;
 
             case "renderersettings":
-                RendererSettings = value.FromNonCritical();
+                //RendererSettings = value.FromNonCritical();
                 return true;
 
             case "backcolorcolumnhead":
-                BackColor_ColumnHead = ColorParse(value);
+                //BackColor_ColumnHead = ColorParse(value);
                 return true;
 
             case "backcolorcolumncell":
-                BackColor_ColumnCell = ColorParse(value);
+                //BackColor_ColumnCell = ColorParse(value);
                 return true;
 
             case "fontcolorcaption":
-                FontColor_Caption = ColorParse(value);
+                //FontColor_Caption = ColorParse(value);
                 return true;
 
             case "fonthorizontal":

@@ -53,7 +53,7 @@ public sealed class RowListItem : RowBackground {
     #region Methods
 
     public static void ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
-        switch (viewItem.BackgroundStyle) {
+        switch (viewItem.Column?.BackgroundStyle ?? ColumnBackgroundStyle.None) {
             case ColumnBackgroundStyle.None:
             case ColumnBackgroundStyle.Brighten:
             case ColumnBackgroundStyle.Darken:
@@ -82,7 +82,7 @@ public sealed class RowListItem : RowBackground {
     }
 
     public static void ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
-        switch (viewItem.BackgroundStyle) {
+        switch (viewItem.Column?.BackgroundStyle ?? ColumnBackgroundStyle.None) {
             case ColumnBackgroundStyle.None:
             case ColumnBackgroundStyle.PopIn:
             case ColumnBackgroundStyle.PopOut:
