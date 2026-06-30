@@ -313,7 +313,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "permissiongroups":
                 _permissionGroups_show.Clear();
-                _permissionGroups_show.AddRange(value.FromNonCritical().SplitByCr());
+                _permissionGroups_show.AddRange(value.FromNonCritical().SplitAndCutBy("|"));
                 return true;
 
             case "showhead":

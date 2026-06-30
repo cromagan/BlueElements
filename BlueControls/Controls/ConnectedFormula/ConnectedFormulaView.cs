@@ -410,10 +410,12 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
 
-        if (_generated) {
-            InvalidateView();
-            _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-        }
+        // Größe hat sich geändert — Controls immer neu positionieren,
+        // solange das Formular geladen ist. GenerateView() hat alle nötigen
+        // Guards (Visible, Page, Mindestgröße), ein frühes `return' dort
+        // darf nicht verhindern, dass bei der nächsten Gelegenheit resized wird.
+        InvalidateView();
+        _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
