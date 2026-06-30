@@ -268,38 +268,27 @@ public static partial class Extensions {
         }
     }
 
-    public static void Magnify(this Bitmap sourceBmp, PointF point, Graphics gr, bool swapX) {
-        const int w1 = 200;
+    public static void Magnify(this Bitmap sourceBmp, PointF sourcePoint, Rectangle destRect, Graphics gr) {
         const int w5 = 10;
-        int x;
-        if (!swapX) {
-            x = 150 - (int)(w1 / 2.0);
-            if (point.X < sourceBmp.Width / 2.0) { x = sourceBmp.Width - 150 - (int)(w1 / 2.0); }
-        } else {
-            x = sourceBmp.Width - 150 - (int)(w1 / 2.0);
-            if (point.X < sourceBmp.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
-        }
-        var y = 150 - (int)(w1 / 2.0);
-        if (point.Y < sourceBmp.Height / 2.0) { y = sourceBmp.Height - 150 - (int)(w1 / 2.0); }
-        var r = new Rectangle(x, y, w1, w1);
+
         for (var z = 5; z >= 0; z--) {
-            r.Inflate(1, 1);
             var w = Convert.ToByte(255 / (double)10 * z);
             using var fadePen = new Pen(Color.FromArgb(w, 0, 0, 0));
-            gr.DrawRectangle(fadePen, r);
+            gr.DrawRectangle(fadePen, Rectangle.Inflate(destRect, 6 - z, 6 - z));
         }
-        r.Inflate(-5, -5);
+
         gr.InterpolationMode = InterpolationMode.NearestNeighbor;
         gr.PixelOffsetMode = PixelOffsetMode.Half;
-        gr.DrawImage(sourceBmp, r, new Rectangle((int)point.X - w5, (int)point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
-        gr.DrawRectangle(Pens.Black, r);
-        var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
+        gr.DrawImage(sourceBmp, destRect, new Rectangle((int)sourcePoint.X - w5, (int)sourcePoint.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
+        gr.DrawRectangle(Pens.Black, destRect);
+
+        var mitte = destRect.PointOf(Alignment.Horizontal_Vertical_Center);
         using var crossPen = new Pen(Color.FromArgb(128, 255, 255, 255), 3);
         gr.DrawLine(crossPen, mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
         gr.DrawLine(crossPen, mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
         using var guidePen = new Pen(Color.FromArgb(20, 255, 0, 0));
-        gr.DrawLine(guidePen, mitte.X, r.Top, mitte.X, r.Bottom);
-        gr.DrawLine(guidePen, r.Left, mitte.Y, r.Right, mitte.Y);
+        gr.DrawLine(guidePen, mitte.X, destRect.Top, mitte.X, destRect.Bottom);
+        gr.DrawLine(guidePen, destRect.Left, mitte.Y, destRect.Right, mitte.Y);
         gr.DrawLine(Pens.Red, mitte.X, mitte.Y - 6, mitte.X, mitte.Y + 5);
         gr.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }

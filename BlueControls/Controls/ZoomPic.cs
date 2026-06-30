@@ -245,7 +245,20 @@ public partial class ZoomPic : CreativePad {
         PrintInfoText(gr, CurrentMouseData);
 
         if (Helper.HasFlag(Helpers.Magnifier) && Bmp is not null && CurrentMouseData is not null) {
-            Bmp.Magnify(CurrentMouseData.CanvasPoint, gr, false);
+            const int magnifierSize = 200;
+            const int magnifierMargin = 50;
+
+            var visibleArea = AvailableControlPaintArea;
+            var mouseControl = CurrentMouseData.ControlPoint;
+
+            var mx = mouseControl.X < visibleArea.Left + visibleArea.Width / 2.0
+                ? visibleArea.Right - magnifierMargin - magnifierSize
+                : visibleArea.Left + magnifierMargin;
+            var my = mouseControl.Y < visibleArea.Top + visibleArea.Height / 2.0
+                ? visibleArea.Bottom - magnifierMargin - magnifierSize
+                : visibleArea.Top + magnifierMargin;
+
+            Bmp.Magnify(CurrentMouseData.CanvasPoint, new Rectangle(mx, my, magnifierSize, magnifierSize), gr);
         }
     }
 
