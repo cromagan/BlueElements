@@ -198,7 +198,7 @@ public abstract class Method : IReadableTextWithKey {
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt[..oo], ld, varCol, scp);
             if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, ld);
+                return new DoItFeedback($"Befehls-Berechnungsfehler vor ||: {txt[..oo]}", txt1.NeedsScriptFix, ld);
             }
 
             if (txt1.ReturnValue is VariableBool { ValueBool: true }) {

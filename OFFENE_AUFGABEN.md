@@ -257,3 +257,48 @@ Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern
 ##Aufgabe
 Alls Json convertierungen in ParseThisJson    wie   _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
 in value.GetBoolean() direkt abändern
+
+##Aufgabe
+VariableEditor.cs modifizierenn, dass mehrzeilige Werte angezeigt werden (Renderer), gespeichert und geladen werden können.
+
+##Aufgabe
+Wenn in der Tabelle eine Zeile einzeilig angezeigt wird, beim Bearbeiten aber Mehrzeilig ust, das Fenster zum Tippen etwas größer machen
+
+##Aufgabe
+Fährt man in der Listbox über den Hinzufügen Button, bleibt das letzte Item "Mouseover"
+
+##Aufgabe
+In Filtern muss der Mousover Effekt so wie in der Listbox sein, dass man einen unterschied zum markierten erkennt.
+
+##Aufgabe
+Bei den Skripten stimmen die Angabe der Fehlerhaften zeile nicht mehr. Pro IF ist der Wert eine zu wenig.
+Prüfe auch Try und andere Calls
+
+##Aufgabe
+Ich habe ein problem, dass in Skripten manche Routinen unterschiedliche Variablen hinzugefügt werden können.
+Im syntax Check kann es aber sein, dass diese Routinen das nicht tun. Danach läuft der Syntaxcheck immer auf Fehler, weil verschiedenste Routinen den Synatx-Check nicht mehr ausführen können. Hast du eine Idee?
+
+##Aufgabe
+Aktuelle Ansicht fehlerhaft.
+Entweder "Ansicht nicht definiert" ODER
+bei Admin, die Dummy-Spalte (zum hinzufügen neuer Ansichten) anzeigen
+
+##Aufgabe
+Lade Chunk ... von .... 
+bleibt ab und zu hängen.
+Ab und zu geht dieh Uhrzeit auch weiter.
+1) Suche den Bug, warum es hängt.
+2) Mach eine Meldung in der Status-Leiste, warum es hängt (Wenn die uhrzeit weitergeht)
+
+##Aufgabe
+ZoomPad soll bei Mausrad da hinzoomen, wo die maus ist. Jedesmal, wenn ich zoome, ist es wieder resetedt
+
+##Aufgabe
+Der Button "Ausrichten" bei den Tools regiert nicht.
+
+##Aufgabe
+Der Radiergummi in der Stift soll PIXELGENAU angeziegt werden, nicht als kreis. Dann stimmen die Pixel nicht überein.
+Zudem einen Slider, der die Größe ändern kann.
+
+##Aufgabe
+Pad Lininen Items stehen über den erlaubten Zeichenbereich hinaus.
