@@ -10,9 +10,10 @@ internal class Method_Min : Method {
     public override List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "min";
 
-    public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
+    public override string Description => "Gibt von den angegebenen Werten den mit dem niedrigsten Wert zurück.\r\n" +
                                             "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
-                                            "Ist das nicht möglich, wird der Text ignoriert.";
+                                            "Ist das nicht möglich, wird der Text ignoriert.\r\n" +
+                                            "Eine angegebene Liste muss mindestens einen Eintrag enthalten.";
 
     public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override bool MustUseReturnValue => true;
@@ -38,6 +39,9 @@ internal class Method_Min : Method {
                     break;
 
                 case VariableListString vl:
+                    if (vl.ValueList is not { Count: > 0 }) {
+                        return new DoItFeedback("Eine angegebene Liste enthält keine Werte.", true, ld);
+                    }
                     foreach (var thiss in vl.ValueList) {
                         if (DoubleTryParse(thiss, out var r2)) {
                             l.Add(r2);

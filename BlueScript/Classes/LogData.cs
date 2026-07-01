@@ -4,6 +4,12 @@ namespace BlueScript.Classes;
 
 public class LogData {
 
+    #region Fields
+
+    private readonly List<string> _syntaxCheckUnknownVariables = [];
+
+    #endregion
+
     #region Constructors
 
     public LogData(string subname, int linestart) {
@@ -42,6 +48,14 @@ public class LogData {
 
         Line += c;
     }
+
+    public void RegisterSyntaxCheckUnknownVariable(string name) {
+        if (!_syntaxCheckUnknownVariables.Contains(name, StringComparer.OrdinalIgnoreCase)) {
+            _syntaxCheckUnknownVariables.Add(name);
+        }
+    }
+
+    public List<string> SyntaxCheckUnknownVariables() => [.. _syntaxCheckUnknownVariables.OrderBy(x => x)];
 
     #endregion
 }

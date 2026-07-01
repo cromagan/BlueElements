@@ -103,6 +103,7 @@ public class Script {
         #region Befehle prüfen mit Lookup - CanDo und DoIt kombiniert (erster erfolgreiche Kandidat gewinnt)
 
         DoItFeedback? firstResult = null;
+        var firstResultPos = pos;
 
         if (idEnd > pos && scp.MethodLookup.TryGetValue(scriptText[pos..idEnd], out var matchingMethods)) {
             foreach (var thisC in matchingMethods) {
@@ -112,7 +113,10 @@ public class Script {
 
                 // CanDo erfolgreich → sofort DoIt ausführen
                 var scx = thisC.DoIt(varCol, f, scp);
-                firstResult ??= scx;
+                if (firstResult is null) {
+                    firstResult = scx;
+                    firstResultPos = f.ContinueOrErrorPosition;
+                }
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
                     return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
@@ -133,7 +137,10 @@ public class Script {
                 if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
                 var scx = thisC.DoIt(varCol, f, scp);
-                firstResult ??= scx;
+                if (firstResult is null) {
+                    firstResult = scx;
+                    firstResultPos = f.ContinueOrErrorPosition;
+                }
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
                     return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
@@ -146,7 +153,7 @@ public class Script {
             // (ggf. mit korrekten Sub-Skript-Zeilennummern via CallSub) bereits gesetzt.
             // Ein erneutes ld.ErrorMessage würde ld.Protocol überschreiben und die
             // Zeilennummer des Sub-Skripts verwerfen (Bug: "pro IF eine Zeile zu wenig").
-            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue);
+            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, firstResultPos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue);
         }
 
         #endregion
@@ -223,12 +230,29 @@ public class Script {
         Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
 
         var t = Stopwatch.StartNew();
+        var syntaxErrors = new List<string>();
 
         do {
             if (pos >= normalizedScriptText.Length) {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
-                return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, string.Empty, null);
+                var unknownVars = ld.SyntaxCheckUnknownVariables();
+                var protocol = ld.Protocol;
+
+                if (unknownVars.Count > 0) {
+                    protocol += "\r\n\r\nUnbekannte Variablen (vermutlich datenabhängig, nur beim SyntaxCheck):\r\n" +
+                                string.Join("\r\n", unknownVars.Select(v => "  " + v));
+                }
+
+                if (syntaxErrors.Count > 0) {
+                    return new ScriptEndedFeedback(varCol, protocol, true, false, false, string.Join("\r\n", syntaxErrors), null) {
+                        SyntaxCheckUnknownVariables = unknownVars
+                    };
+                }
+
+                return new ScriptEndedFeedback(varCol, protocol, false, false, false, string.Empty, null) {
+                    SyntaxCheckUnknownVariables = unknownVars
+                };
             }
 
             if (normalizedScriptText[pos] == '¶') {
@@ -238,11 +262,17 @@ public class Script {
                 var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
-                    if (!scp.SyntaxCheck || scx.NeedsScriptFix) {
-                        // SyntaxCheck darf bei einfachen Fails nicht aufgeben, sonst werden echte Fehler nicht angezeigt
+                    if (!scp.SyntaxCheck) {
+                        // Echte Ausführung: Bei jedem Fehler stoppen
                         Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
-                        return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
+                        return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null) {
+                            SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
+                        };
                     }
+                    // Syntax-Check: Fehler protokollieren und weitermachen,
+                    // damit nachfolgender Code ebenfalls geprüft werden kann.
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Fehler übergangen (SyntaxCheck): {scx.FailedReason}", scp.Stufe);
+                    syntaxErrors.Add($"[{ld.Subname}, Zeile {ld.Line}] {scx.FailedReason}");
                 }
 
                 pos = scx.Position;
@@ -250,18 +280,24 @@ public class Script {
                 // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
                 if (pos <= previousPos) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null) {
+                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
+                    };
                 }
 
                 ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (scx.BreakFired) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null) {
+                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
+                    };
                 }
 
                 if (scx.ReturnFired) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue) {
+                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
+                    };
                 }
             }
 
@@ -271,7 +307,9 @@ public class Script {
 
                 if (!string.IsNullOrEmpty(f)) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null) {
+                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
+                    };
                 }
             }
         } while (true);

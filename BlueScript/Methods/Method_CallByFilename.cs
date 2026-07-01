@@ -59,6 +59,11 @@ public class Method_CallByFilename : Method {
 
         var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, null);
 
+        // Unknown-Variables-Tracking aus dem Sub-Skript zurückpropagieren
+        foreach (var u in scx.SyntaxCheckUnknownVariables) {
+            ld.RegisterSyntaxCheckUnknownVariable(u);
+        }
+
 
         if (scx.Failed) {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden

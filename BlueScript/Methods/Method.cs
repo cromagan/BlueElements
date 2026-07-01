@@ -179,7 +179,19 @@ public abstract class Method : IReadableTextWithKey {
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, Brackets);
         if (uu > 0) {
             var scx = GetVariableByParsing(txt[..uu], ld, varCol, scp);
-            if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
+            if (scx.Failed || scx.ReturnValue is null) {
+                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt[..uu]}", true, ld);
+                return scx;
+            }
+
+            // Während des SyntaxChecks gilt VariableUnknown als Wildcard.
+            // Beide Seiten parsen, damit der gesamte Ausdruck geprüft wird.
+            if (scx.ReturnValue is VariableUnknown) {
+                if (scp.SyntaxCheck) {
+                    var right = GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
+                    if (right.Failed) { return right; }
+                    return scx;
+                }
                 scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt[..uu]}", true, ld);
                 return scx;
             }
@@ -197,8 +209,19 @@ public abstract class Method : IReadableTextWithKey {
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, Brackets);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt[..oo], ld, varCol, scp);
-            if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
+            if (txt1.Failed || txt1.ReturnValue is null) {
                 return new DoItFeedback($"Befehls-Berechnungsfehler vor ||: {txt[..oo]}", txt1.NeedsScriptFix, ld);
+            }
+
+            // Während des SyntaxChecks gilt VariableUnknown als Wildcard.
+            // Beide Seiten parsen, damit der gesamte Ausdruck geprüft wird.
+            if (txt1.ReturnValue is VariableUnknown) {
+                if (scp.SyntaxCheck) {
+                    var right = GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
+                    if (right.Failed) { return right; }
+                    return txt1;
+                }
+                return new DoItFeedback($"Befehls-Berechnungsfehler vor ||: {txt[..oo]}", true, ld);
             }
 
             if (txt1.ReturnValue is VariableBool { ValueBool: true }) {
@@ -253,6 +276,9 @@ public abstract class Method : IReadableTextWithKey {
         foreach (var thisVt in Variable.VarTypes.Instances) {
             if (thisVt.GetFromStringPossible) {
                 if (thisVt.TryParse(txt, out var v) && v is not null) {
+                    if (scp.SyntaxCheck && v is VariableUnknown) {
+                        RegisterSyntaxCheckUnknownsFromText(txt, ld);
+                    }
                     return new DoItFeedback(v);
                 }
             }
@@ -619,6 +645,52 @@ public abstract class Method : IReadableTextWithKey {
         if (attributText.Trim() is not { Length: > 0 } varName) { return; }
         if (!Variable.IsValidName(varName)) { return; }
         varCol.Add(new VariableUnknown(varName, true, "Dummy für SyntaxCheck"));
+    }
+
+    /// <summary>
+    /// Registriert während eines SyntaxChecks alle potentiellen Variablennamen,
+    /// die in einem nicht auflösbaren Ausdruck enthalten sind.
+    /// String-Literale (in Anführungszeichen) werden dabei übersprungen.
+    /// Beispiele: "qrrq" → qrrq; "qrrq+\"kk\"" → qrrq (nicht kk).
+    /// </summary>
+    private static void RegisterSyntaxCheckUnknownsFromText(string txt, LogData ld) {
+        if (Variable.IsValidName(txt)) {
+            ld.RegisterSyntaxCheckUnknownVariable(txt);
+            return;
+        }
+
+        var inQuote = false;
+        var tokenStart = -1;
+
+        for (var i = 0; i <= txt.Length; i++) {
+            var c = i < txt.Length ? txt[i] : '\0';
+
+            if (c == '"') {
+                FlushToken(txt, tokenStart, i, ld);
+                tokenStart = -1;
+                inQuote = !inQuote;
+                continue;
+            }
+
+            if (inQuote) { continue; }
+
+            if (i < txt.Length && BlueBasics.ClassesStatic.Constants.AllowedCharsVariableName.Contains(c)) {
+                // Token nur starten, wenn es mit Buchstabe oder Unterstrich beginnt.
+                // Ziffern setzen ein vorhandenes Token fort, starten aber kein neues.
+                if (tokenStart < 0 && !char.IsDigit(c)) { tokenStart = i; }
+            } else {
+                FlushToken(txt, tokenStart, i, ld);
+                tokenStart = -1;
+            }
+        }
+    }
+
+    private static void FlushToken(string txt, int start, int end, LogData ld) {
+        if (start < 0 || end <= start) { return; }
+        var name = txt[start..end];
+        if (Variable.IsValidName(name)) {
+            ld.RegisterSyntaxCheckUnknownVariable(name);
+        }
     }
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp, LogData ld) {
