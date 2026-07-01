@@ -92,8 +92,10 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
     }
 
     private void btnAusrichten_Click(object sender, System.EventArgs e) {
+        if (OnNeedCurrentPic() is null) { return; }
         _ausricht = true;
         OnDoInvalidate();
+        Notification.Show("Auf dem Bild eine Linie entlang der Kante ziehen,<br>die waagerecht oder senkrecht ausgerichtet werden soll.", ImageCode.Information);
     }
 
     private void btnDrehenL_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.Rotate270FlipNone);

@@ -142,7 +142,11 @@ public class Script {
         }
 
         if (firstResult is not null) {
-            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue, ld);
+            // Bewusst OHNE ld: firstResult stammt aus DoIt und hat ld.Protocol
+            // (ggf. mit korrekten Sub-Skript-Zeilennummern via CallSub) bereits gesetzt.
+            // Ein erneutes ld.ErrorMessage würde ld.Protocol überschreiben und die
+            // Zeilennummer des Sub-Skripts verwerfen (Bug: "pro IF eine Zeile zu wenig").
+            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue);
         }
 
         #endregion

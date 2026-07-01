@@ -36,6 +36,7 @@ namespace BlueControls.Controls
             btnDown.TabIndex = 51;
             btnDown.Visible = false;
             btnDown.Click += btnDown_Click;
+            btnDown.MouseEnter += Sibling_MouseEnter;
             // 
             // btnEdit
             // 
@@ -47,6 +48,7 @@ namespace BlueControls.Controls
             btnEdit.TabIndex = 51;
             btnEdit.Visible = false;
             btnEdit.Click += btnEdit_Click;
+            btnEdit.MouseEnter += Sibling_MouseEnter;
             // 
             // btnUp
             // 
@@ -58,6 +60,7 @@ namespace BlueControls.Controls
             btnUp.TabIndex = 50;
             btnUp.Visible = false;
             btnUp.Click += btnUp_Click;
+            btnUp.MouseEnter += Sibling_MouseEnter;
             // 
             // btnPlus
             // 
@@ -70,6 +73,7 @@ namespace BlueControls.Controls
             btnPlus.TabIndex = 48;
             btnPlus.Visible = false;
             btnPlus.Click += btnPlus_Click;
+            btnPlus.MouseEnter += Sibling_MouseEnter;
             // 
             // btnMinus
             // 
@@ -82,6 +86,7 @@ namespace BlueControls.Controls
             btnMinus.TabStop = false;
             btnMinus.Visible = false;
             btnMinus.Click += btnMinus_Click;
+            btnMinus.MouseEnter += Sibling_MouseEnter;
             // 
             // lstBox
             // 
@@ -104,6 +109,7 @@ namespace BlueControls.Controls
             txtAdd.Visible = false;
             txtAdd.TextChanged += AddInput_TextChanged;
             txtAdd.EnterKey += AddInput_EnterKey;
+            txtAdd.MouseEnter += Sibling_MouseEnter;
             // 
             // cbxAdd
             // 
@@ -115,6 +121,7 @@ namespace BlueControls.Controls
             cbxAdd.Visible = false;
             cbxAdd.TextChanged += AddInput_TextChanged;
             cbxAdd.ItemAddedByClick += CbxAdd_ItemAddedByClick;
+            cbxAdd.MouseEnter += Sibling_MouseEnter;
             // 
             // ListBox
             // 

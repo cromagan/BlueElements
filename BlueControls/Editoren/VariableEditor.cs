@@ -48,8 +48,8 @@ public partial class VariableEditor : EditorEasy {
         if (na is { IsDisposed: false }) { na.IsFirst = true; }
         tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder_TextOneLine.Instance, "Variablentyp");
         tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder_Bit.Instance, "Readonly, Schreibgeschützt");
-        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_TextOneLine.Instance, "Inhalt");
-        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder_TextOneLine.Instance, "Kommentar");
+        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_TextMultiline.Instance, "Inhalt");
+        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder_TextMultiline.Instance, "Kommentar");
 
         tb.Column.DisableAllEditing();
 
@@ -61,7 +61,6 @@ public partial class VariableEditor : EditorEasy {
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 is not null) {
                     thisColumn2.EditableWithTextInput = true;
-                    thisColumn2.MultiLine = false;
                     thisColumn2.PermissionGroupsChangeCell = new([Constants.Everybody]);
                 }
             }

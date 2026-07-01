@@ -226,7 +226,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
         if (!ca.Table?.IsAdministrator() ?? true) { return false; }
 
-        if (clickedColumn?.IsDummyColumn == true && (ca?.Ansichtbearbeitung ?? false)) {
+        if (clickedColumn?.IsDummyColumn == true) {
             ShowDummyColumnDropDown(ca, tableView, null);
             return true;
         }

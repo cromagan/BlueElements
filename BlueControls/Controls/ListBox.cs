@@ -330,6 +330,14 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         }
     }
 
+    // lstBox liegt mit Dock=Fill hinter den Sibling-Buttons (btnPlus, txtAdd, ...).
+    // Its OnMouseLeave hält die Maus für "noch innerhalb" und cleart den MouseOver
+    // nicht. Beim Betreten eines Sibling-Buttons hier explizit zurücksetzen,
+    // sonst bliebe das letzte Item optisch im MouseOver-Zustand.
+    private void Sibling_MouseEnter(object? sender, System.EventArgs e) {
+        if (lstBox is { IsDisposed: false }) { lstBox.DoMouseMovement(-1, -1); }
+    }
+
     private void CbxAdd_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) { }
 
     private void ClearAddInput() {

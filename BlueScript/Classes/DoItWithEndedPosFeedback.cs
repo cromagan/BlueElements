@@ -11,6 +11,13 @@ public class DoItWithEndedPosFeedback : DoItFeedback {
 
     public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData ld) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, ld) => Position = endpos;
 
+    /// <summary>
+    /// Nutzt den protected Base-Konstruktor OHNE LogData-Seiteneffekt.
+    /// Wird gebraucht, wenn firstResult bereits von DoIt/CallSub ein vollständiges
+    /// Protokoll in ld geschrieben hat und dieses nicht überschrieben werden darf.
+    /// </summary>
+    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) => Position = endpos;
+
     public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData ld) : base(failedReason, needsScriptFix, ld) { }
 
     #endregion

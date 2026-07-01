@@ -433,9 +433,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         logZoom += step;
         Zoom = (float)Math.Pow(2, logZoom);
 
-        // Fokuspunkt-Korrektur
-        OffsetX =(int)( m.CanvasX * Zoom - e.X);
-        OffsetY =(int)( m.CanvasY * Zoom - e.Y);
+        UpdateSliderBounds();
+
+        // Fokuspunkt-Korrektur: Canvas-Punkt unter der Maus soll dort bleiben
+        OffsetX = (int)(e.X - m.CanvasX * Zoom);
+        OffsetY = (int)(e.Y - m.CanvasY * Zoom);
     }
 
 

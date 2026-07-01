@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using static BlueTable.Classes.Chunk;
 using static BlueBasics.Interfaces.IHasKeyNameExtension;
 
@@ -126,6 +127,15 @@ public class TableChunk : TableFile {
     /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
     /// </summary>
     private bool _systemChunksVerified;
+
+    /// <summary>
+    /// Reentrancy-Sperre für <see cref="BeSureToBeUpToDate"/>: 0 = frei, 1 = läuft.
+    /// Der statische <c>_tableUpdateTimer</c> (alle 5 Min.) sowie UI-Aktionen können
+    /// die Methode zeitgleich aufrufen. Ohne Sperre überlappen sich die Aufrufe,
+    /// erzeugen doppelte "Lade Chunk..."-Meldungen (Statusleiste friert ein,
+    /// "Uhrzeit läuft weiter") und stapeln sich zu einem effektiven Hängende.
+    /// </summary>
+    private int _isRefreshingChunks;
 
     #endregion
 
@@ -451,54 +461,73 @@ public class TableChunk : TableFile {
         if (IsDisposed || !DropMessages) { return true; }
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
-        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
-
-        if (firstTime) {
-            if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
+        // Reentrancy-Sperre: Der statische _tableUpdateTimer (alle 5 Min.) sowie
+        // UI-Aktionen (Button-Klicks, Editoren) können BeSureToBeUpToDate zeitgleich
+        // aufrufen. Ohne Sperre würden sich die Aufrufe überlappen, doppelte
+        // "Lade Chunk..."-Meldungen erzeugen und die Statusleiste mit ständig
+        // neuen Zeitstempeln fluten ("Uhrzeit läuft weiter"). Bei langsamen
+        // Netzwerken stapeln sich weitere Timer-Ticks und verschärfen den Effekt
+        // bis zum scheinbaren Einfrieren.
+        if (Interlocked.CompareExchange(ref _isRefreshingChunks, 1, 0) != 0) {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Aktualisierung von '{KeyName}' läuft bereits — übersprungen, um eine Überlagerung zu vermeiden", 0);
+            return true;
         }
 
-        var loaded = false;
-        var ok = true;
+        try {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
 
-        OnLoading();
+            if (firstTime) {
+                if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
+            }
 
-        if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData);
-            if (result.IsFailed) { return false; }
-            loaded = result.Value is true;
+            var loaded = false;
+            var ok = true;
+
+            OnLoading();
+
+            if (!firstTime) {
+                var result = LoadChunkWithChunkId(Chunk_MainData);
+                if (result.IsFailed) {
+                    Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}", 0);
+                    return false;
+                }
+                loaded = result.Value is true;
+            }
+
+            Column.GetSystems();
+
+            List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
+
+            foreach (var item in list) {
+                // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
+                // Im Gegensatz zur regulären Chunk-Verwaltung gibt es hier kein CachedFileSystem, das
+                // neu erscheinende Dateien automatisch erkennt. Ohne diese Prüfung
+                // würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
+                // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
+                // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
+                // (Already-Current-Check via Dateiname-Vergleich).
+                var result = LoadChunkWithChunkId(item);
+                loaded = loaded || result.Value is true;
+                ok = ok && result.IsSuccessful;
+            }
+
+            loaded = loaded || RefreshLoadedChunks(firstTime);
+
+            if (loaded) { OnLoaded(firstTime, true); }
+
+            // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
+            // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.
+            // TryToSetMeTemporaryMaster selbst klärt über NewMasterPossible, ob ein
+            // Master-Wechsel überhaupt möglich ist.
+            if (ok && (firstTime || DateTime.UtcNow.Subtract(_lastMasterAttemptUtc).TotalMinutes >= MasterCheckIntervalMinutes)) {
+                _lastMasterAttemptUtc = DateTime.UtcNow;
+                TryToSetMeTemporaryMaster();
+            }
+
+            return ok;
+        } finally {
+            Interlocked.Exchange(ref _isRefreshingChunks, 0);
         }
-
-        Column.GetSystems();
-
-        List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
-
-        foreach (var item in list) {
-            // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
-            // Im Gegensatz zur regulären Chunk-Verwaltung gibt es hier kein CachedFileSystem, das
-            // neu erscheinende Dateien automatisch erkennt. Ohne diese Prüfung
-            // würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
-            // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
-            // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
-            // (Already-Current-Check via Dateiname-Vergleich).
-            var result = LoadChunkWithChunkId(item);
-            loaded = loaded || result.Value is true;
-            ok = ok && result.IsSuccessful;
-        }
-
-        loaded = loaded || RefreshLoadedChunks(firstTime);
-
-        if (loaded) { OnLoaded(firstTime, true); }
-
-        // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
-        // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.
-        // TryToSetMeTemporaryMaster selbst klärt über NewMasterPossible, ob ein
-        // Master-Wechsel überhaupt möglich ist.
-        if (ok && (firstTime || DateTime.UtcNow.Subtract(_lastMasterAttemptUtc).TotalMinutes >= MasterCheckIntervalMinutes)) {
-            _lastMasterAttemptUtc = DateTime.UtcNow;
-            TryToSetMeTemporaryMaster();
-        }
-
-        return ok;
     }
 
     /// <summary>

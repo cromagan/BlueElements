@@ -11,6 +11,8 @@ public partial class Tool_Eraser : GenericTool {
 
     private static readonly Brush BrushRedTranspOverlay = new SolidBrush(ColorRedTransp);
 
+    private int _brushSize = 4;
+
     #endregion
 
     #region Constructors
@@ -25,9 +27,7 @@ public partial class Tool_Eraser : GenericTool {
         if (mouseCurrent is null) { return; }
 
         if (Razi.Checked) {
-            var r = 3 * zoom;
-            var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
-            gr.FillEllipse(BrushRedTranspOverlay, p.X - r, p.Y - r, r * 2, r * 2);
+            DrawPixelExactCircle(gr, zoom, offsetX, offsetY, mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY, _brushSize - 1, BrushRedTranspOverlay);
         }
 
         if (!DrawBox.Checked || mouseDown is null) {
@@ -64,7 +64,7 @@ public partial class Tool_Eraser : GenericTool {
             if (Razi.Checked) {
                 var pic = OnNeedCurrentPic();
                 if (pic is null) { return; }
-                pic.FillCircle(Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
+                pic.FillCircle(Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, _brushSize - 1);
             }
         }
         OnDoInvalidate();
@@ -93,6 +93,12 @@ public partial class Tool_Eraser : GenericTool {
     }
 
     private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
+
+    private void sldSize_ValueChanged(object sender, System.EventArgs e) {
+        _brushSize = (int)Math.Round(sldSize.Value, MidpointRounding.AwayFromZero);
+        capSize.Text = _brushSize.ToString1();
+        OnDoInvalidate();
+    }
 
     #endregion
 }

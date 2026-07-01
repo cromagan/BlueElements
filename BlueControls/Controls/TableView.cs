@@ -165,7 +165,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (field is { IsDisposed: false }) {
                 field.Ansichtbearbeitung = Ansichtbearbeitung;
-                if (Ansichtbearbeitung) {
+
+                // Die Dummy-Spalte wird eingeblendet, wenn die Ansichtbearbeitung
+                // aktiv ist. Zusätzlich bei Admins, deren Ansicht keine echten Spalten
+                // enthält, damit sie eine neue Ansicht aufbauen können.
+                var showDummy = Ansichtbearbeitung
+                    || (tb.IsAdministrator() && tb.Column.Count > 0 && field.First() is null);
+
+                if (showDummy) {
                     field.EnsureDummyColumn();
                 } else {
                     field.RemoveDummyColumn();
@@ -1506,13 +1513,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         try {
             if (CurrentArrangement is not { IsDisposed: false } ca) {
-                DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+                DrawWaitScreen(gr, "Ansicht nicht definiert");
                 return;
             }
 
             if (ca.Count < 1) {
                 if (tb.Column.Count > 0) {
-                    DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+                    DrawWaitScreen(gr, "Ansicht nicht definiert");
                     return;
                 }
                 DrawWaitScreen(gr, "Keine Spalten vorhanden");
@@ -3861,7 +3868,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
 
         if (cellInThisTableRow is RowListItem rli) {
-            return (controlPos, rli.Row, rli.Row.CellGetString(viewItem.Column));
+            var cellText = rli.Row.CellGetString(viewItem.Column);
+
+            // Spalte erlaubt Mehrzeiler, wird aber einzeilig angezeigt ->
+            // Edit-Feld vergrößern, damit mehrzeilig getippt werden kann.
+            if (viewItem.Column is { IsDisposed: false, MultiLine: true } && controlPos.Height <= 30) {
+                var lineCount = Math.Clamp(cellText.CountChar('\r') + 1, 3, 6);
+                controlPos.Height = controlPos.Height * lineCount;
+            }
+
+            return (controlPos, rli.Row, cellText);
         }
 
         return (controlPos, null, string.Empty);

@@ -37,6 +37,27 @@ public abstract partial class GenericTool : GroupBox {
     public virtual void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) { }
 
     /// <summary>
+    /// Zeichnet einen Pinsel-Vorschau-Kreis pixelgenau nach. Es wird exakt dieselbe
+    /// Pixel-Bedingung wie bei <see cref="Extensions.FillCircle"/> verwendet, sodass
+    /// die Vorschau deckungsgleich mit den tatsächlich gemalten Pixeln ist.
+    /// </summary>
+    protected static void DrawPixelExactCircle(Graphics gr, float zoom, int offsetX, int offsetY, int centerX, int centerY, int radius, Brush brush) {
+        var rr = (double)radius;
+        for (var adx = -radius; adx <= radius; adx++) {
+            for (var ady = -radius; ady <= radius; ady++) {
+                if (Math.Sqrt(adx * adx + ady * ady) - 0.5 > rr) { continue; }
+                var px = centerX + adx;
+                var py = centerY + ady;
+                var left = px.CanvasToControl(zoom, offsetX);
+                var top = py.CanvasToControl(zoom, offsetY);
+                var right = (px + 1f).CanvasToControl(zoom, offsetX);
+                var bottom = (py + 1f).CanvasToControl(zoom, offsetY);
+                gr.FillRectangle(brush, left, top, right - left, bottom - top);
+            }
+        }
+    }
+
+    /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>

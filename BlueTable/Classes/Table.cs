@@ -1956,6 +1956,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
+        // Bei gleichnamigen Skripten das mit dem weniger Inhalt verwerfen
+        if (_eventScript.GroupBy(s => s.KeyName, StringComparer.OrdinalIgnoreCase).Any(g => g.Count() > 1)) {
+            var deduplicated = _eventScript
+                .GroupBy(s => s.KeyName, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.OrderByDescending(s => s.Script.Length).First())
+                .ToList();
+            deduplicated.Sort();
+
+            _hasValueChangedScript = null;
+            _mayAffectUser = null;
+            _changesRowColor = null;
+            _eventScript = deduplicated.AsReadOnly();
+        }
+
         OnAdditionalRepair();
     }
 

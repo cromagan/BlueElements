@@ -11,6 +11,8 @@ public partial class Tool_Paint {
 
     private static readonly Brush BrushRedSemiTransp = new SolidBrush(Color.FromArgb(50, 255, 0, 0));
 
+    private int _brushSize = 3;
+
     #endregion
 
     #region Constructors
@@ -23,9 +25,7 @@ public partial class Tool_Paint {
 
     public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
         if (mouseCurrent is null) { return; }
-        var r = 2 * zoom;
-        var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
-        gr.FillEllipse(BrushRedSemiTransp, p.X - r, p.Y - r, r * 2, r * 2);
+        DrawPixelExactCircle(gr, zoom, offsetX, offsetY, mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY, _brushSize - 1, BrushRedSemiTransp);
     }
 
     public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {
@@ -37,11 +37,17 @@ public partial class Tool_Paint {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
             if (pic is null) { return; }
-            pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
+            pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, _brushSize - 1);
             OnDoInvalidate();
         } else {
             OnDoInvalidate();
         }
+    }
+
+    private void sldSize_ValueChanged(object sender, System.EventArgs e) {
+        _brushSize = (int)Math.Round(sldSize.Value, MidpointRounding.AwayFromZero);
+        capSize.Text = _brushSize.ToString1();
+        OnDoInvalidate();
     }
 
     #endregion

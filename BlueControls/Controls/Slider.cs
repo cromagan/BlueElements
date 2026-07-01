@@ -15,11 +15,17 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
     private const int ButtonSize = 18;
 
+    private const int DragThreshold = 4;
+
     private readonly object _lock = new();
 
     private Design _backStyle;
 
     private Rectangle _clickArea;
+
+    private bool _isDragging;
+
+    private Point _mouseDownPos;
 
     private float? _lastFiredValue;
     private float _maximum = 100;
@@ -245,6 +251,9 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
         if (!Enabled) { return; }
 
+        _mouseDownPos = e.Location;
+        _isDragging = false;
+
         Invalidate();
     }
 
@@ -270,6 +279,16 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
         if (e.Button != MouseButtons.Left) { return; }
 
+        // Erst ab einer kleinen Bewegungsschwelle als Drag werten — verhindert,
+        // dass ein normaler Klick (mit minimaler Mausbewegung) sofort den
+        // Thumb verschiebt und danach OnMouseUp noch einen LargeChange-Sprung macht.
+        if (!_isDragging) {
+            if (Math.Abs(e.X - _mouseDownPos.X) < DragThreshold &&
+                Math.Abs(e.Y - _mouseDownPos.Y) < DragThreshold) { return; }
+
+            _isDragging = true;
+        }
+
         DoMouseAction(e, true);
     }
 
@@ -279,7 +298,13 @@ public partial class Slider : GenericControl, IBackgroundNone {
         if (!Enabled) { return; }
 
         if (e.Button == MouseButtons.Left) {
-            DoMouseAction(e, false);
+            // LargeChange-Sprung nur bei echtem Klick (ohne Drag) ausführen —
+            // sonst würde nach dem Ziehen noch ein zweiter Sprung folgen.
+            if (!_isDragging) {
+                DoMouseAction(e, false);
+            }
+
+            _isDragging = false;
         }
 
         Invalidate();

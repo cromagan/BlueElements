@@ -199,9 +199,16 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent is null) { return; }
 
+            var clipState = gr.Save();
+            if (Parent is ItemCollectionPadItem icpi) {
+                gr.SetClip(icpi.CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false));
+            }
+
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
                 gr.DrawLine(this.GetFont().Pen(zoom), _tempPoints[z].CanvasToControl(zoom, offsetX, offsetY), _tempPoints[z + 1].CanvasToControl(zoom, offsetX, offsetY));
             }
+
+            gr.Restore(clipState);
         }
     }
 

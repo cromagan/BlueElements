@@ -1564,9 +1564,10 @@
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "0072BC",
-      "Border": "None",
-      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
+      "BC1": "CCE8FF",
+      "Border": "Solid1Px",
+      "BOC1": "99D1FF",
+      "Font": "{Name=Calibri, Size=10.15, Underline=true}"
     },
     "Checked": {
       "Contour": "Rectangle",
@@ -1588,7 +1589,7 @@
       "BC1": "0072BC",
       "Border": "Solid1Px",
       "BOC1": "000000",
-      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, Underline=true}"
     },
     "Standard_Disabled": {
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
@@ -1596,9 +1597,9 @@
     "Standard_MouseOver": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "0072BC",
+      "BC1": "E5F3FF",
       "Border": "None",
-      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
+      "Font": "{Name=Calibri, Size=10.15, Underline=true}"
     },
     "Standard_HasFocus": {
       "Font": "{Name=Calibri, Size=10.15}"
@@ -1606,9 +1607,9 @@
     "Standard_MouseOver_HasFocus": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "0072BC",
+      "BC1": "E5F3FF",
       "Border": "None",
-      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
+      "Font": "{Name=Calibri, Size=10.15, Underline=true}"
     }
   },
   "Item_ListBox": {
