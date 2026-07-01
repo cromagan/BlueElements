@@ -45,14 +45,14 @@ public static class Develop {
 
     public static bool DiagFlag { get; set; }
 
+    [DefaultValue(false)]
+    public static bool Exited { get; private set; }
+
     /// <summary>
     /// Aktiviert detaillierte Log-Ausgaben während des Beenden-Vorgangs (SaveEnd-Pfad).
     /// Nur wenn TRUE, werden Meldungen über <see cref="EndLog"/> in das Trace-Log geschrieben.
     /// </summary>
     public static bool ExtendedEndLog { get; set; }
-
-    [DefaultValue(false)]
-    public static bool Exited { get; private set; }
 
     public static string MonitorMessage { get; set; } = "Monitor-Message";
 
@@ -132,16 +132,13 @@ public static class Develop {
         var type = obj.GetType();
 
         var table = type.GetProperty("Table")?.GetValue(obj);
-        if (table is IHasKeyName tk && tk.KeyName is { Length: > 0 } tkey) { info += ", Table: " + tkey; }
-        else if (table?.ToString() is { Length: > 0 } tts) { info += ", Table: " + tts; }
+        if (table is IHasKeyName tk && tk.KeyName is { Length: > 0 } tkey) { info += ", Table: " + tkey; } else if (table?.ToString() is { Length: > 0 } tts) { info += ", Table: " + tts; }
 
         var filename = type.GetProperty("Filename")?.GetValue(obj);
-        if (filename is IHasKeyName fk && fk.KeyName is { Length: > 0 } fkey) { info += ", Filename: " + fkey; }
-        else if (filename?.ToString() is { Length: > 0 } fts) { info += ", Filename: " + fts; }
+        if (filename is IHasKeyName fk && fk.KeyName is { Length: > 0 } fkey) { info += ", Filename: " + fkey; } else if (filename?.ToString() is { Length: > 0 } fts) { info += ", Filename: " + fts; }
 
         var fileName = type.GetProperty("FileName")?.GetValue(obj);
-        if (fileName is IHasKeyName fnk && fnk.KeyName is { Length: > 0 } fnkey) { info += ", FileName: " + fnkey; }
-        else if (fileName?.ToString() is { Length: > 0 } fnts) { info += ", FileName: " + fnts; }
+        if (fileName is IHasKeyName fnk && fnk.KeyName is { Length: > 0 } fnkey) { info += ", FileName: " + fnkey; } else if (fileName?.ToString() is { Length: > 0 } fnts) { info += ", FileName: " + fnts; }
 
         return info;
     }
@@ -178,6 +175,9 @@ public static class Develop {
                 _isTraceLogging = type;
                 if (type == ErrorType.Error) { _lastDebugMessage = string.Empty; }
                 if (DateTime.UtcNow.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
+
+                message = message.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
+
                 var net = type + (";" + message);
                 if (net == _lastDebugMessage) {
                     _isTraceLogging = null;
@@ -246,7 +246,7 @@ public static class Develop {
                         first = false;
                     }
                 }
-                message = message.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
+
                 Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + message + "</th>");
                 Trace.WriteLine("</tr>");
                 if (type == ErrorType.Error) {
@@ -304,6 +304,8 @@ public static class Develop {
         Debug.WriteLine($"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
     }
 
+    public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
+
     /// <summary>
     /// Schreibt eine detaillierte Log-Meldung in das Trace-Log, ABER nur wenn
     /// <see cref="ExtendedEndLog"/> aktiviert ist. Gedacht für Diagnose des Beenden-Pfads.
@@ -312,8 +314,6 @@ public static class Develop {
         if (!ExtendedEndLog) { return; }
         DebugPrint(ErrorType.Info, message);
     }
-
-    public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
 
     public static async Task<T?> GetSafePropertyValueAsync<T>(Func<T> propertyFunc) {
         if (propertyFunc is null) {
@@ -474,6 +474,8 @@ public static class Develop {
             Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
             Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
         } catch { /* TraceLogging_Start: Fehler beim Schreiben des HTML-Headers */ }
+
+        _lastDebugMessage = string.Empty;
     }
 
     private static void CloseAfter12Hours() {

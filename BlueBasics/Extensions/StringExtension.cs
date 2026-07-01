@@ -173,7 +173,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Primitive Methode. Ersetzt nur Umlaute und \r
-    /// Besser: Siehe MethodStringAsciiToHTML
+    /// Besser: Siehe Method_StringAsciiToHTML
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
@@ -188,7 +188,7 @@ public static partial class Extensions {
             if (match.Index > lastIndex) {
                 var segment = text[lastIndex..match.Index];
                 segment = System.Net.WebUtility.HtmlDecode(segment);
-                segment = System.Net.WebUtility.HtmlEncode(segment).Replace("\r\n", "<br>").Replace("\n", "<br>");
+                segment = System.Net.WebUtility.HtmlEncode(segment).Replace("\r\n", "<br>").Replace("\r", "<br>").Replace("\n", "<br>");
                 result.Append(segment);
             }
 
