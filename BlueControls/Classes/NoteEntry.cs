@@ -65,12 +65,14 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
         _ => Color.FromArgb(240, 240, 240)
     };
 
-    public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => symbol switch {
-        NoteSymbols.Critical => QuickImage.Get(ImageCode.Kritisch, size),
-        NoteSymbols.Warning => QuickImage.Get(ImageCode.Warnung, size),
-        NoteSymbols.Ok => QuickImage.Get(ImageCode.Häkchen, size),
-        _ => QuickImage.Get(ImageCode.Stift, 16)
+    public static ImageCode ImageCodeFor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Critical => ImageCode.Kritisch,
+        NoteSymbols.Warning => ImageCode.Warnung,
+        NoteSymbols.Ok => ImageCode.Häkchen,
+        _ => ImageCode.Stift
     };
+
+    public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => QuickImage.Get(ImageCodeFor(symbol), size);
 
     public static Color GetTextColor(NoteSymbols symbol) => symbol switch {
         NoteSymbols.Critical => Color.FromArgb(100, 0, 0),
@@ -104,12 +106,7 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
 
     public QuickImage? SymbolForReadableText() => SymbolForReadableText(16);
 
-    public QuickImage? SymbolForReadableText(int size) => Symbol switch {
-        NoteSymbols.Ok => QuickImage.Get(ImageCode.Häkchen, size),
-        NoteSymbols.Warning => QuickImage.Get(ImageCode.Warnung, size),
-        NoteSymbols.Critical => QuickImage.Get(ImageCode.Kritisch, size),
-        _ => QuickImage.Get(ImageCode.Stift, size)
-    };
+    public QuickImage? SymbolForReadableText(int size) => QuickImage.Get(ImageCodeFor(Symbol), size);
 
     private void OnPropertyChanged(string propertyName) {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

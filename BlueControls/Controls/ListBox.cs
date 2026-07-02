@@ -330,20 +330,28 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         }
     }
 
-    // lstBox liegt mit Dock=Fill hinter den Sibling-Buttons (btnPlus, txtAdd, ...).
-    // Its OnMouseLeave hält die Maus für "noch innerhalb" und cleart den MouseOver
-    // nicht. Beim Betreten eines Sibling-Buttons hier explizit zurücksetzen,
-    // sonst bliebe das letzte Item optisch im MouseOver-Zustand.
-    private void Sibling_MouseEnter(object? sender, System.EventArgs e) {
-        if (lstBox is { IsDisposed: false }) { lstBox.DoMouseMovement(-1, -1); }
-    }
-
     private void CbxAdd_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) { }
 
     private void ClearAddInput() {
         txtAdd.Text = string.Empty;
         cbxAdd.Text = string.Empty;
     }
+
+    private void Core_ButtonUpdate(object? sender, ButtonUpdateEventArgs e) {
+        UpdateAddArea();
+        if (!e.MouseOverChanged) { return; }
+        if (lstBox.MouseOverItem is not null) {
+            UpdateItemButtons();
+        } else {
+            HideAllButtons();
+        }
+    }
+
+    private void Core_ItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
+
+    private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    private void Core_ItemLayoutChanged(object? sender, System.EventArgs e) => ScheduleAddAreaUpdate();
 
     private string CurrentAddText() {
         if (cbxAdd.Visible) { return cbxAdd.Text; }
@@ -399,20 +407,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     private void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
 
-    private void OnCoreButtonUpdate(object? sender, ButtonUpdateEventArgs e) {
-        UpdateAddArea();
-        if (!e.MouseOverChanged) { return; }
-        if (lstBox.MouseOverItem is not null) {
-            UpdateItemButtons();
-        } else {
-            HideAllButtons();
-        }
-    }
-
-    private void OnCoreItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
-
-    private void OnCoreItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
     private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
@@ -430,6 +424,24 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
             _addAreaUpdateQueued = false;
             UpdateAddArea();
         }));
+    }
+
+    // lstBox liegt mit Dock=Fill hinter den Sibling-Buttons (btnPlus, txtAdd, ...).
+    // Its OnMouseLeave hält die Maus für "noch innerhalb" und cleart den MouseOver
+    // nicht. Beim Betreten eines Sibling-Buttons hier explizit zurücksetzen,
+    // sonst bliebe das letzte Item optisch im MouseOver-Zustand.
+    private void Sibling_MouseEnter(object? sender, System.EventArgs e) {
+        if (lstBox is not { IsDisposed: false }) { return; }
+
+        // Die Item-Aktions-Buttons (Minus, Hoch, Runter, Bearbeiten) liegen direkt
+        // auf dem gehoverten Item. Würde hier MouseOverItem zurückgesetzt, blende
+        // sich der Button sofort selbst aus (Maus auf Button -> Hover weg ->
+        // Button weg -> Maus auf lstBox -> Hover an -> Button an -> ...) und
+        // flackert. Sie gehören zur Hover-UI des Items und dürfen den Hover halten.
+        if (ReferenceEquals(sender, btnMinus) || ReferenceEquals(sender, btnUp) ||
+            ReferenceEquals(sender, btnDown) || ReferenceEquals(sender, btnEdit)) { return; }
+
+        lstBox.DoMouseMovement(-1, -1);
     }
 
     private void SyncCbxAddSuggestions() {

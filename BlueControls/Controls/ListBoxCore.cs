@@ -62,6 +62,14 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// </summary>
     internal event EventHandler<ButtonUpdateEventArgs>? ButtonUpdate;
 
+    /// <summary>
+    /// Wird ausgelöst, wenn sich die Anordnung oder Größe der Items geändert hat
+    /// (z.B. Höhe eines Items durch eine Fehler-Statusänderung). Ermöglicht dem
+    /// äußeren <see cref="ListBox"/>-Control, abhängige UI-Elemente wie den
+    /// Hinzufügen-Button neu zu positionieren.
+    /// </summary>
+    internal event EventHandler? ItemLayoutChanged;
+
     #endregion
 
     #region Properties
@@ -693,7 +701,26 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private bool IsChecked(string name) => _checked.Exists(x => x.KeyName == name);
 
-    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        // CanvasPosition ist ein Layout-ERGEBNIS und wird in ComputeAllItemPositions
+        // selbst gesetzt. Darauf erneut Layout/Slider anstoßen, würde einen
+        // Rückkopplungs-Loop erzeugen.
+        if (e.PropertyName == nameof(AbstractListItem.CanvasPosition)) {
+            Invalidate();
+            return;
+        }
+        // Inhalt/Größe kann sich geändert haben (Text, Symbol, Fehler-Status …):
+        // Item-Positionen neu berechnen lassen, damit z.B. der Hinzufügen-Button
+        // des äußeren ListBox-Controls richtig nachrutscht.
+        // Bewusst OHNE Invalidate_MaxBounds: Ein Verwerfen von CanvasMaxBounds
+        // führt bei jedem Paint (UpdateSliderBounds) zu minimal schwankendem
+        // OffsetY — und jeder OffsetY-Wechsel setzt MouseOverItem zurück und
+        // blendet die Hover-Buttons neu ein/aus → Flackern. Der Slider-Bereich
+        // passt sich stattdessen beim nächsten Resize/ZoomFit an.
+        _maxNeededItemSize = Size.Empty;
+        Invalidate();
+        OnItemLayoutChanged();
+    }
 
     private void OnButtonUpdate(bool isInForm, bool mouseOverChanged) =>
                                                                                                                                                                                                                                                                                                             ButtonUpdate?.Invoke(this, new ButtonUpdateEventArgs(isInForm, mouseOverChanged));
@@ -701,6 +728,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    private void OnItemLayoutChanged() => ItemLayoutChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChanged;

@@ -95,9 +95,10 @@ namespace BlueControls.Controls
             lstBox.Name = "lstBox";
             lstBox.Size = new Size(467, 423);
             lstBox.TabIndex = 53;
-            lstBox.ButtonUpdate += OnCoreButtonUpdate;
-            lstBox.ItemClicked += OnCoreItemClicked;
-            lstBox.ItemCheckedChanged += OnCoreItemCheckedChanged;
+            lstBox.ButtonUpdate += Core_ButtonUpdate;
+            lstBox.ItemClicked += Core_ItemClicked;
+            lstBox.ItemCheckedChanged += Core_ItemCheckedChanged;
+            lstBox.ItemLayoutChanged += Core_ItemLayoutChanged;
             // 
             // txtAdd
             // 

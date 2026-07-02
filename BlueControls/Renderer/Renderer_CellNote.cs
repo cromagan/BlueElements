@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Controls;
+using BlueTable.Classes;
 
 namespace BlueControls.Renderer;
 
@@ -9,9 +10,19 @@ public class Renderer_CellNote : Renderer_Abstract {
 
     #region Fields
 
-    private bool _showSymbol = true;
-    private bool _showText = true;
-    private int _symbolSize = 16;
+    // Alle Maße in Canvas-Pixeln.
+    private const int SymbolSize = 16;
+    private const int Padding = 3;
+    private const int BoxGap = 4;
+    private const int HeaderToTextGap = 2;
+
+    /// <summary>
+    /// Angenommene Textbreite in Canvas-Pixeln, die nur für die Höhenberechnung
+    /// (CalculateContentSize) verwendet wird, da dort die tatsächliche Spaltenbreite
+    /// nicht zur Verfügung steht. Bewusst schmal gewählt, damit Notizen mit langem
+    /// Text ausreichend Höhe reserviert bekommen.
+    /// </summary>
+    private const int AssumedBodyWidth = 120;
 
     #endregion
 
@@ -19,127 +30,107 @@ public class Renderer_CellNote : Renderer_Abstract {
 
     public static string ClassId => "CellNote";
 
-    public override string Description => "Stellt eine Zellnotiz mit Symbol und Text dar.\r\nFormat: Symbol|Text (z.B. Warning|Bitte prüfen)";
-
-    public bool ShowSymbol {
-        get => _showSymbol;
-        set {
-            if (_showSymbol == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _showSymbol = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool ShowText {
-        get => _showText;
-        set {
-            if (_showText == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _showText = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public int SymbolSize {
-        get => _symbolSize;
-        set {
-            if (_symbolSize == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _symbolSize = value;
-            OnPropertyChanged();
-        }
-    }
+    public override string Description => "Stellt alle Zellnotizen dieser Zeile dar.\r\nJede Notiz erscheint als eigener Kasten mit Symbol, Spaltenname und Text.";
 
     #endregion
 
     #region Methods
 
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
-        if (string.IsNullOrEmpty(content)) { return; }
+        var entries = CellNoteHelper.ParseAllNotes(content);
+        if (entries.Count == 0) { return; }
 
-        var (symbol, _) = ParseContent(content);
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+        var table = affectingRow is { IsDisposed: false } r && r.Table is { IsDisposed: false } t ? t : null;
 
-        QuickImage? qi = null;
-        if (_showSymbol) {
-            var pix = _symbolSize.CanvasToControl(zoom);
-            qi = NoteEntry.GetQuickImage(symbol, pix);
+        var font = GetFont(zoom, design, state);
+        var headerFont = BoldVariant(font);
+
+        var pad = Padding.CanvasToControl(zoom);
+        var gap = BoxGap.CanvasToControl(zoom);
+        var hgt = HeaderToTextGap.CanvasToControl(zoom);
+        var lineH = (int)Math.Ceiling(font.MeasureString("X").Height);
+        var headerH = Math.Max(SymbolSize.CanvasToControl(zoom), (int)Math.Ceiling(headerFont.MeasureString("X").Height));
+
+        var innerWidth = drawingAreaControl.Width - 2 * pad;
+        if (innerWidth < 1) { innerWidth = 1; }
+
+        var y = drawingAreaControl.Top;
+
+        foreach (var (keyName, symbol, text) in entries) {
+            var bodyLines = WrapBody(font, text, innerWidth);
+            var boxHeight = pad + headerH + hgt + (bodyLines.Count * lineH) + pad;
+
+            if (y + boxHeight > drawingAreaControl.Bottom) {
+                // Letzter Kasten wird nur gezeichnet, wenn zumindest Kopfzeile + eine Textzeile Platz haben
+                if (y + pad + headerH + hgt + lineH + pad > drawingAreaControl.Bottom) { break; }
+                boxHeight = drawingAreaControl.Bottom - y;
+            }
+
+            var box = new Rectangle(drawingAreaControl.Left, y, drawingAreaControl.Width, boxHeight);
+
+            gr.FillRectangle(BlueFont.GetBrush(NoteEntry.GetBackColor(symbol)), box);
+            gr.DrawRectangle(NoteEntry.PenForSymbol(symbol), box);
+
+            var headerRect = new Rectangle(box.Left + pad, box.Top + pad, box.Width - 2 * pad, headerH);
+            var qi = NoteEntry.GetQuickImage(symbol, SymbolSize)?.Scale(zoom);
+            var caption = ResolveCaption(table, keyName);
+            Skin.Draw_FormatedText(gr, caption, qi, Alignment.VerticalCenter_Left, headerRect, headerFont, false);
+
+            var bodyY = headerRect.Bottom + hgt;
+            foreach (var line in bodyLines) {
+                if (bodyY + lineH > box.Bottom) { break; }
+                font.DrawString(gr, line, box.Left + pad, bodyY);
+                bodyY += lineH;
+            }
+
+            y += boxHeight + gap;
         }
-
-        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =
-        [
-            new FlexiControlForProperty<bool>(() => ShowSymbol),
-            new FlexiControlForProperty<bool>(() => ShowText),
-            new FlexiControlForProperty<int>(() => SymbolSize)
-        ];
-        return result;
-    }
-
-    public override List<string> ParseableItems() {
-        List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("ShowSymbol", _showSymbol);
-        result.ParseableAdd("ShowText", _showText);
-        result.ParseableAdd("SymbolSize", _symbolSize);
-        return result;
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "showsymbol":
-                _showSymbol = value.FromPlusMinus();
-                return true;
-
-            case "showtext":
-                _showText = value.FromPlusMinus();
-                return true;
-
-            case "symbolsize":
-                _symbolSize = Converter.IntParse(value);
-                return true;
-        }
-        return base.ParseThis(key, value);
-    }
+    public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
     public override string ReadableText() => "Zellnotiz";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stift);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
-        var contentSize = GetFont().FormatedText_NeededSize(replacedText, null, 16);
+        var entries = CellNoteHelper.ParseAllNotes(content);
+        if (entries.Count == 0) { return new(16, 16); }
 
-        if (_showSymbol) {
-            contentSize.Width += _symbolSize + 4;
-            contentSize.Height = Math.Max(contentSize.Height, _symbolSize + 4);
+        var font = GetFont();
+        var headerFont = BoldVariant(font);
+
+        var lineH = (int)Math.Ceiling(font.MeasureString("X").Height);
+        var headerH = Math.Max(SymbolSize, (int)Math.Ceiling(headerFont.MeasureString("X").Height));
+
+        var totalH = 0;
+        for (var i = 0; i < entries.Count; i++) {
+            var bodyLines = WrapBody(font, entries[i].Text, AssumedBodyWidth).Count;
+            totalH += Padding + headerH + HeaderToTextGap + (bodyLines * lineH) + Padding;
+            if (i < entries.Count - 1) { totalH += BoxGap; }
         }
 
-        return contentSize;
+        return new(100, Math.Max(totalH, 16));
     }
 
     protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
-        if (!_showText && !_showSymbol) { return string.Empty; }
-
-        var (symbol, text) = ParseContent(content);
-
-        if (!_showText) {
-            return symbol.ToString();
-        }
-
-        return LanguageTool.PrepaireText(text, style, string.Empty, string.Empty, doOpticalTranslation, null);
+        var entries = CellNoteHelper.ParseAllNotes(content);
+        return entries.Count == 0 ? string.Empty : string.Join("\r", entries.Select(e => $"{e.Symbol}: {e.Text}"));
     }
 
-    private static (NoteSymbols Symbol, string Text) ParseContent(string content) {
-        var parts = content.SplitBy("|");
-        if (parts.Length < 2) { return (NoteSymbols.Pencil, content); }
+    private static BlueFont BoldVariant(BlueFont font) => BlueFont.Get(font.FontName, font.Size, true, font.Italic, font.Underline, font.StrikeOut, font.ColorMain, font.ColorOutline, font.ColorBack);
 
-        var symbol = Enum.TryParse<NoteSymbols>(parts[0], true, out var s) ? s : NoteSymbols.Pencil;
-        var text = content[(content.IndexOf('|') + 1)..];
-        return (symbol, text);
+    private static string ResolveCaption(Table? table, string keyName) {
+        if (table is { IsDisposed: false } && table.Column[keyName] is { IsDisposed: false } col && !string.IsNullOrEmpty(col.Caption)) {
+            return col.Caption.Replace("\r", " ");
+        }
+        return keyName;
+    }
+
+    private static List<string> WrapBody(BlueFont font, string text, float maxWidth) {
+        if (string.IsNullOrEmpty(text)) { return [string.Empty]; }
+        if (maxWidth <= 5) { return [text]; }
+        return BlueFont.SplitByWidth(font, text, maxWidth, 100);
     }
 
     #endregion

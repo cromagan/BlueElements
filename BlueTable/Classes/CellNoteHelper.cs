@@ -4,21 +4,64 @@ namespace BlueTable.Classes;
 
 public static class CellNoteHelper {
 
+    #region Fields
+
+    private const string KeySymbol = "Symbol";
+    private const string KeyText = "Text";
+
+    #endregion
+
     #region Methods
 
+    /// <summary>
+    /// Liefert die Notiz für <paramref name="column" /> in <paramref name="row" />,
+    /// oder <c>null</c>, wenn keine vorhanden ist.
+    /// </summary>
     public static (NoteSymbols Symbol, string Text)? GetNoteData(ColumnItem column, RowItem row) {
         if (GetNoteColumn(column) is not { } noteColumn) { return null; }
 
         var cellValue = row.CellGetString(noteColumn);
         if (cellValue is not { Length: > 0 }) { return null; }
 
-        var data = "\r" + cellValue;
-        var (idx, contentStart, end) = FindEntryBounds(data, column.KeyName);
-        if (idx < 0) { return null; }
+        foreach (var (keyName, symbol, text) in ParseAllNotes(cellValue)) {
+            if (string.Equals(keyName, column.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                return (symbol, text);
+            }
+        }
+        return null;
+    }
 
-        var entry = end < 0 ? data[contentStart..] : data[contentStart..end];
-        var parts = entry.Split('|');
-        return parts.Length < 2 ? null : (ParseSymbol(parts[0]), parts[1]);
+    /// <summary>
+    /// Zerlegt den Rohwert der Notiz-Spalte in einzelne Einträge. Das Format ist
+    /// ein JSON-Objekt, das jeder Column-KeyName auf ein { Symbol, Text }-Objekt
+    /// abbildet. Zeilenumbrüche im Text werden durch die JSON-Kodierung erhalten.
+    /// Beschädigte oder leere Werte liefern eine leere Liste.
+    /// </summary>
+    public static List<(string KeyName, NoteSymbols Symbol, string Text)> ParseAllNotes(string content) {
+        var result = new List<(string, NoteSymbols, string)>();
+        if (content is not { Length: > 0 }) { return result; }
+
+        JsonNode? root;
+        try {
+            root = JsonNode.Parse(content);
+        } catch (JsonException) {
+            return result;
+        }
+
+        if (root is not JsonObject obj) { return result; }
+
+        foreach (var kvp in obj) {
+            if (string.IsNullOrEmpty(kvp.Key)) { continue; }
+            if (kvp.Value is not JsonObject entry) { continue; }
+
+            var symbol = ParseSymbol(entry.GetString(KeySymbol));
+            var text = entry.GetString(KeyText);
+            if (string.IsNullOrEmpty(text)) { continue; }
+
+            result.Add((kvp.Key, symbol, text));
+        }
+
+        return result;
     }
 
     public static void RemoveNote(ColumnItem column, RowItem row) {
@@ -27,12 +70,11 @@ public static class CellNoteHelper {
         var cellValue = row.CellGetString(noteColumn);
         if (cellValue is not { Length: > 0 }) { return; }
 
-        var data = "\r" + cellValue;
-        var (idx, _, end) = FindEntryBounds(data, column.KeyName);
-        if (idx < 0) { return; }
+        var entries = ParseAllNotes(cellValue);
+        var removed = entries.RemoveAll(e => string.Equals(e.KeyName, column.KeyName, StringComparison.OrdinalIgnoreCase));
+        if (removed == 0) { return; }
 
-        var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
-        row.CellSet(noteColumn, remaining.Length > 0 ? remaining[1..] : string.Empty, "Notiz entfernt");
+        row.CellSet(noteColumn, BuildJson(entries), "Notiz entfernt");
     }
 
     public static void SetNote(ColumnItem column, RowItem row, NoteSymbols symbol, string text) {
@@ -43,23 +85,33 @@ public static class CellNoteHelper {
             return;
         }
 
-        var cleanText = CleanForStorage(text);
-        var cleanSymbol = CleanForStorage(symbol.ToString());
-        var newEntry = $"{column.KeyName}|{cleanSymbol}|{cleanText}";
-
         var cellValue = row.CellGetString(noteColumn);
-        var data = "\r" + cellValue;
-        var (idx, _, end) = FindEntryBounds(data, column.KeyName);
+        var entries = ParseAllNotes(cellValue);
 
-        string newValue;
-        if (idx < 0) {
-            newValue = string.IsNullOrEmpty(cellValue) ? newEntry : cellValue + "\r" + newEntry;
-        } else {
-            var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
-            newValue = remaining.Length > 0 ? remaining[1..] + "\r" + newEntry : newEntry;
+        var replaced = false;
+        for (var i = 0; i < entries.Count; i++) {
+            if (string.Equals(entries[i].KeyName, column.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                entries[i] = (entries[i].KeyName, symbol, text);
+                replaced = true;
+                break;
+            }
         }
 
-        row.CellSet(noteColumn, newValue, "Notiz setzen");
+        if (!replaced) { entries.Add((column.KeyName, symbol, text)); }
+
+        row.CellSet(noteColumn, BuildJson(entries), "Notiz setzen");
+    }
+
+    private static string BuildJson(List<(string KeyName, NoteSymbols Symbol, string Text)> entries) {
+        if (entries.Count == 0) { return string.Empty; }
+
+        JsonObject obj = new();
+        foreach (var (keyName, symbol, text) in entries) {
+            obj[keyName] = new JsonObject()
+                .Set(KeySymbol, symbol.ToString())
+                .Set(KeyText, text);
+        }
+        return obj.ToJsonString();
     }
 
     private static ColumnItem? GetNoteColumn(ColumnItem column) {
@@ -67,37 +119,16 @@ public static class CellNoteHelper {
         return tb.Column.SysCellNote is { IsDisposed: false } nc ? nc : null;
     }
 
-    /// <summary>
-    /// Sucht den Notiz-Eintrag für <paramref name="columnKeyName"/> in <paramref name="data"/>
-    /// (das mit führendem \r vorbereitete cellValue). Liefert (-1, -1, -1) falls kein Eintrag
-    /// existiert. Der zweite Wert (ContentStart) zeigt hinter das "key|"-Präfix, der dritte
-    /// Wert (End) auf das nächste \r oder -1, wenn der Eintrag bis zum Ende reicht.
-    /// </summary>
-    private static (int Idx, int ContentStart, int End) FindEntryBounds(string data, string columnKeyName) {
-        var search = $"\r{columnKeyName}|";
-        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
-        if (idx < 0) { return (-1, -1, -1); }
-        var contentStart = idx + search.Length;
-        return (idx, contentStart, data.IndexOf('\r', contentStart));
-    }
-
-    private static string CleanForStorage(string value) {
-        if (string.IsNullOrEmpty(value)) { return value; }
-        return value
-            .Replace("\r", "")
-            .Replace("\n", "")
-            .Replace("|", "");
-    }
-
     private static NoteSymbols ParseSymbol(string value) {
         if (Enum.TryParse<NoteSymbols>(value, true, out var result)) { return result; }
-        return value switch {
-            "Kritisch" => NoteSymbols.Critical,
-            "Warnung" => NoteSymbols.Warning,
-            "Häkchen" => NoteSymbols.Ok,
-            "Stift" => NoteSymbols.Pencil,
-            _ => NoteSymbols.Pencil
-        };
+
+        switch (value) {
+            case "Kritisch": return NoteSymbols.Critical;
+            case "Warnung": return NoteSymbols.Warning;
+            case "Häkchen": return NoteSymbols.Ok;
+            case "Stift": return NoteSymbols.Pencil;
+            default: return NoteSymbols.Pencil;
+        }
     }
 
     #endregion

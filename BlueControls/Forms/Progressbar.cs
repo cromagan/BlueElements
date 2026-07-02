@@ -28,6 +28,33 @@ public partial class Progressbar : FloatingForm {
 
     #endregion
 
+    #region Properties
+
+    /// <summary>
+    /// Wenn true, wird ein Abbrechen-Button angezeigt. Der Aufrufer muss
+    /// <see cref="IsCancelRequested" /> zyklisch prüfen und die Progressbar schließen.
+    /// </summary>
+    public bool CancelSupported {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            btnAction.Visible = value;
+            if (value) {
+                btnAction.Text = "Abbrechen";
+                btnAction.FitSize();
+            }
+            LayoutForm();
+        }
+    }
+
+    /// <summary>
+    /// Wird true, sobald der Benutzer den Abbrechen-Button geklickt hat.
+    /// </summary>
+    public bool IsCancelRequested { get; private set; }
+
+    #endregion
+
     #region Methods
 
     public static Progressbar Show(string text) {
@@ -60,6 +87,10 @@ public partial class Progressbar : FloatingForm {
             return;
         }
         UpdateInternal(CalculateText(_baseText, current, _count));
+    }
+
+    private void btnAction_Click(object sender, System.EventArgs e) {
+        IsCancelRequested = true;
     }
 
     private string CalculateText(string baseText, int current, int count) {
@@ -128,18 +159,28 @@ public partial class Progressbar : FloatingForm {
         return baseText + "...abgeschlossen!";
     }
 
+    private void LayoutForm() {
+        var wi = Math.Max(Size.Width, capText.Right + Skin.Padding);
+        var he = Math.Max(Size.Height, capText.Bottom + Skin.Padding);
+
+        if (btnAction.Visible) {
+            btnAction.Location = new Point(Skin.Padding, capText.Bottom + Skin.Padding);
+            wi = Math.Max(wi, btnAction.Width + Skin.Padding * 2);
+            he = Math.Max(he, btnAction.Bottom + Skin.Padding);
+        }
+
+        Size = new Size(wi, he);
+        Refresh();
+    }
+
     private void UpdateInternal(string text) {
         if (text != capText.Text) {
             capText.Text = text;
             capText.FitSize();
             capText.Location = new Point(Skin.Padding, Skin.Padding);
-            var wi = Math.Max(Size.Width, capText.Right + Skin.Padding);
-            var he = Math.Max(Size.Height, capText.Bottom + Skin.Padding);
-            Size = new Size(wi, he);
-            Refresh();
+            LayoutForm();
         }
     }
 
     #endregion
-
 }

@@ -2203,6 +2203,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (rows.Count > 3) {
             _pg = Progressbar.Show(info, rows.Count);
+            _pg.CancelSupported = true;
         }
 
         var firstRow = rows[0];
@@ -2212,6 +2213,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].CellFirstString()}", 0);
 
             _pg?.Update(c++);
+            Develop.DoEvents();
+
+            if (_pg is { IsCancelRequested: true }) {
+                _pg.Close();
+                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
 
             if (!tb.CanDoValueChangedScript(true)) {
                 _pg?.Close();

@@ -32,6 +32,7 @@ namespace BlueControls.Forms
         private void InitializeComponent()
         {
             this.capText = new BlueControls.Controls.Caption();
+            this.btnAction = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // capText
@@ -44,9 +45,20 @@ namespace BlueControls.Forms
             this.capText.Name = "capText";
             this.capText.Size = new System.Drawing.Size(72, 48);
             // 
+            // btnAction
+            // 
+            this.btnAction.ButtonStyle = BlueControls.Enums.ButtonStyle.Button;
+            this.btnAction.Location = new System.Drawing.Point(8, 60);
+            this.btnAction.Name = "btnAction";
+            this.btnAction.Size = new System.Drawing.Size(100, 28);
+            this.btnAction.Translate = false;
+            this.btnAction.Visible = false;
+            this.btnAction.Click += new System.EventHandler(this.btnAction_Click);
+            // 
             // Progressbar
             // 
             this.ClientSize = new System.Drawing.Size(86, 65);
+            this.Controls.Add(this.btnAction);
             this.Controls.Add(this.capText);
             this.Name = "Progressbar";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -55,5 +67,6 @@ namespace BlueControls.Forms
         #endregion
 
         private Caption capText;
+        private BlueControls.Controls.Button btnAction;
     }
 }

@@ -219,7 +219,7 @@ public sealed class RowListItem : RowBackground {
 
         var note = CellNoteHelper.GetNoteData(column, Row);
         if (note.HasValue && note.Value.Text.Length > 0) {
-            return $"<u><imagecode={note.Value.Symbol}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
+            return $"<u><imagecode={NoteEntry.ImageCodeFor(note.Value.Symbol)}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
         }
 
         if (column.RelationType == RelationType.CellValues) {
