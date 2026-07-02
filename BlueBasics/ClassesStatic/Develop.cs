@@ -25,6 +25,13 @@ public static class Develop {
     private static DateTime _lastDebugTime = DateTime.UtcNow;
     private static TextWriterTraceListener? _traceListener;
 
+    /// <summary>
+    /// Statische Referenz auf den Shutdown-Timer. Ohne diese Wurzelreferenz würde der
+    /// <see cref="System.Threading.Timer"/> vom GC eingesammelt werden, da er intern nur
+    /// schwach referenziert wird – der 12-Stunden-Shutdown würde dann nicht mehr feuern.
+    /// </summary>
+    private static Timer? _shutdownTimer;
+
     #endregion
 
     #region Delegates
@@ -429,7 +436,10 @@ public static class Develop {
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
 
-        _ = new System.Threading.Timer(_ => CloseAfter12Hours(), null, 60000, 60000);
+        // WICHTIG: Timer muss im statischen Field _shutdownTimer gehalten werden.
+        // System.Threading.Timer wird sonst vom GC eingesammelt und der
+        // 12-Stunden-Shutdown feuert nicht mehr.
+        _shutdownTimer = new Timer(_ => CloseAfter12Hours(), null, 60000, 60000);
     }
 
     public static void TraceLogging_End() {
@@ -479,11 +489,22 @@ public static class Develop {
     }
 
     private static void CloseAfter12Hours() {
-        if (Generic.Ending) { return; }
-        if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
+        try {
+            if (Generic.Ending) { return; }
+            if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours <= 12) { return; }
             if (IsHostRunning()) { return; }
+
             DebugPrint(ErrorType.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
             AbortExe(true);
+        } catch (Exception ex) {
+            // Letzte Absicherung: Wenn beim geordneten Beenden etwas schiefgeht,
+            // Prozess hart terminieren, damit der 12h-Shutdown garantiert durchkommt.
+            try { DebugPrint(ErrorType.Error, "Fehler beim 12-Stunden-Shutdown.", ex); } catch { /* Logging darf nicht blockieren */ }
+            Environment.FailFast("Fehler beim 12-Stunden-Shutdown.", ex);
+        } finally {
+            // GC.KeepAlive ist ein No-Op zur Laufzeit, dokumentiert aber, dass _shutdownTimer
+            // bewusst nur als Root-Referenz gehalten wird, damit der Timer nicht eingesammelt wird.
+            GC.KeepAlive(_shutdownTimer);
         }
     }
 
