@@ -2010,20 +2010,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var avgRunTime = script.AverageRunTime;
 
         if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
-            //failed = $"Tabelle: {Caption}\r\n" +
-            //         $"Benutzer: {UserName}\r\n" +
-            //         $"Zeit (UTC): {DateTime.UtcNow.ToString5()}\r\n" +
-            //         $"Extended: {extended}\r\n";
-
-            //if (row is { IsDisposed: false } r) {
-            //    failed += $"Zeile: {r.CellFirstString()}\r\n";
-            //    failed += $"Zeilen-Schlüssel: {r.KeyName}\r\n";
-            //    if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            //        failed += $"Chunk-Wert: {r.CellGetString(spc)}\r\n";
-            //    }
-            //}
-
-            //failed += $"\r\n\r\n\r\n{scf.ProtocolText}";
             if (string.IsNullOrEmpty(failed)) {
                 failed = scf.ProtocolText;
                 savedVariables = scf.Variables?.ToListVariableString();
@@ -2036,12 +2022,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     var newt = avgRunTime; // Zurücksetzen
                     var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
 
-                    if ((runTimeCount < 100 && deviation > 0.1f) ||
-                        (runTimeCount < 300 && deviation > 0.3f)) {
+                    if ((runTimeCount < 100 && deviation > 0.1f) ||  deviation > 0.3f) {
                         newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
                     }
 
-                    if (Math.Abs(newt - avgRunTime) > 100 || runTimeCount < 25) {
+                    if (Math.Abs(newt - avgRunTime) > 100 || runTimeCount < 25 || deviation > 0.3f) {
                         runTimeCount++;
                         avgRunTime = newt;
                     }

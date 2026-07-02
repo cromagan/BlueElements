@@ -274,3 +274,18 @@ bleibt ab und zu hängen.
 Ab und zu geht dieh Uhrzeit auch weiter.
 1) Suche den Bug, warum es hängt.
 2) Mach eine Meldung in der Status-Leiste, warum es hängt (Wenn die uhrzeit weitergeht)
+
+
+##Aufgabe
+In einer Listbox, wenn ein Item die Größe ändert (z.B. kein Fehler mehr), rutscht der hinzufügen button erst hoch, wenn ich mit der Maus in das Control fahre.
+
+##Aufgabe
+Mach ein neues Kontrol. Eine Mischung aus TabControl und Listbox.
+Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts oben oder unten "versteckt".
+Fährt man mit der Maus darüber fährt es raus.
+
+##Aufgabe
+Datenüberprüfung, das Feld mit der Geschäzten Laufzeit, einen klickbaren Button einbauen. Der Button kann frei definiert werden (sie Notification). Und bei Datenüberprüfung soll es abbrechen sein.
+
+##Aufgabe
+Beenden nach 12 h klappt nicht. Der Prozess soll Bulletproof sein, egal welche Fenster gerade offen ist.
