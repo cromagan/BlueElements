@@ -2,6 +2,7 @@
 
 using BlueBasics.Attributes;
 using BlueTable.ClassesStatic;
+using BlueTable.Enums;
 using System.Globalization;
 using System.ComponentModel;
 using System.IO;
@@ -31,7 +32,12 @@ public class TableCSV : TableFile {
 
     public TableCSV(string tablename) : base(tablename) { }
 
-    public TableCSV(string filename, Table? source) : base(filename, source) { }
+    public TableCSV(string filename, Table? source) : base(filename, source) {
+        // Beim "Speichern unter" kopiert der Basiskonstruktor per CopyTo sämtliche
+        // Head-Daten (Spalten-Metadaten, Variablen, Tags, …) in diese Instanz.
+        // Daher muss die .hbdb-Begleitdatei beim ersten Speichern erzeugt werden.
+        if (source is not null) { _headDirty = true; }
+    }
 
     #endregion
 
@@ -292,8 +298,9 @@ public class TableCSV : TableFile {
             startLine = 1;
 
             for (var i = 0; i < columnKeyes.Count; i++) {
-                var colName = FormatHolder_SystemName.MakeValid(columnKeyes[i]);
-                if (string.IsNullOrEmpty(colName)) {
+                var original = columnKeyes[i];
+                var colName = FormatHolder_SystemName.MakeValid(original);
+                if (!ColumnItem.IsValidColumnKey(colName)) {
                     colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }
 
@@ -301,8 +308,15 @@ public class TableCSV : TableFile {
 
                 var col = Column[colName];
                 if (col is null) {
-                    col = Column.GenerateAndAdd(colName);
-                    col?.Caption = columnKeyes[i];
+                    // Direkt über ExecuteCommand mit NoUndo_NoInvalidate (= IgnoreFreeze),
+                    // analog zum .bdb/.tblh-Parser in Table.cs. Während des Ladens wäre
+                    // die IsValueEditable-Prüfung (Chunk-Lock, MultiUser) blockiert.
+                    if (!string.IsNullOrEmpty(Column.ExecuteCommand(
+                        TableDataType.Command_AddColumnByName, colName, Reason.NoUndo_NoInvalidate))) {
+                        Develop.DebugError($"CSV-Spalte konnte nicht erzeugt werden: '{colName}'");
+                    }
+                    col = Column[colName];
+                    if (col is not null && !col.IsSystemColumn()) { col.Caption = original; }
                 }
             }
         } else {
@@ -313,7 +327,10 @@ public class TableCSV : TableFile {
 
                 var col = Column[colName];
                 if (col is null) {
-                    _ = Column.GenerateAndAdd(colName);
+                    if (!string.IsNullOrEmpty(Column.ExecuteCommand(
+                        TableDataType.Command_AddColumnByName, colName, Reason.NoUndo_NoInvalidate))) {
+                        Develop.DebugError($"CSV-Spalte konnte nicht erzeugt werden: '{colName}'");
+                    }
                 }
             }
         }

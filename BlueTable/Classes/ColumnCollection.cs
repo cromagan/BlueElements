@@ -145,16 +145,16 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnKey(keyName)) {
-            Develop.DebugError("Spaltenname (Schlüssel) nicht erlaubt!");
+            Develop.DebugError($"Spaltenname (Schlüssel) nicht erlaubt: '{keyName}'");
             return null;
         }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
 
-        Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
+        var result = Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
         if (item is null) {
-            Develop.DebugError("Erstellung fehlgeschlagen.");
+            Develop.DebugError($"Erstellung fehlgeschlagen: '{keyName}' – ChangeData: '{result}'");
             return null;
         }
 

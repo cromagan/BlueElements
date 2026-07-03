@@ -1780,7 +1780,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 _dragSourceRowItem = null;
                 _dragSourceColumn = null;
 
-                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca) && _mouseOverColumn?.Column is { } mc) {
+                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca) && _mouseOverColumn?.Column is { IsDisposed: false } mc) {
                     if (mc == Table.Column.SysRowSortIndex
                         && _mouseOverRow is RowListItem dragRli
                         && !PinnedRows.Contains(dragRli.Row)
