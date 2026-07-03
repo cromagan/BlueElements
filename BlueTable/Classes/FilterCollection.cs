@@ -168,8 +168,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc && !tb.PowerEdit) {
             if (InitValue(spc, true, true, filter) is { } i) {
-                var ok = tb.BeSureRowIsLoaded(i);
-                if (!ok) { return []; }
+                if (tb.BeSureRowIsLoaded(i).IsFailed) { return []; }
             } else {
                 return [];
             }

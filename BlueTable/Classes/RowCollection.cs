@@ -95,7 +95,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (Table.Column.First is not { IsDisposed: false } c) { return null; }
 
             if (c.Value_for_Chunk != ChunkType.None) {
-                if (!Table.BeSureRowIsLoaded(primärSchlüssel)) { return null; }
+                if (Table.BeSureRowIsLoaded(primärSchlüssel).IsFailed) { return null; }
             }
 
             foreach (var thisRow in _internal.Values) {
@@ -471,8 +471,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
                     chunkval = inval;
-                    if (!tb2.BeSureRowIsLoaded(inval)) {
-                        return OperationResult.FailedRetryable("Chunk konnte nicht geladen werden.");
+                    var loadResult = tb2.BeSureRowIsLoaded(inval);
+                    if (loadResult.IsFailed) {
+                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' konnte nicht geladen werden: {loadResult.FailedReason}");
                     }
                 }
             }

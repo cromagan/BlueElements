@@ -62,6 +62,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public long AverageRunTime {
         get;
         private set {
+            // Beim Setzen auf 500 ms runden — so wird auch beim Parsen alter,
+            // ungerundeter Daten normalisiert. Siehe RoundRunTime.
+            value = RoundRunTime(value);
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -156,6 +159,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Rundet eine Laufzeit auf 500 ms, um Fragment-Schreibvorgänge zu reduzieren.
+    /// Die Statistik dient nur der Anzeige (Sekunden) und MayAffectUser (&gt; 5000 ms),
+    /// daher ist eine Auflösung von 500 ms mehr als ausreichend.
+    /// </summary>
+    internal static long RoundRunTime(long milliseconds) => ((milliseconds + 250) / 500) * 500;
 
     public static bool MustBeReadonly(ScriptEventTypes type) {
         if (type.HasFlag(ScriptEventTypes.prepare_formula)) { return true; }

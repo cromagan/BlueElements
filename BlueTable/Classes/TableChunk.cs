@@ -436,8 +436,9 @@ public class TableChunk : TableFile {
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
-    public override bool BeSureRowIsLoaded(string chunkValue) {
-        if (!base.BeSureRowIsLoaded(chunkValue)) { return false; }
+    public override OperationResult BeSureRowIsLoaded(string chunkValue) {
+        var baseResult = base.BeSureRowIsLoaded(chunkValue);
+        if (baseResult.IsFailed) { return baseResult; }
 
         var chunkValues = chunkValue.SplitAndCutByCr().SortedDistinctList();
 
@@ -447,13 +448,13 @@ public class TableChunk : TableFile {
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
             var result = LoadChunkWithChunkId(chunkId);
-            if (result.IsFailed) { return false; }
+            if (result.IsFailed) { return result; }
             loaded = loaded || result.Value is true;
         }
 
         if (loaded) { OnLoaded(false, false); }
 
-        return true;
+        return OperationResult.Success;
     }
 
     public override bool BeSureToBeUpToDate(bool firstTime) {

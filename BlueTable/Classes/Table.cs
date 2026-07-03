@@ -1161,7 +1161,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public virtual bool BeSureRowIsLoaded(string chunkValue) => string.IsNullOrEmpty(IsGenericEditable(false));
+    public virtual OperationResult BeSureRowIsLoaded(string chunkValue) {
+        var f = IsGenericEditable(false);
+        return string.IsNullOrEmpty(f) ? OperationResult.Success : OperationResult.Failed(f);
+    }
 
     public virtual bool BeSureToBeUpToDate(bool firstTime) => true;
 
@@ -2007,26 +2010,33 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var failed = script.FailedReason;
         var savedVariables = script.SavedVariables;
         var runTimeCount = script.StoppedTimeCount;
+        // Bereits auf 500 ms gerundet (siehe AverageRunTime-Setter in TableScriptDescription).
         var avgRunTime = script.AverageRunTime;
 
-        if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
-            if (string.IsNullOrEmpty(failed)) {
-                failed = scf.ProtocolText;
-                savedVariables = scf.Variables?.ToListVariableString();
+        if (!string.IsNullOrEmpty(scf.FailedReason)) {
+            // Skript fehlgeschlagen: Es darf keine neue Laufzeit geschrieben werden,
+            // da die gemessene Zeit bei einem Abbruch verfälscht ist.
+            if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
+                if (string.IsNullOrEmpty(failed)) {
+                    failed = scf.ProtocolText;
+                    savedVariables = scf.Variables?.ToListVariableString();
+                }
             }
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
             if (extended || scf.Variables?.GetByKey(KeyExtendend) is null) {
                 if (runTimeCount < int.MaxValue - 100) {
-                    var newt = avgRunTime; // Zurücksetzen
                     var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
 
-                    if ((runTimeCount < 100 && deviation > 0.1f) ||  deviation > 0.3f) {
-                        newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
+                    var newt = avgRunTime;
+                    if ((runTimeCount < 100 && deviation > 0.1f) || deviation > 0.3f) {
+                        newt = TableScriptDescription.RoundRunTime(((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1));
                     }
 
-                    if (Math.Abs(newt - avgRunTime) > 100 || runTimeCount < 25 || deviation > 0.3f) {
+                    // runTimeCount wird weitergezählt (für MayAffectUser/Anzeige), aber persistiert
+                    // wird nur, wenn sich der gerundete Durchschnitt tatsächlich geändert hat.
+                    if (newt != avgRunTime || runTimeCount < 25) {
                         runTimeCount++;
                         avgRunTime = newt;
                     }
@@ -2040,7 +2050,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         var failedChanged = failed != script.FailedReason;
-        var timeChanged = runTimeCount != script.StoppedTimeCount || avgRunTime != script.AverageRunTime;
+        // Persistiert wird nur, wenn sich der gerundete Durchschnitt geändert hat —
+        // ein reiner Zählerstand löst keinen Fragment-Schreib mehr aus.
+        var timeChanged = avgRunTime != script.AverageRunTime;
 
         if (failedChanged || timeChanged) {
             // Variablen dürfen nur in Kombination mit einem geänderten FailedReason gespeichert werden
