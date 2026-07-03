@@ -420,14 +420,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         //_ = se.ShowDialog();
     }
 
-    private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc[1].Edit();
-        TableView.RepairColumnArrangements(tb);
-    }
-
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
 
     private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {

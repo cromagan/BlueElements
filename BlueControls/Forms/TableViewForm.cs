@@ -247,16 +247,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
-    /// <summary>
-    /// Schaltet die Ansicht auf die übergebene Spaltenanordnung.
-    /// Wird z.B. vom ColumnArrangementPadEditor aufgerufen, wenn eine neue
-    /// Ansicht erstellt wurde und sofort aktiviert werden soll.
-    /// </summary>
-    public void SwitchToArrangement(string keyName) {
-        if (IsDisposed || keyName is not { Length: > 0 }) { return; }
-        TableView.Arrangement = keyName;
-    }
-
     public TabPage? TabExists(string tablename) {
         tablename = tablename.FileNameWithoutSuffix();
 
@@ -617,14 +607,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         FormManager.SaveAllFiles();
         Table.BeSureToBeUpToDate(Table.AllFiles);
-    }
-
-    private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc.GetByKey(cbxColumnArr.Text)?.Edit();
-        BlueControls.Controls.TableView.RepairColumnArrangements(tb);
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();

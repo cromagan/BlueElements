@@ -2,19 +2,12 @@
 
 using BlueControls.Classes;
 using BlueControls.Controls;
-using BlueTable.Classes;
 
 namespace BlueControls.Renderer;
 
 public class Renderer_CellNote : Renderer_Abstract {
 
     #region Fields
-
-    // Alle Maße in Canvas-Pixeln.
-    private const int SymbolSize = 16;
-    private const int Padding = 3;
-    private const int BoxGap = 4;
-    private const int HeaderToTextGap = 2;
 
     /// <summary>
     /// Angenommene Textbreite in Canvas-Pixeln, die nur für die Höhenberechnung
@@ -23,6 +16,15 @@ public class Renderer_CellNote : Renderer_Abstract {
     /// Text ausreichend Höhe reserviert bekommen.
     /// </summary>
     private const int AssumedBodyWidth = 120;
+
+    private const int BoxGap = 4;
+
+    private const int HeaderToTextGap = 2;
+
+    private const int Padding = 3;
+
+    // Alle Maße in Canvas-Pixeln.
+    private const int SymbolSize = 16;
 
     #endregion
 

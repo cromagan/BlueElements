@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Classes;
 using BlueControls.Controls;
 using System.Windows.Forms;
 
@@ -100,12 +101,18 @@ public static class SimpleEditorExtension {
 
         element.DoForm(l);
 
-        foreach (var control in l.Controls) {
-            if (control is Control c) {
-                l.Height = Math.Max(l.Height, c.Bottom);
-            }
+        var contentHeight = Skin.Padding;
+        foreach (Control c in l.Controls) {
+            if (c is Slider) { continue; }
+            contentHeight += c.Height + Skin.Padding;
         }
-        return l;
+
+        var chrome = BlueControls.Forms.Form.BorderHeight + (Skin.Padding * 4) + 40;
+        var maxHeight = (Screen.PrimaryScreen?.WorkingArea.Height ?? contentHeight) - chrome;
+
+        l.Height = Math.Clamp(contentHeight, 100, Math.Max(100, maxHeight));
+
+        return l;;
     }
 
     #endregion

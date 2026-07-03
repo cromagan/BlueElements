@@ -154,6 +154,12 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             } else if (myObject is EditorEasy ea) {
                 ea.Mode = ea.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
                 mb = new InputBoxEditor(ea, supportsCancel, allowInvalid);
+            } else if (myObject is ISimpleEditor se) {
+                if (se is IIsEditor seEditor) {
+                    seEditor.Mode = seEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
+                    seEditor.InputItem = toEdit;
+                }
+                mb = new InputBoxEditor(se.GetControl(400), supportsCancel, allowInvalid);
             }
         } catch { }
 

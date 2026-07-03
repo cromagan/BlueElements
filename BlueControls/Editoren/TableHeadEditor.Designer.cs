@@ -47,7 +47,6 @@ namespace BlueControls.BlueTableDialogs {
             btnUnMaster = new Button();
             btnTabellenAnsicht = new Button();
             btnSkripte = new Button();
-            btnSpaltenAnordnungen = new Button();
             txbZeilenQuickInfo = new TextBox();
             butSystemspaltenErstellen = new Button();
             btnOptimize = new Button();
@@ -290,7 +289,6 @@ namespace BlueControls.BlueTableDialogs {
             tabAllgemein.Controls.Add(btnUnMaster);
             tabAllgemein.Controls.Add(btnTabellenAnsicht);
             tabAllgemein.Controls.Add(btnSkripte);
-            tabAllgemein.Controls.Add(btnSpaltenAnordnungen);
             tabAllgemein.Controls.Add(txbZeilenQuickInfo);
             tabAllgemein.Controls.Add(butSystemspaltenErstellen);
             tabAllgemein.Controls.Add(btnOptimize);
@@ -366,17 +364,6 @@ namespace BlueControls.BlueTableDialogs {
             btnSkripte.TabIndex = 52;
             btnSkripte.Text = "Skripte";
             btnSkripte.Click += btnSkripte_Click;
-            // 
-            // btnSpaltenAnordnungen
-            // 
-            btnSpaltenAnordnungen.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnSpaltenAnordnungen.ImageCode = "Spalte|16";
-            btnSpaltenAnordnungen.Location = new Point(216, 592);
-            btnSpaltenAnordnungen.Name = "btnSpaltenAnordnungen";
-            btnSpaltenAnordnungen.Size = new Size(200, 32);
-            btnSpaltenAnordnungen.TabIndex = 51;
-            btnSpaltenAnordnungen.Text = "Spaltenanordnung";
-            btnSpaltenAnordnungen.Click += btnSpaltenAnordnungen_Click;
             // 
             // txbZeilenQuickInfo
             // 
@@ -721,7 +708,6 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
         private Button btnDummyAdmin;
-        private Button btnSpaltenAnordnungen;
         private Button btnSkripte;
         private Button btnTabellenAnsicht;
         private Button btnUnMaster;

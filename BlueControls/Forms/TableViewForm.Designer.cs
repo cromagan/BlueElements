@@ -79,7 +79,6 @@ namespace BlueControls.Forms {
             btnSuchInScript = new Button();
             btnSkripteBearbeiten = new Button();
             btnFormular = new Button();
-            btnSpaltenanordnung = new Button();
             btnTabelleKopf = new Button();
             btnLayouts = new Button();
             tabExport = new TabPage();
@@ -613,7 +612,6 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.Controls.Add(btnSuchInScript);
             grpAdminBearbeiten.Controls.Add(btnSkripteBearbeiten);
             grpAdminBearbeiten.Controls.Add(btnFormular);
-            grpAdminBearbeiten.Controls.Add(btnSpaltenanordnung);
             grpAdminBearbeiten.Controls.Add(btnTabelleKopf);
             grpAdminBearbeiten.Controls.Add(btnLayouts);
             grpAdminBearbeiten.Dock = DockStyle.Left;
@@ -657,17 +655,6 @@ namespace BlueControls.Forms {
             btnFormular.TabIndex = 44;
             btnFormular.Text = "Formular-Editor";
             btnFormular.Click += btnFormular_Click;
-            // 
-            // btnSpaltenanordnung
-            // 
-            btnSpaltenanordnung.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnSpaltenanordnung.ImageCode = "Spalte||||||||||Stift";
-            btnSpaltenanordnung.Location = new Point(176, 2);
-            btnSpaltenanordnung.Name = "btnSpaltenanordnung";
-            btnSpaltenanordnung.Size = new Size(64, 66);
-            btnSpaltenanordnung.TabIndex = 43;
-            btnSpaltenanordnung.Text = "Spalten-anordung";
-            btnSpaltenanordnung.Click += btnSpaltenanordnung_Click;
             // 
             // btnTabelleKopf
             // 
@@ -959,7 +946,6 @@ namespace BlueControls.Forms {
         private Button btnZeileLöschen;
         private Button btnPowerBearbeitung;
         private Button btnAnsichtbearbeitung;
-        private Button btnSpaltenanordnung;
         private Button btnLayouts;
         private Button btnTabelleKopf;
         private Button btnSpaltenUebersicht;
