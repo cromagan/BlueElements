@@ -267,3 +267,6 @@ bei Admin, die Dummy-Spalte (zum hinzufügen neuer Ansichten) anzeigen
 Mach ein neues Kontrol. Eine Mischung aus TabControl und Listbox.
 Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts oben oder unten "versteckt".
 Fährt man mit der Maus darüber fährt es raus.
+
+##Aufgabe
+führe Jason.md aus. Beachte: die Zeilennummern können inzwischen anders sein, aber sinngemäß passt die Anforderung noch.

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
+using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes;
 
@@ -54,9 +55,11 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     /// an einem Ort zu bündeln.
     /// </summary>
     public static void SaveAllFiles() {
-        CachedFileSystem.SaveAll(false);
+        CachedFile.SaveAll(false, ConnectedFormula.LiveInstances.Values);
+        CachedFile.SaveAll(false, Chunk.LiveInstances.Values);
         Table.SaveAll();
-        CachedFileSystem.SaveAll(true);
+        CachedFile.SaveAll(true, ConnectedFormula.LiveInstances.Values);
+        CachedFile.SaveAll(true, Chunk.LiveInstances.Values);
     }
 
     public static void SaveEnd(Form? lastForm) {
@@ -91,6 +94,12 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
             thisTable.Freeze("Beenden...");
             Develop.EndLog($"SaveEnd: [{idx}/{allTables.Count}] Nach Freeze '{thisTable.KeyName}'");
         }
+
+        Develop.EndLog("SaveEnd: Vor ConnectedFormula.DisposeAll()");
+        CachedFile.DisposeAll(ConnectedFormula.LiveInstances.Values);
+        Develop.EndLog("SaveEnd: Vor CachedFile.DisposeAll()");
+        CachedFile.DisposeAll(Chunk.LiveInstances.Values);
+        Develop.EndLog("SaveEnd: Nach CachedFile.DisposeAll()");
 
         Develop.EndLog("SaveEnd: Vor CachedFileSystem.DisposeAll()");
         CachedFileSystem.DisposeAll();

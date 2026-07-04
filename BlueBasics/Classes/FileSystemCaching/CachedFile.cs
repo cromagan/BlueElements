@@ -13,7 +13,10 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// Abstrakte Basisklasse für alle gecachten Dateitypen.
 /// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading und Versionierung.
 /// Thread-sicher durch Double-Checked-Locking mit Semaphore.
-/// Instanzen dürfen nur über CachedFileSystem erzeugt werden.
+/// Das zentrale Lifecycle-Management (<see cref="SaveAll(bool, IEnumerable{CachedFile})"/>
+/// und <see cref="DisposeAll(IEnumerable{CachedFile})"/>) erhält die zu behandelnden
+/// Instanzen vom Aufrufer — die Ableitungen (z.B. Chunk, ConnectedFormula) pflegen
+/// dafür eigene Live-Register.
 /// </summary>
 public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableText {
 
@@ -63,7 +66,11 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     /// <summary>
     /// Erstellt eine neue CachedFile-Instanz für den angegebenen Dateipfad.
-    /// Nur über CachedFileSystem.CreateCachedFile() (via Activator.CreateInstance) aufrufbar.
+    /// Registriert die Instanz im CachedFileSystem (für Watcher-basierte
+    /// Invalidierung). Ableitungen pflegen ihre Live-Instanzen zusätzlich in
+    /// eigenen Registern, die dem Aufrufer von
+    /// <see cref="SaveAll(bool, IEnumerable{CachedFile})"/> bzw.
+    /// <see cref="DisposeAll(IEnumerable{CachedFile})"/> übergeben werden.
     /// </summary>
     /// <param name="filename">Vollständiger Dateipfad.</param>
     protected CachedFile(string filename) {
@@ -267,6 +274,58 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Speichert die angegebenen CachedFile-Instanzen.
+    /// </summary>
+    /// <param name="mustWait">
+    /// Falls FALSE: Asynchrones Speichern anstoßen und NICHT warten.
+    /// Falls TRUE: Asynchrones Speichern anstoßen und WARTEN, bis alle fertig sind.
+    /// </param>
+    /// <param name="files">Die zu speichernden CachedFile-Instanzen (z. B. aus
+    /// <c>Chunk.LiveInstances</c> und <c>ConnectedFormula.LiveInstances</c>).</param>
+    public static void SaveAll(bool mustWait, IEnumerable<CachedFile> files) {
+        var tasks = new List<Task>();
+        foreach (var file in files) {
+            if (file.IsDisposed) { continue; }
+            if (!file.IsSaved) {
+                if (file.IsSaveAbleNow() is { Length: 0 }) {
+                    tasks.Add(file.Save());
+                } else if (mustWait && file.IsSaving) {
+                    tasks.Add(Task.Run(file.WaitDiskOperationFinished));
+                }
+            }
+        }
+
+        if (tasks.Count > 0) {
+            Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
+
+            if (mustWait) {
+                EndLog($"CachedFile.SaveAll(true): Warte auf {tasks.Count} Task(s) (max 60s)");
+                try {
+                    Task.WaitAll(tasks.ToArray(), 60000);
+                    EndLog("CachedFile.SaveAll(true): Task.WaitAll zurück");
+                } catch {
+                    EndLog("CachedFile.SaveAll(true): Task.WaitAll hat Exception geworfen");
+                }
+            }
+
+            Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+        } else {
+            EndLog("CachedFile.SaveAll: keine anstehenden Tasks");
+        }
+    }
+
+    /// <summary>
+    /// Disposed die angegebenen CachedFile-Instanzen.
+    /// </summary>
+    /// <param name="files">Die zu verwerfenden CachedFile-Instanzen (z. B. aus
+    /// <c>Chunk.LiveInstances</c> und <c>ConnectedFormula.LiveInstances</c>).</param>
+    public static void DisposeAll(IEnumerable<CachedFile> files) {
+        foreach (var file in files) {
+            try { file.Dispose(); } catch { }
+        }
+    }
 
     /// <summary>
     /// Disposed alle zugeordneten Ressourcen.
@@ -651,49 +710,45 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     private OperationResult SaveExtended(byte[] contentToWrite, string savedContentHash) {
         var backup = BackupName(Filename);
-        var tempfile = Path.GetTempFileName();
+        // Tempfile im Zielverzeichnis anlegen, damit File.Replace funktioniert
+        // (gleiche Volume erforderlich) und Cross-Volume-Kopien vermieden werden.
+        var tempfile = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix(), "tmp");
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
             CachedFileSystem.BeginIgnoreFile(Filename);
             CachedFileSystem.BeginIgnoreFile(backup);
+            CachedFileSystem.BeginIgnoreFile(tempfile);
 
             // 1. Lokal schreiben (schnell, sicher vor Netzwerk-Abbrüchen)
             var result = WriteAllBytes(tempfile, contentToWrite);
             if (result.IsFailed) { return result; }
-            //// File.Replace führt Replace+Backup in einem atomaren Syscall aus.
-            //// Schneller und sicherer als DeleteFile + MoveFile + MoveFile.
-            //if (!FileExists(Filename)) {
-            //    if (!MoveFile(tempfile, Filename, false)) {
-            //        DeleteFile(tempfile, false);
-            //        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-            //    }
-            //}
 
-            try {
-                // 2. Atomares Ersetzen im Netzwerk
-                File.Replace(tempfile, Filename, backup, ignoreMetadataErrors: true);
-            } catch {
-                // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
-                // Zuerst altes Backup entfernen, falls vorhanden
-                if (FileExists(backup) && !FileExists(Filename)) {
-                    DeleteFile(tempfile, false);
-                    return OperationResult.Failed("Hauptdatei fehlt!");
-                }
-
-                if (FileExists(backup) && !DeleteFile(backup, false)) {
-                    return OperationResult.Failed("Backup konnte nicht gelöscht werden");
-                }
-
-                if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                    return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
-                }
-
+            if (!FileExists(Filename)) {
+                // 2a. Erstspeicherung: Datei existiert noch nicht — kein Backup nötig,
+                //     kein File.Replace möglich (Zieldatei fehlt). Direktes Verschieben.
                 if (!MoveFile(tempfile, Filename, false)) {
-                    if (FileExists(backup) && !FileExists(Filename)) {
-                        MoveFile(backup, Filename, false);
-                    }
                     return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                }
+            } else {
+                // 2b. Datei existiert — atomares Ersetzen mit Backup-Rotation.
+                //     File.Replace führt Replace+Backup in einem Syscall aus.
+                try {
+                    File.Replace(tempfile, Filename, backup, ignoreMetadataErrors: true);
+                } catch {
+                    // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
+                    if (FileExists(backup) && !DeleteFile(backup, false)) {
+                        return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+                    }
+
+                    if (!MoveFile(Filename, backup, false)) {
+                        return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+                    }
+
+                    if (!MoveFile(tempfile, Filename, false)) {
+                        MoveFile(backup, Filename, false);
+                        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                    }
                 }
             }
 
@@ -711,6 +766,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             DeleteFile(tempfile, false);
             CachedFileSystem.EndIgnoreFile(Filename);
             CachedFileSystem.EndIgnoreFile(backup);
+            CachedFileSystem.EndIgnoreFile(tempfile);
         }
     }
 

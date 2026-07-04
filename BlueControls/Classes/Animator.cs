@@ -100,12 +100,26 @@ public static class Animator {
     /// <paramref name="onFinished" /> wird im Animations-Thread aufgerufen,
     /// sobald <see cref="AnimationFrame.Finished" /> true ist — UI-Aufrufe
     /// darin müssen selbst via BeginInvoke gemarshalled werden.
+    /// Standardmäßig wird das Fenster als Layered-Window markiert, damit
+    /// <see cref="AnimationFrame.Opacity" /> greift (Top-Level-Fenster).
     /// </summary>
     public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) {
-        if (hwnd == IntPtr.Zero) { return; }
-        EnsureLayered(hwnd);
+        Start(hwnd, compute, onFinished, true);
+    }
 
-        var entry = new Entry(hwnd, compute, onFinished, DateTime.UtcNow);
+    /// <summary>
+    /// Startet eine Animation für das Fenster <paramref name="hwnd" />.
+    /// Wenn <paramref name="layered" /> false ist, wird das Fenster NICHT als
+    /// Layered-Window markiert und <see cref="AnimationFrame.Opacity" /> wird
+    /// ignoriert. Das ist für Child-Controls gedacht, die nur ihre Position
+    /// ändern (z.B. <see cref="Controls.SlideOutPanel" />) und weder
+    /// Transparenz noch das WS_EX_LAYERED-Flag benötigen.
+    /// </summary>
+    public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, bool layered) {
+        if (hwnd == IntPtr.Zero) { return; }
+        if (layered) { EnsureLayered(hwnd); }
+
+        var entry = new Entry(hwnd, compute, onFinished, DateTime.UtcNow, layered);
         lock (_lock) {
             _entries[hwnd] = entry;
         }
@@ -122,7 +136,18 @@ public static class Animator {
     /// </summary>
     public static void Start(IAnimatable target) {
         if (target is null) { return; }
-        Start(target.Handle, target.Animate, target.OnAnimationFinished);
+        Start(target.Handle, target.Animate, target.OnAnimationFinished, true);
+    }
+
+    /// <summary>
+    /// Startet eine Animation für <paramref name="target" /> mit expliziter
+    /// Wahl, ob das Fenster als Layered-Window markiert wird. Child-Controls
+    /// (z.B. <see cref="Controls.SlideOutPanel" />) übergeben hier false,
+    /// da sie nur ihre Position animieren und kein WS_EX_LAYERED benötigen.
+    /// </summary>
+    public static void Start(IAnimatable target, bool layered) {
+        if (target is null) { return; }
+        Start(target.Handle, target.Animate, target.OnAnimationFinished, layered);
     }
 
     /// <summary>
@@ -135,13 +160,15 @@ public static class Animator {
         }
     }
 
-    private static void ApplyFrame(IntPtr hwnd, in AnimationFrame frame) {
+    private static void ApplyFrame(IntPtr hwnd, in AnimationFrame frame, bool layered) {
         // Position — Win32 direkt, am UI-Thread vorbei.
         SetWindowPos(hwnd, IntPtr.Zero, frame.X, frame.Y, 0, 0, SwpPosFlags);
 
-        // Opacity — Layered-Window-Alpha direkt setzen.
-        var alpha = (byte)Math.Clamp((int)(frame.Opacity * 255), 0, 255);
-        SetLayeredWindowAttributes(hwnd, 0, alpha, LwaAlpha);
+        // Opacity — nur bei Layered-Windows sinnvoll/anwendbar.
+        if (layered) {
+            var alpha = (byte)Math.Clamp((int)(frame.Opacity * 255), 0, 255);
+            SetLayeredWindowAttributes(hwnd, 0, alpha, LwaAlpha);
+        }
     }
 
     private static void EnsureLayered(IntPtr hwnd) {
@@ -214,7 +241,7 @@ public static class Animator {
                     continue;
                 }
 
-                ApplyFrame(e.Hwnd, frame);
+                ApplyFrame(e.Hwnd, frame, e.Layered);
 
                 if (frame.Finished) {
                     (finished ??= []).Add(e);
@@ -308,13 +335,14 @@ public static class Animator {
 
     #region Classes
 
-    private sealed class Entry(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, DateTime startTime) {
+    private sealed class Entry(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, DateTime startTime, bool layered) {
 
         #region Properties
 
         public Func<TimeSpan, AnimationFrame> Compute { get; } = compute;
         public IntPtr Hwnd { get; } = hwnd;
         public Action? OnFinished { get; } = onFinished;
+        public bool Layered { get; } = layered;
 
         public DateTime StartTime { get; } = startTime;
 

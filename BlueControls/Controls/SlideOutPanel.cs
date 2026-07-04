@@ -7,30 +7,24 @@ using System.Windows.Forms;
 namespace BlueControls.Controls;
 
 /// <summary>
-/// Herausfahrendes Panel, das wie eine Registerkarte am oberen oder unteren
-/// Rand seines Parents andockt. Im eingefahrenen Zustand ist nur die schmale
-/// Registerkarte sichtbar (<see cref="TabSize" /> Pixel hoch). Fährt die Maus
-/// über das Control, wird der Body smooth herausgefahren (200 ms, Smoothstep-
-/// Easing analog <see cref="Forms.QuickNote" />). Verlässt die Maus das
-/// Control, fährt es wieder ein.
-/// Über <see cref="TabAtTop" /> wird festgelegt, ob die Registerkarte am
-/// oberen (true) oder unteren (false) Rand liegt.
-/// Im Designer wird das Panel frei platziert. Sobald es zur Laufzeit
-/// erstmals angezeigt wird, rutscht es automatisch an den entsprechenden
-/// Rand seines Parents (volle Breite, Registerkarte bündig mit dem Rand).
-/// Der Body kann beliebige Child-Controls aufnehmen, die innerhalb von
-/// <see cref="BodyClientArea" /> platziert werden sollten.
+/// Herausfahrendes Panel, das am oberen oder unteren Rand seines Parents
+/// andockt. Die Größe des Panels bleibt dabei immer unverändert
+/// (<see cref="ExpandedHeight" />) — ein- und ausgefahren wird ausschließlich
+/// über die Position (Y) gesteuert, und zwar von der <see cref="Animator" />-
+/// Engine über das <see cref="IAnimatable" />-Interface.
+/// Im eingefahrenen Zustand ragen nur <see cref="TabSize" /> Pixel in den
+/// sichtbaren Bereich des Parents. Fährt die Maus über das Control, wird das
+/// Panel smooth herausgefahren (200 ms, Smoothstep-Easing). Verlässt die Maus
+/// das Control, fährt es wieder ein.
+/// Über <see cref="TabAtTop" /> wird festgelegt, ob das Panel am oberen Rand
+/// andockt (Body fährt nach unten, true) oder am unteren Rand (Body fährt nach
+/// oben, false).
+/// Die Zeichenroutine stammt vollständig von der Basisklasse <see cref="GroupBox" />
+/// — es gibt kein eigenes OnPaint, GroupBox zeichnet Rahmen und Caption
+/// (<see cref="Control.Text" />) wie gewohnt.
 /// </summary>
-/// <remarks>
-/// Basisklasse ist die hauseigene <see cref="Controls.GroupBox" />, damit der
-/// WinForms-Designer das Control als Container erkennt (GroupBox ist über
-/// ihren framework-seitigen Designer automatisch ein Container) und beliebige
-/// Child-Controls aufnehmen kann. Die GroupBox-eigene Rahmenzeichnung wird
-/// durch eine eigene <see cref="OnPaint" />-Implementierung vollständig
-/// ersetzt.
-/// </remarks>
 [DefaultEvent(nameof(ExpandedChanged))]
-public sealed class SlideOutPanel : GroupBox, ITranslateable {
+public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
 
     #region Fields
 
@@ -38,13 +32,21 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     private const int DefaultExpandedHeight = 400;
     private const double SlideDurationMs = 200;
 
+    // Animations-Fortschritt: 0 = eingefahren, 1 = ausgefahren.
+    // Wird von Animate() (Animations-Thread) geschrieben und von
+    // StartSlide() (UI-Thread) gelesen — int/double Reads sind auf x86/x64
+    // atomar, ein allenfalls veralteter Wert kostet maximal einen Frame.
     private double _animProgress;
-    private DateTime _animStart;
     private double _animStartProgress;
     private double _animTargetProgress;
-    private bool _containsMouse;
+
+    // Y-Positionen (parent-relativ), vor dem Start der Animation auf dem
+    // UI-Thread gecacht, damit Animate() keine WinForms-Properties liest.
+    private int _animCollapsedY;
+    private int _animExpandedY;
+
+    private volatile bool _isAnimating;
     private System.Windows.Forms.Control? _hookedParent;
-    private System.Windows.Forms.Timer? _timer;
 
     #endregion
 
@@ -53,9 +55,7 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     public SlideOutPanel() {
         DoubleBuffered = true;
         SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
-        // Initial eingefahren darstellen
         _animProgress = 0;
-        UpdateSize();
     }
 
     #endregion
@@ -69,19 +69,8 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     #region Properties
 
     /// <summary>
-    /// Liefert den Bereich innerhalb des Panels, in dem Child-Controls
-    /// platziert werden sollten (also ohne die Registerkarte).
-    /// Im eingefahrenen Zustand hat dieser Bereich die Größe 0.
-    /// </summary>
-    public Rectangle BodyClientArea => BodyRectangle;
-
-    private Rectangle BodyRectangle => TabAtTop
-        ? new Rectangle(0, TabSize, Width, Math.Max(0, Height - TabSize))
-        : new Rectangle(0, 0, Width, Math.Max(0, Height - TabSize));
-
-    /// <summary>
-    /// Vollständige Höhe des Panels im ausgefahrenen Zustand (inklusive
-    /// Registerkarte). Die Breite richtet sich zur Laufzeit nach dem Parent.
+    /// Vollständige Höhe des Panels (immer konstant, ändert sich nie).
+    /// Die Breite richtet sich zur Laufzeit nach dem Parent.
     /// </summary>
     [DefaultValue(DefaultExpandedHeight)]
     public int ExpandedHeight {
@@ -89,18 +78,16 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
         set {
             if (field == value) { return; }
             field = Math.Max(TabSize + 1, value);
-            UpdateSize();
-            Invalidate();
+            UpdateLayout();
         }
     } = DefaultExpandedHeight;
 
     public bool IsExpanded { get; private set; }
 
     /// <summary>
-    /// Bestimmt den Rand, an dem die Registerkarte liegt und an den das
-    /// Panel zur Laufzeit andockt.
-    /// true  → Registerkarte oben,  Body fährt nach unten heraus.
-    /// false → Registerkarte unten, Body fährt nach oben heraus.
+    /// Bestimmt den Rand, an dem das Panel andockt und die Slide-Richtung.
+    /// true  → Panel am oberen Rand, Body fährt nach unten heraus.
+    /// false → Panel am unteren Rand, Body fährt nach oben heraus.
     /// </summary>
     [DefaultValue(true)]
     public bool TabAtTop {
@@ -108,19 +95,23 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
         set {
             if (field == value) { return; }
             field = value;
-            UpdateSize();
-            Invalidate();
+            UpdateLayout();
         }
     } = true;
 
-    public QuickImage? TabImage {
+    /// <summary>
+    /// Anzahl Pixel, die im eingefahrenen Zustand in den Parent hineinragen
+    /// (als Interaktionsfläche für die Maus).
+    /// </summary>
+    [DefaultValue(DefaultTabSize)]
+    public int TabSize {
         get;
         set {
             if (field == value) { return; }
-            field = value;
-            Invalidate();
+            field = Math.Max(5, value);
+            UpdateLayout();
         }
-    }
+    } = DefaultTabSize;
 
     /// <summary>
     /// Benötigt, damit der Designer das nicht erstellt.
@@ -132,20 +123,6 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     }
 
     /// <summary>
-    /// Höhe der Registerkarte in Pixel.
-    /// </summary>
-    [DefaultValue(DefaultTabSize)]
-    public int TabSize {
-        get;
-        set {
-            if (field == value) { return; }
-            field = Math.Max(5, value);
-            UpdateSize();
-            Invalidate();
-        }
-    } = DefaultTabSize;
-
-    /// <summary>
     /// Benötigt, damit der Designer das nicht erstellt.
     /// </summary>
     [DefaultValue(false)]
@@ -154,26 +131,66 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
         set { _ = value; base.TabStop = false; }
     }
 
-    [DefaultValue("")]
-    public string TabText {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            Invalidate();
-        }
-    } = string.Empty;
-
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
-    private Rectangle TabRectangle {
-        get {
-            var ts = Math.Min(TabSize, Height);
-            return TabAtTop
-                ? new Rectangle(0, 0, Width, ts)
-                : new Rectangle(0, Math.Max(0, Height - ts), Width, ts);
+    #endregion
+
+    #region IAnimatable
+
+    /// <summary>
+    /// Berechnet das Frame der Slide-Animation aus der seit Start verstrichenen
+    /// Zeit. Wird auf dem Animations-Thread aufgerufen und liest ausschließlich
+    /// gecachte Felder — keine WinForms-Properties.
+    /// </summary>
+    public AnimationFrame Animate(TimeSpan elapsed) {
+        var rawProgress = Math.Min(1.0, elapsed.TotalMilliseconds / SlideDurationMs);
+        var eased = EaseInOut(rawProgress);
+
+        var progress = _animStartProgress + (_animTargetProgress - _animStartProgress) * eased;
+        _animProgress = progress;
+
+        var y = _animCollapsedY + (int)((_animExpandedY - _animCollapsedY) * progress);
+
+        var finished = rawProgress >= 1.0;
+        if (finished) {
+            _animProgress = _animTargetProgress;
+            y = _animTargetProgress > 0.5 ? _animExpandedY : _animCollapsedY;
         }
+
+        return new AnimationFrame { Opacity = 1, X = 0, Y = y, Finished = finished };
+    }
+
+    void IAnimatable.Close() => ((IAnimatable)this).StopAnimation();
+
+    /// <summary>
+    /// Animation beendet — Panel bleibt an der Zielposition, wird NICHT
+    /// geschlossen (anders als bei FloatingForms). Überschreibt den
+    /// Default von <see cref="IAnimatable.OnAnimationFinished" />, der das
+    /// Objekt schließen würde.
+    /// </summary>
+    void IAnimatable.OnAnimationFinished() {
+        _isAnimating = false;
+        if (!IsHandleCreated || Disposing || IsDisposed) { return; }
+        try {
+            ((ISynchronizeInvoke)this).BeginInvoke(new Action(UpdateLayout), null);
+        } catch (Exception ex) {
+            Develop.DebugPrint("OnAnimationFinished: UpdateLayout konnte nicht gemarshalled werden", ex);
+        }
+    }
+
+    /// <summary>
+    /// Startet die Animation über den <see cref="Animator" /> — ohne
+    /// Layered-Window, da SlideOutPanel ein Child-Control ist, das nur seine
+    /// Position ändert. Überschreibt den Default von
+    /// <see cref="IAnimatable.StartAnimation" />, der WS_EX_LAYERED setzen würde.
+    /// </summary>
+    void IAnimatable.StartAnimation() {
+        if (!IsHandleCreated) {
+            Develop.DebugPrint("StartAnimation vor CreateHandle aufgerufen");
+            return;
+        }
+        Animator.Start(this, false);
     }
 
     #endregion
@@ -183,75 +200,36 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     public void Collapse() {
         if (!IsExpanded) { return; }
         IsExpanded = false;
-        StartAnimation(0.0);
         OnExpandedChanged();
+        StartSlide(0.0);
     }
 
     public void Expand() {
         if (IsExpanded) { return; }
         IsExpanded = true;
-        StartAnimation(1.0);
         OnExpandedChanged();
+        StartSlide(1.0);
     }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            ((IAnimatable)this).StopAnimation();
             if (_hookedParent is not null) {
                 _hookedParent.SizeChanged -= Parent_SizeChanged;
                 _hookedParent = null;
-            }
-            if (_timer is not null) {
-                _timer.Tick -= Timer_Tick;
-                _timer.Dispose();
-                _timer = null;
             }
         }
         base.Dispose(disposing);
     }
 
-    /// <summary>
-    /// Zeichnet Body- und Registerkarte vollständig selbst. Die
-    /// GroupBox-Rahmenzeichnung der Basisklasse wird bewusst nicht
-    /// aufgerufen (<c>base.OnPaint</c> fehlt absichtlich).
-    /// </summary>
-    protected override void OnPaint(PaintEventArgs e) {
-        if (IsDisposed) { return; }
-
-        var gr = e.Graphics;
-        var bodyRect = BodyRectangle;
-        var tabRect = TabRectangle;
-
-        // Body nur zeichnen, wenn er überhaupt sichtbare Fläche hat.
-        // Optik wie eine TabPage eines TabControls (inkl. Transparenz).
-        if (bodyRect.Width > 0 && bodyRect.Height > 0) {
-            Skin.Draw_Back(gr, Design.TabStrip_Body, States.Standard, bodyRect, this, true);
-            Skin.Draw_Border(gr, Design.TabStrip_Body, States.Standard, bodyRect);
-        }
-
-        // Registerkarte wie ein echtes TabControl-Register darstellen:
-        // aktiviert (Checked) wenn ausgefahren, Hover wenn die Maus darüber steht.
-        var tabState = States.Standard;
-        if (IsExpanded) { tabState |= States.Checked; }
-        if (_containsMouse) { tabState |= States.Standard_MouseOver; }
-
-        Skin.Draw_Back(gr, Design.TabStrip_Head, tabState, tabRect, this, true);
-        Skin.Draw_Border(gr, Design.TabStrip_Head, tabState, tabRect);
-
-        var text = LanguageTool.DoTranslate(TabText, Translate);
-        Skin.Draw_FormatedText(gr, text, TabImage, Alignment.Horizontal_Vertical_Center,
-            tabRect, Design.TabStrip_Head, tabState, this, false, false);
-    }
-
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        _containsMouse = true;
         if (DesignMode) { return; }
         Expand();
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        _containsMouse = false;
         if (DesignMode) { return; }
         // OnMouseLeave feuert auch, wenn die Maus über ein Child-Control bewegt
         // wird. Deshalb prüfen, ob die Maus wirklich außerhalb des Client-Bereichs ist.
@@ -264,7 +242,7 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     protected override void OnParentChanged(System.EventArgs e) {
         base.OnParentChanged(e);
         HookParent();
-        SnapToEdge();
+        UpdateLayout();
     }
 
     /// <summary>
@@ -272,18 +250,18 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
     /// </summary>
     private static double EaseInOut(double t) => (3.0 - 2.0 * t) * t * t;
 
-    private int ComputeHeight() {
-        var bodyH = Math.Max(0, ExpandedHeight - TabSize);
-        return (int)(TabSize + bodyH * _animProgress);
+    private int ComputeCollapsedY() {
+        if (Parent is null) { return 0; }
+        return TabAtTop
+            ? -(ExpandedHeight - TabSize)
+            : Math.Max(0, Parent.ClientSize.Height - TabSize);
     }
 
-    private void EnsureTimer() {
-        if (_timer is null) {
-            _timer = new System.Windows.Forms.Timer {
-                Interval = 16
-            };
-            _timer.Tick += Timer_Tick;
-        }
+    private int ComputeExpandedY() {
+        if (Parent is null) { return 0; }
+        return TabAtTop
+            ? 0
+            : Math.Max(0, Parent.ClientSize.Height - ExpandedHeight);
     }
 
     private void HookParent() {
@@ -300,59 +278,46 @@ public sealed class SlideOutPanel : GroupBox, ITranslateable {
 
     private void OnExpandedChanged() => ExpandedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void Parent_SizeChanged(object? sender, System.EventArgs e) => SnapToEdge();
+    private void Parent_SizeChanged(object? sender, System.EventArgs e) => UpdateLayout();
 
     /// <summary>
-    /// Setzt das Panel im Laufzeitmodus bündig an den Rand seines Parents
-    /// (volle Breite, Registerkarte am oberen/unteren Rand). Im Designer
-    /// bleibt das Panel dort, wo es platziert wurde.
+    /// Startet die Slide-Animation Richtung <paramref name="targetProgress" />
+    /// (0 = eingefahren, 1 = ausgefahren). Positionen werden auf dem UI-Thread
+    /// gecacht, damit Animate() thread-safe bleibt. Falls Handle/Parent noch
+    /// nicht bereit sind, wird nur der Zustand synchronisiert — die Position
+    /// korrigiert sich beim nächsten UpdateLayout.
     /// </summary>
-    private void SnapToEdge() {
-        if (DesignMode || IsDisposed || Disposing || Parent is null) { return; }
-        if (Dock != DockStyle.None) { Dock = DockStyle.None; }
-        BringToFront();
-        UpdateSize();
-    }
-
-    private void StartAnimation(double targetProgress) {
+    private void StartSlide(double targetProgress) {
         _animStartProgress = _animProgress;
         _animTargetProgress = targetProgress;
-        _animStart = DateTime.UtcNow;
-        EnsureTimer();
-        if (!_timer!.Enabled) {
-            _timer.Start();
-        }
-    }
 
-    private void Timer_Tick(object? sender, System.EventArgs e) {
-        var elapsed = DateTime.UtcNow - _animStart;
-        var rawProgress = Math.Min(1.0, elapsed.TotalMilliseconds / SlideDurationMs);
-        var eased = EaseInOut(rawProgress);
-
-        _animProgress = _animStartProgress + (_animTargetProgress - _animStartProgress) * eased;
-        UpdateSize();
-        Invalidate();
-
-        if (rawProgress >= 1.0) {
-            _animProgress = _animTargetProgress;
-            UpdateSize();
-            _timer!.Stop();
-        }
-    }
-
-    private void UpdateSize() {
-        if (DesignMode) { return; }
-
-        var h = ComputeHeight();
-
-        if (Parent is null) {
-            if (Height != h) { Height = h; }
+        if (DesignMode || IsDisposed || Disposing || Parent is null || !IsHandleCreated) {
+            _animProgress = targetProgress;
             return;
         }
 
+        _animCollapsedY = ComputeCollapsedY();
+        _animExpandedY = ComputeExpandedY();
+        _isAnimating = true;
+
+        ((IAnimatable)this).StartAnimation();
+    }
+
+    /// <summary>
+    /// Positioniert das Panel am Rand seines Parents (volle Breite, feste
+    /// Höhe <see cref="ExpandedHeight" />). Ausgefahren: vollständig sichtbar.
+    /// Eingefahren: nur <see cref="TabSize" /> Pixel ragen in den Parent.
+    /// Wird während der Animation nicht aufgerufen — dann steuert der
+    /// Animator die Y-Position via SetWindowPos.
+    /// </summary>
+    private void UpdateLayout() {
+        if (DesignMode || IsDisposed || Disposing || Parent is null || _isAnimating) { return; }
+        if (Dock != DockStyle.None) { Dock = DockStyle.None; }
+        BringToFront();
+
         var width = Parent.ClientSize.Width;
-        var y = TabAtTop ? 0 : Math.Max(0, Parent.ClientSize.Height - h);
-        var newBounds = new Rectangle(0, y, width, h);
+        var y = IsExpanded ? ComputeExpandedY() : ComputeCollapsedY();
+        var newBounds = new Rectangle(0, y, width, ExpandedHeight);
         if (Bounds != newBounds) { Bounds = newBounds; }
     }
 

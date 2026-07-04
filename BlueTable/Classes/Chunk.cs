@@ -28,18 +28,18 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
     /// normalisiertem Dateinamen.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, Chunk> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
+    public static readonly ConcurrentDictionary<string, Chunk> LiveInstances = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
     #region Constructors
 
     /// <summary>
-    /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung durch CachedFileSystem.
-    /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung
+    /// über <see cref="Get(string)"/>. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
     public Chunk(string fullPath) : base(fullPath) {
-        _liveInstances[Filename] = this;
+        LiveInstances[Filename] = this;
 
         var suffix = fullPath.FileSuffix().ToLowerInvariant();
 
@@ -103,7 +103,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     /// <summary>
     /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
-    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register.
+    /// angegebenen Dateinamen. Nutzt das eigene <see cref="LiveInstances"/>-Register.
     /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
     /// </summary>
     public static Chunk? Get(string filename) {
@@ -112,9 +112,9 @@ public class Chunk : CachedFile, IMultiUserCapable {
         if (!FileExists(normalizedFileName)) { return null; }
 
         // Bestehende lebende Instanz zurückgeben
-        if (_liveInstances.TryGetValue(normalizedFileName, out var existing)) {
+        if (LiveInstances.TryGetValue(normalizedFileName, out var existing)) {
             if (existing.IsDisposed) {
-                _liveInstances.TryRemove(normalizedFileName, out _);
+                LiveInstances.TryRemove(normalizedFileName, out _);
             } else {
                 return existing;
             }
@@ -126,24 +126,11 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
         // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
         // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
-        var winner = _liveInstances.GetOrAdd(normalizedFileName, created);
+        var winner = LiveInstances.GetOrAdd(normalizedFileName, created);
         if (!ReferenceEquals(winner, created)) {
             created.Dispose();
         }
         return winner;
-    }
-
-    /// <summary>
-    /// Disposed die Instanz und trägt sie aus dem <see cref="_liveInstances"/>-Register aus.
-    /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
-    /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
-    /// </summary>
-    public override void Dispose() {
-        if (IsDisposed) { return; }
-
-        _liveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
-
-        base.Dispose();
     }
 
     /// <summary>
@@ -326,6 +313,19 @@ public class Chunk : CachedFile, IMultiUserCapable {
         var tablename = MainFileName.FileNameWithoutSuffix();
 
         return $"{folder}{tablename}\\";
+    }
+
+    /// <summary>
+    /// Disposed die Instanz und trägt sie aus dem <see cref="LiveInstances"/>-Register aus.
+    /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
+    /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
+    /// </summary>
+    public override void Dispose() {
+        if (IsDisposed) { return; }
+
+        LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
+
+        base.Dispose();
     }
 
     public List<byte> GetHeadBytes() {
