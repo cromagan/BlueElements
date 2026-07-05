@@ -87,6 +87,17 @@ public class TableChunk : TableFile {
     private readonly ConcurrentDictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    /// chunkId (lowercase) → zuletzt beobachteter UTC-LastWriteTime des Chunk-Ordners.
+    /// Ist der Wert unverändert, wurde seit dem letzten Load keine Datei hinzugefügt
+    /// oder entfernt — da Chunks write-once sind, bedeutet das zwingend, dass kein
+    /// neuer Inhalt vorliegen kann. In diesem Fall kann die teure Ordner-Enumeration
+    /// in <see cref="LoadChunkWithChunkId"/> und <see cref="RefreshLoadedChunks"/>
+    /// übersprungen werden. Auf Windows wird der Zeitstempel nur auf Ebene des
+    /// Ordners aktualisiert (nicht rekursiv), was für die flachen Chunk-Ordner passt.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, DateTime> _lastFolderWriteTimeUtc = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
     /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern, Refresh).
     /// Wird genutzt, um ungenutzte Chunks bei BeSureToBeUpToDate zu überspringen.
     /// </summary>
@@ -101,15 +112,13 @@ public class TableChunk : TableFile {
     private readonly ConcurrentDictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// chunkId (lowercase) → zuletzt beobachteter UTC-LastWriteTime des Chunk-Ordners.
-    /// Ist der Wert unverändert, wurde seit dem letzten Load keine Datei hinzugefügt
-    /// oder entfernt — da Chunks write-once sind, bedeutet das zwingend, dass kein
-    /// neuer Inhalt vorliegen kann. In diesem Fall kann die teure Ordner-Enumeration
-    /// in <see cref="LoadChunkWithChunkId"/> und <see cref="RefreshLoadedChunks"/>
-    /// übersprungen werden. Auf Windows wird der Zeitstempel nur auf Ebene des
-    /// Ordners aktualisiert (nicht rekursiv), was für die flachen Chunk-Ordner passt.
+    /// Reentrancy-Sperre für <see cref="BeSureToBeUpToDate"/>: 0 = frei, 1 = läuft.
+    /// Der statische <c>_tableUpdateTimer</c> (alle 5 Min.) sowie UI-Aktionen können
+    /// die Methode zeitgleich aufrufen. Ohne Sperre überlappen sich die Aufrufe,
+    /// erzeugen doppelte "Lade Chunk..."-Meldungen (Statusleiste friert ein,
+    /// "Uhrzeit läuft weiter") und stapeln sich zu einem effektiven Hängende.
     /// </summary>
-    private readonly ConcurrentDictionary<string, DateTime> _lastFolderWriteTimeUtc = new(StringComparer.OrdinalIgnoreCase);
+    private int _isRefreshingChunks;
 
     /// <summary>
     /// UTC-Zeitpunkt des letzten Master-Prüfung. Die Prüfung (lädt den Master-Chunk)
@@ -127,15 +136,6 @@ public class TableChunk : TableFile {
     /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
     /// </summary>
     private bool _systemChunksVerified;
-
-    /// <summary>
-    /// Reentrancy-Sperre für <see cref="BeSureToBeUpToDate"/>: 0 = frei, 1 = läuft.
-    /// Der statische <c>_tableUpdateTimer</c> (alle 5 Min.) sowie UI-Aktionen können
-    /// die Methode zeitgleich aufrufen. Ohne Sperre überlappen sich die Aufrufe,
-    /// erzeugen doppelte "Lade Chunk..."-Meldungen (Statusleiste friert ein,
-    /// "Uhrzeit läuft weiter") und stapeln sich zu einem effektiven Hängende.
-    /// </summary>
-    private int _isRefreshingChunks;
 
     #endregion
 
@@ -238,10 +238,8 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.RowQuickInfo, tb.RowQuickInfo);
         SaveToByteList(result, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 
-        foreach (var columnitem in tb.Column.OrderBy(t => t.KeyName)) {
-            if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
-                SaveToByteList(result, columnitem);
-            }
+        foreach (var columnitem in ColumnsInSaveOrder(tb)) {
+            SaveToByteList(result, columnitem);
         }
 
         SaveToByteList(result, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
@@ -353,10 +351,8 @@ public class TableChunk : TableFile {
     public static List<byte> GenerateUsesChunk(TableFile tb) {
         List<byte> usesBytes = new();
 
-        foreach (var columnitem in tb.Column.OrderBy(t => t.KeyName)) {
-            if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
-                SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
-            }
+        foreach (var columnitem in ColumnsInSaveOrder(tb)) {
+            SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
         }
 
         SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases.ToLowerInvariant()}^~");
@@ -875,6 +871,27 @@ public class TableChunk : TableFile {
                 try { IO.DeleteFile(file, false); } catch { }
             }
         }
+    }
+
+    /// <summary>
+    /// Liefert die Spalten der Tabelle in der Speicherreihenfolge:
+    /// Zuerst die Spalten aus Ansicht 1 (Index 1) in deren Reihenfolge,
+    /// dann die verbleibenden Spalten alphabetisch nach KeyName.
+    /// </summary>
+    private static List<ColumnItem> ColumnsInSaveOrder(TableFile tb) {
+        var result = new List<ColumnItem>();
+
+        if (tb.ColumnArrangements.Count > 1) {
+            foreach (var col in tb.ColumnArrangements[1].ListOfUsedColumn()) {
+                if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
+            }
+        }
+
+        foreach (var col in tb.Column.OrderBy(t => t.KeyName)) {
+            if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
+        }
+
+        return result;
     }
 
     /// <summary>
