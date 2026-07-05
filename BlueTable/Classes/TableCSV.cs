@@ -111,13 +111,20 @@ public class TableCSV : TableFile {
         var content = ReadAllText(Filename, Encoding.UTF8);
         _csvFileInfo = GetFileInfo(Filename);
 
-         //Develop.Diagnose("UNDO",$"CSV Load Clear WAIT: T{Environment.CurrentManagedThreadId}");
+        //Develop.Diagnose("UNDO",$"CSV Load Clear WAIT: T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-             //Develop.Diagnose("UNDO",$"CSV Load Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"CSV Load Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.Clear();
-             //Develop.Diagnose("UNDO",$"CSV Load Clear DONE: T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"CSV Load Clear DONE: T{Environment.CurrentManagedThreadId}");
         }
         Row.RemoveNullOrEmpty();
+
+        // Head-Chunk VOR dem CSV-Content parsen, damit die Spalten-Metadaten
+        // (insbesondere IsFirst -> Column.First) bereits gesetzt sind.
+        // ParseCSVContent benötigt Column.First für Row.GenerateAndAdd,
+        // sonst werden keine Zeilen angelegt.
+        LoadHeadChunk();
+        Column.GetSystems();
 
         var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -126,9 +133,6 @@ public class TableCSV : TableFile {
             Freeze("CSV-Parsen fehlgeschlagen!");
             return false;
         }
-
-        LoadHeadChunk();
-        Column.GetSystems();
 
         return true;
     }
@@ -224,51 +228,6 @@ public class TableCSV : TableFile {
         }
     }
 
-    private bool ReloadCSVFromDisk() {
-        if (IsDisposed) { return false; }
-
-        if (!FileExists(Filename)) { return false; }
-
-        var content = ReadAllText(Filename, Encoding.UTF8);
-        _csvFileInfo = GetFileInfo(Filename);
-
-        OnLoading();
-
-         //Develop.Diagnose("UNDO",$"CSV Reload Clear WAIT: T{Environment.CurrentManagedThreadId}");
-        lock (_undoLock) {
-             //Develop.Diagnose("UNDO",$"CSV Reload Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
-            Undo.Clear();
-             //Develop.Diagnose("UNDO",$"CSV Reload Clear DONE: T{Environment.CurrentManagedThreadId}");
-        }
-        Row.RemoveNullOrEmpty();
-        Cell.Clear();
-
-        var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        if (!ParseCSVContent(content, parsedColumns, parsedRowKeys)) {
-            Freeze("CSV-Parsen fehlgeschlagen!");
-            return false;
-        }
-
-        Row.RemoveObsoleteRows(Row, parsedRowKeys);
-        Column.RemoveObsoleteColumns(Column, parsedColumns, Reason.NoUndo_NoInvalidate);
-
-        // Head-Begleitdatei laden und Spaltenmetadaten anwenden
-        LoadHeadChunk();
-
-        Column.GetSystems();
-        RepairAfterParse();
-
-        SaveRequired = false;
-        MainChunkLoadDone = true;
-
-        OnLoaded(true, true);
-
-        if (DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"CSV-Datei geladen: {KeyName}", 0); }
-        return true;
-    }
-
     private void LoadHeadChunk() {
         var headFile = HeadFile();
 
@@ -357,6 +316,51 @@ public class TableCSV : TableFile {
             }
         }
 
+        return true;
+    }
+
+    private bool ReloadCSVFromDisk() {
+        if (IsDisposed) { return false; }
+
+        if (!FileExists(Filename)) { return false; }
+
+        var content = ReadAllText(Filename, Encoding.UTF8);
+        _csvFileInfo = GetFileInfo(Filename);
+
+        OnLoading();
+
+        lock (_undoLock) {
+            Undo.Clear();
+        }
+        Row.RemoveNullOrEmpty();
+        Cell.Clear();
+
+        // Head-Chunk VOR dem CSV-Content parsen, damit die Spalten-Metadaten
+        // (insbesondere IsFirst -> Column.First) bereits gesetzt sind.
+        // ParseCSVContent benötigt Column.First für Row.GenerateAndAdd,
+        // sonst werden keine Zeilen angelegt.
+        LoadHeadChunk();
+
+        var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!ParseCSVContent(content, parsedColumns, parsedRowKeys)) {
+            Freeze("CSV-Parsen fehlgeschlagen!");
+            return false;
+        }
+
+        Row.RemoveObsoleteRows(Row, parsedRowKeys);
+        Column.RemoveObsoleteColumns(Column, parsedColumns, Reason.NoUndo_NoInvalidate);
+
+        Column.GetSystems();
+        RepairAfterParse();
+
+        SaveRequired = false;
+        MainChunkLoadDone = true;
+
+        OnLoaded(true, true);
+
+        if (DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"CSV-Datei geladen: {KeyName}", 0); }
         return true;
     }
 
