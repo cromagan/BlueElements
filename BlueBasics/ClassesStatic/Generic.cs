@@ -46,7 +46,7 @@ public static class Generic {
                 } catch { continue; }
 
                 foreach (var thist in types) {
-                    if (thist is { IsClass: true, IsAbstract: false }) {
+                    if (thist.IsClass && (!thist.IsAbstract || thist.IsSealed)) {
                         field.Add(thist);
                     }
                 }
@@ -195,7 +195,7 @@ public static class Generic {
         foreach (var thisType in AllTypes) {
             IEnumerable<MethodInfo> methods;
             try {
-                if (!thisType.IsClass || thisType.IsAbstract) { continue; }
+                if (!thisType.IsClass || (thisType.IsAbstract && !thisType.IsSealed)) { continue; }
                 methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
                     .Where(m => m.GetCustomAttribute<TAttribute>() is not null);
             } catch {
