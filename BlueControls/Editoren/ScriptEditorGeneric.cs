@@ -165,7 +165,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (string.IsNullOrEmpty(LastFailedReason)) {
             UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
         } else {
-            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen werden während des Auftretens werden angezeigt", LastVariables, true);
+            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen während des Auftretens werden angezeigt", LastVariables, true);
         }
     }
 

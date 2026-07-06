@@ -40,7 +40,7 @@ namespace BlueControls.BlueTableDialogs {
             // tbcScriptEigenschaften
             // 
             tbcScriptEigenschaften.Location = new Point(290, 128);
-            tbcScriptEigenschaften.Size = new Size(494, 433);
+            tbcScriptEigenschaften.Size = new Size(494, 409);
             // 
             // tabStart
             // 
@@ -94,9 +94,9 @@ namespace BlueControls.BlueTableDialogs {
             // 
             capInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             capInfo.CausesValidation = false;
-            capInfo.Location = new Point(8, 392);
+            capInfo.Location = new Point(8, 448);
             capInfo.Name = "capInfo";
-            capInfo.Size = new Size(274, 50);
+            capInfo.Size = new Size(274, 64);
             capInfo.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - NACHDEM die Zeile(n) angelegt wurden.";
             // 
             // capInfo2
@@ -105,25 +105,25 @@ namespace BlueControls.BlueTableDialogs {
             capInfo2.CausesValidation = false;
             capInfo2.Location = new Point(8, 48);
             capInfo2.Name = "capInfo2";
-            capInfo2.Size = new Size(274, 50);
+            capInfo2.Size = new Size(274, 56);
             capInfo2.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - BEVOR die Zeile(n) angelegt werden.";
             // 
             // capScriptMenu
             // 
             capScriptMenu.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             capScriptMenu.CausesValidation = false;
-            capScriptMenu.Location = new Point(8, 136);
+            capScriptMenu.Location = new Point(8, 144);
             capScriptMenu.Name = "capScriptMenu";
-            capScriptMenu.Size = new Size(274, 220);
+            capScriptMenu.Size = new Size(274, 248);
             capScriptMenu.Text = resources.GetString("capScriptMenu.Text");
             // 
             // btnScriptAfter
             // 
             btnScriptAfter.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnScriptAfter.ButtonStyle = ButtonStyle.Optionbox;
-            btnScriptAfter.Location = new Point(8, 360);
+            btnScriptAfter.Location = new Point(8, 400);
             btnScriptAfter.Name = "btnScriptAfter";
-            btnScriptAfter.Size = new Size(274, 32);
+            btnScriptAfter.Size = new Size(274, 40);
             btnScriptAfter.TabIndex = 2;
             btnScriptAfter.Text = "After";
             btnScriptAfter.Click += btnScriptAfter_Click;
@@ -133,7 +133,7 @@ namespace BlueControls.BlueTableDialogs {
             btnScriptMenu.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnScriptMenu.ButtonStyle = ButtonStyle.Optionbox;
             btnScriptMenu.Checked = true;
-            btnScriptMenu.Location = new Point(8, 104);
+            btnScriptMenu.Location = new Point(8, 112);
             btnScriptMenu.Name = "btnScriptMenu";
             btnScriptMenu.Size = new Size(274, 32);
             btnScriptMenu.TabIndex = 1;
@@ -212,15 +212,15 @@ namespace BlueControls.BlueTableDialogs {
             ClientSize = new Size(784, 561);
             Controls.Add(grpScripte);
             Controls.Add(grpRow);
-            VariableDefinitions = "Attribut0, Attribut1, Attribut2, Attribut3, Attribut4, Attribut5";
             Name = "RowAdderScriptEditor";
             Text = "Tabellen-Eigenschaften";
+            VariableDefinitions = "";
             Controls.SetChildIndex(tabStart, 0);
             Controls.SetChildIndex(grpRow, 0);
             Controls.SetChildIndex(grpInjectVariables, 0);
             Controls.SetChildIndex(grpScripte, 0);
-            Controls.SetChildIndex(tbcScriptEigenschaften, 0);
             Controls.SetChildIndex(pnlStatusBar, 0);
+            Controls.SetChildIndex(tbcScriptEigenschaften, 0);
             tabStart.ResumeLayout(false);
             pnlStatusBar.ResumeLayout(false);
             grpScripte.ResumeLayout(false);
