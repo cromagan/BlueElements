@@ -8,6 +8,7 @@ public class ColumnFormatHolder_TextMultiline : ColumnFormatHolder {
 
     public ColumnFormatHolder_TextMultiline() : base(FormatHolder_TextMultiline.Instance) {
         Align = AlignmentHorizontal.Links;
+        MultiLine = true;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;

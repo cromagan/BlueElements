@@ -544,6 +544,8 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
     /// <summary>
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
+    /// Der Inhalt wird NICHT sofort neu serialisiert, sondern erst beim nächsten
+    /// Speichern über <see cref="BuildContent"/>.
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
@@ -554,10 +556,14 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             return;
         }
 
-        var text = ParseableItems().FinishParseable();
-        Content = Constants.Win1252.GetBytes(text);
+        MarkDirty();
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected override byte[]? BuildContent() {
+        if (!IsParsed || IsDisposed) { return null; }
+        return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
     }
 
     private void PadData_PropertyChanged(object? sender, PropertyChangedEventArgs e) {

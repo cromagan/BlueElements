@@ -93,6 +93,15 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// </summary>
     private string? _contentOnDiskHash;
 
+    /// <summary>
+    /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
+    /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
+    /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
+    /// nächsten Speichern über <see cref="BuildContent"/> neu generiert.
+    /// </summary>
+    private bool _isDirty;
+
+
     private FileInfo? _fileInfo;
 
     /// <summary>
@@ -192,17 +201,14 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             set {
                 lock (_lock) {
                     if (ReferenceEquals(_content, value)) { return; }
-                    if (_content is not null && value is not null) {
-                        if (_content.SequenceEqual(value)) { return; }
-                        DebugPrint(ErrorType.Warning, $"Existierender Content wird überschrieben. Datei: {Filename}");
-                    }
+                    if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
                     _content = value;
-                _contentHash = null;
-                if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
-                if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
+                    _contentHash = null;
+                    if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
+                    if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
+                }
             }
-        }
     }
 
     /// <summary>
@@ -246,11 +252,13 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Gibt an, ob der aktuelle Inhalt gespeichert ist.
-    /// Vergleicht den Hash des Arbeitsinhalts mit dem Hash des zuletzt geladenen/gespeicherten Standes.
+    /// Ist <c>false</c>, sobald <see cref="MarkDirty"/> aufgerufen wurde
+    /// (also das abgeleitete Objekt seit dem letzten Laden/Speichern verändert wurde).
     /// </summary>
     public bool IsSaved {
         get {
             lock (_lock) {
+                if (_isDirty) { return false; }
                 if (_content is null) { return _contentOnDiskHash is null; }
                 if (_contentOnDiskHash is null) { return false; }
                 _contentHash ??= Generic.GetSHA256HashString(_content);
@@ -474,6 +482,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             _content = null;
             _contentHash = null;
             _contentOnDiskHash = null;
+            _isDirty = false;
         }
     }
 
@@ -491,6 +500,45 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             _content = content;
             _contentHash = hash;
             _contentOnDiskHash = hash;
+            _isDirty = false;
+        }
+    }
+
+    /// <summary>
+    /// Wird von <see cref="EnsureContentCurrent"/> aufgerufen, wenn der gecachte
+    /// Inhalt veraltet ist (<c>_isDirty</c>). Ableitungen serialisieren hier ihr
+    /// aktuelles Objektmodell in Bytes. <c>null</c> bedeutet: keine Neugenerierung
+    /// möglich (z. B. weil noch nicht geparst); der gecachte Inhalt bleibt.
+    /// </summary>
+    protected virtual byte[]? BuildContent() => null;
+
+    /// <summary>
+    /// Markiert den Inhalt als verändert (<c>_isDirty = true</c>).
+    /// <see cref="IsSaved"/> liefert danach false. Der eigentliche Content wird
+    /// NICHT sofort neu generiert — das passiert erst, wenn er gebraucht wird
+    /// (in <see cref="Save"/> über <see cref="EnsureContentCurrent"/>).
+    /// </summary>
+    protected void MarkDirty() {
+        lock (_lock) {
+            _isDirty = true;
+        }
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass <c>_content</c> den aktuellen Objektzustand abbildet.
+    /// Falls <c>_isDirty</c>, wird <see cref="BuildContent"/> aufgerufen und das
+    /// Ergebnis übernimmt. Wird vor jedem Speichern ausgeführt.
+    /// </summary>
+    private void EnsureContentCurrent() {
+        lock (_lock) {
+            if (!_isDirty) { return; }
+
+            var built = BuildContent();
+            if (built is null) { return; }
+
+            _content = built;
+            _contentHash = null;
+            _isDirty = false;
         }
     }
 
@@ -622,6 +670,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         }
 
         try {
+            EnsureContentCurrent();
+
             if (IsSaveAbleNow() is { Length: > 0 } f) {
                 return OperationResult.Failed(f);
             }
@@ -674,6 +724,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
             if (!EnsureContentLoaded()) { return OperationResult.Failed("Datei wurde nicht korrekt geladen."); }
+
+            EnsureContentCurrent();
 
             byte[] data;
             lock (_lock) {

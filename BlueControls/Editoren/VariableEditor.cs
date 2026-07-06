@@ -89,6 +89,7 @@ public partial class VariableEditor : EditorEasy {
         tb.SortDefinition = new RowSortDefinition(tb, na, false);
 
         tableVariablen.Table = tb;
+        tableVariablen.ContextMenuDefault = false;
 
         tb.CellValueChanged += TableVariablen_CellValueChanged;
     }
