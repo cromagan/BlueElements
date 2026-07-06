@@ -25,7 +25,7 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     /// </summary>
     public static readonly ConcurrentDictionary<string, Chunk> LiveInstances = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>Synchronisierungsobjekt für thread-sichere Zugriffe auf _fileInfo und LoadFailed.</summary>
+    /// <summary>Synchronisierungsobjekt für thread-sichere Zugriffe auf FileInfo und LoadFailed.</summary>
     private readonly object _lock = new();
 
     private volatile int _isDisposedFlag;
@@ -62,29 +62,14 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     #region Properties
 
     public FileInfo? FileInfo {
-        get {
-            if (field is null) {
-                field = GetFileInfo(Filename);
-            }
-
-            return field;
-        }
-
+        get => field ??= GetFileInfo(Filename);
         private set;
     }
 
     /// <summary>Der vollständige Dateipfad dieser Chunk-Datei.</summary>
     public string Filename { get; } = string.Empty;
 
-    /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
-    /// Um den FreezedReason zu setzen, die Methode <see cref="Freeze"/> benutzen.
-    /// </summary>
-    public string FreezedReason { get; private set; } = string.Empty;
-
     public bool IsDisposed => _isDisposedFlag == 1;
-
-    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     /// <summary>
     /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
@@ -111,7 +96,7 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     /// <summary>
     /// Mindestgröße des Inhalts in Bytes.
     /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
-    /// Wird nach erfolgreichem Laden/Speichern über <see cref="SetMinLen"/> gesetzt.
+    /// Wird nach erfolgreichem Laden über <see cref="SetMinLen"/> gesetzt.
     /// </summary>
     public int MinimumBytes { get; private set; }
 
@@ -134,6 +119,8 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
     /// </summary>
     public static Chunk? Get(string filename) {
+        if (string.IsNullOrEmpty(filename)) { return null; }
+
         var normalizedFileName = filename.NormalizeFile();
 
         if (!FileExists(normalizedFileName)) { return null; }
@@ -161,8 +148,9 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
 
     /// <summary>
     /// Prüft, ob der Content den erwarteten CheckPoint enthält.
-    /// System-Chunks (_maindata, _master, _vars, _uses, _rowdata) suchen nach ~^{KeyName}^~.
-    /// Row-Chunks (Hash-basiert) geben true zurück.
+    /// System-Chunks (_maindata, _maindatalite, _master, _vars, _uses, _rowdata)
+    /// suchen nach ~^{KeyName}^~.
+    /// Row-Chunks (Hash- oder Namens-basiert) geben true zurück.
     /// </summary>
     public static bool HasCheckPoint(byte[] content, string keyName) {
         if (content.Length < 12) { return false; }
@@ -184,7 +172,9 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     }
 
     /// <summary>
-    /// Bestimmt, ob ein Chunk-Key ein Row-Chunk ist (Hash-basiert oder _rowdata).
+    /// Bestimmt, ob ein Chunk-Key ein Row-Chunk ist (Hash- oder Namens-basiert).
+    /// System-Chunks (_maindata, _maindatalite, _master, _vars, _uses, _rowdata)
+    /// werden separat via BeSureToBeUpToDate geladen und liefern false.
     /// </summary>
     public static bool IsRowChunk(string keyName) =>
         !string.Equals(keyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase) &&
@@ -341,11 +331,6 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>Friert die Datei ein. Kann nicht rückgängig gemacht werden.</summary>
-    public void Freeze(string reason) {
-        FreezedReason = string.IsNullOrEmpty(reason) ? "Eingefroren" : reason;
-    }
-
     /// <summary>
     /// Setzt das gecachte FileInfo zurück, damit beim nächsten Zugriff die
     /// Metadaten frisch vom Dateisystem gelesen werden.
@@ -358,7 +343,6 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
 
     public string IsNowEditable() {
         if (IsDisposed) { return "Verworfen."; }
-        if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
 
         return CanWriteFile(Filename, 2).FailedReason;
@@ -366,7 +350,7 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
 
     /// <summary>
     /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes,
+    /// Berücksichtigt: IsDisposed, LoadFailed, MinimumBytes,
     /// gültigen EOF-Marker und CheckPoint.
     /// </summary>
     public string IsSaveAbleNow(byte[] content) {

@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +34,9 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
     private const int PollingIntervalMinutes = 5;
+
+    /// <summary>Timeout (ms) für <see cref="WaitDiskOperationFinished"/>.</summary>
+    private const int DiskOperationTimeoutMs = 30000;
 
     /// <summary>
     /// Alle registrierten BlockableFile-Instanzen, geordnet nach normalisiertem Dateinamen.
@@ -71,20 +73,23 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     /// <summary>
-    /// Schreib-/Build-Puffer für abgeleitete Klassen. Alle Werte beziehen sich auf _content.
-    /// Wenn gesetzt, liefert DataLength die Anzahl der gepufferten Bytes.
+    /// Der aktuelle Arbeitsinhhalt der Datei. Wird per Lazy-Loading vom
+    /// Dateisystem geladen oder von abgeleiteten Klassen gesetzt.
     /// </summary>
     private byte[]? _content;
 
     /// <summary>
     /// Der SHA256-Hash des aktuellen Arbeitsinhalts (_content).
-    /// Wird analog zum Content bei Bedarf generiert.
+    /// Wird bei Bedarf (lazy) generiert.
     /// </summary>
     private string? _contentHash;
 
     /// <summary>
-    /// Der SHA256-Hash des Inhalts, wie er zuletzt vom Dateisystem geladen oder dorthin gespeichert wurde.
-    /// Dient dem Vergleich in IsSaved.
+    /// Der SHA256-Hash des Inhalts, wie er zuletzt vom Dateisystem geladen
+    /// oder dorthin gespeichert wurde. Dient dem Vergleich in IsSaved.
+    /// null bedeutet: invalide / nie geladen — NeedsLoading liefert true.
+    /// Leerstring wird als Sentinel im Content-Setter verwendet, damit
+    /// NeedsLoading false liefert, obwohl noch kein echter Disk-Hash vorliegt.
     /// </summary>
     private string? _contentOnDiskHash;
 
@@ -139,7 +144,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
-    /// Beim Setzen wird _isSaved auf false gesetzt.
+    /// Beim Setzen gilt der Inhalt als nicht gespeichert (<see cref="IsSaved"/> ist false).
     /// Erwirbt _loadSemaphore während des Ladevorgangs, sodass IsLoading korrekt true liefert.
     /// Nach einem Frisch-Ladevorgang wird OnLoaded() automatisch aufgerufen.
     /// </summary>
@@ -148,7 +153,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             if (IsDisposed) { return []; }
 
             lock (_lock) {
-                if (!NeedsLoading() && _content is not null) { return _content; }
+                if (_content is { } c1 && !NeedsLoading()) { return c1; }
             }
 
             bool acquired = false;
@@ -169,7 +174,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 }
 
                 lock (_lock) {
-                    if (!NeedsLoading() && _content is not null) { return _content; }
+                    if (_content is { } c2 && !NeedsLoading()) { return c2; }
                 }
 
                 return GetContentInternal();
@@ -186,14 +191,12 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         }
         set {
             lock (_lock) {
-                if (_content is null && value is not null) {
-                    DebugPrint(ErrorType.Warning, $"Content wird überschrieben, obwohl _content null ist. Datei: {Filename}");
+                if (ReferenceEquals(_content, value)) { return; }
+                if (_content is not null && value is not null) {
+                    if (_content.SequenceEqual(value)) { return; }
+                    DebugPrint(ErrorType.Warning, $"Existierender Content wird überschrieben. Datei: {Filename}");
                 }
 
-                if (ReferenceEquals(_content, value)) { return; }
-                if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
-
-                //Diagnose("CF",$"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}");
                 _content = value;
                 _contentHash = null;
                 if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
@@ -203,9 +206,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
-    /// Anzahl der aktuell verfügbaren Bytes:
-    /// Im Build-Modus (_buildBuffer gesetzt): Länge des Build-Puffers.
-    /// Im Lese-Modus: Länge des gecachten Contents.
+    /// Anzahl der aktuell verfügbaren Bytes (Länge des gecachten Contents).
     /// </summary>
     public long ContentLength => _content?.Length ?? 0;
 
@@ -340,12 +341,18 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         var tasks = new List<Task>();
         foreach (var file in files) {
             if (file.IsDisposed) { continue; }
-            if (!file.IsSaved) {
-                if (file.IsSaveAbleNow() is { Length: 0 }) {
-                    tasks.Add(file.Save());
-                } else if (mustWait && file.IsSaving) {
-                    tasks.Add(Task.Run(file.WaitDiskOperationFinished));
-                }
+            if (file.IsSaved) { continue; }
+
+            if (file.IsSaving) {
+                // Ein Speichervorgang läuft bereits — Save() würde sofort
+                // mit FailedRetryable zurückkehren. Stattdessen (bei mustWait)
+                // auf den Abschluss warten.
+                if (mustWait) { tasks.Add(Task.Run(file.WaitDiskOperationFinished)); }
+                continue;
+            }
+
+            if (file.IsSaveAbleNow() is { Length: 0 }) {
+                tasks.Add(file.Save());
             }
         }
 
@@ -360,9 +367,9 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 } catch {
                     EndLog("BlockableFile.SaveAll(true): Task.WaitAll hat Exception geworfen");
                 }
-            }
 
-            Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+                Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+            }
         } else {
             EndLog("BlockableFile.SaveAll: keine anstehenden Tasks");
         }
@@ -398,7 +405,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         }
 
         _hasWriteAccess = true;
-        _writeAccessHolders.TryAdd(Filename, this);
+        _writeAccessHolders[Filename] = this;
         return string.Empty;
     }
 
@@ -430,18 +437,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         Invalidate();
 
         // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.
-        // Wir nutzen hier Try-Catch, falls Threads noch in WaitDiskOperationFinished hängen.
-        try {
-            if (_loadSemaphore.Wait(30000)) {
-                _loadSemaphore.Release();
-            }
-        } catch { }
-
-        try {
-            if (_saveSemaphore.Wait(30000)) {
-                _saveSemaphore.Release();
-            }
-        } catch { }
+        WaitDiskOperationFinished();
 
         GC.SuppressFinalize(this);
 
@@ -463,16 +459,14 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// <returns>True wenn erfolgreich geladen, false bei Fehler oder Disposed.</returns>
     public bool EnsureContentLoaded() {
         if (IsDisposed) { return false; }
-        //Diagnose("CF",$"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         _ = Content;
-        //Diagnose("CF",$"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         return !LoadFailed;
     }
 
     /// <summary>
     /// Invalidiert den gecachten Inhalt, damit er beim nächsten Zugriff neu geladen wird.
     /// Setzt IsParsed auf false — die Ableitung muss ihre Daten neu verarbeiten.
-    /// Setzt auch _isSaved auf true (lokale Änderungen gelten als verworfen).
+    /// Lokale Änderungen gelten als verworfen (<see cref="IsSaved"/> ist danach true).
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
@@ -558,10 +552,18 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Wird aufgerufen, bevor die Blockdatei freigegeben wird.
-    /// Standard: speichert ungespeicherte Änderungen.
+    /// Standard: speichert ungespeicherte Änderungen SYNCHRON — andernfalls
+    /// könnte die Blockdatei freigegeben werden, bevor das Speichern abgeschlossen
+    /// ist, und ein anderer Benutzer lädt veraltete Daten.
     /// </summary>
     public virtual void OnReleasingWriteAccess() {
-        if (!IsSaved) { _ = Save(); }
+        if (IsSaved) { return; }
+
+        try {
+            Save().GetAwaiter().GetResult();
+        } catch (Exception ex) {
+            Develop.DebugPrint("Fehler beim Speichern vor Freigabe des Schreibzugriffs", ex);
+        }
     }
 
     /// <summary>
@@ -572,11 +574,17 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Gibt den Schreibzugriff frei. Speichert ungespeicherte Änderungen
-    /// über <see cref="OnReleasingWriteAccess"/> und entfernt die Blockdatei.
+    /// über <see cref="OnReleasingWriteAccess"/>, BEVOR die Blockdatei
+    /// entfernt wird — sonst könnte ein anderer Benutzer zwischen Löschen
+    /// der Sperre und Speichern die Datei laden und veraltete Daten vorfinden.
     /// </summary>
     public void RevokeWriteAccess() {
+        if (!_hasWriteAccess) { return; }
+
+        OnReleasingWriteAccess();
+
         _hasWriteAccess = false;
-        BlockFile.RevokeFor(Filename, OnReleasingWriteAccess);
+        BlockFile.RevokeFor(Filename);
         _writeAccessHolders.TryRemove(Filename, out _);
     }
 
@@ -598,38 +606,28 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) {
-                //Diagnose("CF",$"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}");
                 return OperationResult.Failed(f);
             }
 
-            var sw = Stopwatch.StartNew();
             Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
-            byte[] contentToWrite;
+            byte[]? contentToWrite;
             string savedContentHash;
 
             lock (_lock) {
                 if (_content is null || _content.Length == 0) {
-                    //Diagnose("CF",$"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}");
                     return OperationResult.Failed("Keine Daten zum Speichern");
                 }
 
-                contentToWrite = MustZipped ? (_content.ZipIt() ?? []) : _content;
+                contentToWrite = MustZipped ? _content.ZipIt() : _content;
                 savedContentHash = Generic.GetSHA256HashString(_content);
             }
 
-            if (contentToWrite.Length == 0) {
+            if (contentToWrite is null || contentToWrite.Length == 0) {
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            //Diagnose("CF",$"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}");
-
-            var result = await (ExtendedSave
-                ? Task.Run(() => SaveExtended(contentToWrite, savedContentHash))
-                : Task.Run(() => SaveSimple(contentToWrite, savedContentHash))).ConfigureAwait(false);
-
-            //Diagnose("CF",$"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
-            return result;
+            return await Task.Run(() => SaveToDisk(contentToWrite, savedContentHash)).ConfigureAwait(false);
         } finally {
             if (acquired) {
                 try {
@@ -658,9 +656,11 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
+            if (!EnsureContentLoaded()) { return OperationResult.Failed("Datei wurde nicht korrekt geladen."); }
+
             byte[] data;
             lock (_lock) {
-                data = GetContentInternal();
+                data = _content ?? [];
             }
 
             if (data.Length == 0) { return OperationResult.Failed("Keine Daten zum Speichern"); }
@@ -691,7 +691,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             if (acquired) {
                 try {
                     _saveSemaphore.Release();
-                } catch (ObjectDisposedException) { } catch (SemaphoreFullException) { }
+                } catch { }
             }
         }
     }
@@ -701,27 +701,6 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     public override string ToString() => $"{GetType().Name}: {Filename}";
 
     /// <summary>
-    /// Wartet, bis alle laufenden Lade- und Speichervorgänge abgeschlossen sind.
-    /// </summary>
-    public void WaitDiskOperationFinished() {
-        if (IsDisposed) { return; }
-
-        try {
-            // Load Semaphore abarbeiten
-            if (_loadSemaphore.Wait(30000)) {
-                try { _loadSemaphore.Release(); } catch { }
-            }
-
-            // Save Semaphore abarbeiten
-            if (_saveSemaphore.Wait(30000)) {
-                try { _saveSemaphore.Release(); } catch { }
-            }
-        } catch (ObjectDisposedException) {
-            // Falls während des Wartens Dispose aufgerufen wurde
-        }
-    }
-
-    /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
     /// Wird automatisch nach jedem Frisch-Ladevorgang durch den Content-Getter aufgerufen.
@@ -729,7 +708,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Wird nach erfolgreichem Speichern aufgerufen (nachdem _isSaved = true gesetzt wurde).
+    /// Wird nach erfolgreichem Speichern aufgerufen (nachdem IsSaved true liefert).
     /// Ableitungen können hier interne Zustände nach dem Speichern aktualisieren.
     /// </summary>
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
@@ -770,13 +749,10 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.
+    /// Aufrufer (Content-Getter) muss bereits <see cref="_loadSemaphore"/> halten
+    /// und NeedsLoading vor dem Aufruf geprüft haben.
     /// </summary>
     private byte[] GetContentInternal() {
-        lock (_lock) {
-            if (!NeedsLoading() && _content is not null) { return _content; }
-        }
-
-        var sw = Stopwatch.StartNew();
         var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
         var processedContent = content;
         var finalLoadFailed = loadFailed;
@@ -837,16 +813,19 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
-    /// Erweiterter Speicherpfad: Delegiert die Dateioperationen (Backup-Rotation,
-    /// atomares Ersetzen) an <see cref="IO.SaveExtended"/> und aktualisiert danach
-    /// die Instanz-Zustände (Hashes, FileInfo) sowie löst <see cref="OnSaved"/> aus.
-    /// Für Dateien mit ExtendedSave = true.
+    /// Schreibt den Content auf die Festplatte und aktualisiert danach die
+    /// Instanz-Zustände (Hashes, FileInfo) sowie löst <see cref="OnSaved"/> aus.
+    /// Für <see cref="ExtendedSave"/> = true wird <see cref="IO.SaveExtended"/>
+    /// (Backup-Rotation, atomares Ersetzen) genutzt, sonst ein direkter Schreibvorgang.
     /// </summary>
-    private OperationResult SaveExtended(byte[] contentToWrite, string savedContentHash) {
+    private OperationResult SaveToDisk(byte[] contentToWrite, string savedContentHash) {
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
-            var result = IO.SaveExtended(Filename, contentToWrite);
+            var result = ExtendedSave
+                ? IO.SaveExtended(Filename, contentToWrite)
+                : WriteAllBytes(Filename, contentToWrite);
+
             if (result.IsFailed) { return result; }
 
             lock (_lock) {
@@ -864,27 +843,23 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
-    /// Vereinfachter Speicherpfad: Direktes Schreiben ohne Backup-Rotation und ohne CanWriteFile-Retries.
-    /// Für Dateien mit ExtendedSave = false.
+    /// Erwirbt beide Semaphoren (Load + Save) kurzzeitig und gibt sie sofort
+    /// wieder frei. Dadurch wird bis zum Abschluss laufender I/O-Vorgänge
+    /// gewartet. ObjectDisposedException wird stillgeschlagen — die Methode
+    /// ist auch während eines parallel laufenden Dispose sicher aufrufbar.
     /// </summary>
-    private OperationResult SaveSimple(byte[] contentToWrite, string savedContentHash) {
+    private void WaitDiskOperationFinished() {
+        if (IsDisposed) { return; }
+
         try {
-            if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
-
-            File.WriteAllBytes(Filename, contentToWrite);
-
-            lock (_lock) {
-                _contentOnDiskHash = savedContentHash;
-                _contentHash = savedContentHash;
-                _fileInfo = GetFileInfo(Filename);
+            if (_loadSemaphore.Wait(DiskOperationTimeoutMs)) {
+                try { _loadSemaphore.Release(); } catch { }
             }
 
-            OnSaved();
-
-            return OperationResult.Success;
-        } catch (Exception ex) {
-            return OperationResult.Failed(ex);
-        }
+            if (_saveSemaphore.Wait(DiskOperationTimeoutMs)) {
+                try { _saveSemaphore.Release(); } catch { }
+            }
+        } catch (ObjectDisposedException) { }
     }
 
     #endregion
