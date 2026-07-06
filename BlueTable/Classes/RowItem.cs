@@ -393,10 +393,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CopyTo(RowItem targetRow, ColumnCollection targetColumns) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        // Werte direkt in den Speicher schreiben — OHNE ChangeData/OnCellValueChanged.
+        // CopyTo ist ein Bulk-Ladevorgang (wie Parse) und darf nicht pro Zelle
+        // Relations-Reparaturen (RelationTextNameChanged, RepairRelationText) triggern,
+        // sonst entsteht O(N²)-Verhalten. DoSystemColumns würde zudem SysRowChanger/
+        // SysRowChangeDate mit dem aktuellen Benutzer/Zeitpunkt überschreiben statt die
+        // Werte der Quelle zu erhalten. Systemspalten werden als normale Spalten kopiert.
         foreach (var col in tb.Column) {
             if (targetColumns[col.KeyName] is not { } targetCol) { continue; }
             var val = CellGetString(col);
-            targetRow.CellSet(targetCol, val, "CopyTo");
+            if (!string.IsNullOrEmpty(val)) { _ = targetRow.CellSetInMemory(targetCol, val); }
         }
     }
 

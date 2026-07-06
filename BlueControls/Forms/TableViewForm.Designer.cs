@@ -881,7 +881,7 @@ namespace BlueControls.Forms {
             // 
             // SaveTab
             // 
-            SaveTab.Filter = "*.BDB Single-User Tabellen|*.BDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH Chunk basierte Tabellen|*.CSV Tabellen|*.CSV|*.* Alle Dateien|*";
+            SaveTab.Filter = "*.BDB Single-User Tabellen|*.BDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH|*.CSV Tabellen|*.CSV|*.* Alle Dateien|*";
             SaveTab.Title = "Bitte neuen Dateinamen der Tabelle wählen.";
             // 
             // grpAufräumen

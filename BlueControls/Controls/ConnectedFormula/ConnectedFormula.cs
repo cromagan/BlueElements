@@ -402,6 +402,8 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         } finally {
             _finishingParse = false;
         }
+
+        SyncContent(Constants.Win1252.GetBytes(ParseableItems().FinishParseable()));
     }
 
     public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());

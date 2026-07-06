@@ -1094,9 +1094,7 @@ public class TableChunk : TableFile {
         if (newestFile is null) {
             // Alle Dateien des Chunks wurden gelöscht — Tracking-Eintrag entfernen,
             // damit veraltete Daten nicht als "aktuell" gelten.
-            if (_processedFile.TryRemove(chunkId, out var prevFile)) {
-                //Develop.Diagnose("CF",$"Chunk '{chunkId}': Alle Dateien gelöscht, bisher verarbeitet: {prevFile}");
-            }
+            _processedFile.TryRemove(chunkId, out var prevFile);
             _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
         }
@@ -1112,7 +1110,6 @@ public class TableChunk : TableFile {
         // Fehlt der Marker, ist die Datei möglicherweise gerade beim Schreiben
         // (anderer Benutzer) oder korrupt. In beiden Fall nicht laden.
         if (!HasValidEofMarker(rawBytes)) {
-            //Develop.Diagnose("CF",$"Chunk '{chunkId}' unvollständig (kein EOF-Marker): {newestFile.FileNameWithoutSuffix()}");
             return OperationResult.Failed($"Row-Chunk '{chunkId}' ist unvollständig (kein EOF-Marker)");
         }
 
@@ -1160,12 +1157,9 @@ public class TableChunk : TableFile {
     private bool ParseChunk(byte[] chunkContent, string chunkId, bool isMain) {
         if (chunkContent.Length == 0) { return true; }
 
-        //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll WAIT: chunk={chunkId} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll ENTER: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
                 && string.Equals(GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunkId, StringComparison.OrdinalIgnoreCase));
-            //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll DONE: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

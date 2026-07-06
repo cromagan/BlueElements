@@ -189,15 +189,15 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 }
             }
         }
-        set {
-            lock (_lock) {
-                if (ReferenceEquals(_content, value)) { return; }
-                if (_content is not null && value is not null) {
-                    if (_content.SequenceEqual(value)) { return; }
-                    DebugPrint(ErrorType.Warning, $"Existierender Content wird überschrieben. Datei: {Filename}");
-                }
+            set {
+                lock (_lock) {
+                    if (ReferenceEquals(_content, value)) { return; }
+                    if (_content is not null && value is not null) {
+                        if (_content.SequenceEqual(value)) { return; }
+                        DebugPrint(ErrorType.Warning, $"Existierender Content wird überschrieben. Datei: {Filename}");
+                    }
 
-                _content = value;
+                    _content = value;
                 _contentHash = null;
                 if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
                 if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
@@ -474,6 +474,21 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             _content = null;
             _contentHash = null;
             _contentOnDiskHash = null;
+        }
+    }
+
+    /// <summary>
+    /// Synchronisiert den gecachten Inhalt direkt, ohne den Setter-Weg zu nehmen.
+    /// Wird von Ableitungen nach dem Parsen aufgerufen, damit <c>_content</c> den
+    /// normalisierten Zustand abbildet und <see cref="OnPropertyChanged"/> beim
+    /// ersten Property-Change keine abweichenden Bytes erkennnt.
+    /// <see cref="_contentOnDiskHash"/> bleibt unberührt, <see cref="IsSaved"/>
+    /// liefert also korrekt false, falls das Parsen den Inhalt verändert hat.
+    /// </summary>
+    protected void SyncContent(byte[] content) {
+        lock (_lock) {
+            _content = content;
+            _contentHash = null;
         }
     }
 
