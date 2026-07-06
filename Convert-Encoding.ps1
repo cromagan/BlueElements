@@ -163,7 +163,7 @@ $styleTotal = 0
 
 $keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
 
-$disposableTypes = @('Table', 'RowItem', 'ColumnItem', 'GenericControl', 'RowCollection', 'ColumnCollection', 'FilterCollection', 'ColumnViewCollection', 'CellCollection', 'ColumnViewItem', 'ConnectedFormula', 'AbstractPadItem', 'AbstractListItem', 'BlueFont', 'ExtText', 'PointM', 'ExtChar', 'ScriptDescription', 'FlexiStrategyBase', 'CachedFile', 'CachedFileSystem', 'PictureView', 'QuickPicSelector', 'Row', 'Column', 'Filter')
+$disposableTypes = @('Table', 'RowItem', 'ColumnItem', 'GenericControl', 'RowCollection', 'ColumnCollection', 'FilterCollection', 'ColumnViewCollection', 'CellCollection', 'ColumnViewItem', 'ConnectedFormula', 'AbstractPadItem', 'AbstractListItem', 'BlueFont', 'ExtText', 'PointM', 'ExtChar', 'ScriptDescription', 'FlexiStrategyBase', 'CachedFile', 'BlockableFile', 'PictureView', 'QuickPicSelector', 'Row', 'Column', 'Filter')
 $dispPattern = ($disposableTypes | ForEach-Object { [regex]::Escape($_) }) -join '|'
 
 Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object { $_.FullName -notlike "*\obj\*" } | ForEach-Object {

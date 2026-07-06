@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
@@ -22,7 +21,7 @@ namespace BlueTable.Classes;
 /// Edit-Sperre: Neueste Datei &lt;10 Min → nur der Ersteller darf bearbeiten.
 /// <para>
 /// Im Gegensatz zur regulären Chunk-Verwaltung werden Chunks hier NICHT über das
-/// <see cref="BlueBasics.Classes.FileSystemCaching.CachedFileSystem"/> verwaltet.
+/// CachedFileSystem verwaltet (CachedFileSystem wurde entfernt).
 /// Geladene Chunks werden nach dem Parsen sofort verworfen — nur der Dateiname
 /// wird für Aktualitätsprüfungen gemerkt. Jeder Chunk ist ein Einweg (write-once):
 /// eine einmal gespeicherte Datei wird nie wieder überschrieben. Vor dem Parsen
@@ -36,7 +35,6 @@ namespace BlueTable.Classes;
 ///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc       (Row-Chunk pro Chunk)
 /// </remarks>
 [Browsable(false)]
-[FileSuffix(".tblh")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableChunk : TableFile {
 
@@ -151,8 +149,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Letzter UTC-Zeitpunkt der letzten Speicherung der Hauptdatei.
-    /// Liest direkt vom Dateisystem (nicht über CachedFileSystem, da .tblh
-    /// nicht mehr im CachedFileSystem registriert ist).
+    /// Liest direkt vom Dateisystem (ohne Caching-Schicht).
     /// </summary>
     public override DateTime LastSaveMainFileUtcDate {
         get {
@@ -497,9 +494,8 @@ public class TableChunk : TableFile {
 
             foreach (var item in list) {
                 // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
-                // Im Gegensatz zur regulären Chunk-Verwaltung gibt es hier kein CachedFileSystem, das
-                // neu erscheinende Dateien automatisch erkennt. Ohne diese Prüfung
-                // würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
+                // Es gibt kein automatisches Erkennen neu erscheinender Dateien.
+                // Ohne diese Prüfung würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
                 // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
                 // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
                 // (Already-Current-Check via Dateiname-Vergleich).
@@ -560,8 +556,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
-    /// CachedFileSystem.Get&lt;Chunk&gt;(Filename) verwendet, was für .tblh-Dateien
-    /// nicht mehr funktioniert (Suffix wurde vom CachedFileSystem entfernt).
+    /// auf Chunk.Get(Filename) zurückgreift, was für .tblh-Dateien
+    /// nicht funktioniert (Suffix wird nicht von Chunk unterstützt).
     /// </summary>
     public override string IsValueEditable(TableDataType type, string? chunkValue) {
         if (InitialSavePending) { return string.Empty; }
@@ -624,8 +620,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Generiert den Timestamp-String für Chunk-Dateinamen im Format
-    /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash. Wird von <see cref="Table.RenameChunks"/>
-    /// genutzt, um beim Formatwechsel einheitliche Dateinamen zu erzeugen.
+    /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash. Wird beim Speichern von Row-Chunks
+    /// verwendet, um einheitliche, zeitlich sortierbare Dateinamen zu erzeugen.
     /// </summary>
     internal static string GenerateChunkTimestamp() =>
         $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MachineInstanceHash}";
@@ -649,7 +645,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Speichert alle Chunks direkt auf die Festplatte (ohne CachedFileSystem).
+    /// Speichert alle Chunks direkt auf die Festplatte.
     /// Nach dem Speichern werden alle generierten Daten verworfen.
     /// Jeder Chunk ist ein Einweg — eine einmal gespeicherte Datei wird nie
     /// wieder überschrieben. Die Lite-Hauptdatei (.tblh) wird ebenfalls nur einmal
@@ -801,7 +797,7 @@ public class TableChunk : TableFile {
                 }
             }
 
-            // Direkt auf Festplatte schreiben (ohne CachedFileSystem).
+            // Direkt auf Festplatte schreiben.
             // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
             Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'", 2);
 
@@ -813,7 +809,7 @@ public class TableChunk : TableFile {
                     return $"Verzeichnis für '{path}' konnte nicht erstellt werden";
                 }
 
-                // Chunk-Dateien werden gezippt gespeichert (wie bei CachedFile/Chunk mit MustZipped=true)
+                // Chunk-Dateien werden gezippt gespeichert (wie bei Chunk mit MustZipped=true)
                 var zipped = kvp.Value.ToArray().ZipIt();
                 if (zipped is null || zipped.Length == 0) {
                     Freeze($"Komprimierung fehlgeschlagen für '{path}'");
@@ -944,7 +940,7 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Generiert die Head-Bytes (Version + Werbung), die jeder Chunk-Datei
     /// vorangestellt werden. Entspricht Chunk.GetHeadBytes(), aber ohne
-    /// Instanz-Abhängigkeit — wird direkt ohne CachedFileSystem genutzt.
+    /// Instanz-Abhängigkeit — wird direkt genutzt.
     /// </summary>
     private static List<byte> GenerateHeadBytes() {
         var headBytes = new List<byte>();
@@ -1042,7 +1038,7 @@ public class TableChunk : TableFile {
     private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
     /// <summary>
-    /// Lädt einen Chunk direkt von der Festplatte (ohne CachedFileSystem).
+    /// Lädt einen Chunk direkt von der Festplatte.
     /// Vor dem Parsen wird <see cref="TableFile.HasValidEofMarker"/> geprüft,
     /// damit nur komplett gespeicherte Chunks eingelesen werden. Nach dem
     /// Parsen wird der Chunk-Inhalt verworfen — nur der Dateiname wird
@@ -1105,7 +1101,7 @@ public class TableChunk : TableFile {
             return OperationResult.SuccessFalse;
         }
 
-        // Raw bytes direkt von der Festplatte lesen (ohne CachedFileSystem)
+        // Raw bytes direkt von der Festplatte lesen
         Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{KeyName}'", 1);
 
         if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
@@ -1200,7 +1196,7 @@ public class TableChunk : TableFile {
         var loaded = false;
 
         //// Neue Row-Chunk-Ordner entdecken (z.B. neue Zeilen anderer Benutzer).
-        //// Ohne CachedFileSystem werden neue Ordner nicht automatisch erkannt.
+        //// Neue Ordner werden nicht automatisch erkannt.
         //foreach (var subDir in IO.GetDirectories(chunkFolder)) {
         //    var newChunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
         //    if (IsRowChunk(newChunkId) && !_processedFile.ContainsKey(newChunkId)) {

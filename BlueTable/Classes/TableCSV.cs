@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
 using BlueTable.ClassesStatic;
-using BlueTable.Enums;
 using System.Globalization;
 using System.ComponentModel;
 using System.IO;
@@ -12,8 +10,6 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueTable.Classes;
 
 [Browsable(false)]
-[FileSuffix(".csv")]
-[FileSuffix(".hbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableCSV : TableFile {
 
@@ -188,9 +184,7 @@ public class TableCSV : TableFile {
 
                 if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
 
-                _headChunk.EnsureContentLoaded();
-                _headChunk.Content = headContent.ToArray();
-                var headResult = _headChunk.Save().GetAwaiter().GetResult();
+                var headResult = SaveExtended(headFile, headContent.ToArray().ZipIt() ?? []);
 
                 if (headResult.IsFailed) {
                     return headResult.FailedReason ?? "Head-Speichern fehlgeschlagen";
@@ -234,9 +228,11 @@ public class TableCSV : TableFile {
         _headChunk = Chunk.Get(headFile);
         if (_headChunk is null) { return; }
 
-        if (!_headChunk.EnsureContentLoaded()) { return; }
+        _ = _headChunk.LoadContent();
 
-        var data = _headChunk.Content;
+        if (_headChunk.LoadFailed) { return; }
+
+        var data = _headChunk.LoadContent();
         if (data is null || data.Length == 0) { return; }
 
         Parse(data, true, null);

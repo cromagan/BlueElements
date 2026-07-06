@@ -54,6 +54,12 @@ public static class IO {
     #region Methods
 
     /// <summary>
+    /// Berechnet den Backup-Dateinamen im Format "originaldatei.suffix.bak".
+    /// Beispiel: "daten.mbdb" → "daten.mbdb.bak"
+    /// </summary>
+    public static string BackupName(string filename) => $"{filename}.bak";
+
+    /// <summary>
     /// Prüft, ob eine Datei gespeichert werden kann, basierend auf Dateizugriff und zeitlichen Beschränkungen
     /// </summary>
     /// <param name="filename">Der Pfad zur zu prüfenden Datei</param>
@@ -245,33 +251,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                            ? FileFormat.Unknown
-                            : filename.FileSuffix().ToUpperInvariant() switch {
-                                "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                                "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                                "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                                "CSV" => FileFormat.CSV,
-                                "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                                "MSG" or "EML" => FileFormat.EMail,
-                                "PDF" => FileFormat.Pdf,
-                                "HTM" or "HTML" => FileFormat.HTML,
-                                "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                                "ICO" => FileFormat.Icon,
-                                "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                                "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                                "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                                "CHM" => FileFormat.HelpFile,
-                                "XML" => FileFormat.XMLFile,
-                                "VCF" => FileFormat.Visitenkarte,
-                                "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                                "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                                "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
-                                "TBLC" => FileFormat.TableChunk,
-                                "LNK" or "URL" => FileFormat.Link,
-                                "BCR" => FileFormat.BlueCreativeFile,
-                                "BCS" => FileFormat.BlueCreativeSymbol,
-                                _ => FileFormat.Unknown
-                            };
+                                ? FileFormat.Unknown
+                                : filename.FileSuffix().ToUpperInvariant() switch {
+                                    "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                                    "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                                    "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                                    "CSV" => FileFormat.CSV,
+                                    "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                                    "MSG" or "EML" => FileFormat.EMail,
+                                    "PDF" => FileFormat.Pdf,
+                                    "HTM" or "HTML" => FileFormat.HTML,
+                                    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                                    "ICO" => FileFormat.Icon,
+                                    "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                                    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                                    "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                                    "CHM" => FileFormat.HelpFile,
+                                    "XML" => FileFormat.XMLFile,
+                                    "VCF" => FileFormat.Visitenkarte,
+                                    "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                                    "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                                    "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
+                                    "TBLC" => FileFormat.TableChunk,
+                                    "LNK" or "URL" => FileFormat.Link,
+                                    "BCR" => FileFormat.BlueCreativeFile,
+                                    "BCS" => FileFormat.BlueCreativeSymbol,
+                                    _ => FileFormat.Unknown
+                                };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -302,10 +308,10 @@ public static class IO {
     public static FileInfo? GetFileInfo(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileInfo, [filename], abortIfFailed, time).Value as FileInfo;
 
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                                => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
+                                    => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
 
     public static string[] GetFiles(string directory)
-                         => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
+                             => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
 
     public static DateTime? GetFolderWriteTimeUtc(string directory) => ProcessFile(TryGetFolderWriteTimeUtc, [directory], false, 5).Value as DateTime?;
 
@@ -532,6 +538,58 @@ public static class IO {
         }
 
         return encoding.GetString(b, bomOffset, b.Length - bomOffset);
+    }
+
+    /// <summary>
+    /// Erweiterter Speicherpfad: Schreibt zuerst lokal (SSD), rotiert dann über Backup zur Hauptdatei im Netzwerk.
+    /// Minimiert Netzwerk-Latenz-Probleme während des Schreibvorgangs.
+    /// Führt nur Dateioperationen aus — die Aktualisierung von Instanz-Zuständen
+    /// (Hashes, FileInfo, OnSaved) obliegt dem Aufrufer.
+    /// </summary>
+    public static OperationResult SaveExtended(string filename, byte[] contentToWrite) {
+        var backup = BackupName(filename);
+        // Tempfile im Zielverzeichnis anlegen, damit File.Replace funktioniert
+        // (gleiche Volume erforderlich) und Cross-Volume-Kopien vermieden werden.
+        var tempfile = TempFile(filename.FilePath(), $"{filename.FileNameWithoutSuffix()}-{UserName}", "tmp");
+        try {
+            // 1. Lokal schreiben (schnell, sicher vor Netzwerk-Abbrüchen)
+            var result = WriteAllBytes(tempfile, contentToWrite);
+            if (result.IsFailed) { return result; }
+
+            if (!FileExists(filename)) {
+                // 2a. Erstspeicherung: Datei existiert noch nicht — kein Backup nötig,
+                //     kein File.Replace möglich (Zieldatei fehlt). Direktes Verschieben.
+                if (!MoveFile(tempfile, filename, false)) {
+                    return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                }
+            } else {
+                // 2b. Datei existiert — atomares Ersetzen mit Backup-Rotation.
+                //     File.Replace führt Replace+Backup in einem Syscall aus.
+                try {
+                    File.Replace(tempfile, filename, backup, ignoreMetadataErrors: true);
+                } catch {
+                    // Fallback bei exotischen Filesystems, die File.Replace nicht unterstützen
+                    if (FileExists(backup) && !DeleteFile(backup, false)) {
+                        return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+                    }
+
+                    if (!MoveFile(filename, backup, false)) {
+                        return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+                    }
+
+                    if (!MoveFile(tempfile, filename, false)) {
+                        MoveFile(backup, filename, false);
+                        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                    }
+                }
+            }
+
+            return OperationResult.Success;
+        } catch (Exception ex) {
+            return OperationResult.Failed(ex);
+        } finally {
+            DeleteFile(tempfile, false);
+        }
     }
 
     public static string TempFile(string newPath, string filename) {

@@ -1,26 +1,58 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.ClassesStatic.IO;
 using static BlueBasics.ClassesStatic.Develop;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueBasics.Classes.FileSystemCaching;
+namespace BlueBasics.Classes;
 
 /// <summary>
-/// Abstrakte Basisklasse für alle gecachten Dateitypen.
-/// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading und Versionierung.
-/// Thread-sicher durch Double-Checked-Locking mit Semaphore.
-/// Das zentrale Lifecycle-Management (<see cref="SaveAll(bool, IEnumerable{CachedFile})"/>
-/// und <see cref="DisposeAll(IEnumerable{CachedFile})"/>) erhält die zu behandelnden
-/// Instanzen vom Aufrufer — die Ableitungen (z.B. Chunk, ConnectedFormula) pflegen
-/// dafür eigene Live-Register.
+/// Abstrakte Basisklasse für gecachte Dateien, die zusätzlich per
+/// <see cref="BlockFile"/> gegen parallele Bearbeitung durch andere Benutzer
+/// gesperrt werden können.
 /// </summary>
-public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableText {
+/// <remarks>
+/// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading,
+/// Versionierung und Thread-sicherheit (Double-Checked-Locking mit Semaphoren).
+/// Zusätzlich wird ein statischer Polling-Timer betrieben, der alle
+/// <see cref="PollingIntervalMinutes"/> Minuten prüft, ob sich die Datei auf der
+/// Festplatte geändert hat, und ggf. <see cref="Invalidate"/> aufruft.
+/// Dateien mit aktivem Schreibzugriff werden beim Polling übersprungen.
+/// <para>
+/// Das zentrale Lifecycle-Management (<see cref="SaveAll(bool, IEnumerable{BlockableFile})"/>
+/// und <see cref="DisposeAll(IEnumerable{BlockableFile})"/>) erhält die zu behandelnden
+/// Instanzen vom Aufrufer — die Ableitungen (z.B. ConnectedFormula) pflegen
+/// dafür eigene Live-Register.
+/// </para>
+/// </remarks>
+public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
+
+    /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
+    private const int PollingIntervalMinutes = 5;
+
+    /// <summary>
+    /// Alle registrierten BlockableFile-Instanzen, geordnet nach normalisiertem Dateinamen.
+    /// Wird vom Polling-Timer durchlaufen.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, BlockableFile> _registeredFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly object _timerLock = new();
+
+    /// <summary>
+    /// Registry aller Instanzen, die aktuell erfolgreich Schreibrechte erworben haben.
+    /// Schlüssel ist der Dateipfad (<see cref="Filename"/>).
+    /// Wird genutzt, um <see cref="RevokeWriteAccessAll"/> beim Shutdown ohne Kenntnis
+    /// des Caching-Systems auszuführen.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, BlockableFile> _writeAccessHolders = new(StringComparer.OrdinalIgnoreCase);
+
+    private static Timer? _pollingTimer;
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
@@ -58,6 +90,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     private FileInfo? _fileInfo;
 
+    /// <summary>
+    /// true, wenn diese Instanz aktuell den Schreibzugriff (Blockdatei) hält.
+    /// Wird vom Polling-Timer ausgewertet: Dateien mit Write Access werden nicht invalidiert.
+    /// </summary>
+    private volatile bool _hasWriteAccess;
+
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -65,17 +103,20 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     #region Constructors
 
     /// <summary>
-    /// Erstellt eine neue CachedFile-Instanz für den angegebenen Dateipfad.
-    /// Registriert die Instanz im CachedFileSystem (für Watcher-basierte
-    /// Invalidierung). Ableitungen pflegen ihre Live-Instanzen zusätzlich in
-    /// eigenen Registern, die dem Aufrufer von
-    /// <see cref="SaveAll(bool, IEnumerable{CachedFile})"/> bzw.
-    /// <see cref="DisposeAll(IEnumerable{CachedFile})"/> übergeben werden.
+    /// Erstellt eine neue BlockableFile-Instanz für den angegebenen Dateipfad,
+    /// registriert sie im Polling-Register und startet bei Bedarf den statischen
+    /// Polling-Timer. Ableitungen pflegen ihre Live-Instanzen in eigenen Registern,
+    /// die dem Aufrufer von <see cref="SaveAll(bool, IEnumerable{BlockableFile})"/> bzw.
+    /// <see cref="DisposeAll(IEnumerable{BlockableFile})"/> übergeben werden.
     /// </summary>
     /// <param name="filename">Vollständiger Dateipfad.</param>
-    protected CachedFile(string filename) {
+    protected BlockableFile(string filename) {
         Filename = string.IsNullOrEmpty(filename) ? string.Empty : filename.NormalizeFile();
-        CachedFileSystem.AutoRegister(this);
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            _registeredFiles[Filename] = this;
+            EnsurePollingTimerStarted();
+        }
     }
 
     #endregion
@@ -110,8 +151,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (!NeedsLoading() && _content is not null) { return _content; }
             }
 
-            //Diagnose("CF",$"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}");
-
             bool acquired = false;
             try {
                 try {
@@ -124,7 +163,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 if (!acquired) {
                     MarkLoadFailed();
-                    //Diagnose("CF",$"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
                     lock (_lock) {
                         return _content ?? [];
                     }
@@ -134,13 +172,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                     if (!NeedsLoading() && _content is not null) { return _content; }
                 }
 
-                var sw = Stopwatch.StartNew();
-                var result = GetContentInternal();
-                //Diagnose("CF",$"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
-                return result;
+                return GetContentInternal();
             } catch {
                 MarkLoadFailed();
-                //Diagnose("CF",$"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}");
                 return [];
             } finally {
                 if (acquired) {
@@ -193,24 +227,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public string Filename { get; }
 
     /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
-    /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
-    /// </summary>
-    public string FreezedReason { get; private set; } = string.Empty;
-
-    /// <summary>
     /// Flag zur Überwachung, ob die Instanz disposed wurde.
     /// </summary>
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    /// <summary>
-    /// Gibt an, ob die Datei eingefroren ist.
-    /// </summary>
-    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
-
     public bool IsLoading {
         get {
-            if (IsDisposed || IsFreezed) { return false; }
+            if (IsDisposed) { return false; }
 
             try {
                 if (!_loadSemaphore.Wait(0)) { return true; }
@@ -237,7 +260,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     public bool IsSaving {
         get {
-            if (IsDisposed || IsFreezed) { return false; }
+            if (IsDisposed) { return false; }
 
             try {
                 if (!_saveSemaphore.Wait(0)) { return true; }
@@ -276,15 +299,44 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     #region Methods
 
     /// <summary>
-    /// Speichert die angegebenen CachedFile-Instanzen.
+    /// Disposed die angegebenen BlockableFile-Instanzen.
+    /// </summary>
+    /// <param name="files">Die zu verwerfenden BlockableFile-Instanzen (z. B. aus
+    /// <c>ConnectedFormula.LiveInstances</c>).</param>
+    public static void DisposeAll(IEnumerable<BlockableFile> files) {
+        foreach (var file in files) {
+            try { file.Dispose(); } catch { }
+        }
+    }
+
+    /// <summary>
+    /// Widerruft alle aktiven Schreibzugriffe dieser Instanzen.
+    /// Wird beim Herunterfahren der Anwendung aufgerufen, damit keine
+    /// Blockdateien auf der Festplatte liegen bleiben.
+    /// </summary>
+    public static void RevokeWriteAccessAll() {
+        var snapshot = _writeAccessHolders.Values.ToList();
+        Develop.EndLog($"RevokeWriteAccessAll: {snapshot.Count} Lock(s) zu entfernen");
+        var done = 0;
+        foreach (var mu in snapshot) {
+            done++;
+            Develop.EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Vor RevokeWriteAccess '{mu.Filename}'");
+            mu.RevokeWriteAccess();
+            Develop.EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Nach RevokeWriteAccess '{mu.Filename}'");
+        }
+        Develop.EndLog("RevokeWriteAccessAll: ENDE");
+    }
+
+    /// <summary>
+    /// Speichert die angegebenen BlockableFile-Instanzen.
     /// </summary>
     /// <param name="mustWait">
     /// Falls FALSE: Asynchrones Speichern anstoßen und NICHT warten.
     /// Falls TRUE: Asynchrones Speichern anstoßen und WARTEN, bis alle fertig sind.
     /// </param>
-    /// <param name="files">Die zu speichernden CachedFile-Instanzen (z. B. aus
-    /// <c>Chunk.LiveInstances</c> und <c>ConnectedFormula.LiveInstances</c>).</param>
-    public static void SaveAll(bool mustWait, IEnumerable<CachedFile> files) {
+    /// <param name="files">Die zu speichernden BlockableFile-Instanzen (z. B. aus
+    /// <c>ConnectedFormula.LiveInstances</c>).</param>
+    public static void SaveAll(bool mustWait, IEnumerable<BlockableFile> files) {
         var tasks = new List<Task>();
         foreach (var file in files) {
             if (file.IsDisposed) { continue; }
@@ -301,36 +353,75 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
 
             if (mustWait) {
-                EndLog($"CachedFile.SaveAll(true): Warte auf {tasks.Count} Task(s) (max 60s)");
+                EndLog($"BlockableFile.SaveAll(true): Warte auf {tasks.Count} Task(s) (max 60s)");
                 try {
                     Task.WaitAll(tasks.ToArray(), 60000);
-                    EndLog("CachedFile.SaveAll(true): Task.WaitAll zurück");
+                    EndLog("BlockableFile.SaveAll(true): Task.WaitAll zurück");
                 } catch {
-                    EndLog("CachedFile.SaveAll(true): Task.WaitAll hat Exception geworfen");
+                    EndLog("BlockableFile.SaveAll(true): Task.WaitAll hat Exception geworfen");
                 }
             }
 
             Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
         } else {
-            EndLog("CachedFile.SaveAll: keine anstehenden Tasks");
+            EndLog("BlockableFile.SaveAll: keine anstehenden Tasks");
         }
     }
 
     /// <summary>
-    /// Disposed die angegebenen CachedFile-Instanzen.
+    /// Stoppt den Polling-Timer und leert das Instanz-Register.
+    /// Wird beim Herunterfahren der Anwendung aufgerufen.
     /// </summary>
-    /// <param name="files">Die zu verwerfenden CachedFile-Instanzen (z. B. aus
-    /// <c>Chunk.LiveInstances</c> und <c>ConnectedFormula.LiveInstances</c>).</param>
-    public static void DisposeAll(IEnumerable<CachedFile> files) {
-        foreach (var file in files) {
-            try { file.Dispose(); } catch { }
+    public static void StopPolling() {
+        lock (_timerLock) {
+            _pollingTimer?.Dispose();
+            _pollingTimer = null;
         }
+        _registeredFiles.Clear();
     }
 
     /// <summary>
-    /// Disposed alle zugeordneten Ressourcen.
+    /// Erwirbt den Schreibzugriff für diese Datei.
+    /// Prüft die Blockdatei, erstellt sie bei Bedarf und merkt sich den Zustand.
+    /// Gibt eine Fehlermeldung zurück, wenn ein anderer Benutzer die Datei sperrt;
+    /// <see cref="string.Empty"/> bei Erfolg.
+    /// </summary>
+    public string AcquireWriteAccess() {
+        if (Develop.AllReadOnly) { return string.Empty; }
+
+        if (!IsMyLock()) {
+            var blocker = BlockFile.BlockerMessage(Filename);
+            if (blocker.Length > 0) { return blocker; }
+
+            BlockFile.AcquireWriteAccessFor(Filename);
+            if (!IsMyLock()) { return "Schreibrecht konnte nicht erworben werden"; }
+        }
+
+        _hasWriteAccess = true;
+        _writeAccessHolders.TryAdd(Filename, this);
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Liefert eine Blocker-Meldung, falls ein anderer Benutzer die Datei sperrt;
+    /// <see cref="string.Empty"/> wenn frei.
+    /// </summary>
+    public string BlockerMessage() => BlockFile.BlockerMessage(Filename);
+
+    /// <summary>
+    /// Disposed alle zugeordneten Ressourcen. Trägt die Instanz aus dem
+    /// Polling-Register aus, gibt einen eventuell gehaltenen Schreibzugriff frei
+    /// (dabei ggf. Save via OnReleasingWriteAccess) und schließt die Datei-Verwaltung ab.
     /// </summary>
     public virtual void Dispose() {
+        // Cleanup, das passieren muss, während IsDisposed noch false ist
+        // (RevokeWriteAccess kann über OnReleasingWriteAccess Save auslösen).
+        if (!IsDisposed) {
+            _registeredFiles.TryRemove(Filename, out _);
+            if (_hasWriteAccess) { RevokeWriteAccess(); }
+        }
+
+        // Ab hier thread-sicher und idempotent.
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         Loaded = null;
@@ -379,21 +470,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     }
 
     /// <summary>
-    /// Friert die Datei ein. Kann nicht rückgängig gemacht werden.
-    /// </summary>
-    public void Freeze(string reason) {
-        if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
-        FreezedReason = reason;
-    }
-
-    /// <summary>
     /// Invalidiert den gecachten Inhalt, damit er beim nächsten Zugriff neu geladen wird.
     /// Setzt IsParsed auf false — die Ableitung muss ihre Daten neu verarbeiten.
     /// Setzt auch _isSaved auf true (lokale Änderungen gelten als verworfen).
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
-            //Diagnose("CF",$"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}");
             _fileInfo = null;
             _content = null;
             _contentHash = null;
@@ -401,9 +483,18 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         }
     }
 
+    /// <summary>
+    /// Prüft, ob der aktuelle Prozess die aktive Sperre für diese Datei hält.
+    /// </summary>
+    public bool IsMyLock() => BlockFile.IsMyLockFor(Filename);
+
+    /// <summary>
+    /// Prüft, ob die Datei aktuell bearbeitet werden darf.
+    /// Berücksichtigt: IsDisposed, LoadFailed, Ladezustand,
+    /// Schreibrecht auf der Festplatte und Multi-User-Sperre via Blockdatei.
+    /// </summary>
     public virtual string IsNowEditable() {
         if (IsDisposed) { return "Verworfen."; }
-        if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
         if (NeedsLoading()) {
             if (!EnsureContentLoaded()) { return "Datei wurde nicht korrekt geladen."; }
@@ -413,12 +504,14 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (_contentOnDiskHash is null) { return "Interner Fehler."; }
 
         var r = CanWriteFile(Filename, 2);
-        return r.IsSuccessful ? string.Empty : r.FailedReason;
+        if (r.IsFailed) { return r.FailedReason; }
+
+        return BlockerMessage();
     }
 
     /// <summary>
     /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes.
+    /// Berücksichtigt: IsDisposed, LoadFailed, MinimumBytes.
     /// </summary>
     public virtual string IsSaveAbleNow() {
         if (IsNowEditable() is { Length: > 0 } f) { return f; }
@@ -464,10 +557,28 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     }
 
     /// <summary>
+    /// Wird aufgerufen, bevor die Blockdatei freigegeben wird.
+    /// Standard: speichert ungespeicherte Änderungen.
+    /// </summary>
+    public virtual void OnReleasingWriteAccess() {
+        if (!IsSaved) { _ = Save(); }
+    }
+
+    /// <summary>
     /// Menschenlesbarer Name dieser Datei für Statusmeldungen (z. B. "Speichere ...").
     /// Muss von konkreten Ableitungen implementiert werden.
     /// </summary>
     public abstract string ReadableText();
+
+    /// <summary>
+    /// Gibt den Schreibzugriff frei. Speichert ungespeicherte Änderungen
+    /// über <see cref="OnReleasingWriteAccess"/> und entfernt die Blockdatei.
+    /// </summary>
+    public void RevokeWriteAccess() {
+        _hasWriteAccess = false;
+        BlockFile.RevokeFor(Filename, OnReleasingWriteAccess);
+        _writeAccessHolders.TryRemove(Filename, out _);
+    }
 
     /// <summary>
     /// Speichert den Inhalt asynchron mit optionaler Backup-Rotation und Semaphore-Synchronisierung.
@@ -557,7 +668,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             var dataToWrite = MustZipped ? data.ZipIt() : data;
             if (dataToWrite is null || dataToWrite.Length == 0) { return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern"); }
 
-            var backup = BackupName(filename);
+            var backup = IO.BackupName(filename);
             var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
             var result = WriteAllBytes(tmpFile, dataToWrite);
@@ -595,7 +706,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public void WaitDiskOperationFinished() {
         if (IsDisposed) { return; }
 
-        var sw = Stopwatch.StartNew();
         try {
             // Load Semaphore abarbeiten
             if (_loadSemaphore.Wait(30000)) {
@@ -605,10 +715,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             // Save Semaphore abarbeiten
             if (_saveSemaphore.Wait(30000)) {
                 try { _saveSemaphore.Release(); } catch { }
-            }
-
-            if (sw.ElapsedMilliseconds > 50) {
-                //Diagnose("CF",$"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             }
         } catch (ObjectDisposedException) {
             // Falls während des Wartens Dispose aufgerufen wurde
@@ -628,11 +734,39 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
 
+    private static void EnsurePollingTimerStarted() {
+        if (_pollingTimer is not null) { return; }
+        lock (_timerLock) {
+            if (_pollingTimer is not null) { return; }
+            _pollingTimer = new Timer(OnPollingTick, null,
+                TimeSpan.FromMinutes(PollingIntervalMinutes),
+                TimeSpan.FromMinutes(PollingIntervalMinutes));
+        }
+    }
+
     /// <summary>
-    /// Berechnet den Backup-Dateinamen im Format "originaldatei.suffix.bak".
-    /// Beispiel: "daten.mbdb" → "daten.mbdb.bak"
+    /// Wird vom Polling-Timer alle <see cref="PollingIntervalMinutes"/> Minuten aufgerufen.
+    /// Prüft alle registrierten Dateien auf externe Änderungen und invalidiert
+    /// veraltete Instanzen. Dateien mit aktivem Schreibzugriff werden übersprungen.
     /// </summary>
-    private static string BackupName(string filename) => $"{filename}.bak";
+    private static void OnPollingTick(object? state) {
+        foreach (var kvp in _registeredFiles) {
+            var file = kvp.Value;
+
+            if (file.IsDisposed) {
+                _registeredFiles.TryRemove(kvp.Key, out _);
+                continue;
+            }
+
+            if (file._hasWriteAccess) { continue; }
+
+            try {
+                if (file.IsStale()) {
+                    file.Invalidate();
+                }
+            } catch { }
+        }
+    }
 
     /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.
@@ -646,8 +780,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
         var processedContent = content;
         var finalLoadFailed = loadFailed;
-
-        //Diagnose("CF",$"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp is not null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
 
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 
@@ -705,52 +837,17 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     }
 
     /// <summary>
-    /// Erweiterter Speicherpfad: Schreibt zuerst lokal (SSD), rotiert dann über Backup zur Hauptdatei im Netzwerk.
-    /// Minimiert Netzwerk-Latenz-Probleme während des Schreibvorgangs.
+    /// Erweiterter Speicherpfad: Delegiert die Dateioperationen (Backup-Rotation,
+    /// atomares Ersetzen) an <see cref="IO.SaveExtended"/> und aktualisiert danach
+    /// die Instanz-Zustände (Hashes, FileInfo) sowie löst <see cref="OnSaved"/> aus.
+    /// Für Dateien mit ExtendedSave = true.
     /// </summary>
     private OperationResult SaveExtended(byte[] contentToWrite, string savedContentHash) {
-        var backup = BackupName(Filename);
-        // Tempfile im Zielverzeichnis anlegen, damit File.Replace funktioniert
-        // (gleiche Volume erforderlich) und Cross-Volume-Kopien vermieden werden.
-        var tempfile = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix(), "tmp");
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
-            CachedFileSystem.BeginIgnoreFile(Filename);
-            CachedFileSystem.BeginIgnoreFile(backup);
-            CachedFileSystem.BeginIgnoreFile(tempfile);
-
-            // 1. Lokal schreiben (schnell, sicher vor Netzwerk-Abbrüchen)
-            var result = WriteAllBytes(tempfile, contentToWrite);
+            var result = IO.SaveExtended(Filename, contentToWrite);
             if (result.IsFailed) { return result; }
-
-            if (!FileExists(Filename)) {
-                // 2a. Erstspeicherung: Datei existiert noch nicht — kein Backup nötig,
-                //     kein File.Replace möglich (Zieldatei fehlt). Direktes Verschieben.
-                if (!MoveFile(tempfile, Filename, false)) {
-                    return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-                }
-            } else {
-                // 2b. Datei existiert — atomares Ersetzen mit Backup-Rotation.
-                //     File.Replace führt Replace+Backup in einem Syscall aus.
-                try {
-                    File.Replace(tempfile, Filename, backup, ignoreMetadataErrors: true);
-                } catch {
-                    // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
-                    if (FileExists(backup) && !DeleteFile(backup, false)) {
-                        return OperationResult.Failed("Backup konnte nicht gelöscht werden");
-                    }
-
-                    if (!MoveFile(Filename, backup, false)) {
-                        return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
-                    }
-
-                    if (!MoveFile(tempfile, Filename, false)) {
-                        MoveFile(backup, Filename, false);
-                        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-                    }
-                }
-            }
 
             lock (_lock) {
                 _contentOnDiskHash = savedContentHash;
@@ -759,14 +856,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             OnSaved();
+
             return OperationResult.Success;
         } catch (Exception ex) {
             return OperationResult.Failed(ex);
-        } finally {
-            DeleteFile(tempfile, false);
-            CachedFileSystem.EndIgnoreFile(Filename);
-            CachedFileSystem.EndIgnoreFile(backup);
-            CachedFileSystem.EndIgnoreFile(tempfile);
         }
     }
 
@@ -777,8 +870,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     private OperationResult SaveSimple(byte[] contentToWrite, string savedContentHash) {
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
-
-            CachedFileSystem.BeginIgnoreFile(Filename);
 
             File.WriteAllBytes(Filename, contentToWrite);
 
@@ -793,8 +884,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             return OperationResult.Success;
         } catch (Exception ex) {
             return OperationResult.Failed(ex);
-        } finally {
-            CachedFileSystem.EndIgnoreFile(Filename);
         }
     }
 

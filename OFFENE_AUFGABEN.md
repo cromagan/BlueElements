@@ -228,9 +228,6 @@ Kontextmenu: Kapitel ändern
 Chunk und ConnectedFormula das get vereinheitlichen
 
 ##Aufgabe
-CachedFileSystem möchte ich komplett entfernen. Welcher kleiner schritt wäre möglich, um meinem Ziel ein Stück näher zu kommen?
-
-##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
 
 ## Aufgabe
@@ -244,29 +241,29 @@ Syntaxcheck ist nicht so gut:
 Stimmt die Komplettierung, injizierzen und löschen der TableFragments korrekt?
 Irgendwie gehen Daten verloren
 
-##Aufgabe
+## Aufgabe
  Row.InvalidateAllCheckData(); wird immer bei SetValueInternal aufgerufen, auch wenn sich NUR die Metdadaten es Scriptes ändern. Da soll nichgt sein.
  
-##Aufgabe
+## Aufgabe
 ConnectedFormula, Wird eine Zeile in einem TabelViewWithFilters angeklickt, wird die Ausgehende Zeile an andere Felder weitergegeben.
 DaS klappt nicht, wenn ein Zeilenfilter vorhanden ist! normale Filter funktionieren. Die Melduing ist: Kein Bezug zu einer Zeile
 
-##Aufgabe
+## Aufgabe
 Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern.
 
-##Aufgabe
+## Aufgabe
 Alls Json convertierungen in ParseThisJson    wie   _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
 in value.GetBoolean() direkt abändern
 
-##Aufgabe
+## Aufgabe
 Aktuelle Ansicht fehlerhaft.
 Entweder "Ansicht nicht definiert" ODER
 bei Admin, die Dummy-Spalte (zum hinzufügen neuer Ansichten) anzeigen
 
-##Aufgabe
+## Aufgabe
 Mach ein neues Kontrol. Eine Mischung aus TabControl und Listbox.
 Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts oben oder unten "versteckt".
 Fährt man mit der Maus darüber fährt es raus.
 
-##Aufgabe
+## Aufgabe
 führe Jason.md aus. Beachte: die Zeilennummern können inzwischen anders sein, aber sinngemäß passt die Anforderung noch.

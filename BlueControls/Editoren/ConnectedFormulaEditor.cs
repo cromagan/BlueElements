@@ -63,14 +63,14 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
-            if (value is not null && ((IMultiUserCapable)value).AcquireWriteAccess() is { Length: > 0 }) { value = null; }
+            if (value is not null && value.AcquireWriteAccess() is { Length: > 0 }) { value = null; }
 
             if (field == value) { return; }
 
             if (field is not null) {
                 field.Editing -= _cFormula_Editing;
 
-                ((IMultiUserCapable)field).RevokeWriteAccess();
+                field.RevokeWriteAccess();
             }
 
             field = value;

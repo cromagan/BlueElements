@@ -1,16 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
-[FileSuffix(".bdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFile : Table {
 
@@ -57,8 +54,9 @@ public class TableFile : Table {
 
     /// <summary>
     /// Mapping von Datei-Suffix auf die zugehörige TableFile-Ableitung.
-    /// Wird einmalig per Reflection aus den [FileSuffix]-Attributen aller TableFile-Ableitungen befüllt.
-    /// Berücksichtigt AllowMultiple auf FileSuffixAttribute.
+    /// Wird einmalig beim ersten Zugriff aus der hardcoded Tabelle in
+    /// <see cref="BuildSuffixTypeMap"/> erzeugt. Neue TableFile-Ableitungen
+    /// müssen dort eingetragen werden.
     /// </summary>
     internal static readonly Lazy<Dictionary<string, Type>> LoadableFileTypes = new(BuildSuffixTypeMap);
 
@@ -69,6 +67,9 @@ public class TableFile : Table {
     /// Der Globale Timer, der die Tabellen regelmäßig updated
     /// </summary>
     private static Timer? _tableUpdateTimer;
+
+    /// <summary>Semaphore zum Synchronisieren von Speichervorgängen.</summary>
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     private int _checkerTickCount = -5;
 
@@ -110,7 +111,7 @@ public class TableFile : Table {
 
     /// <summary>
     /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
-    /// Wird aus dem FileInfo (LastWriteTimeUtc) des CachedFile ermittelt.
+    /// Wird aus dem FileInfo (LastWriteTimeUtc) des zugehörigen Chunk ermittelt.
     /// </summary>
     public override DateTime LastSaveMainFileUtcDate {
         get {
@@ -346,24 +347,24 @@ public class TableFile : Table {
         PauseTimer();
 
         try {
-        OnLoading();
+            OnLoading();
 
-        LoadMainData();
+            LoadMainData();
 
-        BeSureToBeUpToDate(true);
+            BeSureToBeUpToDate(true);
 
-        MainChunkLoadDone = true;
+            MainChunkLoadDone = true;
 
-        RepairAfterParse();
+            RepairAfterParse();
 
-        var opr = CanWriteInDirectory(fileNameToLoad.FilePath());
+            var opr = CanWriteInDirectory(fileNameToLoad.FilePath());
 
-        if (opr.IsFailed) { Freeze(opr.FailedReason); }
+            if (opr.IsFailed) { Freeze(opr.FailedReason); }
 
-        if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
-        OnLoaded(true, true);
+            if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
+            OnLoaded(true, true);
 
-        CreateWatcher();
+            CreateWatcher();
 
             if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
         } catch (Exception ex) {
@@ -375,8 +376,8 @@ public class TableFile : Table {
             Freeze("Laden der Tabelle fehlgeschlagen: " + ex.Message);
             MainChunkLoadDone = true;
         } finally {
-        ResumeTimer();
-    }
+            ResumeTimer();
+        }
     }
 
     public override void RepairAfterParse() {
@@ -410,6 +411,58 @@ public class TableFile : Table {
     }
 
     /// <summary>
+    /// Speichert den übergebenen Inhalt mit Backup-Rotation und
+    /// Semaphore-Synchronisierung. Der Inhalt wird gezippt gespeichert und
+    /// nutzt den erweiterten Speicherpfad. Der Inhalt wird NICHT im Speicher gehalten.
+    /// </summary>
+    public OperationResult Save(byte[] content) {
+        if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
+
+        bool acquired = false;
+        try {
+            acquired = _saveSemaphore.Wait(0);
+            if (!acquired) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+        } catch (ObjectDisposedException) {
+            return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
+        }
+
+        try {
+            if (content is null || content.Length == 0) {
+                return OperationResult.Failed("Keine Daten zum Speichern");
+            }
+
+            if (IsGenericEditable(false) is { Length: > 0 } f) {
+                return OperationResult.Failed(f);
+            }
+
+            if (!HasValidEofMarker(content)) {
+                return OperationResult.Failed("Kein gültiger EOF-Marker");
+            }
+
+            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {KeyName}", 0);
+
+            var contentToWrite = content.ZipIt() ?? [];
+            if (contentToWrite.Length == 0) {
+                return OperationResult.Failed("Komprimierung fehlgeschlagen");
+            }
+
+            var result = SaveExtended(Filename, contentToWrite);
+
+            if (result.IsSuccessful) {
+                Chunk.Get(Filename)?.Invalidate();
+            }
+
+            return result;
+        } finally {
+            if (acquired) {
+                try {
+                    _saveSemaphore.Release();
+                } catch { }
+            }
+        }
+    }
+
+    /// <summary>
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
     public void TryToSetMeTemporaryMaster() {
@@ -429,7 +482,7 @@ public class TableFile : Table {
         Develop.EndLog($"UnMasterMe '{KeyName}': ENDE");
     }
 
-    protected static string SaveMainFile(TableFile tbf) {
+    protected static string SaveFullFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -458,20 +511,14 @@ public class TableFile : Table {
             return "Datei zu klein für Speicherung.";
         }
 
-        var chunk = Chunk.Get(tbf.Filename);
-
-        if (chunk is null) {
+        if (Chunk.Get(tbf.Filename) is null) {
             if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
             }
-            chunk = new Chunk(tbf.Filename);
+            _ = new Chunk(tbf.Filename);
         }
 
-        chunk.EnsureContentLoaded();
-
-        chunk.Content = content.ToArray();
-
-        var result = chunk.Save().GetAwaiter().GetResult();
+        var result = tbf.Save(content.ToArray());
         if (result.IsFailed) { return result.FailedReason; }
 
         return string.Empty;
@@ -522,6 +569,13 @@ public class TableFile : Table {
             UnMasterMe();
 
             try {
+                // Auf laufende Speichervorgänge warten, BEVOR die Semaphore disposed wird.
+                if (_saveSemaphore.Wait(30000)) {
+                    _saveSemaphore.Release();
+                }
+            } catch { }
+
+            try {
                 // LÖSUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
                 lock (_timerLock) {
                     _activeTableCount--;
@@ -531,6 +585,10 @@ public class TableFile : Table {
                         _tableUpdateTimer = null;
                     }
                 }
+            } catch { }
+
+            try {
+                _saveSemaphore.Dispose();
             } catch { }
         }
 
@@ -545,7 +603,7 @@ public class TableFile : Table {
             return false;
         }
 
-        var ok = Parse(chunk.Content, true, null);
+        var ok = Parse(chunk.LoadContent(), true, null);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -557,7 +615,7 @@ public class TableFile : Table {
 
     protected virtual string SaveInternal() {
         try {
-            var result = SaveMainFile(this);
+            var result = SaveFullFile(this);
 
             if (string.IsNullOrEmpty(result)) {
                 InitialSavePending = false;
@@ -579,18 +637,13 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    private static Dictionary<string, Type> BuildSuffixTypeMap() {
-        var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-        foreach (var type in GetEnumerableOfType<TableFile>()) {
-            var attrs = type.GetCustomAttributes<FileSuffixAttribute>();
-            foreach (var attr in attrs) {
-                if (!string.IsNullOrEmpty(attr.Suffix)) {
-                    map[attr.Suffix] = type;
-                }
-            }
-        }
-        return map;
-    }
+    private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
+        [".bdb"] = typeof(TableFile),
+        [".csv"] = typeof(TableCSV),
+        [".hbdb"] = typeof(TableCSV),
+        [".mbdb"] = typeof(TableFragments),
+        [".tblh"] = typeof(TableChunk)
+    };
 
     private static void GenerateTableUpdateTimer() {
         lock (_timerLock) {

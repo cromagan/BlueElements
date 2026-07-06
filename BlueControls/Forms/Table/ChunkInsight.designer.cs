@@ -72,7 +72,7 @@ namespace BlueControls.BlueTableDialogs {
             btnOeffnen.ImageCode = "Ordner|16";
             btnOeffnen.Location = new Point(8, 0);
             btnOeffnen.Name = "btnOeffnen";
-            btnOeffnen.QuickInfo = "Chunk-Datei (.bdbc, .cbdb, .bdb, .mbdb, .hbdb, .tblc, .tblh) auswählen";
+            btnOeffnen.QuickInfo = "Chunk-Datei (.bdb, .mbdb, .hbdb, .tblc, .tblh) auswählen";
             btnOeffnen.Size = new Size(120, 24);
             btnOeffnen.TabIndex = 0;
             btnOeffnen.Text = "Chunk öffnen";
@@ -80,7 +80,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // OpenTab
             // 
-            OpenTab.Filter = "Chunk-Dateien|*.bdbc;*.cbdb;*.bdb;*.mbdb;*.hbdb;*.tblc;*.tblh|Alle Dateien|*.*";
+            OpenTab.Filter = "Chunk-Dateien|*.bdb;*.mbdb;*.hbdb;*.tblc;*.tblh|Alle Dateien|*.*";
             OpenTab.Title = "Chunk-Datei öffnen";
             // 
             // capZeilen2

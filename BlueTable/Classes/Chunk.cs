@@ -1,26 +1,21 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
-using BlueBasics.Classes.FileSystemCaching;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.IO;
+using System.Threading;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-[FileSuffix(".bdb")]
-[FileSuffix(".mbdb")]
-[FileSuffix(".hbdb")]
-public class Chunk : CachedFile, IMultiUserCapable {
+public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
 
-    public const int EditTimeInMinutes = 10;
-
     /// <summary>
     /// Zeitraum in Minuten, nach dem ein ungenutzter Chunk bei BeSureUpToDate übersprungen wird.
-    /// Wird der Chunk wieder benötigt, laden IsStale/LoadChunkWithChunkId die Daten automatisch neu.
+    /// Wird der Chunk wieder benötigt, laden die Daten automatisch neu.
     /// </summary>
     public const int SkipIfUnusedMinutes = 5;
 
@@ -30,6 +25,11 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// </summary>
     public static readonly ConcurrentDictionary<string, Chunk> LiveInstances = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Synchronisierungsobjekt für thread-sichere Zugriffe auf _fileInfo und LoadFailed.</summary>
+    private readonly object _lock = new();
+
+    private volatile int _isDisposedFlag;
+
     #endregion
 
     #region Constructors
@@ -38,68 +38,95 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung
     /// über <see cref="Get(string)"/>. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
-    public Chunk(string fullPath) : base(fullPath) {
+    public Chunk(string fullPath) {
+        Filename = string.IsNullOrEmpty(fullPath) ? string.Empty : fullPath.NormalizeFile();
         LiveInstances[Filename] = this;
 
-        var suffix = fullPath.FileSuffix().ToLowerInvariant();
+        var suffix = Filename.FileSuffix().ToLowerInvariant();
 
         if (suffix == "hbdb") {
             // .hbdb ist eine Begleitdatei zur .csv-Datei im gleichen Verzeichnis
-            MainFileName = fullPath.FilePath() + fullPath.FileNameWithoutSuffix() + ".csv";
-        } else if (suffix == "bdbc") {
-            // .bdbc sind Chunks im Unterordner.
-            // Die Hauptdatei dazu ist immer eine .cbdb Datei eine Ebene höher.
-            // Beispiel: ...\MeineTabelle\daten.bdbc -> ...\MeineTabelle.cbdb
-            MainFileName = fullPath.FilePath().TrimEnd('\\') + ".cbdb";
+            MainFileName = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".csv";
         } else {
-            // .bdb/.mbdb/.cbdb sind Hauptdateien — MainFileName ist die Datei selbst
-            MainFileName = fullPath;
+            // .bdb/.mbdb/.tblh sind Hauptdateien — MainFileName ist die Datei selbst
+            MainFileName = Filename;
         }
+
+        KeyName = string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)
+            ? TableFile.Chunk_MainData.ToLowerInvariant()
+            : Filename.FileNameWithoutSuffix().ToLowerInvariant();
     }
 
     #endregion
 
     #region Properties
 
-    public override bool ExtendedSave => true;
+    public FileInfo? FileInfo {
+        get {
+            if (field is null) {
+                field = GetFileInfo(Filename);
+            }
 
-    public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+            return field;
+        }
+
+        private set;
+    }
+
+    /// <summary>Der vollständige Dateipfad dieser Chunk-Datei.</summary>
+    public string Filename { get; } = string.Empty;
+
+    /// <summary>
+    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
+    /// Um den FreezedReason zu setzen, die Methode <see cref="Freeze"/> benutzen.
+    /// </summary>
+    public string FreezedReason { get; private set; } = string.Empty;
+
+    public bool IsDisposed => _isDisposedFlag == 1;
+
+    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     /// <summary>
     /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
-    /// Für Hauptdateien (.bdb, .cbdb, .mbdb) wird Chunk_MainData zurückgegeben,
-    /// für Chunk-Dateien (.bdbc) der Dateiname ohne Suffix.
+    /// Für Hauptdateien (.bdb, .mbdb, .tblh) wird Chunk_MainData zurückgegeben,
+    /// für Begleit- und Chunk-Dateien (z. B. .hbdb, .tblc) der Dateiname ohne Suffix.
+    /// Wird im Konstruktor einmalig berechnet, da Filename und MainFileName unveränderlich sind.
     /// </summary>
-    public override string KeyName {
-        get {
-            if (string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)) {
-                return TableFile.Chunk_MainData.ToLowerInvariant();
-            }
-
-            return Filename.FileNameWithoutSuffix().ToLowerInvariant();
-        }
-    }
+    public string KeyName { get; }
 
     /// <summary>
-    /// Letzter UTC-Zeitpunkt, an dem dieser Chunk gelesen oder beschrieben wurde.
-    /// Wird bei Content-Zugriff (lesen/schreiben) und in LoadChunkWithChunkId aktualisiert.
-    /// Chunks, die länger als <see cref="SkipIfUnusedMinutes"/> nicht verwendet wurden,
-    /// werden in BeSureUpToDate übersprungen, um Speicherzugriffe zu sparen.
+    /// UTC-Zeitpunkt der Konstruktion dieser Instanz. Wird von <see cref="IsChunkRecentlyUsed"/>
+    /// ausgewertet, um kürzlich erzeugte Chunks beim Update zu bevorzugen.
     /// </summary>
     public DateTime LastUsed { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
+    /// Wird auch gesetzt, wenn der geladene Inhalt kleiner als MinimumBytes ist.
+    /// </summary>
+    public bool LoadFailed { get; private set; }
 
     public string MainFileName { get; } = string.Empty;
 
     /// <summary>
-    /// Chunks werden immer gezippt gespeichert.
+    /// Mindestgröße des Inhalts in Bytes.
+    /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
+    /// Wird nach erfolgreichem Laden/Speichern über <see cref="SetMinLen"/> gesetzt.
     /// </summary>
-    public override bool MustZipped => true;
-
-    public bool UsesBlockFile => Filename.FileSuffix().ToLowerInvariant() is "bdbc" or "cbdb";
+    public int MinimumBytes { get; private set; }
 
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Disposed alle lebenden Chunk-Instanzen. Wird beim Herunterfahren der Anwendung aufgerufen.
+    /// </summary>
+    public static void DisposeAll() {
+        foreach (var chunk in LiveInstances.Values) {
+            try { chunk.Dispose(); } catch { }
+        }
+    }
 
     /// <summary>
     /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
@@ -120,8 +147,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
             }
         }
 
-        // Neue Instanz erzeugen. Der Konstruktor registriert in _liveInstances
-        // und (übergangsweise) im CachedFileSystem, inkl. Watcher-Setup.
+        // Neue Instanz erzeugen. Der Konstruktor registriert in LiveInstances.
         var created = new Chunk(normalizedFileName);
 
         // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
@@ -140,28 +166,15 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// </summary>
     public static bool HasCheckPoint(byte[] content, string keyName) {
         if (content.Length < 12) { return false; }
-
         if (IsRowChunk(keyName)) { return true; }
+
         var searchText = $"~^{keyName.ToLowerInvariant()}^~".UTF8_ToByte();
-
-        for (var i = 0; i <= content.Length - searchText.Length; i++) {
-            var found = true;
-            for (var j = 0; j < searchText.Length; j++) {
-                if (content[i + j] != searchText[j]) {
-                    found = false;
-                    break;
-                }
-            }
-
-            if (found) { return true; }
-        }
-
-        return false;
+        return content.AsSpan().IndexOf(searchText) >= 0;
     }
 
     /// <summary>
-    /// Prüft, ob der Chunk mit der angegebenen ID innerhalb von <see cref="Chunk.SkipIfUnusedMinutes"/>
-    /// verwendet wurde. Wird in BeSureUpToDate aufgerufen, um Speicherzugriffe
+    /// Prüft, ob der Chunk mit der angegebenen Datei innerhalb von <see cref="SkipIfUnusedMinutes"/>
+    /// erzeugt wurde. Wird in BeSureUpToDate aufgerufen, um Speicherzugriffe
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
     public static bool IsChunkRecentlyUsed(string filename) {
@@ -192,13 +205,13 @@ public class Chunk : CachedFile, IMultiUserCapable {
     public static void SaveToByteList(List<byte> bytes, long numberToAdd, int byteCount) {
         do {
             byteCount--;
-            var te = (long)Math.Pow(255, byteCount);
-            var mu = (long)Math.Truncate((decimal)(numberToAdd / te));
+            var divisor = (long)Math.Pow(255, byteCount);
+            var digit = numberToAdd / divisor;
 
-            if (mu > 255) { Develop.DebugError($"SaveToByteList overflow: {numberToAdd} passt nicht in {byteCount + 1} Byte(s), Max={te * 256 - 1}"); return; }
+            if (digit > 255) { Develop.DebugError($"SaveToByteList overflow: {numberToAdd} passt nicht in {byteCount + 1} Byte(s), Max={divisor * 256 - 1}"); return; }
 
-            bytes.Add((byte)mu);
-            numberToAdd %= te;
+            bytes.Add((byte)digit);
+            numberToAdd %= divisor;
         } while (byteCount > 0);
     }
 
@@ -236,9 +249,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
         bytes.AddRange(b);
     }
 
-    /// <summary>
-    /// Alle Spaltendaten außer Systeminfo
-    /// </summary>
+    /// <summary>Alle Spaltendaten außer Systeminfo</summary>
     public static void SaveToByteList(List<byte> bytes, ColumnItem c) {
         var name = c.KeyName;
 
@@ -320,67 +331,128 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
     /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
     /// </summary>
-    public override void Dispose() {
-        if (IsDisposed) { return; }
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
 
-        base.Dispose();
+        Invalidate();
+
+        GC.SuppressFinalize(this);
     }
 
-    public List<byte> GetHeadBytes() {
-        if (LoadFailed) { return []; }
-
-        var headBytes = new List<byte>();
-
-        SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
-        SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
-
-        return headBytes;
+    /// <summary>Friert die Datei ein. Kann nicht rückgängig gemacht werden.</summary>
+    public void Freeze(string reason) {
+        FreezedReason = string.IsNullOrEmpty(reason) ? "Eingefroren" : reason;
     }
 
-    public override string IsNowEditable() {
-        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
-        return ((IMultiUserCapable)this).BlockerMessage();
+    /// <summary>
+    /// Setzt das gecachte FileInfo zurück, damit beim nächsten Zugriff die
+    /// Metadaten frisch vom Dateisystem gelesen werden.
+    /// </summary>
+    public void Invalidate() {
+        lock (_lock) {
+            FileInfo = null;
+        }
     }
 
-    public override string IsSaveAbleNow() {
-        if (base.IsSaveAbleNow() is { Length: > 0 } f) { return f; }
+    public string IsNowEditable() {
+        if (IsDisposed) { return "Verworfen."; }
+        if (IsFreezed) { return FreezedReason; }
+        if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
 
-        if (!TableFile.HasValidEofMarker(Content)) {
+        return CanWriteFile(Filename, 2).FailedReason;
+    }
+
+    /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes,
+    /// gültigen EOF-Marker und CheckPoint.
+    /// </summary>
+    public string IsSaveAbleNow(byte[] content) {
+        if (IsNowEditable() is { Length: > 0 } f) { return f; }
+
+        if (content.Length < MinimumBytes) { return "Byte-Fehler"; }
+
+        if (!TableFile.HasValidEofMarker(content)) {
             return "Kein gültiger EOF-Marker";
         }
 
-        if (!HasCheckPoint(Content, KeyName)) {
+        if (!HasCheckPoint(content, KeyName)) {
             return $"Chunk '{KeyName}' enthält keinen gültigen CheckPoint";
         }
 
-        return ((IMultiUserCapable)this).BlockerMessage();
+        return string.Empty;
     }
 
-    public void OnReleasingWriteAccess() {
-        if (!IsSaved) { Save(); }
+    /// <summary>
+    /// Liest den logischen Dateiinhalt frisch vom Dateisystem (auf Disk gezippt,
+    /// hier entpackt). Der Inhalt wird NICHT im Speicher gehalten.
+    /// Aktualisiert <see cref="LoadFailed"/>, <see cref="FileInfo"/> und
+    /// <see cref="MinimumBytes"/> als Seiteneffekt.
+    /// Schreiben erfolgt über <see cref="TableFile.Save(byte[])"/>.
+    /// </summary>
+    public byte[] LoadContent() {
+        if (IsDisposed) { return []; }
+
+        var (content, fileInfo, loadFailed) = ReadContentFromFileSystem();
+
+        if (!loadFailed && content.Length > 0) {
+            if (content.IsZipped()) {
+                var unzipped = content.UnzipIt();
+                if (unzipped is null) {
+                    loadFailed = true;
+                } else {
+                    content = unzipped;
+                }
+            }
+
+            if (!loadFailed && MinimumBytes > 0 && content.Length < MinimumBytes) {
+                loadFailed = true;
+            }
+        }
+
+        if (loadFailed) { content = []; }
+
+        lock (_lock) {
+            LoadFailed = loadFailed;
+            FileInfo = fileInfo ?? new FileInfo(Filename);
+        }
+
+        if (!loadFailed) { SetMinLen(content.Length); }
+
+        return content;
     }
 
-    public override string ReadableText() => $"Chunk '{KeyName}'";
+    public string ReadableText() => $"Chunk '{KeyName}'";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
 
     public override string ToString() => KeyName;
 
-    internal string AcquireWriteAccess() {
-        if (IsNowEditable() is { Length: > 0 } f) { return f; }
-        return ((IMultiUserCapable)this).AcquireWriteAccess();
+    private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
+        try {
+            var retries = 0;
+            do {
+                var fileInfo1 = GetFileInfo(Filename, false, 0.1f);
+                if (fileInfo1 is null) { return ([], null, false); }
+
+                var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
+                var fileInfo2 = GetFileInfo(Filename, false, 2f);
+                if (fileInfo2 is not null &&
+                    fileInfo1.LastWriteTime == fileInfo2.LastWriteTime &&
+                    fileInfo1.Length == fileInfo2.Length) { return (content, fileInfo2, false); }
+
+                retries++;
+            } while (retries < 20);
+
+            return ([], null, true); // Datei ändert sich ständig, Laden fehlgeschlagen
+        } catch {
+            return ([], null, true);
+        }
     }
 
-    protected override void OnLoaded() {
-        SetMinLen();
-        base.OnLoaded();
-    }
-
-    protected override void OnSaved() => SetMinLen();
-
-    private void SetMinLen() => MinimumBytes = (int)(ContentLength * 0.3);
+    private void SetMinLen(int length) => MinimumBytes = (int)(length * 0.3);
 
     #endregion
 }

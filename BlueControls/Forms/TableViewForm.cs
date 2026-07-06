@@ -197,7 +197,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
         }
 
-        var forbidden = new[] { "bdb", "mbdb", "cbdb", "csv", "hbdb", "tblh" };
+        var forbidden = new[] { "bdb", "mbdb", "csv", "hbdb", "tblh" };
 
         foreach (var ext in forbidden) {
             if (string.Equals(ext, targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }

@@ -149,7 +149,7 @@ Wichtige Methoden:
 **Datei:** `BlueControls\Controls\ConnectedFormula\ConnectedFormula.cs` (608 Zeilen)
 
 - Basisklasse: `CachedFile` (`BlueBasics\Classes\FileSystemCaching\CachedFile.cs`, 743 Zeilen)
-- Implementiert u.a. `IParseable, IJsonParseable, IMultiUserCapable, INotifyPropertyChanged`
+- Implementiert u.a. `IParseable, IJsonParseable, INotifyPropertyChanged`
 - **Zentraler teurer Member:** `Pages` (ItemCollectionPadItem?), Zeile 106-127
 - **Pages-Getter** (Zeile 106-127): Lazy Load via `this.Parse(Constants.Win1252.GetString(Content))` bei `!IsParsed`
 - `ParseableItems()` in Zeile 270-286 (alt, String)
@@ -164,7 +164,7 @@ private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown
     if (IsDisposed) { return; }
     if (IsSaving || IsLoading || _finishingParse || !IsParsed) { return; }
 
-    if (((IMultiUserCapable)this).AcquireWriteAccess() is { Length: > 0 } f) {
+    if (AcquireWriteAccess() is { Length: > 0 } f) {
         Develop.DebugError(...);
         return;
     }
@@ -415,7 +415,7 @@ Beim ersten Laden (Lazy):
   - `Save()`
 
 #### 4.7 Multi-User-Koexistenz
-- Bestehendes `IMultiUserCapable`-Locking wiederverwenden
+- Bestehendes `BlockableFile`-Locking wiederverwenden
 - `.cfolog` pro User-Session (wie `TableFragments._myFragmentsFilename`)
 - Beim Laden: alle `.cfolog`-Dateien der anderen User auch berücksichtigen (analog `GetLastChanges`)
 

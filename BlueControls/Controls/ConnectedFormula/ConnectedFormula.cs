@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
-using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.EventArgs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -17,9 +15,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
-[FileSuffix(".cfo")]
-[FileSuffix(".bcr")]
-public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged {
+public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -151,8 +147,8 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             }
         }
 
-        // Neue Instanz erzeugen. Der Konstruktor registriert in _liveInstances
-        // und (übergangsweise) im CachedFileSystem, inkl. Watcher-Setup.
+        // Neue Instanz erzeugen. Der Konstruktor registriert in LiveInstances
+        // und im Polling-Register von BlockableFile.
         var created = new ConnectedFormula(normalizedFileName);
 
         // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
@@ -248,20 +244,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     public override void Invalidate() {
         IsParsed = false;
         base.Invalidate();
-    }
-
-    public override string IsNowEditable() {
-        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
-        return ((IMultiUserCapable)this).BlockerMessage();
-    }
-
-    public override string IsSaveAbleNow() {
-        if (base.IsSaveAbleNow() is { Length: > 0 } f) { return f; }
-        return ((IMultiUserCapable)this).BlockerMessage();
-    }
-
-    public void OnReleasingWriteAccess() {
-        if (!IsSaved) { Save(); }
     }
 
     /// <summary>
@@ -565,7 +547,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading || _finishingParse || !IsParsed) { return; }
 
-        if (((IMultiUserCapable)this).AcquireWriteAccess() is { Length: > 0 } f) {
+        if (AcquireWriteAccess() is { Length: > 0 } f) {
             Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})! {f}");
             return;
         }

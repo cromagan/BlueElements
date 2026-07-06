@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes;
@@ -49,17 +48,15 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
 
     /// <summary>
     /// Speichert alle offenen Dateien auf die Festplatte: Stößt asynchron das
-    /// Speichern der CachedFile-Instanzen an, speichert dann die Tabellen und
-    /// wartet schließlich, bis alle CachedFile-Speichervorgänge abgeschlossen sind.
+    /// Speichern der BlockableFile-Instanzen an, speichert dann die Tabellen und
+    /// wartet schließlich, bis alle BlockableFile-Speichervorgänge abgeschlossen sind.
     /// Zentrale Methode, um das Muster SaveAll(false) → Table.SaveAll() → SaveAll(true)
     /// an einem Ort zu bündeln.
     /// </summary>
     public static void SaveAllFiles() {
-        CachedFile.SaveAll(false, ConnectedFormula.LiveInstances.Values);
-        CachedFile.SaveAll(false, Chunk.LiveInstances.Values);
+        BlockableFile.SaveAll(false, ConnectedFormula.LiveInstances.Values);
         Table.SaveAll();
-        CachedFile.SaveAll(true, ConnectedFormula.LiveInstances.Values);
-        CachedFile.SaveAll(true, Chunk.LiveInstances.Values);
+        BlockableFile.SaveAll(true, ConnectedFormula.LiveInstances.Values);
     }
 
     public static void SaveEnd(Form? lastForm) {
@@ -70,9 +67,9 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         SaveAllFiles();
         Develop.EndLog("SaveEnd: Nach SaveAllFiles()");
 
-        Develop.EndLog("SaveEnd: Vor IMultiUserCapable.RevokeWriteAccessAll()");
-        IMultiUserCapable.RevokeWriteAccessAll();
-        Develop.EndLog("SaveEnd: Nach IMultiUserCapable.RevokeWriteAccessAll()");
+        Develop.EndLog("SaveEnd: Vor BlockableFile.RevokeWriteAccessAll()");
+        BlockableFile.RevokeWriteAccessAll();
+        Develop.EndLog("SaveEnd: Nach BlockableFile.RevokeWriteAccessAll()");
 
         List<Table> allTables = [.. Table.AllFiles];
         Develop.EndLog($"SaveEnd: Freeze-Schleife über {allTables.Count} Tabelle(n)");
@@ -96,14 +93,14 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         }
 
         Develop.EndLog("SaveEnd: Vor ConnectedFormula.DisposeAll()");
-        CachedFile.DisposeAll(ConnectedFormula.LiveInstances.Values);
-        Develop.EndLog("SaveEnd: Vor CachedFile.DisposeAll()");
-        CachedFile.DisposeAll(Chunk.LiveInstances.Values);
-        Develop.EndLog("SaveEnd: Nach CachedFile.DisposeAll()");
+        BlockableFile.DisposeAll(ConnectedFormula.LiveInstances.Values);
+        Develop.EndLog("SaveEnd: Vor Chunk.DisposeAll()");
+        Chunk.DisposeAll();
+        Develop.EndLog("SaveEnd: Nach Chunk.DisposeAll()");
 
-        Develop.EndLog("SaveEnd: Vor CachedFileSystem.DisposeAll()");
-        CachedFileSystem.DisposeAll();
-        Develop.EndLog("SaveEnd: Nach CachedFileSystem.DisposeAll()");
+        Develop.EndLog("SaveEnd: Vor BlockableFile.StopPolling()");
+        BlockableFile.StopPolling();
+        Develop.EndLog("SaveEnd: Nach BlockableFile.StopPolling()");
 
         Develop.EndLog("SaveEnd: === ENDE ===");
     }
