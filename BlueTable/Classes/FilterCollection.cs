@@ -166,10 +166,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
         if (tb?.IsDisposed != false) { return []; }
 
-        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc && !tb.PowerEdit) {
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
+                // Chunk immer laden — auch im PowerEdit-Modus. Ohne Laden können
+                // die Zeilen des neu ausgewählten Chunks nicht angezeigt werden.
                 if (tb.BeSureRowIsLoaded(i).IsFailed) { return []; }
-            } else {
+            } else if (!tb.PowerEdit) {
+                // Ohne PowerEdit ist ein Chunk-Filter zwingend erforderlich.
                 return [];
             }
         }

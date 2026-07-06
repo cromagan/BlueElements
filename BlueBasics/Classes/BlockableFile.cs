@@ -478,17 +478,19 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
-    /// Synchronisiert den gecachten Inhalt direkt, ohne den Setter-Weg zu nehmen.
-    /// Wird von Ableitungen nach dem Parsen aufgerufen, damit <c>_content</c> den
-    /// normalisierten Zustand abbildet und <see cref="OnPropertyChanged"/> beim
-    /// ersten Property-Change keine abweichenden Bytes erkennnt.
-    /// <see cref="_contentOnDiskHash"/> bleibt unberührt, <see cref="IsSaved"/>
-    /// liefert also korrekt false, falls das Parsen den Inhalt verändert hat.
+    /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
+    /// <c>_content</c>, <c>_contentHash</c> und <c>_contentOnDiskHash</c> werden
+    /// auf den übergebenen Wert synchronisiert, <see cref="IsSaved"/> ist danach
+    /// true. Wird von Ableitungen nach der Verarbeitung der Rohdaten aufgerufen
+    /// — z. B. nachdem die geladenen Bytes geparst und normalisiert wurden —,
+    /// damit der gecachte Inhalt den tatsächlich geladenen Stand abbildet.
     /// </summary>
-    protected void SyncContent(byte[] content) {
+    protected void SetLoadedContent(byte[] content) {
+        var hash = Generic.GetSHA256HashString(content);
         lock (_lock) {
             _content = content;
-            _contentHash = null;
+            _contentHash = hash;
+            _contentOnDiskHash = hash;
         }
     }
 

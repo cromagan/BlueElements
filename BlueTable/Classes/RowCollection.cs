@@ -473,7 +473,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                     chunkval = inval;
                     var loadResult = tb2.BeSureRowIsLoaded(inval);
                     if (loadResult.IsFailed) {
-                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' konnte nicht geladen werden: {loadResult.FailedReason}");
+                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
                     }
                 }
             }

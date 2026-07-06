@@ -1106,12 +1106,12 @@ public class TableChunk : TableFile {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht gelesen werden");
         }
 
-        // VOR dem Parsen: EOF-Marker prüfen — nur komplett gespeicherte Chunks laden.
-        // Fehlt der Marker, ist die Datei möglicherweise gerade beim Schreiben
-        // (anderer Benutzer) oder korrupt. In beiden Fall nicht laden.
-        if (!HasValidEofMarker(rawBytes)) {
-            return OperationResult.Failed($"Row-Chunk '{chunkId}' ist unvollständig (kein EOF-Marker)");
-        }
+        //// VOR dem Parsen: EOF-Marker prüfen — nur komplett gespeicherte Chunks laden.
+        //// Fehlt der Marker, ist die Datei möglicherweise gerade beim Schreiben
+        //// (anderer Benutzer) oder korrupt. In beiden Fall nicht laden.
+        //if (!HasValidEofMarker(rawBytes)) {
+        //    return OperationResult.Failed($"Row-Chunk '{chunkId}' ist unvollständig (kein EOF-Marker)");
+        //}
 
         // Für Parsing entpacken (Chunk-Dateien werden gezippt gespeichert)
         byte[] chunkContent;
@@ -1242,7 +1242,7 @@ public class TableChunk : TableFile {
 
         foreach (var id in checkIds) {
             var loadResult = LoadChunkWithChunkId(id);
-            if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
+            if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}'\r\n({loadResult.FailedReason})"; }
         }
 
         return string.Empty;
