@@ -26,6 +26,23 @@ public sealed class RowCaptionListItem : RowBackground {
     public string ChapterText { get; }
     public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Title);
     public bool IsExpanded { get; set; }
+
+    /// <summary>
+    /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
+    /// Nur bei echten Kapiteln (nicht Ohne/Angepinnt/Weitere Zeilen),
+    /// mit vorhandener Kapitel-Spalte, außerhalb von TableChunk
+    /// und wenn die Benutzerrechte es erlauben.
+    /// </summary>
+    internal bool CanEditChapter {
+        get {
+            if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
+            if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
+            if (tb is TableChunk) { return false; }
+            if (ChapterText == TableView.Ohne || ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
+            return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
+        }
+    }
+
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -70,22 +87,6 @@ public sealed class RowCaptionListItem : RowBackground {
         bt.Visible = true;
         bt.BringToFront();
         bt.Focus();
-    }
-
-    /// <summary>
-    /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Nur bei echten Kapiteln (nicht Ohne/Angepinnt/Weitere Zeilen),
-    /// mit vorhandener Kapitel-Spalte, außerhalb von TableChunk
-    /// und wenn die Benutzerrechte es erlauben.
-    /// </summary>
-    internal bool CanEditChapter {
-        get {
-            if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
-            if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
-            if (tb is TableChunk) { return false; }
-            if (ChapterText == TableView.Ohne || ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
-            return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null);
-        }
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);

@@ -393,7 +393,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         GenerateQickInfoText(filterSingle);
         if (IsDisposed || f is null) { return; }
-        f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
+        f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b>\r\n{_filterOrigin}" : string.Empty;
 
         if (MustMenu()) {
             SetupButton(DefaultCaptionPosition);

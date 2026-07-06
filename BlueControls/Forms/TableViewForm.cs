@@ -957,7 +957,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
             void OnScriptClick(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, TableView.TableView.RowsVisibleUnique()));
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), OnScriptClick, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), OnScriptClick, tb.PermissionCheck(script.UserGroups, null, true) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 
         if (addedit) {

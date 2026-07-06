@@ -1815,9 +1815,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return true;
     }
 
-    public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
+    public bool PermissionCheck(IList<string>? allowed, RowItem? row, bool adminValue) {
         try {
-            if (IsAdministrator() || PowerEdit) { return true; }
+            if (IsAdministrator() || PowerEdit) { return adminValue; }
             if (allowed is not { Count: not 0 }) { return false; }
 
             foreach (var thisString in allowed) {

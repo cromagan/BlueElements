@@ -721,7 +721,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
                 var b = new Button();
 
-                b.Enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
+                b.Enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.IsOk();
                 b.Visible = true;
                 b.Text = thiss.ReadableText();
                 b.ImageCode = thiss.SymbolForReadableText().ToString();

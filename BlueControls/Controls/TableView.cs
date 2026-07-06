@@ -822,7 +822,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var addedCount = 0;
 
             foreach (var thisArrangement in tcvc) {
-                if (tb.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
+                if (tb.PermissionCheck(thisArrangement.PermissionGroups_Show, null, true)) {
                     var item = ItemOf(thisArrangement as IReadableTextWithKey);
                     if (addedCount < 2) { item.MoveLocked = true; item.RemoveLocked = true; }
                     columnArrangementSelector.ItemAdd(item);
@@ -848,7 +848,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (CursorPosRow?.Row.Table != tb) { CursorPosRow = null; }
 
         if (CurrentArrangement is { IsDisposed: false } ca && tb is not null) {
-            if (!tb.PermissionCheck(ca.PermissionGroups_Show, null)) { Arrangement = string.Empty; }
+            if (!tb.PermissionCheck(ca.PermissionGroups_Show, null, true)) { Arrangement = string.Empty; }
         } else {
             Arrangement = string.Empty;
         }
@@ -1003,7 +1003,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (ca.Kontextmenu_Skripte.Count > 0 && row is not null) {
                 foreach (var thisString in ca.Kontextmenu_Skripte) {
                     if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
-                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
+                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.NeedRow && thiss.IsOk();
 
                         contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
                     }
@@ -1090,12 +1090,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
-                    if (thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
+                    if (thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.NeedRow && thiss.IsOk()) {
                         if (!didmenu) {
                             contextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
                         }
-                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
+                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.NeedRow && thiss.IsOk();
                         contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
                     }
                 }
@@ -2657,7 +2657,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var t = sb.ToString();
 
         if (!string.IsNullOrEmpty(t)) {
-            Forms.MessageBox.Show("<b>Dieser Filter wurde automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
+            Forms.MessageBox.Show($"<b>Dieser Filter wurde automatisch gesetzt:</b>\r\n{t}", ImageCode.Information, "OK");
             return;
         }
 

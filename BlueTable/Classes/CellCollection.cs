@@ -152,7 +152,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
-            if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null)) {
+            if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null, true)) {
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
@@ -168,7 +168,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
             oldChunk = row.ChunkValue;
         }
 
-        if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
+        if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
@@ -236,7 +236,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     public static OperationResult ValidateLinkedCellFilterConfig(Table? linkedTable, ColumnItem inputColumn) {
         if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
         if (inputColumn.IsDisposed) { return OperationResult.Failed("Spalte verworfen."); }
-        if (inputColumn.Table is not { IsDisposed: false} tb) { return OperationResult.Failed("Tabelle verworfen."); }
+        if (inputColumn.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen."); }
 
         var build = TryBuildLinkedCellFilterItems(linkedTable, inputColumn, null, null);
         if (build.IsFailed) { return build; }
@@ -370,7 +370,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        if (disposing) {}
+        if (disposing) { }
         Table = null;
         _internal.Clear();
     }
