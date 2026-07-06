@@ -145,9 +145,8 @@ public class PagePreviewListItem : AbstractListItem {
 
             _tmpBmp = new Bitmap(bmpW, bmpH);
             var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
-            var freiraumControl = ItemCollectionPadItem.FreiraumControl(canvasUsedArea, _tmpBmp.Size, zoomv);
-            var sliderX = canvasUsedArea.Left * zoomv + freiraumControl.X / 2f;
-            var sliderY = canvasUsedArea.Top * zoomv + freiraumControl.Y / 2f;
+            var sliderX = -canvasUsedArea.Left * zoomv;
+            var sliderY = -canvasUsedArea.Top * zoomv;
             Page.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY);
         } catch {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 64);
