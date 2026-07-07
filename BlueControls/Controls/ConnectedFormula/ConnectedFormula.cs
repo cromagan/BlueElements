@@ -191,10 +191,16 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     public ItemCollectionPadItem? AddPage(string headname) {
         if (Pages is not { IsDisposed: false }) { return null; }
 
+        // Ein Gitterkästchen in mm - konsistent zu ParseFinished.
+        var gridMm = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+
         var p = new ItemCollectionPadItem {
             Caption = headname,
-            Breite = 100,
-            Höhe = 100
+            Breite = 100 * gridMm,
+            Höhe = 100 * gridMm,
+            GridShow = gridMm,
+            GridSnap = gridMm,
+            Parent = Pages
         };
 
         var it = new RowEntryPadItem();

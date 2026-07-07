@@ -581,13 +581,7 @@ public class TableChunk : TableFile {
         var chunkFolder = BaseChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return true; }
 
-        var subDirs = IO.GetDirectories(chunkFolder);
-        var chunkIds = new List<string>();
-
-        foreach (var subDir in subDirs) {
-            var chunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
-            if (IsRowChunk(chunkId)) { chunkIds.Add(chunkId); }
-        }
+        var chunkIds = GetAvailableChunkIds();
 
         if (count >= 0) {
             if (oldest) {
@@ -1030,6 +1024,25 @@ public class TableChunk : TableFile {
         if (!IO.FileExists(Filename)) {
             IO.WriteAllBytes(Filename, []);
         }
+    }
+
+    /// <summary>
+    /// Listet verfügbare Chunk-IDs aus dem Dateisystem auf.
+    /// </summary>
+    private List<string> GetAvailableChunkIds() {
+        if (string.IsNullOrEmpty(Filename)) { return []; }
+
+        var chunkFolder = BaseChunkFolder();
+        if (!IO.DirectoryExists(chunkFolder)) { return []; }
+
+        // Ordnernamen (= Chunk-IDs) direkt als Chunk-Werte verwenden.
+        var allChunkIds = new List<string>();
+        foreach (var subDir in IO.GetDirectories(chunkFolder)) {
+            var chunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+            if (IsRowChunk(chunkId)) { allChunkIds.Add(chunkId); }
+        }
+
+        return allChunkIds.OrderBy(c => c).ToList();
     }
 
     /// <summary>

@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
@@ -12,6 +13,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Fields
 
+    private Controls.TextBox? _dropDownTarget;
     private RowAdderPadItem? _item;
 
     /// <summary>
@@ -45,7 +47,14 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
             _item = null;
 
-            if (value is RowAdderPadItem cpi) { _item = cpi; }
+            if (value is RowAdderPadItem cpi) {
+                _item = cpi;
+                LastFailedReason = cpi.LastFailedReason;
+                LastVariables = cpi.LastSavedVariables;
+            } else {
+                LastFailedReason = string.Empty;
+                LastVariables = null;
+            }
 
             ShowScript();
             UpdateChunkUiState();
@@ -102,22 +111,43 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
         var produktiv = !(testmode || syntaxCheck);
 
+        ScriptEndedFeedback feedback;
+
         switch (scriptNo) {
             case 1:
-                return RowAdder.ExecuteScript(_item.Script_Before, produktiv, "Testmodus", _item.EntityID, r, false, "Before", syntaxCheck, GetParseArgs());
+                feedback = RowAdder.ExecuteScript(_item.Script_Before, produktiv, "Testmodus", _item.EntityID, r, false, "Before", syntaxCheck, GetParseArgs());
+                break;
 
             case 3:
-                return RowAdder.ExecuteScript(_item.Script_After, produktiv, "Testmodus", _item.EntityID, r, false, "After", syntaxCheck, GetParseArgs());
+                feedback = RowAdder.ExecuteScript(_item.Script_After, produktiv, "Testmodus", _item.EntityID, r, false, "After", syntaxCheck, GetParseArgs());
+                break;
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, produktiv, "Testmodus", _item.EntityID, r, true, "Menu", syntaxCheck, GetParseArgs());
+                feedback = RowAdder.ExecuteScript(_item.Script_MenuGeneration, produktiv, "Testmodus", _item.EntityID, r, true, "Menu", syntaxCheck, GetParseArgs());
+                break;
         }
+
+        if (!syntaxCheck) {
+            if (feedback.Failed && feedback.NeedsScriptFix) {
+                LastFailedReason = feedback.ProtocolText;
+                LastVariables = feedback.Variables?.ToListVariableString();
+            } else if (!feedback.Failed) {
+                LastFailedReason = string.Empty;
+                LastVariables = null;
+            }
+            WriteInfosBack();
+        }
+
+        return feedback;
     }
 
     public override void WriteInfosBack() {
         //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table is null || Table.IsDisposed) { return; }
 
         if (_item is not null) {
+            _item.LastFailedReason = LastFailedReason;
+            _item.LastSavedVariables = LastVariables;
+
             switch (scriptNo) {
                 case 1:
                     _item.Script_Before = Script;
@@ -208,6 +238,15 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         Close();
     }
 
+    private void btnChunkDropDown_Click(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false }) { return; }
+        var items = TableScriptEditor.BuildChunkDropdownItems(Table);
+
+        _dropDownTarget = txbChunk;
+        var dropDown = TableScriptEditor.ShowScriptEditorDropDown(btnChunkDropDown, items, txbChunk.Text);
+        dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
+    }
+
     private void btnScriptAfter_Click(object sender, System.EventArgs e) {
         WriteInfosBack();
         scriptNo = 3;
@@ -227,6 +266,21 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
+
+    private void btnTestZeileDropDown_Click(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false }) { return; }
+        var items = TableScriptEditor.BuildRowDropdownItems(Table, txbChunk.Text);
+
+        _dropDownTarget = txbTestZeile;
+        var dropDown = TableScriptEditor.ShowScriptEditorDropDown(btnTestZeileDropDown, items, txbTestZeile.Text);
+        dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
+    }
+
+    private void ScriptEditorDropDown_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+        if (_dropDownTarget is { IsDisposed: false } tbx && e.Item is { } item) {
+            tbx.Text = item.KeyName;
+        }
+    }
 
     private void ShowScript() {
         if (_item is { } cpi) {
@@ -257,6 +311,12 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
+        // Bei TableChunk: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
+        if (Table is TableChunk) {
+            btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
+            txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
+        }
+
         if (Table is not TableChunk || Table.Row.Count == 0) { return; }
 
         if (string.IsNullOrEmpty(txbChunk.Text)) {
@@ -271,6 +331,12 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         var isChunk = Table is TableChunk;
         txbChunk.Enabled = isChunk;
         capChunk.Enabled = isChunk;
+        btnChunkDropDown.Enabled = isChunk;
+
+        // Bei TableChunk muss zwingend erst ein Chunk gewählt werden,
+        // bevor das Zeilen-Dropdown aktiv wird.
+        btnTestZeileDropDown.Enabled = !isChunk || !string.IsNullOrEmpty(txbChunk.Text);
+        txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
     }
 
     #endregion

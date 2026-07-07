@@ -687,7 +687,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     }
 
     private (int Width, int Height) GetColumnDimensions(Size area, int biggestX) => Appearance switch {
-        ListBoxAppearance.Gallery => (200, 200),
+        ListBoxAppearance.Gallery => (area.Width < 5 ? 200 : Math.Min(200, area.Width), area.Width < 5 ? 200 : Math.Min(200, area.Width)),
         ListBoxAppearance.FileSystem => (110, 110),
         ListBoxAppearance.ButtonList => (64, 80),
         _ => CalculateDefaultDimensions(area, biggestX)

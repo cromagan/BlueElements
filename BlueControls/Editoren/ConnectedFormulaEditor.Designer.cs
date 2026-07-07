@@ -489,6 +489,7 @@ namespace BlueControls.Forms {
             this.lstPages.Name = "lstPages";
             this.lstPages.Size = new System.Drawing.Size(170, 451);
             this.lstPages.TabIndex = 3;
+            this.lstPages.AddClicked += new System.EventHandler<BlueControls.EventArgs.AddItemEventArgs>(this.lstPages_AddClicked);
             this.lstPages.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPages_ItemClicked);
             // 
             // LoadTab

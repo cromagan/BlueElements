@@ -40,9 +40,11 @@ namespace BlueControls.BlueTableDialogs {
             txbName = new TextBox();
             grpRow = new GroupBox();
             txbChunk = new TextBox();
+            btnChunkDropDown = new Button();
             capChunk = new Caption();
             cpZeile = new Caption();
             txbTestZeile = new TextBox();
+            btnTestZeileDropDown = new Button();
             chkExtendend = new Button();
             btnTest = new Button();
             grpVerfügbareSkripte = new GroupBox();
@@ -378,9 +380,11 @@ namespace BlueControls.BlueTableDialogs {
             // 
             grpRow.BackColor = Color.FromArgb(255, 255, 255);
             grpRow.Controls.Add(txbChunk);
+            grpRow.Controls.Add(btnChunkDropDown);
             grpRow.Controls.Add(capChunk);
             grpRow.Controls.Add(cpZeile);
             grpRow.Controls.Add(txbTestZeile);
+            grpRow.Controls.Add(btnTestZeileDropDown);
             grpRow.Dock = DockStyle.Top;
             grpRow.GroupBoxStyle = GroupBoxStyle.RoundRect;
             grpRow.Location = new Point(0, 36);
@@ -398,9 +402,20 @@ namespace BlueControls.BlueTableDialogs {
             txbChunk.Location = new Point(828, 8);
             txbChunk.Name = "txbChunk";
             txbChunk.RaiseChangeDelay = 10;
-            txbChunk.Size = new Size(416, 22);
+            txbChunk.Size = new Size(388, 22);
             txbChunk.TabIndex = 9;
             txbChunk.TextChanged += txbChunk_TextChanged;
+            // 
+            // btnChunkDropDown
+            // 
+            btnChunkDropDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnChunkDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
+            btnChunkDropDown.Location = new Point(1218, 8);
+            btnChunkDropDown.Name = "btnChunkDropDown";
+            btnChunkDropDown.QuickInfo = "Chunk-Wert auswählen.";
+            btnChunkDropDown.Size = new Size(22, 22);
+            btnChunkDropDown.TabIndex = 10;
+            btnChunkDropDown.Click += btnChunkDropDown_Click;
             // 
             // capChunk
             // 
@@ -422,13 +437,24 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // txbTestZeile
             // 
-            txbTestZeile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbTestZeile.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             txbTestZeile.Cursor = Cursors.IBeam;
             txbTestZeile.Location = new Point(128, 8);
             txbTestZeile.Name = "txbTestZeile";
             txbTestZeile.RaiseChangeDelay = 5;
-            txbTestZeile.Size = new Size(604, 22);
+            txbTestZeile.Size = new Size(574, 22);
             txbTestZeile.TabIndex = 7;
+            // 
+            // btnTestZeileDropDown
+            // 
+            btnTestZeileDropDown.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnTestZeileDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
+            btnTestZeileDropDown.Location = new Point(704, 8);
+            btnTestZeileDropDown.Name = "btnTestZeileDropDown";
+            btnTestZeileDropDown.QuickInfo = "Zeile aus der Tabelle auswählen.\r\nBeachtet den gewählten Chunk-Wert.";
+            btnTestZeileDropDown.Size = new Size(22, 22);
+            btnTestZeileDropDown.TabIndex = 8;
+            btnTestZeileDropDown.Click += btnTestZeileDropDown_Click;
             // 
             // chkExtendend
             // 
@@ -584,5 +610,7 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capLaufzeit;
         private Caption capChunk;
         private TextBox txbChunk;
+        private Button btnChunkDropDown;
+        private Button btnTestZeileDropDown;
     }
 }

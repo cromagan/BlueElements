@@ -6,5 +6,6 @@ public enum SuggestionPosition {
     Top,
     Bottom,
     Left,
-    Right
+    Right,
+    ContextMenuOnly
 }

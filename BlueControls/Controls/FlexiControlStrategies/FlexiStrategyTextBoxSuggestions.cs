@@ -38,6 +38,7 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
         _control.GetStyleFrom(this);
         _control.CustomVocabulary = CustomVocabulary;
         _control.Suffix = Suffix;
+        _control.SuggestionPosition = SuggestionPosition;
         _control.Verhalten = ParentHeight > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;

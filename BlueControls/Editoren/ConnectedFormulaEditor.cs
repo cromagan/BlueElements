@@ -463,6 +463,20 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
+    private void lstPages_AddClicked(object sender, AddItemEventArgs e) {
+        if (Formula is not { IsDisposed: false } cf) { return; }
+        if (cf.Pages is not { IsDisposed: false }) { return; }
+
+        // Auto-Erstellung eines TextItems unterbinden - die Page wird hier angelegt.
+        e.Cancel = true;
+
+        if (string.IsNullOrWhiteSpace(e.Text)) { return; }
+
+        if (cf.AddPage(e.Text) is { } p) {
+            Pad.Items = p; // triggert Pad_GotNewItemCollection -> DoPages
+        }
+    }
+
     private void lstPages_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (Formula?.Pages is not { IsDisposed: false } pg) {
             Pad.Items = null;

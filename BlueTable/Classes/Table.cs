@@ -1652,7 +1652,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Lädt Zeilen der Tabelle nach. Je nach Tabellentyp werden andere Funktionen unterstützt
     /// </summary>
     /// <param name="oldest">True wird versucht, die ältesten Zeilen zu laden. Im normalfall langsamer, das Stände verglichen werden müssen</param>
-    /// <param name="count">Dei Mindestanzahl der Zeilen zum laden. -1 für alle</param>
+    /// <param name="count">Die Mindestanzahl der Zeilen zum laden. -1 für alle</param>
     /// <returns></returns>
     public virtual bool LoadTableRows(bool oldest, int count) => BeSureToBeUpToDate(false);
 

@@ -95,8 +95,8 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
         Table = fi.Table;
 
-        if (Table is not null) {
-            lstColumns.ItemAddRange(ItemsOf(Table.Column, true));
+        if (Table is { IsDisposed: false } tb) {
+            lstColumns.ItemAddRange(ItemsOf(tb.Column, true));
 
             if (fi.Column is { IsDisposed: false }) {
                 lstColumns.Check(ItemOf(fi.Column));

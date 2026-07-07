@@ -24,6 +24,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private bool _didMessage;
 
+    private Controls.TextBox? _dropDownTarget;
     private TableScriptDescription? _item;
 
     private bool _loaded;
@@ -183,6 +184,78 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Erzeugt eine Liste von Chunk-Werten für das Dropdown-Menü.
+    /// Chunk-IDs (Hash-Ordnernamen) können nicht verwendet werden, da
+    /// <see cref="TableChunk.BeSureRowIsLoaded(string"/> und
+    /// <see cref="TableChunk.GetChunkId"/> einen Chunk-<b>Wert</b> erwarten
+    /// und diesen erneut hashen würden.
+    /// </summary>
+    public static List<AbstractListItem> BuildChunkDropdownItems(Table? table) {
+        if (table is not TableChunk { IsDisposed: false } tc) { return []; }
+
+        tc.LoadTableRows(false, 100);
+
+        var chunkValues = tc.Row
+            .Where(r => r is { IsDisposed: false } && !string.IsNullOrEmpty(r.ChunkValue))
+            .Select(r => r.ChunkValue)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+
+        var chunkItems = new List<AbstractListItem>();
+        foreach (var c in chunkValues) {
+            chunkItems.Add(ItemOf(c, c));
+        }
+
+        return chunkItems;
+    }
+
+    /// <summary>
+    /// Erzeugt eine Liste von Zeilen für das Dropdown-Menü, gefiltert nach dem Chunk-Wert.
+    /// Bei einer <see cref="TableChunk"/> werden nur die Zeilen des angegebenen Chunks geladen.
+    /// </summary>
+    public static List<AbstractListItem> BuildRowDropdownItems(Table? table, string chunkValue) {
+        if (table is not { IsDisposed: false }) { return []; }
+
+        IEnumerable<RowItem> rows = table.Row.Where(r => r is { IsDisposed: false });
+
+        if (table is TableChunk tc && !string.IsNullOrEmpty(chunkValue)) {
+            var chunkId = TableChunk.GetChunkId(tc, TableDataType.UTF8Value_withoutSizeData, chunkValue);
+            rows = TableChunk.RowsOfChunk(tc, chunkId);
+        }
+
+        var rowList = rows.OrderBy(r => r.CellFirstString()).ToList();
+
+        var items = new List<AbstractListItem>();
+        foreach (var r in rowList) {
+            items.Add(ItemOf(r.CellFirstString(), r.KeyName, ImageCode.Zeile));
+        }
+
+        return items;
+    }
+
+    /// <summary>
+    /// Zeigt ein Dropdown-Menü neben dem übergebenen Control an.
+    /// Wenn <paramref name="totalCount"/> größer als <see cref="MaxDropdownEntries"/> ist,
+    /// wird ein Hinweis "... und X weitere ausgeblendet" angehängt.
+    /// Der KeyName des gewählten Eintrags wird in die Ziel-TextBox geschrieben.
+    /// </summary>
+    public static FloatingInputBoxListBoxStyle? ShowScriptEditorDropDown(Control anchorControl, List<AbstractListItem> items, string currentValue) {
+        if (items.Count == 0) { return null; }
+
+        items.Add(ItemOf("... und weitere", true));
+
+        var screenPoint = anchorControl.PointToScreen(new Point(0, anchorControl.Height));
+        var x = screenPoint.X;
+        var y = screenPoint.Y;
+
+        return FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.SingleSelection,
+             string.IsNullOrEmpty(currentValue) ? null : [currentValue],
+             x, y, anchorControl.Width, anchorControl, false,
+             ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, false);
+    }
 
     public object? CreateNewItem() => null;
 
@@ -365,6 +438,15 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }
 
+    private void btnChunkDropDown_Click(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false }) { return; }
+        var items = BuildChunkDropdownItems(Table);
+
+        _dropDownTarget = txbChunk;
+        var dropDown = ShowScriptEditorDropDown(btnChunkDropDown, items, txbChunk.Text);
+        dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
+    }
+
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
@@ -380,6 +462,15 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
 
         TesteScript(true);
+    }
+
+    private void btnTestZeileDropDown_Click(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false }) { return; }
+        var items = BuildRowDropdownItems(Table, txbChunk.Text);
+
+        _dropDownTarget = txbTestZeile;
+        var dropDown = ShowScriptEditorDropDown(btnTestZeileDropDown, items, txbTestZeile.Text);
+        dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
@@ -555,6 +646,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateSelectedItem(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
 
+    private void ScriptEditorDropDown_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+        if (_dropDownTarget is { IsDisposed: false } tbx && e.Item is { } item) {
+            tbx.Text = item.KeyName;
+        }
+    }
+
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
@@ -576,6 +673,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
+        // Bei TableChunk: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
+        if (Table is TableChunk) {
+            btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
+            txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
+        }
+
         if (Table is not TableChunk || Table.Row.Count == 0) { return; }
 
         if (string.IsNullOrEmpty(txbChunk.Text)) {
@@ -605,6 +708,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var isChunk = Table is TableChunk;
         txbChunk.Enabled = isChunk;
         capChunk.Enabled = isChunk;
+        btnChunkDropDown.Enabled = isChunk;
+
+        // Bei TableChunk muss zwingend erst ein Chunk gewählt werden,
+        // bevor das Zeilen-Dropdown aktiv wird.
+        btnTestZeileDropDown.Enabled = !isChunk || !string.IsNullOrEmpty(txbChunk.Text);
+        txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
     }
 
     private void UpdateList() {

@@ -136,7 +136,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
-    public bool MultiLine {
+    public bool MoveAllowed {
         get;
         set {
             if (field == value) { return; }
@@ -145,7 +145,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
-    public bool MoveAllowed {
+    public bool MultiLine {
         get;
         set {
             if (field == value) { return; }
@@ -216,6 +216,15 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
             if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
+
+    public SuggestionPosition SuggestionPosition {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    } = SuggestionPosition.Bottom;
 
     public bool TextFormatingAllowed {
         get;

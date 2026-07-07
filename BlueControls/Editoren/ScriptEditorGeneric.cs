@@ -21,6 +21,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private static Befehlsreferenz? _befehlsReferenz;
     private bool _assistantDone;
+
     private string _lastVariableContent = string.Empty;
     private string? _lastWord = string.Empty;
     private bool _menuDone;

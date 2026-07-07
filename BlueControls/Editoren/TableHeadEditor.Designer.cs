@@ -47,7 +47,7 @@ namespace BlueControls.BlueTableDialogs {
             btnUnMaster = new Button();
             btnTabellenAnsicht = new Button();
             btnSkripte = new Button();
-            txbZeilenQuickInfo = new TextBox();
+            txbZeilenQuickInfo = new TextBoxSuggestions();
             butSystemspaltenErstellen = new Button();
             btnOptimize = new Button();
             txbStandardFormulaFile = new TextBox();
@@ -697,7 +697,7 @@ namespace BlueControls.BlueTableDialogs {
         private TableViewWithFilters tblUndo;
         private Caption capNeueZeilenInfo;
         private TabControl GlobalTab;
-        private TextBox txbZeilenQuickInfo;
+        private TextBoxSuggestions txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private TextBox txbAssetFolder;
         private Caption capAdditional;

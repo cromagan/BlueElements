@@ -366,6 +366,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = 4000;
 
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool MoveAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.MoveAllowed = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.MoveAllowed = value;
+        }
+    }
+
     /// <summary>
     /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
     /// </summary>
@@ -417,24 +435,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.RegexCheck = value;
         }
     } = string.Empty;
-
-    [DefaultValue(false)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool MoveAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.MoveAllowed = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.MoveAllowed = value;
-        }
-    }
 
     [DefaultValue(false)]
     [Browsable(false)]
@@ -504,6 +504,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.Suffix = value;
         }
     } = string.Empty;
+
+    [DefaultValue(SuggestionPosition.Bottom)]
+    public SuggestionPosition SuggestionPosition {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.SuggestionPosition = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.SuggestionPosition = value;
+        }
+    } = SuggestionPosition.Bottom;
 
     [Obsolete("Value anstelle Text benutzen", true)]
     [DefaultValue("")]
@@ -654,6 +670,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.TextFormatingAllowed = TextFormatingAllowed;
             _strategy.CustomVocabulary = CustomVocabulary;
             _strategy.Suffix = Suffix;
+            _strategy.SuggestionPosition = SuggestionPosition;
             _strategy.ParentHeight = Height;
             _strategy.QuickInfo = QuickInfo;
             _strategy.ListItems = ListItems;

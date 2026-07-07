@@ -282,6 +282,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         txbAssetFolder.Text = tb.AssetFolder;
         txbStandardFormulaFile.Text = tb.StandardFormulaFile;
         txbZeilenQuickInfo.Text = tb.RowQuickInfo.Replace("<br>", "\r");
+        txbZeilenQuickInfo.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+        txbZeilenQuickInfo.Suggestions = tb.Column.Where(c => !c.IsDisposed).Select(c => $"~{c.KeyName}~").ToList().AsReadOnly();
 
         lbxTableAdmin.Suggestions.Clear();
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));

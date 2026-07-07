@@ -3,26 +3,38 @@
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
+using BlueScript.Variables;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
+/// Erzeugt eine Liste mit Zeilen, die eine andere Tabelle befüllen können.
 /// </summary>
 public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable, ISimpleEditor {
 
     #region Fields
 
-    private string _additinalInfoColumnKey = string.Empty;
+    private string _additionalInfoColumnKey = string.Empty;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
     /// Dadurch können verschiedene Datensätze gespeichert werden.
-    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// Beispiele: Rezeptname, Personenname, Beleg-Nummer
     /// </summary>
     private string _entityId = string.Empty;
+
+    /// <summary>
+    /// Letzter Skript-Fehlertext, der beim Testen aufgetreten ist.
+    /// Wird im Editor über "anzeigen" wieder sichtbar gemacht.
+    /// </summary>
+    private string _lastFailedReason = string.Empty;
+
+    /// <summary>
+    /// Variablen zum Zeitpunkt des letzten Fehlers.
+    /// </summary>
+    private List<Variable>? _lastSavedVariables;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Tabelle.
@@ -56,18 +68,18 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         get {
             if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = tb.Column[_additinalInfoColumnKey];
+            var c = tb.Column[_additionalInfoColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
     [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string AdditionalInfoColumnKey {
-        get => _additinalInfoColumnKey;
+        get => _additionalInfoColumnKey;
         set {
             if (IsDisposed) { return; }
-            if (_additinalInfoColumnKey == value) { return; }
-            _additinalInfoColumnKey = value;
+            if (_additionalInfoColumnKey == value) { return; }
+            _additionalInfoColumnKey = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -77,13 +89,14 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public bool AutoSizeableHeight => true;
 
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
-                                          "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangstabelle benutzt.\r\n" +
-                                            "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
+                                          "<b>Aus der eingehenden Zeile (Referenz-Zeile)</b> wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangstabelle benutzt.\r\n" +
+                                            "Diese ID wird auch als Ausgangsfilter weitergegeben.\r\n" +
+                                            "<b>In die Ausgangs-Tabelle</b> werden durch Skripte gesteuert neue Zeilen angelegt.";
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
     /// Dadurch können verschiedene Datensätze gespeichert werden.
-    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// Beispiele: Rezeptname, Personenname, Beleg-Nummer
     /// </summary>
     [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
     public string EntityID {
@@ -97,6 +110,34 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     public override bool InputMustBeOneRow => true;
+
+    /// <summary>
+    /// Letzter Skript-Fehlertext, der beim Testen aufgetreten ist.
+    /// Wird im Editor über "anzeigen" wieder sichtbar gemacht.
+    /// </summary>
+    public string LastFailedReason {
+        get => _lastFailedReason;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _lastFailedReason) { return; }
+            _lastFailedReason = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Variablen zum Zeitpunkt des letzten Fehlers.
+    /// </summary>
+    public List<Variable>? LastSavedVariables {
+        get => _lastSavedVariables;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _lastSavedVariables) { return; }
+            _lastSavedVariables = value;
+            OnPropertyChanged();
+        }
+    }
+
     public override bool MustBeInDrawingArea => true;
 
     /// <summary>
@@ -132,30 +173,36 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
     }
 
+    [Description("Skript, das ausgeführt wird, wenn der User einen Eintrag wählt - NACHDEM die Zeile(n) angelegt wurden.")]
     public string Script_After {
         get => _script_After;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _script_After) { return; }
             _script_After = value;
             OnPropertyChanged();
         }
     }
 
+    [Description("Skript, das ausgeführt wird, wenn der User einen Eintrag wählt - BEVOR die Zeile(n) angelegt werden.")]
     public string Script_Before {
         get => _script_Before;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _script_Before) { return; }
             _script_Before = value;
             OnPropertyChanged();
         }
     }
 
+    [Description("Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.")]
     public string Script_MenuGeneration {
         get => _script_MenuGeneration;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _script_MenuGeneration) { return; }
             _script_MenuGeneration = value;
             OnPropertyChanged();
@@ -218,8 +265,13 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         ];
 
         var inr = GetFilterFromGet();
-        if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false }) {
-            result.Add(new FlexiControlForProperty<string>(() => EntityID));
+        if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false } inTable) {
+            var entityFlex = new FlexiControlForProperty<string>(() => EntityID);
+            entityFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+            entityFlex.ListItems = [.. inTable.Column.Where(c => !c.IsDisposed).Select(c => ItemOf($"~{c.KeyName}~"))];
+            entityFlex.Height = 24;
+            entityFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+            result.Add(entityFlex);
             result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
@@ -237,10 +289,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnKey);
-        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnKey);
+        result.ParseableAdd("AdditionalInfoColumnName", _additionalInfoColumnKey);
         result.ParseableAdd("ScriptMenu", _script_MenuGeneration);
         result.ParseableAdd("ScriptAfter", _script_After);
         result.ParseableAdd("ScriptBefore", _script_Before);
+        result.ParseableAdd("LastFailedReason", _lastFailedReason);
+        result.ParseableAdd("LastSavedVariables", _lastSavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
         return result;
     }
 
@@ -253,13 +307,13 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             case "originidcolum":
             case "originidcolumkey":
             case "originidcolumnname":
-                _originIdColumnKey = value;
+                _originIdColumnKey = value.FromNonCritical();
                 return true;
 
             case "additionalinfocolumn":
             case "additionalinfocolumnkey":
             case "additionalinfocolumnname":
-                _additinalInfoColumnKey = value;
+                _additionalInfoColumnKey = value.FromNonCritical();
                 return true;
 
             case "script":
@@ -273,6 +327,14 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
             case "scriptafter":
                 _script_After = value.FromNonCritical();
+                return true;
+
+            case "lastfailedreason":
+                _lastFailedReason = value.FromNonCritical();
+                return true;
+
+            case "lastsavedvariables":
+                _lastSavedVariables = VariableCollection.ParseVariable(value.FromNonCritical(), true);
                 return true;
         }
         return base.ParseThis(key, value);
