@@ -480,13 +480,25 @@ public abstract class Method : IReadableTextWithKey {
         if (attvar.Failed) { return new DoItFeedback(attvar.FailedReason, attvar.NeedsScriptFix, ld); }
 
         if (attvar.Attributes[0] is VariableUnknown) {
-            if (scp.SyntaxCheck) { return new DoItFeedback(attvar.Attributes[0]); }
+            if (scp.SyntaxCheck) {
+                // RHS ließ sich nicht auflösen (z. B. unbekannte Methode wie Loadxyz).
+                // varnam als unbekannt markieren UND als Dummy in varCol ablegen,
+                // damit nachfolgender Code wie `ttt = "Hallo";` validierbar bleibt.
+                ld.RegisterSyntaxCheckUnknownVariable(varnam);
+                varCol.Add(new VariableUnknown(varnam, false, "Dummy für SyntaxCheck (RHS nicht auflösbar)"));
+                return new DoItFeedback(attvar.Attributes[0]);
+            }
 
-            return new DoItFeedback("Variable unbekannt", true, ld);
+            return new DoItFeedback("Der Wert '" + value + "' für Variable '" + varnam + "' konnte nicht aufgelöst werden (unbekannte Methode oder Variable im Ausdruck).", true, ld);
         }
 
         if (attvar.Attributes[0] is { } v) {
-            if (generateVariable) {
+            // generateVariable: neue Variable anlegen (var x = ...).
+            // SyntaxCheck + vari ist Dummy: nachfolgende Zuweisung an eine zuvor
+            //   nicht auflösbare Variable (z. B. `ttt = "Hallo";` nach `var ttt = Loadxyz(...);`).
+            //   Der Dummy wird durch den konkreten Wert ersetzt.
+            if (generateVariable || (scp.SyntaxCheck && vari is VariableUnknown)) {
+                if (vari is VariableUnknown) { varCol.Remove(vari.KeyName); }
                 v.KeyName = varnam;
                 v.ReadOnly = false;
                 varCol.Add(v);
