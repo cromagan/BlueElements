@@ -17,6 +17,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
+
     #endregion
 
     #region Properties
@@ -129,6 +131,26 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Default: keine Sub-Items. Container-Klassen überschreiben dies.
+    /// </summary>
+    public virtual IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    /// <summary>
+    /// Löst das <see cref="PropertyChangedExt" />-Event aus. Wird von Property-Settern
+    /// in Subklassen aufgerufen, um eine inkrementelle Speicherung auszulösen.
+    /// EventArgs-Erzeugung delegiert an
+    /// <see cref="JsonParseableExtension.BuildPartialJson" />, nur der SourceKey
+    /// wird hier individuell aufgebaut (ParseableItem ist formal nicht
+    /// IJsonParseable, deshalb kein direkter Aufruf der Extension).
+    /// </summary>
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed) { return; }
+        var key = (this as IHasKeyName)?.KeyName ?? MyClassId;
+        var partial = JsonParseableExtension.BuildPartialJson(relativePath, value);
+        PropertyChangedExt?.Invoke(this, new JsonPathChangedEventArgs(relativePath, partial, key));
+    }
+
     public virtual List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("ClassId", MyClassId);
@@ -145,6 +167,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            PropertyChangedExt = null;
             PropertyChanged = null;
         }
     }

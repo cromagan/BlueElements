@@ -299,6 +299,20 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         LoadTab.ShowDialog();
     }
 
+    private void btnOeffnenBeta_Click(object sender, System.EventArgs e) {
+        const string path = @"D:\01_Data\test.json";
+        if (!FileExists(path)) { return; }
+
+        var cf = ConnectedFormula.Get(path);
+        if (cf is null) { return; }
+
+        var json = ReadAllText(path, Constants.Win1252);
+        using var doc = JsonDocument.Parse(json);
+        cf.ParseJson(doc.RootElement);
+
+        FormulaSet(cf, null);
+    }
+
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
     private void btnRegionAdd_Click(object sender, System.EventArgs e) {
@@ -323,6 +337,13 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => FormManager.SaveAllFiles();
+
+    private void btnSpeichernBeta_Click(object sender, System.EventArgs e) {
+        if (Formula is not { IsDisposed: false } cf) { return; }
+
+        var json = cf.ParseableJson().ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+        System.IO.File.WriteAllText(@"D:\01_Data\test.json", json, Constants.Win1252);
+    }
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }

@@ -65,6 +65,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
             if (_drehwinkel == value) { return; }
             _drehwinkel = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("rotation", _drehwinkel);
         }
     }
 
@@ -124,8 +125,20 @@ public abstract class RectanglePadItem : AbstractPadItem {
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["rotation"] = _drehwinkel;
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
+        CalculateSlavePoints();
+    }
+
+    public override void ParseJson(JsonObject json) {
+        if (json["rotation"] is JsonValue v && v.TryGetValue(out int r)) { _drehwinkel = r; }
+        base.ParseJson(json);
         CalculateSlavePoints();
     }
 
@@ -140,21 +153,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
                 return true;
         }
         return base.ParseThis(key, value);
-    }
-
-    public override JsonObject ParseableJson() {
-        var json = base.ParseableJson();
-        json["rotation"] = _drehwinkel;
-        return json;
-    }
-
-    public override bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "rotation":
-                _drehwinkel = value.TryGetInt32(out var ri) ? ri : 0;
-                return true;
-        }
-        return base.ParseThisJson(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {

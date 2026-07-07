@@ -33,12 +33,15 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposableExtended {
 
     public override object EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value) {
         _edSvc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+        if (_edSvc is null) { return value; }
+
         var _c = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         _fqp.StartAll(_c);
         _fqp.btnOk.Click += Click;
         Develop.Debugprint_BackgroundThread();
-        _edSvc?.DropDownControl(_fqp);
-        return _c;
+        _edSvc.DropDownControl(_fqp);
+        _fqp.btnOk.Click -= Click;
+        return _fqp.ImgCode();
     }
 
     public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context) => UITypeEditorEditStyle.Modal;

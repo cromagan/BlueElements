@@ -596,9 +596,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnItemAdded();
 
         item.PropertyChanged += Item_PropertyChanged;
-        //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
-        //item.CheckedChanged += Item_CheckedChanged;
-        //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+        item.PropertyChangedExt += Child_PropertyChangedExt;
     }
 
     public void BringToFront(AbstractPadItem thisItem) {
@@ -660,6 +658,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return null;
+    }
+
+    public override IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Items", StringComparison.OrdinalIgnoreCase)) {
+            return this[key];
+        }
+        return base.GetSubItemByKey(containerName, key);
     }
 
     public ItemCollectionPadItem? GetSubItemCollection(string keyOrCaption) {
@@ -773,6 +778,35 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return json;
     }
 
+    public override void ParseJson(JsonObject json) {
+        Caption = json.GetString("caption");
+        SheetStyle = json.GetString("sheetstyle");
+        Endless = json.GetBool("endless");
+        AutoZoomFit = json.GetBool("autozoomfit");
+        ShowAlways = json.GetBool("showalways");
+        ShowJointPoints = json.GetBool("showjointpoints");
+
+        if (json["backcolor"] is JsonValue bv && bv.TryGetValue(out int argb)) { BackColor = Color.FromArgb(argb); }
+        if (json.ContainsKey("snapmode")) { SnapMode = json.GetEnum<SnapMode>("snapmode"); }
+        if (json.ContainsKey("editmode")) { EditMode = json.GetEnum<EditMode>("editmode"); }
+
+        if (json["gridshow"] is JsonValue gs && gs.TryGetValue(out float gf)) { GridShow = gf; }
+        if (json["gridsnap"] is JsonValue gsn && gsn.TryGetValue(out float gsf)) { GridSnap = gsf; }
+        if (json["width"] is JsonValue w && w.TryGetValue(out float wf)) { Breite = wf; }
+        if (json["height"] is JsonValue h && h.TryGetValue(out float hf)) { Höhe = hf; }
+
+        if (json["printarea"] is JsonObject pa) { RandinMm = pa.ToJsonElement().AsPadding(); }
+
+        if (json["items"] is JsonArray its) {
+            foreach (var item in its) {
+                if (item is not JsonObject io) { continue; }
+                if (NewByParsingJson<AbstractPadItem>(io.ToJsonElement()) is { } created) { Add(created); }
+            }
+        }
+
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "sheetsize":
@@ -850,89 +884,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return base.ParseThis(key, value);
     }
 
-    public override bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "caption":
-                Caption = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "sheetstyle":
-                SheetStyle = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "backcolor":
-                if (value.TryGetInt32(out var argb)) {
-                    BackColor = Color.FromArgb(argb);
-                }
-                return true;
-
-            case "endless":
-                Endless = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "autozoomfit":
-                AutoZoomFit = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "showalways":
-                ShowAlways = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "showjointpoints":
-                ShowJointPoints = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "snapmode":
-                SnapMode = value.TryGetInt32(out var sm) ? (SnapMode)sm : SnapMode.SnapToGrid;
-                return true;
-
-            case "gridshow":
-                GridShow = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-
-            case "gridsnap":
-                GridSnap = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-
-            case "editmode":
-                EditMode = value.TryGetInt32(out var em) ? (EditMode)em : EditMode.Editable;
-                return true;
-
-            case "printarea":
-                RandinMm = value.AsPadding();
-                return true;
-
-            case "width":
-                if (value.ValueKind == JsonValueKind.Number) {
-                    Breite = value.GetSingle();
-                }
-                return true;
-
-            case "height":
-                if (value.ValueKind == JsonValueKind.Number) {
-                    Höhe = value.GetSingle();
-                }
-                return true;
-
-            case "items":
-                if (value.ValueKind == JsonValueKind.Array) {
-                    foreach (var item in value.EnumerateArray()) {
-                        if (item.ValueKind != JsonValueKind.Object) { continue; }
-                        if (NewByParsingJson<AbstractPadItem>(item) is { } created) { Add(created); }
-                    }
-                }
-                return true;
-        }
-
-        return base.ParseThisJson(key, value);
-    }
-
     public override string ReadableText() => BestCaption();
 
     public void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
         if (item is null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
+        item.PropertyChangedExt -= Child_PropertyChangedExt;
         lock (_itemLock) {
             _internal.Remove(item);
         }
@@ -1201,6 +1159,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (disposing) {
             foreach (var thisIt in _internal) {
                 thisIt.PropertyChanged -= Item_PropertyChanged;
+                thisIt.PropertyChangedExt -= Child_PropertyChangedExt;
                 thisIt.Dispose();
             }
             UnRegisterEvents();
@@ -1300,6 +1259,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         IsSaved = false;
         base.OnPropertyChanged(propertyName);
+    }
+
+    private void Child_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
+        if (sender is not IHasKeyName child) { return; }
+        OnPropertyChangedExt($"Items[{child.KeyName}].{e.RelativePath}", e.Partial);
     }
 
     private bool CreateItems(string toParse) {

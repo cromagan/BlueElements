@@ -53,6 +53,8 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
+
     #endregion
 
     #region Properties
@@ -96,26 +98,28 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             _notAllowedChilds.Clear();
             _notAllowedChilds.AddRange(l);
             OnPropertyChanged();
+            OnPropertyChangedExt("notAllowedChilds", _notAllowedChilds);
         }
     }
 
     public ItemCollectionPadItem? Pages {
         get {
-            if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
+            if (!IsParsed) {
+                this.Parse(Constants.Win1252.GetString(Content));
+            }
             return field;
         }
         private set {
             if (IsDisposed) { value = null; }
             if (field == value) { return; }
-
-            field?.PropertyChanged -= PadData_PropertyChanged;
+            field?.PropertyChangedExt -= Pages_PropertyChangedExt;
 
             field = value;
             if (IsDisposed) { return; }
 
             if (field is not null) {
                 field.Parent = this;
-                field.PropertyChanged += PadData_PropertyChanged;
+                field.PropertyChangedExt += Pages_PropertyChangedExt;
             }
 
             OnPropertyChanged();
@@ -232,6 +236,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
         Editing = null;
         PropertyChanged = null;
+        PropertyChangedExt = null;
 
         base.Dispose();
 
@@ -247,9 +252,29 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         return pg.GetSubItemCollection(keyOrCaption);
     }
 
+    /// <summary>
+    /// ConnectedFormula ist die Wurzel des Baums und löst keine Container-Pfade
+    /// direkt auf. Pfad-Abstiege über <see cref="JsonParseableExtension.ApplyPartialJson" />
+    /// erreichen diese Methode nicht, weil nach oben kein Partial-Json gepusht wird.
+    /// Gibt daher stets <c>null</c> zurück.
+    /// </summary>
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
     public override void Invalidate() {
         IsParsed = false;
         base.Invalidate();
+    }
+
+    /// <summary>
+    /// Löst das <see cref="PropertyChangedExt" />-Event aus. ConnectedFormula ist
+    /// die Wurzel des Baums; Sub-Item-Änderungen aus dem <see cref="Pages" />-Baum
+    /// werden über <see cref="Pages_PropertyChangedExt" /> hierher durchgereicht
+    /// und zusammen mit <see cref="OnPropertyChanged" /> (das <see cref="BlockableFile" />
+    /// via <c>MarkDirty</c> als ungespeichert markiert) weitergegeben.
+    /// </summary>
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
     }
 
     /// <summary>
@@ -418,6 +443,24 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
     public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());
 
+    public void ParseJson(JsonObject json) {
+        CreateDate = json.GetString("createdate");
+        Creator = json.GetString("creator");
+
+        if (json["notallowedchilds"] is JsonArray na) {
+            _notAllowedChilds.Clear();
+            foreach (var item in na) {
+                if (item is JsonValue v && v.TryGetValue(out string? s)) { _notAllowedChilds.Add(s ?? string.Empty); }
+            }
+        }
+
+        if (json["page"] is JsonObject po) {
+            var tmp = new ItemCollectionPadItem();
+            tmp.ParseJson(po);
+            Pages = tmp;
+        }
+    }
+
     /// <summary>
     /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
     /// </summary>
@@ -454,42 +497,6 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             case "lastusedid":
             case "events":
             case "variables":
-                return true;
-        }
-
-        return false;
-    }
-
-    public bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "type":
-            case "version":
-                // Wird formal akzeptiert - keine Aktion notwendig.
-                return true;
-
-            case "createdate":
-                CreateDate = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "creator":
-                Creator = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "notallowedchilds":
-                _notAllowedChilds.Clear();
-                if (value.ValueKind == JsonValueKind.Array) {
-                    foreach (var item in value.EnumerateArray()) {
-                        if (item.ValueKind == JsonValueKind.String) { _notAllowedChilds.Add(item.GetString() ?? string.Empty); }
-                    }
-                }
-                return true;
-
-            case "page":
-                if (value.ValueKind == JsonValueKind.Object) {
-                    var tmp = new ItemCollectionPadItem();
-                    tmp.ParseJson(value);
-                    Pages = tmp;
-                }
                 return true;
         }
 
@@ -576,9 +583,10 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
     }
 
-    private void PadData_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+    private void Pages_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged();
+        OnPropertyChangedExt(e.RelativePath, e.Partial);
     }
 
     private void RepairReciver(ItemCollectionPadItem icpi) {

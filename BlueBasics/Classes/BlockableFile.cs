@@ -32,11 +32,11 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     #region Fields
 
-    /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
-    private const int PollingIntervalMinutes = 5;
-
     /// <summary>Timeout (ms) für <see cref="WaitDiskOperationFinished"/>.</summary>
     private const int DiskOperationTimeoutMs = 30000;
+
+    /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
+    private const int PollingIntervalMinutes = 5;
 
     /// <summary>
     /// Alle registrierten BlockableFile-Instanzen, geordnet nach normalisiertem Dateinamen.
@@ -93,15 +93,6 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// </summary>
     private string? _contentOnDiskHash;
 
-    /// <summary>
-    /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
-    /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
-    /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
-    /// nächsten Speichern über <see cref="BuildContent"/> neu generiert.
-    /// </summary>
-    private bool _isDirty;
-
-
     private FileInfo? _fileInfo;
 
     /// <summary>
@@ -109,6 +100,14 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Wird vom Polling-Timer ausgewertet: Dateien mit Write Access werden nicht invalidiert.
     /// </summary>
     private volatile bool _hasWriteAccess;
+
+    /// <summary>
+    /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
+    /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
+    /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
+    /// nächsten Speichern über <see cref="BuildContent"/> neu generiert.
+    /// </summary>
+    private bool _isDirty;
 
     private volatile int _isDisposedFlag;
 
@@ -198,17 +197,17 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 }
             }
         }
-            set {
-                lock (_lock) {
-                    if (ReferenceEquals(_content, value)) { return; }
-                    if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
+        set {
+            lock (_lock) {
+                if (ReferenceEquals(_content, value)) { return; }
+                if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
-                    _content = value;
-                    _contentHash = null;
-                    if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
-                    if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
-                }
+                _content = value;
+                _contentHash = null;
+                if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
+                if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
             }
+        }
     }
 
     /// <summary>
@@ -487,85 +486,6 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
-    /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
-    /// <c>_content</c>, <c>_contentHash</c> und <c>_contentOnDiskHash</c> werden
-    /// auf den übergebenen Wert synchronisiert, <see cref="IsSaved"/> ist danach
-    /// true. Wird von Ableitungen nach der Verarbeitung der Rohdaten aufgerufen
-    /// — z. B. nachdem die geladenen Bytes geparst und normalisiert wurden —,
-    /// damit der gecachte Inhalt den tatsächlich geladenen Stand abbildet.
-    /// </summary>
-    protected void SetLoadedContent(byte[] content) {
-        var hash = Generic.GetSHA256HashString(content);
-        lock (_lock) {
-            _content = content;
-            _contentHash = hash;
-            _contentOnDiskHash = hash;
-            _isDirty = false;
-        }
-    }
-
-    /// <summary>
-    /// Synchronisiert die Hashes mit dem aktuell gecachten <c>_content</c>,
-    /// ohne diesen neu zu erzeugen oder zu überschreiben. Im Gegensatz zu
-    /// <see cref="SetLoadedContent"/> wird <c>_content</c> nicht ausgetauscht
-    /// und insbesondere kein Serialisierungs-Aufruf benötigt.
-    /// </summary>
-    /// <remarks>
-    /// Geeignet für Ableitungen, die in <see cref="IParseable.ParseFinished"/>
-    /// eine Re-Serialisierung (zur Normalisierung des Inhalts) vermeiden wollen,
-    /// weil diese unerwünschte Seiteneffekte hätte — etwa das Lazy-Loaden
-    /// abhängiger Dateien. Voraussetzung: <c>_content</c> ist bereits gefüllt
-    /// (z. B. durch den vorherigen Ladevorgang). Ist kein Content vorhanden,
-    /// ist der Aufruf eine No-Op.
-    /// </remarks>
-    protected void MarkCurrentContentAsLoaded() {
-        lock (_lock) {
-            if (_content is null) { return; }
-            _contentHash ??= Generic.GetSHA256HashString(_content);
-            _contentOnDiskHash = _contentHash;
-            _isDirty = false;
-        }
-    }
-
-    /// <summary>
-    /// Wird von <see cref="EnsureContentCurrent"/> aufgerufen, wenn der gecachte
-    /// Inhalt veraltet ist (<c>_isDirty</c>). Ableitungen serialisieren hier ihr
-    /// aktuelles Objektmodell in Bytes. <c>null</c> bedeutet: keine Neugenerierung
-    /// möglich (z. B. weil noch nicht geparst); der gecachte Inhalt bleibt.
-    /// </summary>
-    protected virtual byte[]? BuildContent() => null;
-
-    /// <summary>
-    /// Markiert den Inhalt als verändert (<c>_isDirty = true</c>).
-    /// <see cref="IsSaved"/> liefert danach false. Der eigentliche Content wird
-    /// NICHT sofort neu generiert — das passiert erst, wenn er gebraucht wird
-    /// (in <see cref="Save"/> über <see cref="EnsureContentCurrent"/>).
-    /// </summary>
-    protected void MarkDirty() {
-        lock (_lock) {
-            _isDirty = true;
-        }
-    }
-
-    /// <summary>
-    /// Stellt sicher, dass <c>_content</c> den aktuellen Objektzustand abbildet.
-    /// Falls <c>_isDirty</c>, wird <see cref="BuildContent"/> aufgerufen und das
-    /// Ergebnis übernimmt. Wird vor jedem Speichern ausgeführt.
-    /// </summary>
-    private void EnsureContentCurrent() {
-        lock (_lock) {
-            if (!_isDirty) { return; }
-
-            var built = BuildContent();
-            if (built is null) { return; }
-
-            _content = built;
-            _contentHash = null;
-            _isDirty = false;
-        }
-    }
-
-    /// <summary>
     /// Prüft, ob der aktuelle Prozess die aktive Sperre für diese Datei hält.
     /// </summary>
     public bool IsMyLock() => BlockFile.IsMyLockFor(Filename);
@@ -717,7 +637,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            return await Task.Run(() => SaveToDisk(contentToWrite, savedContentHash)).ConfigureAwait(false);
+            return SaveToDisk(contentToWrite, savedContentHash);
         } finally {
             if (acquired) {
                 try {
@@ -793,6 +713,49 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     public override string ToString() => $"{GetType().Name}: {Filename}";
 
     /// <summary>
+    /// Wird von <see cref="EnsureContentCurrent"/> aufgerufen, wenn der gecachte
+    /// Inhalt veraltet ist (<c>_isDirty</c>). Ableitungen serialisieren hier ihr
+    /// aktuelles Objektmodell in Bytes. <c>null</c> bedeutet: keine Neugenerierung
+    /// möglich (z. B. weil noch nicht geparst); der gecachte Inhalt bleibt.
+    /// </summary>
+    protected virtual byte[]? BuildContent() => null;
+
+    /// <summary>
+    /// Synchronisiert die Hashes mit dem aktuell gecachten <c>_content</c>,
+    /// ohne diesen neu zu erzeugen oder zu überschreiben. Im Gegensatz zu
+    /// <see cref="SetLoadedContent"/> wird <c>_content</c> nicht ausgetauscht
+    /// und insbesondere kein Serialisierungs-Aufruf benötigt.
+    /// </summary>
+    /// <remarks>
+    /// Geeignet für Ableitungen, die in <see cref="IParseable.ParseFinished"/>
+    /// eine Re-Serialisierung (zur Normalisierung des Inhalts) vermeiden wollen,
+    /// weil diese unerwünschte Seiteneffekte hätte — etwa das Lazy-Loaden
+    /// abhängiger Dateien. Voraussetzung: <c>_content</c> ist bereits gefüllt
+    /// (z. B. durch den vorherigen Ladevorgang). Ist kein Content vorhanden,
+    /// ist der Aufruf eine No-Op.
+    /// </remarks>
+    protected void MarkCurrentContentAsLoaded() {
+        lock (_lock) {
+            if (_content is null) { return; }
+            _contentHash ??= Generic.GetSHA256HashString(_content);
+            _contentOnDiskHash = _contentHash;
+            _isDirty = false;
+        }
+    }
+
+    /// <summary>
+    /// Markiert den Inhalt als verändert (<c>_isDirty = true</c>).
+    /// <see cref="IsSaved"/> liefert danach false. Der eigentliche Content wird
+    /// NICHT sofort neu generiert — das passiert erst, wenn er gebraucht wird
+    /// (in <see cref="Save"/> über <see cref="EnsureContentCurrent"/>).
+    /// </summary>
+    protected void MarkDirty() {
+        lock (_lock) {
+            _isDirty = true;
+        }
+    }
+
+    /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
     /// Wird automatisch nach jedem Frisch-Ladevorgang durch den Content-Getter aufgerufen.
@@ -804,6 +767,24 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Ableitungen können hier interne Zustände nach dem Speichern aktualisieren.
     /// </summary>
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
+    /// <c>_content</c>, <c>_contentHash</c> und <c>_contentOnDiskHash</c> werden
+    /// auf den übergebenen Wert synchronisiert, <see cref="IsSaved"/> ist danach
+    /// true. Wird von Ableitungen nach der Verarbeitung der Rohdaten aufgerufen
+    /// — z. B. nachdem die geladenen Bytes geparst und normalisiert wurden —,
+    /// damit der gecachte Inhalt den tatsächlich geladenen Stand abbildet.
+    /// </summary>
+    protected void SetLoadedContent(byte[] content) {
+        var hash = Generic.GetSHA256HashString(content);
+        lock (_lock) {
+            _content = content;
+            _contentHash = hash;
+            _contentOnDiskHash = hash;
+            _isDirty = false;
+        }
+    }
 
     private static void EnsurePollingTimerStarted() {
         if (_pollingTimer is not null) { return; }
@@ -836,6 +817,24 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                     file.Invalidate();
                 }
             } catch { }
+        }
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass <c>_content</c> den aktuellen Objektzustand abbildet.
+    /// Falls <c>_isDirty</c>, wird <see cref="BuildContent"/> aufgerufen und das
+    /// Ergebnis übernimmt. Wird vor jedem Speichern ausgeführt.
+    /// </summary>
+    private void EnsureContentCurrent() {
+        lock (_lock) {
+            if (!_isDirty) { return; }
+
+            var built = BuildContent();
+            if (built is null) { return; }
+
+            _content = built;
+            _contentHash = null;
+            _isDirty = false;
         }
     }
 

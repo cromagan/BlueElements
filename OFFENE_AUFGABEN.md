@@ -251,9 +251,6 @@ DaS klappt nicht, wenn ein Zeilenfilter vorhanden ist! normale Filter funktionie
 ## Aufgabe
 Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern.
 
-## Aufgabe
-Alls Json convertierungen in ParseThisJson    wie   _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-in value.GetBoolean() direkt abändern
 
 ## Aufgabe
 Aktuelle Ansicht fehlerhaft.
@@ -266,8 +263,50 @@ Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts obe
 Fährt man mit der Maus darüber fährt es raus.
 
 ## Aufgabe
-führe Jason.md aus. Beachte: die Zeilennummern können inzwischen anders sein, aber sinngemäß passt die Anforderung noch.
-
+FailedReason und Protokoll in ScriptEndedFeedback haben fast den gleichen sinn. Vereinfache, dass nur noch eine Variable vorhanden ist.
 
 ## Aufgabe
-FailedReason und Protokoll in ScriptEndedFeedback haben fast den gleichen sinn. Vereinfache, dass nur noch eine Variable vorhanden ist.
+Alle  public void ParseJson(JsonObject json) 
+Alle Aufrufe so apassen, das sie ohne If auskommen uns sinngemäß so aufgerufen werden. Also mit Default Wert
+KeyName = json.GetString("key", KeyName);
+
+## Aufgabe
+Alle json Keys in kleinschreibung.  Oder was ist Stand der Dinge?
+
+## ConnectedFormula: JSON-Save/Load ist unvollständig
+
+**Symptom:** Beim Speichern/Laden einer ConnectedFormula als JSON (Beta-Buttons im `ConnectedFormulaEditor`) gehen die eingehenden Filterungen (`_getFilterFromKeys`) sowie viele weitere Eigenschaften verloren.
+
+**Ursache:** Die gesamte Hierarchie ab `ReciverControlPadItem` implementiert nur das alte `ParseableItems()`/`ParseThis()`-Format, **nicht aber** `ParseableJson()`/`ParseJson()`. Beim JSON-Pfad wird nur das geschrieben/gelesen, was `RectanglePadItem`/`AbstractPadItem` beisteuern.
+
+**Muster:** Jede Klasse muss `ParseableJson()` (mit `base`-Aufruf) und `ParseJson()` übersetzen — spiegelbildlich zu `ParseableItems()`/`ParseThis()`. Keys kleingeschrieben.
+
+### Zu ergänzen (Reihenfolge = Abhängigkeit)
+
+- [ ] **`ReciverControlPadItem.cs`** (abstrakte Basis)
+  - `_getFilterFromKeys` → `"getFilterFromKeys"` (JSON-Array)
+  - `VisibleFor` → `"visibleFor"` (nur wenn `MustBeInDrawingArea`)
+  - `_xPosition` → `"xLock"`
+
+- [ ] **`ReciverSenderControlPadItem.cs`** (abstrakt, erbt oben)
+  - `_tableOutputName` → `"outputTable"`
+
+- [ ] **Alle konkreten Subklassen** (eigene Felder je `ParseableItems()`-Inhalt):
+  - [ ] `OutputFilterPadItem` (`columnKey`, `captionPosition`, `standard_Bei_Keiner_Eingabe`, `filterart_Bei_Texteingabe`, `einschnappen`)
+  - [ ] `EditFieldPadItem`
+  - [ ] `ScriptButtonPadItem`
+  - [ ] `RowAdderPadItem`
+  - [ ] `RowEntryPadItem`
+  - [ ] `TabFormulaPadItem`
+  - [ ] `FilterConverterElementPadItem`
+  - [ ] `RegionFormulaPadItem`
+  - [ ] `MonitorPadItem`
+  - [ ] `FileExplorerPadItem`
+  - [ ] `EasyPicPadItem`
+  - [ ] `TableViewPadItem`
+  - [ ] `DropDownSelectRowPadItem`
+  - [ ] `TimerPadItem`
+
+### Verifikation
+- JSON-Speichern → Laden → Alle Filter-Pfeile, Tabellen, Captions und Klasseneinstellungen müssen erhalten bleiben.
+- Vergleich: ALT-Format (`.cfo`) vs. JSON-Pfad müssen zum gleichen Zustand führen.

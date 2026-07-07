@@ -24,522 +24,558 @@ namespace BlueControls.Forms {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.tabEditorStd = new System.Windows.Forms.TabPage();
-            this.grpVorschau = new BlueControls.Controls.GroupBox();
-            this.btnPfeileAusblenden = new BlueControls.Controls.Button();
-            this.grpFelder = new BlueControls.Controls.GroupBox();
-            this.btnSymbolLaden = new BlueControls.Controls.Button();
-            this.btnWeitereCF = new BlueControls.Controls.Button();
-            this.btnRegionAdd = new BlueControls.Controls.Button();
-            this.btnButton = new BlueControls.Controls.Button();
-            this.btnBild = new BlueControls.Controls.Button();
-            this.btnFileExplorer = new BlueControls.Controls.Button();
-            this.btnFeldHinzu = new BlueControls.Controls.Button();
-            this.grpOptik = new BlueControls.Controls.GroupBox();
-            this.btnRegisterKarte = new BlueControls.Controls.Button();
-            this.btnTabControlAdd = new BlueControls.Controls.Button();
-            this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.btnTable = new BlueControls.Controls.Button();
-            this.btnDropdownmenu = new BlueControls.Controls.Button();
-            this.btnFilterConverter = new BlueControls.Controls.Button();
-            this.btnBenutzerFilterWahl = new BlueControls.Controls.Button();
-            this.grpAllgemein = new BlueControls.Controls.GroupBox();
-            this.btnArbeitsbereich = new BlueControls.Controls.Button();
-            this.tabFile = new System.Windows.Forms.TabPage();
-            this.grpDatei = new BlueControls.Controls.GroupBox();
-            this.btnSpeichern = new BlueControls.Controls.Button();
-            this.btnLetzteFormulare = new BlueControls.Controls.LastFilesCombo();
-            this.btnOeffnen = new BlueControls.Controls.Button();
-            this.btnSaveAs = new BlueControls.Controls.Button();
-            this.btnNeuDB = new BlueControls.Controls.Button();
-            this.lstPages = new BlueControls.Controls.ListBox();
-            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
-            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.LoadSymbol = new System.Windows.Forms.OpenFileDialog();
-            this.Ribbon.SuspendLayout();
-            this.tabStart.SuspendLayout();
-            this.grpAssistent.SuspendLayout();
-            this.tabHintergrund.SuspendLayout();
-            this.grpDesign.SuspendLayout();
-            this.pnlStatusBar.SuspendLayout();
-            this.tabEditorStd.SuspendLayout();
-            this.grpVorschau.SuspendLayout();
-            this.grpFelder.SuspendLayout();
-            this.grpOptik.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.grpAllgemein.SuspendLayout();
-            this.tabFile.SuspendLayout();
-            this.grpDatei.SuspendLayout();
-            this.lstPages.SuspendLayout();
-            this.SuspendLayout();
+            var resources = new ComponentResourceManager(typeof(ConnectedFormulaEditor));
+            tabEditorStd = new TabPage();
+            grpVorschau = new GroupBox();
+            btnPfeileAusblenden = new Button();
+            grpFelder = new GroupBox();
+            btnSymbolLaden = new Button();
+            btnWeitereCF = new Button();
+            btnRegionAdd = new Button();
+            btnButton = new Button();
+            btnBild = new Button();
+            btnFileExplorer = new Button();
+            btnFeldHinzu = new Button();
+            grpOptik = new GroupBox();
+            btnRegisterKarte = new Button();
+            btnTabControlAdd = new Button();
+            groupBox1 = new GroupBox();
+            btnTable = new Button();
+            btnDropdownmenu = new Button();
+            btnFilterConverter = new Button();
+            btnBenutzerFilterWahl = new Button();
+            grpAllgemein = new GroupBox();
+            btnArbeitsbereich = new Button();
+            tabFile = new TabPage();
+            grpDatei = new GroupBox();
+            btnSpeichern = new Button();
+            btnLetzteFormulare = new LastFilesCombo();
+            btnOeffnen = new Button();
+            btnSaveAs = new Button();
+            btnNeuDB = new Button();
+            lstPages = new ListBox();
+            LoadTab = new OpenFileDialog();
+            SaveTab = new SaveFileDialog();
+            LoadSymbol = new OpenFileDialog();
+            grpBETA = new GroupBox();
+            btnSpeichernBeta = new Button();
+            btnOeffnenBeta = new Button();
+            Ribbon.SuspendLayout();
+            tabStart.SuspendLayout();
+            grpAssistent.SuspendLayout();
+            tabHintergrund.SuspendLayout();
+            grpDesign.SuspendLayout();
+            pnlStatusBar.SuspendLayout();
+            tabEditorStd.SuspendLayout();
+            grpVorschau.SuspendLayout();
+            grpFelder.SuspendLayout();
+            grpOptik.SuspendLayout();
+            groupBox1.SuspendLayout();
+            grpAllgemein.SuspendLayout();
+            tabFile.SuspendLayout();
+            grpDatei.SuspendLayout();
+            grpBETA.SuspendLayout();
+            SuspendLayout();
             // 
             // Pad
             // 
-            this.Pad.Location = new System.Drawing.Point(170, 110);
-            this.Pad.Size = new System.Drawing.Size(242, 401);
-            this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
+            Pad.Location = new Point(170, 110);
+            Pad.Size = new Size(242, 427);
+            Pad.GotNewItemCollection += Pad_GotNewItemCollection;
             // 
             // Ribbon
             // 
-            this.Ribbon.Controls.Add(this.tabEditorStd);
-            this.Ribbon.Controls.Add(this.tabFile);
-            this.Ribbon.Size = new System.Drawing.Size(784, 110);
-            this.Ribbon.TabDefault = this.tabFile;
-            this.Ribbon.TabDefaultOrder = new string[] {
-        "Datei",
-        "Editor-Std.",
-        "Start"};
-            this.Ribbon.Controls.SetChildIndex(this.tabFile, 0);
-            this.Ribbon.Controls.SetChildIndex(this.tabEditorStd, 0);
-            this.Ribbon.Controls.SetChildIndex(this.tabHintergrund, 0);
-            this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
-            this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
+            Ribbon.Controls.Add(tabEditorStd);
+            Ribbon.Controls.Add(tabFile);
+            Ribbon.Size = new Size(784, 110);
+            Ribbon.TabDefault = tabFile;
+            Ribbon.TabDefaultOrder = new string[]
+    {
+    "Datei",
+    "Editor-Std.",
+    "Start"
+    };
+            Ribbon.Controls.SetChildIndex(tabFile, 0);
+            Ribbon.Controls.SetChildIndex(tabEditorStd, 0);
+            Ribbon.Controls.SetChildIndex(tabHintergrund, 0);
+            Ribbon.Controls.SetChildIndex(tabExport, 0);
+            Ribbon.Controls.SetChildIndex(tabStart, 0);
             // 
             // tabStart
             // 
-            this.tabStart.Size = new System.Drawing.Size(776, 81);
-            // 
-            // tabExport
-            // 
-            this.tabExport.Size = new System.Drawing.Size(776, 81);
+            tabStart.Size = new Size(776, 81);
             // 
             // grpAssistent
             // 
-            this.grpAssistent.Visible = false;
+            grpAssistent.Visible = false;
             // 
             // btnVorschauModus
             // 
-            this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
+            btnVorschauModus.CheckedChanged += btnVorschauModus_CheckedChanged;
             // 
             // grpKomponenteHinzufügen
             // 
-            this.grpKomponenteHinzufügen.Visible = false;
-            // 
-            // tabHintergrund
-            // 
-            this.tabHintergrund.Size = new System.Drawing.Size(776, 81);
+            grpKomponenteHinzufügen.Visible = false;
             // 
             // grpDesign
             // 
-            this.grpDesign.Visible = false;
+            grpDesign.Visible = false;
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(412, 110);
+            tabRightSide.Location = new Point(412, 110);
+            tabRightSide.Size = new Size(372, 451);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(242, 24);
+            capStatusBar.Size = new Size(412, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(170, 537);
-            this.pnlStatusBar.Size = new System.Drawing.Size(242, 24);
+            pnlStatusBar.Location = new Point(0, 537);
+            pnlStatusBar.Size = new Size(412, 24);
             // 
             // tabEditorStd
             // 
-            this.tabEditorStd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabEditorStd.Controls.Add(this.grpVorschau);
-            this.tabEditorStd.Controls.Add(this.grpFelder);
-            this.tabEditorStd.Controls.Add(this.grpOptik);
-            this.tabEditorStd.Controls.Add(this.groupBox1);
-            this.tabEditorStd.Controls.Add(this.grpAllgemein);
-            this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
-            this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
-            this.tabEditorStd.Name = "tabEditorStd";
-            this.tabEditorStd.Size = new System.Drawing.Size(776, 81);
-            this.tabEditorStd.TabIndex = 4;
-            this.tabEditorStd.Text = "Editor-Std.";
+            tabEditorStd.BackColor = Color.FromArgb(244, 245, 246);
+            tabEditorStd.Controls.Add(grpVorschau);
+            tabEditorStd.Controls.Add(grpFelder);
+            tabEditorStd.Controls.Add(grpOptik);
+            tabEditorStd.Controls.Add(groupBox1);
+            tabEditorStd.Controls.Add(grpAllgemein);
+            tabEditorStd.Location = new Point(4, 25);
+            tabEditorStd.Margin = new Padding(0);
+            tabEditorStd.Name = "tabEditorStd";
+            tabEditorStd.Size = new Size(876, 81);
+            tabEditorStd.TabIndex = 4;
+            tabEditorStd.Text = "Editor-Std.";
             // 
             // grpVorschau
             // 
-            this.grpVorschau.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
-            this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(848, 0);
-            this.grpVorschau.Name = "grpVorschau";
-            this.grpVorschau.Size = new System.Drawing.Size(88, 81);
-            this.grpVorschau.TabIndex = 1;
-            this.grpVorschau.TabStop = false;
-            this.grpVorschau.Text = "Vorschau";
+            grpVorschau.BackColor = Color.FromArgb(244, 245, 246);
+            grpVorschau.Controls.Add(btnPfeileAusblenden);
+            grpVorschau.Dock = DockStyle.Left;
+            grpVorschau.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpVorschau.Location = new Point(848, 0);
+            grpVorschau.Name = "grpVorschau";
+            grpVorschau.Size = new Size(88, 81);
+            grpVorschau.TabIndex = 1;
+            grpVorschau.TabStop = false;
+            grpVorschau.Text = "Vorschau";
             // 
             // btnPfeileAusblenden
             // 
-            this.btnPfeileAusblenden.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
-            this.btnPfeileAusblenden.ImageCode = "Pfeil_Rechts|16||1||||0";
-            this.btnPfeileAusblenden.Location = new System.Drawing.Point(8, 2);
-            this.btnPfeileAusblenden.Name = "btnPfeileAusblenden";
-            this.btnPfeileAusblenden.Size = new System.Drawing.Size(72, 66);
-            this.btnPfeileAusblenden.TabIndex = 0;
-            this.btnPfeileAusblenden.Text = "Pfeile etc. ausblenden";
-            this.btnPfeileAusblenden.CheckedChanged += new System.EventHandler(this.btnPfeileAusblenden_CheckedChanged);
+            btnPfeileAusblenden.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
+            btnPfeileAusblenden.ImageCode = "Pfeil_Rechts|16||1||||0";
+            btnPfeileAusblenden.Location = new Point(8, 2);
+            btnPfeileAusblenden.Name = "btnPfeileAusblenden";
+            btnPfeileAusblenden.Size = new Size(72, 66);
+            btnPfeileAusblenden.TabIndex = 0;
+            btnPfeileAusblenden.Text = "Pfeile etc. ausblenden";
+            btnPfeileAusblenden.CheckedChanged += btnPfeileAusblenden_CheckedChanged;
             // 
             // grpFelder
             // 
-            this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpFelder.Controls.Add(this.btnSymbolLaden);
-            this.grpFelder.Controls.Add(this.btnWeitereCF);
-            this.grpFelder.Controls.Add(this.btnRegionAdd);
-            this.grpFelder.Controls.Add(this.btnButton);
-            this.grpFelder.Controls.Add(this.btnBild);
-            this.grpFelder.Controls.Add(this.btnFileExplorer);
-            this.grpFelder.Controls.Add(this.btnFeldHinzu);
-            this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(504, 0);
-            this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(344, 81);
-            this.grpFelder.TabIndex = 0;
-            this.grpFelder.TabStop = false;
-            this.grpFelder.Text = "Felder";
+            grpFelder.BackColor = Color.FromArgb(244, 245, 246);
+            grpFelder.Controls.Add(btnSymbolLaden);
+            grpFelder.Controls.Add(btnWeitereCF);
+            grpFelder.Controls.Add(btnRegionAdd);
+            grpFelder.Controls.Add(btnButton);
+            grpFelder.Controls.Add(btnBild);
+            grpFelder.Controls.Add(btnFileExplorer);
+            grpFelder.Controls.Add(btnFeldHinzu);
+            grpFelder.Dock = DockStyle.Left;
+            grpFelder.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpFelder.Location = new Point(504, 0);
+            grpFelder.Name = "grpFelder";
+            grpFelder.Size = new Size(344, 81);
+            grpFelder.TabIndex = 0;
+            grpFelder.TabStop = false;
+            grpFelder.Text = "Felder";
             // 
             // btnSymbolLaden
             // 
-            this.btnSymbolLaden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSymbolLaden.ImageCode = "Ordner|16";
-            this.btnSymbolLaden.Location = new System.Drawing.Point(256, 2);
-            this.btnSymbolLaden.Name = "btnSymbolLaden";
-            this.btnSymbolLaden.Size = new System.Drawing.Size(72, 66);
-            this.btnSymbolLaden.TabIndex = 14;
-            this.btnSymbolLaden.Text = "Symbol laden";
-            this.btnSymbolLaden.Click += new System.EventHandler(this.btnSymbolLaden_Click);
+            btnSymbolLaden.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnSymbolLaden.ImageCode = "Ordner|16";
+            btnSymbolLaden.Location = new Point(256, 2);
+            btnSymbolLaden.Name = "btnSymbolLaden";
+            btnSymbolLaden.Size = new Size(72, 66);
+            btnSymbolLaden.TabIndex = 14;
+            btnSymbolLaden.Text = "Symbol laden";
+            btnSymbolLaden.Click += btnSymbolLaden_Click;
             // 
             // btnWeitereCF
             // 
-            this.btnWeitereCF.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitereCF.Location = new System.Drawing.Point(144, 46);
-            this.btnWeitereCF.Name = "btnWeitereCF";
-            this.btnWeitereCF.Size = new System.Drawing.Size(104, 22);
-            this.btnWeitereCF.TabIndex = 8;
-            this.btnWeitereCF.Text = "weitere...";
-            this.btnWeitereCF.Click += new System.EventHandler(this.btnWeitereCF_Click);
+            btnWeitereCF.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnWeitereCF.Location = new Point(144, 46);
+            btnWeitereCF.Name = "btnWeitereCF";
+            btnWeitereCF.Size = new Size(104, 22);
+            btnWeitereCF.TabIndex = 8;
+            btnWeitereCF.Text = "weitere...";
+            btnWeitereCF.Click += btnWeitereCF_Click;
             // 
             // btnRegionAdd
             // 
-            this.btnRegionAdd.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnRegionAdd.ImageCode = "Layout|16";
-            this.btnRegionAdd.Location = new System.Drawing.Point(8, 46);
-            this.btnRegionAdd.Name = "btnRegionAdd";
-            this.btnRegionAdd.Size = new System.Drawing.Size(136, 22);
-            this.btnRegionAdd.TabIndex = 7;
-            this.btnRegionAdd.Text = "Region";
-            this.btnRegionAdd.Click += new System.EventHandler(this.btnRegionAdd_Click);
+            btnRegionAdd.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnRegionAdd.ImageCode = "Layout|16";
+            btnRegionAdd.Location = new Point(8, 46);
+            btnRegionAdd.Name = "btnRegionAdd";
+            btnRegionAdd.Size = new Size(136, 22);
+            btnRegionAdd.TabIndex = 7;
+            btnRegionAdd.Text = "Region";
+            btnRegionAdd.Click += btnRegionAdd_Click;
             // 
             // btnButton
             // 
-            this.btnButton.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnButton.ImageCode = "Stop";
-            this.btnButton.Location = new System.Drawing.Point(8, 24);
-            this.btnButton.Name = "btnButton";
-            this.btnButton.Size = new System.Drawing.Size(136, 22);
-            this.btnButton.TabIndex = 6;
-            this.btnButton.Text = "Schaltfläche";
-            this.btnButton.Click += new System.EventHandler(this.btnButton_Click);
+            btnButton.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnButton.ImageCode = "Stop";
+            btnButton.Location = new Point(8, 24);
+            btnButton.Name = "btnButton";
+            btnButton.Size = new Size(136, 22);
+            btnButton.TabIndex = 6;
+            btnButton.Text = "Schaltfläche";
+            btnButton.Click += btnButton_Click;
             // 
             // btnBild
             // 
-            this.btnBild.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnBild.ImageCode = "Bild";
-            this.btnBild.Location = new System.Drawing.Point(144, 24);
-            this.btnBild.Name = "btnBild";
-            this.btnBild.Size = new System.Drawing.Size(104, 22);
-            this.btnBild.TabIndex = 5;
-            this.btnBild.Text = "Bild";
-            this.btnBild.Click += new System.EventHandler(this.btnBild_Click);
+            btnBild.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnBild.ImageCode = "Bild";
+            btnBild.Location = new Point(144, 24);
+            btnBild.Name = "btnBild";
+            btnBild.Size = new Size(104, 22);
+            btnBild.TabIndex = 5;
+            btnBild.Text = "Bild";
+            btnBild.Click += btnBild_Click;
             // 
             // btnFileExplorer
             // 
-            this.btnFileExplorer.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnFileExplorer.ImageCode = "Ordner";
-            this.btnFileExplorer.Location = new System.Drawing.Point(144, 2);
-            this.btnFileExplorer.Name = "btnFileExplorer";
-            this.btnFileExplorer.Size = new System.Drawing.Size(104, 22);
-            this.btnFileExplorer.TabIndex = 3;
-            this.btnFileExplorer.Text = "Verzeichnis";
-            this.btnFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
+            btnFileExplorer.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnFileExplorer.ImageCode = "Ordner";
+            btnFileExplorer.Location = new Point(144, 2);
+            btnFileExplorer.Name = "btnFileExplorer";
+            btnFileExplorer.Size = new Size(104, 22);
+            btnFileExplorer.TabIndex = 3;
+            btnFileExplorer.Text = "Verzeichnis";
+            btnFileExplorer.Click += grpFileExplorer_Click;
             // 
             // btnFeldHinzu
             // 
-            this.btnFeldHinzu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnFeldHinzu.ImageCode = "Textfeld2|24";
-            this.btnFeldHinzu.Location = new System.Drawing.Point(8, 2);
-            this.btnFeldHinzu.Name = "btnFeldHinzu";
-            this.btnFeldHinzu.Size = new System.Drawing.Size(136, 22);
-            this.btnFeldHinzu.TabIndex = 1;
-            this.btnFeldHinzu.Text = "Zelle";
-            this.btnFeldHinzu.Click += new System.EventHandler(this.btnFeldHinzu_Click);
+            btnFeldHinzu.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnFeldHinzu.ImageCode = "Textfeld2|24";
+            btnFeldHinzu.Location = new Point(8, 2);
+            btnFeldHinzu.Name = "btnFeldHinzu";
+            btnFeldHinzu.Size = new Size(136, 22);
+            btnFeldHinzu.TabIndex = 1;
+            btnFeldHinzu.Text = "Zelle";
+            btnFeldHinzu.Click += btnFeldHinzu_Click;
             // 
             // grpOptik
             // 
-            this.grpOptik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpOptik.Controls.Add(this.btnRegisterKarte);
-            this.grpOptik.Controls.Add(this.btnTabControlAdd);
-            this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(344, 0);
-            this.grpOptik.Name = "grpOptik";
-            this.grpOptik.Size = new System.Drawing.Size(160, 81);
-            this.grpOptik.TabIndex = 2;
-            this.grpOptik.TabStop = false;
-            this.grpOptik.Text = "Optik";
+            grpOptik.BackColor = Color.FromArgb(244, 245, 246);
+            grpOptik.Controls.Add(btnRegisterKarte);
+            grpOptik.Controls.Add(btnTabControlAdd);
+            grpOptik.Dock = DockStyle.Left;
+            grpOptik.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpOptik.Location = new Point(344, 0);
+            grpOptik.Name = "grpOptik";
+            grpOptik.Size = new Size(160, 81);
+            grpOptik.TabIndex = 2;
+            grpOptik.TabStop = false;
+            grpOptik.Text = "Optik";
             // 
             // btnRegisterKarte
             // 
-            this.btnRegisterKarte.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnRegisterKarte.ImageCode = "Register|16|||||||||PlusZeichen";
-            this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
-            this.btnRegisterKarte.Name = "btnRegisterKarte";
-            this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
-            this.btnRegisterKarte.TabIndex = 6;
-            this.btnRegisterKarte.Text = "Neue Registerkarte";
-            this.btnRegisterKarte.Click += new System.EventHandler(this.btnRegisterKarte_Click);
+            btnRegisterKarte.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnRegisterKarte.ImageCode = "Register|16|||||||||PlusZeichen";
+            btnRegisterKarte.Location = new Point(72, 2);
+            btnRegisterKarte.Name = "btnRegisterKarte";
+            btnRegisterKarte.Size = new Size(80, 66);
+            btnRegisterKarte.TabIndex = 6;
+            btnRegisterKarte.Text = "Neue Registerkarte";
+            btnRegisterKarte.Click += btnRegisterKarte_Click;
             // 
             // btnTabControlAdd
             // 
-            this.btnTabControlAdd.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnTabControlAdd.ImageCode = "Registersammlung";
-            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
-            this.btnTabControlAdd.Name = "btnTabControlAdd";
-            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
-            this.btnTabControlAdd.TabIndex = 3;
-            this.btnTabControlAdd.Text = "Register-sammlung";
-            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
+            btnTabControlAdd.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnTabControlAdd.ImageCode = "Registersammlung";
+            btnTabControlAdd.Location = new Point(8, 2);
+            btnTabControlAdd.Name = "btnTabControlAdd";
+            btnTabControlAdd.Size = new Size(64, 66);
+            btnTabControlAdd.TabIndex = 3;
+            btnTabControlAdd.Text = "Register-sammlung";
+            btnTabControlAdd.Click += btnTabControlAdd_Click;
             // 
             // groupBox1
             // 
-            this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox1.Controls.Add(this.btnTable);
-            this.groupBox1.Controls.Add(this.btnDropdownmenu);
-            this.groupBox1.Controls.Add(this.btnFilterConverter);
-            this.groupBox1.Controls.Add(this.btnBenutzerFilterWahl);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(72, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(272, 81);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Zeilen-Berechnung";
+            groupBox1.BackColor = Color.FromArgb(244, 245, 246);
+            groupBox1.Controls.Add(btnTable);
+            groupBox1.Controls.Add(btnDropdownmenu);
+            groupBox1.Controls.Add(btnFilterConverter);
+            groupBox1.Controls.Add(btnBenutzerFilterWahl);
+            groupBox1.Dock = DockStyle.Left;
+            groupBox1.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            groupBox1.Location = new Point(72, 0);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(272, 81);
+            groupBox1.TabIndex = 3;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Zeilen-Berechnung";
             // 
             // btnTable
             // 
-            this.btnTable.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnTable.ImageCode = "Tabelle|16";
-            this.btnTable.Location = new System.Drawing.Point(200, 2);
-            this.btnTable.Name = "btnTable";
-            this.btnTable.Size = new System.Drawing.Size(64, 66);
-            this.btnTable.TabIndex = 5;
-            this.btnTable.Text = "Tabelle";
-            this.btnTable.Click += new System.EventHandler(this.btnTable_Click);
+            btnTable.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnTable.ImageCode = "Tabelle|16";
+            btnTable.Location = new Point(200, 2);
+            btnTable.Name = "btnTable";
+            btnTable.Size = new Size(64, 66);
+            btnTable.TabIndex = 5;
+            btnTable.Text = "Tabelle";
+            btnTable.Click += btnTable_Click;
             // 
             // btnDropdownmenu
             // 
-            this.btnDropdownmenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDropdownmenu.ImageCode = "Textfeld2|16|||||||||Pfeil_Unten_Scrollbar";
-            this.btnDropdownmenu.Location = new System.Drawing.Point(136, 2);
-            this.btnDropdownmenu.Name = "btnDropdownmenu";
-            this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
-            this.btnDropdownmenu.TabIndex = 4;
-            this.btnDropdownmenu.Text = "Auswahl-feld";
-            this.btnDropdownmenu.Click += new System.EventHandler(this.btnDropdownmenu_Click);
+            btnDropdownmenu.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnDropdownmenu.ImageCode = "Textfeld2|16|||||||||Pfeil_Unten_Scrollbar";
+            btnDropdownmenu.Location = new Point(136, 2);
+            btnDropdownmenu.Name = "btnDropdownmenu";
+            btnDropdownmenu.Size = new Size(64, 66);
+            btnDropdownmenu.TabIndex = 4;
+            btnDropdownmenu.Text = "Auswahl-feld";
+            btnDropdownmenu.Click += btnDropdownmenu_Click;
             // 
             // btnFilterConverter
             // 
-            this.btnFilterConverter.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnFilterConverter.ImageCode = "Trichter|16|||||||||PlusZeichen";
-            this.btnFilterConverter.Location = new System.Drawing.Point(72, 2);
-            this.btnFilterConverter.Name = "btnFilterConverter";
-            this.btnFilterConverter.Size = new System.Drawing.Size(64, 66);
-            this.btnFilterConverter.TabIndex = 3;
-            this.btnFilterConverter.Text = "Filter";
-            this.btnFilterConverter.Click += new System.EventHandler(this.btnFilterConverter_Click);
+            btnFilterConverter.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnFilterConverter.ImageCode = "Trichter|16|||||||||PlusZeichen";
+            btnFilterConverter.Location = new Point(72, 2);
+            btnFilterConverter.Name = "btnFilterConverter";
+            btnFilterConverter.Size = new Size(64, 66);
+            btnFilterConverter.TabIndex = 3;
+            btnFilterConverter.Text = "Filter";
+            btnFilterConverter.Click += btnFilterConverter_Click;
             // 
             // btnBenutzerFilterWahl
             // 
-            this.btnBenutzerFilterWahl.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnBenutzerFilterWahl.ImageCode = "Trichter|16|||||||||Textfeld2";
-            this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(8, 2);
-            this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
-            this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);
-            this.btnBenutzerFilterWahl.TabIndex = 2;
-            this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
-            this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
+            btnBenutzerFilterWahl.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnBenutzerFilterWahl.ImageCode = "Trichter|16|||||||||Textfeld2";
+            btnBenutzerFilterWahl.Location = new Point(8, 2);
+            btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
+            btnBenutzerFilterWahl.Size = new Size(64, 66);
+            btnBenutzerFilterWahl.TabIndex = 2;
+            btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
+            btnBenutzerFilterWahl.Click += btnBenutzerFilterWahl_Click;
             // 
             // grpAllgemein
             // 
-            this.grpAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAllgemein.Controls.Add(this.btnArbeitsbereich);
-            this.grpAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAllgemein.Location = new System.Drawing.Point(0, 0);
-            this.grpAllgemein.Name = "grpAllgemein";
-            this.grpAllgemein.Size = new System.Drawing.Size(72, 81);
-            this.grpAllgemein.TabIndex = 4;
-            this.grpAllgemein.TabStop = false;
-            this.grpAllgemein.Text = "Allgemein";
+            grpAllgemein.BackColor = Color.FromArgb(244, 245, 246);
+            grpAllgemein.Controls.Add(btnArbeitsbereich);
+            grpAllgemein.Dock = DockStyle.Left;
+            grpAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpAllgemein.Location = new Point(0, 0);
+            grpAllgemein.Name = "grpAllgemein";
+            grpAllgemein.Size = new Size(72, 81);
+            grpAllgemein.TabIndex = 4;
+            grpAllgemein.TabStop = false;
+            grpAllgemein.Text = "Allgemein";
             // 
             // btnArbeitsbereich
             // 
-            this.btnArbeitsbereich.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnArbeitsbereich.ImageCode = "SeiteEinrichten";
-            this.btnArbeitsbereich.Location = new System.Drawing.Point(8, 2);
-            this.btnArbeitsbereich.Name = "btnArbeitsbereich";
-            this.btnArbeitsbereich.Size = new System.Drawing.Size(56, 66);
-            this.btnArbeitsbereich.TabIndex = 0;
-            this.btnArbeitsbereich.Text = "Arbeits-bereich";
-            this.btnArbeitsbereich.Click += new System.EventHandler(this.btnArbeitsbereich_Click);
+            btnArbeitsbereich.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnArbeitsbereich.ImageCode = "SeiteEinrichten";
+            btnArbeitsbereich.Location = new Point(8, 2);
+            btnArbeitsbereich.Name = "btnArbeitsbereich";
+            btnArbeitsbereich.Size = new Size(56, 66);
+            btnArbeitsbereich.TabIndex = 0;
+            btnArbeitsbereich.Text = "Arbeits-bereich";
+            btnArbeitsbereich.Click += btnArbeitsbereich_Click;
             // 
             // tabFile
             // 
-            this.tabFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabFile.Controls.Add(this.grpDatei);
-            this.tabFile.Location = new System.Drawing.Point(4, 25);
-            this.tabFile.Margin = new System.Windows.Forms.Padding(0);
-            this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(776, 81);
-            this.tabFile.TabIndex = 5;
-            this.tabFile.Text = "Datei";
+            tabFile.BackColor = Color.FromArgb(244, 245, 246);
+            tabFile.Controls.Add(grpBETA);
+            tabFile.Controls.Add(grpDatei);
+            tabFile.Location = new Point(4, 25);
+            tabFile.Margin = new Padding(0);
+            tabFile.Name = "tabFile";
+            tabFile.Size = new Size(776, 81);
+            tabFile.TabIndex = 5;
+            tabFile.Text = "Datei";
             // 
             // grpDatei
             // 
-            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpDatei.CausesValidation = false;
-            this.grpDatei.Controls.Add(this.btnSpeichern);
-            this.grpDatei.Controls.Add(this.btnLetzteFormulare);
-            this.grpDatei.Controls.Add(this.btnOeffnen);
-            this.grpDatei.Controls.Add(this.btnSaveAs);
-            this.grpDatei.Controls.Add(this.btnNeuDB);
-            this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDatei.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpDatei.Location = new System.Drawing.Point(0, 0);
-            this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(368, 81);
-            this.grpDatei.TabIndex = 5;
-            this.grpDatei.TabStop = false;
-            this.grpDatei.Text = "Datei";
+            grpDatei.BackColor = Color.FromArgb(244, 245, 246);
+            grpDatei.CausesValidation = false;
+            grpDatei.Controls.Add(btnSpeichern);
+            grpDatei.Controls.Add(btnLetzteFormulare);
+            grpDatei.Controls.Add(btnOeffnen);
+            grpDatei.Controls.Add(btnSaveAs);
+            grpDatei.Controls.Add(btnNeuDB);
+            grpDatei.Dock = DockStyle.Left;
+            grpDatei.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpDatei.Location = new Point(0, 0);
+            grpDatei.Name = "grpDatei";
+            grpDatei.Size = new Size(368, 81);
+            grpDatei.TabIndex = 5;
+            grpDatei.TabStop = false;
+            grpDatei.Text = "Datei";
             // 
             // btnSpeichern
             // 
-            this.btnSpeichern.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSpeichern.ImageCode = "Diskette";
-            this.btnSpeichern.Location = new System.Drawing.Point(232, 2);
-            this.btnSpeichern.Name = "btnSpeichern";
-            this.btnSpeichern.Size = new System.Drawing.Size(64, 66);
-            this.btnSpeichern.TabIndex = 5;
-            this.btnSpeichern.Text = "Speichern";
-            this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
+            btnSpeichern.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnSpeichern.ImageCode = "Diskette";
+            btnSpeichern.Location = new Point(232, 2);
+            btnSpeichern.Name = "btnSpeichern";
+            btnSpeichern.Size = new Size(64, 66);
+            btnSpeichern.TabIndex = 5;
+            btnSpeichern.Text = "Speichern";
+            btnSpeichern.Click += btnSpeichern_Click;
             // 
             // btnLetzteFormulare
             // 
-            this.btnLetzteFormulare.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.btnLetzteFormulare.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.btnLetzteFormulare.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.btnLetzteFormulare.Enabled = false;
-            this.btnLetzteFormulare.ImageCode = "Ordner";
-            this.btnLetzteFormulare.Location = new System.Drawing.Point(128, 2);
-            this.btnLetzteFormulare.Name = "btnLetzteFormulare";
-            this.btnLetzteFormulare.SettingsLoaded = false;
-            this.btnLetzteFormulare.Size = new System.Drawing.Size(104, 66);
-            this.btnLetzteFormulare.TabIndex = 1;
-            this.btnLetzteFormulare.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteFormulare.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            btnLetzteFormulare.DrawStyle = ComboboxStyle.RibbonBar;
+            btnLetzteFormulare.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnLetzteFormulare.Enabled = false;
+            btnLetzteFormulare.ImageCode = "Ordner";
+            btnLetzteFormulare.Location = new Point(128, 2);
+            btnLetzteFormulare.Name = "btnLetzteFormulare";
+            btnLetzteFormulare.RemoveAllowed = true;
+            btnLetzteFormulare.SettingsLoaded = false;
+            btnLetzteFormulare.Size = new Size(104, 66);
+            btnLetzteFormulare.TabIndex = 1;
+            btnLetzteFormulare.Text = "zuletzt geöffnete Dateien";
+            btnLetzteFormulare.ItemClicked += btnLetzteDateien_ItemClicked;
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnOeffnen.ImageCode = "Ordner";
-            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
-            this.btnOeffnen.Name = "btnOeffnen";
-            this.btnOeffnen.Size = new System.Drawing.Size(56, 66);
-            this.btnOeffnen.TabIndex = 1;
-            this.btnOeffnen.Text = "Öffnen";
-            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
+            btnOeffnen.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnOeffnen.ImageCode = "Ordner";
+            btnOeffnen.Location = new Point(72, 2);
+            btnOeffnen.Name = "btnOeffnen";
+            btnOeffnen.Size = new Size(56, 66);
+            btnOeffnen.TabIndex = 1;
+            btnOeffnen.Text = "Öffnen";
+            btnOeffnen.Click += btnOeffnen_Click;
             // 
             // btnSaveAs
             // 
-            this.btnSaveAs.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSaveAs.Enabled = false;
-            this.btnSaveAs.ImageCode = "Diskette";
-            this.btnSaveAs.Location = new System.Drawing.Point(296, 2);
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
-            this.btnSaveAs.TabIndex = 4;
-            this.btnSaveAs.Text = "Speichern unter";
-            this.btnSaveAs.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
+            btnSaveAs.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnSaveAs.Enabled = false;
+            btnSaveAs.ImageCode = "Diskette";
+            btnSaveAs.Location = new Point(296, 2);
+            btnSaveAs.Name = "btnSaveAs";
+            btnSaveAs.Size = new Size(64, 66);
+            btnSaveAs.TabIndex = 4;
+            btnSaveAs.Text = "Speichern unter";
+            btnSaveAs.Click += btnNeuDB_SaveAs_Click;
             // 
             // btnNeuDB
             // 
-            this.btnNeuDB.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnNeuDB.ImageCode = "Datei";
-            this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
-            this.btnNeuDB.Name = "btnNeuDB";
-            this.btnNeuDB.Size = new System.Drawing.Size(56, 66);
-            this.btnNeuDB.TabIndex = 0;
-            this.btnNeuDB.Text = "Neu";
-            this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
+            btnNeuDB.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnNeuDB.ImageCode = "Datei";
+            btnNeuDB.Location = new Point(8, 2);
+            btnNeuDB.Name = "btnNeuDB";
+            btnNeuDB.Size = new Size(56, 66);
+            btnNeuDB.TabIndex = 0;
+            btnNeuDB.Text = "Neu";
+            btnNeuDB.Click += btnNeuDB_SaveAs_Click;
             // 
             // lstPages
             // 
-            this.lstPages.Appearance = ListBoxAppearance.Gallery;
-            this.lstPages.AutoSort = false;
-            this.lstPages.CheckBehavior = CheckBehavior.SingleSelection;
-            this.lstPages.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lstPages.Location = new System.Drawing.Point(0, 110);
-            this.lstPages.Name = "lstPages";
-            this.lstPages.Size = new System.Drawing.Size(170, 451);
-            this.lstPages.TabIndex = 3;
-            this.lstPages.AddClicked += new System.EventHandler<BlueControls.EventArgs.AddItemEventArgs>(this.lstPages_AddClicked);
-            this.lstPages.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPages_ItemClicked);
+            lstPages.Appearance = ListBoxAppearance.Gallery;
+            lstPages.AutoSort = false;
+            lstPages.Dock = DockStyle.Left;
+            lstPages.Location = new Point(0, 110);
+            lstPages.Name = "lstPages";
+            lstPages.Size = new Size(170, 427);
+            lstPages.TabIndex = 3;
+            lstPages.AddClicked += lstPages_AddClicked;
+            lstPages.ItemClicked += lstPages_ItemClicked;
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
-            this.LoadTab.Title = "Bitte Formular wählen:";
-            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
+            LoadTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
+            LoadTab.Title = "Bitte Formular wählen:";
+            LoadTab.FileOk += LoadTab_FileOk;
             // 
             // SaveTab
             // 
-            this.SaveTab.DefaultExt = "CFO";
-            this.SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
-            this.SaveTab.Title = "Bitte neuen Dateinamen des Formulars wählen.";
+            SaveTab.DefaultExt = "CFO";
+            SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
+            SaveTab.Title = "Bitte neuen Dateinamen des Formulars wählen.";
             // 
             // LoadSymbol
             // 
-            this.LoadSymbol.DefaultExt = "BCS";
-            this.LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
-            this.LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
-            this.LoadSymbol.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadSymbol_FileOk);
+            LoadSymbol.DefaultExt = "BCS";
+            LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
+            LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
+            LoadSymbol.FileOk += LoadSymbol_FileOk;
+            // 
+            // grpBETA
+            // 
+            grpBETA.BackColor = Color.FromArgb(244, 245, 246);
+            grpBETA.CausesValidation = false;
+            grpBETA.Controls.Add(btnSpeichernBeta);
+            grpBETA.Controls.Add(btnOeffnenBeta);
+            grpBETA.Dock = DockStyle.Left;
+            grpBETA.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            grpBETA.Location = new Point(368, 0);
+            grpBETA.Name = "grpBETA";
+            grpBETA.Size = new Size(136, 81);
+            grpBETA.TabIndex = 6;
+            grpBETA.TabStop = false;
+            grpBETA.Text = "BETA";
+            // 
+            // btnSpeichernBeta
+            // 
+            btnSpeichernBeta.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnSpeichernBeta.ImageCode = "Diskette";
+            btnSpeichernBeta.Location = new Point(64, 2);
+            btnSpeichernBeta.Name = "btnSpeichernBeta";
+            btnSpeichernBeta.Size = new Size(64, 66);
+            btnSpeichernBeta.TabIndex = 5;
+            btnSpeichernBeta.Text = "Speichern (BETA)";
+            btnSpeichernBeta.Click += btnSpeichernBeta_Click;
+            // 
+            // btnOeffnenBeta
+            // 
+            btnOeffnenBeta.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnOeffnenBeta.ImageCode = "Ordner";
+            btnOeffnenBeta.Location = new Point(8, 2);
+            btnOeffnenBeta.Name = "btnOeffnenBeta";
+            btnOeffnenBeta.Size = new Size(56, 66);
+            btnOeffnenBeta.TabIndex = 1;
+            btnOeffnenBeta.Text = "Öffnen (BETA)";
+            btnOeffnenBeta.Click += btnOeffnenBeta_Click;
             // 
             // ConnectedFormulaEditor
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.lstPages);
-            this.Name = "ConnectedFormulaEditor";
-            this.Text = "ConnectedFormula";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Controls.SetChildIndex(this.Ribbon, 0);
-            this.Controls.SetChildIndex(this.tabRightSide, 0);
-            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.lstPages, 0);
-            this.Controls.SetChildIndex(this.Pad, 0);
-            this.Ribbon.ResumeLayout(false);
-            this.tabStart.ResumeLayout(false);
-            this.grpAssistent.ResumeLayout(false);
-            this.tabHintergrund.ResumeLayout(false);
-            this.grpDesign.ResumeLayout(false);
-            this.pnlStatusBar.ResumeLayout(false);
-            this.tabEditorStd.ResumeLayout(false);
-            this.grpVorschau.ResumeLayout(false);
-            this.grpFelder.ResumeLayout(false);
-            this.grpOptik.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.grpAllgemein.ResumeLayout(false);
-            this.tabFile.ResumeLayout(false);
-            this.grpDatei.ResumeLayout(false);
-            this.lstPages.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.None;
+            ClientSize = new Size(784, 561);
+            Controls.Add(lstPages);
+            Name = "ConnectedFormulaEditor";
+            Text = "ConnectedFormula";
+            WindowState = FormWindowState.Maximized;
+            Controls.SetChildIndex(Ribbon, 0);
+            Controls.SetChildIndex(tabRightSide, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
+            Controls.SetChildIndex(lstPages, 0);
+            Controls.SetChildIndex(Pad, 0);
+            Ribbon.ResumeLayout(false);
+            tabStart.ResumeLayout(false);
+            grpAssistent.ResumeLayout(false);
+            tabHintergrund.ResumeLayout(false);
+            grpDesign.ResumeLayout(false);
+            pnlStatusBar.ResumeLayout(false);
+            tabEditorStd.ResumeLayout(false);
+            grpVorschau.ResumeLayout(false);
+            grpFelder.ResumeLayout(false);
+            grpOptik.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            grpAllgemein.ResumeLayout(false);
+            tabFile.ResumeLayout(false);
+            grpDatei.ResumeLayout(false);
+            grpBETA.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
@@ -577,5 +613,8 @@ namespace BlueControls.Forms {
         private Button btnWeitereCF;
         private Button btnSymbolLaden;
         private OpenFileDialog LoadSymbol;
+        private GroupBox grpBETA;
+        private Button btnSpeichernBeta;
+        private Button btnOeffnenBeta;
     }
 }

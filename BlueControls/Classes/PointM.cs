@@ -76,6 +76,8 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
+
     #endregion
 
     #region Properties
@@ -155,6 +157,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
         PropertyChanged = null;
         Moved = null;
+        PropertyChangedExt = null;
         _parent = null;
     }
 
@@ -170,6 +173,8 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         Skin.Draw_Border(gr, type, state, r);
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
     public void Mirror(PointM? p, bool vertical, bool horizontal) {
         if (p is null) { return; }
 
@@ -180,6 +185,11 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public void Move(float x, float y, bool isMouse) => SetTo(_x + x, _y + y, isMouse);
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -211,17 +221,11 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public JsonObject ParseableJson() {
         var json = new JsonObject()
-            .Set("name", KeyName)
+            .Set("key", KeyName)
             .Set("x", _x)
             .Set("y", _y)
             .Set("distance", _distance)
             .Set("angle", _angle);
-
-        // Parent wird nur für Diagnose serialisiert, beim Parsen aber ignoriert
-        // (Parent muss vom Aufrufer gesetzt werden, da PointM die Hierarchie nicht kennt).
-        if (_parent is IHasKeyName hasKeyName && !string.IsNullOrEmpty(hasKeyName.KeyName)) {
-            json.Set("parentName", hasKeyName.KeyName);
-        }
 
         return json;
     }
@@ -229,6 +233,15 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public void ParseFinished(string parsed) { }
 
     public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        KeyName = json.GetString("key");
+
+        if (json["x"] is JsonValue x && x.TryGetValue(out float xv)) { _x = xv; }
+        if (json["y"] is JsonValue y && y.TryGetValue(out float yv)) { _y = yv; }
+        if (json["distance"] is JsonValue d && d.TryGetValue(out float dv)) { _distance = dv; }
+        if (json["angle"] is JsonValue a && a.TryGetValue(out float av)) { _angle = av; }
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -275,36 +288,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         return false;
     }
 
-    public bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "name":
-                KeyName = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "parentname":
-                // Parent kann nicht wiederhergestellt werden - wird vom Parent-Objekt gesetzt.
-                return true;
-
-            case "x":
-                _x = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-
-            case "y":
-                _y = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-
-            case "distance":
-                _distance = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-
-            case "angle":
-                _angle = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : 0f;
-                return true;
-        }
-
-        return false;
-    }
-
     public void SetTo(float x, float y, bool byMouse) {
         var mx = (float)Math.Round(x - _x, 6);
         var my = (float)Math.Round(y - _y, 6);
@@ -314,6 +297,9 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         _y = y;
         OnMoved(new MoveEventArgs(byMouse));
         OnPropertyChanged("Position");
+
+        if (mx != 0) { OnPropertyChangedExt("x", _x); }
+        if (my != 0) { OnPropertyChangedExt("y", _y); }
     }
 
     public void SetTo(PointM startPoint, float länge, float alpha, bool byMouse) {

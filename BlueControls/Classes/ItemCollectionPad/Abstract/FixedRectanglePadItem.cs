@@ -128,8 +128,20 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.SetSizeF("size", _canvassize);
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
+        SizeChanged();
+    }
+
+    public override void ParseJson(JsonObject json) {
+        if (json["size"] is JsonObject so) { _canvassize = so.ToJsonElement().AsSizeF(); }
+        base.ParseJson(json);
         SizeChanged();
     }
 
@@ -141,22 +153,6 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         return base.ParseThis(key, value);
-    }
-
-    public override JsonObject ParseableJson() {
-        var json = base.ParseableJson();
-        json.SetSizeF("size", _canvassize);
-        return json;
-    }
-
-    public override bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "size":
-                _canvassize = value.AsSizeF();
-                return true;
-        }
-
-        return base.ParseThisJson(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {

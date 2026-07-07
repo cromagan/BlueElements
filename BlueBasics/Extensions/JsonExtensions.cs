@@ -36,6 +36,20 @@ public static partial class Extensions {
         return default;
     }
 
+    /// <summary>
+    /// Liest einen Enum-Wert unter <paramref name="key" />. Akzeptiert sowohl den
+    /// numerischen Wert (<see cref="JsonValueKind.Number" />) als auch die
+    /// String-Repräsentation. Bei fehlendem oder ungültigem Key wird
+    /// <c>default(T)</c> geliefert.
+    /// </summary>
+    public static T GetEnum<T>(this JsonObject json, string key) where T : struct, Enum {
+        switch (json[key]) {
+            case JsonValue v when v.TryGetValue(out int i): return (T)(object)i;
+            case JsonValue v when v.TryGetValue(out string? s) && Enum.TryParse<T>(s, out var result): return result;
+        }
+        return default;
+    }
+
     public static float GetFloat(this JsonElement json, string key, float defaultValue = 0f) {
         if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Number) { return elem.GetSingle(); }
         return defaultValue;
@@ -185,6 +199,16 @@ public static partial class Extensions {
     /// </summary>
     public static JsonNode? ToJsonNode(this JsonElement element) =>
         element.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null ? null : JsonNode.Parse(element.GetRawText());
+
+    /// <summary>
+    /// Konvertiert einen <see cref="JsonNode" /> (z.B. <see cref="JsonObject" />,
+    /// <see cref="JsonArray" />) in ein <see cref="JsonElement" />, sodass er an
+    /// APIs übergeben werden kann, die auf <see cref="JsonElement" /> arbeiten
+    /// (z.B. die <c>AsPadding</c>-/<c>AsSizeF</c>-Erweiterungen). <c>null</c> liefert
+    /// <see cref="JsonValueKind.Undefined" />.
+    /// </summary>
+    public static JsonElement ToJsonElement(this JsonNode? node) =>
+        node is null ? default : JsonDocument.Parse(node.ToJsonString()).RootElement.Clone();
 
     #endregion
 }

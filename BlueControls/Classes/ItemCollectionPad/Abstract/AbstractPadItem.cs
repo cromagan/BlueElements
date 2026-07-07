@@ -77,6 +77,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("print", _beiExportSichtbar);
         }
     }
 
@@ -107,6 +108,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             if (_enabled == value) { return; }
             _enabled = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("enabled", _enabled);
         }
     }
 
@@ -130,6 +132,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("key", field);
         }
     }
 
@@ -141,7 +144,16 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     public virtual bool MoveXByMouse => true;
     public virtual bool MoveYByMouse => true;
-    public string Page { get; set; } = string.Empty;
+
+    public string Page {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+            OnPropertyChangedExt("page", field);
+        }
+    } = string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~AbstractPadItem()
@@ -166,7 +178,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// </summary>
     public List<PointM> PointsForSuccessfullyMove { get; } = [];
 
-    public virtual string QuickInfo { get; set; } = string.Empty;
+    public virtual string QuickInfo {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+            OnPropertyChangedExt("quickinfo", field);
+        }
+    } = string.Empty;
 
     public bool ShowAlways {
         get {
@@ -327,6 +347,18 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return result;
     }
 
+    public override IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Points", StringComparison.OrdinalIgnoreCase)) {
+            return MovablePoint.GetByKey(key);
+        }
+
+        if (string.Equals(containerName, "JointPoints", StringComparison.OrdinalIgnoreCase)) {
+            return JointPoints.GetByKey(key);
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Wird für den Editor benötigt, um bei hinzufügen es für den Benutzer mittig zu Plazieren
     /// </summary>
@@ -379,7 +411,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         json["key"] = KeyName;
         json["enabled"] = _enabled;
         json["print"] = _beiExportSichtbar;
-        json["quickInfo"] = QuickInfo;
+        json["quickinfo"] = QuickInfo;
         json["page"] = Page;
 
         json.SetArrayIfNotEmpty("points", MovablePoint);
@@ -390,6 +422,53 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public virtual void ParseFinishedJson(JsonElement parsed) { }
+
+    /// <summary>
+    /// Default-Implementation für <see cref="IJsonParseable" />. Subklassen
+    /// überschreiben diese Methode, lesen ihre eigenen Keys aus
+    /// <paramref name="json" /> und rufen am Ende <c>base.ParseJson(json)</c>
+    /// auf. So bleibt die Leseschicht spiegelbildlich zu <see cref="ParseableJson" />.
+    /// </summary>
+    public virtual void ParseJson(JsonObject json) {
+        // "type": Klassenkennung, nur formal - der Dispatcher hat sie bereits
+        // zum Konstruieren der richtigen Klasse genutzt.
+        KeyName = json.GetString("key");
+        _enabled = json.GetBool("enabled");
+        _beiExportSichtbar = json.GetBool("print");
+        QuickInfo = json.GetString("quickinfo");
+        Page = json.GetString("page");
+
+        if (json["points"] is JsonArray pts) {
+            foreach (var item in pts) {
+                if (item is not JsonObject po) { continue; }
+                var name = po.GetString("key");
+                if (string.IsNullOrEmpty(name)) { continue; }
+
+                foreach (var thisPoint in MovablePoint) {
+                    if (string.Equals(thisPoint.KeyName, name, StringComparison.Ordinal)) {
+                        thisPoint.ParseJson(po);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (json["jointpoints"] is JsonArray jps) {
+            foreach (var item in jps) {
+                if (item is not JsonObject jo) { continue; }
+                var jp = new PointM(this, string.Empty, 0f, 0f);
+                jp.ParseJson(jo);
+                JointPoints.Add(jp);
+            }
+        }
+
+        if (json["tags"] is JsonArray tags) {
+            Tags.Clear();
+            foreach (var item in tags) {
+                if (item is JsonValue v && v.TryGetValue(out string? s)) { Tags.Add(s ?? string.Empty); }
+            }
+        }
+    }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
@@ -462,78 +541,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             case "tags":
                 Tags.Clear();
                 Tags.AddRange(value.SplitBy("|").FromNonCritical());
-                return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Default-Implementation für <see cref="IJsonParseable" />. Subklassen
-    /// überschreiben diese Methode, rufen <c>base.ParseThisJson</c> auf und
-    /// ergänzen ihre eigenen Keys. So bleibt die Dispatch-Logik zentral.
-    /// </summary>
-    public virtual bool ParseThisJson(string key, JsonElement value) {
-        switch (key) {
-            case "type":
-                // Klassenkennung - nur formal prüfen (wie bei ParseThis("classid"))
-                return value.ValueKind == JsonValueKind.String;
-
-            case "key":
-                KeyName = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "enabled":
-                _enabled = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "print":
-                _beiExportSichtbar = value.ValueKind is JsonValueKind.True or JsonValueKind.False && value.GetBoolean();
-                return true;
-
-            case "quickinfo":
-                QuickInfo = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "page":
-                Page = value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : string.Empty;
-                return true;
-
-            case "points":
-                if (value.ValueKind == JsonValueKind.Array) {
-                    foreach (var item in value.EnumerateArray()) {
-                        if (item.ValueKind != JsonValueKind.Object) { continue; }
-                        var name = item.GetString("name");
-                        if (string.IsNullOrEmpty(name)) { continue; }
-
-                        foreach (var thisPoint in MovablePoint) {
-                            if (string.Equals(thisPoint.KeyName, name, StringComparison.Ordinal)) {
-                                thisPoint.ParseJson(item);
-                                break;
-                            }
-                        }
-                    }
-                }
-                return true;
-
-            case "jointpoints":
-                if (value.ValueKind == JsonValueKind.Array) {
-                    foreach (var item in value.EnumerateArray()) {
-                        if (item.ValueKind != JsonValueKind.Object) { continue; }
-                        var jp = new PointM(this, string.Empty, 0f, 0f);
-                        jp.ParseJson(item);
-                        JointPoints.Add(jp);
-                    }
-                }
-                return true;
-
-            case "tags":
-                Tags.Clear();
-                if (value.ValueKind == JsonValueKind.Array) {
-                    foreach (var item in value.EnumerateArray()) {
-                        if (item.ValueKind == JsonValueKind.String) { Tags.Add(item.GetString() ?? string.Empty); }
-                    }
-                }
                 return true;
         }
 
@@ -702,6 +709,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             foreach (var thisit in e.NewItems) {
                 if (thisit is PointM p) {
                     p.Moved += PointMoved;
+                    p.PropertyChangedExt += SubPoint_PropertyChangedExt;
                 }
             }
         }
@@ -710,6 +718,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             foreach (var thisit in e.OldItems) {
                 if (thisit is PointM p) {
                     p.Moved -= PointMoved;
+                    p.PropertyChangedExt -= SubPoint_PropertyChangedExt;
                 }
             }
         }
@@ -717,10 +726,17 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (e.Action == NotifyCollectionChangedAction.Reset) {
             foreach (var thisit in JointPoints) {
                 thisit.Moved -= PointMoved;
+                thisit.PropertyChangedExt -= SubPoint_PropertyChangedExt;
             }
         }
 
         OnPropertyChanged("JointPoint");
+    }
+
+    private void SubPoint_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
+        if (sender is not PointM p) { return; }
+        var container = JointPoints.Contains(p) ? "JointPoints" : "Points";
+        OnPropertyChangedExt($"{container}[{p.KeyName}].{e.RelativePath}", e.Partial);
     }
 
     #endregion
