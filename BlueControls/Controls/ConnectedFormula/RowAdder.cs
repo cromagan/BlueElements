@@ -115,25 +115,35 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         AbortReason? abr = rowIn.Table is { IsDisposed: false } tb ? tb.ExternalAbortScriptReason : null;
         var scf = sc.Parse(0, "Main", abr);
 
-        if (scf.Failed) {
-            if (Generic.UserGroup == Constants.Administrator) {
-                List<string> l =
-                [
-                    "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                    info,
-                    generatedentityID,
-                    //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                    //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                    //"Tabelle: " + Table.Caption,
-                    " ",
-                    " ",
-                    //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                    " ",
-                    scf.ProtocolText
-                ];
-                l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
+        if (isMenuGeneration && !scf.Failed) {
+            var menu = scf.Variables?.GetList("Menu") ?? [];
+            var infos = scf.Variables?.GetList("Infos") ?? [];
+
+            if (menu.Count == 0 || infos.Count == 0 || menu.Count != infos.Count) {
+                var txt = "Menu und Infos müssen die gleiche Anzahl Einträge > 0 haben";
+                scf = new ScriptEndedFeedback(scf.Variables, txt, true, false, false, txt, null);
             }
         }
+
+        //if (scf.Failed) {
+        //    if (Generic.UserGroup == Constants.Administrator) {
+        //        List<string> l =
+        //        [
+        //            "### ACHTUNG - EINMALIGE ANZEIGE ###",
+        //            info,
+        //            generatedentityID,
+        //            //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+        //            //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+        //            //"Tabelle: " + Table.Caption,
+        //            " ",
+        //            " ",
+        //            //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+        //            " ",
+        //            scf.ProtocolText
+        //        ];
+        //        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
+        //    }
+        //}
 
         return scf;
     }

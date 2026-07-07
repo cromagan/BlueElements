@@ -267,3 +267,7 @@ Fährt man mit der Maus darüber fährt es raus.
 
 ## Aufgabe
 führe Jason.md aus. Beachte: die Zeilennummern können inzwischen anders sein, aber sinngemäß passt die Anforderung noch.
+
+
+## Aufgabe
+FailedReason und Protokoll in ScriptEndedFeedback haben fast den gleichen sinn. Vereinfache, dass nur noch eine Variable vorhanden ist.

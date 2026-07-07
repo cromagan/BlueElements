@@ -409,7 +409,11 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             _finishingParse = false;
         }
 
-        SetLoadedContent(Constants.Win1252.GetBytes(ParseableItems().FinishParseable()));
+        // KEIN SetLoadedContent mit re-serialisierten ParseableItems: das würde
+        // das Lazy-Loaden aller referenzierten Tabellen auslösen. Der Content
+        // wurde bereits vom Dateisystem geladen und ist in _content aktuell —
+        // lediglich die Hashes werden als "gespeichert" markiert.
+        MarkCurrentContentAsLoaded();
     }
 
     public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());

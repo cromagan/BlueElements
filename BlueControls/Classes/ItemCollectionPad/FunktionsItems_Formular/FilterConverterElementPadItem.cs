@@ -149,11 +149,21 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         //    l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
         //}
 
-        //var inr = GetFilterFromGet();
         if (TableOutput is { IsDisposed: false } tb) {
             result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ItemsOf(tb.Column, true)));
             result.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ItemsOf(typeof(FilterTypeRowInputItem))));
-            result.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
+
+            var filterWertFlex = new FlexiControlForProperty<string>(() => Filter_Wert);
+            filterWertFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+            filterWertFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+            filterWertFlex.Height = 24;
+
+            var inr = GetFilterFromGet();
+            if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false } inTable) {
+                filterWertFlex.ListItems = [.. inTable.Column.Where(c => !c.IsDisposed).Select(c => ItemOf($"~{c.KeyName}~"))];
+            }
+
+            result.Add(filterWertFlex);
             result.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
         }
 

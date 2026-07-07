@@ -505,6 +505,29 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     }
 
     /// <summary>
+    /// Synchronisiert die Hashes mit dem aktuell gecachten <c>_content</c>,
+    /// ohne diesen neu zu erzeugen oder zu überschreiben. Im Gegensatz zu
+    /// <see cref="SetLoadedContent"/> wird <c>_content</c> nicht ausgetauscht
+    /// und insbesondere kein Serialisierungs-Aufruf benötigt.
+    /// </summary>
+    /// <remarks>
+    /// Geeignet für Ableitungen, die in <see cref="IParseable.ParseFinished"/>
+    /// eine Re-Serialisierung (zur Normalisierung des Inhalts) vermeiden wollen,
+    /// weil diese unerwünschte Seiteneffekte hätte — etwa das Lazy-Loaden
+    /// abhängiger Dateien. Voraussetzung: <c>_content</c> ist bereits gefüllt
+    /// (z. B. durch den vorherigen Ladevorgang). Ist kein Content vorhanden,
+    /// ist der Aufruf eine No-Op.
+    /// </remarks>
+    protected void MarkCurrentContentAsLoaded() {
+        lock (_lock) {
+            if (_content is null) { return; }
+            _contentHash ??= Generic.GetSHA256HashString(_content);
+            _contentOnDiskHash = _contentHash;
+            _isDirty = false;
+        }
+    }
+
+    /// <summary>
     /// Wird von <see cref="EnsureContentCurrent"/> aufgerufen, wenn der gecachte
     /// Inhalt veraltet ist (<c>_isDirty</c>). Ableitungen serialisieren hier ihr
     /// aktuelles Objektmodell in Bytes. <c>null</c> bedeutet: keine Neugenerierung

@@ -131,9 +131,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             if (feedback.Failed && feedback.NeedsScriptFix) {
                 LastFailedReason = feedback.ProtocolText;
                 LastVariables = feedback.Variables?.ToListVariableString();
-            } else if (!feedback.Failed) {
-                LastFailedReason = string.Empty;
-                LastVariables = null;
             }
             WriteInfosBack();
         }
