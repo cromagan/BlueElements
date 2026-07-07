@@ -100,6 +100,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
+    /// <summary>
+    /// Hook für externe Erweiterungen des Kontextmenüs.
+    /// Wird zu Beginn von <see cref="GetContextMenuItems"/> aufgerufen;
+    /// die gelieferten Einträge werden vor den Standard-Einträgen eingefügt.
+    /// Wird z.B. von <see cref="TextBoxSuggestions"/> genutzt, um die Vorschläge
+    /// in das Kontextmenü der internen TextBox zu transferieren.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<object?, List<AbstractListItem>?>? AdditionalContextMenuItems { get; set; }
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -285,6 +297,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public virtual List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
         AbortSpellChecking();
+
+        if (AdditionalContextMenuItems?.Invoke(hotItem) is { } additional && additional.Count > 0) {
+            contextMenu.AddRange(additional);
+        }
 
         var (markStart, markEnd, word) = GetContextData(hotItem);
 

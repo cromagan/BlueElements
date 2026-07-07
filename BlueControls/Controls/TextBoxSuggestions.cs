@@ -6,6 +6,7 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -42,6 +43,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
         _textBox = new TextBox();
         _textBox.TextChanged += TextBox_TextChanged;
+        _textBox.AdditionalContextMenuItems = BuildSuggestionMenu;
         _textBox.EnterKey += (_, _) => OnEnterKey();
         _textBox.EscKey += (_, _) => OnEscKey();
         _textBox.TabKey += (_, _) => OnTabKey();
@@ -102,18 +104,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.MultiLine = value;
     }
 
-    [DefaultValue(SuggestionPosition.Bottom)]
-    public SuggestionPosition Position {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            _scrollOffset = 0;
-            _layoutDirty = true;
-            Invalidate();
-        }
-    } = SuggestionPosition.Bottom;
-
     public override string QuickInfo {
         get => _textBox.QuickInfo;
         set => _textBox.QuickInfo = value;
@@ -138,6 +128,18 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         get => _textBox.Suffix;
         set => _textBox.Suffix = value;
     }
+
+    [DefaultValue(SuggestionPosition.Bottom)]
+    public SuggestionPosition SuggestionPosition {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            _scrollOffset = 0;
+            _layoutDirty = true;
+            Invalidate();
+        }
+    } = SuggestionPosition.Bottom;
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
     public ReadOnlyCollection<string> Suggestions {
@@ -210,7 +212,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
 
     public int GetEstimatedHeight(int availableWidth, int textboxHeight, int maxChipRows = 3) {
-        if (_chipItems.Count == 0 || textboxHeight < 1) { return textboxHeight; }
+        if (_chipItems.Count == 0 || SuggestionPosition == SuggestionPosition.ContextMenuOnly || textboxHeight < 1) { return textboxHeight; }
 
         var lineH = 0;
         var chipSizes = new List<Size>(_chipItems.Count);
@@ -243,6 +245,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         if (IsDisposed) { return; }
 
         _textBox.TextChanged -= TextBox_TextChanged;
+        _textBox.AdditionalContextMenuItems = null;
 
         if (disposing) {
             EnterKey = null;
@@ -430,6 +433,30 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         _totalContentHeight = rowCount * (lineH + ChipSpacing) - ChipSpacing;
     }
 
+    /// <summary>
+    /// Erstellt die Menü-Einträge für die Vorschläge.
+    /// Liefert null, wenn keine Vorschläge vorhanden sind oder diese als Chips angezeigt werden.
+    /// Bei <see cref="SuggestionPosition.ContextMenuOnly"/> werden die Einträge vom Kontextmenü der internen TextBox eingebunden.
+    /// Wird über den Hook <see cref="TextBox.AdditionalContextMenuItems"/> in das Kontextmenü der TextBox transferiert.
+    /// </summary>
+    private List<AbstractListItem>? BuildSuggestionMenu(object? hotItem) {
+        _ = hotItem;
+        if (_chipItems.Count == 0 || SuggestionPosition != SuggestionPosition.ContextMenuOnly) { return null; }
+
+        var cursorPos = _textBox.CursorPosition;
+        var sugMenu = new List<AbstractListItem> { ItemOf("Vorschläge", true) };
+
+        foreach (var item in _chipItems) {
+            var text = item.ListItem.KeyName;
+            sugMenu.Add(ItemOf(text, null, (s, e) => {
+                _textBox.CursorPosition = _textBox.Insert(cursorPos, text);
+            }, true, string.Empty));
+        }
+
+        sugMenu.Add(Separator());
+        return sugMenu;
+    }
+
     private void CalculateLayout() {
         _chipContentRects.Clear();
         _totalContentHeight = 0;
@@ -441,12 +468,12 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
             return;
         }
 
-        if (_chipItems.Count == 0) {
+        if (_chipItems.Count == 0 || SuggestionPosition == SuggestionPosition.ContextMenuOnly) {
             PositionTextBox(DisplayRectangle);
             return;
         }
 
-        var isHorizontal = Position is SuggestionPosition.Top or SuggestionPosition.Bottom || TextboxSize != Size.Empty;
+        var isHorizontal = SuggestionPosition is SuggestionPosition.Top or SuggestionPosition.Bottom || TextboxSize != Size.Empty;
 
         var lineH = 0;
         var chipSizes = new List<Size>(_chipItems.Count);
@@ -483,7 +510,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
 
         Rectangle tbArea;
-        switch (Position) {
+        switch (SuggestionPosition) {
             case SuggestionPosition.Top: {
                     var areaW = Width - 2 * AreaPadding;
                     BuildChipRects(chipSizes, areaW, lineH, true);
