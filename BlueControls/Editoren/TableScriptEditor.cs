@@ -228,9 +228,22 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         var rowList = rows.OrderBy(r => r.CellFirstString()).ToList();
 
+        var uni = false;
+
+        if (table.Column.First is { } colum) {
+            RowCollection.GetUniques(colum, table.Row.ToList(), out _, out var nichteinzigartig);
+            uni = nichteinzigartig.Count == 0;
+        }
+
         var items = new List<AbstractListItem>();
         foreach (var r in rowList) {
-            items.Add(ItemOf(r.CellFirstString(), r.KeyName, ImageCode.Zeile));
+            var f = r.CellFirstString();
+
+            if (uni) {
+                items.Add(ItemOf(f, f, ImageCode.Zeile));
+            } else {
+                items.Add(ItemOf(f, r.KeyName, ImageCode.Zeile));
+            }
         }
 
         return items;
@@ -238,9 +251,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     /// <summary>
     /// Zeigt ein Dropdown-Menü neben dem übergebenen Control an.
-    /// Wenn <paramref name="totalCount"/> größer als <see cref="MaxDropdownEntries"/> ist,
-    /// wird ein Hinweis "... und X weitere ausgeblendet" angehängt.
-    /// Der KeyName des gewählten Eintrags wird in die Ziel-TextBox geschrieben.
     /// </summary>
     public static FloatingInputBoxListBoxStyle? ShowScriptEditorDropDown(Control anchorControl, List<AbstractListItem> items, string currentValue) {
         if (items.Count == 0) { return null; }
@@ -385,8 +395,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
-                }
             }
+        }
         }
 
         // txbChunk: Wert übernehmen, falls vorhanden. Sonst Feld unverändert lassen.

@@ -155,7 +155,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // txbTestZeile
             // 
-            txbTestZeile.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            txbTestZeile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txbTestZeile.Cursor = Cursors.IBeam;
             txbTestZeile.Location = new Point(128, 16);
             txbTestZeile.Name = "txbTestZeile";
@@ -165,7 +165,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // btnTestZeileDropDown
             // 
-            btnTestZeileDropDown.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnTestZeileDropDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnTestZeileDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
             btnTestZeileDropDown.Location = new Point(236, 16);
             btnTestZeileDropDown.Name = "btnTestZeileDropDown";
