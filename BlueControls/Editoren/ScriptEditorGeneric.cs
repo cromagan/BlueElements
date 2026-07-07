@@ -215,14 +215,12 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     protected virtual void VariablesToSpecialField(JsonObject? data) {
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                string? s = null;
                 if (data is not null
                     && data.TryGetPropertyValue(name.ToUpperInvariant(), out var node)
                     && node is JsonValue v
-                    && v.TryGetValue(out s)) {
-                    // Wert gefunden
+                    && v.TryGetValue(out string? s)) {
+                    flx.Value = s ?? string.Empty;
                 }
-                flx.Value = s ?? string.Empty;
             }
         }
     }
@@ -258,6 +256,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         LastFailedReason = string.Empty;
         LastVariables = null;
         WriteInfosBack();
+        btnAnzeigen_Click(null, System.EventArgs.Empty);
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) {

@@ -58,6 +58,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
             ShowScript();
             UpdateChunkUiState();
+            btnAnzeigen_Click(null, System.EventArgs.Empty);
         }
     }
 
@@ -128,10 +129,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         }
 
         if (!syntaxCheck) {
-            if (feedback.Failed && feedback.NeedsScriptFix) {
-                LastFailedReason = feedback.ProtocolText;
-                LastVariables = feedback.Variables?.ToListVariableString();
-            }
             WriteInfosBack();
         }
 
@@ -184,8 +181,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         base.VariablesToSpecialField(data);
 
         // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
-        // der aktuellen Tabelle existiert. Sonst das Feld leeren.
-        var tzApplied = false;
+        // der aktuellen Tabelle existiert. Sonst Feld unverändert lassen.
         if (data is not null
             && data.TryGetPropertyValue(Constants.KeyTestZeile.ToUpperInvariant(), out var tzNode)
             && tzNode is JsonValue tzv
@@ -195,24 +191,18 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
             if (r is { IsDisposed: false }) {
                 txbTestZeile.Text = tz;
-                tzApplied = true;
             }
         }
-        if (!tzApplied) {
-            txbTestZeile.Text = string.Empty;
-        }
 
-        // txbChunk: Wert übernehmen oder Feld leeren.
+        // txbChunk: Wert übernehmen, falls vorhanden. Sonst Feld unverändert lassen.
         if (data is not null
             && data.TryGetPropertyValue(Constants.KeyChunk.ToUpperInvariant(), out var chNode)
             && chNode is JsonValue chv
             && chv.TryGetValue(out string? ch)) {
             txbChunk.Text = ch ?? string.Empty;
-        } else {
-            txbChunk.Text = string.Empty;
         }
 
-        // scriptNo: gültigen Wert übernehmen oder auf den Standard (2) zurücksetzen.
+        // scriptNo: gültigen Wert übernehmen. Sonst unverändert lassen.
         if (data is not null
             && data.TryGetPropertyValue(Constants.KeyScriptNo.ToUpperInvariant(), out var snNode)
             && snNode is JsonValue snv
@@ -223,10 +213,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
                 scriptNo = sn;
                 ShowScript();
             }
-        } else if (scriptNo != 2) {
-            WriteInfosBack();
-            scriptNo = 2;
-            ShowScript();
         }
     }
 

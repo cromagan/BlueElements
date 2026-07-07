@@ -374,8 +374,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         base.VariablesToSpecialField(data);
 
         // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
-        // der aktuellen Tabelle existiert. Sonst das Feld leeren.
-        var tzApplied = false;
+        // der aktuellen Tabelle existiert. Sonst Feld unverändert lassen.
         if (data is not null && Table is { IsDisposed: false } tb) {
             // Versuche zuerst KeyTestZeile, falls nicht vorhanden oder leer, versuche keyRowKey
             if (!(data.TryGetPropertyValue(KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz) && !string.IsNullOrEmpty(tz))) {
@@ -386,22 +385,16 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
-                    tzApplied = true;
                 }
             }
         }
-        if (!tzApplied) {
-            txbTestZeile.Text = string.Empty;
-        }
 
-        // txbChunk: Wert übernehmen oder Feld leeren.
+        // txbChunk: Wert übernehmen, falls vorhanden. Sonst Feld unverändert lassen.
         if (data is not null
             && data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode)
             && chNode is JsonValue chv
             && chv.TryGetValue(out string? ch)) {
             txbChunk.Text = ch ?? string.Empty;
-        } else {
-            txbChunk.Text = string.Empty;
         }
 
         // chkExtendend: nur behandeln, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
@@ -411,8 +404,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 && exNode is JsonValue exv
                 && exv.TryGetValue(out string? ex)) {
                 chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
-            } else {
-                chkExtendend.Checked = false;
             }
         }
     }

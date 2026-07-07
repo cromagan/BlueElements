@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
@@ -450,6 +451,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         var scf = ExecuteScript(Script_Before, false, Mode, EntityID, rowIn, false, "Before", false, null);
         if (scf.Failed) {
+            SaveProductionErrorIfNeeded(scf);
             Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
             return;
         }
@@ -476,6 +478,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         scf = ExecuteScript(Script_After, false, Mode, EntityID, rowIn, false, "After", false, null);
         if (scf.Failed) {
+            SaveProductionErrorIfNeeded(scf);
             Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
             return;
         }
@@ -506,6 +509,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         var scf = ExecuteScript(Script_MenuGeneration, false, Mode, EntityID, rowIn, true, "MenuGeneration", false, null);
 
         if (scf.Failed) {
+            SaveProductionErrorIfNeeded(scf);
             return "Interner Fehler: Skript Menu Generation fehlerhaft; " + scf.ProtocolText;
         }
 
@@ -544,6 +548,19 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _infos = infos;
 
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Speichert einen Produktions-Skriptfehler ins RowAdderPadItem, damit der Entwickler
+    /// ihn später im Skript-Editor nachvollziehen kann. Nur wenn noch kein Fehler gespeichert ist.
+    /// </summary>
+    private void SaveProductionErrorIfNeeded(ScriptEndedFeedback scf) {
+        if (!scf.Failed || !scf.NeedsScriptFix) { return; }
+        if (GeneratedFrom is not RowAdderPadItem rapi) { return; }
+        if (!string.IsNullOrEmpty(rapi.LastFailedReason)) { return; }
+
+        rapi.LastFailedReason = scf.ProtocolText;
+        rapi.LastSavedVariables = scf.Variables?.ToListVariableString();
     }
 
     #endregion
