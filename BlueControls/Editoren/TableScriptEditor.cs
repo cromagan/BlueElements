@@ -195,7 +195,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     public static List<AbstractListItem> BuildChunkDropdownItems(Table? table) {
         if (table is not TableChunk { IsDisposed: false } tc) { return []; }
 
-        tc.LoadTableRows(false, 100);
+        if (tc.Row.Count < 5) {
+            tc.LoadTableRows(false, 10);
+        }
 
         var chunkValues = tc.Row
             .Where(r => r is { IsDisposed: false } && !string.IsNullOrEmpty(r.ChunkValue))
@@ -395,8 +397,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
+                }
             }
-        }
         }
 
         // txbChunk: Wert übernehmen, falls vorhanden. Sonst Feld unverändert lassen.
