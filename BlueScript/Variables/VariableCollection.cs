@@ -375,7 +375,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// Gibt alle Variabelen Sortiern nach Keyname zurück, die 'ToStringPossible' sind.
     /// </summary>
     /// <returns></returns>
-    public List<Variable> ToListVariableString() {
+    public List<Variable> ToStringableListVariable() {
         var l = new List<Variable>();
 
         foreach (var thiss in _internal.Values.OrderBy(r => r.KeyName)) {

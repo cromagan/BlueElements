@@ -128,7 +128,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
             WriteCommandsToList();
-            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString(), false);
+            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToList(), false);
             return;
         }
 
@@ -138,16 +138,16 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         WriteCommandsToList();
 
         if (f.Failed) {
-            UpdateState(f.ProtocolText, f.Variables?.ToListVariableString(), false);
+            UpdateState(f.ProtocolText, f.Variables?.ToList(), false);
             return;
         }
 
         if (!string.IsNullOrEmpty(f.FailedReason)) {
-            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToListVariableString(), false);
+            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToList(), false);
             return;
         }
 
-        UpdateState("Erfolgreich geprüft.", f.Variables?.ToListVariableString(), false);
+        UpdateState("Erfolgreich geprüft.", f.Variables?.ToList(), false);
     }
 
     public void UpdateState(string txt, List<Variable>? variables, bool updateSpecialFields) {
@@ -156,7 +156,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
 
         if (updateSpecialFields) {
-            VariablesToSpecialField(DummyJson(variables));
+            VariablesToSpecialField(DummyJson(variables), false);
         }
     }
 
@@ -208,11 +208,13 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     /// <summary>
     /// Übernimmt die gespeicherten Feldwerte in die Injektions-Felder
-    /// (<see cref="grpInjectVariables"/>). Fehlt ein Wert in <paramref name="data"/>
-    /// (oder ist <paramref name="data"/> null), wird das entsprechende Feld geleert.
+    /// (<see cref="grpInjectVariables"/>). Ist <paramref name="clearMissing"/> true,
+    /// werden Felder, deren Wert in <paramref name="data"/> fehlt, geleert
+    /// (z.B. beim Laden eines Variablen-Sets). Bei false bleiben sie unverändert
+    /// (z.B. beim Wiederherstellen eines Fehler-Snapshots).
     /// Abgeleitete Klassen überschreiben dies, base aufrufen und besondere Felder befüllen.
     /// </summary>
-    protected virtual void VariablesToSpecialField(JsonObject? data) {
+    protected virtual void VariablesToSpecialField(JsonObject? data, bool clearMissing) {
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
                 if (data is not null
@@ -220,6 +222,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                     && node is JsonValue v
                     && v.TryGetValue(out string? s)) {
                     flx.Value = s ?? string.Empty;
+                } else if (clearMissing) {
+                    flx.Value = string.Empty;
                 }
             }
         }
@@ -408,7 +412,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } data) { return false; }
 
-        VariablesToSpecialField(data);
+        VariablesToSpecialField(data, true);
         return true;
     }
 

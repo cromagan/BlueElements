@@ -12,7 +12,6 @@ using BlueTable.AdditionalScriptVariables;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using static BlueScript.Classes.Script;
 
 namespace BlueControls.Controls;
 
@@ -81,7 +80,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktivPhase, string mode, string entitiId, RowItem rowIn, bool isMenuGeneration, string info, bool syntaxCheck, List<string>? args) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktivPhase, string mode, string entitiId, RowItem rowIn, bool isMenuGeneration, bool syntaxCheck) {
         var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -103,8 +102,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
-        AddAttributes(vars, args ?? []);
-
         var m = Method.GetMethods(MethodType.Sub); // Ja, Sub/Longtime... andere Tabellen müssen geladen werden.
 
         var scp = new ScriptProperties("Row-Adder", m, produktivPhase, [], rowIn, "Row-Adder", "Row-Adder", syntaxCheck);
@@ -113,7 +110,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             ScriptText = scripttext
         };
 
-        AbortReason? abr = rowIn.Table is { IsDisposed: false } tb ? tb.ExternalAbortScriptReason : null;
+        Script.AbortReason? abr = rowIn.Table is { IsDisposed: false } tb ? tb.ExternalAbortScriptReason : null;
         var scf = sc.Parse(0, "Main", abr);
 
         if (isMenuGeneration && !scf.Failed) {
@@ -449,7 +446,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
-        var scf = ExecuteScript(Script_Before, false, Mode, EntityID, rowIn, false, "Before", false, null);
+        var scf = ExecuteScript(Script_Before, false, Mode, EntityID, rowIn, false, false);
         if (scf.Failed) {
             SaveProductionErrorIfNeeded(scf);
             Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
@@ -476,7 +473,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }
 
-        scf = ExecuteScript(Script_After, false, Mode, EntityID, rowIn, false, "After", false, null);
+        scf = ExecuteScript(Script_After, false, Mode, EntityID, rowIn, false, false);
         if (scf.Failed) {
             SaveProductionErrorIfNeeded(scf);
             Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
@@ -506,7 +503,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         _infos = [];
 
-        var scf = ExecuteScript(Script_MenuGeneration, false, Mode, EntityID, rowIn, true, "MenuGeneration", false, null);
+        var scf = ExecuteScript(Script_MenuGeneration, false, Mode, EntityID, rowIn, true, false);
 
         if (scf.Failed) {
             SaveProductionErrorIfNeeded(scf);
@@ -560,7 +557,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         if (!string.IsNullOrEmpty(rapi.LastFailedReason)) { return; }
 
         rapi.LastFailedReason = scf.ProtocolText;
-        rapi.LastSavedVariables = scf.Variables?.ToListVariableString();
+        rapi.LastSavedVariables = scf.Variables?.ToList();
     }
 
     #endregion

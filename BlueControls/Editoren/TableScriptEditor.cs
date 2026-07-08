@@ -178,8 +178,10 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// <summary>
     /// Speicherschlüssel pro Tabelle — alle Skripte einer Tabelle teilen sich die Variablen-Sets,
     /// sodass die Werte unabhängig vom gewählten Skript geladen werden können.
+    /// Der Editor-Typ-Suffix stellt sicher, dass die Sets nicht mit anderen Skript-Editoren
+    /// (z.B. RowAdderScriptEditor) derselben Tabelle kollidieren.
     /// </summary>
-    public override string? VariablesStorageKey => Table?.KeyName;
+    public override string? VariablesStorageKey => Table?.KeyName is { Length: > 0 } k ? k + "|TableScript" : null;
 
     #endregion
 
@@ -382,11 +384,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// übergebenen JsonObject. Fehlt ein Wert in <paramref name="data"/> oder passt er
     /// nicht zum aktuellen Skript-Kontext, wird das entsprechende Feld geleert.
     /// </summary>
-    protected override void VariablesToSpecialField(JsonObject? data) {
-        base.VariablesToSpecialField(data);
+    protected override void VariablesToSpecialField(JsonObject? data, bool clearMissing) {
+        base.VariablesToSpecialField(data, clearMissing);
 
-        // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
-        // der aktuellen Tabelle existiert. Sonst Feld unverändert lassen.
+        // txbTestZeile: übernehmen, wenn ein Wert vorhanden ist UND die Zeile in der
+        // aktuellen Tabelle existiert. Bei clearMissing sonst leeren, sonst unverändert lassen.
+        var testZeileSet = false;
         if (data is not null && Table is { IsDisposed: false } tb) {
             // Versuche zuerst KeyTestZeile, falls nicht vorhanden oder leer, versuche keyRowKey
             if (!(data.TryGetPropertyValue(KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz) && !string.IsNullOrEmpty(tz))) {
@@ -397,16 +400,22 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
+                    testZeileSet = true;
                 }
             }
         }
+        if (!testZeileSet && clearMissing) {
+            txbTestZeile.Text = string.Empty;
+        }
 
-        // txbChunk: Wert übernehmen, falls vorhanden. Sonst Feld unverändert lassen.
+        // txbChunk: übernehmen, falls vorhanden. Bei clearMissing sonst leeren, sonst unverändert lassen.
         if (data is not null
             && data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode)
             && chNode is JsonValue chv
             && chv.TryGetValue(out string? ch)) {
             txbChunk.Text = ch ?? string.Empty;
+        } else if (clearMissing) {
+            txbChunk.Text = string.Empty;
         }
 
         // chkExtendend: nur behandeln, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.

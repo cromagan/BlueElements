@@ -508,7 +508,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return [.. _variables];
         }
         set {
-            var l = value.ToListVariableString();
+            var l = value.ToStringableListVariable();
             foreach (var thisv in l) {
                 thisv.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
             }
@@ -1233,7 +1233,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (tableHeadVariables) {
-            foreach (var thisvar in Variables.ToListVariableString()) {
+            foreach (var thisvar in Variables.ToStringableListVariable()) {
                 var v = new VariableString("TB_" + thisvar.KeyName, thisvar.ValueForCell, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
@@ -1922,7 +1922,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
                 if (string.IsNullOrEmpty(failed)) {
                     failed = scf.ProtocolText;
-                    savedVariables = scf.Variables?.ToListVariableString();
+                    savedVariables = scf.Variables?.ToList();
                 }
             }
         } else {
