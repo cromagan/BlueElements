@@ -109,7 +109,7 @@ public class Method_Row : Method_TableGeneric {
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
+                Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
             if (scp.SyntaxCheck) { return RowToObjectFeedback(null); }

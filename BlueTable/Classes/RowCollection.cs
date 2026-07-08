@@ -143,7 +143,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString(), 0);
+        Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.ReadableText(), 0);
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -847,7 +847,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             nRow.CellSet(sortCol, maxIndex + 1, "SortIndex neue Zeile");
         }
 
-        Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.CellFirstString()}", 0);
+        Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.ReadableText()}", 0);
 
         tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f, false);
 

@@ -230,7 +230,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             rows = TableChunk.RowsOfChunk(tc, chunkId);
         }
 
-        var rowList = rows.OrderBy(r => r.CellFirstString()).ToList();
+        var rowList = rows.OrderBy(r => r.ReadableText()).ToList();
 
         var uni = false;
 
@@ -241,12 +241,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         var items = new List<AbstractListItem>();
         foreach (var r in rowList) {
-            var f = r.CellFirstString();
+            var caption = r.ReadableText();
 
             if (uni) {
-                items.Add(ItemOf(f, f, ImageCode.Zeile));
+                items.Add(ItemOf(caption, r.CellFirstString(), ImageCode.Zeile));
             } else {
-                items.Add(ItemOf(f, r.KeyName, ImageCode.Zeile));
+                items.Add(ItemOf(caption, r.KeyName, ImageCode.Zeile));
             }
         }
 

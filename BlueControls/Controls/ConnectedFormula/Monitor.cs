@@ -46,7 +46,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
             lstDone.ItemClear();
 
             if (field is not null) {
-                capInfo.Text = "Überwache: " + field.CellFirstString();
+                capInfo.Text = "Überwache: " + field.ReadableText();
                 // Simuliere eine Start-Meldung
                 _lastRow_DropMessage(ErrorType.Info, ImageCode.Monitor, "Überwachung gestartet");
             }

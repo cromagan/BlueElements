@@ -399,7 +399,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (r[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
         if (r.Count == 1) {
-            if (Forms.MessageBox.Show($"Zeile wirklich löschen? (<b>{r[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+            if (Forms.MessageBox.Show($"Zeile wirklich löschen? (<b>{r[0].ReadableText()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         } else {
             if (Forms.MessageBox.Show($"{r.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         }
@@ -2210,7 +2210,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var all = rows.Count;
         var c = 0;
         while (rows.Count > 0) {
-            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].CellFirstString()}", 0);
+            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].ReadableText()}", 0);
 
             _pg?.Update(c++);
             Develop.DoEvents();

@@ -13,7 +13,7 @@ public class RowPrepareFormulaEventArgs : RowEventArgs {
         PrepareFormulaFeedback = prepareFormulaFeedback;
         RowColor = rowcolor;
         Message = string.Empty;
-        Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
+        Message = "<b><u>" + row.ReadableText() + "</b></u><br><br>" + message;
     }
 
     #endregion

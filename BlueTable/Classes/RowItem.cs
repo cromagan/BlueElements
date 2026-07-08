@@ -11,7 +11,7 @@ using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText {
 
     #region Fields
 
@@ -457,7 +457,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
-                                   tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
+                                       tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
     public string LastFailedReason() {
         if (IsDisposed || !RowCollection.FailedRows.TryGetValue(this, out var txt)) { return string.Empty; }
@@ -609,6 +609,42 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
+    /// Liefert einen lesbaren Text für die Zeile. Versucht die Quellen in dieser Reihenfolge:
+    /// 1. ZeilenInfo (RowQuickInfo)
+    /// 2. Größte Unique-Definition
+    /// 3. CellFirstString (Fallback)
+    /// </summary>
+    public string ReadableText() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        // 1. ZeilenInfo
+        if (tb.RowQuickInfo is { Length: > 0 } && GetQuickInfo() is { Length: > 0 } qi) { return qi; }
+
+        // 2. Größte Unique-Definition
+        if (tb.UniqueValues is { Count: > 0 }) {
+            var largest = tb.UniqueValues
+                .Where(u => u.KeyColumns.Count > 0)
+                .OrderByDescending(u => u.KeyColumns.Count)
+                .FirstOrDefault();
+
+            if (largest is { KeyColumns: { Count: > 0 } cols }) {
+                var sb = new StringBuilder();
+                foreach (var c in cols) {
+                    if (c is not { IsDisposed: false }) { continue; }
+                    if (CellGetString(c) is { Length: > 0 } v) {
+                        if (sb.Length > 0) { sb.Append(' '); }
+                        sb.Append(v);
+                    }
+                }
+                if (sb.Length > 0) { return sb.ToString(); }
+            }
+        }
+
+        // 3. CellFirstString
+        return CellFirstString();
+    }
+
+    /// <summary>
     ///
     /// </summary>
     /// <returns>Empty, wenn alles in Ordung ist. Ansonten ein Grund.</returns>
@@ -712,6 +748,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         return resultBuilder.ToString();
     }
+
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
@@ -869,7 +907,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (IsDisposed ||  column?.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || column?.Table is not { IsDisposed: false } tb) { return; }
 
         if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
         if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }

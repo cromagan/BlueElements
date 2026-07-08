@@ -29,9 +29,7 @@ public class RowFormulaListItem : AbstractListItem {
         _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
 
-        QuickInfo = !string.IsNullOrEmpty(row.Table?.RowQuickInfo)
-                   ? _row.GetQuickInfo().CreateHtmlCodes()
-                   : _row.CellFirstString().CreateHtmlCodes();
+        QuickInfo = _row.ReadableText().CreateHtmlCodes();
     }
 
     /// <summary>

@@ -35,7 +35,7 @@ public class VariableRowItem : Variable {
     public override bool IsNullOrEmpty => _row is not { IsDisposed: false };
 
     /// <summary>
-    /// Gibt den Text "Row: CellFirstString" zurück.
+    /// Gibt den Text "Row: ReadableText" zurück.
     /// </summary>
     public override string ReadableText => _lastText;
 
@@ -108,7 +108,7 @@ public class VariableRowItem : Variable {
         return false;
     }
 
-    private void GetText() => _lastText = _row is not { IsDisposed: false } ? "Row: [NULL]" : "Row: " + _row.CellFirstString();
+    private void GetText() => _lastText = _row is not { IsDisposed: false } ? "Row: [NULL]" : "Row: " + _row.ReadableText();
 
     #endregion
 }

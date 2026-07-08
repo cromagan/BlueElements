@@ -46,7 +46,7 @@ public class Method_CallRow : Method_TableGeneric {
 
         var scx = row.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, row, a, false, true, 0, scp.SyntaxCheck);
         if (scx is null || scx.Failed) {
-            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
+            return new DoItFeedback($"'{vs}' bei  '{row.ReadableText()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

@@ -39,7 +39,7 @@ public class Method_CallFilter : Method_TableGeneric {
             if (thisR is { IsDisposed: false }) {
                 var scx = thisR.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, thisR, a, false, true, 0, scp.SyntaxCheck);
                 if (scx is null || scx.Failed) {
-                    return new DoItFeedback($"'Subroutinen-Aufruf [{vs}]' bei Zeile '{thisR.CellFirstString()}' abgebrochen:\r\n{scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
+                    return new DoItFeedback($"'Subroutinen-Aufruf [{vs}]' bei Zeile '{thisR.ReadableText()}' abgebrochen:\r\n{scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
                 }
             }
         }
