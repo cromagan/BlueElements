@@ -310,3 +310,26 @@ Alle json Keys in kleinschreibung.  Oder was ist Stand der Dinge?
 ### Verifikation
 - JSON-Speichern → Laden → Alle Filter-Pfeile, Tabellen, Captions und Klasseneinstellungen müssen erhalten bleiben.
 - Vergleich: ALT-Format (`.cfo`) vs. JSON-Pfad müssen zum gleichen Zustand führen.
+
+## Aufgabe
+Syntaxcheck, Filter werden nicht in der Variabelübersicht angezeigt
+ 
+## Aufgabe
+Gespeicherte Variabelnsets in Skript-Editoren müssen für jeden Editor unterschiedlich sein. Aktuell werden im Sternchen Menu alle jemals gespeicherten Sets in jedem Script-Editor angezeigt
+
+## Aufgabe
+Zeilen haben ab und keinen CellFirstString.
+Versuche Alle CellFirstString in Items zu elemnieren und ersetze es in ReadableText.
+Nutze dazu die Quellen in der Reihenfolge:
+- ZeilenInfo
+- Größte Row Unique Definitoim
+- CellFirstString
+
+## Aufgabe
+Wird ein Variablenset geladen, sollen nicht vorhandene Fehler geleert werden.
+
+## Aufgabe
+RowAdderScript darf kein Attribut 0 - 9 haben.
+
+## Aufgabe
+ConnectedFormula haben ein Speicherproblem: ab und zu kann die Datei nicht mehr gelesen werden
