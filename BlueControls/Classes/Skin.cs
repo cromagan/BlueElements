@@ -266,7 +266,7 @@ public static class Skin {
 
         try {
             var pSize = SizeF.Empty;
-            if (qi is not null) { pSize = ((Bitmap)qi).Size; }
+            if (qi is not null) { pSize = new SizeF(qi.Width, qi.Height); }
 
             if (LanguageTool.Translation is not null) { txt = LanguageTool.DoTranslate(txt, translate); }
 
@@ -297,12 +297,17 @@ public static class Skin {
                     if (qi is not null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
                 } else {
                     var c = BackgroundFill.DeleteBackBrush;
-                    if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
-                    if (qi is not null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
+                    lock (c) {
+                        if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
+                        if (qi is not null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
+                    }
                 }
             }
 
-            if (qi is not null) { gr.DrawImageUnscaled(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
+            if (qi is not null) {
+                var img = (Bitmap)qi;
+                lock (img) { gr.DrawImageUnscaled(img, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
+            }
             if (!string.IsNullOrEmpty(txt)) { bFont?.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
             // Bitmap oder Graphics wird reentrant verwendet (WinForms Reentrancy)

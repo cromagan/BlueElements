@@ -27,9 +27,12 @@ public static partial class Extensions {
 
     public static Bitmap CloneFromBitmap(this Bitmap sourceBmp) {
         try {
-            var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height);
-            using var gr = Graphics.FromImage(bmp);
-            gr.DrawImageUnscaled(sourceBmp, 0, 0);
+            Bitmap bmp;
+            lock (sourceBmp) {
+                bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height);
+                using var gr = Graphics.FromImage(bmp);
+                gr.DrawImageUnscaled(sourceBmp, 0, 0);
+            }
             return bmp;
         } catch {
             Develop.AbortAppIfStackOverflow();

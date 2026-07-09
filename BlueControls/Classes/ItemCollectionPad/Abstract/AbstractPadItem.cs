@@ -289,17 +289,18 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     var bp = BorderDraw.GetPen(Color.Gray, zoom);
                     lock (bp) { gr.DrawRectangle(bp, positionControl); }
                 } else {
-                    gr.DrawRectangle(ZoomPad.PenGray, positionControl);
+                    lock (ZoomPad.PenGray) { gr.DrawRectangle(ZoomPad.PenGray, positionControl); }
                 }
 
                 if (positionControl is { Width: < 1, Height: < 1 }) {
-                    gr.DrawEllipse(TinyItemPen, positionControl.Left - 5, positionControl.Top - 5, 10, 10);
-                    gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right));
+                    lock (TinyItemPen) { gr.DrawEllipse(TinyItemPen, positionControl.Left - 5, positionControl.Top - 5, 10, 10); }
+                    lock (ZoomPad.PenGray) { gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right)); }
                 }
 
                 if (!_beiExportSichtbar) {
                     var q = QuickImage.Get("Drucker|16||1");
-                    gr.DrawImageUnscaled(q, positionControl.X, positionControl.Y);
+                    var qBmp = (Bitmap)q;
+                    lock (qBmp) { gr.DrawImageUnscaled(qBmp, positionControl.X, positionControl.Y); }
                 }
 
                 if (this is IErrorCheckable iec) {
@@ -308,7 +309,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     if (!string.IsNullOrEmpty(r)) {
                         lock (RedStripesBrush) { gr.FillRectangle(RedStripesBrush, positionControl); }
                         var q = QuickImage.Get("Kritisch|32||1");
-                        gr.DrawImageUnscaled(q, positionControl.X, positionControl.Y);
+                        var qBmp = (Bitmap)q;
+                        lock (qBmp) { gr.DrawImageUnscaled(qBmp, positionControl.X, positionControl.Y); }
                     }
                 }
                 //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionControl); }

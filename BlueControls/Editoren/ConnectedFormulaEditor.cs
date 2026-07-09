@@ -63,30 +63,26 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
-            if (value is not null && value.AcquireWriteAccess() is { Length: > 0 }) { value = null; }
 
             if (field == value) { return; }
 
             if (field is not null) {
                 field.Editing -= _cFormula_Editing;
+                field.Invalidated -= Formula_Invalidated;
+                field.BlockStatusChanged -= Formula_BlockStatusChanged;
 
                 field.RevokeWriteAccess();
             }
 
             field = value;
 
-            field?.Editing += _cFormula_Editing;
-
-            if (field?.Pages is { IsDisposed: false } pg) {
-                foreach (var thisp in pg) {
-                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
-                        Pad.Items = icpi;
-                        break;
-                    }
-                }
-            } else {
-                Pad.Items = null;
+            if (field is not null) {
+                field.Editing += _cFormula_Editing;
+                field.Invalidated += Formula_Invalidated;
+                field.BlockStatusChanged += Formula_BlockStatusChanged;
             }
+
+            UpdateFromFormula();
         }
     }
 
@@ -448,17 +444,102 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         //    Formula.NotAllowedChilds = l.AsReadOnly();
         //}
+    }
 
+    private void UpdateFromFormula() {
+        if (Formula is not { IsDisposed: false }) {
+            Pad.Items = null;
+            NotEditableReason = string.Empty;
+            return;
+        }
+
+        ShowPage(null);
+
+        // ConnectedFormula ist eine BlockableFile: Schreibzugriff versuchen.
+        // Gelingt es nicht (Sperre durch einen anderen Benutzer), wird das
+        // Formular trotzdem geladen - nur schreibgeschützt.
+        NotEditableReason = Formula.AcquireWriteAccess();
+    }
+
+    /// <summary>
+    /// Zeigt die gewünschte Seite im Pad an. Ist <paramref name="preferredCaption"/>
+    /// leer oder nicht vorhanden, wird die Head-Seite gewählt.
+    /// </summary>
+    private void ShowPage(string? preferredCaption) {
         if (Formula?.Pages is { IsDisposed: false } pg) {
+            if (!string.IsNullOrEmpty(preferredCaption)) {
+                foreach (var thisp in pg) {
+                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.Caption == preferredCaption) {
+                        Pad.Items = icpi;
+                        return;
+                    }
+                }
+            }
+
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
                     Pad.Items = icpi;
-                    break;
+                    return;
                 }
             }
-        } else {
-            Pad.Items = null;
         }
+
+        Pad.Items = null;
+    }
+
+    /// <summary>
+    /// Setzt beim Schreibschutz alle Bearbeitungs-Controls (Komponenten hinzufügen,
+    /// Arbeitsbereich etc.) außer Kraft. Datei- und Ansichts-Aktionen bleiben aktiv.
+    /// </summary>
+    protected override void OnNotEditableReasonChanged() {
+        base.OnNotEditableReasonChanged();
+        UpdateEditingControlsEnabled();
+    }
+
+    private void UpdateEditingControlsEnabled() {
+        var editable = Formula is not null && string.IsNullOrEmpty(NotEditableReason);
+
+        grpFelder.Enabled = editable;
+        grpOptik.Enabled = editable;
+        groupBox1.Enabled = editable;
+        grpAllgemein.Enabled = editable;
+    }
+
+    /// <summary>
+    /// Reagiert auf <see cref="BlockableFile.BlockStatusChanged"/> (Polling-Thread):
+    /// Status auf dem UI-Thread neu auswerten und Lock ggf. übernehmen.
+    /// </summary>
+    private void Formula_BlockStatusChanged(object? sender, System.EventArgs e) {
+        if (IsHandleCreated) { BeginInvoke(new Action(OnBlockStatusChanged)); }
+    }
+
+    private void OnBlockStatusChanged() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Formula is not { IsDisposed: false } cf) { return; }
+
+        // Sperrstatus neu ermitteln; ist die Datei frei, wird der Schreibzugriff
+        // hier übernommen (NotEditableReason wird leer).
+        NotEditableReason = cf.AcquireWriteAccess();
+    }
+
+    /// <summary>
+    /// Reagiert auf <see cref="BlockableFile.Invalidated"/> (Polling-Thread):
+    /// Im schreibgeschützten Modus die Datei neu anzeigen, damit Änderungen
+    /// anderer Benutzer sichtbar werden.
+    /// </summary>
+    private void Formula_Invalidated(object? sender, System.EventArgs e) {
+        if (IsHandleCreated) { BeginInvoke(new Action(OnInvalidated)); }
+    }
+
+    private void OnInvalidated() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Formula is not { IsDisposed: false }) { return; }
+
+        // Nur im schreibgeschützten Modus neu laden. Im editierbaren Modus hält
+        // der Editor den Schreibzugriff und wird vom Polling nicht invalidiert.
+        if (string.IsNullOrEmpty(NotEditableReason)) { return; }
+
+        ShowPage(Pad?.Items?.Caption);
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
@@ -485,11 +566,12 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
     private void lstPages_AddClicked(object sender, AddItemEventArgs e) {
-        if (Formula is not { IsDisposed: false } cf) { return; }
-        if (cf.Pages is not { IsDisposed: false }) { return; }
-
         // Auto-Erstellung eines TextItems unterbinden - die Page wird hier angelegt.
         e.Cancel = true;
+
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
+        if (Formula is not { IsDisposed: false } cf) { return; }
+        if (cf.Pages is not { IsDisposed: false }) { return; }
 
         if (string.IsNullOrWhiteSpace(e.Text)) { return; }
 

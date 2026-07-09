@@ -102,6 +102,12 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     private volatile bool _hasWriteAccess;
 
     /// <summary>
+    /// Zuletzt festgestellte Blocker-Meldung. Dient dem Polling dazu, Änderungen
+    /// des Sperrstatus zu erkennen und <see cref="BlockStatusChanged"/> zu werfen.
+    /// </summary>
+    private string _lastBlockerMessage = string.Empty;
+
+    /// <summary>
     /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
     /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
     /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
@@ -145,6 +151,21 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Ereignis, das nach erfolgreichem Speichern ausgelöst wird.
     /// </summary>
     public event EventHandler? Saved;
+
+    /// <summary>
+    /// Ereignis, das ausgelöst wird, wenn der gecachte Inhalt invalidiert wurde
+    /// (z. B. weil die Datei auf der Festplatte geändert wurde). Abonnenten können
+    /// daraufhin die Daten neu laden bzw. erneut anzeigen.
+    /// </summary>
+    public event EventHandler? Invalidated;
+
+    /// <summary>
+    /// Ereignis, das ausgelöst wird, wenn sich der Multi-User-Sperrstatus
+    /// (Blockdatei) geändert hat - etwa weil ein anderer Benutzer die Sperre
+    /// übernommen oder freigegeben hat. Abonnenten ermitteln den aktuellen
+    /// Status über <see cref="BlockerMessage"/> bzw. <see cref="AcquireWriteAccess"/>.
+    /// </summary>
+    public event EventHandler? BlockStatusChanged;
 
     #endregion
 
@@ -440,6 +461,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
         Loaded = null;
         Saved = null;
+        Invalidated = null;
+        BlockStatusChanged = null;
 
         Invalidate();
 
@@ -483,6 +506,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             _contentOnDiskHash = null;
             _isDirty = false;
         }
+
+        Invalidated?.Invoke(this, System.EventArgs.Empty);
     }
 
     /// <summary>
@@ -799,7 +824,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// <summary>
     /// Wird vom Polling-Timer alle <see cref="PollingIntervalMinutes"/> Minuten aufgerufen.
     /// Prüft alle registrierten Dateien auf externe Änderungen und invalidiert
-    /// veraltete Instanzen. Dateien mit aktivem Schreibzugriff werden übersprungen.
+    /// veraltete Instanzen. Dateien mit aktivem Schreibzugriff werden beim
+    /// Invalidieren übersprungen, der Sperrstatus wird dennoch geprüft.
     /// </summary>
     private static void OnPollingTick(object? state) {
         foreach (var kvp in _registeredFiles) {
@@ -810,6 +836,13 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 continue;
             }
 
+            // Sperrstatus für alle Dateien prüfen - auch für eigene
+            // Schreibzugriffe -, damit eine Übernahme durch andere Benutzer
+            // erkannt wird.
+            file.CheckBlockStatus();
+
+            // Dateien mit eigenem Schreibzugriff nicht invalidieren:
+            // ungespeicherte Änderungen würden sonst verworfen.
             if (file._hasWriteAccess) { continue; }
 
             try {
@@ -818,6 +851,17 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
                 }
             } catch { }
         }
+    }
+
+    /// <summary>
+    /// Ermittelt den aktuellen Sperrstatus und wirft <see cref="BlockStatusChanged"/>,
+    /// wenn er sich seit der letzten Prüfung geändert hat.
+    /// </summary>
+    private void CheckBlockStatus() {
+        var current = BlockerMessage();
+        if (current == _lastBlockerMessage) { return; }
+        _lastBlockerMessage = current;
+        BlockStatusChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     /// <summary>

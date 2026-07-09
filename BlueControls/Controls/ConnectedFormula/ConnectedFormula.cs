@@ -113,6 +113,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             if (IsDisposed) { value = null; }
             if (field == value) { return; }
             field?.PropertyChangedExt -= Pages_PropertyChangedExt;
+            field?.PropertyChanged -= Pages_PropertyChanged;
 
             field = value;
             if (IsDisposed) { return; }
@@ -120,6 +121,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             if (field is not null) {
                 field.Parent = this;
                 field.PropertyChangedExt += Pages_PropertyChangedExt;
+                field.PropertyChanged += Pages_PropertyChanged;
             }
 
             OnPropertyChanged();
@@ -554,6 +556,11 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         return e.Editing;
     }
 
+    protected override byte[]? BuildContent() {
+        if (!IsParsed || IsDisposed) { return null; }
+        return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
+    }
+
     /// <summary>
     /// Ruft das Editing-Ereignis auf.
     /// </summary>
@@ -563,10 +570,15 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
     /// Der Inhalt wird NICHT sofort neu serialisiert, sondern erst beim nächsten
     /// Speichern über <see cref="BuildContent"/>.
+    /// Ist die Datei durch einen anderen Prozess gesperrt (<see cref="BlockerMessage"/>),
+    /// werden die Änderungen im Speicher übernommen, aber NICHT als Dirty markiert
+    /// und kein Schreibzugriff versucht. Standard-Reparaturen (z.B. ShowAlways im
+    /// Editor) sind nicht speicherrelevant.
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading || _finishingParse || !IsParsed) { return; }
+        if (BlockerMessage() is { Length: > 0 }) { return; }
 
         if (AcquireWriteAccess() is { Length: > 0 } f) {
             Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})! {f}");
@@ -578,9 +590,9 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected override byte[]? BuildContent() {
-        if (!IsParsed || IsDisposed) { return null; }
-        return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
+    private void Pages_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        OnPropertyChanged(e.PropertyName ?? "unknown");
     }
 
     private void Pages_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {

@@ -27,7 +27,33 @@ public partial class PadEditor : FormWithStatusBar {
 
     #endregion
 
+    #region Properties
+
+    /// <summary>
+    /// Ungleich leer: Das Pad ist schreibgeschützt und der Text wird als
+    /// Hinweis über allen Items im <see cref="CreativePad"/> eingeblendet.
+    /// Jegliche Bearbeitung wird unterbunden. Zoom und Verschieben bleiben möglich.
+    /// </summary>
+    public string NotEditableReason {
+        get;
+        set {
+            value ??= string.Empty;
+            if (field == value) { return; }
+            field = value;
+            if (Pad is { IsDisposed: false }) { Pad.NotEditableReason = value; }
+            OnNotEditableReasonChanged();
+        }
+    } = string.Empty;
+
+    #endregion
+
     #region Methods
+
+    /// <summary>
+    /// Wird aufgerufen, nachdem sich <see cref="NotEditableReason"/> geändert hat.
+    /// Ableitungen können hier z.B. Bearbeitungs-Buttons (de)aktivieren.
+    /// </summary>
+    protected virtual void OnNotEditableReasonChanged() { }
 
     protected virtual void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
         Pad.LastClickedItem?.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;

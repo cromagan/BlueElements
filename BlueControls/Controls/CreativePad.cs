@@ -153,6 +153,22 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Ungleich leer: Das Pad ist schreibgeschützt. Der Text wird als Hinweis
+    /// über allen Items eingeblendet und jegliche Bearbeitung (Maus, Tastatur,
+    /// Kontextmenü) wird unterbunden. Zoom und Verschieben bleiben möglich.
+    /// </summary>
+    public string NotEditableReason {
+        get;
+        set {
+            value ??= string.Empty;
+            if (field == value) { return; }
+            field = value;
+            if (!string.IsNullOrEmpty(value)) { Unselect(); }
+            Invalidate();
+        }
+    } = string.Empty;
+
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 
@@ -175,6 +191,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return null; }
+
         List<AbstractListItem> contextMenu = [];
 
         if (hotItem is AbstractPadItem bpi) {
@@ -324,6 +342,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         DrawCreativePadItems(gr, controla);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
+
+        if (!string.IsNullOrEmpty(NotEditableReason)) {
+            DrawNotEditableOverlay(gr, controla);
+        }
     }
 
     protected virtual void DrawCreativePadItems(Graphics gr, Rectangle drawArea) {
@@ -362,6 +384,33 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #endregion
     }
 
+    private void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea) {
+        // Halbtransparenter Schleier signalisiert die Schreibsperre,
+        // lässt die Items darunter aber erkennbar.
+        using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
+        gr.FillRectangle(veil, drawArea);
+
+        // Banner oben mittig, über allen Items.
+        var bannerWidth = Math.Min(drawArea.Width - 20, 600);
+        var bannerRect = new Rectangle(
+            drawArea.X + ((drawArea.Width - bannerWidth) / 2),
+            drawArea.Y + 10,
+            bannerWidth,
+            70);
+
+        using var bg = new SolidBrush(Color.FromArgb(235, 255, 243, 205));
+        gr.FillRectangle(bg, bannerRect);
+        using var borderPen = new Pen(Color.FromArgb(180, 150, 40, 40), 2f);
+        gr.DrawRectangle(borderPen, bannerRect);
+
+        var qi = QuickImage.Get(ImageCode.Warnung, 24);
+        var reasonFont = BlueFont.Get("Arial", 13f, true, false, false, false,
+                                      Color.FromArgb(150, 40, 40), Color.Transparent, Color.Transparent);
+
+        Skin.Draw_FormatedText(gr, "Schreibgeschützt: " + NotEditableReason, qi,
+            Alignment.Top_HorizontalCenter, bannerRect, reasonFont, false);
+    }
+
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e is null || Items is null) { return null; }
 
@@ -390,6 +439,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         base.OnKeyUp(e);
         if (_items is null) { return; }
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
 
         var parentCollection = ParentCollectionOfSelectedItems();
         if (parentCollection is null) { return; }
@@ -434,6 +484,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
 
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
+
         QuickInfo = string.Empty;
 
         if (e.Button == System.Windows.Forms.MouseButtons.Left) {
@@ -468,6 +520,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
 
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
+
         var it = GetHotItem(e, false, true);
 
         if (e.Button == System.Windows.Forms.MouseButtons.None && it is AbstractPadItem bpi) {
@@ -487,6 +541,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         base.OnMouseUp(e);
+
+        if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
 
         switch (e.Button) {
             case System.Windows.Forms.MouseButtons.Left:
