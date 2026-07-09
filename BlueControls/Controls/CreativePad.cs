@@ -390,25 +390,53 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
         gr.FillRectangle(veil, drawArea);
 
-        // Banner oben mittig, über allen Items.
+        var reasonFont = BlueFont.Get("Arial", 13f, true, false, false, false,
+                                      Color.FromArgb(150, 40, 40), Color.Transparent, Color.Transparent);
+
+        var qi = QuickImage.Get(ImageCode.Warnung, 24);
+        var iconSize = new SizeF(qi.Width, qi.Height);
+
+        const int padding = 12;
         var bannerWidth = Math.Min(drawArea.Width - 20, 600);
+        var textMaxWidth = bannerWidth - (2 * padding) - iconSize.Width - 6;
+        if (textMaxWidth < 50) { textMaxWidth = 50; }
+
+        // Lange Begründungen umbrechen statt abschneiden, damit nichts
+        // abgeschnitten und einzeilig dargestellt wird.
+        var lines = BlueFont.SplitByWidth(reasonFont, "Schreibgeschützt: " + NotEditableReason,
+                                          textMaxWidth, 5);
+
+        var lineHeight = reasonFont.MeasureString("Xy").Height;
+        const float lineGap = 2f;
+        var textHeight = (lines.Count * lineHeight) + ((lines.Count - 1) * lineGap);
+        var contentHeight = Math.Max(iconSize.Height, textHeight);
+        var bannerHeight = (int)(contentHeight + (2 * padding));
+
+        // Banner oben mittig, über allen Items.
         var bannerRect = new Rectangle(
             drawArea.X + ((drawArea.Width - bannerWidth) / 2),
             drawArea.Y + 10,
             bannerWidth,
-            70);
+            bannerHeight);
 
         using var bg = new SolidBrush(Color.FromArgb(235, 255, 243, 205));
         gr.FillRectangle(bg, bannerRect);
         using var borderPen = new Pen(Color.FromArgb(180, 150, 40, 40), 2f);
         gr.DrawRectangle(borderPen, bannerRect);
 
-        var qi = QuickImage.Get(ImageCode.Warnung, 24);
-        var reasonFont = BlueFont.Get("Arial", 13f, true, false, false, false,
-                                      Color.FromArgb(150, 40, 40), Color.Transparent, Color.Transparent);
+        var contentTop = bannerRect.Y + ((bannerHeight - contentHeight) / 2f);
+        var iconX = bannerRect.X + padding;
+        var iconY = contentTop + ((contentHeight - iconSize.Height) / 2f);
 
-        Skin.Draw_FormatedText(gr, "Schreibgeschützt: " + NotEditableReason, qi,
-            Alignment.Top_HorizontalCenter, bannerRect, reasonFont, false);
+        var img = (Bitmap)qi;
+        lock (img) { gr.DrawImageUnscaled(img, iconX, (int)iconY); }
+
+        var textX = iconX + iconSize.Width + 6;
+        var textY = contentTop + ((contentHeight - textHeight) / 2f);
+        foreach (var line in lines) {
+            reasonFont.DrawString(gr, line, textX, textY);
+            textY += lineHeight + lineGap;
+        }
     }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
