@@ -24,7 +24,7 @@ public class Method_FilterFirstValue : Method_TableGeneric {
         if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
-            return new DoItFeedback("Tabellefehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true, ld);
         }
 
         var r = allFi.Rows;

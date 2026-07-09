@@ -26,9 +26,6 @@ internal class Method_IsNullOrEmpty : Method {
                 return DoItFeedback.AttributFehler(infos.LogData, attvar);
             }
 
-            // Während des SyntaxChecks die fehlende Variable als Dummy registrieren,
-            // damit nachfolgender Code innerhalb eines Bodies validierbar bleibt.
-            RegisterSyntaxCheckDummyVariable(varCol, scp, infos.AttributText);
             return DoItFeedback.Wahr();
         }
 

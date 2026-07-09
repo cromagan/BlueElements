@@ -27,7 +27,7 @@ internal class Method_ImportCsv : Method_TableGeneric {
         var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
+        
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 

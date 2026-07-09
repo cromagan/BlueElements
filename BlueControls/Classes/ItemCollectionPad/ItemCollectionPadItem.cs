@@ -921,7 +921,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
         if (row?.Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
-        var script = tb.ExecuteScript(ScriptEventTypes.export, string.Empty, true, row, null, true, false, 0, false);
+        var script = tb.ExecuteScript(ScriptEventTypes.export, string.Empty, true, row, null, true, false, 0);
         if (script.Failed) { return script; }
 
         this.ParseVariables(script.Variables);

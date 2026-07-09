@@ -31,7 +31,6 @@ internal class Method_MoveFile : Method {
 
         if (FileExists(dep)) { return DoItFeedback.Falsch(); }
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveFile(sop, dep, false)) {

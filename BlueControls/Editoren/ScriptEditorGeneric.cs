@@ -90,7 +90,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Methods
 
-    public virtual ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) => new("Fehler", false, false, "Unbekannt");
+    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
@@ -123,17 +123,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public void TesteScript(bool testmode) {
         UpdateState("Starte Skript", null, false);
 
-        // Schritt 1: Syntaxprüfung - alle Befehle durchrechnen, keine echten Operationen
-        var syntaxResult = ExecuteScript(true, true);
-
-        if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
-            WriteCommandsToList();
-            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToList(), false);
-            return;
-        }
-
-        // Schritt 2: Richtige Ausführung
-        var f = ExecuteScript(testmode, false);
+        var f = ExecuteScript(testmode);
 
         WriteCommandsToList();
 

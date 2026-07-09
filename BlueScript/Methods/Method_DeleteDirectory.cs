@@ -29,8 +29,6 @@ internal class Method_DeleteDirectory : Method {
             return DoItFeedback.Wahr();
         }
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
-
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         try {

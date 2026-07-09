@@ -2,7 +2,6 @@
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Element : Method {
 
     #region Properties
@@ -26,9 +25,7 @@ internal class Method_Element : Method {
             return new DoItFeedback(list[i]);
         }
 
-        return scp.SyntaxCheck
-            ? new DoItFeedback(string.Empty)
-            : new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld);
+        return new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld);
     }
 
     #endregion

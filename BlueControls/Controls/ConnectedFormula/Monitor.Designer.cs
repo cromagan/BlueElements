@@ -17,7 +17,7 @@ namespace BlueControls.Controls
         private void InitializeComponent()
         {
             this.capInfo = new Caption();
-            this.lstDone = new ListBox();
+            this.lstDone = new ListBoxCore();
             this.SuspendLayout();
             // 
             // capInfo
@@ -30,7 +30,6 @@ namespace BlueControls.Controls
             // 
             // lstDone
             // 
-            this.lstDone.AddAllowed = AddType.None;
             this.lstDone.AutoSort = true;
             this.lstDone.Dock = DockStyle.Fill;
             this.lstDone.Location = new Point(0, 24);
@@ -49,6 +48,6 @@ namespace BlueControls.Controls
         }
 
         private Caption capInfo;
-        private ListBox lstDone;
+        private ListBoxCore lstDone;
     }
 }

@@ -25,7 +25,7 @@ namespace BlueControls.Controls {
         private void InitializeComponent() {
             this.components = new Container();
             this.ThumbGenerator = new BackgroundWorker();
-            this.lsbFiles = new ListBox();
+            this.lsbFiles = new ListBoxCore();
             this.txbPfad = new TextBox();
             this.panel1 = new Panel();
             this.btnZurück = new Button();
@@ -43,7 +43,6 @@ namespace BlueControls.Controls {
             // 
             // lsbFiles
             // 
-            this.lsbFiles.AddAllowed = AddType.None;
             this.lsbFiles.AllowDrop = true;
             this.lsbFiles.Appearance = ListBoxAppearance.FileSystem;
             this.lsbFiles.AutoSort = true;
@@ -126,7 +125,7 @@ namespace BlueControls.Controls {
         #endregion
 
         private BackgroundWorker ThumbGenerator;
-        private ListBox lsbFiles;
+        private ListBoxCore lsbFiles;
         private TextBox txbPfad;
         private Panel panel1;
         private Button btnAddScreenShot;

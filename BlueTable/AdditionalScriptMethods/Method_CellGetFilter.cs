@@ -26,7 +26,7 @@ public class Method_CellGetFilter : Method_TableGeneric {
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
-            return new DoItFeedback("Tabellefehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true, ld);
         }
 
         var r = allFi.Rows;

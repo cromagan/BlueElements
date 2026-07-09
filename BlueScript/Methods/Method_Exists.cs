@@ -22,11 +22,6 @@ internal class Method_Exists : Method {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Failed) {
-            // Während des SyntaxChecks eine fehlende Variable als Dummy registrieren,
-            // damit nachfolgender Code innerhalb eines Bodies - etwa if(exists(x), ... x verwenden ...) - validierbar bleibt.
-            if (attvar.ScriptIssueType == ScriptIssueType.VariableNichtGefunden) {
-                RegisterSyntaxCheckDummyVariable(varCol, scp, infos.AttributText);
-            }
             return DoItFeedback.Falsch();
         }
         return DoItFeedback.Wahr();

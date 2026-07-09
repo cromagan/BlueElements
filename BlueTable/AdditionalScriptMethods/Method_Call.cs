@@ -61,7 +61,7 @@ internal class Method_Call : Method_TableGeneric {
         var sw = Stopwatch.StartNew();
 
         var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
-        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(BlueBasics.ClassesStatic.Constants.KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase || scp.SyntaxCheck);
+        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(BlueBasics.ClassesStatic.Constants.KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true, ld);

@@ -87,7 +87,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Methods
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Table is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
@@ -114,27 +114,25 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }
 
-        var produktiv = !(testmode || syntaxCheck);
+        var produktiv = !testmode;
 
         ScriptEndedFeedback feedback;
 
         switch (scriptNo) {
             case 1:
-                feedback = RowAdder.ExecuteScript(_item.Script_Before, produktiv, "Testmodus", _item.EntityID, r, false, syntaxCheck);
+                feedback = RowAdder.ExecuteScript(_item.Script_Before, produktiv, "Testmodus", _item.EntityID, r, false);
                 break;
 
             case 3:
-                feedback = RowAdder.ExecuteScript(_item.Script_After, produktiv, "Testmodus", _item.EntityID, r, false, syntaxCheck);
+                feedback = RowAdder.ExecuteScript(_item.Script_After, produktiv, "Testmodus", _item.EntityID, r, false);
                 break;
 
             default:
-                feedback = RowAdder.ExecuteScript(_item.Script_MenuGeneration, produktiv, "Testmodus", _item.EntityID, r, true, syntaxCheck);
+                feedback = RowAdder.ExecuteScript(_item.Script_MenuGeneration, produktiv, "Testmodus", _item.EntityID, r, true);
                 break;
         }
 
-        if (!syntaxCheck) {
-            WriteInfosBack();
-        }
+        WriteInfosBack();
 
         return feedback;
     }

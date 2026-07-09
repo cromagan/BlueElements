@@ -468,7 +468,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
 
-        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false, false);
+        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
         var m = s.ProtocolText;
 
         if (string.IsNullOrEmpty(m)) {
@@ -2236,7 +2236,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 rows[0].InvalidateRowState($"TableView, Kontextmenü, {info}");
                 fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
             } else {
-                fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0, false);
+                fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
             }
 
             if (fb?.Failed == true) {

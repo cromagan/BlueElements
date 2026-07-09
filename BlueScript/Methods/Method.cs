@@ -184,25 +184,12 @@ public abstract class Method : IReadableTextWithKey {
                 return scx;
             }
 
-            // Während des SyntaxChecks gilt VariableUnknown als Wildcard.
-            // Beide Seiten parsen, damit der gesamte Ausdruck geprüft wird.
             if (scx.ReturnValue is VariableUnknown) {
-                if (scp.SyntaxCheck) {
-                    var right = GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
-                    if (right.Failed) { return right; }
-                    return scx;
-                }
                 scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt[..uu]}", true, ld);
                 return scx;
             }
 
-            if (scx.ReturnValue is VariableBool { ValueBool: false }) {
-                if (scp.SyntaxCheck) {
-                    var right = GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
-                    if (right.Failed) { return right; }
-                }
-                return scx;
-            }
+            if (scx.ReturnValue is VariableBool { ValueBool: false }) { return scx; }
             return GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
         }
 
@@ -213,24 +200,11 @@ public abstract class Method : IReadableTextWithKey {
                 return new DoItFeedback($"Befehls-Berechnungsfehler vor ||: {txt[..oo]}", txt1.NeedsScriptFix, ld);
             }
 
-            // Während des SyntaxChecks gilt VariableUnknown als Wildcard.
-            // Beide Seiten parsen, damit der gesamte Ausdruck geprüft wird.
             if (txt1.ReturnValue is VariableUnknown) {
-                if (scp.SyntaxCheck) {
-                    var right = GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
-                    if (right.Failed) { return right; }
-                    return txt1;
-                }
                 return new DoItFeedback($"Befehls-Berechnungsfehler vor ||: {txt[..oo]}", true, ld);
             }
 
-            if (txt1.ReturnValue is VariableBool { ValueBool: true }) {
-                if (scp.SyntaxCheck) {
-                    var right = GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
-                    if (right.Failed) { return right; }
-                }
-                return txt1;
-            }
+            if (txt1.ReturnValue is VariableBool { ValueBool: true }) { return txt1; }
             return GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
         }
 
@@ -276,9 +250,6 @@ public abstract class Method : IReadableTextWithKey {
         foreach (var thisVt in Variable.VarTypes.Instances) {
             if (thisVt.GetFromStringPossible) {
                 if (thisVt.TryParse(txt, out var v) && v is not null) {
-                    if (scp.SyntaxCheck && v is VariableUnknown) {
-                        RegisterSyntaxCheckUnknownsFromText(txt, ld);
-                    }
                     return new DoItFeedback(v);
                 }
             }
@@ -386,7 +357,6 @@ public abstract class Method : IReadableTextWithKey {
 
                 v = varcol?.GetByKey(varn);
                 if (v is null) {
-                    if (scp?.SyntaxCheck is true) { continue; }
                     return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true);
                 }
             } else {
@@ -419,9 +389,6 @@ public abstract class Method : IReadableTextWithKey {
             foreach (var thisAt in exceptetType) {
                 if (thisAt.TrimStart('*') == v.MyClassId) { ok = true; break; }
                 if (thisAt.TrimStart('*') == Variable.Any_Plain) { ok = true; break; }
-                // Während des SyntaxChecks gilt eine VariableUnknown (Dummy) als Wildcard für jeden Typ,
-                // damit Bodies validierbar bleiben, die über exists()/isNullOrEmpty()/isNullOrZero() abgesichert sind.
-                if (scp is { SyntaxCheck: true } && v is VariableUnknown) { ok = true; break; }
             }
 
             if (!ok) {
@@ -459,13 +426,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var vari = varCol.GetByKey(varnam);
         if (generateVariable && vari is not null) {
-            // Während des SyntaxChecks darf ein Dummy (VariableUnknown, registriert z. B. durch exists())
-            // überschrieben werden, damit nachfolgendes `var x = ...;` keine False-Positive auslst.
-            if (!scp.SyntaxCheck || vari is not VariableUnknown) {
-                return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
-            }
-            varCol.Remove(vari.KeyName);
-            vari = null;
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
         }
         if (!generateVariable && vari is null) {
             return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", true, ld);
@@ -480,24 +441,11 @@ public abstract class Method : IReadableTextWithKey {
         if (attvar.Failed) { return new DoItFeedback(attvar.FailedReason, attvar.NeedsScriptFix, ld); }
 
         if (attvar.Attributes[0] is VariableUnknown) {
-            if (scp.SyntaxCheck) {
-                // RHS ließ sich nicht auflösen (z. B. unbekannte Methode wie Loadxyz).
-                // varnam als unbekannt markieren UND als Dummy in varCol ablegen,
-                // damit nachfolgender Code wie `ttt = "Hallo";` validierbar bleibt.
-                ld.RegisterSyntaxCheckUnknownVariable(varnam);
-                varCol.Add(new VariableUnknown(varnam, false, "Dummy für SyntaxCheck (RHS nicht auflösbar)"));
-                return new DoItFeedback(attvar.Attributes[0]);
-            }
-
             return new DoItFeedback("Der Wert '" + value + "' für Variable '" + varnam + "' konnte nicht aufgelöst werden (unbekannte Methode oder Variable im Ausdruck).", true, ld);
         }
 
         if (attvar.Attributes[0] is { } v) {
-            // generateVariable: neue Variable anlegen (var x = ...).
-            // SyntaxCheck + vari ist Dummy: nachfolgende Zuweisung an eine zuvor
-            //   nicht auflösbare Variable (z. B. `ttt = "Hallo";` nach `var ttt = Loadxyz(...);`).
-            //   Der Dummy wird durch den konkreten Wert ersetzt.
-            if (generateVariable || (scp.SyntaxCheck && vari is VariableUnknown)) {
+            if (generateVariable) {
                 if (vari is VariableUnknown) { varCol.Remove(vari.KeyName); }
                 v.KeyName = varnam;
                 v.ReadOnly = false;
@@ -646,64 +594,6 @@ public abstract class Method : IReadableTextWithKey {
     public string ReadableText() => Syntax;
 
     public QuickImage? SymbolForReadableText() => null;
-
-    /// <summary>
-    /// Registriert während eines SyntaxChecks eine fehlende Variable als Dummy (VariableUnknown).
-    /// Außerhalb des SyntaxChecks oder bei ungültigem Namen passiert nichts.
-    /// Dadurch bleibt nachfolgender Code innerhalb eines Bodies - etwa bei if(exists(x), ... x verwenden ...) - validierbar.
-    /// </summary>
-    protected static void RegisterSyntaxCheckDummyVariable(VariableCollection varCol, ScriptProperties scp, string attributText) {
-        if (!scp.SyntaxCheck) { return; }
-        if (attributText.Trim() is not { Length: > 0 } varName) { return; }
-        if (!Variable.IsValidName(varName)) { return; }
-        varCol.Add(new VariableUnknown(varName, true, "Dummy für SyntaxCheck"));
-    }
-
-    /// <summary>
-    /// Registriert während eines SyntaxChecks alle potentiellen Variablennamen,
-    /// die in einem nicht auflösbaren Ausdruck enthalten sind.
-    /// String-Literale (in Anführungszeichen) werden dabei übersprungen.
-    /// Beispiele: "qrrq" → qrrq; "qrrq+\"kk\"" → qrrq (nicht kk).
-    /// </summary>
-    private static void RegisterSyntaxCheckUnknownsFromText(string txt, LogData ld) {
-        if (Variable.IsValidName(txt)) {
-            ld.RegisterSyntaxCheckUnknownVariable(txt);
-            return;
-        }
-
-        var inQuote = false;
-        var tokenStart = -1;
-
-        for (var i = 0; i <= txt.Length; i++) {
-            var c = i < txt.Length ? txt[i] : '\0';
-
-            if (c == '"') {
-                FlushToken(txt, tokenStart, i, ld);
-                tokenStart = -1;
-                inQuote = !inQuote;
-                continue;
-            }
-
-            if (inQuote) { continue; }
-
-            if (i < txt.Length && BlueBasics.ClassesStatic.Constants.AllowedCharsVariableName.Contains(c)) {
-                // Token nur starten, wenn es mit Buchstabe oder Unterstrich beginnt.
-                // Ziffern setzen ein vorhandenes Token fort, starten aber kein neues.
-                if (tokenStart < 0 && !char.IsDigit(c)) { tokenStart = i; }
-            } else {
-                FlushToken(txt, tokenStart, i, ld);
-                tokenStart = -1;
-            }
-        }
-    }
-
-    private static void FlushToken(string txt, int start, int end, LogData ld) {
-        if (start < 0 || end <= start) { return; }
-        var name = txt[start..end];
-        if (Variable.IsValidName(name)) {
-            ld.RegisterSyntaxCheckUnknownVariable(name);
-        }
-    }
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp, LogData ld) {
         if (Variable.TryParseValue<VariableBool>(txt, out var result) && result is bool b) { return b; }

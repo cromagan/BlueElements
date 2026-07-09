@@ -40,11 +40,7 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     public string ProtocolText { get; }
 
-    public List<string> SyntaxCheckUnknownVariables { get; init; } = [];
-
     public VariableCollection? Variables { get; }
 
     #endregion
-
-
 }

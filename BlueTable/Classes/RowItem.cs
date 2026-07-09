@@ -320,7 +320,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        var sef = Table?.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, this, null, true, false, 0, false) ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein");
+        var sef = Table?.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, this, null, true, false, 0) ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein");
 
         if (sef.Failed) {
             _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", null);
@@ -773,7 +773,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
             }
 
-            var ok = tb.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, this, null, true, mustBeExtended, 2, false);
+            var ok = tb.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, this, null, true, mustBeExtended, 2);
 
             if (ok.Failed) { return ok; }
 

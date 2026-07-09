@@ -6,9 +6,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) : this(scriptname, allowedMethods, produktivphase, scriptAttributes, additionalInfo, chain, mainInfo, false) { }
-
-    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo, bool syntaxCheck) {
+    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -17,10 +15,9 @@ public class ScriptProperties {
         Stufe = 0;
         Chain = chain;
         MainInfo = mainInfo;
-        SyntaxCheck = syntaxCheck;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo, scriptProperties.SyntaxCheck) => Stufe = stufe;
+    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
 
     #endregion
 
@@ -45,7 +42,6 @@ public class ScriptProperties {
 
     public string ScriptName { get; }
     public int Stufe { get; }
-    public bool SyntaxCheck { get; }
 
     #endregion
 

@@ -41,7 +41,6 @@ public class Method_EditRow : Method_TableGeneric {
             return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
         }
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         row.Edit(typeof(RowEditor), true);

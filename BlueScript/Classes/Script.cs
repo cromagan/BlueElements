@@ -236,23 +236,13 @@ public class Script {
             if (pos >= normalizedScriptText.Length) {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
-                var unknownVars = ld.SyntaxCheckUnknownVariables();
                 var protocol = ld.Protocol;
 
-                if (unknownVars.Count > 0) {
-                    protocol += "\r\n\r\nUnbekannte Variablen (vermutlich datenabhängig, nur beim SyntaxCheck):\r\n" +
-                                string.Join("\r\n", unknownVars.Select(v => "  " + v));
-                }
-
                 if (syntaxErrors.Count > 0) {
-                    return new ScriptEndedFeedback(varCol, protocol, true, false, false, string.Join("\r\n", syntaxErrors), null) {
-                        SyntaxCheckUnknownVariables = unknownVars
-                    };
+                    return new ScriptEndedFeedback(varCol, protocol, true, false, false, string.Join("\r\n", syntaxErrors), null);
                 }
 
-                return new ScriptEndedFeedback(varCol, protocol, false, false, false, string.Empty, null) {
-                    SyntaxCheckUnknownVariables = unknownVars
-                };
+                return new ScriptEndedFeedback(varCol, protocol, false, false, false, string.Empty, null);
             }
 
             if (normalizedScriptText[pos] == '¶') {
@@ -262,17 +252,9 @@ public class Script {
                 var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
-                    if (!scp.SyntaxCheck) {
-                        // Echte Ausführung: Bei jedem Fehler stoppen
-                        Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
-                        return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null) {
-                            SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
-                        };
-                    }
-                    // Syntax-Check: Fehler protokollieren und weitermachen,
-                    // damit nachfolgender Code ebenfalls geprüft werden kann.
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Fehler übergangen (SyntaxCheck): {scx.FailedReason}", scp.Stufe);
-                    syntaxErrors.Add($"[{ld.Subname}, Zeile {ld.Line}] {scx.FailedReason}");
+                    // Echte Ausführung: Bei jedem Fehler stoppen
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
                 }
 
                 pos = scx.Position;
@@ -280,24 +262,18 @@ public class Script {
                 // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
                 if (pos <= previousPos) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null) {
-                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
-                    };
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);
                 }
 
                 ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (scx.BreakFired) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null) {
-                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
-                    };
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null);
                 }
 
                 if (scx.ReturnFired) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue) {
-                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
-                    };
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
                 }
             }
 
@@ -307,9 +283,7 @@ public class Script {
 
                 if (!string.IsNullOrEmpty(f)) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null) {
-                        SyntaxCheckUnknownVariables = ld.SyntaxCheckUnknownVariables()
-                    };
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null);
                 }
             }
         } while (true);

@@ -65,8 +65,6 @@ public class Method_AddRow : Method_TableGeneric {
             return new DoItFeedback("Eingabe durch Benutzer abgebrochen", false, ld);
         }
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
-
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (tb.Row[gewählt] is RowItem existingRow) {
@@ -82,7 +80,6 @@ public class Method_AddRow : Method_TableGeneric {
 
         var newRow = tb.Row.GenerateAndAdd(gewählt, "Method_AddRow");
         if (newRow is not { IsDisposed: false }) {
-            if (scp.SyntaxCheck) { return Method_Row.RowToObjectFeedback(null); }
             return new DoItFeedback("Zeile konnte nicht erstellt werden", true, ld);
         }
 

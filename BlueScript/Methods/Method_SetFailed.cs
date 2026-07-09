@@ -13,8 +13,6 @@ public class Method_SetFailed : Method {
                                             "Dient dazu, temporäre Fehler, wie Netzwerkabbruche zu kompensieren.\r\n" +
                                                 "Beim nächsten Programmstart ist deser Fehlerspeicher wieder gelöscht.";
 
-
-
     public override string Syntax => "SetFailed(Nachricht);";
 
     #endregion
@@ -23,11 +21,6 @@ public class Method_SetFailed : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var r = attvar.ValueStringGet(0);
-
-        // Während des SyntaxChecks: SetFailed verhält sich wie Break — der restliche Codeblock
-        // ist unerreichbar. BreakFired beendet Script.Parse, wird aber an der nächsten
-        // Blockgrenze (Schleife/If/Sub) konsumiert, sodass danach weiter validiert wird.
-        if (scp.SyntaxCheck) { return new DoItFeedback(false, true, false, string.Empty, null, ld); }
 
         if (string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true, ld); }
 

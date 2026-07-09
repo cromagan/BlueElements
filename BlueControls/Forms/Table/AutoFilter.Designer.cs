@@ -25,7 +25,7 @@ namespace BlueControls.BlueTableDialogs
             this.txbEingabe = new TextBox();
             this.Line = new Line();
             this.lsbFilterItems = new ListBox();
-            this.lsbStandardFilter = new ListBox();
+            this.lsbStandardFilter = new ListBoxCore();
             this.capWas = new Caption();
             this.butFertig = new Button();
             this.capInfo = new Caption();
@@ -68,7 +68,6 @@ namespace BlueControls.BlueTableDialogs
             // 
             // lsbStandardFilter
             // 
-            this.lsbStandardFilter.AddAllowed = AddType.None;
             this.lsbStandardFilter.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                              | AnchorStyles.Right)));
             this.lsbStandardFilter.Appearance = ListBoxAppearance.Autofilter;
@@ -129,7 +128,7 @@ namespace BlueControls.BlueTableDialogs
         internal TextBox txbEingabe;
         internal Line Line;
         internal ListBox lsbFilterItems;
-        internal ListBox lsbStandardFilter;
+        internal ListBoxCore lsbStandardFilter;
         internal Caption capWas;
         private Button butFertig;
         private Caption capInfo;

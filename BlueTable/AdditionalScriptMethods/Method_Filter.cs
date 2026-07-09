@@ -38,7 +38,7 @@ public class Method_Filter : Method_TableGeneric {
             if (fii.Column?.Table is { IsDisposed: false } tb) {
                 fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcetable ?? tb, user);
 
-                if (tb.IsDisposed) { return (null, "Tabellefehler!", false); }
+                if (tb.IsDisposed) { return (null, "Tabellenfehler!", false); }
 
                 //if (tb != sourcetable && !tb.AreScriptsExecutable()) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false); }
             }

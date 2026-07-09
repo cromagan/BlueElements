@@ -1341,9 +1341,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="tableHeadVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="ignoreError"></param>
-    /// <param name="syntaxCheck"></param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError, bool syntaxCheck) {
+    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError) {
         // Vorab-Prüfungen
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
@@ -1363,8 +1362,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (produktivphase) {
             extended = extended || !script.MayAffectUser;
         }
-
-        extended = extended || syntaxCheck;
 
         var isNewId = false;
         var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();
@@ -1403,7 +1400,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (row is { IsDisposed: false }) { ki = ki + "\\" + row.CellFirstString(); }
 
-            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki, syntaxCheck);
+            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki);
 
             var sc = new Script(vars, scp) {
                 ScriptText = script.Script
@@ -1467,7 +1464,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="retrySeconds">Maximale Zeit für Retry bei GiveItAnotherTry, 0 = kein Retry</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds, bool syntaxCheck) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds) {
         scriptname ??= string.Empty;
 
         if (eventname is not null && !string.IsNullOrWhiteSpace(scriptname)) {
@@ -1490,7 +1487,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (l.Count == 1) {
                 script = l[0];
             } else if (l.Count == 0) {
-                var vars = CreateVariableCollection(row, true, tbHeadVariables, true, syntaxCheck, null);
+                var vars = CreateVariableCollection(row, true, tbHeadVariables, true, false, null);
                 return new ScriptEndedFeedback(vars, string.Empty);
             }
         } else {
@@ -1501,7 +1498,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
         if (retrySeconds <= 0) {
-            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, syntaxCheck);
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
         }
 
         var startTime = DateTime.UtcNow;
@@ -1510,7 +1507,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         do {
             attempt++;
-            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, syntaxCheck);
+            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
 
             if (!erg.Failed) { return erg; }
 

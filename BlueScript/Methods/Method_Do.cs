@@ -32,7 +32,6 @@ internal class Method_Do : Method {
             var addme = new List<Variable>() { new VariableDouble("Index", index, true, "Iterations-Variable") };
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "Do", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
-            if (scp.SyntaxCheck) { break; }
         } while (true);
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden

@@ -37,9 +37,6 @@ public class Method_MsgBox : Method {
 
         if (buttons.Count == 0) { buttons.Add("Ok"); }
 
-
-        if(scp.SyntaxCheck) { return new DoItFeedback(0); }
-
         var l = MessageBox.Show(txt, pic, true, [.. buttons]);
 
         return new DoItFeedback(l);

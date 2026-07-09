@@ -29,8 +29,6 @@ internal class Method_DeleteFile : Method {
         }
         files = files.SortedDistinctList();
 
-        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
-
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         foreach (var filn in files) {

@@ -33,12 +33,11 @@ partial class RowAdder {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
-            this.f = new ListBox();
+            this.f = new ListBoxCore();
             this.SuspendLayout();
             // 
             // f
             // 
-            this.f.AddAllowed = AddType.None;
             this.f.Appearance = ListBoxAppearance.Listbox_Boxes;
             this.f.CheckBehavior = CheckBehavior.MultiSelection;
             this.f.Dock = DockStyle.Fill;
@@ -61,6 +60,6 @@ partial class RowAdder {
 
     #endregion
 
-    public ListBox f;
+    public ListBoxCore f;
 
 }

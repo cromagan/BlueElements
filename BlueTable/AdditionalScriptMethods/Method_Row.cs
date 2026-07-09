@@ -70,7 +70,7 @@ public class Method_Row : Method_TableGeneric {
                 return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
             }
 
-            if (!scp.SyntaxCheck && thisFi.SearchValue[0] != l) {
+            if (thisFi.SearchValue[0] != l) {
                 return new DoItFeedback($"Fehler im Filter:\r\nWert '{thisFi.SearchValue[0]}' kann nicht gesetzt werden.\r\nVorgeschlager Wert: '{l}'\r\nSpalte: {thisFi.Column.Caption}", true, ld);
             }
         }
@@ -78,7 +78,6 @@ public class Method_Row : Method_TableGeneric {
         Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
         RowItem? newrow = null;
-        if (scp.SyntaxCheck) { return RowToObjectFeedback(newrow); }
 
         if (scp.ProduktivPhase) {
             var t = Stopwatch.StartNew();
@@ -103,7 +102,6 @@ public class Method_Row : Method_TableGeneric {
         if (newrow is { IsDisposed: false } r) {
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
-                if (scp.SyntaxCheck) { return RowToObjectFeedback(r); }
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var f = Table.IsCellEditable(srs, r, fic.ChunkVal, false);
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
@@ -112,7 +110,6 @@ public class Method_Row : Method_TableGeneric {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
-            if (scp.SyntaxCheck) { return RowToObjectFeedback(null); }
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
         }
 

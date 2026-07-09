@@ -45,9 +45,7 @@ internal class Method_ForEachRow : Method_TableGeneric {
         ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
-        var maxCount = !scp.SyntaxCheck ? r.Count : Math.Min(1, r.Count);
-
-        for (var index = 0; index < maxCount; index++) {
+        for (var index = 0; index < r.Count; index++) {
             var addme = new List<Variable>() {
                 new VariableRowItem(varnam, r[index], true, "Iterations-Variable"),
                 new VariableDouble("Index", index, true, "Iterations-Variable")

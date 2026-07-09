@@ -18,9 +18,6 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
 
-##Aufgabe
-Wozu wird "DropMessage" noch benötigt? Optimiern!
-
 ##Aufgabe 
  _parent?.StyleChanged -= _parent_StyleChanged
  entfernen. Das Parent sollte das Child pushen
@@ -28,14 +25,6 @@ Wozu wird "DropMessage" noch benötigt? Optimiern!
  ##Aufgabe
  Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
  Entferne OnColumnDisposed
- 
- ##Aufgabe
- TextBoxSuggestions
- löst LostFocus nicht richtig aus
- Die Chips zeigen keinen Text analysiert
- De chipfläche muss ein klares ende (Umrdanung) haben. Nutze dazu das gleiche Zeichnen der Groupbox im Minimal-Stil
- Die Chipgläche ist zu groß (unten / oben) - TableView soll eine Schätzing und grobe berechung der Große vorab mache
- Die Textfläche wird bei Bottom nicht richig angezeigt
  
 ##Aufgabe
 ListItem, PadItems, Renderer, Cells, ExtChar kommt mir seltsam vor. Als ob die zusammengehören würden. Also ob man sie zusammenlegen könnte.
@@ -95,7 +84,9 @@ ContextmenuItemns auch
 Spalten-Verlinkung muss ein EditorEasy werden.
 
 ##Aufgabe
-Skript-Überprüfung muss auch alle Ifs und Verzweigungen prüfen.
+Mach eine komplett eigene Routine, die vor dem Skript-Test-Ausführen folgenes mach:
+- Alle var Befehel checken und die Variablelnamen ermitteln.
+- Ein einfacher Syntax-Check, welche Befehle/Variablen nicht geparsed werden können.
 
 ##Aufgabe
 Logik zur Thread-Synchronisierung (Invoke) und Logik zur Vererbung (virtual) gehören niemals in dieselbe Methode.
@@ -197,20 +188,10 @@ Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern d
 Externe Änderung an 'xxx' erkannt, lokale ungespeicherte Änderungen werden verworfen.
 
 ##Aufgabe
-    Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
-Die Meldung kommt, obwohl es vorhanden ist
-
-##Aufgabe
 Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
 
 ##Aufgabe
 CurrentArrangement mit dessen Logik ist alt und nicht effizienzt. Auch der Demstsprechende Editor
-
-##Aufgabe
-Ansicht bearbeiten abspecken. So, dass nur die Kopfdaten bearbeitet werden können. In den Kopfdaten muss der Ansichtname bearbeitbar sein
-
-##Aufgabe
-Den Auswahldialog der Ansichten so  erweitert, dass das hinzufügen und löschen möglich ist. Die Listbox (Nicht ListboxCore) hat bereits entsprechende Funktionen
 
 ##Aufgabe
 CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
@@ -250,7 +231,6 @@ DaS klappt nicht, wenn ein Zeilenfilter vorhanden ist! normale Filter funktionie
 
 ## Aufgabe
 Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern.
-
 
 ## Aufgabe
 Aktuelle Ansicht fehlerhaft.
@@ -333,3 +313,22 @@ RowAdderScript darf kein Attribut 0 - 9 haben.
 
 ## Aufgabe
 ConnectedFormula haben ein Speicherproblem: ab und zu kann die Datei nicht mehr gelesen werden
+
+## Aufgabe
+RowAdderPadItem - wenn ich nur das Script ändere, wird das ConnectedFormula nachher nicht gespeichert
+
+## Aufgabe
+RowAdder - Sobald ich die erste Stufe anwähle, stimmt die Sortierung nicht mehr
+
+## Aufgabe
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at BlueControls.Controls.TableView.get_CurrentArrangement()
+   at BlueControls.Controls.TableView.CalculateCanvasMaxBounds()
+   at BlueControls.Controls.ZoomPad.get_CanvasMaxBounds()
+   at BlueControls.Controls.ZoomPad.UpdateSliderBounds()
+   
+## Aufgabe
+Pages in ConnectedFormulaEditor, die Vorschau soll in Printmode=false gezeichnet werden.
+Evtl. wird ein neues Property oder sogar Item benötigt
+Zudem muss der Titel Direkt in das Item geschrieben werden. Halb überlappend, dass man die Zugehörigkeit erkennen kann. Mit einem schönen Rahmen/Hintergrund
+

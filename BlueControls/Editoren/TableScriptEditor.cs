@@ -273,7 +273,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     public object? CreateNewItem() => null;
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
@@ -308,7 +308,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }
         }
-        var produktiv = !(testmode || syntaxCheck);
+        var produktiv = !testmode;
 
         if (produktiv) {
             if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
@@ -319,7 +319,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var ext = chkExtendend is { Checked: true, Enabled: true };
 
         _allowTemporay = true;
-        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true, syntaxCheck);
+        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true);
         _allowTemporay = false;
 
         return f;

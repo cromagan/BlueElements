@@ -17,7 +17,7 @@ public class Method_Stop : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
+        
         if (!scp.ProduktivPhase) { return new DoItFeedback("=== STOP ===", true, ld); }
         return DoItFeedback.Null();
     }
