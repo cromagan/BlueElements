@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKeyName {
+public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKeyName, IJsonParseable {
 
     #region Fields
 
@@ -43,6 +43,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         set {
             if (_comment == value) { return; }
             _comment = value;
+            OnPropertyChangedExt("comment", _comment);
         }
     }
 
@@ -56,6 +57,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
             value = value.ToUpperInvariant();
             if (field == value) { return; }
             field = value;
+            OnPropertyChangedExt("key", field);
         }
     }
 
@@ -137,6 +139,35 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         result.ParseableAdd("Comment", Comment);
         result.ParseableAdd("ReadOnly", ReadOnly);
         return result;
+    }
+
+    /// <summary>
+    /// JSON-Pendant zu <see cref="ParseableItems" />. Schreibt die gemeinsamen
+    /// Metadaten aller Variablen (Typ, Schlüssel, Kommentar, Schreibschutz).
+    /// Subklassen überschreiben diese Methode, rufen <c>base.ParseableJson()</c>
+    /// auf und ergänzen ihren Wert.
+    /// </summary>
+    public virtual JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json["type"] = MyClassId;
+        json["key"] = KeyName;
+        json["comment"] = Comment;
+        json["readonly"] = ReadOnly;
+        return json;
+    }
+
+    public virtual void ParseFinishedJson(JsonElement parsed) { }
+
+    /// <summary>
+    /// JSON-Pendant zu <see cref="ParseThis" />. Liest die gemeinsamen Metadaten.
+    /// Subklassen überschreiben diese Methode, lesen ihren eigenen Wert aus
+    /// <paramref name="json" /> und rufen am Ende <c>base.ParseJson(json)</c> auf.
+    /// Nicht vorhandene Keys werden übersprungen, sodass auch Partial-Updates funktionieren.
+    /// </summary>
+    public virtual void ParseJson(JsonObject json) {
+        KeyName = json.GetString("key");
+        Comment = json.GetString("comment");
+        ReadOnly = json.GetBool("readonly");
     }
 
     public override bool ParseThis(string key, string value) {

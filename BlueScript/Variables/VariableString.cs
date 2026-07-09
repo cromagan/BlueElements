@@ -62,6 +62,7 @@ public class VariableString : Variable {
                 return;
             }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+            OnPropertyChangedExt("value", _valueString);
         }
     }
 
@@ -76,6 +77,17 @@ public class VariableString : Variable {
         if (ReadOnly) { return Schreibgschützt(); }
         ValueString = v.ValueString;
         return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["value"] = _valueString;
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        SetValue(json.GetString("value"));
+        base.ParseJson(json);
     }
 
     protected override void SetValue(object? x) {

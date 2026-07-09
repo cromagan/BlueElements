@@ -44,6 +44,7 @@ public class VariableBool : Variable {
         set {
             if (ReadOnly) { return; }
             _valuebool = value; // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+            OnPropertyChangedExt("value", _valuebool);
         }
     }
 
@@ -61,6 +62,17 @@ public class VariableBool : Variable {
         if (ReadOnly) { return Schreibgschützt(); }
         ValueBool = v.ValueBool;
         return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["value"] = _valuebool;
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        SetValue(json.GetBool("value"));
+        base.ParseJson(json);
     }
 
     protected override void SetValue(object? x) {

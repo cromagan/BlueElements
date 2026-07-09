@@ -18,7 +18,7 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
 
-##Aufgabe 
+##Aufgabe
  _parent?.StyleChanged -= _parent_StyleChanged
  entfernen. Das Parent sollte das Child pushen
  
@@ -26,7 +26,7 @@ Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und w
  Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
  Entferne OnColumnDisposed
  
-##Aufgabe
+ ##Aufgabe
 ListItem, PadItems, Renderer, Cells, ExtChar kommt mir seltsam vor. Als ob die zusammengehören würden. Also ob man sie zusammenlegen könnte.
 Besonders, weil fast jedes Control ein Listitem oder anders rum ein CellItem anzeigen kann.
 Analysiere:
@@ -243,7 +243,7 @@ Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts obe
 Fährt man mit der Maus darüber fährt es raus.
 
 ## Aufgabe
-FailedReason und Protokoll in ScriptEndedFeedback haben fast den gleichen sinn. Vereinfache, dass nur noch eine Variable vorhanden ist.
+FailedReason und Protokoll in ScriptEndedFeedback haben fast den gleichen sinn. Vereinfache, dass nur noch FailedReason vorhanden ist.
 
 ## Aufgabe
 Alle  public void ParseJson(JsonObject json) 

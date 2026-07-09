@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
+
 namespace BlueBasics;
 
 public static partial class Extensions {
@@ -44,8 +46,11 @@ public static partial class Extensions {
     /// </summary>
     public static T GetEnum<T>(this JsonObject json, string key) where T : struct, Enum {
         switch (json[key]) {
-            case JsonValue v when v.TryGetValue(out int i): return (T)(object)i;
-            case JsonValue v when v.TryGetValue(out string? s) && Enum.TryParse<T>(s, out var result): return result;
+            case JsonValue v when v.TryGetValue(out int i):
+                return (T)(object)i;
+
+            case JsonValue v when v.TryGetValue(out string? s) && Enum.TryParse<T>(s, out var result):
+                return result;
         }
         return default;
     }
@@ -81,6 +86,27 @@ public static partial class Extensions {
     public static JsonElement? GetJson(this JsonElement? json, string key) => json.HasValue ? json.Value.GetJson(key) : null;
 
     public static JsonNode? GetJson(this JsonObject json, string key) => json[key];
+
+    /// <summary>
+    /// Liest ein JSON-Array von <see cref="IJsonParseable" />-Objekten unter dem
+    /// angegebenen <paramref name="key" /> und erzeugt über
+    /// <see cref="ParseableItem.NewByParsingJson{T}" /> die passenden Instanzen.
+    /// Elemente, die kein JSON-Objekt sind oder nicht geparsed werden konnten,
+    /// werden übersprungen. Fehlt der Key oder ist er kein Array, wird eine leere
+    /// Liste geliefert. Bei <paramref name="sort" /> = <c>true</c> wird die
+    /// Ergebnisliste vor der Rückgabe sortiert.
+    /// </summary>
+    public static List<T> GetList<T>(this JsonObject json, string key, bool sort) where T : ParseableItem, IJsonParseable {
+        List<T> result = [];
+        if (json[key] is JsonArray arr) {
+            foreach (var item in arr) {
+                if (item is not JsonObject jo) { continue; }
+                if (ParseableItem.NewByParsingJson<T>(jo.ToJsonElement()) is { } created) { result.Add(created); }
+            }
+            if (sort) { result.Sort(); }
+        }
+        return result;
+    }
 
     /// <summary>
     /// Liest ein vom <see cref="SetPadding" /> geschriebenes verschachteltes Objekt
@@ -123,6 +149,17 @@ public static partial class Extensions {
         List<string> result = new(elem.GetArrayLength());
         foreach (var item in elem.EnumerateArray()) {
             result.Add(item.ValueKind == JsonValueKind.String ? item.GetString() ?? string.Empty : string.Empty);
+        }
+        return result;
+    }
+
+    /// <inheritdoc cref="GetStringList(JsonElement, string)" />
+    public static List<string> GetStringList(this JsonObject json, string key) {
+        if (json[key] is not JsonArray arr) { return []; }
+
+        List<string> result = new(arr.Count);
+        foreach (var item in arr) {
+            result.Add(item is JsonValue v && v.TryGetValue(out string? s) ? s ?? string.Empty : string.Empty);
         }
         return result;
     }
@@ -190,6 +227,16 @@ public static partial class Extensions {
     }
 
     /// <summary>
+    /// Konvertiert einen <see cref="JsonNode" /> (z.B. <see cref="JsonObject" />,
+    /// <see cref="JsonArray" />) in ein <see cref="JsonElement" />, sodass er an
+    /// APIs übergeben werden kann, die auf <see cref="JsonElement" /> arbeiten
+    /// (z.B. die <c>AsPadding</c>-/<c>AsSizeF</c>-Erweiterungen). <c>null</c> liefert
+    /// <see cref="JsonValueKind.Undefined" />.
+    /// </summary>
+    public static JsonElement ToJsonElement(this JsonNode? node) =>
+        node is null ? default : JsonDocument.Parse(node.ToJsonString()).RootElement.Clone();
+
+    /// <summary>
     /// Konvertiert ein <see cref="JsonElement" /> (z. B. aus <see cref="System.Text.Json.JsonDocument" />
     /// oder <see cref="System.Text.Json.JsonElement.Clone" />) in einen <see cref="JsonNode" />,
     /// sodass es direkt in ein übergeordnetes <see cref="JsonObject" /> / <see cref="JsonArray" />
@@ -199,16 +246,6 @@ public static partial class Extensions {
     /// </summary>
     public static JsonNode? ToJsonNode(this JsonElement element) =>
         element.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null ? null : JsonNode.Parse(element.GetRawText());
-
-    /// <summary>
-    /// Konvertiert einen <see cref="JsonNode" /> (z.B. <see cref="JsonObject" />,
-    /// <see cref="JsonArray" />) in ein <see cref="JsonElement" />, sodass er an
-    /// APIs übergeben werden kann, die auf <see cref="JsonElement" /> arbeiten
-    /// (z.B. die <c>AsPadding</c>-/<c>AsSizeF</c>-Erweiterungen). <c>null</c> liefert
-    /// <see cref="JsonValueKind.Undefined" />.
-    /// </summary>
-    public static JsonElement ToJsonElement(this JsonNode? node) =>
-        node is null ? default : JsonDocument.Parse(node.ToJsonString()).RootElement.Clone();
 
     #endregion
 }

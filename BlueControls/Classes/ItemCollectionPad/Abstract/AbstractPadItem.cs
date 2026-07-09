@@ -306,7 +306,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     var r = iec.ErrorReason();
 
                     if (!string.IsNullOrEmpty(r)) {
-                        gr.FillRectangle(RedStripesBrush, positionControl);
+                        lock (RedStripesBrush) { gr.FillRectangle(RedStripesBrush, positionControl); }
                         var q = QuickImage.Get("Kritisch|32||1");
                         gr.DrawImageUnscaled(q, positionControl.X, positionControl.Y);
                     }
@@ -316,11 +316,11 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY) {
+    public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY, bool forPrinting) {
         if (bmp is null) { return; }
         using var gr = Graphics.FromImage(bmp);
         var positionControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
-        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY, true);
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY, forPrinting);
     }
 
     /// <summary>
@@ -583,7 +583,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         var bmp = new Bitmap(r.Width.CanvasToControl(scale), r.Height.CanvasToControl(scale));
 
-        DrawToBitmap(bmp, scale, -r.Left.CanvasToControl(scale), -r.Top.CanvasToControl(scale));
+        DrawToBitmap(bmp, scale, -r.Left.CanvasToControl(scale), -r.Top.CanvasToControl(scale), true);
 
         //using var gr = Graphics.FromImage(I);
         //gr.Clear(BackColor);

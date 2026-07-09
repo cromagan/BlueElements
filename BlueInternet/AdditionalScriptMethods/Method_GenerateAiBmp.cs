@@ -25,7 +25,6 @@ internal class Method_GenerateAiBmp : Method {
         if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
         if (mai.IsNullOrEmpty) { return DoItFeedback.InternerFehler(ld); }
 
-        if (scp.SyntaxCheck) { return new DoItFeedback(null as Bitmap); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var imageModel = attvar.ValueStringGet(2);

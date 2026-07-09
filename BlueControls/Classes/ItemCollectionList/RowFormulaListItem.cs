@@ -149,7 +149,7 @@ public class RowFormulaListItem : AbstractListItem {
         var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
         var sliderX = -canvasUsedArea.Left * zoomv;
         var sliderY = -canvasUsedArea.Top * zoomv;
-        pad.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY);
+        pad.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY, true);
     }
 
     private void RemovePic() {

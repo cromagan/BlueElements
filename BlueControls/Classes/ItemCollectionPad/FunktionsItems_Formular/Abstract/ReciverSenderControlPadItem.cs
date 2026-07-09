@@ -70,6 +70,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             _tableOutputLoaded = true;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
+            OnPropertyChangedExt("outputtable", _tableOutputName);
         }
     }
 
@@ -152,6 +153,27 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         //result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+
+        if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } tb) {
+            json["outputtable"] = tb.KeyName;
+        } else {
+            json["outputtable"] = _tableOutputName;
+        }
+
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        var name = json.GetString("outputtable");
+        if (!string.IsNullOrEmpty(name)) {
+            _tableOutputName = name;
+            _tableOutputLoaded = false;
+        }
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

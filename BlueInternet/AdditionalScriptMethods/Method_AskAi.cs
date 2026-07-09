@@ -24,7 +24,6 @@ internal class Method_AskAi : Method {
         if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
         if (mai.IsNullOrEmpty) { return DoItFeedback.InternerFehler(ld); }
 
-        if (scp.SyntaxCheck) { return new DoItFeedback(string.Empty); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var tries = 0;

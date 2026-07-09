@@ -71,6 +71,7 @@ public class VariableListString : Variable {
 
             _list = value;
             //if (value is not null) { _list.AddRange(value); }
+            OnPropertyChangedExt("value", _list);
         }
     }
 
@@ -85,6 +86,18 @@ public class VariableListString : Variable {
         if (ReadOnly) { return Schreibgschützt(); }
         ValueList = v.ValueList;
         return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.SetArrayIfNotEmpty("value", _list);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        var l = json.GetStringList("value");
+        if (l.Count > 0) { SetValue(l); }
+        base.ParseJson(json);
     }
 
     protected override void SetValue(object? x) {

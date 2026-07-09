@@ -26,7 +26,6 @@ internal class Method_AskAiBmp : Method {
         if (mai.IsNullOrEmpty) { return DoItFeedback.InternerFehler(ld); }
         if (attvar.ValueBitmapGet(2) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
-        if (scp.SyntaxCheck) { return new DoItFeedback(string.Empty); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var tries = 0;

@@ -81,7 +81,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (_additionalInfoColumnKey == value) { return; }
             _additionalInfoColumnKey = value;
             OnPropertyChanged();
-            //UpdateSideOptionMenu();
+            OnPropertyChangedExt("additionalInfoColumnKey", value);
         }
     }
 
@@ -106,6 +106,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (_entityId == value) { return; }
             _entityId = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("entityId", value);
         }
     }
 
@@ -169,7 +170,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (_originIdColumnKey == value) { return; }
             _originIdColumnKey = value;
             OnPropertyChanged();
-            //UpdateSideOptionMenu();
+            OnPropertyChangedExt("originIdColumnKey", value);
         }
     }
 
@@ -182,6 +183,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (value == _script_After) { return; }
             _script_After = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("scriptAfter", value);
         }
     }
 
@@ -194,6 +196,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (value == _script_Before) { return; }
             _script_Before = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("scriptBefore", value);
         }
     }
 
@@ -206,6 +209,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (value == _script_MenuGeneration) { return; }
             _script_MenuGeneration = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("scriptMenu", value);
         }
     }
 
@@ -296,6 +300,32 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         result.ParseableAdd("LastFailedReason", _lastFailedReason);
         result.ParseableAdd("LastSavedVariables", _lastSavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
         return result;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["entityId"] = _entityId;
+        json["originIdColumnKey"] = _originIdColumnKey;
+        json["additionalInfoColumnKey"] = _additionalInfoColumnKey;
+        json["scriptMenu"] = _script_MenuGeneration;
+        json["scriptBefore"] = _script_Before;
+        json["scriptAfter"] = _script_After;
+        json["lastFailedReason"] = _lastFailedReason;
+        json.SetArrayIfNotEmpty("lastSavedVariables", _lastSavedVariables?.SortByKeyName() ?? []);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _entityId = json.GetString("entityId");
+        _originIdColumnKey = json.GetString("originIdColumnKey");
+        _additionalInfoColumnKey = json.GetString("additionalInfoColumnKey");
+        _script_MenuGeneration = json.GetString("scriptMenu");
+        _script_Before = json.GetString("scriptBefore");
+        _script_After = json.GetString("scriptAfter");
+        _lastFailedReason = json.GetString("lastFailedReason");
+        _lastSavedVariables = json.GetList<Variable>("lastSavedVariables", true);
+
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

@@ -55,6 +55,7 @@ public class VariableDouble : Variable {
         set {
             if (ReadOnly) { return; }
             _double = Math.Round(value, 5, MidpointRounding.AwayFromZero);
+            OnPropertyChangedExt("value", _double);
         }
     }
 
@@ -69,6 +70,17 @@ public class VariableDouble : Variable {
         if (ReadOnly) { return Schreibgschützt(); }
         ValueNum = v.ValueNum;
         return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["value"] = _double;
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        if (json["value"] is JsonValue v && v.TryGetValue(out double d)) { SetValue(d); }
+        base.ParseJson(json);
     }
 
     protected override void SetValue(object? x) {

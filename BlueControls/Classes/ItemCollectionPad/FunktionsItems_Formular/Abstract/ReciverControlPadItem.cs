@@ -83,6 +83,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             CalculateInputColorIds();
             OnPropertyChanged();
+            OnPropertyChangedExt("getfilterfromkeys", _getFilterFromKeys);
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -120,6 +121,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             field = tmp.AsReadOnly();
             OnPropertyChanged();
+            OnPropertyChangedExt("visiblefor", field);
         }
     } = new([]);
 
@@ -130,6 +132,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             if (_xPosition == value) { return; }
             _xPosition = value;
             OnPropertyChanged();
+            OnPropertyChangedExt("xlock", (int)_xPosition);
 
             if (_xPosition != XPosition.frei) {
                 PointMoved(Plo, new MoveEventArgs(false));
@@ -335,6 +338,47 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
 
         return result;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json["version"] = Version;
+        json["xlock"] = (int)_xPosition;
+        json.SetArrayIfNotEmpty("getfilterfromkeys", _getFilterFromKeys);
+
+        if (MustBeInDrawingArea) {
+            json.SetArrayIfNotEmpty("visiblefor", VisibleFor);
+        }
+
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Version = json.GetInt("version");
+        _xPosition = json.GetEnum<XPosition>("xlock");
+
+        if (json["getfilterfromkeys"] is JsonArray gff) {
+            _getFilterFromKeys.Clear();
+            foreach (var item in gff) {
+                if (item is JsonValue v && v.TryGetValue(out string? s)) {
+                    _getFilterFromKeys.Add(s ?? string.Empty);
+                }
+            }
+            _getFilterFrom = null;
+        }
+
+        if (MustBeInDrawingArea && json["visiblefor"] is JsonArray vf) {
+            var l = new List<string>();
+            foreach (var item in vf) {
+                if (item is JsonValue v && v.TryGetValue(out string? s)) {
+                    l.Add(s ?? string.Empty);
+                }
+            }
+            if (l.Count == 0) { l.Add(Constants.Everybody); }
+            VisibleFor = Table.RepairUserGroups(l).AsReadOnly();
+        }
+
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

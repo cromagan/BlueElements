@@ -163,26 +163,39 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 _pendingRowAddedRebuild = false;
             }
 
-            if (field is { IsDisposed: false }) {
-                field.Ansichtbearbeitung = Ansichtbearbeitung;
+            // Lokale Kopie des Backing-Fields: Invalidate_CurrentArrangement kann
+            // (z. B. über Table-DisposingEvent oder synchrones Refresh im Table-Setter)
+            // field zwischen den einzelnen Zugriffen auf null setzen. Mit der lokalen
+            // Variablen wird auf einer konsistenten Momentaufnahme gearbeitet.
+            var ca = field;
+
+            if (ca is { IsDisposed: false }) {
+                ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
                 // Die Dummy-Spalte wird eingeblendet, wenn die Ansichtbearbeitung
                 // aktiv ist. Zusätzlich bei Admins, deren Ansicht keine echten Spalten
                 // enthält, damit sie eine neue Ansicht aufbauen können.
                 var showDummy = Ansichtbearbeitung
-                    || (tb.IsAdministrator() && tb.Column.Count > 0 && field.First() is null);
+                    || (tb.IsAdministrator() && tb.Column.Count > 0 && ca.First() is null);
 
                 if (showDummy) {
-                    field.EnsureDummyColumn();
+                    ca.EnsureDummyColumn();
                 } else {
-                    field.RemoveDummyColumn();
+                    ca.RemoveDummyColumn();
                 }
+            } else if (ca is { IsDisposed: true }) {
+                // Veraltete (disposete) Collection verwerfen, beim nächsten
+                // Zugriff wird neu aufgebaut.
+                field = null;
+                return null;
             }
 
-            field?.SheetStyle = SheetStyle;
-            field?.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+            if (ca is not null) {
+                ca.SheetStyle = SheetStyle;
+                ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+            }
 
-            return field;
+            return ca;
         }
 
         private set;

@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 
 namespace BlueScript.Variables;
 
-public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
+public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable, IJsonParseable {
 
     #region Fields
 
@@ -30,6 +30,12 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         }
         ReadOnly = readOnly;
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -94,6 +100,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (variable is null) { return false; }
 
         if (!_internal.TryAdd(variable.KeyName, variable)) { return false; }
+        variable.PropertyChangedExt += Variable_PropertyChangedExt;
         InvalidateCache();
         return true;
     }
@@ -201,7 +208,18 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return vf.ValueString;
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Variables", StringComparison.OrdinalIgnoreCase)) {
+            return GetByKey(key);
+        }
+        return null;
+    }
+
     public string IsNowEditable() => string.Empty;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -212,7 +230,27 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return result;
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json["readonly"] = ReadOnly;
+        json.SetArrayIfNotEmpty("variables", _internal.Values);
+        return json;
+    }
+
     public void ParseFinished(string parsed) { }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        ReadOnly = json.GetBool("readonly");
+
+        if (json["variables"] is JsonArray arr) {
+            foreach (var item in arr) {
+                if (item is not JsonObject jo) { continue; }
+                if (ParseableItem.NewByParsingJson<Variable>(jo.ToJsonElement()) is { } created) { Add(created); }
+            }
+        }
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -232,7 +270,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Remove(string keyName) {
         if (ReadOnly) { return false; }
 
-        if (!_internal.TryRemove(keyName, out _)) { return false; }
+        if (!_internal.TryRemove(keyName, out var v)) { return false; }
+        v.PropertyChangedExt -= Variable_PropertyChangedExt;
         InvalidateCache();
         return true;
     }
@@ -243,7 +282,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         var changed = false;
         foreach (var kvp in _internal) {
             if (kvp.Value.Comment.Contains(comment)) {
-                _internal.TryRemove(kvp.Key, out _);
+                _internal.TryRemove(kvp.Key, out var v);
+                if (v is not null) { v.PropertyChangedExt -= Variable_PropertyChangedExt; }
                 changed = true;
             }
         }
@@ -390,6 +430,9 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     internal void Clear() {
         if (ReadOnly) { return; }
 
+        foreach (var v in _internal.Values) {
+            v.PropertyChangedExt -= Variable_PropertyChangedExt;
+        }
         _internal.Clear();
         InvalidateCache();
     }
@@ -398,6 +441,11 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     private void InvalidateCache() {
         _cachedStringableNames = null;
+    }
+
+    private void Variable_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
+        if (sender is not Variable v) { return; }
+        OnPropertyChangedExt($"Variables[{v.KeyName}].{e.RelativePath}", e.Partial);
     }
 
     #endregion
