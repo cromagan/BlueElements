@@ -72,4 +72,12 @@ public enum Design {
     Table_Lines_Thick,
     Table_Lines_Thin,
     Table_Cursor,
+
+    Note_OK,
+    Note_Warning,
+    Note_Error,
+    Note_Default,
+
+    Badge_Caption,
+    Badge_Warning
 }

@@ -183,8 +183,9 @@ public sealed class RowListItem : RowBackground {
         if (viewItem.Column.Table is { IsDisposed: false }) {
             var note = CellNoteHelper.GetNoteData(viewItem.Column, Row);
             if (note.HasValue && note.Value.Text.Length > 0) {
-                var pen = NoteEntry.PenForSymbol(note.Value.Symbol);
-                gr.DrawRectangle(pen, positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
+                var noteDesign = NoteEntry.DesignFor(note.Value.Symbol);
+                var noteRect = new Rectangle((int)positionControl.X + 1, (int)positionControl.Y + 1, (int)positionControl.Width - 2, (int)positionControl.Height - 2);
+                Skin.Draw_Border(gr, noteDesign, States.Standard, noteRect);
                 if (NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale)) is { } icon) {
                     gr.DrawImageUnscaled(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
                 }

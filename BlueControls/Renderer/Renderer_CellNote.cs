@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Controls;
+using BlueControls.Extended_Text;
 
 namespace BlueControls.Renderer;
 
@@ -19,12 +20,8 @@ public class Renderer_CellNote : Renderer_Abstract {
 
     private const int BoxGap = 4;
 
-    private const int HeaderToTextGap = 2;
-
-    private const int Padding = 3;
-
     // Alle Maße in Canvas-Pixeln.
-    private const int SymbolSize = 16;
+    private const int Padding = 3;
 
     #endregion
 
@@ -44,46 +41,38 @@ public class Renderer_CellNote : Renderer_Abstract {
 
         var table = affectingRow is { IsDisposed: false } r && r.Table is { IsDisposed: false } t ? t : null;
 
-        var font = GetFont(zoom, design, state);
-        var headerFont = BoldVariant(font);
-
         var pad = Padding.CanvasToControl(zoom);
         var gap = BoxGap.CanvasToControl(zoom);
-        var hgt = HeaderToTextGap.CanvasToControl(zoom);
-        var lineH = (int)Math.Ceiling(font.MeasureString("X").Height);
-        var headerH = Math.Max(SymbolSize.CanvasToControl(zoom), (int)Math.Ceiling(headerFont.MeasureString("X").Height));
-
-        var innerWidth = drawingAreaControl.Width - 2 * pad;
-        if (innerWidth < 1) { innerWidth = 1; }
+        var innerWidthControl = Math.Max(1, drawingAreaControl.Width - 2 * pad);
+        var innerWidthCanvas = Math.Max(1, (int)(innerWidthControl / zoom));
 
         var y = drawingAreaControl.Top;
 
         foreach (var (keyName, symbol, text) in entries) {
-            var bodyLines = WrapBody(font, text, innerWidth);
-            var boxHeight = pad + headerH + hgt + (bodyLines.Count * lineH) + pad;
+            var noteDesign = NoteEntry.DesignFor(symbol);
+
+            using var extText = new ExtText(noteDesign, States.Standard) {
+                TextDimensions = new Size(innerWidthCanvas, 0),
+                HtmlText = BuildNoteHtml(table, keyName, symbol, text)
+            };
+
+            var boxHeight = (int)(extText.HeightControl * zoom) + 2 * pad;
 
             if (y + boxHeight > drawingAreaControl.Bottom) {
-                // Letzter Kasten wird nur gezeichnet, wenn zumindest Kopfzeile + eine Textzeile Platz haben
-                if (y + pad + headerH + hgt + lineH + pad > drawingAreaControl.Bottom) { break; }
+                // Letzter Kasten wird nur gezeichnet, wenn zumindest eine Zeile Platz hat
+                var minLineH = (int)Math.Ceiling(extText.BaseFont.MeasureString("X").Height * zoom);
+                if (y + pad + minLineH + pad > drawingAreaControl.Bottom) { break; }
                 boxHeight = drawingAreaControl.Bottom - y;
             }
 
             var box = new Rectangle(drawingAreaControl.Left, y, drawingAreaControl.Width, boxHeight);
 
-            gr.FillRectangle(BlueFont.GetBrush(NoteEntry.GetBackColor(symbol)), box);
-            gr.DrawRectangle(NoteEntry.PenForSymbol(symbol), box);
+            Skin.Draw_Back(gr, noteDesign, States.Standard, box, null, false);
 
-            var headerRect = new Rectangle(box.Left + pad, box.Top + pad, box.Width - 2 * pad, headerH);
-            var qi = NoteEntry.GetQuickImage(symbol, SymbolSize)?.Scale(zoom);
-            var caption = ResolveCaption(table, keyName);
-            Skin.Draw_FormatedText(gr, caption, qi, Alignment.VerticalCenter_Left, headerRect, headerFont, false);
+            extText.AreaControl = new Rectangle(box.Left + pad, box.Top + pad, innerWidthControl, boxHeight - 2 * pad);
+            extText.Draw(gr, zoom, box.Left + pad, box.Top + pad);
 
-            var bodyY = headerRect.Bottom + hgt;
-            foreach (var line in bodyLines) {
-                if (bodyY + lineH > box.Bottom) { break; }
-                font.DrawString(gr, line, box.Left + pad, bodyY);
-                bodyY += lineH;
-            }
+            Skin.Draw_Border(gr, noteDesign, States.Standard, box);
 
             y += boxHeight + gap;
         }
@@ -99,16 +88,17 @@ public class Renderer_CellNote : Renderer_Abstract {
         var entries = CellNoteHelper.ParseAllNotes(content);
         if (entries.Count == 0) { return new(16, 16); }
 
-        var font = GetFont();
-        var headerFont = BoldVariant(font);
-
-        var lineH = (int)Math.Ceiling(font.MeasureString("X").Height);
-        var headerH = Math.Max(SymbolSize, (int)Math.Ceiling(headerFont.MeasureString("X").Height));
-
         var totalH = 0;
+
         for (var i = 0; i < entries.Count; i++) {
-            var bodyLines = WrapBody(font, entries[i].Text, AssumedBodyWidth).Count;
-            totalH += Padding + headerH + HeaderToTextGap + (bodyLines * lineH) + Padding;
+            var noteDesign = NoteEntry.DesignFor(entries[i].Symbol);
+
+            using var extText = new ExtText(noteDesign, States.Standard) {
+                TextDimensions = new Size(AssumedBodyWidth, 0),
+                HtmlText = BuildNoteHtml(null, entries[i].KeyName, entries[i].Symbol, entries[i].Text)
+            };
+
+            totalH += 2 * Padding + extText.HeightControl;
             if (i < entries.Count - 1) { totalH += BoxGap; }
         }
 
@@ -120,19 +110,18 @@ public class Renderer_CellNote : Renderer_Abstract {
         return entries.Count == 0 ? string.Empty : string.Join("\r", entries.Select(e => $"{e.Symbol}: {e.Text}"));
     }
 
-    private static BlueFont BoldVariant(BlueFont font) => BlueFont.Get(font.FontName, font.Size, true, font.Italic, font.Underline, font.StrikeOut, font.ColorMain, font.ColorOutline, font.ColorBack);
+    private static string BuildNoteHtml(Table? table, string keyName, NoteSymbols symbol, string text) {
+        var caption = ResolveCaption(table, keyName);
+        var imgCode = NoteEntry.ImageCodeFor(symbol);
+        var body = text.Replace("\r\n", "<br>").Replace("\n", "<br>");
+        return $"<Imagecode={imgCode}><b>{caption}</b><br>{body}";
+    }
 
     private static string ResolveCaption(Table? table, string keyName) {
         if (table is { IsDisposed: false } && table.Column[keyName] is { IsDisposed: false } col && !string.IsNullOrEmpty(col.Caption)) {
             return col.Caption.Replace("\r", " ");
         }
         return keyName;
-    }
-
-    private static List<string> WrapBody(BlueFont font, string text, float maxWidth) {
-        if (string.IsNullOrEmpty(text)) { return [string.Empty]; }
-        if (maxWidth <= 5) { return [text]; }
-        return BlueFont.SplitByWidth(font, text, maxWidth, 100);
     }
 
     #endregion

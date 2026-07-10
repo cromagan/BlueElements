@@ -15,11 +15,9 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
     private const double FloatUpDurationMs = 700;
     private const double FloatUpPixels = 30;
 
-    private readonly Color _backColor;
+    private readonly Design _design;
     private readonly double _durationMs;
-    private readonly BlueFont _font;
     private readonly QuickImage? _image;
-    private readonly Pen _pen;
     private readonly int _startTop;
     private readonly int _startX;
     private readonly string _text;
@@ -28,17 +26,17 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
 
     #region Constructors
 
-    private QuickNote(NoteSymbols symbol, string text, int x, int y) : base(Design.Form_Notification) {
+    private QuickNote(NoteSymbols symbol, string text, int x, int y) : base(NoteEntry.DesignFor(symbol)) {
         DismissMode = DismissMode.ManualOnly;
 
         _text = text;
-        _pen = new Pen(NoteEntry.GetTextColor(symbol));
-        _backColor = NoteEntry.GetBackColor(symbol);
+        _design = NoteEntry.DesignFor(symbol);
         _image = NoteEntry.GetQuickImage(symbol, 14);
-        _font = BlueFont.Get("Arial", 9, false, false, false, false, NoteEntry.GetTextColor(symbol), Color.Transparent, Color.Transparent);
+
+        var font = Skin.GetBlueFont(_design, States.Standard);
         _durationMs = BaseDurationMs + Math.Max(0, text.Length - BaseCharCount) * ExtraMsPerChar;
 
-        var textSize = _font.MeasureString(text);
+        var textSize = font.MeasureString(text);
 
         var imageWidth = _image?.Width ?? 0;
         var totalWidth = (int)(imageWidth + Skin.PaddingSmal + textSize.Width + Skin.PaddingSmal * 3);
@@ -134,13 +132,9 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
         var gr = e.Graphics;
         gr.SmoothingMode = SmoothingMode.HighQuality;
 
-        var r = new Rectangle(0, 0, Width - 1, Height - 1);
+        var r = new Rectangle(0, 0, Width, Height);
 
-        using var backBrush = new SolidBrush(_backColor);
-        gr.FillRectangle(backBrush, r);
-
-        using var borderPen = new Pen(_pen.Color, _pen.Width);
-        gr.DrawRectangle(borderPen, r);
+        Skin.Draw_Back(gr, _design, States.Standard, r, this, false);
 
         var imageWidth = _image?.Width ?? 0;
         var imageHeight = _image?.Height ?? 0;
@@ -152,7 +146,10 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
             gr.DrawImage((Bitmap)_image, Skin.PaddingSmal, imgY, imageWidth, imageHeight);
         }
 
-        _font.DrawString(gr, _text, textX, textY);
+        var font = Skin.GetBlueFont(_design, States.Standard);
+        font.DrawString(gr, _text, textX, textY);
+
+        Skin.Draw_Border(gr, _design, States.Standard, r);
     }
 
     #endregion

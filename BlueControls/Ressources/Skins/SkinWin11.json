@@ -402,7 +402,7 @@
       "Border": "Solid3Px",
       "BOC1": "3399FF"
     },
-	"Standard_MousePressed": {
+    "Standard_MousePressed": {
       "Contour": "Rectangle",
       "Background": "Solid",
       "BC1": "F0F0F0",
@@ -1850,6 +1850,66 @@
       "Background": "None",
       "Border": "Solid3Px",
       "BOC1": "3399FF"
+    }
+  },
+  "Note_OK": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "DCFFDC",
+      "Border": "Solid1Px",
+      "BOC1": "32B450",
+      "Font": "{Name=Calibri, Size=9, Color=#006400}"
+    }
+  },
+  "Note_Warning": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "FFFFDC",
+      "Border": "Solid1Px",
+      "BOC1": "E6B41E",
+      "Font": "{Name=Calibri, Size=9, Color=#646400}"
+    }
+  },
+  "Note_Error": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "FFDCDC",
+      "Border": "Solid1Px",
+      "BOC1": "DC3232",
+      "Font": "{Name=Calibri, Size=9, Color=#640000}"
+    }
+  },
+  "Note_Default": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "F0F0F0",
+      "Border": "Solid1Px",
+      "BOC1": "969696",
+      "Font": "{Name=Calibri, Size=9, Color=#000000}"
+    }
+  },
+  "Badge_Caption": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "FFFFDC",
+      "Border": "Solid1Px",
+      "BOC1": "E6B41E",
+      "Font": "{Name=Calibri, Size=10.15, Color=#646400}"
+    }
+  },
+  "Badge_Warning": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "FFF3CD",
+      "Border": "Solid1Px",
+      "BOC1": "962828",
+      "Font": "{Name=Calibri, Size=13, Bold=true, Color=#962828}"
     }
   }
 }

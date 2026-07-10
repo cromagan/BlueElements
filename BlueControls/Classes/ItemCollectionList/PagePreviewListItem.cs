@@ -127,9 +127,9 @@ public class PagePreviewListItem : AbstractListItem {
                 badge.Width,
                 badge.Height);
 
-            Skin.Draw_Back(gr, Design.Form_QuickInfo, States.Standard, badgeRect.ToRect(), null, false);
-            Skin.Draw_FormatedText(gr, _caption, null, Alignment.Horizontal_Vertical_Center, badgeRect.ToRect(), Design.Form_QuickInfo, States.Standard, null, false, false);
-            Skin.Draw_Border(gr, Design.Form_QuickInfo, States.Standard, badgeRect.ToRect());
+            Skin.Draw_Back(gr, Design.Badge_Caption, States.Standard, badgeRect.ToRect(), null, false);
+            Skin.Draw_FormatedText(gr, _caption, null, Alignment.Horizontal_Vertical_Center, badgeRect.ToRect(), Design.Badge_Caption, States.Standard, null, false, false);
+            Skin.Draw_Border(gr, Design.Badge_Caption, States.Standard, badgeRect.ToRect());
         }
 
         if (drawBorderAndBack) {
@@ -140,7 +140,7 @@ public class PagePreviewListItem : AbstractListItem {
     protected override string GetCompareKey() => KeyName;
 
     private SizeF BadgeSize() {
-        var font = Skin.GetBlueFont(Design.Form_QuickInfo, States.Standard);
+        var font = Skin.GetBlueFont(Design.Badge_Caption, States.Standard);
         var s = font.MeasureString(_caption);
         return new SizeF(s.Width + ConstBadgeHPad * 2, s.Height + ConstBadgeVPad * 2);
     }

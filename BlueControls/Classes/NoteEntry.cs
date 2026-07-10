@@ -7,15 +7,6 @@ namespace BlueControls.Classes;
 
 public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyChanged {
 
-    #region Fields
-
-    private static readonly Pen PenNoteCritical = new(Color.FromArgb(200, 220, 50, 50)) { Width = 2f };
-    private static readonly Pen PenNoteNone = new(Color.FromArgb(200, 150, 150, 150)) { Width = 2f };
-    private static readonly Pen PenNoteOk = new(Color.FromArgb(200, 50, 180, 80)) { Width = 2f };
-    private static readonly Pen PenNoteWarning = new(Color.FromArgb(200, 230, 180, 30)) { Width = 2f };
-
-    #endregion
-
     #region Constructors
 
     public NoteEntry() { }
@@ -58,34 +49,20 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
 
     #region Methods
 
-    public static Color GetBackColor(NoteSymbols symbol) => symbol switch {
-        NoteSymbols.Critical => Color.FromArgb(255, 220, 220),
-        NoteSymbols.Warning => Color.FromArgb(255, 255, 220),
-        NoteSymbols.Ok => Color.FromArgb(220, 255, 220),
-        _ => Color.FromArgb(240, 240, 240)
+    public static Design DesignFor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Ok => Design.Note_OK,
+        NoteSymbols.Warning => Design.Note_Warning,
+        NoteSymbols.Critical => Design.Note_Error,
+        _ => Design.Note_Default
     };
+
+    public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => QuickImage.Get(ImageCodeFor(symbol), size);
 
     public static ImageCode ImageCodeFor(NoteSymbols symbol) => symbol switch {
         NoteSymbols.Critical => ImageCode.Kritisch,
         NoteSymbols.Warning => ImageCode.Warnung,
         NoteSymbols.Ok => ImageCode.Häkchen,
         _ => ImageCode.Stift
-    };
-
-    public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => QuickImage.Get(ImageCodeFor(symbol), size);
-
-    public static Color GetTextColor(NoteSymbols symbol) => symbol switch {
-        NoteSymbols.Critical => Color.FromArgb(100, 0, 0),
-        NoteSymbols.Warning => Color.FromArgb(100, 100, 0),
-        NoteSymbols.Ok => Color.FromArgb(0, 100, 0),
-        _ => Color.FromArgb(0, 0, 0)
-    };
-
-    public static Pen PenForSymbol(NoteSymbols symbol) => symbol switch {
-        NoteSymbols.Critical => PenNoteCritical,
-        NoteSymbols.Warning => PenNoteWarning,
-        NoteSymbols.Ok => PenNoteOk,
-        _ => PenNoteNone
     };
 
     public List<GenericControl> GetProperties(int widthOfControl) {

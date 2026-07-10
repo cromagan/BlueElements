@@ -6,6 +6,7 @@ using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
+using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
@@ -344,7 +345,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
 
         if (!string.IsNullOrEmpty(NotEditableReason)) {
-            DrawNotEditableOverlay(gr, controla);
+            DrawNotEditableOverlay(gr, controla, ImageCode.Warnung, "Schreibgeschützt: " + NotEditableReason);
         }
     }
 
@@ -384,59 +385,30 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #endregion
     }
 
-    private void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea) {
+    private static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text) {
         // Halbtransparenter Schleier signalisiert die Schreibsperre,
         // lässt die Items darunter aber erkennbar.
         using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
         gr.FillRectangle(veil, drawArea);
 
-        var reasonFont = BlueFont.Get("Arial", 13f, true, false, false, false,
-                                      Color.FromArgb(150, 40, 40), Color.Transparent, Color.Transparent);
-
-        var qi = QuickImage.Get(ImageCode.Warnung, 24);
-        var iconSize = new SizeF(qi.Width, qi.Height);
-
         const int padding = 12;
-        var bannerWidth = Math.Min(drawArea.Width - 20, 600);
-        var textMaxWidth = bannerWidth - (2 * padding) - iconSize.Width - 6;
-        if (textMaxWidth < 50) { textMaxWidth = 50; }
+        var maxWidth = Math.Max(50, Math.Min(drawArea.Width - 20, 600) - (2 * padding));
 
-        // Lange Begründungen umbrechen statt abschneiden, damit nichts
-        // abgeschnitten und einzeilig dargestellt wird.
-        var lines = BlueFont.SplitByWidth(reasonFont, "Schreibgeschützt: " + NotEditableReason,
-                                          textMaxWidth, 5);
+        using var extText = new ExtText(Design.Badge_Warning, States.Standard) {
+            Ausrichtung = Alignment.Top_Left,
+            TextDimensions = new Size(maxWidth, 500),
+            HtmlText = $"<Imagecode={imageCode}>" + text
+        };
 
-        var lineHeight = reasonFont.MeasureString("Xy").Height;
-        const float lineGap = 2f;
-        var textHeight = (lines.Count * lineHeight) + ((lines.Count - 1) * lineGap);
-        var contentHeight = Math.Max(iconSize.Height, textHeight);
-        var bannerHeight = (int)(contentHeight + (2 * padding));
-
-        // Banner oben mittig, über allen Items.
         var bannerRect = new Rectangle(
-            drawArea.X + ((drawArea.Width - bannerWidth) / 2),
+            drawArea.X + ((drawArea.Width - extText.WidthControl - (2 * padding)) / 2),
             drawArea.Y + 10,
-            bannerWidth,
-            bannerHeight);
+            extText.WidthControl + (2 * padding),
+            extText.HeightControl + (2 * padding));
 
-        using var bg = new SolidBrush(Color.FromArgb(235, 255, 243, 205));
-        gr.FillRectangle(bg, bannerRect);
-        using var borderPen = new Pen(Color.FromArgb(180, 150, 40, 40), 2f);
-        gr.DrawRectangle(borderPen, bannerRect);
-
-        var contentTop = bannerRect.Y + ((bannerHeight - contentHeight) / 2f);
-        var iconX = bannerRect.X + padding;
-        var iconY = contentTop + ((contentHeight - iconSize.Height) / 2f);
-
-        var img = (Bitmap)qi;
-        lock (img) { gr.DrawImageUnscaled(img, iconX, (int)iconY); }
-
-        var textX = iconX + iconSize.Width + 6;
-        var textY = contentTop + ((contentHeight - textHeight) / 2f);
-        foreach (var line in lines) {
-            reasonFont.DrawString(gr, line, textX, textY);
-            textY += lineHeight + lineGap;
-        }
+        Skin.Draw_Back(gr, Design.Badge_Warning, States.Standard, bannerRect, null, false);
+        extText.Draw(gr, 1, bannerRect.X + padding, bannerRect.Y + padding);
+        Skin.Draw_Border(gr, Design.Badge_Warning, States.Standard, bannerRect);
     }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
