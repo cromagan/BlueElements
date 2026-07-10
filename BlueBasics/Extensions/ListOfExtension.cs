@@ -277,7 +277,7 @@ public static partial class Extensions {
     /// </summary>
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
         if (arr is null) { return []; }
-        var result = arr.Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
+        var result = arr.Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s, StringComparer.Ordinal).ToList();
         return result;
     }
 
