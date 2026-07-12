@@ -412,9 +412,9 @@ namespace BlueControls.Forms {
             cbxColumnArr.Name = "cbxColumnArr";
             cbxColumnArr.Size = new Size(200, 22);
             cbxColumnArr.TabIndex = 2;
+            cbxColumnArr.AddClicked += cbxColumnArr_AddClicked;
             cbxColumnArr.ItemClicked += cbxColumnArr_ItemClicked;
             cbxColumnArr.ItemRemoved += cbxColumnArr_ItemRemoved;
-            cbxColumnArr.AddClicked += cbxColumnArr_AddClicked;
             cbxColumnArr.UpDownClicked += cbxColumnArr_UpDownClicked;
             // 
             // grpHilfen
@@ -473,7 +473,7 @@ namespace BlueControls.Forms {
             grpAdminZeilen.Controls.Add(btnZeileLöschen);
             grpAdminZeilen.Dock = DockStyle.Left;
             grpAdminZeilen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAdminZeilen.Location = new Point(752, 0);
+            grpAdminZeilen.Location = new Point(688, 0);
             grpAdminZeilen.Name = "grpAdminZeilen";
             grpAdminZeilen.Size = new Size(232, 81);
             grpAdminZeilen.TabIndex = 8;
@@ -527,7 +527,7 @@ namespace BlueControls.Forms {
             grpAdminAllgemein.Controls.Add(btnSpaltenUebersicht);
             grpAdminAllgemein.Dock = DockStyle.Left;
             grpAdminAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAdminAllgemein.Location = new Point(376, 0);
+            grpAdminAllgemein.Location = new Point(312, 0);
             grpAdminAllgemein.Name = "grpAdminAllgemein";
             grpAdminAllgemein.Size = new Size(376, 81);
             grpAdminAllgemein.TabIndex = 7;
@@ -618,7 +618,7 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminBearbeiten.Location = new Point(0, 0);
             grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            grpAdminBearbeiten.Size = new Size(376, 81);
+            grpAdminBearbeiten.Size = new Size(312, 81);
             grpAdminBearbeiten.TabIndex = 9;
             grpAdminBearbeiten.TabStop = false;
             grpAdminBearbeiten.Text = "Bearbeiten";
@@ -626,8 +626,8 @@ namespace BlueControls.Forms {
             // btnSuchInScript
             // 
             btnSuchInScript.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnSuchInScript.ImageCode = "Skript||||||||||Stift";
-            btnSuchInScript.Location = new Point(304, 2);
+            btnSuchInScript.ImageCode = "Skript||||||||||Lupe";
+            btnSuchInScript.Location = new Point(240, 2);
             btnSuchInScript.Name = "btnSuchInScript";
             btnSuchInScript.Size = new Size(64, 66);
             btnSuchInScript.TabIndex = 46;
@@ -638,7 +638,7 @@ namespace BlueControls.Forms {
             // 
             btnSkripteBearbeiten.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
-            btnSkripteBearbeiten.Location = new Point(240, 2);
+            btnSkripteBearbeiten.Location = new Point(184, 2);
             btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
             btnSkripteBearbeiten.Size = new Size(56, 66);
             btnSkripteBearbeiten.TabIndex = 45;
@@ -698,7 +698,7 @@ namespace BlueControls.Forms {
             grpExport.Controls.Add(btnCSVClipboard);
             grpExport.Dock = DockStyle.Left;
             grpExport.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpExport.Location = new Point(144, 0);
+            grpExport.Location = new Point(80, 0);
             grpExport.Name = "grpExport";
             grpExport.Size = new Size(224, 81);
             grpExport.TabIndex = 3;
@@ -751,7 +751,7 @@ namespace BlueControls.Forms {
             grpImport.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpImport.Location = new Point(0, 0);
             grpImport.Name = "grpImport";
-            grpImport.Size = new Size(144, 81);
+            grpImport.Size = new Size(80, 81);
             grpImport.TabIndex = 4;
             grpImport.TabStop = false;
             grpImport.Text = "Import";

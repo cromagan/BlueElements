@@ -385,7 +385,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #endregion
     }
 
-    private static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text) {
+    public static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text) {
         // Halbtransparenter Schleier signalisiert die Schreibsperre,
         // lässt die Items darunter aber erkennbar.
         using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
@@ -397,7 +397,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         using var extText = new ExtText(Design.Badge_Warning, States.Standard) {
             Ausrichtung = Alignment.Top_Left,
             TextDimensions = new Size(maxWidth, 500),
-            HtmlText = $"<Imagecode={imageCode}>" + text
+            HtmlText = $"<Imagecode={imageCode}> " + text
         };
 
         var bannerRect = new Rectangle(

@@ -20,13 +20,14 @@ public class Renderer_RichText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
+        // TextDimensions ist in Canvas-Pixeln (ExtText-Koordinatensystem),
+        // drawingAreaControl.Width aber in Control-Pixeln. Bei zoom != 1.0
+        // muss konvertiert werden, sonst stimmt der Zeilenumbruch nicht.
+        var canvasWidth = Math.Max(1, (int)(drawingAreaControl.Width / zoom));
+
         using var _txt = new ExtText(SheetStyle, PadStyles.Standard) {
             HtmlText = content,
-            //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
-            //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
-            //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
-            //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            TextDimensions = new Size(drawingAreaControl.Width, -1),
+            TextDimensions = new Size(canvasWidth, -1),
             Ausrichtung = align,
             AreaControl = drawingAreaControl,
         };
@@ -52,6 +53,15 @@ public class Renderer_RichText : Renderer_Abstract {
         };
 
         _etxt.TextDimensions = new Size(400, -1);
+
+        return _etxt.LastSize();
+    }
+
+    protected override Size CalculateContentSizeAtWidth(string content, TranslationType doOpticalTranslation, int canvasWidth) {
+        using var _etxt = new ExtText(SheetStyle, PadStyles.Standard) {
+            HtmlText = content,
+            TextDimensions = new Size(Math.Max(1, canvasWidth), -1)
+        };
 
         return _etxt.LastSize();
     }

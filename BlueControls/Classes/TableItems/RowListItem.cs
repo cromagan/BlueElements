@@ -20,6 +20,9 @@ public sealed class RowListItem : RowBackground {
     private static readonly Pen PenBrighten = new Pen(Color.FromArgb(128, 255, 255, 255));
     private static readonly Pen PenDarken = new Pen(Color.FromArgb(128, 0, 0, 0));
 
+    private string? _heightWidthKey;
+    private int _heightWidthValue = -1;
+
     #endregion
 
     #region Constructors
@@ -194,8 +197,8 @@ public sealed class RowListItem : RowBackground {
 
         var toDrawd = Row.CellGetString(viewItem.Column);
 
-        var pax = 4.ControlToCanvas(scale);
-        var pay = 2.ControlToCanvas(scale);
+        var pax = 4.CanvasToControl(scale);
+        var pay = 2.CanvasToControl(scale);
         positionControl.Inflate(-pax, -pay);
 
         if (state.HasFlag(States.Standard_HasFocus)) { state ^= States.Standard_HasFocus; }
@@ -208,7 +211,42 @@ public sealed class RowListItem : RowBackground {
         ColumnOverlay(gr, viewItem, positionControl);
     }
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        if (IsDisposed || Row.IsDisposed || Arrangement is null) { return 18; }
+
+        // columnWidth ist die Canvas-Gesamtbreite (von CalculateAllViewItems_CalculateYPosition
+        // als arrangement.ControlColumnsWidth().ControlToCanvas(Zoom) übergeben).
+        // ControlColumnsWidth() ist die Control-Gesamtbreite. Daraus lässt sich der
+        // Zoom ableiten, um Control-Pixel → Canvas-Pixel zu konvertieren.
+        var totalControlWidth = Arrangement.ControlColumnsWidth();
+        var zoom = columnWidth > 0 && totalControlWidth > 0
+            ? (float)totalControlWidth / columnWidth
+            : 1f;
+
+        // Cache-Schlüssel inkl. Zoom (bzw. canvas-Gesamtbreite), damit bei
+        // Zoom-Änderung neu berechnet wird — auch wenn die Control-Breiten gleich bleiben.
+        var key = BuildColumnWidthsKey(columnWidth);
+        if (key == _heightWidthKey) { return _heightWidthValue; }
+
+        var drawHeight = 18;
+
+        foreach (var thisViewItem in Arrangement) {
+            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
+                var renderer = thisViewItem.GetRenderer(SheetStyle);
+                // ControlColumnWidth() ist in Control-Pixeln → Canvas-Pixel: / zoom.
+                // 4 Canvas-Pixel Padding je Seite abziehen.
+                var contentWidth = Math.Max(1, (int)(thisViewItem.ControlColumnWidth() / zoom) - 8);
+                drawHeight = Math.Max(drawHeight, renderer.ContentSizeAtWidth(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation, contentWidth).Height);
+            }
+        }
+
+        drawHeight = Math.Min(drawHeight, 200);
+        drawHeight = Math.Max(drawHeight + 4, 18);
+
+        _heightWidthKey = key;
+        _heightWidthValue = drawHeight;
+        return drawHeight;
+    }
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { IsDisposed: false } column) { return string.Empty; }
@@ -248,19 +286,9 @@ public sealed class RowListItem : RowBackground {
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return new(16, 16); }
 
-        var drawHeight = 18;
-
-        foreach (var thisViewItem in Arrangement) {
-            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
-                var renderer = thisViewItem.GetRenderer(SheetStyle);
-                drawHeight = Math.Max(drawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);
-            }
-        }
-
-        drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight + 4, 18);
-
-        return new(100, drawHeight);
+        // An HeightInControl delegieren, damit Spaltenbreiten-basierte Höhen-
+        // berechnung (inkl. ScaleToFit) konsistent verwendet wird.
+        return new(100, HeightInControl(ListBoxAppearance.Listbox, 0, itemdesign));
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
@@ -272,6 +300,20 @@ public sealed class RowListItem : RowBackground {
         var _tmpCursorRect = positionControl.ToRect();
         var pen = BorderDraw.GetPen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180), 1);
         lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1)); }
+    }
+
+    private string BuildColumnWidthsKey(int canvasTotalWidth) {
+        if (Arrangement is null) { return string.Empty; }
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append(canvasTotalWidth).Append(':');
+        foreach (var cvi in Arrangement) {
+            if (cvi.Column is { IsDisposed: false }) {
+                sb.Append(cvi.ControlColumnWidth()).Append('|');
+            }
+        }
+
+        return sb.ToString();
     }
 
     #endregion

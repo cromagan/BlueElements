@@ -16,6 +16,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
     private static readonly ConcurrentCache<string, string> Replaced = new(1000);
     private static readonly ConcurrentCache<string, Size> Sizes = new(1000);
+    private static readonly ConcurrentCache<string, Size> SizesAtWidth = new(2000);
     private BlueFont? _font;
     private string _lastCode = "?";
 
@@ -64,6 +65,20 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
         return Sizes.GetOrAdd(key, _ => CalculateContentSize(content, translate));
     }
 
+    /// <summary>
+    /// Berechnet die benötigte Inhaltsgröße bei einer vorgegebenen Canvas-Breite.
+    /// Einzeilige Renderer ignorieren die Breite. Mehrzeilige Renderer (z. B.
+    /// <see cref="Renderer_RichText"/>) berechnen die korrekte Höhe basierend auf
+    /// dem Zeilenumbruch bei der angegebenen Breite. Wichtig für ScaleToFit: Die
+    /// Zeilenhöhe muss zur tatsächlichen Spaltenbreite passen, nicht zu einem
+    /// hartkodierten Standardwert.
+    /// </summary>
+    public Size ContentSizeAtWidth(string content, TranslationType translate, int canvasWidth) {
+        var key = TextSizeKey(_lastCode, content) + "|w" + canvasWidth;
+
+        return SizesAtWidth.GetOrAdd(key, _ => CalculateContentSizeAtWidth(content, translate, canvasWidth));
+    }
+
     public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
@@ -101,6 +116,16 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     }
 
     protected abstract Size CalculateContentSize(string content, TranslationType doOpticalTranslation);
+
+    /// <summary>
+    /// Berechnet die Inhaltsgröße bei einer konkreten Breite. Die Standard-
+    /// Implementierung ignoriert die Breite und delegiert an
+    /// <see cref="CalculateContentSize"/>. Mehrzeilige Renderer überschreiben dies,
+    /// um die Höhe abhängig vom Zeilenumbruch zu berechnen.
+    /// </summary>
+    protected virtual Size CalculateContentSizeAtWidth(string content, TranslationType doOpticalTranslation, int canvasWidth) {
+        return CalculateContentSize(content, doOpticalTranslation);
+    }
 
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
 

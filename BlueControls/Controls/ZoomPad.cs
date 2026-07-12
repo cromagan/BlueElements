@@ -308,12 +308,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     protected void DrawWaitScreen(Graphics gr, string info) {
         Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
+        if (!string.IsNullOrEmpty(info)) {
+            CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, info);
+        }
+
         var i = QuickImage.Get(ImageCode.Uhr, 64);
         gr.DrawImageUnscaled(i, (Width - 64) / 2, (Height - 64) / 2);
-
-        var fa = BlueFont.DefaultFont;
-
-        fa.DrawString(gr, info, 12, 50);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
@@ -421,8 +421,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Fitting = false;
         var m = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
 
-        // Logarithmischer Zoom: 
-        // Wir wandeln den aktuellen Zoom in einen Exponenten um (Log), 
+        // Logarithmischer Zoom:
+        // Wir wandeln den aktuellen Zoom in einen Exponenten um (Log),
         // ändern diesen linear und wandeln ihn zurück (Pow).
         double logZoom = Math.Log(Zoom, 2);
 
@@ -439,7 +439,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         OffsetX = (int)(e.X - m.CanvasX * Zoom);
         OffsetY = (int)(e.Y - m.CanvasY * Zoom);
     }
-
 
     protected virtual void OnOffsetXChanged() => Invalidate();
 
