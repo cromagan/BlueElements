@@ -41,6 +41,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     private readonly List<string> _collapsed = [];
 
+    /// <summary>
+    /// NumberStyle (SYS_ROWSORTINDEX aktiv): Menge der KeyNames der ersten
+    /// Zeile unter jedem eingeklappten Header-Block. Dient dazu, dass
+    /// derselbe Chapter-Text mehrfach auftreten kann — jeder Block ist
+    /// unabhängig auf-/zuklappbar. Der Key ist stabil gegen UI-Änderungen,
+    /// solange die Zeile nicht gelöscht wird.
+    /// </summary>
+    private readonly HashSet<string> _collapsedBlockFirstRowKeys = [];
+
     private readonly object _lockUserAction = new();
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
@@ -315,6 +324,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             ShowWaitScreen = true;
             Refresh();
             _storedView = null;
+            _collapsedBlockFirstRowKeys.Clear();
             field = value;
             Invalidate_CurrentArrangement();
             Invalidate_AllViewItems(true);
@@ -482,12 +492,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
 
         var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
-        var m = s.ProtocolText;
 
-        if (string.IsNullOrEmpty(m)) {
+        if (!s.Failed) {
             QuickNote.Show(NoteSymbols.Ok, "Skript erfolgreich ausgeführt");
         } else {
-            Forms.MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+            Forms.MessageBox.Show("Skript abgebrochen:\r\n" + s.ProtocolText, ImageCode.Kreuz, "OK");
         }
     }
 
@@ -872,8 +881,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (AllViewItems is not { } avi) { return; }
 
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowCaptionListItem { IsDisposed: false, IsExpanded: true } rcli) { rcli.IsExpanded = false; did = true; }
+        // NumberStyle: alle sichtbaren Block-Header einklappen. Der Zustand
+        // wird pro Block in _collapsedBlockFirstRowKeys gespeichert.
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            foreach (var thisItem in _sortedViewItems) {
+                if (thisItem is RowCaptionListItem { IsDisposed: false } rcli
+                    && GetChapterBlockRows(rcli) is { Count: > 0 } blockRows
+                    && blockRows[0] is { IsDisposed: false } firstRow) {
+                    did |= _collapsedBlockFirstRowKeys.Add(firstRow.KeyName);
+                }
+            }
+        } else {
+            foreach (var thisItem in avi.Values) {
+                if (thisItem is RowCaptionListItem { IsDisposed: false, IsExpanded: true } rcli) { rcli.IsExpanded = false; did = true; }
+            }
         }
 
         if (did) { Invalidate_AllViewItems(false); }
@@ -919,8 +940,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (AllViewItems is not { } avi) { return; }
 
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) { rcli.IsExpanded = true; did = true; }
+        // NumberStyle: alle Block-Zustände verwerfen, damit jeder Block
+        // ausgeklappt wird.
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            did = _collapsedBlockFirstRowKeys.Count > 0;
+            _collapsedBlockFirstRowKeys.Clear();
+        } else {
+            foreach (var thisItem in avi.Values) {
+                if (thisItem is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) { rcli.IsExpanded = true; did = true; }
+            }
         }
 
         if (did) {
@@ -1232,6 +1260,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // FilterCombined wird automatisch durch Filter.Clear() → PropertyChanged → DoFilterCombined() neu berechnet.
 
         PinnedRows.Clear();
+        _collapsedBlockFirstRowKeys.Clear();
 
         Invalidate_AllViewItems(true);
 
@@ -1286,6 +1315,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (view.GetJson("Collapsed") is not null) {
             CollapseThis(view.GetString("Collapsed").SplitAndCutBy("|"));
+        }
+
+        if (view.GetJson("CollapsedBlocks") is not null) {
+            foreach (var thisk in view.GetString("CollapsedBlocks").SplitBy("|")) {
+                _collapsedBlockFirstRowKeys.Add(thisk);
+            }
         }
 
         if (view.GetJson("Reduced") is not null) {
@@ -1343,6 +1378,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (_collapsed.Count > 0) {
             result.Add("Collapsed", string.Join("|", _collapsed));
+        }
+
+        if (_collapsedBlockFirstRowKeys.Count > 0) {
+            result.Add("CollapsedBlocks", string.Join("|", _collapsedBlockFirstRowKeys));
         }
 
         var reduced = CurrentArrangement?.ReducedColumns().ToListOfString();
@@ -1416,6 +1455,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else if (controlY > controlHeight) {
             OffsetY = OffsetY - controlY + controlHeight;
         }
+    }
+
+    /// <summary>
+    /// Ermittelt die Zeilen des zusammenhängenden Kapitel-Blocks, der unter
+    /// dem übergebenen Header beginnt. Gesucht wird in <see cref="_sortedViewItems"/>
+    /// per Referenzgleichheit. Der Block endet am nächsten Kapitel-Header oder
+    /// am Ende der Liste. Wird der Header nicht gefunden, wird <c>null</c> zurückgegeben.
+    /// </summary>
+    internal List<RowItem>? GetChapterBlockRows(RowCaptionListItem header) {
+        var rows = new List<RowItem>();
+        var found = false;
+
+        foreach (var item in _sortedViewItems) {
+            if (!found) {
+                if (ReferenceEquals(item, header)) { found = true; }
+                continue;
+            }
+
+            // Der nächste Kapitel-Header beendet den Block.
+            if (item is RowCaptionListItem) { break; }
+
+            if (item is RowListItem rli && rli.Row is { IsDisposed: false } row) {
+                rows.Add(row);
+            }
+        }
+
+        return found ? rows : null;
     }
 
     internal void Invalidate_CurrentArrangement() {
@@ -1774,18 +1840,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     && rcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)) {
                     CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
-                    rcli.IsExpanded = !rcli.IsExpanded;
-
-                    // Bei NumberStyle (SYS_ROWSORTINDEX aktiv) werden die sichtbaren
-                    // Caption-Items als Clone erzeugt. Der Ein-/Ausklapp-Zustand muss
-                    // zusätzlich ins gecachte Original übertragen werden, damit
-                    // CalculateAllViewItems_Collapsed und _collapsed korrekt folgen.
-                    if (_allViewItems.TryGetValue(RowCaptionListItem.Identifier(rcli.ChapterText), out var cached)
-                        && cached is RowCaptionListItem cachedRcli
-                        && cachedRcli != rcli) {
-                        cachedRcli.IsExpanded = rcli.IsExpanded;
-                    }
-
+                    ToggleChapterExpanded(rcli);
                     Invalidate_AllViewItems(false);
                 }
                 EnsureVisible(_mouseOverColumn, _mouseOverRow);
@@ -1812,14 +1867,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                                && dragRcli.CanEditChapter
                                && Table.Column.SysRowSortIndex is { IsDisposed: false } srsCol) {
                         // Vor dem Drag ausklappen, damit alle Zeilen mitgehen.
-                        var didExpand = !dragRcli.IsExpanded;
+                        var didExpand = IsChapterCollapsed(dragRcli);
                         if (didExpand) {
-                            dragRcli.IsExpanded = true;
-                            if (_allViewItems.TryGetValue(RowCaptionListItem.Identifier(dragRcli.ChapterText), out var dragCached)
-                                && dragCached is RowCaptionListItem dragCachedRcli
-                                && dragCachedRcli != dragRcli) {
-                                dragCachedRcli.IsExpanded = true;
-                            }
+                            SetChapterExpanded(dragRcli, true);
                             Invalidate_AllViewItems(false);
                         }
 
@@ -2053,7 +2103,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         sb.Append("\r\n");
     }
 
-    private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
+    private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows, HashSet<string> parentCaps) {
         HashSet<string> allCaps = [];
 
         // NumberStyle (SYS_ROWSORTINDEX aktiv): strikte Sortierung hat Vorrang,
@@ -2066,14 +2116,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
             var caps = cap.Contents(filteredRows, Ohne);
 
+            // Volle Pfad-Hierarchie aufbauen — für "A\B\C" werden "A", "A\B"
+            // und "A\B\C" als eigenständige Captions angelegt. Beide Separatoren
+            // ('\' und '/') werden akzeptiert (analog zum Windows Datei-Explorer).
             foreach (var capValue in caps) {
-                var parts = capValue.Trim('\\').Split('\\');
-                var currentPath = parts[0];
-                allCaps.Add(parts[0]);
+                allCaps.UnionWith(capValue.ChapterPathHierarchy());
+            }
 
-                for (var i = 1; i < parts.Length; i++) {
-                    currentPath += "\\" + parts[i];
-                    allCaps.Add(currentPath);
+            // Für Chapter-Werte, die selbst als Parent fungieren (für die es
+            // Unterpfade gibt), eine "X\Ohne"-Sub-Section anlegen. Rows mit
+            // Chapter "Pfad1" erscheinen dann unter "Pfad1 > Ohne" statt
+            // direkt unter dem Pfad1-Header (was verwirrend wäre, da Pfad1
+            // ja selbst ein Header ist).
+            foreach (var capValue in caps) {
+                var norm = capValue.ChapterPathNormalize();
+                if (parentCaps.Contains(norm)) {
+                    allCaps.UnionWith((norm + "\\" + Ohne).ChapterPathHierarchy());
                 }
             }
 
@@ -2106,9 +2164,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
 
         // Caption-Reihenfolge aus der sortierten Liste ableiten.
-        // So wird jede Kapitelgruppe an die Position ihres ersten (sortierten) Eintrags platziert.
+        // Für jede Zeile die vollständige Pfad-Hierarchie eintragen — bei
+        // "PFAD1\PFAD2" also sowohl "PFAD1" als auch "PFAD1\PFAD2". So werden
+        // auch die Parent-Header an der Position ihres ersten Unter-Eintrags
+        // eingefügt (analog zum Windows Datei-Explorer).
         foreach (var dataItem in sortedRows) {
-            captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
+            foreach (var ancestor in dataItem.AlignsToChapter.ChapterPathHierarchy()) {
+                captionOrder.AddIfNotExists(ancestor);
+            }
         }
 
         return captionOrder;
@@ -2139,15 +2202,28 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     /// <summary>
-    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss
+    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss.
+    /// Chapters, die selbst als Parent fungieren (für die es Unterpfade gibt),
+    /// werden durch "X\Ohne" ersetzt — sonst hätte eine Zeile mit Chapter
+    /// "Pfad1" denselben Text wie der Parent-Header "Pfad1" und würde direkt
+    /// darunter angezeigt. Stattdessen erscheint die Zeile unter
+    /// "Pfad1 &gt; Ohne" in einer eigenen Sub-Section.
     /// </summary>
-    /// <returns></returns>
-    private static List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement, bool mustHaveACap) {
+    private static List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement, bool mustHaveACap, HashSet<string> parentCaps) {
         List<string> capsOfRow = [];
 
         if (isfiltered) {
             capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? row.CellGetList(sc) : [];
             capsOfRow.Remove(string.Empty);
+
+            // Parent-Chapters zu "X\Ohne" umleiten, damit sie unter dem
+            // Parent-Header in einer eigenen Ohne-Sub-Section erscheinen.
+            for (var i = 0; i < capsOfRow.Count; i++) {
+                var norm = capsOfRow[i].ChapterPathNormalize();
+                if (parentCaps.Contains(norm)) {
+                    capsOfRow[i] = norm + "\\" + Ohne;
+                }
+            }
         }
 
         if (capsOfRow.Count == 0 && mustHaveACap && isfiltered) {
@@ -2817,13 +2893,32 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var sortedItems = new List<RowBackground>();
 
+        // Parent-Chapters berechnen: Ein Chapter ist ein Parent, wenn ein
+        // anderes Chapter existiert, das als Unterpfad dient. Beispiel: Für
+        // "Pfad1\Pfad2\Pfad3" sind sowohl "Pfad1" als auch "Pfad1\Pfad2"
+        // Parents. Rows mit Chapter "Pfad1" oder "Pfad1\Pfad2" werden später
+        // zu "X\Ohne" umgeleitet, damit sie unter dem jeweiligen Parent-Header
+        // in einer eigenen Ohne-Sub-Section erscheinen.
+        // Alle Vorfahren (nicht nur direkte Parents) berücksichtigen — sonst
+        // fehlt bei tiefen Hierarchien die Ohne-Section auf Zwischenebenen.
+        var parentCaps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (arrangement.ColumnForChapter is { IsDisposed: false } parentCapCol) {
+            foreach (var capValue in parentCapCol.Contents(filteredRows, Ohne)) {
+                var hierarchy = capValue.ChapterPathHierarchy();
+                // Alle Pfade außer dem letzten (dem Pfad selbst) sind Vorfahren.
+                for (var i = 0; i < hierarchy.Count - 1; i++) {
+                    parentCaps.Add(hierarchy[i]);
+                }
+            }
+        }
+
         CalculateAllViewItems_AddHeadElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
         CalculateAllViewItems_NewRow(allItems, arrangement, tb, _newRowsAllowed, true, sortedItems);
 
-        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, pinnedRows);
+        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, pinnedRows, parentCaps);
 
-        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused, filteredRows);
+        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused, filteredRows, parentCaps);
 
         CalculateAllViewItems_Collapsed(allItems);
 
@@ -2861,28 +2956,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             foreach (var rli in sortedRows) {
                 var chapter = rli.AlignsToChapter;
+                var isCollapsed = _collapsedBlockFirstRowKeys.Contains(rli.Row.KeyName);
 
                 // Header nur bei definiertem Kapitel und nur bei tatsächlichem
                 // Wechsel einfügen. Bei fehlender Chapter-Spalte ist chapter leer.
                 if (!string.IsNullOrEmpty(chapter)
                     && !string.Equals(chapter, previousChapter, StringComparison.OrdinalIgnoreCase)) {
-                    // Original-Schreibweise und Ein-/Ausklapp-Zustand aus dem
-                    // gecachten Canonical-Item holen, da AlignsToChapter
-                    // upper-cased ist und die sichtbaren Header Clone sind.
+                    // Original-Schreibweise aus dem gecachten Canonical-Item
+                    // holen, da AlignsToChapter upper-cased ist und die
+                    // sichtbaren Header Clone sind. IsExpanded pro Block aus
+                    // dem zustandslosen Cache bestimmen — so bleibt jeder Block
+                    // mit gleichem Chapter-Text unabhängig auf/zu klappbar.
                     RowCaptionListItem headerItem;
                     if (allItems.TryGetValue(RowCaptionListItem.Identifier(chapter), out var capItem) && capItem is RowCaptionListItem rcli) {
-                        headerItem = new RowCaptionListItem(rcli.ChapterText, rli.Arrangement) { IsExpanded = rcli.IsExpanded };
+                        headerItem = new RowCaptionListItem(rcli.ChapterText, rli.Arrangement) { IsExpanded = !isCollapsed };
                     } else {
-                        headerItem = new RowCaptionListItem(chapter, rli.Arrangement);
+                        headerItem = new RowCaptionListItem(chapter, rli.Arrangement) { IsExpanded = !isCollapsed };
                     }
 
                     sortedItems.Add(headerItem);
                     previousChapter = chapter;
                 }
 
-                // Zeile nur anzeigen, wenn das Kapitel nicht eingeklappt ist.
-                // _collapsed enthält die upper-cased Chapter-Texte.
-                if (!_collapsed.Contains(chapter)) {
+                // Zeile nur anzeigen, wenn der Block nicht eingeklappt ist.
+                if (!isCollapsed) {
                     sortedItems.Add(rli);
                 }
             }
@@ -2892,11 +2989,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var grouped = sortedRows.ToLookup(x => x.AlignsToChapter);
 
+        // _collapsed enthält nur die direkt eingeklappten Kapitel. Um auch
+        // Nachfahren zu verbergen, zusätzlich auf eingeklappte Vorfahren prüfen.
+        var collapsedSet = new HashSet<string>(_collapsed, StringComparer.OrdinalIgnoreCase);
+
         foreach (var captionKey in captionOrder) {
+            // Vorfahr eingeklappt? → Header und Zeilen komplett überspringen.
+            // Der Parent-Header selbst wird weiterhin angezeigt (eingeklappt).
+            if (HasCollapsedAncestor(captionKey, collapsedSet)) { continue; }
+
             allItems.TryGetValue(RowCaptionListItem.Identifier(captionKey), out var caption);
             if (caption is not null) { sortedItems.Add(caption); }
 
-            if (!_collapsed.Contains(captionKey)) {
+            // Direkt eingeklappt? → Header ja, aber keine Zeilen darunter.
+            if (!collapsedSet.Contains(captionKey)) {
                 sortedItems.AddRange(grouped[captionKey]);
             }
         }
@@ -2997,38 +3103,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     /// <summary>
-    /// Berechnet die Variable _collapsed
+    /// Berechnet die Variable _collapsed. Enthält NUR die direkt
+    /// eingeklappten Kapitel (als Großschreibung). Nachfahren von
+    /// eingeklappten Kapiteln werden in CalculateAllViewItems_AddCaptionsAndRows
+    /// via HasCollapsedAncestor behandelt — dort wird entschieden, ob ein
+    /// Sub-Header bzw. dessen Zeilen angezeigt werden.
     /// </summary>
-    /// <param name="allItems"></param>
     private void CalculateAllViewItems_Collapsed(Dictionary<string, RowBackground> allItems) {
-        // Alle eingeklappten Kapitel (Parents) in einem Set sammeln.
-        // Case-insensitive, da die ursprüngliche Prüfung OrdinalIgnoreCase nutzte.
-        var collapsedParents = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        _collapsed.Clear();
 
         foreach (var thisR in allItems.Values) {
             if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) {
-                collapsedParents.Add(rcli.ChapterText);
+                _collapsed.Add(rcli.ChapterText.ToUpperInvariant());
             }
         }
-
-        var l = new List<string>();
-
-        foreach (var thisR in allItems.Values) {
-            if (thisR is not RowCaptionListItem { IsDisposed: false } rcli) { continue; }
-
-            // Ein eingeklapptes Kapitel selbst (als Großschreibung, wie bisher).
-            if (collapsedParents.Contains(rcli.ChapterText)) {
-                l.Add(rcli.ChapterText.ToUpperInvariant());
-            }
-
-            // Alle Kapitel, deren Vorgänger-Pfad eingeklappt ist, ebenfalls verbergen.
-            if (HasCollapsedAncestor(rcli.ChapterText, collapsedParents)) {
-                l.Add(rcli.ChapterText.ToUpperInvariant());
-            }
-        }
-
-        _collapsed.Clear();
-        _collapsed.AddRange(l.SortedDistinctList());
     }
 
     private void CalculateAllViewItems_HildeAllItems(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement) {
@@ -3061,7 +3149,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         sortedItems.Add(newRow);
     }
 
-    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused, List<RowItem> filteredRows) {
+    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused, List<RowItem> filteredRows, HashSet<string> parentCaps) {
         var hasCaps = allVisibleCaps.Count > 0;
         var visibleRowListItems = new List<RowListItem>(allrows.Count);
         var pinnedSet = new HashSet<RowItem>(pinnedRows);
@@ -3071,7 +3159,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var isPinned = pinnedSet.Contains(thisRow);
             var isFiltered = filteredSet.Contains(thisRow);
 
-            foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement, hasCaps)) {
+            foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement, hasCaps, parentCaps)) {
                 var id = RowListItem.Identifier(thisRow, thisCap);
 
                 if (!allItems.TryGetValue(id, out var it2) || it2 is not RowListItem rowListItem) {
@@ -4030,6 +4118,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Gibt wahr, wenn der Block unter dem übergebenen Header eingeklappt ist.
+    /// Im NumberStyle wird der Zustand pro Block in
+    /// <see cref="_collapsedBlockFirstRowKeys"/> gespeichert, sonst am
+    /// <see cref="RowCaptionListItem.IsExpanded"/> des Originals.
+    /// </summary>
+    private bool IsChapterCollapsed(RowCaptionListItem rcli) {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            var blockRows = GetChapterBlockRows(rcli);
+            return blockRows is { Count: > 0 } && blockRows[0] is { IsDisposed: false } firstRow
+                && _collapsedBlockFirstRowKeys.Contains(firstRow.KeyName);
+        }
+        return !rcli.IsExpanded;
+    }
+
     private RowBackground? ItemAtPosition(int controlY, bool ignoreYOffset) {
         if (_sortedViewItems.Count == 0) { return null; }
 
@@ -4049,12 +4152,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                    // Bestehenden Code belassen
-                    FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                        // Bestehenden Code belassen
+                        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() =>
-                    // Bestehenden Code belassen
-                    PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+                        // Bestehenden Code belassen
+                        PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -4131,6 +4234,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (PinnedRows.Contains(e.Row)) {
             PinnedRows.Remove(e.Row);
         }
+        // Veraltete Block-Zustände der entfernten Zeile verwerfen, damit
+        // keine "Geister-Zustände" im NumberStyle übrig bleiben.
+        _collapsedBlockFirstRowKeys.Remove(e.Row.KeyName);
     }
 
     /// <summary>
@@ -4178,6 +4284,36 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return maxBottom.CanvasToControl(Zoom);
     }
 
+    /// <summary>
+    /// Setzt den Auf-/Ausklapp-Zustand eines Kapitel-Headers auf den
+    /// übergebenen Wert. Im NumberStyle (SYS_ROWSORTINDEX aktiv) wird der
+    /// Zustand pro Block in <see cref="_collapsedBlockFirstRowKeys"/> abgelegt
+    /// — der Block wird über den Key der ersten Zeile unter dem Header
+    /// identifiziert. So bleibt jeder Block unabhängig, auch wenn derselbe
+    /// Chapter-Text mehrfach vorkommt. Im Standard-Modus wird der Zustand am
+    /// Original-Caption in <see cref="_allViewItems"/> synchronisiert.
+    /// </summary>
+    private void SetChapterExpanded(RowCaptionListItem rcli, bool expanded) {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            var blockRows = GetChapterBlockRows(rcli);
+            if (blockRows is { Count: > 0 } && blockRows[0] is { IsDisposed: false } firstRow) {
+                if (expanded) {
+                    _collapsedBlockFirstRowKeys.Remove(firstRow.KeyName);
+                } else {
+                    _collapsedBlockFirstRowKeys.Add(firstRow.KeyName);
+                }
+            }
+            return;
+        }
+
+        rcli.IsExpanded = expanded;
+        if (_allViewItems.TryGetValue(RowCaptionListItem.Identifier(rcli.ChapterText), out var cached)
+            && cached is RowCaptionListItem cachedRcli
+            && cachedRcli != rcli) {
+            cachedRcli.IsExpanded = expanded;
+        }
+    }
+
     private RowSortDefinition? SortUsed() {
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
             return new RowSortDefinition(tb, sortCol, false);
@@ -4189,6 +4325,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed) { return; }
         Invalidate();
     }
+
+    /// <summary>
+    /// Schaltet den Auf-/Ausklapp-Zustand eines Kapitel-Headers um.
+    /// Siehe <see cref="SetChapterExpanded"/> für die Details zur
+    /// Zustandsverwaltung im NumberStyle.
+    /// </summary>
+    private void ToggleChapterExpanded(RowCaptionListItem rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
 
     private void TXTBox_Close(GenericControl? textbox) {
         if (IsDisposed || textbox is null || Table is not { IsDisposed: false }) { return; }
@@ -4244,8 +4387,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else if (isChapterEdit && tags[1] is RowCaptionListItem rcli
             && rcli.Arrangement?.ColumnForChapter is { IsDisposed: false } capCol
             && rcli.Arrangement.Table is { IsDisposed: false } tbChapter) {
-            var newChapter = w.Replace("\r\n", "\r").Trim('\\').Trim();
-            var oldChapter = rcli.ChapterText.Trim('\\');
+            // newChapter normalisieren ( '/' → '\' ), oldChapter aus rcli ist
+            // bereits normalisiert. Dadurch funktionieren Vergleiche auch dann,
+            // wenn in der Zelle noch '/' als Trenner steht.
+            var newChapter = w.Replace("\r\n", "\r").ChapterPathNormalize();
+            var oldChapter = rcli.ChapterText;
 
             if (!string.IsNullOrEmpty(newChapter) && newChapter != oldChapter) {
                 // Nur der zusammenhängende Block unter dem geklickten Header
@@ -4261,11 +4407,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     var values = tableRow.CellGetList(capCol);
                     var changed = false;
                     for (var i = 0; i < values.Count; i++) {
-                        if (values[i] == oldChapter) {
+                        // Vergleich normalisiert durchführen, damit Werte mit
+                        // '/' als Trenner ebenfalls erfasst werden.
+                        var valueNorm = values[i].ChapterPathNormalize();
+                        if (valueNorm == oldChapter) {
                             values[i] = newChapter;
                             changed = true;
-                        } else if (values[i].StartsWith(oldChapter + "\\", StringComparison.Ordinal)) {
-                            values[i] = newChapter + values[i][oldChapter.Length..];
+                        } else if (valueNorm.StartsWith(oldChapter + "\\", StringComparison.Ordinal)) {
+                            // Suffix hinter dem Prefix unverändert übernehmen.
+                            values[i] = newChapter + valueNorm[oldChapter.Length..];
                             changed = true;
                         }
                     }
@@ -4280,33 +4430,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         Focus();
-    }
-
-    /// <summary>
-    /// Ermittelt die Zeilen des zusammenhängenden Kapitel-Blocks, der unter
-    /// dem übergebenen Header beginnt. Gesucht wird in <see cref="_sortedViewItems"/>
-    /// per Referenzgleichheit. Der Block endet am nächsten Kapitel-Header oder
-    /// am Ende der Liste. Wird der Header nicht gefunden, wird <c>null</c> zurückgegeben.
-    /// </summary>
-    internal List<RowItem>? GetChapterBlockRows(RowCaptionListItem header) {
-        var rows = new List<RowItem>();
-        var found = false;
-
-        foreach (var item in _sortedViewItems) {
-            if (!found) {
-                if (ReferenceEquals(item, header)) { found = true; }
-                continue;
-            }
-
-            // Der nächste Kapitel-Header beendet den Block.
-            if (item is RowCaptionListItem) { break; }
-
-            if (item is RowListItem rli && rli.Row is { IsDisposed: false } row) {
-                rows.Add(row);
-            }
-        }
-
-        return found ? rows : null;
     }
 
     /// <summary>
