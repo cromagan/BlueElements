@@ -27,8 +27,11 @@ public sealed class RowListItem : RowBackground {
 
     #region Constructors
 
-    public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption) {
+    public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption.ChapterPathNormalize()) {
         Row = row;
+        // Gleicher Indent wie die zugehörige Überschrift — die Items stehen
+        // unter der Kapitel-Überschrift, nicht zusätzlich eingerückt.
+        Indent = string.IsNullOrEmpty(alignsToCaption) ? 0 : alignsToCaption.ChapterPathDepth();
         MarkYellow = false;
     }
 
@@ -102,7 +105,7 @@ public sealed class RowListItem : RowBackground {
         }
     }
 
-    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
+    public static string Identifier(RowItem row, string chapter) => chapter.ChapterPathNormalize().ToUpperInvariant() + "\\" + row.KeyName;
 
     public static string QuickInfoText(ColumnItem? col, string additionalText) {
         if (col?.Table is not { IsDisposed: false }) { return string.Empty; }

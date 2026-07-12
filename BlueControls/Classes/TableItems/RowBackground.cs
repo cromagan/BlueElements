@@ -341,12 +341,16 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     protected virtual void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (Arrangement is null) { return; }
 
+        // Indent auf die Spalten-Position anwenden — sonst würde der in Draw
+        // berechnete controlIndented-Bereich für die Spalten ignoriert.
+        var indentOffset = 20.CanvasToControl(zoom) * Indent;
+
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
                 if (DoSpezialOrder && (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1)) { continue; }
                 if (viewItem.Column is null && !viewItem.IsDummyColumn) { continue; }
 
-                var left = viewItem.ControlColumnLeft((int)offsetX);
+                var left = viewItem.ControlColumnLeft((int)offsetX) + indentOffset;
 
                 if (left > visibleAreaControl.Width) { continue; }
                 if (left + viewItem.ControlColumnWidth() < 0) { continue; }
@@ -358,7 +362,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
                 if (!DoSpezialOrder) {
                     if (!viewItem.Permanent) {
-                        area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth());
+                        area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth() + indentOffset);
                     }
                 }
                 Brush? backcolor = null;

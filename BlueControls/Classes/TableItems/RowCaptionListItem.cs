@@ -14,8 +14,9 @@ public sealed class RowCaptionListItem : RowBackground {
 
     #region Constructors
 
-    public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.Trim('\\').PathParent()) {
-        ChapterText = chapterText;
+    public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.ChapterPathParent()) {
+        ChapterText = chapterText.ChapterPathNormalize();
+        Indent = ChapterText.ChapterPathDepth();
         IsExpanded = true;
     }
 
@@ -49,7 +50,7 @@ public sealed class RowCaptionListItem : RowBackground {
 
     #region Methods
 
-    public static string Identifier(string caption) => $"CAP-{caption.ToUpperInvariant()}";
+    public static string Identifier(string caption) => $"CAP-{caption.ChapterPathNormalize().ToUpperInvariant()}";
 
     public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) { }
 
@@ -60,13 +61,11 @@ public sealed class RowCaptionListItem : RowBackground {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        var text = ChapterText.Trim('\\');
-
         if (CanEditChapter) {
-            return $"{text}\rDoppelklick auf das Wort zum Bearbeiten";
+            return $"{ChapterText}\rDoppelklick auf das Wort zum Bearbeiten";
         }
 
-        return text;
+        return ChapterText;
     }
 
     internal void EditChapter(TableView tableView) {
@@ -83,7 +82,7 @@ public sealed class RowCaptionListItem : RowBackground {
         var bt = tableView.BTB;
         bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
         bt.MultiLine = false;
-        bt.Text = ChapterText.Trim('\\');
+        bt.Text = ChapterText;
         bt.Location = new Point(0, capPos.Y);
         bt.Size = new Size(tableView.Width, capPos.Height);
         bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];
@@ -106,16 +105,17 @@ public sealed class RowCaptionListItem : RowBackground {
 
     /// <summary>
     /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
-    /// Der Button ist immer am linken Rand des sichtbaren Bereichs.
+    /// Der Button ist am linken Rand des eingerückten Bereichs (Indent beachten!).
     /// </summary>
     internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
         var p2 = 2.CanvasToControl(zoom);
         var p20 = 20.CanvasToControl(zoom);
+        var indentOffset = p20 * Indent;
         var rowHeight = controlPos.Height;
         var size = Math.Min(p20, rowHeight - p2 * 2);
         var buttonY = controlPos.Top + (rowHeight - size) / 2;
-        return new Rectangle(p2, buttonY, size, size);
+        return new Rectangle(controlPos.X + indentOffset + p2, buttonY, size, size);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
@@ -124,7 +124,9 @@ public sealed class RowCaptionListItem : RowBackground {
         if (Arrangement is null) { return; }
 
         var fontScaled = Font_RowChapter.Scale(zoom);
-        var tmp = ChapterText.Trim('\\');
+        // Nur das letzte Pfad-Segment anzeigen — die Hierarchie wird über
+        // Indent optisch dargestellt (analog zum Windows Datei-Explorer).
+        var tmp = ChapterText.ChapterPathLastName();
 
         var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);
@@ -134,10 +136,12 @@ public sealed class RowCaptionListItem : RowBackground {
         // Stark verblasster Hintergrund für die gesamte Zeile
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(80)), positionControl);
 
-        // Pfeil-Button links als eigenständiger Button
+        // Pfeil-Button links als eigenständiger Button — relativ zum
+        // eingerückten positionControl (X) positionieren, damit der Indent
+        // auch für verschachtelte Kapitel sichtbar wird.
         var rowHeight = (int)positionControl.Height;
         var buttonSize = Math.Min(p20, rowHeight - p2 * 2);
-        var buttonRect = new Rectangle(p2, (int)(positionControl.Top + (rowHeight - buttonSize) / 2), buttonSize, buttonSize);
+        var buttonRect = new Rectangle((int)positionControl.X + p2, (int)(positionControl.Top + (rowHeight - buttonSize) / 2), buttonSize, buttonSize);
 
         var arrowState = IsExpanded ? States.Standard : States.Checked;
         var etxt = new ExtText(Design.Button_CheckBox, arrowState);
