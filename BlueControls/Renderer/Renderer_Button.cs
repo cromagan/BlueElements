@@ -91,11 +91,16 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
+        var padLeft = _padding.Left.CanvasToControl(zoom);
+        var padTop = _padding.Top.CanvasToControl(zoom);
+        var padRight = _padding.Right.CanvasToControl(zoom);
+        var padBottom = _padding.Bottom.CanvasToControl(zoom);
+
         drawingAreaControl = new Rectangle(
-            drawingAreaControl.X + _padding.Left,
-            drawingAreaControl.Y + _padding.Top,
-            drawingAreaControl.Width - _padding.Horizontal,
-            drawingAreaControl.Height - _padding.Vertical);
+            drawingAreaControl.X + padLeft,
+            drawingAreaControl.Y + padTop,
+            drawingAreaControl.Width - padLeft - padRight,
+            drawingAreaControl.Height - padTop - padBottom);
 
         Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawingAreaControl, true);
     }

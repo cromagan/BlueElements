@@ -60,19 +60,23 @@ public sealed class RowCaptionListItem : RowBackground {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        var expandInfo = IsExpanded ? "Kapitel zuklappen" : "Kapitel aufklappen";
         var text = ChapterText.Trim('\\');
 
         if (CanEditChapter) {
-            return $"{expandInfo}: {text}\rDoppelklick zum Bearbeiten";
+            return $"{text}\rDoppelklick auf das Wort zum Bearbeiten";
         }
 
-        return $"{expandInfo}: {text}";
+        return text;
     }
 
     internal void EditChapter(TableView tableView) {
         if (Arrangement?.ColumnForChapter is not { IsDisposed: false }) { return; }
         if (tableView.Table is not { IsDisposed: false }) { return; }
+
+        // Die Zeilen des zusammenhängenden Blocks erfassen, damit beim
+        // Umbenennen nur dieser Block — und nicht alle Zeilen mit dem
+        // gleichen Kapitel-Namen in der gesamten Tabelle — geändert wird.
+        var blockRows = tableView.GetChapterBlockRows(this);
 
         var capPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
 
@@ -82,7 +86,7 @@ public sealed class RowCaptionListItem : RowBackground {
         bt.Text = ChapterText.Trim('\\');
         bt.Location = new Point(0, capPos.Y);
         bt.Size = new Size(tableView.Width, capPos.Height);
-        bt.Tag = (List<object?>)[null, this, "ChapterEdit"];
+        bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];
         bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         bt.Visible = true;
         bt.BringToFront();
@@ -91,33 +95,63 @@ public sealed class RowCaptionListItem : RowBackground {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 
+    /// <summary>
+    /// Prüft, ob der übergebene Punkt (in Control-Koordinaten) auf dem
+    /// Pfeil-Button links liegt.
+    /// </summary>
+    internal bool IsArrowButtonHit(int controlX, int controlY, float zoom, float offsetX, float offsetY) {
+        var rect = ArrowButtonRect(zoom, offsetX, offsetY);
+        return rect.Contains(controlX, controlY);
+    }
+
+    /// <summary>
+    /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
+    /// Der Button ist immer am linken Rand des sichtbaren Bereichs.
+    /// </summary>
+    internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
+        var controlPos = ControlPosition(zoom, offsetX, offsetY);
+        var p2 = 2.CanvasToControl(zoom);
+        var p20 = 20.CanvasToControl(zoom);
+        var rowHeight = controlPos.Height;
+        var size = Math.Min(p20, rowHeight - p2 * 2);
+        var buttonY = controlPos.Top + (rowHeight - size) / 2;
+        return new Rectangle(p2, buttonY, size, size);
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
 
         if (Arrangement is null) { return; }
 
-        var Font_RowChapter_Scaled = Font_RowChapter.Scale(zoom);
-
+        var fontScaled = Font_RowChapter.Scale(zoom);
         var tmp = ChapterText.Trim('\\');
 
-        var p14 = 14.CanvasToControl(zoom);
+        var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);
-        var p23 = 23.CanvasToControl(zoom);
+        var p14 = 14.CanvasToControl(zoom);
+        var p20 = 20.CanvasToControl(zoom);
 
-        var si = Font_RowChapter_Scaled.MeasureString(tmp);
-        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionControl);
-        var buttonPos = new Rectangle(1, (int)(positionControl.Bottom - si.Height - p5 - 2), (int)si.Width + p23 + p14, (int)si.Height + p5);
+        // Stark verblasster Hintergrund für die gesamte Zeile
+        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(80)), positionControl);
 
-        if (!IsExpanded) {
-            var x = new ExtText(Design.Button_CheckBox, States.Checked);
-            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
-            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, buttonPos.Top + p5);
-        } else {
-            var x = new ExtText(Design.Button_CheckBox, States.Standard);
-            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
-            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
-        }
-        Font_RowChapter_Scaled.DrawString(gr, tmp, p23, buttonPos.Top);
+        // Pfeil-Button links als eigenständiger Button
+        var rowHeight = (int)positionControl.Height;
+        var buttonSize = Math.Min(p20, rowHeight - p2 * 2);
+        var buttonRect = new Rectangle(p2, (int)(positionControl.Top + (rowHeight - buttonSize) / 2), buttonSize, buttonSize);
+
+        var arrowState = IsExpanded ? States.Standard : States.Checked;
+        var etxt = new ExtText(Design.Button_CheckBox, arrowState);
+        Button.DrawButton(null, gr, Design.Button_CheckBox, arrowState, null, Alignment.Horizontal_Vertical_Center, false, etxt, string.Empty, buttonRect, false);
+
+        // Pfeil-Icon zentriert im Button
+        var arrowCode = IsExpanded ? "Pfeil_Unten_Scrollbar" : "Pfeil_Rechts_Scrollbar";
+        gr.DrawImageUnscaled(QuickImage.Get(arrowCode + "|" + p14), buttonRect.X + (buttonRect.Width - p14) / 2, buttonRect.Y + (buttonRect.Height - p14) / 2);
+
+        // Wort daneben ohne Rahmen
+        var si = fontScaled.MeasureString(tmp);
+        var textX = buttonRect.Right + p5;
+        var textY = (int)(positionControl.Top + (rowHeight - si.Height) / 2);
+        fontScaled.DrawString(gr, tmp, textX, textY);
     }
 
     protected override string GetCompareKey() => ChapterText;

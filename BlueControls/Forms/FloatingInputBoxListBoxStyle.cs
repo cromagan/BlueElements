@@ -31,7 +31,18 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             }
         }
 
-        Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
+        // Bildschirm-Erkennung. Bei Menüs, die in Cursor-Nähe geöffnet werden
+        // (Kontextmenü: Cursor-Position vs. Menü-Position differieren nur um
+        // die Padding-Verschiebung), die Cursor-Position verwenden. Verhindert,
+        // dass das Menü auf den falschen Bildschirm springt, wenn der Cursor
+        // nah an einer Bildschirmkante steht. Bei Dropdowns ist der Cursor
+        // weiter entfernt (mind. Button-Höhe), dann gilt die übergebene Position.
+        var detectionPoint = new Point(xpos, ypos);
+        if (Math.Abs(Cursor.Position.X - xpos) <= 15 && Math.Abs(Cursor.Position.Y - ypos) <= 15) {
+            detectionPoint = Cursor.Position;
+        }
+
+        Position_SetWindowIntoScreen(Generic.PointOnScreenNr(detectionPoint), xpos, ypos);
         OutsideClicked += (_, _) => OnCancel();
         Show();
     }

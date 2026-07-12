@@ -52,7 +52,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private int _dragMouseDownX;
     private int _dragMouseDownY;
     private ColumnViewItem? _dragSourceColumn;
-    private RowListItem? _dragSourceRowItem;
+    private List<RowItem> _dragSourceRows = [];
     private bool _isDraggingColumn;
     private bool _isDraggingRowSort;
     private bool _isinDoubleClick;
@@ -1646,7 +1646,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     if (anchor is { IsDisposed: false } && anchor.Column is { IsDisposed: false }) {
                         cbli.EditCaptionGroup(anchor, this);
                     }
-                } else if (_mouseOverRow is RowCaptionListItem rcli && rcli.CanEditChapter) {
+                } else if (_mouseOverRow is RowCaptionListItem rcli && rcli.CanEditChapter
+                           && !rcli.IsArrowButtonHit(MouseDownData?.ControlX ?? 0, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY)) {
                     rcli.EditChapter(this);
                 }
             } finally {
@@ -1767,7 +1768,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 // Somit würde das Ereignis doppelt und dreifach ausgelöste werden können.
                 // Beipiel: MouseDown-> Bildchen im Pad erzeugen, dauert.... Maus bewegt sich
                 //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
-                if (_mouseOverRow is RowCaptionListItem rcli) {
+                // Auf-/Zuklappen NUR über den Pfeil-Button links.
+                // Klick auf das Wort startet Drag/Drop (siehe unten).
+                if (_mouseOverRow is RowCaptionListItem rcli
+                    && rcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)) {
                     CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
                     rcli.IsExpanded = !rcli.IsExpanded;
@@ -1788,19 +1792,61 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
 
                 // Drag/Drop-Potential für SYS_ROWSORTINDEX-Spalte speichern.
-                // Der Drag selbst startet erst in OnMouseMove nach Überschreitung
+                // Der Drag selbst startet erst in OnMouseMove nach Überschreiten
                 // einer Bewegungsschwelle (vermeidet versehentliches Dragging bei Klick).
-                _dragSourceRowItem = null;
+                // Bei einem Kapitel-Header werden alle Zeilen des Blocks verschoben.
+                _dragSourceRows.Clear();
                 _dragSourceColumn = null;
 
                 if (e.Button == MouseButtons.Left && !IsAnsicht0(ca) && _mouseOverColumn?.Column is { IsDisposed: false } mc) {
                     if (mc == Table.Column.SysRowSortIndex
                         && _mouseOverRow is RowListItem dragRli
-                        && !PinnedRows.Contains(dragRli.Row)
-                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRli.Row, dragRli.Row.ChunkValue))) {
-                        _dragSourceRowItem = dragRli;
+                        && dragRli.Row is { IsDisposed: false } dragRow
+                        && !PinnedRows.Contains(dragRow)
+                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
+                        _dragSourceRows.Add(dragRow);
                         _dragMouseDownX = e.ControlX;
                         _dragMouseDownY = e.ControlY;
+                    } else if (_mouseOverRow is RowCaptionListItem dragRcli
+                               && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
+                               && dragRcli.CanEditChapter
+                               && Table.Column.SysRowSortIndex is { IsDisposed: false } srsCol) {
+                        // Vor dem Drag ausklappen, damit alle Zeilen mitgehen.
+                        var didExpand = !dragRcli.IsExpanded;
+                        if (didExpand) {
+                            dragRcli.IsExpanded = true;
+                            if (_allViewItems.TryGetValue(RowCaptionListItem.Identifier(dragRcli.ChapterText), out var dragCached)
+                                && dragCached is RowCaptionListItem dragCachedRcli
+                                && dragCachedRcli != dragRcli) {
+                                dragCachedRcli.IsExpanded = true;
+                            }
+                            Invalidate_AllViewItems(false);
+                        }
+
+                        // Bei NumberStyle kann der Header nach Neuberechnung ein
+                        // neuer Clone sein. Den aktuellen Header über die Mausposition finden.
+                        var blockHeader = dragRcli;
+                        if (didExpand) {
+                            _ = AllViewItems; // _sortedViewItems sicherstellen
+                            blockHeader = _sortedViewItems?.OfType<RowCaptionListItem>()
+                                .FirstOrDefault(h => string.Equals(h.ChapterText, dragRcli.ChapterText, StringComparison.OrdinalIgnoreCase)
+                                                     && h.ControlPosition(Zoom, OffsetX, OffsetY).Contains(e.ControlX, e.ControlY))
+                                ?? dragRcli;
+                        }
+
+                        if (GetChapterBlockRows(blockHeader) is { Count: > 0 } blockRows) {
+                            foreach (var br in blockRows) {
+                                if (br is { IsDisposed: false }
+                                    && !PinnedRows.Contains(br)
+                                    && string.IsNullOrEmpty(CellCollection.IsCellEditable(srsCol, br, br.ChunkValue))) {
+                                    _dragSourceRows.Add(br);
+                                }
+                            }
+                            if (_dragSourceRows.Count > 0) {
+                                _dragMouseDownX = e.ControlX;
+                                _dragMouseDownY = e.ControlY;
+                            }
+                        }
                     } else if (_mouseOverRow is RowBackground { IgnoreYOffset: true } and not NewRowListItem
                                && _mouseOverColumn is { IsDisposed: false } colCvi
                                && colCvi.Column is not null
@@ -1828,7 +1874,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             _isinMouseMove = true;
             try {
                 // Drag/Drop für SYS_ROWSORTINDEX-Spalte: Drag starten und Einfüge-Position berechnen
-                if (_dragSourceRowItem is { IsDisposed: false } srcRli && e.Button == MouseButtons.Left) {
+                if (_dragSourceRows.Count > 0 && e.Button == MouseButtons.Left) {
                     if (!_isDraggingRowSort) {
                         var dx = Math.Abs(e.ControlX - _dragMouseDownX);
                         var dy = Math.Abs(e.ControlY - _dragMouseDownY);
@@ -1890,7 +1936,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 FinishRowSortDrag();
                 return;
             }
-            _dragSourceRowItem = null;
+            _dragSourceRows.Clear();
 
             // Drag/Drop für Spalten-Reihenfolge abschließen
             if (_isDraggingColumn) {
@@ -3602,20 +3648,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate_AllViewItems(false);
     }
 
-    private void DoRowSortReorder(RowListItem sourceRli, int insertIndex) {
+    private void DoRowSortReorder(List<RowItem> sourceRows, int insertIndex) {
         if (Table is not { IsDisposed: false } tb) { return; }
         if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
-        if (sourceRli.Row is not { IsDisposed: false } sourceRow) { return; }
-        if (!string.IsNullOrEmpty(CellCollection.IsCellEditable(sortCol, sourceRow, sourceRow.ChunkValue))) { return; }
+        if (sourceRows.Count == 0) { return; }
 
         // Alle Zeilen in der aktuellen Sortierung sammeln
         var sortedRows = SortUsed()?.SortedRows(tb.Row) ?? [.. tb.Row];
         if (sortedRows.Count == 0) { return; }
 
-        // Quelle aus der Liste entfernen
-        var sourceIdx = sortedRows.IndexOf(sourceRow);
-        if (sourceIdx < 0) { return; }
-        sortedRows.RemoveAt(sourceIdx);
+        // Quell-Zeilen aus der Liste entfernen
+        foreach (var sr in sourceRows) {
+            if (sr is { IsDisposed: false }) { sortedRows.Remove(sr); }
+        }
 
         // Einfüge-Position in der sortierten Liste bestimmen.
         // insertIndex ist ein Index in _cachedRowViewItems (sichtbare Zeilen).
@@ -3625,13 +3670,25 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (targetIndexInSorted < 0) { targetIndexInSorted = sortedRows.Count; }
 
-        // Kapitel der verschobenen Zeile an das Ziel-Kapitel anpassen.
-        // Bestimmt anhand der benachbarten Zeile oberhalb der Einfüge-Position
-        // (oder unterhalb, falls am Anfang eingefügt wird).
-        UpdateChapterOnRowSortMove(sourceRli, insertIndex);
+        // Kapitel-Aktualisierung nur bei Einzelzeilen-Verschiebung.
+        // Bei einem Kapitel-Block behalten alle Zeilen ihr Kapitel.
+        if (sourceRows.Count == 1 && sourceRows[0] is { IsDisposed: false } singleRow) {
+            RowListItem? singleRli = null;
+            for (var i = 0; i < _cachedRowViewItems.Count; i++) {
+                if (_cachedRowViewItems[i].Row == singleRow) { singleRli = _cachedRowViewItems[i]; break; }
+            }
+            if (singleRli is { IsDisposed: false }) {
+                UpdateChapterOnRowSortMove(singleRli, insertIndex);
+            }
+        }
 
-        // An der neuen Position einfügen
-        sortedRows.Insert(targetIndexInSorted, sourceRow);
+        // Quell-Zeilen als zusammenhängenden Block an der neuen Position einfügen
+        foreach (var sr in sourceRows) {
+            if (sr is { IsDisposed: false }) {
+                sortedRows.Insert(Math.Min(targetIndexInSorted, sortedRows.Count), sr);
+                targetIndexInSorted++;
+            }
+        }
 
         // Alle Zeilen neu nummerieren
         var nr = 1;
@@ -3710,12 +3767,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var columnsRight = (int)ca.ControlColumnsWidth() + columnsLeft;
         var rowsTop = RowsAreaTop();
 
-        // Entspricht die Einfüge-Position der aktuellen Position, die eigene Zeile markieren
-        if (_dragSourceRowItem is { IsDisposed: false } srcRli) {
-            var sourceIdx = _cachedRowViewItems.IndexOf(srcRli);
-            if (sourceIdx >= 0 && (_dragInsertRowIndex == sourceIdx || _dragInsertRowIndex == sourceIdx + 1)) {
-                var srcPos = srcRli.ControlPosition(Zoom, OffsetX, OffsetY);
-                DrawInsertIndicatorRect(gr, new Rectangle(columnsLeft, srcPos.Top, columnsRight - columnsLeft, srcPos.Height));
+        // Entspricht die Einfüge-Position dem aktuellen Block, den gesamten Block markieren
+        if (_dragSourceRows.Count > 0) {
+            var firstSrc = -1;
+            var lastSrc = -1;
+            for (var i = 0; i < _cachedRowViewItems.Count; i++) {
+                if (_dragSourceRows.Contains(_cachedRowViewItems[i].Row)) {
+                    if (firstSrc < 0) { firstSrc = i; }
+                    lastSrc = i;
+                }
+            }
+            if (firstSrc >= 0 && _dragInsertRowIndex >= firstSrc && _dragInsertRowIndex <= lastSrc + 1) {
+                var firstPos = _cachedRowViewItems[firstSrc].ControlPosition(Zoom, OffsetX, OffsetY);
+                var lastPos = _cachedRowViewItems[lastSrc].ControlPosition(Zoom, OffsetX, OffsetY);
+                DrawInsertIndicatorRect(gr, new Rectangle(columnsLeft, firstPos.Top, columnsRight - columnsLeft, lastPos.Bottom - firstPos.Top));
                 return;
             }
         }
@@ -3867,15 +3932,27 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void FinishRowSortDrag() {
-        var srcRli = _dragSourceRowItem;
+        var srcRows = _dragSourceRows;
         var insertIndex = _dragInsertRowIndex;
 
         _isDraggingRowSort = false;
-        _dragSourceRowItem = null;
+        _dragSourceRows = [];
         _dragInsertRowIndex = -1;
 
-        if (srcRli is { IsDisposed: false } && insertIndex >= 0) {
-            DoRowSortReorder(srcRli, insertIndex);
+        if (srcRows.Count > 0 && insertIndex >= 0) {
+            // No-Op: Wird auf den eigenen Block zurückgezogen, nichts verschieben.
+            // Gleiche Bedingung wie in DrawRowSortInsertIndicator.
+            var firstSrc = -1;
+            var lastSrc = -1;
+            for (var i = 0; i < _cachedRowViewItems.Count; i++) {
+                if (srcRows.Contains(_cachedRowViewItems[i].Row)) {
+                    if (firstSrc < 0) { firstSrc = i; }
+                    lastSrc = i;
+                }
+            }
+            if (firstSrc < 0 || insertIndex < firstSrc || insertIndex > lastSrc + 1) {
+                DoRowSortReorder(srcRows, insertIndex);
+            }
         }
 
         Invalidate();
@@ -4171,7 +4248,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var oldChapter = rcli.ChapterText.Trim('\\');
 
             if (!string.IsNullOrEmpty(newChapter) && newChapter != oldChapter) {
-                foreach (var tableRow in tbChapter.Row) {
+                // Nur der zusammenhängende Block unter dem geklickten Header
+                // (tags[3]). Ist der Block nicht ermittelt worden (z. B. weil
+                // die Ansicht inzwischen neu aufgebaut wurde), auf alle Zeilen
+                // zurückgreifen.
+                var blockRows = tags.Count >= 4 && tags[3] is List<RowItem> br
+                    ? br
+                    : [.. tbChapter.Row.Where(r => r is { IsDisposed: false })];
+
+                foreach (var tableRow in blockRows) {
                     if (tableRow is not { IsDisposed: false }) { continue; }
                     var values = tableRow.CellGetList(capCol);
                     var changed = false;
@@ -4195,6 +4280,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         Focus();
+    }
+
+    /// <summary>
+    /// Ermittelt die Zeilen des zusammenhängenden Kapitel-Blocks, der unter
+    /// dem übergebenen Header beginnt. Gesucht wird in <see cref="_sortedViewItems"/>
+    /// per Referenzgleichheit. Der Block endet am nächsten Kapitel-Header oder
+    /// am Ende der Liste. Wird der Header nicht gefunden, wird <c>null</c> zurückgegeben.
+    /// </summary>
+    internal List<RowItem>? GetChapterBlockRows(RowCaptionListItem header) {
+        var rows = new List<RowItem>();
+        var found = false;
+
+        foreach (var item in _sortedViewItems) {
+            if (!found) {
+                if (ReferenceEquals(item, header)) { found = true; }
+                continue;
+            }
+
+            // Der nächste Kapitel-Header beendet den Block.
+            if (item is RowCaptionListItem) { break; }
+
+            if (item is RowListItem rli && rli.Row is { IsDisposed: false } row) {
+                rows.Add(row);
+            }
+        }
+
+        return found ? rows : null;
     }
 
     /// <summary>
