@@ -94,6 +94,19 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("imagename", _bild_dateiname);
+        json.Set("editable", _bearbeitbar);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _bild_dateiname = json.GetString("imagename", _bild_dateiname);
+        _bearbeitbar = json.GetBool("editable", _bearbeitbar);
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "imagename":

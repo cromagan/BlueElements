@@ -81,12 +81,12 @@ public class VariableString : Variable {
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["value"] = _valueString;
+        json.Set("value", _valueString);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetString("value"));
+        SetValue(json.GetString("value", _valueString));
         base.ParseJson(json);
     }
 

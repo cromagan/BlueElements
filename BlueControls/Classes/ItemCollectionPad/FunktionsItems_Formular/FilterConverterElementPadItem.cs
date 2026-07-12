@@ -189,6 +189,23 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("value", _filterwert);
+        json.Set("outputcolumn", _filterSpalte);
+        json.Set("filter", (int)_filtertype);
+        json.Set("errortext", _fehlerText);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _filterwert = json.GetString("value");
+        _filterSpalte = json.GetString("outputcolumn");
+        _filtertype = json.GetEnum<FilterTypeRowInputItem>("filter");
+        _fehlerText = json.GetString("errortext");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":

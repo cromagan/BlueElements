@@ -306,7 +306,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     /// Schema-Vereinheitlichung gegenüber dem alten Format:
     /// <list type="bullet">
     ///   <item><description><c>CreateName</c> → <c>creator</c></description></item>
-    ///   <item><description><c>CreateDate</c> → <c>createDate</c></description></item>
+    ///   <item><description><c>CreateDate</c> → <c>createdate</c></description></item>
     ///   <item><description><c>NotAllowedChilds</c> als JSON-Array statt \r-getrennter String</description></item>
     ///   <item><description><c>Page</c> als echtes JSON-Sub-Objekt (über <see cref="ItemCollectionPadItem" />)</description></item>
     /// </list>
@@ -315,10 +315,10 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         var json = new JsonObject()
             .Set("type", Type)
             .Set("version", Version)
-            .Set("createDate", CreateDate)
+            .Set("createdate", CreateDate)
             .Set("creator", Creator);
 
-        json.SetArrayIfNotEmpty("notAllowedChilds", _notAllowedChilds);
+        json.SetArrayIfNotEmpty("notallowedchilds", _notAllowedChilds);
 
         if (Pages is { IsDisposed: false } pages) {
             json.Set("page", pages.ParseableJson());
@@ -446,14 +446,12 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());
 
     public void ParseJson(JsonObject json) {
-        CreateDate = json.GetString("createdate");
-        Creator = json.GetString("creator");
+        CreateDate = json.GetString("createdate", CreateDate);
+        Creator = json.GetString("creator", Creator);
 
         if (json["notallowedchilds"] is JsonArray na) {
             _notAllowedChilds.Clear();
-            foreach (var item in na) {
-                if (item is JsonValue v && v.TryGetValue(out string? s)) { _notAllowedChilds.Add(s ?? string.Empty); }
-            }
+            _notAllowedChilds.AddRange(na.ToStringList());
         }
 
         if (json["page"] is JsonObject po) {

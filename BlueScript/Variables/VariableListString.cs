@@ -95,8 +95,7 @@ public class VariableListString : Variable {
     }
 
     public override void ParseJson(JsonObject json) {
-        var l = json.GetStringList("value");
-        if (l.Count > 0) { SetValue(l); }
+        SetValue(json.GetStringList("value"));
         base.ParseJson(json);
     }
 

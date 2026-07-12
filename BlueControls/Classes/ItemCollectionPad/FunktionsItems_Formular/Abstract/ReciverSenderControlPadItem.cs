@@ -159,9 +159,9 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         var json = base.ParseableJson();
 
         if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } tb) {
-            json["outputtable"] = tb.KeyName;
+            json.Set("outputtable", tb.KeyName);
         } else {
-            json["outputtable"] = _tableOutputName;
+            json.Set("outputtable", _tableOutputName);
         }
 
         return json;

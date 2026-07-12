@@ -6,10 +6,11 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, string protocol, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
+    public ScriptEndedFeedback(VariableCollection variables, LogData ld, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
         Variables = variables;
         GiveItAnotherTry = false;
-        ProtocolText = protocol;
+        Routine = ld.Subname;
+        Line = ld.Line;
     }
 
     /// <summary>
@@ -19,7 +20,8 @@ public class ScriptEndedFeedback : DoItFeedback {
     public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, "Start abgebrochen: " + failedReason, null) {
         Variables = null;
         GiveItAnotherTry = giveitanothertry;
-        ProtocolText = "[" + scriptname + ", Start abgebrochen] " + failedReason;
+        Routine = scriptname;
+        Line = 0;
     }
 
     /// <summary>
@@ -27,9 +29,9 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// </summary>
     public ScriptEndedFeedback(VariableCollection variables, string failedReason) : base(false, false, true, failedReason, null) {
         GiveItAnotherTry = false;
-        ProtocolText = string.Empty;
-
         Variables = variables;
+        Routine = string.Empty;
+        Line = 0;
     }
 
     #endregion
@@ -38,7 +40,23 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     public bool GiveItAnotherTry { get; }
 
-    public string ProtocolText { get; }
+    public int Line { get; }
+
+    /// <summary>
+    /// Liefert den FailedReason inkl. Kontext-Informationen (Routine, Zeile),
+    /// formatiert für die Anzeige beim Benutzer.
+    /// Ist FailedReason leer, wird ein leerer String zurückgegeben (OK).
+    /// </summary>
+    public string ProtocolText {
+        get {
+            if (string.IsNullOrEmpty(FailedReason)) { return string.Empty; }
+            if (Line > 0) { return $"[{Routine}, Zeile: {Line}]\r\n{FailedReason}"; }
+            if (!string.IsNullOrEmpty(Routine)) { return $"[{Routine}]\r\n{FailedReason}"; }
+            return FailedReason;
+        }
+    }
+
+    public string Routine { get; }
 
     public VariableCollection? Variables { get; }
 

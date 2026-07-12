@@ -140,7 +140,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        if (json["size"] is JsonObject so) { _canvassize = so.ToJsonElement().AsSizeF(); }
+        _canvassize = json.GetSizeF("size", _canvassize);
         base.ParseJson(json);
         SizeChanged();
     }

@@ -235,12 +235,11 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public void ParseFinishedJson(JsonElement parsed) { }
 
     public void ParseJson(JsonObject json) {
-        KeyName = json.GetString("key");
-
-        if (json["x"] is JsonValue x && x.TryGetValue(out float xv)) { _x = xv; }
-        if (json["y"] is JsonValue y && y.TryGetValue(out float yv)) { _y = yv; }
-        if (json["distance"] is JsonValue d && d.TryGetValue(out float dv)) { _distance = dv; }
-        if (json["angle"] is JsonValue a && a.TryGetValue(out float av)) { _angle = av; }
+        KeyName = json.GetString("key", KeyName);
+        _x = json.GetFloat("x", _x);
+        _y = json.GetFloat("y", _y);
+        _distance = json.GetFloat("distance", _distance);
+        _angle = json.GetFloat("angle", _angle);
     }
 
     public bool ParseThis(string key, string value) {

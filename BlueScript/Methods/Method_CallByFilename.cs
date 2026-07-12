@@ -40,7 +40,7 @@ public class Method_CallByFilename : Method {
     /// <param name="args"></param>
     /// <param name="chainlog"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? args, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? args, string chainlog) {
         if (scp.Stufe > 10) {
             return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
@@ -63,7 +63,6 @@ public class Method_CallByFilename : Method {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             varCol.AddRange(tmpv);
-            ld.Protocol = scx.ProtocolText;
         } else {
 
             #region Kritische Variablen Disposen
@@ -118,7 +117,7 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix(), ld);
+        var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix());
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{file.FileNameWithSuffix()}':\r\n{scx.ProtocolText}", true, ld);

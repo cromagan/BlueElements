@@ -194,6 +194,25 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("columnkey", _columnKey);
+        json.Set("edittype", (int)_bearbeitung);
+        json.Set("caption", (int)_captionPosition);
+        json.Set("autodistance", _autoX);
+        json.Set("autonext", _autoNext);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _columnKey = json.GetString("columnkey", _columnKey);
+        _bearbeitung = json.GetEnum<EditTypeFormula>("edittype", _bearbeitung);
+        _captionPosition = json.GetEnum<CaptionPosition>("caption", _captionPosition);
+        _autoX = json.GetBool("autodistance", true);
+        _autoNext = json.GetBool("autonext");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "column":

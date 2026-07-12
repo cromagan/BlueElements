@@ -94,8 +94,8 @@ public sealed class BlockFile {
             if (JsonNode.Parse(Encoding.UTF8.GetString(content)) is JsonObject data) {
                 return new BlockFile {
                     User = data["user"]?.GetValue<string>() ?? string.Empty,
-                    TimeUtc = data["timeUtc"]?.GetValue<DateTime>() ?? DateTime.MinValue,
-                    MachineName = data["machineName"]?.GetValue<string>() ?? string.Empty,
+                    TimeUtc = data["timeutc"]?.GetValue<DateTime>() ?? DateTime.MinValue,
+                    MachineName = data["machinename"]?.GetValue<string>() ?? string.Empty,
                     App = data["app"]?.GetValue<string>() ?? string.Empty,
                     Id = data["id"]?.GetValue<string>() ?? string.Empty,
                 };
@@ -109,8 +109,8 @@ public sealed class BlockFile {
     private static void WriteBlockFile(string blkName) {
         var json = new JsonObject()
             .Set("user", UserName)
-            .Set("timeUtc", DateTime.UtcNow)
-            .Set("machineName", Environment.MachineName)
+            .Set("timeutc", DateTime.UtcNow)
+            .Set("machinename", Environment.MachineName)
             .Set("app", Develop.AppExe())
             .Set("id", MyId)
             .ToJsonString();

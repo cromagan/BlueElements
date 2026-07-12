@@ -30,7 +30,7 @@ internal class Method_Do : Method {
             if (index > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, infos.LogData); }
 
             var addme = new List<Variable>() { new VariableDouble("Index", index, true, "Iterations-Variable") };
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "Do", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "Do");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 

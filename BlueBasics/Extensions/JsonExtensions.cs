@@ -44,7 +44,16 @@ public static partial class Extensions {
     /// String-Repräsentation. Bei fehlendem oder ungültigem Key wird
     /// <c>default(T)</c> geliefert.
     /// </summary>
-    public static T GetEnum<T>(this JsonObject json, string key) where T : struct, Enum {
+    public static T GetEnum<T>(this JsonObject json, string key) where T : struct, Enum => json.GetEnum(key, default(T));
+
+    /// <summary>
+    /// Liest einen Enum-Wert unter <paramref name="key" />. Akzeptiert sowohl den
+    /// numerischen Wert (<see cref="JsonValueKind.Number" />) als auch die
+    /// String-Repräsentation. Bei fehlendem oder ungültigem Key wird
+    /// <paramref name="defaultValue" /> geliefert - so bleiben Partial-Updates
+    /// möglich, ohne bestehende Felder zu überschreiben.
+    /// </summary>
+    public static T GetEnum<T>(this JsonObject json, string key, T defaultValue) where T : struct, Enum {
         switch (json[key]) {
             case JsonValue v when v.TryGetValue(out int i):
                 return (T)(object)i;
@@ -52,7 +61,7 @@ public static partial class Extensions {
             case JsonValue v when v.TryGetValue(out string? s) && Enum.TryParse<T>(s, out var result):
                 return result;
         }
-        return default;
+        return defaultValue;
     }
 
     public static float GetFloat(this JsonElement json, string key, float defaultValue = 0f) {
@@ -64,6 +73,18 @@ public static partial class Extensions {
 
     public static float GetFloat(this JsonObject json, string key, float defaultValue = 0f) {
         if (json[key] is JsonValue v && v.TryGetValue(out float f)) { return f; }
+        return defaultValue;
+    }
+
+    public static double GetDouble(this JsonElement json, string key, double defaultValue = 0d) {
+        if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Number) { return elem.GetDouble(); }
+        return defaultValue;
+    }
+
+    public static double GetDouble(this JsonElement? json, string key, double defaultValue = 0d) => json.HasValue ? json.Value.GetDouble(key, defaultValue) : defaultValue;
+
+    public static double GetDouble(this JsonObject json, string key, double defaultValue = 0d) {
+        if (json[key] is JsonValue v && v.TryGetValue(out double d)) { return d; }
         return defaultValue;
     }
 
@@ -117,6 +138,12 @@ public static partial class Extensions {
         return new System.Windows.Forms.Padding(elem.GetInt("left"), elem.GetInt("top"), elem.GetInt("right"), elem.GetInt("bottom"));
     }
 
+    /// <inheritdoc cref="GetPadding(JsonElement, string)" />
+    public static System.Windows.Forms.Padding GetPadding(this JsonObject json, string key, System.Windows.Forms.Padding defaultValue) {
+        if (json[key] is not JsonObject jo) { return defaultValue; }
+        return jo.ToJsonElement().AsPadding();
+    }
+
     /// <summary>
     /// Liest ein vom <see cref="SetSizeF" /> geschriebenes verschachteltes Objekt
     /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird <see cref="SizeF.Empty" /> geliefert.
@@ -124,6 +151,12 @@ public static partial class Extensions {
     public static SizeF GetSizeF(this JsonElement json, string key) {
         if (!json.TryGetProperty(key, out var elem) || elem.ValueKind != JsonValueKind.Object) { return SizeF.Empty; }
         return new SizeF(elem.GetFloat("width"), elem.GetFloat("height"));
+    }
+
+    /// <inheritdoc cref="GetSizeF(JsonElement, string)" />
+    public static SizeF GetSizeF(this JsonObject json, string key, SizeF defaultValue) {
+        if (json[key] is not JsonObject jo) { return defaultValue; }
+        return jo.ToJsonElement().AsSizeF();
     }
 
     public static string GetString(this JsonElement json, string key, string defaultValue = "") {
@@ -154,9 +187,15 @@ public static partial class Extensions {
     }
 
     /// <inheritdoc cref="GetStringList(JsonElement, string)" />
-    public static List<string> GetStringList(this JsonObject json, string key) {
-        if (json[key] is not JsonArray arr) { return []; }
+    public static List<string> GetStringList(this JsonObject json, string key) =>
+        json[key] is JsonArray arr ? arr.ToStringList() : [];
 
+    /// <summary>
+    /// Konvertiert ein <see cref="JsonArray" /> in eine Liste von Strings.
+    /// Elemente, die keine String-<see cref="JsonValue" /> sind, werden als
+    /// leerer String interpretiert.
+    /// </summary>
+    public static List<string> ToStringList(this JsonArray arr) {
         List<string> result = new(arr.Count);
         foreach (var item in arr) {
             result.Add(item is JsonValue v && v.TryGetValue(out string? s) ? s ?? string.Empty : string.Empty);

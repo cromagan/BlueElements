@@ -759,17 +759,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (!HasItems) { return json; }
 
         json.Set("caption", Caption)
-            .Set("sheetStyle", SheetStyle)
-            .Set("backColor", BackColor.ToArgb())
+            .Set("sheetstyle", SheetStyle)
+            .Set("backcolor", BackColor.ToArgb())
             .Set("endless", Endless)
-            .Set("autoZoomFit", AutoZoomFit)
-            .Set("showAlways", ShowAlways)
-            .Set("showJointPoints", ShowJointPoints)
-            .Set("snapMode", (int)SnapMode)
-            .Set("gridShow", GridShow)
-            .Set("gridSnap", GridSnap)
-            .Set("editMode", (int)EditMode)
-            .SetPadding("printArea", RandinMm)
+            .Set("autozoomfit", AutoZoomFit)
+            .Set("showalways", ShowAlways)
+            .Set("showjointpoints", ShowJointPoints)
+            .Set("snapmode", (int)SnapMode)
+            .Set("gridshow", GridShow)
+            .Set("gridsnap", GridSnap)
+            .Set("editmode", (int)EditMode)
+            .SetPadding("printarea", RandinMm)
             .Set("width", Breite)
             .Set("height", Höhe);
 
@@ -779,29 +779,25 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public override void ParseJson(JsonObject json) {
-        Caption = json.GetString("caption");
-        SheetStyle = json.GetString("sheetstyle");
-        Endless = json.GetBool("endless");
-        AutoZoomFit = json.GetBool("autozoomfit");
-        ShowAlways = json.GetBool("showalways");
-        ShowJointPoints = json.GetBool("showjointpoints");
+        Caption = json.GetString("caption", Caption);
+        SheetStyle = json.GetString("sheetstyle", SheetStyle);
+        Endless = json.GetBool("endless", Endless);
+        AutoZoomFit = json.GetBool("autozoomfit", AutoZoomFit);
+        ShowAlways = json.GetBool("showalways", ShowAlways);
+        ShowJointPoints = json.GetBool("showjointpoints", ShowJointPoints);
 
-        if (json["backcolor"] is JsonValue bv && bv.TryGetValue(out int argb)) { BackColor = Color.FromArgb(argb); }
-        if (json.ContainsKey("snapmode")) { SnapMode = json.GetEnum<SnapMode>("snapmode"); }
-        if (json.ContainsKey("editmode")) { EditMode = json.GetEnum<EditMode>("editmode"); }
+        BackColor = Color.FromArgb(json.GetInt("backcolor", BackColor.ToArgb()));
+        SnapMode = json.GetEnum("snapmode", SnapMode);
+        EditMode = json.GetEnum("editmode", EditMode);
+        GridShow = json.GetFloat("gridshow", GridShow);
+        GridSnap = json.GetFloat("gridsnap", GridSnap);
+        Breite = json.GetFloat("width", Breite);
+        Höhe = json.GetFloat("height", Höhe);
 
-        if (json["gridshow"] is JsonValue gs && gs.TryGetValue(out float gf)) { GridShow = gf; }
-        if (json["gridsnap"] is JsonValue gsn && gsn.TryGetValue(out float gsf)) { GridSnap = gsf; }
-        if (json["width"] is JsonValue w && w.TryGetValue(out float wf)) { Breite = wf; }
-        if (json["height"] is JsonValue h && h.TryGetValue(out float hf)) { Höhe = hf; }
+        RandinMm = json.GetPadding("printarea", RandinMm);
 
-        if (json["printarea"] is JsonObject pa) { RandinMm = pa.ToJsonElement().AsPadding(); }
-
-        if (json["items"] is JsonArray its) {
-            foreach (var item in its) {
-                if (item is not JsonObject io) { continue; }
-                if (NewByParsingJson<AbstractPadItem>(io.ToJsonElement()) is { } created) { Add(created); }
-            }
+        foreach (var created in json.GetList<AbstractPadItem>("items", false)) {
+            Add(created);
         }
 
         base.ParseJson(json);

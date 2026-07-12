@@ -74,12 +74,12 @@ public class VariableDouble : Variable {
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["value"] = _double;
+        json.Set("value", _double);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        if (json["value"] is JsonValue v && v.TryGetValue(out double d)) { SetValue(d); }
+        SetValue(json.GetDouble("value", _double));
         base.ParseJson(json);
     }
 

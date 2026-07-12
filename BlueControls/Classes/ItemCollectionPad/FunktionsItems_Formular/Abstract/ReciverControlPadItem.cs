@@ -342,8 +342,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["version"] = Version;
-        json["xlock"] = (int)_xPosition;
+        json.Set("version", Version);
+        json.Set("xlock", (int)_xPosition);
         json.SetArrayIfNotEmpty("getfilterfromkeys", _getFilterFromKeys);
 
         if (MustBeInDrawingArea) {
@@ -354,26 +354,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public override void ParseJson(JsonObject json) {
-        Version = json.GetInt("version");
-        _xPosition = json.GetEnum<XPosition>("xlock");
+        Version = json.GetInt("version", Version);
+        _xPosition = json.GetEnum("xlock", _xPosition);
 
         if (json["getfilterfromkeys"] is JsonArray gff) {
             _getFilterFromKeys.Clear();
-            foreach (var item in gff) {
-                if (item is JsonValue v && v.TryGetValue(out string? s)) {
-                    _getFilterFromKeys.Add(s ?? string.Empty);
-                }
-            }
+            _getFilterFromKeys.AddRange(gff.ToStringList());
             _getFilterFrom = null;
         }
 
         if (MustBeInDrawingArea && json["visiblefor"] is JsonArray vf) {
-            var l = new List<string>();
-            foreach (var item in vf) {
-                if (item is JsonValue v && v.TryGetValue(out string? s)) {
-                    l.Add(s ?? string.Empty);
-                }
-            }
+            var l = vf.ToStringList();
             if (l.Count == 0) { l.Add(Constants.Everybody); }
             VisibleFor = Table.RepairUserGroups(l).AsReadOnly();
         }

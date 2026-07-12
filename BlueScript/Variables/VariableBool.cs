@@ -66,12 +66,12 @@ public class VariableBool : Variable {
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["value"] = _valuebool;
+        json.Set("value", _valuebool);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetBool("value"));
+        SetValue(json.GetBool("value", _valuebool));
         base.ParseJson(json);
     }
 

@@ -409,15 +409,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// </summary>
     public virtual JsonObject ParseableJson() {
         var json = new JsonObject();
-        json["type"] = MyClassId;
-        json["key"] = KeyName;
-        json["enabled"] = _enabled;
-        json["print"] = _beiExportSichtbar;
-        json["quickinfo"] = QuickInfo;
-        json["page"] = Page;
+        json.Set("type", MyClassId);
+        json.Set("key", KeyName);
+        json.Set("enabled", _enabled);
+        json.Set("print", _beiExportSichtbar);
+        json.Set("quickinfo", QuickInfo);
+        json.Set("page", Page);
 
         json.SetArrayIfNotEmpty("points", MovablePoint);
-        json.SetArrayIfNotEmpty("jointPoints", JointPoints);
+        json.SetArrayIfNotEmpty("jointpoints", JointPoints);
         json.SetArrayIfNotEmpty("tags", Tags);
 
         return json;
@@ -434,11 +434,11 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     public virtual void ParseJson(JsonObject json) {
         // "type": Klassenkennung, nur formal - der Dispatcher hat sie bereits
         // zum Konstruieren der richtigen Klasse genutzt.
-        KeyName = json.GetString("key");
-        _enabled = json.GetBool("enabled");
-        _beiExportSichtbar = json.GetBool("print");
-        QuickInfo = json.GetString("quickinfo");
-        Page = json.GetString("page");
+        KeyName = json.GetString("key", KeyName);
+        _enabled = json.GetBool("enabled", _enabled);
+        _beiExportSichtbar = json.GetBool("print", _beiExportSichtbar);
+        QuickInfo = json.GetString("quickinfo", QuickInfo);
+        Page = json.GetString("page", Page);
 
         if (json["points"] is JsonArray pts) {
             foreach (var item in pts) {
@@ -466,9 +466,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         if (json["tags"] is JsonArray tags) {
             Tags.Clear();
-            foreach (var item in tags) {
-                if (item is JsonValue v && v.TryGetValue(out string? s)) { Tags.Add(s ?? string.Empty); }
-            }
+            Tags.AddRange(tags.ToStringList());
         }
     }
 

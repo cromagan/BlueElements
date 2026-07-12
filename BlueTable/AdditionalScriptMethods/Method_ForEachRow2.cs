@@ -46,7 +46,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
                 new VariableDouble("Index", index, true, "Iterations-Variable")
             };
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

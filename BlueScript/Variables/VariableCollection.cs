@@ -232,7 +232,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable, 
 
     public JsonObject ParseableJson() {
         var json = new JsonObject();
-        json["readonly"] = ReadOnly;
+        json.Set("readonly", ReadOnly);
         json.SetArrayIfNotEmpty("variables", _internal.Values);
         return json;
     }
@@ -242,13 +242,10 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable, 
     public void ParseFinishedJson(JsonElement parsed) { }
 
     public void ParseJson(JsonObject json) {
-        ReadOnly = json.GetBool("readonly");
+        ReadOnly = json.GetBool("readonly", ReadOnly);
 
-        if (json["variables"] is JsonArray arr) {
-            foreach (var item in arr) {
-                if (item is not JsonObject jo) { continue; }
-                if (ParseableItem.NewByParsingJson<Variable>(jo.ToJsonElement()) is { } created) { Add(created); }
-            }
+        foreach (var v in json.GetList<Variable>("variables", false)) {
+            Add(v);
         }
     }
 

@@ -143,6 +143,25 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("path", _pfad);
+        json.Set("pathmin", _mindest_pfad);
+        json.Set("filter", _filter);
+        json.Set("createdir", _bei_Bedarf_Erzeugen);
+        json.Set("deleteemptydir", _leere_Ordner_Löschen);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _pfad = json.GetString("path");
+        _mindest_pfad = json.GetString("pathmin");
+        _filter = json.GetString("filter");
+        _bei_Bedarf_Erzeugen = json.GetBool("createdir");
+        _leere_Ordner_Löschen = json.GetBool("deleteemptydir");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "path":

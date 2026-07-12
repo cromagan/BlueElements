@@ -178,6 +178,28 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("parent", ParentFormula?.Filename ?? string.Empty);
+        json.SetArrayIfNotEmpty("childs", _childs);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        var parent = json.GetString("parent");
+        if (parent is { Length: > 0 }) {
+            ParentFormula = ConnectedFormula.Get(parent);
+            ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
+        }
+
+        var ch = json.GetStringList("childs");
+        if (ch.Count > 0) {
+            _childs.Clear();
+            _childs.AddRange(ch);
+        }
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":

@@ -304,26 +304,26 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["entityId"] = _entityId;
-        json["originIdColumnKey"] = _originIdColumnKey;
-        json["additionalInfoColumnKey"] = _additionalInfoColumnKey;
-        json["scriptMenu"] = _script_MenuGeneration;
-        json["scriptBefore"] = _script_Before;
-        json["scriptAfter"] = _script_After;
-        json["lastFailedReason"] = _lastFailedReason;
-        json.SetArrayIfNotEmpty("lastSavedVariables", _lastSavedVariables?.SortByKeyName() ?? []);
+        json.Set("entityid", _entityId);
+        json.Set("originidcolumnkey", _originIdColumnKey);
+        json.Set("additionalinfocolumnkey", _additionalInfoColumnKey);
+        json.Set("scriptmenu", _script_MenuGeneration);
+        json.Set("scriptbefore", _script_Before);
+        json.Set("scriptafter", _script_After);
+        json.Set("lastfailedreason", _lastFailedReason);
+        json.SetArrayIfNotEmpty("lastsavedvariables", _lastSavedVariables?.SortByKeyName() ?? []);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _entityId = json.GetString("entityId");
-        _originIdColumnKey = json.GetString("originIdColumnKey");
-        _additionalInfoColumnKey = json.GetString("additionalInfoColumnKey");
-        _script_MenuGeneration = json.GetString("scriptMenu");
-        _script_Before = json.GetString("scriptBefore");
-        _script_After = json.GetString("scriptAfter");
-        _lastFailedReason = json.GetString("lastFailedReason");
-        _lastSavedVariables = json.GetList<Variable>("lastSavedVariables", true);
+        _entityId = json.GetString("entityid");
+        _originIdColumnKey = json.GetString("originidcolumnkey");
+        _additionalInfoColumnKey = json.GetString("additionalinfocolumnkey");
+        _script_MenuGeneration = json.GetString("scriptmenu");
+        _script_Before = json.GetString("scriptbefore");
+        _script_After = json.GetString("scriptafter");
+        _lastFailedReason = json.GetString("lastfailedreason");
+        _lastSavedVariables = json.GetList<Variable>("lastsavedvariables", true);
 
         base.ParseJson(json);
     }

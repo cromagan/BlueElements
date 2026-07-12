@@ -127,7 +127,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json["rotation"] = _drehwinkel;
+        json.Set("rotation", _drehwinkel);
         return json;
     }
 
@@ -137,7 +137,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        if (json["rotation"] is JsonValue v && v.TryGetValue(out int r)) { _drehwinkel = r; }
+        _drehwinkel = json.GetInt("rotation", _drehwinkel);
         base.ParseJson(json);
         CalculateSlavePoints();
     }

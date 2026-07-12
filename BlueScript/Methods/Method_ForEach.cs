@@ -44,7 +44,7 @@ internal class Method_ForEach : Method {
                 new VariableDouble("Index", index, true, "Iterations-Variable")
             };
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);

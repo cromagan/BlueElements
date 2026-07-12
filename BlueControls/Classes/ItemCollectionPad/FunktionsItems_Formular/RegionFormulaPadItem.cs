@@ -129,6 +129,27 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("parent", ParentFormula?.Filename ?? string.Empty);
+        json.Set("child", _child);
+        json.Set("borderstyle", (int)_borderStyle);
+        json.Set("detachable", Ausklappbar);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        var parent = json.GetString("parent");
+        if (parent is { Length: > 0 }) {
+            ParentFormula = ConnectedFormula.Get(parent);
+            ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
+        }
+        _child = json.GetString("child");
+        _borderStyle = json.GetEnum<GroupBoxStyle>("borderstyle");
+        Ausklappbar = json.GetBool("detachable");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":

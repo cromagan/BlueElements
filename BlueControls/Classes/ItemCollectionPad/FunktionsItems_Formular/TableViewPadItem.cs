@@ -122,6 +122,19 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("defaultarrangement", _defaultArrangement);
+        json.Set("borderstyle", (int)_borderStyle);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _defaultArrangement = json.GetString("defaultarrangement");
+        _borderStyle = json.GetEnum<GroupBoxStyle>("borderstyle");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":

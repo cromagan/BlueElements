@@ -177,6 +177,25 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("columnkey", _columnKey);
+        json.Set("caption", (int)_captionPosition);
+        json.Set("defaultemptyfilter", (int)_standard_Bei_Keiner_Eingabe);
+        json.Set("defaulttextfilter", (int)_filterart_Bei_Texteingabe);
+        json.Set("snapfilter", _einschnappen);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _columnKey = json.GetString("columnkey");
+        _captionPosition = json.GetEnum<CaptionPosition>("caption");
+        _standard_Bei_Keiner_Eingabe = json.GetEnum<FlexiFilterDefaultOutput>("defaultemptyfilter");
+        _filterart_Bei_Texteingabe = json.GetEnum<FlexiFilterDefaultFilter>("defaulttextfilter");
+        _einschnappen = json.GetBool("snapfilter", true);
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":

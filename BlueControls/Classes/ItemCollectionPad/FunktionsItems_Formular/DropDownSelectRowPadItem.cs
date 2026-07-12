@@ -115,6 +115,23 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("captiontext", _caption);
+        json.Set("showformat", _anzeige);
+        json.Set("edittype", (int)_bearbeitung);
+        json.Set("caption", (int)_captionPosition);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        _caption = json.GetString("captiontext");
+        _anzeige = json.GetString("showformat");
+        _bearbeitung = json.GetEnum<EditTypeFormula>("edittype");
+        _captionPosition = json.GetEnum<CaptionPosition>("caption");
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
