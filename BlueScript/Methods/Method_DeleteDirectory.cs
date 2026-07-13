@@ -20,21 +20,21 @@ internal class Method_DeleteDirectory : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder_Filepath.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!filn.IsFormat(FormatHolder_Filepath.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         if (!IO.DirectoryExists(filn)) {
             return DoItFeedback.Wahr();
         }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         try {
             return new DoItFeedback(IO.DeleteDir(filn, false));
         } catch {
-            return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
+            return new DoItFeedback("Fehler beim Löschen: " + filn, true);
         }
     }
 

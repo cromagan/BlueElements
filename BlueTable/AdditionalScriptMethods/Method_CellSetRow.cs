@@ -19,20 +19,20 @@ public class Method_CellSetRow : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ValueRowGet(2) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
-        if (MyTable(scp) is { } myTb && tb != myTb && !tb.IsThisScriptOk(ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ValueRowGet(2) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true); }
+        if (MyTable(scp) is { } myTb && tb != myTb && !tb.IsThisScriptOk(ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false); }
 
         var columnToSet = tb.Column[attvar.ValueStringGet(1)];
-        if (columnToSet is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
+        if (columnToSet is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true); }
 
         if (row == BlockedRow(scp)) {
-            return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true, ld);
+            return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true);
         }
 
         if (!columnToSet.CanBeChangedByRules()) {
-            return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true, ld);
+            return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true);
         }
 
         var value = string.Empty;
@@ -50,7 +50,7 @@ public class Method_CellSetRow : Method_TableGeneric {
         if (!string.IsNullOrEmpty(f)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {
-            if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
+            if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(); }
             return DoItFeedback.Wahr();
         }
 

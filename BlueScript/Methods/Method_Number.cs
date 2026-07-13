@@ -17,7 +17,7 @@ internal class Method_Number : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (Converter.DoubleTryParse(attvar.ValueStringGet(0), out var dbl)) {
             return new DoItFeedback(dbl);
         }

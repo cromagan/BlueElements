@@ -15,8 +15,8 @@ internal class Method_AddSuffix : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
 
         var tmpList = attvar.ValueListStringGet(0);
 
@@ -24,7 +24,7 @@ internal class Method_AddSuffix : Method {
             tmpList[z] += attvar.ValueStringGet(1);
         }
 
-        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList) ?? DoItFeedback.Null();
     }
 
     #endregion

@@ -22,14 +22,14 @@ internal class Method_MoveDirectory : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var sop = attvar.ValueStringGet(0);
-        if (!DirectoryExists(sop)) { return new DoItFeedback("Quell-Verzeichnis existiert nicht.", true, ld); }
+        if (!DirectoryExists(sop)) { return new DoItFeedback("Quell-Verzeichnis existiert nicht.", true); }
         var dep = attvar.ValueStringGet(1);
 
         if (DirectoryExists(dep)) { return DoItFeedback.Falsch(); }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         if (!DirectoryMove(sop, dep, false)) {
             return DoItFeedback.Falsch();

@@ -26,17 +26,17 @@ public class Method_CallTable : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
-        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
+        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true); }
 
         var f = tb.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
+        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
 
         var stackTrace = new StackTrace();
-        if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true, ld); }
+        if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true); }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         #region Attributliste erzeugen
 
@@ -50,7 +50,7 @@ public class Method_CallTable : Method_TableGeneric {
         var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, 0);
         scx.ConsumeBreakAndReturn();
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", true, ld);
+            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", true);
         }
         return scx;
     }

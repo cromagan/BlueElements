@@ -21,26 +21,26 @@ public class Method_SumFilter : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
-            return new DoItFeedback("Tabellenfehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true);
         }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         var returncolumn = tb.Column[attvar.ReadableText(0)];
-        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true); }
 
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         var x = returncolumn.Summe(r);
 
-        return x is not { } xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd);
+        return x is not { } xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true) : new DoItFeedback(xd);
     }
 
     #endregion

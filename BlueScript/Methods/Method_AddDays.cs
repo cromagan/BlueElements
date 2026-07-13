@@ -21,11 +21,11 @@ internal class Method_AddDays : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var d = attvar.ValueDateGet(0);
 
         if (d is null) {
-            return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true, ld);
+            return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true);
         }
 
         var nd = d.Value.AddDays(attvar.ValueNumGet(1));
@@ -33,7 +33,7 @@ internal class Method_AddDays : Method {
         try {
             return new DoItFeedback(nd.ToString(attvar.ReadableText(2), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(2) + "' ist fehlerhaft.", true, ld);
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(2) + "' ist fehlerhaft.", true);
         }
     }
 

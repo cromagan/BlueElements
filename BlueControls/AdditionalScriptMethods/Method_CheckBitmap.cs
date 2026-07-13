@@ -30,8 +30,8 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
     public QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(); }
 
         var x = attvar.ValueIntGet(1);
         var y = attvar.ValueIntGet(2);

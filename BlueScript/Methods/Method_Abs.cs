@@ -21,7 +21,7 @@ internal class Method_Abs : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(Math.Abs(attvar.ValueNumGet(0)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) => new(Math.Abs(attvar.ValueNumGet(0)));
 
     #endregion
 }

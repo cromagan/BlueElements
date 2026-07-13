@@ -19,19 +19,19 @@ public class Method_FilterFirstValue : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
-            return new DoItFeedback("Tabellenfehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true);
         }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         var returncolumn = tb.Column[attvar.ValueStringGet(0)];
-        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true); }
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }

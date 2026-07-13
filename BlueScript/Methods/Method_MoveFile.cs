@@ -22,16 +22,16 @@ internal class Method_MoveFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var sop = attvar.ValueStringGet(0);
         var dep = attvar.ValueStringGet(1);
 
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht:" + dep.FilePath(), true, ld); }
-        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", true, ld); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht:" + dep.FilePath(), true); }
+        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", true); }
 
         if (FileExists(dep)) { return DoItFeedback.Falsch(); }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         if (!MoveFile(sop, dep, false)) {
             return DoItFeedback.Falsch();

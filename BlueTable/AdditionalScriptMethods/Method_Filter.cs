@@ -87,15 +87,15 @@ public class Method_Filter : Method_TableGeneric {
         }
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
 
-        //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false); }
 
         #region Spalte ermitteln
 
         var filterColumn = tb.Column[attvar.ValueStringGet(1)];
-        if (filterColumn is null) { return new DoItFeedback($"Spalte '{attvar.ValueStringGet(1)}' in Tabelle '{tb.Caption}' nicht gefunden", true, ld); }
+        if (filterColumn is null) { return new DoItFeedback($"Spalte '{attvar.ValueStringGet(1)}' in Tabelle '{tb.Caption}' nicht gefunden", true); }
 
         #endregion
 
@@ -104,7 +104,7 @@ public class Method_Filter : Method_TableGeneric {
         var filtertype = StringToFilterType(attvar.ValueStringGet(2));
 
         if (filtertype == FilterType.AlwaysFalse) {
-            return new DoItFeedback("Filtertype unbekannt: " + attvar.ValueStringGet(2), true, ld);
+            return new DoItFeedback("Filtertype unbekannt: " + attvar.ValueStringGet(2), true);
         }
 
         #endregion
@@ -112,7 +112,7 @@ public class Method_Filter : Method_TableGeneric {
         var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
 
         if (!fii.IsOk()) {
-            return new DoItFeedback("Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'", true, ld);
+            return new DoItFeedback("Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'", true);
         }
 
         filterColumn.AddSystemInfo("Filter in Script", tb, scp.ScriptName);

@@ -21,17 +21,17 @@ internal class Method_GetFilesAll : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
+            return new DoItFeedback("Verzeichnis existiert nicht", true);
         }
 
         try {
             return new DoItFeedback(GetFiles(pf, attvar.ValueStringGet(1), System.IO.SearchOption.AllDirectories));
         } catch {
-            return DoItFeedback.InternerFehler(ld);
+            return DoItFeedback.InternerFehler();
         }
     }
 

@@ -26,25 +26,25 @@ public class Method_RowUpdate : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (scp.Stufe > 10) {
-            return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true, ld);
+            return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true);
         }
 
-        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true); }
 
         if (row == BlockedRow(scp)) {
-            return new DoItFeedback("Die eigene Zeile kann nicht aktualisiert werden.", true, ld);
+            return new DoItFeedback("Die eigene Zeile kann nicht aktualisiert werden.", true);
         }
 
-        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{tb.KeyName}' nicht gefunden", true, ld); }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{tb.KeyName}' nicht gefunden", true); }
 
         var minage = attvar.ValueNumGet(1);
         var maxage = attvar.ValueNumGet(2);
 
         if (minage < 0 || minage > maxage) {
-            return new DoItFeedback("Die Zeitangaben sind ungültig.", true, ld);
+            return new DoItFeedback("Die Zeitangaben sind ungültig.", true);
         }
 
         var myTb = MyTable(scp);
@@ -56,9 +56,9 @@ public class Method_RowUpdate : Method_TableGeneric {
         var age = DateTime.UtcNow.Subtract(v).TotalDays;
 
         if ((age >= minage && age <= maxage) || age > 10000) {
-            if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+            if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
             var f = Table.IsCellEditable(srs, row, row.ChunkValue, false);
-            if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
+            if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
             row.InvalidateRowState(coment);
             var sce = row.UpdateRow(true, coment);
 

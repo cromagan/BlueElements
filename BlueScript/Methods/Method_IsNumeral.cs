@@ -18,7 +18,7 @@ internal class Method_IsNumeral : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.Attributes[0] is VariableDouble) { return DoItFeedback.Wahr(); }
         if (attvar.Attributes[0] is VariableString vs) {
             if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }

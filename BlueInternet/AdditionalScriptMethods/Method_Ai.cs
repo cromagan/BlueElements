@@ -18,7 +18,7 @@ internal class Method_Ai : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
 
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,

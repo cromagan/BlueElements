@@ -18,11 +18,11 @@ internal class Method_DirectoryExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder_Filepath.Instance)) {
-            return new DoItFeedback("Dateipfad ungültig: " + pf, true, ld);
+            return new DoItFeedback("Dateipfad ungültig: " + pf, true);
         }
         return new DoItFeedback(IO.DirectoryExists(pf));
     }

@@ -19,7 +19,7 @@ internal class Method_TrimSuffix : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var val = attvar.ValueStringGet(0);
 
         const string tmp = BlueBasics.ClassesStatic.Constants.Char_Numerals + " ";

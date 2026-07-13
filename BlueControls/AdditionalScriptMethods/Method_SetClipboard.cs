@@ -23,10 +23,10 @@ internal class Method_SetClipboard : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var vs = attvar.ValueStringGet(0);
         if (!CopytoClipboard(vs)) {
-            return new DoItFeedback("Fehler beim Kopieren in die Zwischenablage.", false, ld);
+            return new DoItFeedback("Fehler beim Kopieren in die Zwischenablage.", false);
         }
 
         return DoItFeedback.Null();

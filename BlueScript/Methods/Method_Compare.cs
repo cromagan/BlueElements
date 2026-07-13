@@ -22,14 +22,14 @@ internal class Method_Compare : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var ignorenull = attvar.ValueBoolGet(0);
         var cases = attvar.ValueBoolGet(1);
 
         string? firstval = null;
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback("Variablentypen unterschiedlich.", true, ld); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback("Variablentypen unterschiedlich.", true); }
 
             var hasval = !ignorenull;
             var val = string.Empty;

@@ -22,14 +22,14 @@ internal class Method_IsNullOrZero : Method {
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos.LogData, attvar);
+                return DoItFeedback.AttributFehler(attvar);
             }
 
             return DoItFeedback.Wahr();
         }
 
         var v = attvar.Attributes[0];
-        if (v is null) { return DoItFeedback.InternerFehler(infos.LogData); }
+        if (v is null) { return DoItFeedback.InternerFehler(); }
 
         if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
         if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
@@ -39,10 +39,10 @@ internal class Method_IsNullOrZero : Method {
             return DoItFeedback.Falsch();
         }
 
-        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.", true, infos.LogData);
+        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.", true);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

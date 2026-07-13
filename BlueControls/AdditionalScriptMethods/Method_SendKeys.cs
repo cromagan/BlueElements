@@ -24,11 +24,11 @@ internal class Method_SendKeys : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var keySequence = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(keySequence)) {
-            return new DoItFeedback("Keine Tastatureingabe angegeben", true, ld);
+            return new DoItFeedback("Keine Tastatureingabe angegeben", true);
         }
 
         for (var i = 0; i < keySequence.Length; i++) {
@@ -37,12 +37,12 @@ internal class Method_SendKeys : Method {
             if (c == '{') {
                 var endBrace = keySequence.IndexOf('}', i);
                 if (endBrace == -1) {
-                    return new DoItFeedback("Fehlende schließende geschweifte Klammer", true, ld);
+                    return new DoItFeedback("Fehlende schließende geschweifte Klammer", true);
                 }
 
                 var specialKey = keySequence[(i + 1)..endBrace].ToUpper(System.Globalization.CultureInfo.CurrentCulture);
                 if (!SendSpecialKey(specialKey)) {
-                    return new DoItFeedback("Unbekannte Spezialtaste: " + specialKey, true, ld);
+                    return new DoItFeedback("Unbekannte Spezialtaste: " + specialKey, true);
                 }
 
                 i = endBrace;

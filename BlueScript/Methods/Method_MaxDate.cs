@@ -21,7 +21,7 @@ internal class Method_MaxDate : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var d = new DateTime(0);
 
         var l = new List<string>();
@@ -36,7 +36,7 @@ internal class Method_MaxDate : Method {
                 var ok = DateTimeTryParse(thisw, out var da);
 
                 if (!ok) {
-                    return new DoItFeedback("Wert kann nicht als Datum interpretiert werden: " + thisw, true, ld);
+                    return new DoItFeedback("Wert kann nicht als Datum interpretiert werden: " + thisw, true);
                 }
 
                 if (da.Subtract(d).TotalDays > 0) {
@@ -48,7 +48,7 @@ internal class Method_MaxDate : Method {
         try {
             return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true, ld);
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true);
         }
     }
 

@@ -16,24 +16,24 @@ internal class Method_ImportCsv : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } tb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (MyTable(scp) is not { IsDisposed: false } tb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true); }
 
-        if (BlockedRow(scp) is not null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false, ld); }
+        if (BlockedRow(scp) is not null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false); }
 
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
         var f = tb.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
+        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
 
         
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         var sx = tb.ImportCsv(txt, true, sep, false, false);
 
-        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
+        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true);
     }
 
     #endregion

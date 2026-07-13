@@ -31,14 +31,14 @@ public class Method_AddRow : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
-            return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
+            return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 
         var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) {
-            return new DoItFeedback($"Tabellensperre: {f}", true, ld);
+            return new DoItFeedback($"Tabellensperre: {f}", true);
         }
 
         var text = attvar.ValueStringGet(1);
@@ -47,11 +47,11 @@ public class Method_AddRow : Method_TableGeneric {
         var suggestions = attvar.ValueListStringGet(2);
 
         if (tb.Column.First is not ColumnItem colFirst) {
-            return new DoItFeedback($"In der Tabelle '{tb.Caption}' fehlt die Angabe der ersten Spalte.", true, ld);
+            return new DoItFeedback($"In der Tabelle '{tb.Caption}' fehlt die Angabe der ersten Spalte.", true);
         }
 
         if (tb.Column.ChunkValueColumn is ColumnItem chunk && chunk != colFirst) {
-            return new DoItFeedback($"In der Tabelle '{tb.Caption}' wegen Chunks nicht möglich.", true, ld);
+            return new DoItFeedback($"In der Tabelle '{tb.Caption}' wegen Chunks nicht möglich.", true);
         }
 
         text += $"\r\n\r\n<b>{colFirst.Caption}:";
@@ -62,10 +62,10 @@ public class Method_AddRow : Method_TableGeneric {
         gewählt = colFirst.AutoCorrect(gewählt, true);
 
         if (string.IsNullOrEmpty(gewählt)) {
-            return new DoItFeedback("Eingabe durch Benutzer abgebrochen", false, ld);
+            return new DoItFeedback("Eingabe durch Benutzer abgebrochen", false);
         }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         if (tb.Row[gewählt] is RowItem existingRow) {
             if (existingRow == BlockedRow(scp)) {
@@ -80,7 +80,7 @@ public class Method_AddRow : Method_TableGeneric {
 
         var newRow = tb.Row.GenerateAndAdd(gewählt, "Method_AddRow");
         if (newRow is not { IsDisposed: false }) {
-            return new DoItFeedback("Zeile konnte nicht erstellt werden", true, ld);
+            return new DoItFeedback("Zeile konnte nicht erstellt werden", true);
         }
 
         newRow.Edit(typeof(RowEditor), true);

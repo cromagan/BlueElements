@@ -21,11 +21,11 @@ internal class Method_FreeDirectoryName : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
+            return new DoItFeedback("Verzeichnis existiert nicht", true);
         }
 
         var zeichen = BlueBasics.ClassesStatic.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.ClassesStatic.Constants.Char_Numerals + BlueBasics.ClassesStatic.Constants.Char_AZ.ToUpperInvariant();

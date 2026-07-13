@@ -21,13 +21,12 @@ public readonly struct GetEndFeedback {
         ReturnValue = returnvalue;
     }
 
-    public GetEndFeedback(string failedReason, bool needsScriptFix, LogData ld) {
+    public GetEndFeedback(string failedReason, bool needsScriptFix) {
         ContinuePosition = 0;
         FailedReason = failedReason;
         NormalizedText = string.Empty;
         ReturnValue = null;
         NeedsScriptFix = needsScriptFix;
-        ld.ErrorMessage = FailedReason;
     }
 
     public GetEndFeedback(int continuePosition, string attributetext) {

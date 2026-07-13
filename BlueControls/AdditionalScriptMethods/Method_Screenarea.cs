@@ -21,7 +21,7 @@ public class Method_Screenarea : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(ScreenShot.GrabArea(null).Screen);
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) => new(ScreenShot.GrabArea(null).Screen);
 
     #endregion
 }

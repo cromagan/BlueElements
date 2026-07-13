@@ -22,7 +22,7 @@ public class Method_MsgBox : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var txt = attvar.ValueStringGet(0);
 
         var img = attvar.ValueStringGet(1);

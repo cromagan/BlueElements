@@ -21,7 +21,7 @@ internal class Method_StringAsciiToHTML : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var txt = attvar.ValueStringGet(0);
 
         using var e = new ExtText();

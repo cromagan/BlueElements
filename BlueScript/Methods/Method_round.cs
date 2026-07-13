@@ -18,7 +18,7 @@ internal class Method_Round : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var n = (int)attvar.ValueNumGet(1);
         if (n < 0) { n = 0; }
         if (n > 10) { n = 10; }

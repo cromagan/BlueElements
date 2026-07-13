@@ -18,7 +18,7 @@ internal class Method_Do : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
 
         var index = -1;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe, scp.Chain);
@@ -27,7 +27,7 @@ internal class Method_Do : Method {
 
         do {
             index++;
-            if (index > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, infos.LogData); }
+            if (index > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true); }
 
             var addme = new List<Variable>() { new VariableDouble("Index", index, true, "Iterations-Variable") };
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "Do");
@@ -38,7 +38,7 @@ internal class Method_Do : Method {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 

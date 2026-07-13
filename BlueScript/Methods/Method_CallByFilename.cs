@@ -79,7 +79,7 @@ public class Method_CallByFilename : Method {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var file = attvar.ValueStringGet(0);
 
         if (!file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
@@ -87,11 +87,11 @@ public class Method_CallByFilename : Method {
         }
 
         if (!file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-            return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true, ld);
+            return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true);
         }
 
         if (!FileExists(file)) {
-            return new DoItFeedback($"Datei nicht gefunden: {file}", true, ld);
+            return new DoItFeedback($"Datei nicht gefunden: {file}", true);
         }
 
         string scripttxt;
@@ -99,13 +99,13 @@ public class Method_CallByFilename : Method {
         try {
             scripttxt = ReadAllText(file, Encoding.UTF8);
         } catch {
-            return new DoItFeedback($"Fehler beim Lesen der Datei: {file}", true, ld);
+            return new DoItFeedback($"Fehler beim Lesen der Datei: {file}", true);
         }
 
         (scripttxt, var error) = Script.NormalizedText(scripttxt);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback($"Fehler in Datei {file}: {error}", true, ld);
+            return new DoItFeedback($"Fehler in Datei {file}: {error}", true);
         }
 
         #region Attributliste erzeugen
@@ -120,7 +120,7 @@ public class Method_CallByFilename : Method {
         var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix());
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{file.FileNameWithSuffix()}':\r\n{scx.ProtocolText}", true, ld);
+            return new DoItFeedback($"Unterskript '{file.FileNameWithSuffix()}':\r\n{scx.ProtocolText}", true);
         }
         return scx;
     }

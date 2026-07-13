@@ -17,8 +17,8 @@ internal class Method_Add : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
 
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 1; z < attvar.Attributes.Count; z++) {
@@ -33,7 +33,7 @@ internal class Method_Add : Method {
             }
         }
 
-        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList) ?? DoItFeedback.Null();
     }
 
     #endregion

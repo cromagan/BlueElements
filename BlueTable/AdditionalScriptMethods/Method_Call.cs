@@ -25,25 +25,25 @@ internal class Method_Call : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(); }
 
         var vs = attvar.ValueStringGet(0);
 
         var script = myTb.EventScript.GetByKey(vs, StringComparison.OrdinalIgnoreCase);
-        if (script is null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
+        if (script is null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true); }
 
         var newat = script.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
-                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true, ld);
+                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true);
             }
         }
 
         var (f, error) = Script.NormalizedText(script.Script);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true);
         }
 
         #region Attributliste erzeugen
@@ -64,7 +64,7 @@ internal class Method_Call : Method_TableGeneric {
         myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(BlueBasics.ClassesStatic.Constants.KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true, ld);
+            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true);
         }
         return scx;
     }

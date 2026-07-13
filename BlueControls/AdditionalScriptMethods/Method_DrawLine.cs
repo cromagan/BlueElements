@@ -19,14 +19,14 @@ public class Method_DrawLine : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(); }
 
         try {
             using var gr = Graphics.FromImage(bmp);
             gr.DrawLine(Pens.Black, attvar.ValueIntGet(1), attvar.ValueIntGet(2), attvar.ValueIntGet(3), attvar.ValueIntGet(4));
         } catch {
-            return new DoItFeedback("Linie konnte nicht gezeichnet werden.", true, ld);
+            return new DoItFeedback("Linie konnte nicht gezeichnet werden.", true);
         }
 
         return DoItFeedback.Null();

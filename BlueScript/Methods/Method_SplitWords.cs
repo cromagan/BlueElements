@@ -18,7 +18,7 @@ internal class Method_SplitWords : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var txt = attvar.ValueStringGet(0);
 
         var list = txt.AllWords().SortedDistinctList();

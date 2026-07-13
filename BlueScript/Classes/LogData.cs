@@ -2,6 +2,13 @@
 
 namespace BlueScript.Classes;
 
+/// <summary>
+///  Hält den aktuellen Skript-Kontext (Sub-Name und Zeilennummer), der während
+///  des Parsens durchgereicht und über <see cref="LineAdd" /> fortgeschrieben wird.
+///  Wird ausschließlich von der Parsing-Engine (<see cref="Script" />) und den
+///  Schleifen-/Bedingungs-Befehlen genutzt, um Fehlermeldungen mit Positionen
+///  anreichern zu können.
+/// </summary>
 public class LogData {
 
     #region Constructors
@@ -15,16 +22,7 @@ public class LogData {
 
     #region Properties
 
-    public string ErrorMessage {
-        get;
-        set {
-            field = value;
-            Protocol = "[" + Subname + ", Zeile: " + Line + "]\r\n" + field;
-        }
-    }
-
     public int Line { get; private set; }
-    public string Protocol { get; set; } = string.Empty;
 
     /// <summary>
     ///  In welcher Sub wir uns gerade befinden

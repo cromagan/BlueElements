@@ -17,7 +17,7 @@ internal class Method_Element : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
 
@@ -25,7 +25,7 @@ internal class Method_Element : Method {
             return new DoItFeedback(list[i]);
         }
 
-        return new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld);
+        return new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true);
     }
 
     #endregion

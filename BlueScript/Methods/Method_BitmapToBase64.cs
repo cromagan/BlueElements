@@ -23,7 +23,7 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         string x;
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
@@ -40,7 +40,7 @@ internal class Method_BitmapToBase64 : Method {
                 break;
 
             default:
-                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt bmp, jpg oder png erwartet.", true, ld);
+                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt bmp, jpg oder png erwartet.", true);
         }
 
         return new DoItFeedback(x);

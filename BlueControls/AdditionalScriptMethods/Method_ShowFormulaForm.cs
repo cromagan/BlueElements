@@ -30,15 +30,15 @@ public class Method_ShowFormulaForm : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filename = attvar.ValueStringGet(0);
         var row = attvar.ValueRowGet(1);
         var mode = attvar.ValueStringGet(2);
         var isModal = attvar.ValueBoolGet(3);
         var topMost = attvar.ValueBoolGet(4);
 
-        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
-        if (!IO.FileExists(filename)) { return new DoItFeedback("Datei existiert nicht", true, ld); }
+        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
+        if (!IO.FileExists(filename)) { return new DoItFeedback("Datei existiert nicht", true); }
 
         var form = new ConnectedFormulaForm(filename, mode);
         form.TopMost = topMost;

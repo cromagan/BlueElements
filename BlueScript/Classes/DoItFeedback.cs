@@ -12,10 +12,11 @@ public class DoItFeedback {
     #region Constructors
 
     /// <summary>
-    /// Protected Konstruktor für Subklassen, die ihr eigenes Protocol verwalten
-    /// (z.B. ScriptEndedFeedback) und den LogData-Seiteneffekt nicht benötigen.
+    /// Vollständiger Konstruktor. Wird auch von Subklassen
+    /// (<see cref="ScriptEndedFeedback" />, <see cref="DoItWithEndedPosFeedback" />)
+    /// genutzt.
     /// </summary>
-    protected DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) {
+    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) {
         BreakFired = breakFired;
         ReturnFired = returnFired;
 
@@ -27,17 +28,11 @@ public class DoItFeedback {
         }
     }
 
-    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData ld) : this(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
-        if (Failed) {
-            ld.ErrorMessage = failedReason;
-        }
-    }
-
     public DoItFeedback() { }
 
     public DoItFeedback(Variable variable) => ReturnValue = variable;
 
-    public DoItFeedback(string failedReason, bool needsScriptFix, LogData ld) : this(needsScriptFix, false, false, failedReason, null, ld) { }
+    public DoItFeedback(string failedReason, bool needsScriptFix) : this(needsScriptFix, false, false, failedReason, null) { }
 
     public DoItFeedback(string valueString) : this(new VariableString(Variable.DummyName(), valueString)) { }
 
@@ -69,30 +64,29 @@ public class DoItFeedback {
 
     #region Methods
 
-    public static DoItFeedback AttributFehler(LogData ld, SplittedAttributesFeedback f) =>
-        new(f.FailedReason, f.NeedsScriptFix, ld);
+    public static DoItFeedback AttributFehler(SplittedAttributesFeedback f) =>
+        new(f.FailedReason, f.NeedsScriptFix);
 
     public static DoItFeedback Falsch() => new(false);
 
-    public static DoItFeedback FalscherDatentyp(LogData ld) => new("Falscher Datentyp.", true, ld);
+    public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.", true);
 
-    public static DoItFeedback InternerFehler(LogData ld) => new("Interner Programmierfehler. Admin verständigen.", true, ld);
+    public static DoItFeedback InternerFehler() => new("Interner Programmierfehler. Admin verständigen.", true);
 
     public static DoItFeedback Null() => new();
 
-    public static DoItFeedback Schreibgschützt(LogData ld) => new("Variable ist schreibgeschützt.", true, ld);
+    public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.", true);
 
-    public static DoItFeedback TestModusInaktiv(LogData ld) => new("Im Testmodus deaktiviert.", true, ld);
+    public static DoItFeedback TestModusInaktiv() => new("Im Testmodus deaktiviert.", true);
 
     public static DoItFeedback Wahr() => new(true);
 
-    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true, ld);
+    public static DoItFeedback WertKonnteNichtGesetztWerden(int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true);
 
-    public virtual void ChangeFailedReason(string newfailedReason, bool needsScriptFix, LogData ld) {
+    public virtual void ChangeFailedReason(string newfailedReason, bool needsScriptFix) {
         if (string.IsNullOrEmpty(newfailedReason)) { newfailedReason = "Allgemeiner Fehler"; }
 
         FailedReason = newfailedReason;
-        ld.ErrorMessage = newfailedReason;
         NeedsScriptFix = needsScriptFix;
         ReturnValue = null;
     }

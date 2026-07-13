@@ -17,7 +17,7 @@ internal class Method_Substring : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var st = attvar.ValueIntGet(1);
         var en = attvar.ValueIntGet(2);
         if (st < 0) {

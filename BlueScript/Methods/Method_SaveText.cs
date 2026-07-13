@@ -20,18 +20,18 @@ internal class Method_SaveText : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
 
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         var pf = filn.PathParent();
         var opr = CanWriteInDirectory(pf);
-        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true, ld); }
+        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true); }
 
-        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
+        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true); }
 
         #endregion
 
@@ -40,19 +40,19 @@ internal class Method_SaveText : Method {
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "UTF8":
                 if (WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false).IsFailed) {
-                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
+                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true);
                 }
 
                 break;
 
             case "WIN1252":
                 if (WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) {
-                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
+                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true);
                 }
                 break;
 
             default:
-                return new DoItFeedback("Export-Format unbekannt.", true, ld);
+                return new DoItFeedback("Export-Format unbekannt.", true);
         }
 
         return DoItFeedback.Null();

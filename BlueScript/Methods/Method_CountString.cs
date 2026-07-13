@@ -21,7 +21,7 @@ internal class Method_CountString : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         switch (attvar.Attributes[0]) {
             case VariableString vs:
                 return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
@@ -30,7 +30,7 @@ internal class Method_CountString : Method {
                 return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ValueStringGet(1)));
         }
 
-        return DoItFeedback.InternerFehler(ld);
+        return DoItFeedback.InternerFehler();
     }
 
     #endregion

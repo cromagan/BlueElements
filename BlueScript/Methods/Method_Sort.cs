@@ -16,11 +16,11 @@ internal class Method_Sort : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
 
         if (attvar.Attributes[0] is not VariableListString vli) {
-            return DoItFeedback.AttributFehler(ld, attvar);
+            return DoItFeedback.AttributFehler(attvar);
         }
 
         var x = attvar.ValueListStringGet(0);

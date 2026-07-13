@@ -30,13 +30,13 @@ public class Method_SetError : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(); }
         var l = vls.ValueList;
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(scp, attvar, z);
-            if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(z), true, ld); }
+            if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(z), true); }
             l.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
         }
 

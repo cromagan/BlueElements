@@ -20,14 +20,14 @@ internal class Method_Table : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
         if (Table.Get(filn, null) is { IsDisposed: false } tb) {
             return new DoItFeedback(new VariableTable(tb));
         }
 
-        return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true, ld);
+        return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true);
     }
 
     #endregion

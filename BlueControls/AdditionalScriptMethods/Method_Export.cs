@@ -29,13 +29,13 @@ internal class Method_Export : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(); }
 
         #region  Filter ermitteln (allfi)
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myTb, scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         #endregion
 
@@ -45,13 +45,13 @@ internal class Method_Export : Method_TableGeneric {
 
         if (allFi.Table != myTb) {
             allFi.Dispose();
-            return new DoItFeedback("Tabellenfehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true);
         }
 
         allFi.Dispose();
 
         if (!myTb.LoadTableRows(false, -1)) {
-            return new DoItFeedback("Tabelle konnte nicht aktualisiert werden.", true, ld);
+            return new DoItFeedback("Tabelle konnte nicht aktualisiert werden.", true);
         }
 
         #endregion
@@ -65,44 +65,44 @@ internal class Method_Export : Method_TableGeneric {
             cu = tcvc[0];
         }
 
-        if (cu is null) { return new DoItFeedback("Ansicht-Fehler!", true, ld); }
+        if (cu is null) { return new DoItFeedback("Ansicht-Fehler!", true); }
 
         #endregion
 
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         var pf = filn.PathParent();
         var opr = CanWriteInDirectory(pf);
-        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true, ld); }
+        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true); }
 
-        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
+        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true); }
 
         #endregion
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         try {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 //case "MDB":
                 //case "BDB": {
                 //        if (myTb is not TableFile tbf) {
-                //            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
+                //            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true);
                 //        }
 
                 //        var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
 
-                //        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
+                //        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true); }
                 //        mainchunk.Save(filn);
                 //        break;
                 //    }
 
                 case "CSV":
                     var t = Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
-                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                    if (WriteAllText(filn, t, BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
+                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true); }
+                    if (WriteAllText(filn, t, BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true); }
                     break;
 
                 //case "HTML":
@@ -111,10 +111,10 @@ internal class Method_Export : Method_TableGeneric {
                 //    break;
 
                 default:
-                    return new DoItFeedback("Export-Format unbekannt.", true, ld);
+                    return new DoItFeedback("Export-Format unbekannt.", true);
             }
         } catch {
-            return new DoItFeedback("Allgemeiner Fehler beim Erzeugen der Daten.", true, ld);
+            return new DoItFeedback("Allgemeiner Fehler beim Erzeugen der Daten.", true);
         }
 
         return DoItFeedback.Null();

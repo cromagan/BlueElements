@@ -24,7 +24,7 @@ internal class Method_Max : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {
@@ -40,7 +40,7 @@ internal class Method_Max : Method {
 
                 case VariableListString vl:
                     if (vl.ValueList is not { Count: > 0 }) {
-                        return new DoItFeedback("Eine angegebene Liste enthält keine Werte.", true, ld);
+                        return new DoItFeedback("Eine angegebene Liste enthält keine Werte.", true);
                     }
                     foreach (var thiss in vl.ValueList) {
                         if (DoubleTryParse(thiss, out var r2)) {
@@ -51,7 +51,7 @@ internal class Method_Max : Method {
             }
         }
 
-        return l.Count > 0 ? new DoItFeedback(l.Max()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
+        return l.Count > 0 ? new DoItFeedback(l.Max()) : new DoItFeedback("Keine gültigen Werte angekommen", true);
     }
 
     #endregion

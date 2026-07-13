@@ -17,29 +17,29 @@ internal class Method_SetIfExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
 
-            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich.", true, ld); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich.", true); }
 
             switch (attvar.Attributes[z]) {
                 case VariableString vs:
-                    if (attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif) { return dif; }
+                    if (attvar.ValueStringSet(0, vs.ValueString) is { } dif) { return dif; }
                     return DoItFeedback.Null();
 
                 case VariableBool vb:
-                    if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is { } dif2) { return dif2; }
+                    if (attvar.ValueBoolSet(0, vb.ValueBool) is { } dif2) { return dif2; }
                     return DoItFeedback.Null();
 
                 case VariableDouble vf:
-                    if (attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif3) { return dif3; }
+                    if (attvar.ValueNumSet(0, vf.ValueNum) is { } dif3) { return dif3; }
                     return DoItFeedback.Null();
 
                 case VariableListString vl:
-                    if (attvar.ValueListStringSet(0, vl.ValueList, ld) is { } dif4) { return dif4; }
+                    if (attvar.ValueListStringSet(0, vl.ValueList) is { } dif4) { return dif4; }
                     return DoItFeedback.Null();
             }
         }

@@ -13,10 +13,6 @@ public readonly struct CanDoFeedback {
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         LogData = ld;
-
-        if (needsScriptFix) {
-            ld.ErrorMessage = failedreason;
-        }
     }
 
     public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {

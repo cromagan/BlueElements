@@ -28,14 +28,14 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
     public QuickImage ComandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var xdown = attvar.ValueIntGet(0);
         var ydown = attvar.ValueIntGet(1);
 
         var time = attvar.ValueNumGet(2);
 
         if (time is < 0 or > 5) {
-            return new DoItFeedback("Zeitintervall nur von 0 bis 5 Sekunden erlaubt", true, ld);
+            return new DoItFeedback("Zeitintervall nur von 0 bis 5 Sekunden erlaubt", true);
         }
 
         var xup = attvar.ValueIntGet(3);

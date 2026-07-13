@@ -20,7 +20,7 @@ internal class Method_ForEach : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
 
         var l = attvar.ValueListStringGet(1);
 
@@ -28,11 +28,11 @@ internal class Method_ForEach : Method {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true); }
 
         var vari = varCol.GetByKey(varnam);
         if (vari is not null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true);
         }
 
         ScriptEndedFeedback? scx = null;
@@ -51,14 +51,14 @@ internal class Method_ForEach : Method {
         }
 
         if (scx is null) {
-            return new DoItFeedback(false, false, false, string.Empty, null, infos.LogData);
+            return new DoItFeedback();
         }
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 

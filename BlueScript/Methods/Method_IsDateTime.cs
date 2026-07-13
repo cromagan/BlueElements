@@ -19,7 +19,7 @@ internal class Method_IsDateTime : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var ok = DateTimeTryParse(attvar.ValueStringGet(0), out _);
         return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

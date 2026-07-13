@@ -26,11 +26,11 @@ public class Method_CallRow : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
 
         if (row == BlockedRow(scp)) {
-            return new DoItFeedback("Mit der eigenen Zeile kann CallRow nicht benutzt werden. Evtl. Call in betracht ziehen.", true, ld);
+            return new DoItFeedback("Mit der eigenen Zeile kann CallRow nicht benutzt werden. Evtl. Call in betracht ziehen.", true);
         }
 
         #region Attributliste erzeugen
@@ -46,7 +46,7 @@ public class Method_CallRow : Method_TableGeneric {
 
         var scx = row.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, row, a, false, true, 0);
         if (scx is null || scx.Failed) {
-            return new DoItFeedback($"'{vs}' bei  '{row.ReadableText()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
+            return new DoItFeedback($"'{vs}' bei  '{row.ReadableText()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

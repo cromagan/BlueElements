@@ -20,7 +20,7 @@ internal class Method_DeleteFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var files = new List<string>();
 
         foreach (var thisAtt in attvar.Attributes) {
@@ -29,18 +29,18 @@ internal class Method_DeleteFile : Method {
         }
         files = files.SortedDistinctList();
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         foreach (var filn in files) {
             if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                return new DoItFeedback("Dateinamen-Fehler!", true, ld);
+                return new DoItFeedback("Dateinamen-Fehler!", true);
             }
 
             if (IO.FileExists(filn)) {
                 try {
-                    if (!IO.DeleteFile(filn, 120)) { return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld); }
+                    if (!IO.DeleteFile(filn, 120)) { return new DoItFeedback("Fehler beim Löschen: " + filn, true); }
                 } catch {
-                    return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
+                    return new DoItFeedback("Fehler beim Löschen: " + filn, true);
                 }
             }
         }

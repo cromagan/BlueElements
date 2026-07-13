@@ -21,21 +21,21 @@ internal class Method_GenerateAiBmp : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
-        if (mai.IsNullOrEmpty) { return DoItFeedback.InternerFehler(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(); }
+        if (mai.IsNullOrEmpty) { return DoItFeedback.InternerFehler(); }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         var imageModel = attvar.ValueStringGet(2);
-        if (string.IsNullOrWhiteSpace(imageModel)) { return new DoItFeedback("Kein Bild-Modell angegeben.", true, ld); }
+        if (string.IsNullOrWhiteSpace(imageModel)) { return new DoItFeedback("Kein Bild-Modell angegeben.", true); }
 
         var tries = 0;
         do {
             try {
                 Generic.CollectGarbage();
 
-                var bmp = VariableAi.GenerateImageAsync(mai.ApiKey, mai.Endpoint, imageModel, attvar.ValueStringGet(1), ld)
+                var bmp = VariableAi.GenerateImageAsync(mai.ApiKey, mai.Endpoint, imageModel, attvar.ValueStringGet(1))
                     .GetAwaiter().GetResult();
 
                 if (bmp is not null) { return new DoItFeedback(bmp); }
@@ -46,7 +46,7 @@ internal class Method_GenerateAiBmp : Method {
             Generic.Pause(10, false);
         } while (tries < 10);
 
-        return new DoItFeedback("Allgemeiner Fehler bei der Bildgenerierung durch die KI.", false, ld);
+        return new DoItFeedback("Allgemeiner Fehler bei der Bildgenerierung durch die KI.", false);
     }
 
     #endregion

@@ -24,12 +24,12 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
 
         #region  Meine Zeile ermitteln (r)
 
         var r = BlockedRow(scp);
-        if (r?.Table is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true, ld); }
+        if (r?.Table is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true); }
 
         #endregion
 
@@ -37,32 +37,32 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
         var ind = attvar.ValueStringGet(0);
 
-        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback("Layout nicht gefunden.", true, ld); }
+        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback("Layout nicht gefunden.", true); }
 
         #endregion
 
         #region  scale  ermitteln (sc)
 
         var sc = attvar.ValueNumGet(1);
-        if (sc is < 0.1 or > 10) { return new DoItFeedback("Skalierung nur von 0.1 bis 10 erlaubt.", true, ld); }
+        if (sc is < 0.1 or > 10) { return new DoItFeedback("Skalierung nur von 0.1 bis 10 erlaubt.", true); }
 
         #endregion
 
         using var l = new ItemCollectionPadItem(ind);
 
-        if (!l.Any()) { return new DoItFeedback("Layout nicht gefunden oder fehlerhaft.", true, ld); }
+        if (!l.Any()) { return new DoItFeedback("Layout nicht gefunden oder fehlerhaft.", true); }
 
         l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("Generierung fehlgeschlagen", scx.NeedsScriptFix, ld);
+            scx.ChangeFailedReason("Generierung fehlgeschlagen", scx.NeedsScriptFix);
             return scx;
         }
 
         var bmp = l.ToBitmap((float)sc);
 
-        return bmp is null ? new DoItFeedback("Generierung fehlgeschlagen", true, ld) : new DoItFeedback(bmp);
+        return bmp is null ? new DoItFeedback("Generierung fehlgeschlagen", true) : new DoItFeedback(bmp);
     }
 
     #endregion

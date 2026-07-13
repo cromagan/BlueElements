@@ -19,7 +19,7 @@ internal class Method_Contains : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
 
         #region Wortliste erzeugen
 
@@ -55,7 +55,7 @@ internal class Method_Contains : Method {
             return DoItFeedback.Falsch();
         }
 
-        return DoItFeedback.FalscherDatentyp(ld);
+        return DoItFeedback.FalscherDatentyp();
     }
 
     #endregion

@@ -31,29 +31,29 @@ public class Method_AddRows : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";
 
-        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
 
-        if (!tb.IsThisScriptOk(ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (!tb.IsThisScriptOk(ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false); }
 
         var f = tb.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
+        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
 
         var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();
 
         var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 400) {
-            return new DoItFeedback("Stapelspeicherüberlauf", true, ld);
+            return new DoItFeedback("Stapelspeicherüberlauf", true);
         }
 
         
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
-        if (tb.Column.First is not { IsDisposed: false } c) { return new DoItFeedback("Erste Spalte nicht vorhanden", true, ld); }
+        if (tb.Column.First is not { IsDisposed: false } c) { return new DoItFeedback("Erste Spalte nicht vorhanden", true); }
 
         var d = attvar.ValueNumGet(1);
 
@@ -62,7 +62,7 @@ public class Method_AddRows : Method_TableGeneric {
             #region  Filter ermitteln (allfi)
 
             var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myTb, scp.ScriptName, false);
-            if (!string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+            if (!string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
             allFi ??= new FilterCollection(tb, "AddRows");
 
@@ -70,12 +70,12 @@ public class Method_AddRows : Method_TableGeneric {
 
             if (allFi[c] is not null) {
                 allFi.Dispose();
-                return new DoItFeedback("Initialwert doppelt belegt", true, ld);
+                return new DoItFeedback("Initialwert doppelt belegt", true);
             }
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var scx = Method_Row.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {cap}, Skript {scp.ScriptName}", scp, ld);
+            var scx = Method_Row.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
             allFi.Dispose();
             if (scx.Failed) { return scx; }
         }

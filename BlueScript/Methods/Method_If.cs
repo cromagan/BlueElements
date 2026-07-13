@@ -40,7 +40,7 @@ public class Method_If : Method {
         var scpt = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain);
 
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
-        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls: " + attvar.FailedReason, true, infos.LogData); }
+        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls: " + attvar.FailedReason, true); }
 
         if (attvar.ValueBoolGet(0)) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If");
@@ -50,7 +50,7 @@ public class Method_If : Method {
         return DoItFeedback.Null();
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 

@@ -18,7 +18,7 @@ internal class Method_EndsWith : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.ValueBoolGet(1)) {
                 if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z), StringComparison.Ordinal)) {

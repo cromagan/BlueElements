@@ -30,25 +30,25 @@ public class Method_Linkify : Method_TableGeneric {
         return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Parameter 1: Eingehender Text
         var inputText = attvar.ValueStringGet(0);
 
         // Parameter 2: Zieltabelle
         if (attvar.Attributes[1] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
-            return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
+            return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 
         // Parameter 3: Zu durchsuchende Spalte
         var searchColumn = tb.Column[attvar.ValueStringGet(2)];
         if (searchColumn is null) {
-            return new DoItFeedback($"Such-Spalte '{attvar.ValueStringGet(2)}' nicht gefunden", true, ld);
+            return new DoItFeedback($"Such-Spalte '{attvar.ValueStringGet(2)}' nicht gefunden", true);
         }
 
         // Parameter 4: Spalte für Link-Text (optional, sonst = SearchColumn)
         var linkColumn = tb.Column[attvar.ValueStringGet(3)];
         if (linkColumn is null) {
-            return new DoItFeedback($"Link-Spalte '{attvar.ValueStringGet(3)}' nicht gefunden", true, ld);
+            return new DoItFeedback($"Link-Spalte '{attvar.ValueStringGet(3)}' nicht gefunden", true);
         }
 
         // Alle eindeutigen Werte nach Länge sortiert (längste zuerst)

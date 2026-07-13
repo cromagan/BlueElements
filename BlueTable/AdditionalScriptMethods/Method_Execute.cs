@@ -25,7 +25,7 @@ internal class Method_Execute : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
         return DoItFeedback.Null();

@@ -19,12 +19,12 @@ public class Method_SetFailed : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var r = attvar.ValueStringGet(0);
 
-        if (string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true, ld); }
+        if (string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true); }
 
-        return new DoItFeedback(r, false, ld);
+        return new DoItFeedback(r, false);
     }
 
     #endregion

@@ -23,14 +23,14 @@ internal class Method_IsNullOrEmpty : Method {
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos.LogData, attvar);
+                return DoItFeedback.AttributFehler(attvar);
             }
 
             return DoItFeedback.Wahr();
         }
 
         var v = attvar.Attributes[0];
-        if (v is null) { return DoItFeedback.InternerFehler(infos.LogData); }
+        if (v is null) { return DoItFeedback.InternerFehler(); }
 
         if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
 
@@ -39,7 +39,7 @@ internal class Method_IsNullOrEmpty : Method {
         return DoItFeedback.Falsch();
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

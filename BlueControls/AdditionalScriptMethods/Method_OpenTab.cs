@@ -23,23 +23,23 @@ internal class Method_OpenTab : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
-            return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
+            return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 
         if (string.IsNullOrWhiteSpace(tb.Caption)) {
             if (tb is TableFile tbf) {
-                return new DoItFeedback($"Die Benennung der Tabelle '{tbf.Filename.FileNameWithSuffix()}' fehlt.", true, ld);
+                return new DoItFeedback($"Die Benennung der Tabelle '{tbf.Filename.FileNameWithSuffix()}' fehlt.", true);
             }
 
-            return new DoItFeedback("Die Benennung der Tabelle fehlt.", true, ld);
+            return new DoItFeedback("Die Benennung der Tabelle fehlt.", true);
         }
 
         foreach (var thisForm in FormManager.Forms) {
             if (thisForm is TableViewForm tbf && tbf.TabExists(tb.Caption) is null) {
                 
-                if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+                if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
                 tbf.AddTabPage(tb.Caption);
             }
         }

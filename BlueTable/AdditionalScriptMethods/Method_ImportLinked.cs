@@ -15,7 +15,7 @@ public class Method_ImportLinked : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);
@@ -23,7 +23,7 @@ public class Method_ImportLinked : Method_TableGeneric {
         #region  Meine Zeile ermitteln (r)
 
         var r = BlockedRow(scp);
-        if (r?.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Zeilenfehler!", true, ld); }
+        if (r?.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Zeilenfehler!", true); }
 
         #endregion
 
@@ -33,18 +33,18 @@ public class Method_ImportLinked : Method_TableGeneric {
             if (thisColumn.RelationType != RelationType.CellValues) { continue; }
 
             var linkedTable = thisColumn.LinkedTable;
-            if (linkedTable is not { IsDisposed: false }) { return new DoItFeedback($"Verlinkte Tabelle in der Spalte '{thisColumn.KeyName}' nicht vorhanden", true, ld); }
+            if (linkedTable is not { IsDisposed: false }) { return new DoItFeedback($"Verlinkte Tabelle in der Spalte '{thisColumn.KeyName}' nicht vorhanden", true); }
 
-            //if (!linkedTable.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedTable.Caption + "' sind die Skripte defekt", false, ld); }
+            //if (!linkedTable.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedTable.Caption + "' sind die Skripte defekt", false); }
 
             var targetColumn = linkedTable.Column[thisColumn.ColumnKeyOfLinkedTable];
-            if (targetColumn is null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnKeyOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true, ld); }
+            if (targetColumn is null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnKeyOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true); }
 
             var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
-            if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true, ld); }
+            if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true); }
 
             var rows = fc.Rows;
-            if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true, ld); }
+            if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true); }
 
             var v = RowItem.CellToVariable(targetColumn, null, true, false);
 

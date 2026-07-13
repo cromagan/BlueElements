@@ -18,11 +18,11 @@ internal class Method_FileExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
         return !filn.IsFormat(FormatHolder_FilepathAndName.Instance)
-            ? new DoItFeedback("Dateinamen-Fehler!", true, ld)
+            ? new DoItFeedback("Dateinamen-Fehler!", true)
             : new DoItFeedback(IO.FileExists(filn));
     }
 

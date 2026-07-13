@@ -27,21 +27,21 @@ public class Method_EditRow : Method_TableGeneric {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true); }
 
         var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) {
-            return new DoItFeedback($"Tabellensperre: {f}", true, ld);
+            return new DoItFeedback($"Tabellensperre: {f}", true);
         }
 
         if (row == BlockedRow(scp)) {
             MessageBox.Show("Bearbeitung aktuell nicht möglich.", ImageCode.Warnung, "OK");
-            return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
+            return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false);
         }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         row.Edit(typeof(RowEditor), true);
 

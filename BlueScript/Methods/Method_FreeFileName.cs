@@ -21,13 +21,13 @@ internal class Method_FreeFileName : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var pf = attvar.ValueStringGet(0);
         var nam = attvar.ValueStringGet(1);
         var suf = attvar.ValueStringGet(2);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
+            return new DoItFeedback("Verzeichnis existiert nicht", true);
         }
 
         if (!string.IsNullOrEmpty(nam)) {

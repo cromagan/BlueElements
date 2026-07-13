@@ -18,19 +18,19 @@ internal class Method_ReplaceList : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
 
         var tmpList = attvar.ValueListStringGet(0);
 
-        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true, ld); }
-        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true, ld); }
+        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true); }
+        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList.", true, ld); }
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList.", true); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (attvar.ValueBoolGet(2)) {
@@ -64,7 +64,7 @@ internal class Method_ReplaceList : Method {
             }
         } while (again);
 
-        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList) ?? DoItFeedback.Null();
     }
 
     #endregion
