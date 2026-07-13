@@ -145,7 +145,7 @@ public sealed class RowCaptionListItem : RowBackground {
 
         var arrowState = IsExpanded ? States.Standard : States.Checked;
         var etxt = new ExtText(Design.Button_CheckBox, arrowState);
-        Button.DrawButton(null, gr, Design.Button_CheckBox, arrowState, null, Alignment.Horizontal_Vertical_Center, false, etxt, string.Empty, buttonRect, false);
+        Button.DrawButton(null, gr, Design.Button_OpenClose, arrowState, null, Alignment.Horizontal_Vertical_Center, false, etxt, string.Empty, buttonRect, false);
 
         // Pfeil-Icon zentriert im Button
         var arrowCode = IsExpanded ? "MinusZeichen2" : "PlusZeichen2";

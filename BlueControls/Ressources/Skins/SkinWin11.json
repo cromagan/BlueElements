@@ -440,6 +440,22 @@
       "BOC1": "000000"
     }
   },
+  "Button_OpenClose": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "FFFFFF",
+      "Border": "Solid1Px",
+      "BOC1": "000000"
+    },
+    "Checked": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "D8D8D8",
+      "Border": "Solid1Px",
+      "BOC1": "000000"
+    }
+  },
   "HandlePoint_Ghost": {
     "Standard": {
       "Contour": "Rectangle",

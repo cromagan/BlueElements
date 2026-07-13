@@ -13,6 +13,7 @@ public enum Design {
     Button_Slider_Horizontal,
     Button_Slider_Vertical,
     Button_SliderDesign,
+    Button_OpenClose,
 
     HandlePoint,
     HandlePoint_Ghost,
