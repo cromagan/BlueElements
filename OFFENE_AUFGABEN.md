@@ -227,3 +227,8 @@ Was meinst du?
 ## Aufgabe
 Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nicht.
 
+## Aufgabe
+Bearbeiten der Überschrift einer Tabelle:
+- Klicke ich auf ein Unterverzeichniss, darf nur der Letzte Text zum Bearbeiten sein, nicht der ganze Pfad
+- -?- muss generell Bearbeitbar sein, darf nicht zum Bearbeiten angezeigt werden (Es ist ja sozusgen leer)
+- Klickt man nach dem Bearbeiten in die Tabelle, springt der Cursor irgendwo hin. Textbox zumachen muss den ersten klick ignorieren

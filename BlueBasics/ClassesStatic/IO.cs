@@ -251,33 +251,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                                ? FileFormat.Unknown
-                                : filename.FileSuffix().ToUpperInvariant() switch {
-                                    "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                                    "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                                    "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                                    "CSV" => FileFormat.CSV,
-                                    "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                                    "MSG" or "EML" => FileFormat.EMail,
-                                    "PDF" => FileFormat.Pdf,
-                                    "HTM" or "HTML" => FileFormat.HTML,
-                                    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                                    "ICO" => FileFormat.Icon,
-                                    "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                                    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                                    "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                                    "CHM" => FileFormat.HelpFile,
-                                    "XML" => FileFormat.XMLFile,
-                                    "VCF" => FileFormat.Visitenkarte,
-                                    "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                                    "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                                    "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
-                                    "TBLC" => FileFormat.TableChunk,
-                                    "LNK" or "URL" => FileFormat.Link,
-                                    "BCR" => FileFormat.BlueCreativeFile,
-                                    "BCS" => FileFormat.BlueCreativeSymbol,
-                                    _ => FileFormat.Unknown
-                                };
+                                    ? FileFormat.Unknown
+                                    : filename.FileSuffix().ToUpperInvariant() switch {
+                                        "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                                        "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                                        "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                                        "CSV" => FileFormat.CSV,
+                                        "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                                        "MSG" or "EML" => FileFormat.EMail,
+                                        "PDF" => FileFormat.Pdf,
+                                        "HTM" or "HTML" => FileFormat.HTML,
+                                        "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                                        "ICO" => FileFormat.Icon,
+                                        "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                                        "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                                        "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                                        "CHM" => FileFormat.HelpFile,
+                                        "XML" => FileFormat.XMLFile,
+                                        "VCF" => FileFormat.Visitenkarte,
+                                        "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                                        "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                                        "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
+                                        "TBLC" => FileFormat.TableChunk,
+                                        "LNK" or "URL" => FileFormat.Link,
+                                        "BCR" => FileFormat.BlueCreativeFile,
+                                        "BCS" => FileFormat.BlueCreativeSymbol,
+                                        _ => FileFormat.Unknown
+                                    };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -308,10 +308,10 @@ public static class IO {
     public static FileInfo? GetFileInfo(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileInfo, [filename], abortIfFailed, time).Value as FileInfo;
 
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                                    => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
+                                        => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
 
     public static string[] GetFiles(string directory)
-                             => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
+                                 => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
 
     public static DateTime? GetFolderWriteTimeUtc(string directory) => ProcessFile(TryGetFolderWriteTimeUtc, [directory], false, 5).Value as DateTime?;
 
@@ -454,6 +454,8 @@ public static class IO {
                 stopw = Stopwatch.StartNew();
             }
 
+            if (trySeconds < 0.15) { return OperationResult.Failed(result.FailedReason); }
+
             Thread.Sleep(200);
         }
     }
@@ -590,6 +592,136 @@ public static class IO {
         } finally {
             DeleteFile(tempfile, false);
         }
+    }
+
+    /// <summary>
+    /// Synchronisiert den Inhalt von <paramref name="sourceDir"/> nach <paramref name="targetDir"/>.
+    /// Kopiert neue/geänderte Dateien, löscht im Ziel alles, was in der Quelle nicht mehr existiert,
+    /// und räumt danach leere Verzeichnisse auf.
+    /// </summary>
+    /// <param name="sourceDir"></param>
+    /// <param name="targetDir"></param>
+    /// <param name="includeSubdirs"></param>
+    /// <param name="ignore">
+    /// Liste von Ausschlusskriterien. Erlaubt sind:
+    /// - Ordnernamen, z. B. "obj" (überspringt jede Datei, die in einem so benannten Ordner liegt)
+    /// - exakte Dateinamen, z. B. "Thumbs.db"
+    /// - Wildcard-Muster für Dateiendungen, z. B. "*.pdb" oder "*.xml"
+    /// Der Abgleich ist nicht case-sensitiv.
+    /// </param>
+    public static OperationResult SyncDirectoryContent(string sourceDir, string targetDir, bool includeSubdirs, List<string>? ignore) {
+        if (Develop.AllReadOnly) { return new OperationResult(false, "Alles ReadOnly"); }
+
+        var von = sourceDir.NormalizePath();
+        var nach = targetDir.NormalizePath();
+
+        if (!DirectoryExists(von)) { return new OperationResult(false, $"'{von}' existiert nicht"); }
+
+        CreateDirectory(nach);
+        if (!DirectoryExists(nach)) { return new OperationResult(false, $"'{nach}' existiert nicht"); }
+
+        var ignoreList = ignore ?? [];
+        var ignoreExtensions = ignoreList
+            .Where(i => i.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
+            .Select(i => i[1..]) // "*.pdb" -> ".pdb"
+            .ToList();
+        var ignoreNamesOrFolders = ignoreList
+            .Where(i => !i.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+        // Wir speichern die absoluten Zielpfade für den späteren Abgleich
+        var okFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        #region Lokale Hilfsfunktion: Prüft, ob eine Datei ignoriert werden soll
+
+        bool IsIgnored(string relativePath, string fileName) {
+            if (ignoreExtensions.Exists(ext => fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase))) {
+                return true;
+            }
+
+            var pathParts = relativePath.Split('\\', '/');
+            return ignoreNamesOrFolders.Exists(i => Array.Exists(pathParts, part => part.Equals(i, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        #endregion
+
+        #region Daten ins Ziel-Verzeichnis kopieren
+
+        var sourceFiles = GetFiles(von, "*", searchOption);
+        var t = 0;
+
+        foreach (var sourceFile in sourceFiles) {
+            t++;
+
+            var relativePath = sourceFile.Substring(von.Length);
+            var fileName = sourceFile.FileNameWithoutSuffix() + "." + sourceFile.FileSuffix();
+
+            if (IsIgnored(relativePath, fileName)) { continue; }
+
+            var newFile = nach + relativePath;
+            okFiles.Add(newFile);
+
+            // Vergleich auf Zeitstempel/Existenz (BlueBasics Logik)
+            var nf = GetFileInfo(newFile, false, 0.01f);
+            var sf = GetFileInfo(sourceFile, false, 5);
+            Develop.Message(ErrorType.Info, null, "Datei synchronisieren", ImageCode.Datei, $"Synchronisiere {t} von {sourceFiles.Length}: {newFile.FileNameWithoutSuffix()}", 0);
+            Develop.DoEvents();
+
+            if (sf != null && (nf == null ||
+                nf.Length != sf.Length ||
+                nf.LastWriteTime.Ticks != sf.LastWriteTime.Ticks)) {
+                if (DeleteFile(newFile, 60)) {
+                    CreateDirectory(newFile.FilePath());
+                    if (!FileCopy(sourceFile, newFile, false)) {
+                        return new OperationResult(false, $"Die Datei\r\n{sourceFile}\r\nkonnte nicht nach\r\n{newFile}\r\n kopiert werden.");
+                    }
+                } else {
+                    return new OperationResult(false, $"Die lokale Datei\r\n{newFile}\r\nkonnte nicht gelöscht werden.\r\nLöschen sie diese manuell.");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Verzeichnis aufräumen
+
+        // Dateien löschen, die im Quellverzeichnis nicht mehr existieren (oder jetzt ignoriert werden)
+        var targetFiles = GetFiles(nach, "*", searchOption);
+        foreach (var thisf in targetFiles) {
+            var relativePath = thisf.Substring(nach.Length);
+            var fileName = thisf.FileNameWithoutSuffix() + "." + thisf.FileSuffix();
+
+            if (IsIgnored(relativePath, fileName)) { continue; }
+
+            if (!okFiles.Contains(thisf)) {
+                DeleteFile(thisf, false);
+            }
+        }
+
+        if (includeSubdirs) {
+            var targetDirs = Directory.GetDirectories(nach, "*", SearchOption.AllDirectories)
+                                     .Select(d => d.NormalizePath())
+                                     .OrderByDescending(d => d.Length); // Von tief nach flach
+
+            foreach (var dir in targetDirs) {
+                // Ignorierte Ordner nicht löschen, auch wenn sie leer scheinen
+                var relDir = dir.Substring(nach.Length);
+                var dirParts = relDir.Split('\\', '/');
+                if (ignoreNamesOrFolders.Exists(i => Array.Exists(dirParts, part => part.Equals(i, StringComparison.OrdinalIgnoreCase)))) {
+                    continue;
+                }
+
+                if (GetFiles(dir).Length == 0 && GetDirectories(dir).Length == 0) {
+                    DeleteDir(dir, false);
+                }
+            }
+        }
+
+        #endregion
+
+        return OperationResult.Success;
     }
 
     public static string TempFile(string newPath, string filename) {
