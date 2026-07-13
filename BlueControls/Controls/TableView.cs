@@ -2168,10 +2168,65 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // "PFAD1\PFAD2" also sowohl "PFAD1" als auch "PFAD1\PFAD2". So werden
         // auch die Parent-Header an der Position ihres ersten Unter-Eintrags
         // eingefügt (analog zum Windows Datei-Explorer).
+        // Das bestimmt später nur noch die Geschwister-Reihenfolge INNERHALB einer Ebene.
+        var discovered = new List<string>();
         foreach (var dataItem in sortedRows) {
-            foreach (var ancestor in dataItem.AlignsToChapter.ChapterPathHierarchy()) {
-                captionOrder.AddIfNotExists(ancestor);
+            var hierarchy = dataItem.AlignsToChapter.ChapterPathHierarchy();
+
+            if (hierarchy.Count == 0) {
+                discovered.AddIfNotExists(dataItem.AlignsToChapter);
+            } else {
+                foreach (var ancestor in hierarchy) {
+                    discovered.AddIfNotExists(ancestor);
+                }
             }
+        }
+
+        // Hierarchisch (Tiefensuche) neu ordnen. Ohne diesen Schritt
+        // rutscht z.B. "Pfad1\Ohne" ans Ende der Gesamtliste, wenn die
+        // zugehörige Zeile erst spät im sortierten Ergebnis auftaucht.
+        var childrenByParent = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var topLevel = new List<string>();
+
+        foreach (var cap in discovered) {
+            var pos = cap.LastIndexOf('\\');
+            if (pos < 0) {
+                topLevel.AddIfNotExists(cap);
+            } else {
+                var parent = cap[..pos];
+                if (!childrenByParent.TryGetValue(parent, out var list)) {
+                    list = [];
+                    childrenByParent[parent] = list;
+                }
+                list.AddIfNotExists(cap);
+            }
+        }
+
+        void AddRecursive(string cap) {
+            captionOrder.AddIfNotExists(cap);
+
+            if (!childrenByParent.TryGetValue(cap, out var children)) { return; }
+
+            // "X\Ohne" (falls vorhanden) immer zuerst unter seinem Parent,
+            // danach die übrigen Kinder in Entdeckungsreihenfolge.
+            var ohneChild = cap + "\\" + Ohne;
+            var ordered = new List<string>();
+            if (children.Contains(ohneChild, StringComparer.OrdinalIgnoreCase)) {
+                ordered.Add(ohneChild);
+            }
+            foreach (var child in children) {
+                if (!string.Equals(child, ohneChild, StringComparison.OrdinalIgnoreCase)) {
+                    ordered.Add(child);
+                }
+            }
+
+            foreach (var child in ordered) {
+                AddRecursive(child);
+            }
+        }
+
+        foreach (var top in topLevel) {
+            AddRecursive(top);
         }
 
         return captionOrder;

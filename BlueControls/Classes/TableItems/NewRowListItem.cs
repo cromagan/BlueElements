@@ -12,6 +12,7 @@ public sealed class NewRowListItem : RowBackground {
     #region Fields
 
     public const string Identifier = "NewRowListItem";
+    public static readonly Brush NewRowOverlayBrush = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
 
     #endregion
 
@@ -57,7 +58,7 @@ public sealed class NewRowListItem : RowBackground {
         }
 
         if (!doWhiteAfter) {
-            gr.FillRectangle(GrayBrush2, positionControl);
+            gr.FillRectangle(NewRowOverlayBrush, positionControl);
         }
 
         if (!string.IsNullOrEmpty(toDrawd)) {
@@ -69,7 +70,7 @@ public sealed class NewRowListItem : RowBackground {
         }
 
         if (doWhiteAfter) {
-            gr.FillRectangle(GrayBrush2, positionControl);
+            gr.FillRectangle(NewRowOverlayBrush, positionControl);
         }
     }
 

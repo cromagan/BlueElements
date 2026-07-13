@@ -584,7 +584,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
         }
 
-        if (fehler == ChapterColumnMultilineWithRowSort) {
+        if (fehler ==  ChapterColumnMultilineWithRowSort) {
             solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 
@@ -630,8 +630,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Filter definieren", () => { }, tblFilterliste));
         }
 
-        if (fehler == RelationRequiresMultiline) {
+        if (fehler is RelationRequiresMultiline or SortOnlyMultiline) {
             solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => chkMultiline.Checked = true, chkMultiline));
+        }
+
+        if (fehler == SortOnlyMultiline) {
+            solutions.Add(CreateSolution("'Mehrzeilige Einträge sortieren' deaktivieren", () => btnAutoEditAutoSort.Checked = false, btnAutoEditAutoSort));
+        }
+
+
+        if (fehler == RelationRequiresMultiline) {
             solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => chkRelation.Checked = false, chkRelation));
         }
 

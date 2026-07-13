@@ -60,7 +60,7 @@ public sealed class CaptionBarListItem : RowBackground {
 
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state, rowcolor);
-        gr.FillRectangle(GrayBrush, positionControl);
+        gr.FillRectangle(TableHeadOverlayBrush, positionControl);
     }
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {

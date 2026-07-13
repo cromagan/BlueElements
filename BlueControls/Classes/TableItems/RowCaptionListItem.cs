@@ -68,6 +68,21 @@ public sealed class RowCaptionListItem : RowBackground {
         return ChapterText;
     }
 
+    /// <summary>
+    /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
+    /// Der Button ist am linken Rand des eingerückten Bereichs (Indent beachten!).
+    /// </summary>
+    internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
+        var controlPos = ControlPosition(zoom, offsetX, offsetY);
+        var p2 = 2.CanvasToControl(zoom);
+        var p20 = 20.CanvasToControl(zoom);
+        var indentOffset = p20 * Indent;
+        var rowHeight = controlPos.Height;
+        var size = Math.Min(p20, rowHeight - p2 * 2);
+        var buttonY = controlPos.Top + (rowHeight - size) / 2;
+        return new Rectangle(controlPos.X + indentOffset + p2, buttonY, size, size);
+    }
+
     internal void EditChapter(TableView tableView) {
         if (Arrangement?.ColumnForChapter is not { IsDisposed: false }) { return; }
         if (tableView.Table is not { IsDisposed: false }) { return; }
@@ -92,8 +107,6 @@ public sealed class RowCaptionListItem : RowBackground {
         bt.Focus();
     }
 
-    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
-
     /// <summary>
     /// Prüft, ob der übergebene Punkt (in Control-Koordinaten) auf dem
     /// Pfeil-Button links liegt.
@@ -103,20 +116,7 @@ public sealed class RowCaptionListItem : RowBackground {
         return rect.Contains(controlX, controlY);
     }
 
-    /// <summary>
-    /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
-    /// Der Button ist am linken Rand des eingerückten Bereichs (Indent beachten!).
-    /// </summary>
-    internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
-        var controlPos = ControlPosition(zoom, offsetX, offsetY);
-        var p2 = 2.CanvasToControl(zoom);
-        var p20 = 20.CanvasToControl(zoom);
-        var indentOffset = p20 * Indent;
-        var rowHeight = controlPos.Height;
-        var size = Math.Min(p20, rowHeight - p2 * 2);
-        var buttonY = controlPos.Top + (rowHeight - size) / 2;
-        return new Rectangle(controlPos.X + indentOffset + p2, buttonY, size, size);
-    }
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
@@ -134,7 +134,7 @@ public sealed class RowCaptionListItem : RowBackground {
         var p20 = 20.CanvasToControl(zoom);
 
         // Stark verblasster Hintergrund für die gesamte Zeile
-        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(80)), positionControl);
+        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(120)), positionControl);
 
         // Pfeil-Button links als eigenständiger Button — relativ zum
         // eingerückten positionControl (X) positionieren, damit der Indent
@@ -148,7 +148,7 @@ public sealed class RowCaptionListItem : RowBackground {
         Button.DrawButton(null, gr, Design.Button_CheckBox, arrowState, null, Alignment.Horizontal_Vertical_Center, false, etxt, string.Empty, buttonRect, false);
 
         // Pfeil-Icon zentriert im Button
-        var arrowCode = IsExpanded ? "Pfeil_Unten_Scrollbar" : "Pfeil_Rechts_Scrollbar";
+        var arrowCode = IsExpanded ? "MinusZeichen2" : "PlusZeichen2";
         gr.DrawImageUnscaled(QuickImage.Get(arrowCode + "|" + p14), buttonRect.X + (buttonRect.Width - p14) / 2, buttonRect.Y + (buttonRect.Height - p14) / 2);
 
         // Wort daneben ohne Rahmen

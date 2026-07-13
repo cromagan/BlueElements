@@ -18,9 +18,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
     #region Fields
 
-    public static readonly Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
-    public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
-
+    public static readonly Brush TableHeadOverlayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
     private volatile int _isDisposedFlag;
     private Size _untrimmedCanvasSize = Size.Empty;
 
@@ -249,7 +247,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Alignx, _zoom);
     public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
         if (viewItem.IsDummyColumn) {
-            gr.FillRectangle(GrayBrush, positionControl);
+            gr.FillRectangle(TableHeadOverlayBrush, positionControl);
             return;
         }
         var brush = BackgroundFill.GetBrush(viewItem.BackColor_ColumnCell);

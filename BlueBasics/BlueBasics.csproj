@@ -55,6 +55,8 @@
 
   <ItemGroup>
     <None Remove="Ressourcen\Image\Icons\Aufklappen.png" />
+    <None Remove="Ressourcen\Image\Icons\MinusZeichen2.png" />
+    <None Remove="Ressourcen\Image\Icons\PlusZeichen2.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,10 +91,12 @@
     <EmbeddedResource Include="Ressourcen\Image\Icons\Layout.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Linksbündig.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Mauspfeil.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\MinusZeichen2.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Note.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\PDF.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Person.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Pipette.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\PlusZeichen2.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\PowerPoint.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Querformat.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Radiergummi.png" />
