@@ -105,7 +105,7 @@ public sealed class RowListItem : RowBackground {
         }
     }
 
-    public static string Identifier(RowItem row, string chapter) => chapter.ChapterPathNormalize().ToUpperInvariant() + "\\" + row.KeyName;
+    public static string Identifier(RowItem row, string chapter) => chapter.ChapterPathNormalize().ToUpperInvariant() + RowCaptionListItem.Kapiteltrenner + row.KeyName;
 
     public static string QuickInfoText(ColumnItem? col, string additionalText) {
         if (col?.Table is not { IsDisposed: false }) { return string.Empty; }

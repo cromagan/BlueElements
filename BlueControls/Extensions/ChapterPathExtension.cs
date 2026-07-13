@@ -1,11 +1,13 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-namespace BlueBasics;
+using BlueControls.Classes.TableItems;
+
+namespace BlueControls;
 
 /// <content>
-/// Chapter-Pfad-Hilfsroutinen für Tabellen (Chapter-Spalten). Im Gegensatz
-/// zu <c>ClassesStatic.IO.PathParent</c> akzeptieren diese Routinen sowohl
-/// '\' als auch '/' als Trenner — analog zum Windows Datei-Explorer.
+/// Chapter-Pfad-Hilfsroutinen für Tabellen (Chapter-Spalten). Als
+/// Trennzeichen wird ausschließlich <see cref="RowCaptionListItem.Kapiteltrenner"/>
+/// ('\') verwendet.
 /// </content>
 public static partial class Extensions {
 
@@ -13,30 +15,30 @@ public static partial class Extensions {
 
     /// <summary>
     /// Gibt die Tiefe des Pfads zurück (Anzahl Trenner).
-    /// "A" = 0, "A\B" = 1, "A\B\C" = 2. Akzeptiert beide Separatoren.
+    /// "A" = 0, "A\B" = 1, "A\B\C" = 2.
     /// </summary>
     public static int ChapterPathDepth(this string path) {
         if (string.IsNullOrEmpty(path)) { return 0; }
 
         var count = 0;
         foreach (var c in path) {
-            if (c is '\\' or '/') { count++; }
+            if (c == RowCaptionListItem.Kapiteltrenner) { count++; }
         }
         return count;
     }
 
     /// <summary>
     /// Gibt alle Prefix-Pfade des Kapitels zurück, inkl. des Pfads selbst.
-    /// Für "A\B\C" → ["A", "A\B", "A\B\C"]. Akzeptiert beide Separatoren.
+    /// Für "A\B\C" → ["A", "A\B", "A\B\C"].
     /// </summary>
     public static List<string> ChapterPathHierarchy(this string path) {
         var result = new List<string>();
         if (string.IsNullOrWhiteSpace(path)) { return result; }
 
-        var segments = path.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
+        var segments = path.Split([RowCaptionListItem.Kapiteltrenner], StringSplitOptions.RemoveEmptyEntries);
         var current = string.Empty;
         foreach (var s in segments) {
-            current = string.IsNullOrEmpty(current) ? s : current + "\\" + s;
+            current = string.IsNullOrEmpty(current) ? s : current + RowCaptionListItem.Kapiteltrenner + s;
             result.Add(current);
         }
         return result;
@@ -48,23 +50,22 @@ public static partial class Extensions {
     public static string ChapterPathLastName(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
 
-        var pos = Math.Max(path.LastIndexOf('\\'), path.LastIndexOf('/'));
+        var pos = path.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
         return pos < 0 ? path : path[(pos + 1)..];
     }
 
     /// <summary>
-    /// Normalisiert einen Kapitel-Pfad: '/' wird zu '\', führende und
-    /// abschließende Separatoren werden entfernt. "A/B\" wird zu "A\B".
+    /// Normalisiert einen Kapitel-Pfad: führende und abschließende
+    /// Trennzeichen werden entfernt. "  \A\B\  " wird zu "A\B".
     /// </summary>
     public static string ChapterPathNormalize(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
-        return path.Replace('/', '\\').Trim('\\').Trim();
+        return path.Trim(RowCaptionListItem.Kapiteltrenner).Trim();
     }
 
     /// <summary>
     /// Gibt den Parent-Pfad zurück. Für "A\B" → "A". Für "A" → "".
-    /// Akzeptiert beide Separatoren als Eingabe, das Ergebnis verwendet '\' und
-    /// ist normalisiert (keine führenden/abschließenden Separatoren).
+    /// Das Ergebnis ist normalisiert (keine führenden/abschließenden Trennzeichen).
     /// </summary>
     public static string ChapterPathParent(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
@@ -72,7 +73,7 @@ public static partial class Extensions {
         var normalized = path.ChapterPathNormalize();
         if (string.IsNullOrEmpty(normalized)) { return string.Empty; }
 
-        var pos = normalized.LastIndexOf('\\');
+        var pos = normalized.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
         return pos <= 0 ? string.Empty : normalized[..pos];
     }
 

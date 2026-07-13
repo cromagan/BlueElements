@@ -12,6 +12,17 @@ namespace BlueControls.Classes.TableItems;
 /// </summary>
 public sealed class RowCaptionListItem : RowBackground {
 
+    #region Fields
+
+    /// <summary>
+    /// Trennzeichen für Kapitel-Pfade. Kapitel werden NUR noch mit diesem
+    /// Zeichen getrennt und ausgewertet. Kanonische Quelle für alle
+    /// Chapter-Pfad-Routinen (<see cref="Extensions"/>).
+    /// </summary>
+    public const char Kapiteltrenner = '\\';
+
+    #endregion
+
     #region Constructors
 
     public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.ChapterPathParent()) {
@@ -30,19 +41,26 @@ public sealed class RowCaptionListItem : RowBackground {
 
     /// <summary>
     /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Nur bei echten Kapiteln (nicht Ohne/Angepinnt/Weitere Zeilen),
+    /// Nur bei echten Kapiteln (nicht Angepinnt/Weitere Zeilen),
     /// mit vorhandener Kapitel-Spalte, außerhalb von TableChunk
-    /// und wenn die Benutzerrechte es erlauben.
+    /// und wenn die Benutzerrechte es erlauben. Das Ohne-Kapitel (-?-)
+    /// ist ebenfalls bearbeitbar — es repräsentiert leere Kapitel-Werte.
     /// </summary>
     internal bool CanEditChapter {
         get {
             if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
             if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
             if (tb is TableChunk) { return false; }
-            if (ChapterText == TableView.Ohne || ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
+            if (ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
             return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
         }
     }
+
+    /// <summary>
+    /// Letztes Pfad-Segment ist -?- (Ohne), d.h. die Zeilen haben kein
+    /// oder nur den Parent-Pfad als Kapitel-Wert.
+    /// </summary>
+    internal bool IsOhneChapter => string.Equals(ChapterText.ChapterPathLastName(), TableView.Ohne, StringComparison.OrdinalIgnoreCase);
 
     protected override bool DoSpezialOrder => true;
 
@@ -62,10 +80,11 @@ public sealed class RowCaptionListItem : RowBackground {
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (CanEditChapter) {
-            return $"{ChapterText}\rDoppelklick auf das Wort zum Bearbeiten";
+            var displayText = IsOhneChapter ? "(leer)" : ChapterText.ChapterPathLastName();
+            return $"{displayText}\rDoppelklick zum Bearbeiten";
         }
 
-        return ChapterText;
+        return ChapterText.ChapterPathLastName();
     }
 
     /// <summary>
@@ -97,7 +116,9 @@ public sealed class RowCaptionListItem : RowBackground {
         var bt = tableView.BTB;
         bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
         bt.MultiLine = false;
-        bt.Text = ChapterText;
+        // Nur das letzte Pfad-Segment bearbeiten (analog zum Windows Explorer).
+        // Bei -?- (Ohne) leere Textbox anzeigen, da -?- "kein Kapitel" bedeutet.
+        bt.Text = IsOhneChapter ? string.Empty : ChapterText.ChapterPathLastName();
         bt.Location = new Point(0, capPos.Y);
         bt.Size = new Size(tableView.Width, capPos.Height);
         bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];

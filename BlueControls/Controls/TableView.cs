@@ -64,6 +64,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private List<RowItem> _dragSourceRows = [];
     private bool _isDraggingColumn;
     private bool _isDraggingRowSort;
+    private bool _consumeNextMouseDown;
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
@@ -1822,6 +1823,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
+        // Wurde eine Edit-TextBox durch Klick auf die Tabelle geschlossen
+        // (LostFocus), konsumiert dieser Klick nur das Schließen — die
+        // eigentliche Aktion (Cursor setzen etc.) darf erst beim nächsten
+        // Klick erfolgen.
+        if (_consumeNextMouseDown) {
+            _consumeNextMouseDown = false;
+            return;
+        }
+
         lock (_lockUserAction) {
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
@@ -2117,8 +2127,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var caps = cap.Contents(filteredRows, Ohne);
 
             // Volle Pfad-Hierarchie aufbauen — für "A\B\C" werden "A", "A\B"
-            // und "A\B\C" als eigenständige Captions angelegt. Beide Separatoren
-            // ('\' und '/') werden akzeptiert (analog zum Windows Datei-Explorer).
+            // und "A\B\C" als eigenständige Captions angelegt. Als Trennzeichen
+            // wird ausschließlich '\' verwendet (RowCaptionListItem.Kapiteltrenner).
             foreach (var capValue in caps) {
                 allCaps.UnionWith(capValue.ChapterPathHierarchy());
             }
@@ -2131,7 +2141,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             foreach (var capValue in caps) {
                 var norm = capValue.ChapterPathNormalize();
                 if (parentCaps.Contains(norm)) {
-                    allCaps.UnionWith((norm + "\\" + Ohne).ChapterPathHierarchy());
+                    allCaps.UnionWith((norm + RowCaptionListItem.Kapiteltrenner + Ohne).ChapterPathHierarchy());
                 }
             }
 
@@ -2189,7 +2199,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var topLevel = new List<string>();
 
         foreach (var cap in discovered) {
-            var pos = cap.LastIndexOf('\\');
+            var pos = cap.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
             if (pos < 0) {
                 topLevel.AddIfNotExists(cap);
             } else {
@@ -2209,7 +2219,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // "X\Ohne" (falls vorhanden) immer zuerst unter seinem Parent,
             // danach die übrigen Kinder in Entdeckungsreihenfolge.
-            var ohneChild = cap + "\\" + Ohne;
+            var ohneChild = cap + RowCaptionListItem.Kapiteltrenner + Ohne;
             var ordered = new List<string>();
             if (children.Contains(ohneChild, StringComparer.OrdinalIgnoreCase)) {
                 ordered.Add(ohneChild);
@@ -2276,7 +2286,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             for (var i = 0; i < capsOfRow.Count; i++) {
                 var norm = capsOfRow[i].ChapterPathNormalize();
                 if (parentCaps.Contains(norm)) {
-                    capsOfRow[i] = norm + "\\" + Ohne;
+                    capsOfRow[i] = norm + RowCaptionListItem.Kapiteltrenner + Ohne;
                 }
             }
         }
@@ -2515,13 +2525,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// <summary>
     /// Prüft, ob ein Vorgänger-Pfad (strict ancestor) von <paramref name="chapterText"/>
     /// in <paramref name="collapsedParents"/> enthalten ist. Entspricht der bisherigen
-    /// <c>StartsWith(parent + "\\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
+    /// <c>StartsWith(parent + "\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
     /// </summary>
     private static bool HasCollapsedAncestor(string chapterText, HashSet<string> collapsedParents) {
-        var pos = chapterText.IndexOf('\\');
+        var pos = chapterText.IndexOf(RowCaptionListItem.Kapiteltrenner);
         while (pos >= 0) {
             if (collapsedParents.Contains(chapterText[..pos])) { return true; }
-            pos = chapterText.IndexOf('\\', pos + 1);
+            pos = chapterText.IndexOf(RowCaptionListItem.Kapiteltrenner, pos + 1);
         }
         return false;
     }
@@ -2901,6 +2911,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void BB_LostFocus(object sender, System.EventArgs e) {
         if (FloatingForm.IsShowing(BTB) || FloatingForm.IsShowing(BCB)) { return; }
+
+        // Ist die Textbox noch sichtbar, wurde der Fokusverlust durch einen
+        // Klick auf die Tabelle ausgelöst (nicht durch Enter/Tab/Esc — dort
+        // wird Visible vorher auf false gesetzt). Den folgenden MouseDown
+        // konsumieren, damit der Cursor nicht springt.
+        if (sender is Control c && c.Visible) {
+            _consumeNextMouseDown = true;
+        }
+
         CloseAllComponents();
     }
 
@@ -4442,40 +4461,75 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else if (isChapterEdit && tags[1] is RowCaptionListItem rcli
             && rcli.Arrangement?.ColumnForChapter is { IsDisposed: false } capCol
             && rcli.Arrangement.Table is { IsDisposed: false } tbChapter) {
-            // newChapter normalisieren ( '/' → '\' ), oldChapter aus rcli ist
-            // bereits normalisiert. Dadurch funktionieren Vergleiche auch dann,
-            // wenn in der Zelle noch '/' als Trenner steht.
-            var newChapter = w.Replace("\r\n", "\r").ChapterPathNormalize();
+            // Da im Textbox nur das letzte Pfad-Segment bearbeitet wird,
+            // muss der Parent-Pfad für newChapter rekonstruiert werden.
             var oldChapter = rcli.ChapterText;
+            var parentPath = oldChapter.ChapterPathParent();
 
-            if (!string.IsNullOrEmpty(newChapter) && newChapter != oldChapter) {
-                // Nur der zusammenhängende Block unter dem geklickten Header
-                // (tags[3]). Ist der Block nicht ermittelt worden (z. B. weil
-                // die Ansicht inzwischen neu aufgebaut wurde), auf alle Zeilen
-                // zurückgreifen.
-                var blockRows = tags.Count >= 4 && tags[3] is List<RowItem> br
-                    ? br
-                    : [.. tbChapter.Row.Where(r => r is { IsDisposed: false })];
+            // Bei Ohne-Kapiteln ("-?-") enthalten die Zellen den Parent-Pfad
+            // (oder leer bei Top-Level), nicht den Text "-?-".
+            var isOhne = rcli.IsOhneChapter;
+            var cellMatchValue = isOhne ? parentPath : oldChapter;
 
+            // newChapter: nur das letzte Segment ersetzen, Parent bleibt erhalten.
+            var newLastName = w.Replace("\r\n", "\r").ChapterPathNormalize();
+            var newChapter = string.IsNullOrEmpty(parentPath) ? newLastName : parentPath + RowCaptionListItem.Kapiteltrenner + newLastName;
+
+            // Nur der zusammenhängende Block unter dem geklickten Header
+            // (tags[3]). Ist der Block nicht ermittelt worden (z. B. weil
+            // die Ansicht inzwischen neu aufgebaut wurde), auf alle Zeilen
+            // zurückgreifen.
+            var blockRows = tags.Count >= 4 && tags[3] is List<RowItem> br
+                ? br
+                : [.. tbChapter.Row.Where(r => r is { IsDisposed: false })];
+
+            if (!string.IsNullOrEmpty(newLastName) && newChapter != oldChapter) {
+                // Kapitel umbenennen.
                 foreach (var tableRow in blockRows) {
                     if (tableRow is not { IsDisposed: false }) { continue; }
                     var values = tableRow.CellGetList(capCol);
                     var changed = false;
                     for (var i = 0; i < values.Count; i++) {
-                        // Vergleich normalisiert durchführen, damit Werte mit
-                        // '/' als Trenner ebenfalls erfasst werden.
+                        // Vergleich normalisiert durchführen.
                         var valueNorm = values[i].ChapterPathNormalize();
-                        if (valueNorm == oldChapter) {
+                        if (valueNorm == cellMatchValue) {
                             values[i] = newChapter;
                             changed = true;
-                        } else if (valueNorm.StartsWith(oldChapter + "\\", StringComparison.Ordinal)) {
+                        } else if (!isOhne && valueNorm.StartsWith(oldChapter + RowCaptionListItem.Kapiteltrenner, StringComparison.Ordinal)) {
                             // Suffix hinter dem Prefix unverändert übernehmen.
+                            // Bei Ohne-Kapiteln gibt es keine Unterpfade.
                             values[i] = newChapter + valueNorm[oldChapter.Length..];
                             changed = true;
                         }
                     }
+
+                    // Bei Ohne-Kapiteln kann CellGetList eine leere Liste
+                    // zurückgeben (Zelle hat gar keinen Wert). In diesem Fall
+                    // newChapter als einzigen Wert setzen.
+                    if (isOhne && !changed && values.Count == 0) {
+                        values.Add(newChapter);
+                        changed = true;
+                    }
+
                     if (changed) {
                         tableRow.CellSet(capCol, values, "Kapitel umbenannt: " + oldChapter + " → " + newChapter);
+                    }
+                }
+            } else if (string.IsNullOrEmpty(newLastName) && !isOhne) {
+                // Kapitel löschen: passenden Wert aus den Zellen entfernen,
+                // sodass die Zeilen unter -?- (Ohne) erscheinen.
+                foreach (var tableRow in blockRows) {
+                    if (tableRow is not { IsDisposed: false }) { continue; }
+                    var values = tableRow.CellGetList(capCol);
+                    var changed = false;
+                    for (var i = 0; i < values.Count; i++) {
+                        if (values[i].ChapterPathNormalize() == oldChapter) {
+                            values[i] = string.Empty;
+                            changed = true;
+                        }
+                    }
+                    if (changed) {
+                        tableRow.CellSet(capCol, values, "Kapitel entfernt: " + oldChapter);
                     }
                 }
             }
