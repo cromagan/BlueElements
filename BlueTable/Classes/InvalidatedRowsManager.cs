@@ -194,8 +194,8 @@ public class InvalidatedRowsManager {
             } while (true);
 
             Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig", 0);
-        } catch {
-            Develop.Message(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen", 0);
+        } catch (Exception ex) {
+            Develop.Message(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen: {ex.ToString()}", 0);
         } finally {
             // Verarbeitung beenden, egal was passiert
             lock (_processingLock) {
