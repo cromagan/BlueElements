@@ -21,13 +21,24 @@ public sealed class RowCaptionListItem : RowBackground {
     /// </summary>
     public const char Kapiteltrenner = '\\';
 
+    /// <summary>
+    /// Ermittelt, ob das Arrangement im NumberStyle läuft (SYS_ROWSORTINDEX
+    /// aktiv). In diesem Modus wird der Kapitel-Trenner '\' ignoriert —
+    /// Kapitel werden flach auf einer Ebene dargestellt.
+    /// </summary>
+    internal static bool IsNumberStyle(ColumnViewCollection? arrangement)
+        => arrangement?.Table is { IsDisposed: false } tb
+           && tb.Column.SysRowSortIndex is { IsDisposed: false };
+
     #endregion
 
     #region Constructors
 
     public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.ChapterPathParent()) {
         ChapterText = chapterText.ChapterPathNormalize();
-        Indent = ChapterText.ChapterPathDepth();
+        // NumberStyle (SYS_ROWSORTINDEX): Kapitel-Trenner wird ignoriert —
+        // flache Anzeige ohne Einrückung. Sonst Hierarchie-Tiefe als Indent.
+        Indent = IsNumberStyle(arrangement) ? 0 : ChapterText.ChapterPathDepth();
         IsExpanded = true;
     }
 
@@ -79,17 +90,19 @@ public sealed class RowCaptionListItem : RowBackground {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+        var displayText = IsNumberStyle(Arrangement) ? ChapterText : ChapterText.ChapterPathLastName();
         if (CanEditChapter) {
-            var displayText = IsOhneChapter ? "(leer)" : ChapterText.ChapterPathLastName();
+            if (IsOhneChapter) { displayText = "(leer)"; }
             return $"{displayText}\rDoppelklick zum Bearbeiten";
         }
 
-        return ChapterText.ChapterPathLastName();
+        return displayText;
     }
 
     /// <summary>
     /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
-    /// Der Button ist am linken Rand des eingerückten Bereichs (Indent beachten!).
+    /// Der Button ist horizontal festgepinnt (ignoriert offsetX) und am
+    /// linken Rand des eingerückten Bereichs positioniert (Indent beachten!).
     /// </summary>
     internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
@@ -99,7 +112,9 @@ public sealed class RowCaptionListItem : RowBackground {
         var rowHeight = controlPos.Height;
         var size = Math.Min(p20, rowHeight - p2 * 2);
         var buttonY = controlPos.Top + (rowHeight - size) / 2;
-        return new Rectangle(controlPos.X + indentOffset + p2, buttonY, size, size);
+        // Button ist horizontal festgepinnt — offsetX abziehen, damit die
+        // Hit-Test-Position mit der gezeichneten (ungescrollten) Position übereinstimmt.
+        return new Rectangle(controlPos.X - (int)offsetX + indentOffset + p2, buttonY, size, size);
     }
 
     internal void EditChapter(TableView tableView) {
@@ -116,9 +131,13 @@ public sealed class RowCaptionListItem : RowBackground {
         var bt = tableView.BTB;
         bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
         bt.MultiLine = false;
-        // Nur das letzte Pfad-Segment bearbeiten (analog zum Windows Explorer).
+        // Im Normalfall wird nur das letzte Pfad-Segment bearbeitet (analog zum
+        // Windows Explorer). Im NumberStyle ist der Kapitel-Trenner ohne
+        // Bedeutung — der gesamte Wert wird bearbeitet.
         // Bei -?- (Ohne) leere Textbox anzeigen, da -?- "kein Kapitel" bedeutet.
-        bt.Text = IsOhneChapter ? string.Empty : ChapterText.ChapterPathLastName();
+        bt.Text = IsOhneChapter ? string.Empty
+                  : IsNumberStyle(Arrangement) ? ChapterText
+                  : ChapterText.ChapterPathLastName();
         bt.Location = new Point(0, capPos.Y);
         bt.Size = new Size(tableView.Width, capPos.Height);
         bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];
@@ -147,22 +166,25 @@ public sealed class RowCaptionListItem : RowBackground {
         var fontScaled = Font_RowChapter.Scale(zoom);
         // Nur das letzte Pfad-Segment anzeigen — die Hierarchie wird über
         // Indent optisch dargestellt (analog zum Windows Datei-Explorer).
-        var tmp = ChapterText.ChapterPathLastName();
+        // Im NumberStyle wird der Trenner ignoriert: der gesamte Kapitel-Wert
+        // ist flach und wird vollständig angezeigt.
+        var tmp = IsNumberStyle(Arrangement) ? ChapterText : ChapterText.ChapterPathLastName();
 
         var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);
         var p14 = 14.CanvasToControl(zoom);
         var p20 = 20.CanvasToControl(zoom);
 
-        // Stark verblasster Hintergrund für die gesamte Zeile
+        // Stark verblasster Hintergrund für die gesamte Zeile (scrollt mit)
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(120)), positionControl);
 
-        // Pfeil-Button links als eigenständiger Button — relativ zum
-        // eingerückten positionControl (X) positionieren, damit der Indent
-        // auch für verschachtelte Kapitel sichtbar wird.
+        // Pfeil-Button und Text sind horizontal festgepinnt — sie ignorieren
+        // den Scroll-Offset und bleiben an ihrer Position stehen. Nur der
+        // Hintergrund (und die Spalten) scrollt.
+        var pinnedX = (int)(positionControl.X - offsetX);
         var rowHeight = (int)positionControl.Height;
         var buttonSize = Math.Min(p20, rowHeight - p2 * 2);
-        var buttonRect = new Rectangle((int)positionControl.X + p2, (int)(positionControl.Top + (rowHeight - buttonSize) / 2), buttonSize, buttonSize);
+        var buttonRect = new Rectangle(pinnedX + p2, (int)(positionControl.Top + (rowHeight - buttonSize) / 2), buttonSize, buttonSize);
 
         var arrowState = IsExpanded ? States.Standard : States.Checked;
         var etxt = new ExtText(Design.Button_CheckBox, arrowState);

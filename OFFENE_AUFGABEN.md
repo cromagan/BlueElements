@@ -228,35 +228,7 @@ Was meinst du?
 Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nicht.
 
 ## Aufgabe
-Bearbeiten der Überschrift einer Tabelle:
-- Klicke ich auf ein Unterverzeichniss, darf nur der Letzte Text zum Bearbeiten sein, nicht der ganze Pfad
-- -?- muss generell Bearbeitbar sein, darf nicht zum Bearbeiten angezeigt werden (Es ist ja sozusgen leer)
-- Klickt man nach dem Bearbeiten in die Tabelle, springt der Cursor irgendwo hin. Textbox zumachen muss den ersten klick ignorieren
+ColumnViewCollection: Erstelle eine Eigenschaft: StartCollapsed. TableView soll dann beim umschalten auf diese Ansicht alle Überschriften einklappen
 
 ## Aufgabe
-Wenn ich einmal auf den Stift zum Bearbeiten einer Tabelle geklickt habe, funktioniert der Button nicht mehr.
-Ab dann kommt die Meldung: Kein passender Editor gefunden.
-
-## Aufgabe
-SyncDirectoryContent soll generell mit * wildcards arbeiten.
-So können z.B. *.bak Suffixe, */Hallo/* Ordner oder einfach nur Teile  */Backup_* ignoriert werden.
-Zudem wird der Code einfacher, weil es universel ist.
-
-## Aufgabe
-In der Spaltenübersicht (z.B. UniqueRoe Editor) werden die Spalten nach überschtift sortiert.
-Da stimmt was nicht, die Spalten sind nicht immer unter der Richtigen Überschrift.
-Mir ist es aufgefallen, Spalten ohne Überschrift, dann spalten mit Überschrift. Und dann ganz am Ende waren Spalten ohne Überschrift, einfach daruntergehängt
-
-## Aufgabe
-Skript-Ausführungsfehler:
-Meldung: Collection was modified; enumeration operation may not execute.
-at System.Linq.Enumerable.WhereSelectEnumerableIterator`2.ToList()
-at BlueControls.Controls.TableView.RemoveRowItems(RowItem row)
-at BlueControls.Controls.TableView.Cell_CellValueChanged(Object sender, CellEventArgs e)
-at BlueTable.Classes.Table.OnCellValueChanged(ColumnItem column, RowItem rowItem, String previewsValue, String currentValue, Reason reason)
-at BlueTable.Classes.Table.SetValueInternal(TableDataType type, ColumnItem column, RowItem row, String value, String user, DateTime datetimeutc, Reason reason)
-at BlueTable.Classes.Table.ChangeData(TableDataType type, ColumnItem column, RowItem row, String previousValue, String changedTo, String user, DateTime datetimeutc, String comment)
-at BlueTable.Classes.RowItem.CellSet(ColumnItem column, String value, String comment)
-at BlueTable.Classes.RowItem.VariableToCell(ColumnItem column, VariableCollection vars, String scriptname)
-at BlueTable.Classes.Table.WriteBackVariables(RowItem row, VariableCollection vars, Boolean virtualcolumns, Boolean tableHeadVariables, String comment, Boolean doWriteBack)
-at BlueTable.Classes.Table.ExecuteScript(TableScriptDescription script, Boolean produktivphase, RowItem row, List`1 args, Boolean tableHeadVariables, Boolean extended, Boolean ignoreError)
+TableView berechent die X-Max-Koordinate falsch: indents werden ignoriert.

@@ -1799,14 +1799,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 19;
                 _maxCellLength = 19;
                 _sortType = SortierTyp.ZahlenwertInt;
+                _editAllowedDespiteLock = true; // Elementar für Verschiebe funktion
+                _editableWithTextInput = true; // Elementar für Verschiebe funktion
+                _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(FormatHolder_LongOnlyPositive.Instance);
                 if (allDefaultValues) {
-                    _editableWithTextInput = true;
                     ScriptType = ScriptType.Nicht_vorhanden;
                     Align = AlignmentHorizontal.Rechts;
-                    IgnoreAtRowFilter = true;
-                    Caption = "Sortierung";
+                    Caption = "Zeile";
                     DefaultRenderer = "Button";
                     RendererSettings = "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding={-4, -2}}";
                     ForeColor = Color.FromArgb(0, 0, 0);

@@ -131,10 +131,10 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
     public List<GenericControl> GetProperties(int widthOfControl) {
         if (_cvc is not { Table: { IsDisposed: false } tb }) { return []; }
 
-        var chapterColumns = ItemsOf(tb.Column, true);
+        var chapterColumns = ItemsOf(tb.Column);
         chapterColumns.Add(ItemOf("Keine Überschriften", "#ohne", ImageCode.Kreuz, true, "!!!"));
 
-        var filterColumns = ItemsOf(tb.Column, true);
+        var filterColumns = ItemsOf(tb.Column);
 
         var scriptAll = new List<AbstractListItem>();
         var scriptRow = new List<AbstractListItem>();

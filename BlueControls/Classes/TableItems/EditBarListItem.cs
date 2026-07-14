@@ -8,7 +8,7 @@ public sealed class EditBarListItem : RowBackground {
 
     #region Fields
 
-    public const int ButtonCount = 3;
+    public const int ButtonCount = 2;
     public const int ButtonSize = 16;
     public const string Identifier = "EditBarListItem";
 
@@ -40,9 +40,8 @@ public sealed class EditBarListItem : RowBackground {
         var index = relX / bs;
 
         return index switch {
-            0 => EditButtonType.MoveLeft,
-            1 => EditButtonType.Hide,
-            2 => EditButtonType.MoveRight,
+            0 => EditButtonType.Hide,
+            1 => EditButtonType.Permanent,
             _ => EditButtonType.None
         };
     }
@@ -57,32 +56,30 @@ public sealed class EditBarListItem : RowBackground {
 
         if (viewItem.Column is not { IsDisposed: false }) { return; }
 
-        var (isFirst, isLast) = IsAtEdge(viewItem);
+        var canToggle = CanTogglePermanent(viewItem);
 
         var bs = ButtonSize.CanvasToControl(scale);
         var totalW = ButtonCount * bs;
         var startX = (int)((positionControl.Width - totalW) / 2);
         var startY = (int)((positionControl.Height - bs) / 2);
 
-        var btnLeft = new Rectangle((int)positionControl.Left + startX, (int)positionControl.Top + startY, bs, bs);
-        var btnHide = new Rectangle(btnLeft.Right, (int)positionControl.Top + startY, bs, bs);
-        var btnRight = new Rectangle(btnHide.Right, (int)positionControl.Top + startY, bs, bs);
-
-        if (!isFirst) {
-            Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnLeft, null, false);
-            Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnLeft);
-            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Links|" + (bs - 4)), btnLeft.Left + 2, btnLeft.Top + 2);
-        }
+        var btnHide = new Rectangle((int)positionControl.Left + startX, (int)positionControl.Top + startY, bs, bs);
+        var btnPerm = new Rectangle(btnHide.Right, (int)positionControl.Top + startY, bs, bs);
 
         Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnHide, null, false);
         Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnHide);
 
         gr.DrawImageUnscaled(QuickImage.Get(IsView0(viewItem) ? ImageCode.Papierkorb : ImageCode.Kreuz, bs - 4), btnHide.Left + 2, btnHide.Top + 2);
 
-        if (!isLast) {
-            Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRight, null, false);
-            Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRight);
-            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Rechts|" + (bs - 4)), btnRight.Left + 2, btnRight.Top + 2);
+        if (canToggle) {
+            Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnPerm, null, false);
+            Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnPerm);
+
+            var imgCode = viewItem.Permanent
+                ? QuickImage.Get(ImageCode.Pinnadel, bs - 4)
+                : QuickImage.Get("Pinnadel|" + (bs - 4) + "||||||||75");
+
+            gr.DrawImageUnscaled(imgCode, btnPerm.Left + 2, btnPerm.Top + 2);
         }
     }
 
@@ -107,21 +104,8 @@ public sealed class EditBarListItem : RowBackground {
         var parsed = tcvc[currentIdx];
         var parsedViewItem = parsed[clickedColumn.Column];
         if (parsedViewItem is null) { return false; }
-        var viewIdx = parsed.IndexOf(parsedViewItem);
 
         switch (btnType) {
-            case EditButtonType.MoveLeft:
-                if (viewIdx > 0) {
-                    parsed.Swap(viewIdx, viewIdx - 1);
-                }
-                break;
-
-            case EditButtonType.MoveRight:
-                if (viewIdx < parsed.Count - 1) {
-                    parsed.Swap(viewIdx, viewIdx + 1);
-                }
-                break;
-
             case EditButtonType.Hide:
                 if (currentIdx == 0 && clickedColumn.Column is { IsDisposed: false } deletedColumn) {
                     if (MessageBox.Show($"Spalte <b>{deletedColumn.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return false; }
@@ -133,6 +117,11 @@ public sealed class EditBarListItem : RowBackground {
                     return true;
                 }
                 parsed.Remove(parsedViewItem);
+                break;
+
+            case EditButtonType.Permanent:
+                if (!CanTogglePermanent(parsedViewItem, parsed)) { return false; }
+                parsedViewItem.Permanent = !parsedViewItem.Permanent;
                 break;
         }
 
@@ -146,34 +135,41 @@ public sealed class EditBarListItem : RowBackground {
         var bt = GetButtonType(cvi, mouseXinColumn, scale);
         var isView0 = IsView0(cvi);
 
-        var (isFirst, isLast) = IsAtEdge(cvi);
-
         return bt switch {
-            EditButtonType.MoveLeft => isFirst ? string.Empty : "Spalte nach links verschieben",
             EditButtonType.Hide => isView0 ? "Spalte PERMANENT löschen" : "Spalte ausblenden",
-            EditButtonType.MoveRight => isLast ? string.Empty : "Spalte nach rechts verschieben",
+            EditButtonType.Permanent => CanTogglePermanent(cvi)
+                ? (cvi.Permanent ? "Spalte nicht mehr fixieren" : "Spalte fixieren")
+                : string.Empty,
             _ => string.Empty
         };
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(ButtonSize * ButtonCount, ButtonSize + 4);
 
-    private (bool isFirst, bool isLast) IsAtEdge(ColumnViewItem viewItem) {
-        if (Arrangement is null || viewItem.Column is null) { return (true, true); }
-        var myIdx = Arrangement.IndexOf(viewItem);
-        if (myIdx < 0) { return (true, true); }
-        var isPermanent = viewItem.Permanent;
-        var isFirst = true;
-        var isLast = true;
-        for (var i = 0; i < Arrangement.Count; i++) {
-            var item = Arrangement[i];
-            if (item?.Column is null) { continue; }
-            if (item.Permanent != isPermanent) { continue; }
-            if (i < myIdx) { isFirst = false; }
-            if (i > myIdx) { isLast = false; }
+    private static bool CanTogglePermanent(ColumnViewItem viewItem, ColumnViewCollection? arrangement) {
+        if (arrangement is null || viewItem.Column is null) { return false; }
+
+        var myIdx = arrangement.IndexOf(viewItem);
+        if (myIdx < 0) { return false; }
+
+        if (viewItem.Permanent) {
+            // Nur die letzte permanente Spalte darf umgeschaltet werden:
+            // keine weitere permanente Spalte darf dahinter liegen.
+            for (var i = myIdx + 1; i < arrangement.Count; i++) {
+                if (arrangement[i] is { Column: not null, Permanent: true }) { return false; }
+            }
+            return true;
         }
-        return (isFirst, isLast);
+
+        // Nur die erste nicht-permanente Spalte darf umgeschaltet werden:
+        // keine weitere nicht-permanente Spalte darf davor liegen.
+        for (var i = 0; i < myIdx; i++) {
+            if (arrangement[i] is { Column: not null, Permanent: false }) { return false; }
+        }
+        return true;
     }
+
+    private bool CanTogglePermanent(ColumnViewItem viewItem) => CanTogglePermanent(viewItem, Arrangement);
 
     private bool IsView0(ColumnViewItem viewItem) {
         if (viewItem.Column?.Table is not { IsDisposed: false } table) { return false; }

@@ -64,7 +64,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
             }
         }
 
-        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(rsd.Table.Column, true));
+        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(rsd.Table.Column));
 
         return true;
     }

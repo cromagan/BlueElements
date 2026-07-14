@@ -345,7 +345,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
 
         if (!string.IsNullOrEmpty(NotEditableReason)) {
-            DrawNotEditableOverlay(gr, controla, ImageCode.Warnung, "Schreibgeschützt: " + NotEditableReason);
+            DrawNotEditableOverlay(gr, controla, ImageCode.Warnung, "Schreibgeschützt: " + NotEditableReason, States.Standard);
         }
     }
 
@@ -385,7 +385,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #endregion
     }
 
-    public static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text) {
+    public static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text, States state) {
         // Halbtransparenter Schleier signalisiert die Schreibsperre,
         // lässt die Items darunter aber erkennbar.
         using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
@@ -394,7 +394,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         const int padding = 12;
         var maxWidth = Math.Max(50, Math.Min(drawArea.Width - 20, 600) - (2 * padding));
 
-        using var extText = new ExtText(Design.Badge_Warning, States.Standard) {
+        using var extText = new ExtText(Design.Badge_Warning, state) {
             Ausrichtung = Alignment.Top_Left,
             TextDimensions = new Size(maxWidth, 500),
             HtmlText = $"<Imagecode={imageCode}> " + text
@@ -406,9 +406,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             extText.WidthControl + (2 * padding),
             extText.HeightControl + (2 * padding));
 
-        Skin.Draw_Back(gr, Design.Badge_Warning, States.Standard, bannerRect, null, false);
+        Skin.Draw_Back(gr, Design.Badge_Warning, state, bannerRect, null, false);
         extText.Draw(gr, 1, bannerRect.X + padding, bannerRect.Y + padding);
-        Skin.Draw_Border(gr, Design.Badge_Warning, States.Standard, bannerRect);
+        Skin.Draw_Border(gr, Design.Badge_Warning, state, bannerRect);
     }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {

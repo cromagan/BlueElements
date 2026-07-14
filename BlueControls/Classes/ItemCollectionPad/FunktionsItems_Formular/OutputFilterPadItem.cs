@@ -151,7 +151,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         ];
 
         if (TableOutput is { IsDisposed: false } tb) {
-            result.Add(new FlexiControlForProperty<string>(() => ColumnKey, ItemsOf(tb.Column, true)));
+            result.Add(new FlexiControlForProperty<string>(() => ColumnKey, ItemsOf(tb.Column)));
         }
 
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));

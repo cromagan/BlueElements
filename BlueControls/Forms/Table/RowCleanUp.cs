@@ -28,7 +28,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
         if (Table is { IsDisposed: false } tb) {
             //var lst =  List<AbstractListItem>();
-            lstColumns.ItemAddRange(ItemsOf(tb.Column, false));
+            lstColumns.ItemAddRange(ItemsOf(tb.Column));
             //cbxColDateiname.Item = lst;
         }
 

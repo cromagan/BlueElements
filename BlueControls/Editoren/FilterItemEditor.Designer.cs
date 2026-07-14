@@ -24,7 +24,7 @@ namespace BlueTable.Editoren
             lstColumns.AddAllowed = BlueControls.Enums.AddType.None;
             lstColumns.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             lstColumns.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            lstColumns.AutoSort = false;
+            lstColumns.AutoSort = true;
             lstColumns.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             lstColumns.Location = new Point(8, 24);
             lstColumns.Name = "lstColumns";

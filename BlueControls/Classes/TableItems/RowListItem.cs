@@ -31,7 +31,11 @@ public sealed class RowListItem : RowBackground {
         Row = row;
         // Gleicher Indent wie die zugehörige Überschrift — die Items stehen
         // unter der Kapitel-Überschrift, nicht zusätzlich eingerückt.
-        Indent = string.IsNullOrEmpty(alignsToCaption) ? 0 : alignsToCaption.ChapterPathDepth();
+        // NumberStyle (SYS_ROWSORTINDEX): Kapitel-Trenner wird ignoriert —
+        // flache Anzeige ohne Einrückung.
+        Indent = string.IsNullOrEmpty(alignsToCaption) || RowCaptionListItem.IsNumberStyle(arrangement)
+            ? 0
+            : alignsToCaption.ChapterPathDepth();
         MarkYellow = false;
     }
 

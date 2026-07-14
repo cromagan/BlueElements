@@ -22,7 +22,7 @@ namespace BlueControls.Forms {
             lbxKeyColumns.AddAllowed = AddType.None;
             lbxKeyColumns.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lbxKeyColumns.Appearance = ListBoxAppearance.Listbox_Boxes;
-            lbxKeyColumns.AutoSort = false;
+            lbxKeyColumns.AutoSort = true;
             lbxKeyColumns.CheckBehavior = CheckBehavior.MultiSelection;
             lbxKeyColumns.FilterText = null;
             lbxKeyColumns.Location = new Point(0, 24);

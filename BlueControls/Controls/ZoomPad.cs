@@ -309,7 +309,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
         if (!string.IsNullOrEmpty(info)) {
-            CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, info);
+            CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, info, States.Standard_Disabled);
         }
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);

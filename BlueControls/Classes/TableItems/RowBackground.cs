@@ -378,7 +378,19 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
                 Draw_ColumnOverlay(gr, viewItem, area, state);
             }
 
-            if (!DoSpezialOrder) { return; }
+            if (!DoSpezialOrder) { break; }
+        }
+
+        // Bereich VOR dem Indent mit der Control-Backcolor ausfüllen — NACH
+        // dem Zeichnen der Spalten, damit nicht-permanente Spalten, die beim
+        // Scrollen in den Indent-Bereich rutschen, verdeckt werden.
+        // Die Indent-Fläche ist an den permanenten Spalten ausgerichtet und
+        // scrollt NICHT mit dem Inhalt. Daher muss der effektive offsetX
+        // abgezogen werden, damit die Füllung immer am fixen linken Rand liegt.
+        if (indentOffset > 0) {
+            var effectiveOffsetX = IgnoreXOffset ? 0 : (int)offsetX;
+            var fillX = positionControl.X - indentOffset - effectiveOffsetX;
+            gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard)), new RectangleF(fillX, positionControl.Y, indentOffset, positionControl.Height));
         }
     }
 

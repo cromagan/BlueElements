@@ -603,11 +603,22 @@ public static class IO {
     /// <param name="targetDir"></param>
     /// <param name="includeSubdirs"></param>
     /// <param name="ignore">
-    /// Liste von Ausschlusskriterien. Erlaubt sind:
-    /// - Ordnernamen, z. B. "obj" (überspringt jede Datei, die in einem so benannten Ordner liegt)
-    /// - exakte Dateinamen, z. B. "Thumbs.db"
-    /// - Wildcard-Muster für Dateiendungen, z. B. "*.pdb" oder "*.xml"
-    /// Der Abgleich ist nicht case-sensitiv.
+    /// Liste von Filtertexten, die gegen den relativen Pfad jeder Datei
+    /// geprüft werden. Der relative Pfad beginnt stets mit einem Backslash,
+    /// z. B. "\sub\Datei.bak". Ein Treffer liegt vor, wenn der Filtertext
+    /// irgendwo im relativen Pfad enthalten ist (Instr/Teilstring-Abgleich).
+    /// <para>
+    /// Schrägstriche (/) werden wie Backslashes (\) behandelt. Der Abgleich
+    /// ist nicht case-sensitiv. Wildcards (<c>*</c>) werden NICHT
+    /// unterstützt und lösen einen Fehler aus.
+    /// </para>
+    /// Beispiele:
+    /// <list type="bullet">
+    /// <item><c>.bak</c> — ignoriert alle Dateien, deren Pfad ".bak" enthält</item>
+    /// <item><c>\Hallo\</c> — ignoriert alles innerhalb eines Ordners "Hallo"</item>
+    /// <item><c>Backup_</c> — ignoriert Dateien, deren Pfad "Backup_" enthält</item>
+    /// <item><c>\Thumbs.db</c> — ignoriert jede Thumbs.db in einem beliebigen Ordner</item>
+    /// </list>
     /// </param>
     public static OperationResult SyncDirectoryContent(string sourceDir, string targetDir, bool includeSubdirs, List<string>? ignore) {
         if (Develop.AllReadOnly) { return new OperationResult(false, "Alles ReadOnly"); }
@@ -620,29 +631,30 @@ public static class IO {
         CreateDirectory(nach);
         if (!DirectoryExists(nach)) { return new OperationResult(false, $"'{nach}' existiert nicht"); }
 
-        var ignoreList = ignore ?? [];
-        var ignoreExtensions = ignoreList
-            .Where(i => i.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
-            .Select(i => i[1..]) // "*.pdb" -> ".pdb"
-            .ToList();
-        var ignoreNamesOrFolders = ignoreList
-            .Where(i => !i.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        // Muster vorab normalisieren — Schrägstriche wie Backslash behandeln.
+        // Wildcards (*) werden nicht unterstützt, stattdessen erfolgt
+        // ein einfacher Teilstring-Abgleich (Instr) gegen den relativen Pfad.
+        var ignorePatterns = new List<string>();
+        if (ignore != null) {
+            foreach (var p in ignore) {
+                if (p.Contains('*')) {
+                    Develop.DebugPrint(ErrorType.Error, $"Wildcard '*' wird im Ignore-Filter nicht mehr unterstützt: '{p}'");
+                    continue;
+                }
+                ignorePatterns.Add(p.Replace('/', '\\'));
+            }
+        }
 
         var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
         // Wir speichern die absoluten Zielpfade für den späteren Abgleich
         var okFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        #region Lokale Hilfsfunktion: Prüft, ob eine Datei ignoriert werden soll
+        #region Lokale Hilfsfunktion: Prüft, ob ein relativer Pfad ignoriert werden soll
 
-        bool IsIgnored(string relativePath, string fileName) {
-            if (ignoreExtensions.Exists(ext => fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase))) {
-                return true;
-            }
-
-            var pathParts = relativePath.Split('\\', '/');
-            return ignoreNamesOrFolders.Exists(i => Array.Exists(pathParts, part => part.Equals(i, StringComparison.OrdinalIgnoreCase)));
+        bool IsIgnored(string relativePath) {
+            var normalized = relativePath.Replace('/', '\\');
+            return ignorePatterns.Exists(p => normalized.Contains(p, StringComparison.OrdinalIgnoreCase));
         }
 
         #endregion
@@ -655,10 +667,9 @@ public static class IO {
         foreach (var sourceFile in sourceFiles) {
             t++;
 
-            var relativePath = sourceFile.Substring(von.Length);
-            var fileName = sourceFile.FileNameWithoutSuffix() + "." + sourceFile.FileSuffix();
+            var relativePath = sourceFile[von.Length..];
 
-            if (IsIgnored(relativePath, fileName)) { continue; }
+            if (IsIgnored(relativePath)) { continue; }
 
             var newFile = nach + relativePath;
             okFiles.Add(newFile);
@@ -690,10 +701,9 @@ public static class IO {
         // Dateien löschen, die im Quellverzeichnis nicht mehr existieren (oder jetzt ignoriert werden)
         var targetFiles = GetFiles(nach, "*", searchOption);
         foreach (var thisf in targetFiles) {
-            var relativePath = thisf.Substring(nach.Length);
-            var fileName = thisf.FileNameWithoutSuffix() + "." + thisf.FileSuffix();
+            var relativePath = thisf[nach.Length..];
 
-            if (IsIgnored(relativePath, fileName)) { continue; }
+            if (IsIgnored(relativePath)) { continue; }
 
             if (!okFiles.Contains(thisf)) {
                 DeleteFile(thisf, false);
@@ -706,12 +716,11 @@ public static class IO {
                                      .OrderByDescending(d => d.Length); // Von tief nach flach
 
             foreach (var dir in targetDirs) {
-                // Ignorierte Ordner nicht löschen, auch wenn sie leer scheinen
-                var relDir = dir.Substring(nach.Length);
-                var dirParts = relDir.Split('\\', '/');
-                if (ignoreNamesOrFolders.Exists(i => Array.Exists(dirParts, part => part.Equals(i, StringComparison.OrdinalIgnoreCase)))) {
-                    continue;
-                }
+                // Ignorierte Ordner nicht löschen, auch wenn sie leer scheinen.
+                // relDir beginnt mit "\", daher wird zusätzlich mit nachfolgendem "\"
+                // geprüft, damit Muster wie "*/Hallo/*" greifen.
+                var relDir = dir[nach.Length..];
+                if (IsIgnored(relDir) || IsIgnored(relDir + "\\")) { continue; }
 
                 if (GetFiles(dir).Length == 0 && GetDirectories(dir).Length == 0) {
                     DeleteDir(dir, false);

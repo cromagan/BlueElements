@@ -116,6 +116,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             if (ie.EditorFor is not null) { _editorCache[ie.EditorFor] = currentEditorType; }
 
             if (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+                _editorCache[toEditType] = currentEditorType;
                 return currentEditorType;
             }
         }

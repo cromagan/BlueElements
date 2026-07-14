@@ -4,7 +4,6 @@ namespace BlueControls.Enums;
 
 public enum EditButtonType {
     None = 0,
-    MoveLeft = 1,
-    Hide = 2,
-    MoveRight = 3
+    Hide = 1,
+    Permanent = 2
 }

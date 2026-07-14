@@ -168,7 +168,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         var lst = new List<AbstractListItem>();
-        lst.AddRange(ItemsOf(tb.Column, true));
+        lst.AddRange(ItemsOf(tb.Column));
 
         result.Add(new FlexiControlForProperty<string>(() => ColumnKey, lst));
 

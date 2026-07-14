@@ -134,23 +134,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         Invalidated = true;
     }
 
-    /// <summary>
-    /// Bestimmt den Index, an dem eine neue Spalte eingefügt wird.
-    /// Ist <paramref name="insertAfterColumn"/> vorhanden und in dieser
-    /// Anordnung sichtbar, wird die Position direkt dahinter geliefert.
-    /// Andernfalls (auch bei null) wird die Position vor der Dummy-Spalte
-    /// bzw. am Ende gewählt.
-    /// </summary>
-    private int ComputeInsertIndex(ColumnItem? insertAfterColumn) {
-        if (insertAfterColumn is not null) {
-            var afterIdx = _internal.FindIndex(v => v?.Column == insertAfterColumn);
-            if (afterIdx >= 0) { return afterIdx + 1; }
-        }
-
-        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
-        return dummyIdx >= 0 ? dummyIdx : _internal.Count;
-    }
-
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
     public void Dispose() {
@@ -233,10 +216,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
-        if (ScaleToFit != ScaleToFitMode.Normal) {
-            //TODO: If entfernen
-            result.ParseableAdd("ScaleToFit", ScaleToFit);
-        }
+        result.ParseableAdd("ScaleToFit", ScaleToFit);
+
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
@@ -469,6 +450,23 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
+
+    /// <summary>
+    /// Bestimmt den Index, an dem eine neue Spalte eingefügt wird.
+    /// Ist <paramref name="insertAfterColumn"/> vorhanden und in dieser
+    /// Anordnung sichtbar, wird die Position direkt dahinter geliefert.
+    /// Andernfalls (auch bei null) wird die Position vor der Dummy-Spalte
+    /// bzw. am Ende gewählt.
+    /// </summary>
+    private int ComputeInsertIndex(ColumnItem? insertAfterColumn) {
+        if (insertAfterColumn is not null) {
+            var afterIdx = _internal.FindIndex(v => v?.Column == insertAfterColumn);
+            if (afterIdx >= 0) { return afterIdx + 1; }
+        }
+
+        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
+        return dummyIdx >= 0 ? dummyIdx : _internal.Count;
+    }
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }

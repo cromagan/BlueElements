@@ -1926,6 +1926,14 @@
       "Border": "Solid1Px",
       "BOC1": "962828",
       "Font": "{Name=Calibri, Size=13, Bold=true, Color=#962828}"
+    },
+    "Standard_Disabled": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "F0F0F0",
+      "Border": "Solid1Px",
+      "BOC1": "8A8A8A",
+      "Font": "{Name=Calibri, Size=13, Bold=true, Color=#6E6E6E}"
     }
   }
 }

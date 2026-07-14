@@ -242,7 +242,7 @@ public static class AbstractListItemExtension {
         return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer);
     }
 
-    public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
+    public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns) {
         var l = new List<AbstractListItem>();
 
         List<string> cl = [string.Empty];
@@ -251,20 +251,22 @@ public static class AbstractListItemExtension {
             if (thisColumnItem is not null) {
                 var co = ItemOf(thisColumnItem);
 
-                if (doCaptionSort) {
-                    var capt = thisColumnItem.CaptionsCombined;
+                var capt = thisColumnItem.CaptionsCombined;
 
-                    co.UserDefCompareKey = capt + Constants.SecondSortChar + thisColumnItem.KeyName;
+                co.UserDefCompareKey = capt + Constants.SecondSortChar + thisColumnItem.KeyName;
 
-                    if (!cl.Contains(capt)) {
-                        cl.Add(capt);
-                        l.Add(new TextListItem(capt, capt, null, true, true, string.Empty, capt + Constants.FirstSortChar));
-                    }
+                if (!cl.Contains(capt)) {
+                    cl.Add(capt);
+                    l.Add(new TextListItem(capt, capt, null, true, true, string.Empty, capt + Constants.FirstSortChar));
                 }
 
                 l.Add(co);
             }
         }
+
+        // WICHTIG: viele Aufrufer setzen AutoSort=false,
+        // daher ist dies der verlässliche Weg, eine bestimmte Reihenfolge zu garantieren.
+        l.Sort();
 
         return l;
     }
