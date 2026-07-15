@@ -232,3 +232,20 @@ ColumnViewCollection: Erstelle eine Eigenschaft: StartCollapsed. TableView soll 
 
 ## Aufgabe
 TableView berechent die X-Max-Koordinate falsch: indents werden ignoriert.
+
+## Aufgabe
+TableView: bei Indents wird die Markierte Zeile nicht korrekt mit den indents markiert. Es soll von ganz vorne bis ganz nach rechts über die gesamte Ansicht markiert werden.
+
+## Aufgabe
+TableView: ist ein Benutzerdefiniertes Kontextmenu vorhanden, soll das anpinnen deaktiviert werden. Ebenso, wenn SysRowSort vorhanden ist. Und die Buttons in der Leiste komplett entftfernt (und der Bereich aufgefüllt werden)
+
+## Aufgabe
+Ist eine Kapitelspalte vorhanden, soll vor dem Sternchen ein Kollapse Button sein. Einfach die Kontrolls nach rechts rutschen. Ansonsten den Bereich auffüllen.
+ist ein Kapitel "Offen", ALLE Kapitel zumachen
+Sind alle Kapitel "gechlosse", ALLE Kapitel aufmachen.
+
+## Aufgabe
+TaböeView: Manche Zeilen werden hinter dem Head gezeichnet, obwohl sie nicht mehr sichtbar sind.
+
+## Aufgabe:
+Der Bereich neben dem HeadItems muss mit Hintergrundfarbe gefüllt werden. Analog zu dem RowItems, wo das Indent LINKS so aufgefüllt wird. 

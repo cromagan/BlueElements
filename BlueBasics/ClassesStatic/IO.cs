@@ -596,21 +596,21 @@ public static class IO {
 
     /// <summary>
     /// Synchronisiert den Inhalt von <paramref name="sourceDir"/> nach <paramref name="targetDir"/>.
-    /// Kopiert neue/geänderte Dateien, löscht im Ziel alles, was in der Quelle nicht mehr existiert,
-    /// und räumt danach leere Verzeichnisse auf.
+    /// Kopiert neue/geänderte Dateien und löscht im Ziel alles, was in der Quelle nicht mehr existiert.
+    /// Anschließend werden im Ziel die Verzeichnisse gelöscht, die auf ein
+    /// <paramref name="ignore"/>-Muster passen.
     /// </summary>
     /// <param name="sourceDir"></param>
     /// <param name="targetDir"></param>
     /// <param name="includeSubdirs"></param>
     /// <param name="ignore">
-    /// Liste von Filtertexten, die gegen den relativen Pfad jeder Datei
-    /// geprüft werden. Der relative Pfad beginnt stets mit einem Backslash,
-    /// z. B. "\sub\Datei.bak". Ein Treffer liegt vor, wenn der Filtertext
-    /// irgendwo im relativen Pfad enthalten ist (Instr/Teilstring-Abgleich).
+    /// Liste von Filtertexten, die gegen den vollständigen Pfad jeder Datei bzw.
+    /// jedes Verzeichnisses geprüft werden (Quellpfad beim Kopieren, Zielpfad beim
+    /// Aufräumen). Ein Treffer liegt vor, wenn der Filtertext irgendwo im Pfad
+    /// enthalten ist (Instr/Teilstring-Abgleich).
     /// <para>
     /// Schrägstriche (/) werden wie Backslashes (\) behandelt. Der Abgleich
-    /// ist nicht case-sensitiv. Wildcards (<c>*</c>) werden NICHT
-    /// unterstützt und lösen einen Fehler aus.
+    /// ist nicht case-sensitiv. Wildcards (<c>*</c>) werden NICHT unterstützt.
     /// </para>
     /// Beispiele:
     /// <list type="bullet">
@@ -619,6 +619,9 @@ public static class IO {
     /// <item><c>Backup_</c> — ignoriert Dateien, deren Pfad "Backup_" enthält</item>
     /// <item><c>\Thumbs.db</c> — ignoriert jede Thumbs.db in einem beliebigen Ordner</item>
     /// </list>
+    /// Achtung: Da der Abgleich gegen den vollständigen (nicht den relativen) Pfad
+    /// erfolgt, kann ein Muster ungewollt auch Bestandteile von <paramref name="sourceDir"/>
+    /// bzw. <paramref name="targetDir"/> selbst treffen.
     /// </param>
     public static OperationResult SyncDirectoryContent(string sourceDir, string targetDir, bool includeSubdirs, List<string>? ignore) {
         if (Develop.AllReadOnly) { return new OperationResult(false, "Alles ReadOnly"); }
@@ -637,10 +640,6 @@ public static class IO {
         var ignorePatterns = new List<string>();
         if (ignore != null) {
             foreach (var p in ignore) {
-                if (p.Contains('*')) {
-                    Develop.DebugPrint(ErrorType.Error, $"Wildcard '*' wird im Ignore-Filter nicht mehr unterstützt: '{p}'");
-                    continue;
-                }
                 ignorePatterns.Add(p.Replace('/', '\\'));
             }
         }
@@ -652,8 +651,8 @@ public static class IO {
 
         #region Lokale Hilfsfunktion: Prüft, ob ein relativer Pfad ignoriert werden soll
 
-        bool IsIgnored(string relativePath) {
-            var normalized = relativePath.Replace('/', '\\');
+        bool IsIgnored(string path) {
+            var normalized = path.Replace('/', '\\');
             return ignorePatterns.Exists(p => normalized.Contains(p, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -666,10 +665,8 @@ public static class IO {
 
         foreach (var sourceFile in sourceFiles) {
             t++;
-
+            if (IsIgnored(sourceFile)) { continue; }
             var relativePath = sourceFile[von.Length..];
-
-            if (IsIgnored(relativePath)) { continue; }
 
             var newFile = nach + relativePath;
             okFiles.Add(newFile);
@@ -701,28 +698,19 @@ public static class IO {
         // Dateien löschen, die im Quellverzeichnis nicht mehr existieren (oder jetzt ignoriert werden)
         var targetFiles = GetFiles(nach, "*", searchOption);
         foreach (var thisf in targetFiles) {
-            var relativePath = thisf[nach.Length..];
-
-            if (IsIgnored(relativePath)) { continue; }
-
-            if (!okFiles.Contains(thisf)) {
+            if (!okFiles.Contains(thisf) || IsIgnored(thisf)) {
                 DeleteFile(thisf, false);
             }
         }
 
         if (includeSubdirs) {
-            var targetDirs = Directory.GetDirectories(nach, "*", SearchOption.AllDirectories)
+            var targetDirs = GetDirectories(nach, "*", SearchOption.AllDirectories)
                                      .Select(d => d.NormalizePath())
                                      .OrderByDescending(d => d.Length); // Von tief nach flach
 
             foreach (var dir in targetDirs) {
-                // Ignorierte Ordner nicht löschen, auch wenn sie leer scheinen.
-                // relDir beginnt mit "\", daher wird zusätzlich mit nachfolgendem "\"
-                // geprüft, damit Muster wie "*/Hallo/*" greifen.
-                var relDir = dir[nach.Length..];
-                if (IsIgnored(relDir) || IsIgnored(relDir + "\\")) { continue; }
-
-                if (GetFiles(dir).Length == 0 && GetDirectories(dir).Length == 0) {
+                // Ignorierte und leere Order im Ziel löschen, falls vorhanden.
+                if (IsIgnored(dir) || (GetFiles(dir).Length == 0 && GetDirectories(dir).Length == 0)) {
                     DeleteDir(dir, false);
                 }
             }
