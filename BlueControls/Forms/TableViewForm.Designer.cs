@@ -911,7 +911,7 @@ namespace BlueControls.Forms {
         private Caption capZeilen1;
         private ComboBox cbxColumnArr;
         protected GroupBox grpAnsicht;
-        private ComboBox btnAnsichtZoom;
+        protected ComboBox btnAnsichtZoom;
         private GroupBox grpImport;
         private GroupBox grpExport;
         private Button btnHTMLExport;
@@ -934,7 +934,7 @@ namespace BlueControls.Forms {
         private ConnectedFormulaView CFO;
         private Button btnFormular;
         private GroupBox grpHilfen;
-        private ComboBox btnEinstellungen;
+        protected ComboBox btnEinstellungen;
         private Button btnSuchFenster;
         private Button btnSaveLoad;
         private Button btnSkripteBearbeiten;
