@@ -52,16 +52,12 @@ namespace BlueControls.Forms {
             grpAufgaben = new GroupBox();
             lstAufgaben = new ListBox();
             grpAnsicht = new GroupBox();
-            btnZoomFit = new Button();
-            btnZoomOut = new Button();
-            btnZoomIn = new Button();
-            btnAlleSchließen = new Button();
-            btnAlleErweitern = new Button();
+            btnAnsichtZoom = new ComboBox();
             capSpaltenanordnung = new Caption();
             capZeilen1 = new Caption();
             cbxColumnArr = new ComboBox();
             grpHilfen = new GroupBox();
-            ckbZeilenclickInsClipboard = new Button();
+            btnEinstellungen = new ComboBox();
             btnSuchFenster = new Button();
             tabAdmin = new TabPage();
             grpAdminZeilen = new GroupBox();
@@ -288,7 +284,7 @@ namespace BlueControls.Forms {
             grpAufgaben.Controls.Add(lstAufgaben);
             grpAufgaben.Dock = DockStyle.Left;
             grpAufgaben.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAufgaben.Location = new Point(640, 0);
+            grpAufgaben.Location = new Point(416, 0);
             grpAufgaben.Name = "grpAufgaben";
             grpAufgaben.Size = new Size(222, 81);
             grpAufgaben.TabIndex = 7;
@@ -310,79 +306,32 @@ namespace BlueControls.Forms {
             // 
             grpAnsicht.BackColor = Color.FromArgb(244, 245, 246);
             grpAnsicht.CausesValidation = false;
-            grpAnsicht.Controls.Add(btnZoomFit);
-            grpAnsicht.Controls.Add(btnZoomOut);
-            grpAnsicht.Controls.Add(btnZoomIn);
-            grpAnsicht.Controls.Add(btnAlleSchließen);
-            grpAnsicht.Controls.Add(btnAlleErweitern);
+            grpAnsicht.Controls.Add(btnAnsichtZoom);
             grpAnsicht.Controls.Add(capSpaltenanordnung);
             grpAnsicht.Controls.Add(capZeilen1);
             grpAnsicht.Controls.Add(cbxColumnArr);
             grpAnsicht.Dock = DockStyle.Left;
             grpAnsicht.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAnsicht.Location = new Point(256, 0);
+            grpAnsicht.Location = new Point(144, 0);
             grpAnsicht.Margin = new Padding(0);
             grpAnsicht.Name = "grpAnsicht";
             grpAnsicht.Padding = new Padding(0);
-            grpAnsicht.Size = new Size(384, 81);
+            grpAnsicht.Size = new Size(272, 81);
             grpAnsicht.TabIndex = 3;
             grpAnsicht.TabStop = false;
             grpAnsicht.Text = "Ansicht";
             // 
-            // btnZoomFit
+            // btnAnsichtZoom
             // 
-            btnZoomFit.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnZoomFit.ImageCode = "ZoomFit|20";
-            btnZoomFit.Location = new Point(328, 24);
-            btnZoomFit.Name = "btnZoomFit";
-            btnZoomFit.Size = new Size(48, 22);
-            btnZoomFit.TabIndex = 17;
-            btnZoomFit.Text = "1:1";
-            btnZoomFit.Click += btnZoomFit_Click;
-            // 
-            // btnZoomOut
-            // 
-            btnZoomOut.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnZoomOut.ImageCode = "LupeMinus|20";
-            btnZoomOut.Location = new Point(352, 2);
-            btnZoomOut.Name = "btnZoomOut";
-            btnZoomOut.Size = new Size(24, 22);
-            btnZoomOut.TabIndex = 16;
-            btnZoomOut.Click += btnZoomOut_Click;
-            // 
-            // btnZoomIn
-            // 
-            btnZoomIn.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnZoomIn.ImageCode = "LupePlus|20";
-            btnZoomIn.Location = new Point(328, 2);
-            btnZoomIn.Name = "btnZoomIn";
-            btnZoomIn.Size = new Size(24, 22);
-            btnZoomIn.TabIndex = 15;
-            btnZoomIn.Click += btnZoomIn_Click;
-            // 
-            // btnAlleSchließen
-            // 
-            btnAlleSchließen.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
-            btnAlleSchließen.Location = new Point(216, 24);
-            btnAlleSchließen.Name = "btnAlleSchließen";
-            btnAlleSchließen.QuickInfo = "Neuen Eintrag ergänzen";
-            btnAlleSchließen.Size = new Size(104, 22);
-            btnAlleSchließen.TabIndex = 4;
-            btnAlleSchließen.Text = "alle schließen";
-            btnAlleSchließen.Click += btnAlleSchließen_Click;
-            // 
-            // btnAlleErweitern
-            // 
-            btnAlleErweitern.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
-            btnAlleErweitern.Location = new Point(216, 2);
-            btnAlleErweitern.Name = "btnAlleErweitern";
-            btnAlleErweitern.QuickInfo = "Neuen Eintrag ergänzen";
-            btnAlleErweitern.Size = new Size(104, 22);
-            btnAlleErweitern.TabIndex = 3;
-            btnAlleErweitern.Text = "alle erweitern";
-            btnAlleErweitern.Click += btnAlleErweitern_Click;
+            btnAnsichtZoom.AutoSort = false;
+            btnAnsichtZoom.DrawStyle = ComboboxStyle.RibbonBar;
+            btnAnsichtZoom.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnAnsichtZoom.ImageCode = "Lupe";
+            btnAnsichtZoom.Location = new Point(216, 2);
+            btnAnsichtZoom.Name = "btnAnsichtZoom";
+            btnAnsichtZoom.Size = new Size(48, 66);
+            btnAnsichtZoom.TabIndex = 15;
+            btnAnsichtZoom.Text = "Ansicht";
             // 
             // capSpaltenanordnung
             // 
@@ -421,25 +370,28 @@ namespace BlueControls.Forms {
             // 
             grpHilfen.BackColor = Color.FromArgb(244, 245, 246);
             grpHilfen.CausesValidation = false;
-            grpHilfen.Controls.Add(ckbZeilenclickInsClipboard);
+            grpHilfen.Controls.Add(btnEinstellungen);
             grpHilfen.Controls.Add(btnSuchFenster);
             grpHilfen.Dock = DockStyle.Left;
             grpHilfen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpHilfen.Location = new Point(0, 0);
             grpHilfen.Name = "grpHilfen";
-            grpHilfen.Size = new Size(256, 81);
+            grpHilfen.Size = new Size(144, 81);
             grpHilfen.TabIndex = 6;
             grpHilfen.TabStop = false;
             grpHilfen.Text = "Hilfen";
             // 
-            // ckbZeilenclickInsClipboard
+            // btnEinstellungen
             // 
-            ckbZeilenclickInsClipboard.ButtonStyle = ButtonStyle.Checkbox_Text;
-            ckbZeilenclickInsClipboard.Location = new Point(96, 24);
-            ckbZeilenclickInsClipboard.Name = "ckbZeilenclickInsClipboard";
-            ckbZeilenclickInsClipboard.Size = new Size(152, 22);
-            ckbZeilenclickInsClipboard.TabIndex = 13;
-            ckbZeilenclickInsClipboard.Text = "Zeilenclick = Clipboard";
+            btnEinstellungen.AutoSort = false;
+            btnEinstellungen.DrawStyle = ComboboxStyle.RibbonBar;
+            btnEinstellungen.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnEinstellungen.ImageCode = "Zahnrad";
+            btnEinstellungen.Location = new Point(80, 2);
+            btnEinstellungen.Name = "btnEinstellungen";
+            btnEinstellungen.Size = new Size(56, 66);
+            btnEinstellungen.TabIndex = 13;
+            btnEinstellungen.Text = "Einstell-ungen";
             // 
             // btnSuchFenster
             // 
@@ -447,7 +399,7 @@ namespace BlueControls.Forms {
             btnSuchFenster.ImageCode = "Lupe";
             btnSuchFenster.Location = new Point(8, 2);
             btnSuchFenster.Name = "btnSuchFenster";
-            btnSuchFenster.Size = new Size(80, 66);
+            btnSuchFenster.Size = new Size(72, 66);
             btnSuchFenster.TabIndex = 11;
             btnSuchFenster.Text = "Suchfenster öffnen";
             btnSuchFenster.Click += btnSuchFenster_Click;
@@ -716,7 +668,6 @@ namespace BlueControls.Forms {
             btnDrucken.Size = new Size(80, 66);
             btnDrucken.TabIndex = 13;
             btnDrucken.Text = "Drucken bzw. Export";
-            btnDrucken.ItemClicked += btnDrucken_ItemClicked;
             // 
             // btnHTMLExport
             // 
@@ -960,8 +911,7 @@ namespace BlueControls.Forms {
         private Caption capZeilen1;
         private ComboBox cbxColumnArr;
         protected GroupBox grpAnsicht;
-        protected Button btnAlleSchließen;
-        protected Button btnAlleErweitern;
+        private ComboBox btnAnsichtZoom;
         private GroupBox grpImport;
         private GroupBox grpExport;
         private Button btnHTMLExport;
@@ -984,7 +934,7 @@ namespace BlueControls.Forms {
         private ConnectedFormulaView CFO;
         private Button btnFormular;
         private GroupBox grpHilfen;
-        private Button ckbZeilenclickInsClipboard;
+        private ComboBox btnEinstellungen;
         private Button btnSuchFenster;
         private Button btnSaveLoad;
         private Button btnSkripteBearbeiten;
@@ -994,9 +944,6 @@ namespace BlueControls.Forms {
         private Button grpAufräumen;
         private Button btnUserInfo;
         private Button btnSuchInScript;
-        protected Button btnZoomOut;
-        protected Button btnZoomIn;
-        protected Button btnZoomFit;
         private Button btnMonitoring;
     }
 }

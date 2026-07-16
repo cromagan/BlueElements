@@ -21,6 +21,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private bool _switchingTabs;
 
+    private bool _zeilenClickInsClipboard;
+
     #endregion
 
     #region Constructors
@@ -40,14 +42,27 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (btnDrucken is not null) {
             btnDrucken.ItemClear();
-            btnDrucken.ItemAdd(ItemOf("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28)));
+            btnDrucken.ItemAdd(ItemOf("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28), ExportDialog_Click, true, string.Empty));
             btnDrucken.ItemAdd(Separator());
-            btnDrucken.ItemAdd(ItemOf("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28)));
-            btnDrucken.ItemAdd(ItemOf("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28)));
+            btnDrucken.ItemAdd(ItemOf("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28), ExportCSV_Click, true, string.Empty));
+            btnDrucken.ItemAdd(ItemOf("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28), ExportHTML_Click, true, string.Empty));
             btnDrucken.ItemAdd(Separator());
-            btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
+            btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28), ExportLayoutEditor_Click, true, string.Empty));
         }
 
+        if (btnAnsichtZoom is not null) {
+            btnAnsichtZoom.ItemClear();
+            btnAnsichtZoom.ItemAdd(ItemOf("Zoom vergrößern", QuickImage.Get(ImageCode.LupePlus, 28), Ansicht_ZoomIn, true, string.Empty));
+            btnAnsichtZoom.ItemAdd(ItemOf("Zoom verkleinern", QuickImage.Get(ImageCode.LupeMinus, 28), Ansicht_ZoomOut, true, string.Empty));
+            btnAnsichtZoom.ItemAdd(ItemOf("Zoom 1:1", QuickImage.Get(ImageCode.ZoomFit, 28), Ansicht_ZoomFit, true, string.Empty));
+            btnAnsichtZoom.ItemAdd(Separator());
+            btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel öffnen", QuickImage.Get(ImageCode.Pfeil_Unten_Scrollbar, 16), Ansicht_ExpandAll, true, string.Empty));
+            btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel schließen", QuickImage.Get(ImageCode.Pfeil_Oben_Scrollbar, 16), Ansicht_CollapseAll, true, string.Empty));
+        }
+
+        if (btnEinstellungen is not null) {
+            btnEinstellungen.DropDownShowing += btnEinstellungen_DropDownShowing;
+        }
         var keyName = table?.KeyName;
         if (!string.IsNullOrEmpty(keyName)) {
             SwitchTabToTable(keyName);
@@ -289,40 +304,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
-    protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        FormManager.SaveAllFiles();
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
-
-        switch (e.Item.KeyName) {
-            case "erweitert":
-                Visible = false;
-                var selectedRows = TableView.RowsVisibleUnique();
-
-                using (var l = new ExportDialog(tb, selectedRows)) {
-                    l.ShowDialog();
-                }
-
-                Visible = true;
-                break;
-
-            case "csv":
-                if (CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption))) {
-                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
-                } else {
-                    QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
-                }
-                break;
-
-            case "html":
-                TableView.Export_HTML();
-                break;
-
-            default:
-                DebugPrint(e.Item);
-                break;
-        }
-    }
-
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => TableView.Export_HTML();
 
     protected virtual void ContextMenu_OpenScriptEditor(object? sender, System.EventArgs e) => OpenScriptEditor(TableView.Table);
@@ -354,7 +335,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     protected virtual void OnSelectedCellChanged(object sender, CellExtEventArgs e) {
-        if (ckbZeilenclickInsClipboard.Checked) {
+        if (_zeilenClickInsClipboard) {
             BlueControls.Controls.TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
 
             TableView.Focus();
@@ -506,9 +487,15 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         FloatingForm.Close(cbxColumnArr);
     }
 
-    private void btnAlleErweitern_Click(object sender, System.EventArgs e) => TableView.ExpandAll();
+    private void Ansicht_CollapseAll(object? sender, ContextMenuEventArgs e) => TableView.CollapesAll();
 
-    private void btnAlleSchließen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
+    private void Ansicht_ExpandAll(object? sender, ContextMenuEventArgs e) => TableView.ExpandAll();
+
+    private void Ansicht_ZoomFit(object? sender, ContextMenuEventArgs e) => TableView.Zoom = 1f;
+
+    private void Ansicht_ZoomIn(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(true);
+
+    private void Ansicht_ZoomOut(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(false);
 
     private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
         TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
@@ -526,6 +513,15 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
 
         TableView.ImportClipboard();
+    }
+
+    private void btnEinstellungen_DropDownShowing(object? sender, System.EventArgs e) {
+        btnEinstellungen.ItemClear();
+        btnEinstellungen.ItemAdd(ItemOf(
+            _zeilenClickInsClipboard ? "Zeilenclick = Clipboard deaktivieren" : "Zeilenclick = Clipboard aktivieren",
+            "clipboard",
+            QuickImage.Get(_zeilenClickInsClipboard ? ImageCode.Häkchen : ImageCode.Kreis2, 16),
+            Einstellungen_ToggleClipboard, true, string.Empty));
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -642,12 +638,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
         => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, TableView.RowsVisibleUnique()));
-
-    private void btnZoomFit_Click(object sender, System.EventArgs e) => TableView.Zoom = 1f;
-
-    private void btnZoomIn_Click(object sender, System.EventArgs e) => TableView.DoZoom(true);
-
-    private void btnZoomOut_Click(object sender, System.EventArgs e) => TableView.DoZoom(false);
 
     private void cbxColumnArr_AddClicked(object? sender, AddItemEventArgs e) {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
@@ -777,6 +767,45 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         btnSuchenUndErsetzen.Enabled = combi;
 
         UpdateScripts(tb);
+    }
+
+    private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) {
+        _zeilenClickInsClipboard = !_zeilenClickInsClipboard;
+    }
+
+    private void ExportCSV_Click(object? sender, ContextMenuEventArgs e) {
+        FormManager.SaveAllFiles();
+        if (IsDisposed || TableView.Table is not { IsDisposed: false }) { return; }
+
+        if (CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption))) {
+            MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
+    }
+
+    private void ExportDialog_Click(object? sender, ContextMenuEventArgs e) {
+        FormManager.SaveAllFiles();
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
+
+        Visible = false;
+        using var l = new ExportDialog(tb, TableView.RowsVisibleUnique());
+        l.ShowDialog();
+        Visible = true;
+    }
+
+    private void ExportHTML_Click(object? sender, ContextMenuEventArgs e) {
+        FormManager.SaveAllFiles();
+        if (IsDisposed || TableView.Table is not { IsDisposed: false }) { return; }
+
+        TableView.Export_HTML();
+    }
+
+    private void ExportLayoutEditor_Click(object? sender, ContextMenuEventArgs e) {
+        FormManager.SaveAllFiles();
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
+
+        OpenLayoutEditor(tb, string.Empty);
     }
 
     private void FormManager_FormsChanged(object? sender, FormEventArgs e) {

@@ -272,8 +272,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public bool PinAllowed =>
         Table is { IsDisposed: false }
         && Table.Column.SysRowSortIndex is not { IsDisposed: false }
-        && CurrentArrangement?.ColumnForChapter is not { IsDisposed: false }
-        && CustomContextMenuItems is null;
+        && CurrentArrangement?.ColumnForChapter is not { IsDisposed: false };
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1082,10 +1081,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #region Pinnen
 
-            // Anpinnen ist deaktiviert, wenn ein benutzerdefiniertes Kontextmenu
-            // vorhanden ist oder Pinning generell nicht erlaubt ist (Kapitel-Spalte
-            // oder SYS_ROWSORTINDEX). In beiden Fällen wird die komplette Sektion
-            // inkl. Überschrift weggelassen, damit im Kontextmenu keine Lücke entsteht.
+            // Anpinnen ist deaktiviert, wenn Pinning generell nicht erlaubt ist
+            // (Kapitel-Spalte oder SYS_ROWSORTINDEX). In diesem Fall wird die
+            // komplette Sektion inkl. Überschrift weggelassen, damit im Kontextmenu
+            // keine Lücke entsteht.
             if (row is not null && PinAllowed) {
                 contextMenu.Add(ItemOf("Anheften", true));
                 if (PinnedRows.Contains(row)) {
@@ -2011,11 +2010,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         }
                     }
                     if (_isDragging) {
+                        // Außerhalb des Zeichenbereichs: Markierung ausblenden.
+                        // Beim Wiedereintritt wird sie in der nächsten OnMouseMove
+                        // neu berechnet. AutoScroll weiterhin aktiv, damit der
+                        // Benutzer zurückscrollen kann.
+                        var inside = AvailableControlPaintArea.Contains(e.ControlX, e.ControlY);
                         if (_dragItem is ColumnViewItem) {
-                            _dragInsertIndex = CalculateColumnSortInsertIndex(e.ControlX);
+                            _dragInsertIndex = inside ? CalculateColumnSortInsertIndex(e.ControlX) : -1;
                             AutoScrollDuringColumnDrag(e.ControlX);
                         } else {
-                            _dragInsertIndex = CalculateRowSortInsertIndex(e.ControlY);
+                            _dragInsertIndex = inside ? CalculateRowSortInsertIndex(e.ControlY) : -1;
                             AutoScrollDuringDrag(e.ControlY);
                         }
                         Invalidate();
@@ -2047,7 +2051,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         lock (_lockUserAction) {
             // Drag/Drop abschließen
             if (_isDragging) {
-                FinishDrag();
+                // Außerhalb des Zeichenbereichs losgelassen → Drag abbrechen,
+                // kein Reorder durchführen.
+                if (AvailableControlPaintArea.Contains(e.ControlX, e.ControlY)) {
+                    FinishDrag();
+                } else {
+                    _isDragging = false;
+                    _dragItem = null;
+                    _dragInsertIndex = -1;
+                    Invalidate();
+                }
                 return;
             }
             _dragItem = null;
@@ -3993,11 +4006,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // insertIndex ist ein Index in _sortedViewItems (Header + Zeilen).
             // Die Ziel-Position ist "vor" der ersten Zeile (RowListItem) ab
             // insertIndex — ein Header als Drop-Ziel bedeutet "erste Zeile unter
-            // diesem Kapitel".
+            // diesem Kapitel". Bei eingeklappten Kapiteln sind die Zeilen nicht
+            // in _sortedViewItems; dann wird die erste Zeile des Blocks aus
+            // _chapterBlockRows verwendet.
             RowItem? targetRow = null;
             for (var i = Math.Max(0, insertIndex); i < _sortedViewItems.Count; i++) {
                 if (_sortedViewItems[i] is RowListItem tRli && tRli.Row is { IsDisposed: false }) {
                     targetRow = tRli.Row;
+                    break;
+                }
+                if (_sortedViewItems[i] is RowCaptionListItem capRcli
+                    && _chapterBlockRows.TryGetValue(capRcli, out var blockRows)
+                    && blockRows.Count > 0
+                    && blockRows[0] is { IsDisposed: false } firstBlockRow) {
+                    targetRow = firstBlockRow;
                     break;
                 }
             }
@@ -4108,7 +4130,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Entspricht die Einfüge-Position dem aktuellen Block, den gesamten Block markieren
         var srcRows = GetDragSourceRows(_dragItem);
         if (srcRows.Count > 0) {
-            var (firstSrc, lastSrc) = SourceIndexRange(srcRows);
+            var (firstSrc, lastSrc) = SourceIndexRange(srcRows, _dragItem);
             if (firstSrc >= 0 && _dragInsertIndex >= firstSrc && _dragInsertIndex <= lastSrc + 1) {
                 var firstPos = _sortedViewItems[firstSrc].ControlPosition(Zoom, OffsetX, OffsetY);
                 var lastPos = _sortedViewItems[lastSrc].ControlPosition(Zoom, OffsetX, OffsetY);
@@ -4195,11 +4217,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Überschrift als direkter Vorgänger ist verboten — der einzufügende
     /// Kapitel-Header würde sonst einen leeren Block direkt unter einem anderen
     /// Header erzeugen. Gleichnamige Kapitel dürfen jedoch direkt aufeinander
-    /// folgen (sie verschmelzen zu einem gemeinsamen Block). Die Position wird
-    /// dafür solange nach oben verschoben, bis ein gültiger Vorgänger gefunden
-    /// ist (bzw. der Listenanfang erreicht ist). Ist <paramref name="draggedChapter"/>
-    /// null (kein Kapitel-Block wird verschoben), wird <paramref name="index"/>
-    /// unverändert zurückgegeben.
+    /// folgen (sie verschmelzen zu einem gemeinsamen Block). Ausnahme: ist der
+    /// Vorgänger eingeklappt, sind seine Zeilen zwar ausgeblendet, aber
+    /// vorhanden — ein direktes Aufeinandertreffen der Header ist dann
+    /// zulässig. Die Position wird dafür solange nach oben verschoben, bis ein
+    /// gültiger Vorgänger gefunden ist (bzw. der Listenanfang erreicht ist).
+    /// Ist <paramref name="draggedChapter"/> null (kein Kapitel-Block wird
+    /// verschoben), wird <paramref name="index"/> unverändert zurückgegeben.
     /// </summary>
     private int EnsureValidChapterInsertIndex(int index, RowCaptionListItem? draggedChapter) {
         if (draggedChapter is null) { return index; }
@@ -4207,8 +4231,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         while (index > 0) {
             var predecessor = _sortedViewItems[index - 1];
             if (predecessor.IgnoreYOffset || predecessor is RowListItem) { break; }
-            if (predecessor is RowCaptionListItem predChapter
-                && string.Equals(predChapter.ChapterText, draggedChapter.ChapterText, StringComparison.OrdinalIgnoreCase)) { break; }
+            if (predecessor is RowCaptionListItem predChapter) {
+                if (string.Equals(predChapter.ChapterText, draggedChapter.ChapterText, StringComparison.OrdinalIgnoreCase)) { break; }
+                // Eingeklappter Vorgänger: Seine Zeilen sind vorhanden, nur
+                // ausgeblendet. Ein direktes Aufeinandertreffen der Header
+                // ist daher zulässig.
+                if (IsChapterCollapsed(predChapter)) { break; }
+            }
             index--;
         }
         return index;
@@ -4318,7 +4347,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (srcRows.Count > 0) {
                     // No-Op: Wird auf den eigenen Block zurückgezogen, nichts verschieben.
                     // Gleiche Bedingung wie in DrawRowSortInsertIndicator.
-                    var (firstSrc, lastSrc) = SourceIndexRange(srcRows);
+                    var (firstSrc, lastSrc) = SourceIndexRange(srcRows, item);
                     if (firstSrc < 0 || insertIndex < firstSrc || insertIndex > lastSrc + 1) {
                         // Bei Kapitel-Block werden KEINE Überschriften geändert.
                         DoRowSortReorder(srcRows, insertIndex, item is RowCaptionListItem, mouseControlY);
@@ -4649,15 +4678,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Sucht den ersten und letzten Index in <see cref="_sortedViewItems"/>,
     /// dessen Row in <paramref name="srcRows"/> enthalten ist. Wird ein
     /// Kapitel-Block verschoben, gehört der Header (<see cref="RowCaptionListItem"/>
-    /// aus <see cref="_dragItem"/>) ebenfalls zum Quell-Bereich.
+    /// aus <paramref name="dragItem"/>) ebenfalls zum Quell-Bereich. Ist der Block
+    /// eingeklappt, sind seine Zeilen nicht in <see cref="_sortedViewItems"/>
+    /// enthalten — der Quell-Bereich ist dann nur der Header selbst.
     /// </summary>
-    private (int firstIdx, int lastIdx) SourceIndexRange(List<RowItem> srcRows) {
+    private (int firstIdx, int lastIdx) SourceIndexRange(List<RowItem> srcRows, object? dragItem) {
         var first = -1;
         var last = -1;
 
         // Bei einem Kapitel-Block-Drag gehört der Header ebenfalls zum
         // Quell-Bereich — er verbraucht einen eigenen Index in _sortedViewItems.
-        if (_dragItem is RowCaptionListItem rcli) {
+        if (dragItem is RowCaptionListItem rcli) {
             var capIdx = _sortedViewItems.IndexOf(rcli);
             if (capIdx >= 0) { first = capIdx; }
         }
@@ -4668,6 +4699,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (i > last) { last = i; }
             }
         }
+
+        // Kapitel eingeklappt: Die Zeilen sind nicht in _sortedViewItems
+        // enthalten. Der Quell-Bereich ist dann nur der Header selbst.
+        if (last < 0 && dragItem is RowCaptionListItem) { last = first; }
 
         return (first, last);
     }
