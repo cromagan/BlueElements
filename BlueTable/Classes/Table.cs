@@ -1306,6 +1306,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     public void EnableCustomSort() {
         if (IsDisposed) { return; }
+        if (this is TableChunk) { return; }
         if (Column.SysRowSortIndex is { IsDisposed: false }) { return; }
 
         var r = SortDefinition?.SortedRows(Row) ?? [.. Row];

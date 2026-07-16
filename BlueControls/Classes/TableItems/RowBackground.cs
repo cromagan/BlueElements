@@ -18,6 +18,12 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
     #region Fields
 
+    /// <summary>
+    /// Canvas-Pixel pro Indent-Stufe. Jede Kapitel-Ebene rückt die Spalten
+    /// um diesen Wert nach rechts ein.
+    /// </summary>
+    public const int IndentWidth = 20;
+
     public static readonly Brush TableHeadOverlayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
     private volatile int _isDisposedFlag;
     private Size _untrimmedCanvasSize = Size.Empty;
@@ -214,7 +220,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
         if (itemdesign == Design.Undefined) { return; }
 
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
-        var p20 = 20.CanvasToControl(zoom) * Indent;
+        var p20 = IndentWidth.CanvasToControl(zoom) * Indent;
         var controlIndented = new Rectangle(controlPos.X + p20, controlPos.Y, controlPos.Width - p20, controlPos.Height);
 
         if (checkboxDesign != Design.Undefined) {
@@ -341,7 +347,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
         // Indent auf die Spalten-Position anwenden — sonst würde der in Draw
         // berechnete controlIndented-Bereich für die Spalten ignoriert.
-        var indentOffset = 20.CanvasToControl(zoom) * Indent;
+        var indentOffset = IndentWidth.CanvasToControl(zoom) * Indent;
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
@@ -391,6 +397,16 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
             var effectiveOffsetX = IgnoreXOffset ? 0 : (int)offsetX;
             var fillX = positionControl.X - indentOffset - effectiveOffsetX;
             gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard)), new RectangleF(fillX, positionControl.Y, indentOffset, positionControl.Height));
+        }
+
+        // Bereich RECHTS neben den Spalten mit der Control-Backcolor füllen
+        // — analog zum Indent-Fill links. HeadItems (Indent=0) erhalten in
+        // CalculateAllViewItems_CalculateYPosition keinen Indent-Zuschlag
+        // für die CanvasPosition-Breite und sind dadurch schmaler als
+        // eingerückte Body-Zeilen. Der Spalt auf der rechten Seite wird
+        // hier gefüllt.
+        if (positionControl.Right < visibleAreaControl.Right) {
+            gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard)), new RectangleF(positionControl.Right, positionControl.Y, visibleAreaControl.Right - positionControl.Right, positionControl.Height));
         }
     }
 

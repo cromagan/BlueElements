@@ -31,7 +31,15 @@ internal class Method_ImportCsv : Method_TableGeneric {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
-        var sx = tb.ImportCsv(txt, true, sep, false, false);
+        // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
+        // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.
+        tb.SuppressEvents();
+        string sx;
+        try {
+            sx = tb.ImportCsv(txt, true, sep, false, false);
+        } finally {
+            tb.ResumeEvents();
+        }
 
         return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true);
     }

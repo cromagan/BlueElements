@@ -107,7 +107,7 @@ public sealed class RowCaptionListItem : RowBackground {
     internal Rectangle ArrowButtonRect(float zoom, float offsetX, float offsetY) {
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
         var p2 = 2.CanvasToControl(zoom);
-        var p20 = 20.CanvasToControl(zoom);
+        var p20 = IndentWidth.CanvasToControl(zoom);
         var indentOffset = p20 * Indent;
         var rowHeight = controlPos.Height;
         var size = Math.Min(p20, rowHeight - p2 * 2);
@@ -173,7 +173,7 @@ public sealed class RowCaptionListItem : RowBackground {
         var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);
         var p14 = 14.CanvasToControl(zoom);
-        var p20 = 20.CanvasToControl(zoom);
+        var p20 = IndentWidth.CanvasToControl(zoom);
 
         // Stark verblasster Hintergrund für die gesamte Zeile (scrollt mit)
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(120)), positionControl);

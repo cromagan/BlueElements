@@ -413,6 +413,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Pin(null);
     }
 
+    private void btnCollapseChapters_Click(object? sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        TableInternal.ToggleAllChapters();
+    }
+
     private void btnTextLöschen_Click(object? sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void btnViewManager_Click(object? sender, System.EventArgs e) {
@@ -479,13 +484,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (!grpFilter.Visible) { return; }
 
         var hasTB = Table is not null && Enabled;
-        var hasSortIndex = Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false };
+
+        // Pin nur aktivieren, wenn Pinning generell erlaubt ist (keine Kapitel-
+        // Spalte, kein SYS_ROWSORTINDEX). Die Sichtbarkeit wird in
+        // RepositionControls gesetzt, da sie das Layout beeinflusst.
+        var pinAllowed = hasTB && TableInternal.PinAllowed;
 
         // Status der Steuerelemente aktualisieren
-        btnPinZurück.Enabled = hasTB && !hasSortIndex && TableInternal.PinnedRows.Count > 0;
+        btnPin.Enabled = pinAllowed;
+        btnPinZurück.Enabled = pinAllowed && TableInternal.PinnedRows.Count > 0;
         txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation is null;
         btnAlleFilterAus.Enabled = hasTB;
-        btnPin.Enabled = hasTB && !hasSortIndex;
+        btnCollapseChapters.Enabled = hasTB && CurrentArrangement?.ColumnForChapter is { IsDisposed: false };
         btnViewManager.Enabled = Table is TableFile { IsDisposed: false };
 
         // Text im ZeilenFilter aktualisieren
@@ -531,8 +541,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region Pin Button
 
-        var hasSortIndex = Table is { IsDisposed: false } tbPin && tbPin.Column.SysRowSortIndex is { IsDisposed: false };
-        btnPinZurück.Enabled = Table is not null && !hasSortIndex && TableInternal.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = TableInternal.PinAllowed && TableInternal.PinnedRows.Count > 0;
 
         #endregion
 
@@ -914,7 +923,35 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             btnAlleFilterAus.Top = firstRowY;
             btnPin.Top = firstRowY;
             btnPinZurück.Top = firstRowY;
+            btnCollapseChapters.Top = firstRowY;
             btnViewManager.Top = firstRowY;
+
+            // Button-Kette dynamisch aufbauen. Pin-Buttons werden ausgeblendet,
+            // wenn Pinning generell nicht möglich ist (Kapitel-Spalte oder
+            // SYS_ROWSORTINDEX). Der Kapitel-Button nur bei Kapitel-Spalte.
+            // Nicht sichtbare Buttons rutschen die nachfolgenden nach links.
+            var pinAllowed = TableInternal.PinAllowed;
+            if (pinAllowed) {
+                btnPin.Visible = true;
+                btnPinZurück.Visible = true;
+                btnPin.Left = btnAlleFilterAus.Right + 8;
+                btnPinZurück.Left = btnPin.Right;
+            } else {
+                btnPin.Visible = false;
+                btnPinZurück.Visible = false;
+            }
+
+            var nextLeft = pinAllowed ? btnPinZurück.Right : btnAlleFilterAus.Right;
+
+            if (cu?.ColumnForChapter is { IsDisposed: false }) {
+                btnCollapseChapters.Left = nextLeft + 8;
+                btnCollapseChapters.Visible = true;
+                nextLeft = btnCollapseChapters.Right;
+            } else {
+                btnCollapseChapters.Visible = false;
+            }
+
+            btnViewManager.Left = nextLeft + 8;
 
             grpFilter.Left = left;
             grpFilter.Top = tableTop;

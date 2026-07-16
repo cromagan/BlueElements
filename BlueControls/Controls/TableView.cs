@@ -37,6 +37,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private readonly Dictionary<string, RowBackground> _allViewItems = [];
 
     /// <summary>
+    /// Wird beim Aufbau der View (<see cref="CalculateAllViewItems_AddCaptionsAndRows"/>)
+    /// pro aktuellem Kapitel-Header befüllt. Der Key ist die Header-Instanz aus
+    /// <see cref="_sortedViewItems"/>, der Wert alle Zeilen des Blocks — auch
+    /// die eingeklappten. So liefert <see cref="GetChapterBlockRows"/> einen
+    /// vollständigen Block, ohne dass der Block aufklappen muss (z. B. für
+    /// Drag/Drop eines zugeklappten Kapitels).
+    /// </summary>
+    private readonly Dictionary<RowCaptionListItem, List<RowItem>> _chapterBlockRows = [];
+
+    /// <summary>
     /// Großschreibung
     /// </summary>
     private readonly List<string> _collapsed = [];
@@ -50,20 +60,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     private readonly HashSet<string> _collapsedBlockFirstRowKeys = [];
 
-    /// <summary>
-    /// Wird beim Aufbau der View (<see cref="CalculateAllViewItems_AddCaptionsAndRows"/>)
-    /// pro aktuellem Kapitel-Header befüllt. Der Key ist die Header-Instanz aus
-    /// <see cref="_sortedViewItems"/>, der Wert alle Zeilen des Blocks — auch
-    /// die eingeklappten. So liefert <see cref="GetChapterBlockRows"/> einen
-    /// vollständigen Block, ohne dass der Block aufklappen muss (z. B. für
-    /// Drag/Drop eines zugeklappten Kapitels).
-    /// </summary>
-    private readonly Dictionary<RowCaptionListItem, List<RowItem>> _chapterBlockRows = [];
-
     private readonly object _lockUserAction = new();
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
     private List<RowListItem> _cachedRowViewItems = [];
+    private bool _consumeNextMouseDown;
     private int _dragInsertIndex = -1;
 
     /// <summary>
@@ -72,10 +73,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// oder ein <see cref="RowCaptionListItem"/> (Kapitel-Block).
     /// </summary>
     private object? _dragItem;
+
     private Point _dragMouseDown;
 
     private bool _isDragging;
-    private bool _consumeNextMouseDown;
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
@@ -158,6 +159,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 OnViewChanged();
                 CursorPos_Set(CursorPosColumn, CursorPosRow, true);
+
+                if (CurrentArrangement is { StartCollapsed: true }) { CollapesAll(); }
             }
         }
     }
@@ -258,6 +261,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Werden bei FilterCombined berücksichtigt und auch im FilterOutput weitergegeben.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
+
+    /// <summary>
+    /// Gibt an, ob das Anpinnen von Zeilen in der aktuellen Ansicht erlaubt ist.
+    /// Pinning ist deaktiviert, wenn eine Kapitel-Spalte (<see cref="ColumnViewCollection.ColumnForChapter"/>)
+    /// vorhanden ist oder eine benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public bool PinAllowed =>
+        Table is { IsDisposed: false }
+        && Table.Column.SysRowSortIndex is not { IsDisposed: false }
+        && CurrentArrangement?.ColumnForChapter is not { IsDisposed: false }
+        && CustomContextMenuItems is null;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1066,13 +1082,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #region Pinnen
 
-            if (row is not null) {
-                var pinEnabled = tb.Column.SysRowSortIndex is not { IsDisposed: false };
+            // Anpinnen ist deaktiviert, wenn ein benutzerdefiniertes Kontextmenu
+            // vorhanden ist oder Pinning generell nicht erlaubt ist (Kapitel-Spalte
+            // oder SYS_ROWSORTINDEX). In beiden Fällen wird die komplette Sektion
+            // inkl. Überschrift weggelassen, damit im Kontextmenu keine Lücke entsteht.
+            if (row is not null && PinAllowed) {
                 contextMenu.Add(ItemOf("Anheften", true));
                 if (PinnedRows.Contains(row)) {
-                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, pinEnabled));
+                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
                 } else {
-                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, pinEnabled));
+                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true));
                 }
             }
 
@@ -1236,7 +1255,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void Pin(IReadOnlyList<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
-        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
+        if (!PinAllowed) { return; }
 
         rows ??= [];
 
@@ -1250,7 +1269,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinAdd(RowItem? row) {
-        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
+        if (!PinAllowed) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Add(row);
         Invalidate_AllViewItems(false);
@@ -1258,7 +1277,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinRemove(RowItem? row) {
-        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
+        if (!PinAllowed) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Remove(row);
         Invalidate_AllViewItems(false);
@@ -1342,6 +1361,44 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.ParseView(view);
 
         CheckView();
+    }
+
+    /// <summary>
+    /// Schaltet den Auf-/Zuklapp-Zustand aller Kapitel um: Ist mindestens
+    /// ein Kapitel ausgeklappt, werden alle geschlossen. Sind alle
+    /// eingeklappt, werden alle geöffnet.
+    /// </summary>
+    public void ToggleAllChapters() {
+        if (AllViewItems is not { } avi) { return; }
+
+        var anyExpanded = false;
+
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            // NumberStyle: ein Block ist ausgeklappt, wenn sein FirstRow-Key
+            // nicht in _collapsedBlockFirstRowKeys verzeichnet ist.
+            foreach (var thisItem in _sortedViewItems) {
+                if (thisItem is RowCaptionListItem { IsDisposed: false } rcli
+                    && GetChapterBlockRows(rcli) is { Count: > 0 } blockRows
+                    && blockRows[0] is { IsDisposed: false } firstRow
+                    && !_collapsedBlockFirstRowKeys.Contains(firstRow.KeyName)) {
+                    anyExpanded = true;
+                    break;
+                }
+            }
+        } else {
+            foreach (var thisItem in avi.Values) {
+                if (thisItem is RowCaptionListItem { IsDisposed: false, IsExpanded: true }) {
+                    anyExpanded = true;
+                    break;
+                }
+            }
+        }
+
+        if (anyExpanded) {
+            CollapesAll();
+        } else {
+            ExpandAll();
+        }
     }
 
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
@@ -1526,14 +1583,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var x = AvailableControlPaintArea.Width;
         var y = AvailableControlPaintArea.Height;
 
-        if (CurrentArrangement is { } ca) {
-            x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom);
-        }
-
         // AllViewItems sicherstellen, damit _sortedViewItems befüllt ist.
         // Ohne diesen Aufruf wäre _sortedViewItems leer, weil DrawControl
         // erst NACH base.DrawControl() auf AllViewItems zugreift.
         _ = AllViewItems;
+
+        if (CurrentArrangement is { } ca) {
+            // Indent wird beim Zeichnen zu den Spalten-Positionen addiert
+            // (RowBackground.DrawExplicit). Daher muss der maximale Indent aller
+            // sichtbaren Zeilen auch in die Canvas-Breite einfließen — sonst
+            // werden eingerückte Spalten am rechten Rand abgeschnitten.
+            var maxIndent = _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
+            x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom) + RowBackground.IndentWidth * maxIndent;
+        }
 
         if (_sortedViewItems is { Count: > 0 }) {
             (_, _, y, _) = CanvasItemData(_sortedViewItems, Design.Item_ListBox);
@@ -1669,8 +1731,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // damit der Spaltenkopf beim Scrollen nicht von Zeilen überdeckt wird.
             // Die Where-Enumeratoren sind bewusst lazy; ein ToList würde bei jedem Paint
             // neue Listen allozieren.
-            DrawItems(_sortedViewItems.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom);
-            DrawItems(_sortedViewItems.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom);
+            // Normale Zeilen, die vollständig hinter dem fixierten Header liegen,
+            // werden über den clipTop-Parameter ausgeschlossen und gar nicht erst gezeichnet.
+            var rowsTop = RowsAreaTop();
+            DrawItems(_sortedViewItems.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, rowsTop);
+            DrawItems(_sortedViewItems.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, 0);
 
             if (!string.IsNullOrEmpty(Table.FreezedReason)) {
                 var i = QuickImage.Get(ImageCode.Schloss, 48);
@@ -2469,18 +2534,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         gr.DrawRectangle(pen, rect);
     }
 
-    private static void DrawItems(IEnumerable<RowBackground>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom) {
+    private static void DrawItems(IEnumerable<RowBackground>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom, int clipTop) {
         if (list is null) { return; }
 
         try {
             foreach (var thisItem in list) {
-                if (thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) {
-                    var itemState = controlState;
+                if (!thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) { continue; }
 
-                    if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
+                if (clipTop > 0 && thisItem.ControlPosition(zoom, offsetX, offsetY).Bottom <= clipTop) { continue; }
 
-                    thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
-                }
+                var itemState = controlState;
+
+                if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
+
+                thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
             }
         } catch { }
     }
@@ -2526,6 +2593,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         return false;
     }
+
+    /// <summary>
+    /// Ein Drop-Ziel ist jede sichtbare, nicht disposed Zeile oder jeder
+    /// Kapitel-Header. Letzterer wird wie eine Zeile behandelt, damit direkt
+    /// unter ihm abgelegt werden kann.
+    /// </summary>
+    private static bool IsDroppableTarget(RowBackground item)
+        => item is RowListItem or RowCaptionListItem && !item.IsDisposed && item.Visible;
 
     private static void NotEditableInfo(string reason) {
         if (string.IsNullOrEmpty(reason)) { return; }
@@ -2938,9 +3013,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
-        // Bei aktiver SYS_ROWSORTINDEX-Spalte sind Pins nicht erlaubt
-        // (sie würden die strikte Sortierreihenfolge stören).
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false } && PinnedRows.Count > 0) {
+        // Pins sind bei Kapitel-Spalte oder benutzerdefinierter Sortierung
+        // (SYS_ROWSORTINDEX) nicht erlaubt — sie würden die Gruppierung bzw.
+        // die strikte Sortierreihenfolge stören.
+        if (!PinAllowed && PinnedRows.Count > 0) {
             PinnedRows.Clear();
             OnPinnedChanged();
         }
@@ -3194,13 +3270,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems_CalculateYPosition(List<RowBackground> sortedItems, ColumnViewCollection arrangement) {
-        var wi = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
+        var columnsWidth = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
 
         var y = 0;
 
         foreach (var thisItem in sortedItems) {
             thisItem.Visible = true;
-            thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_ListBox));
+            // Indent zur Spaltenbreite addieren: Beim Zeichnen werden die Spalten
+            // um IndentWidth * Indent nach rechts verschoben. Die CanvasPosition-
+            // Breite muss das abdecken, sonst wird die Zeile zu früh abgeschnitten.
+            var wi = columnsWidth + RowBackground.IndentWidth * thisItem.Indent;
+            thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, columnsWidth, Design.Item_ListBox));
             y = thisItem.CanvasPosition.Bottom;
         }
     }
@@ -3223,13 +3303,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems_HildeAllItems(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement) {
-        var wi = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
+        var columnsWidth = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
 
         foreach (var thisItem in allItems.Values) {
             thisItem?.Visible = false;
 
             if (thisItem is RowBackground rbli) {
                 rbli.Arrangement = arrangement;
+                var wi = columnsWidth + RowBackground.IndentWidth * rbli.Indent;
                 rbli.CanvasPosition = rbli.CanvasPosition with { Width = wi };
             }
         }
@@ -3312,53 +3393,32 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// <see cref="_cachedRowViewItems"/>. Ein <see cref="RowCaptionListItem"/>
     /// wird dabei wie ein <see cref="RowListItem"/> als Drop-Ziel behandelt,
     /// damit eine Zeile direkt unter einem Kapitel-Header (als erste Zeile des
-    /// Blocks) abgelegt werden kann. Rückgabe -1 bedeutet: kein gültiges Ziel.
+    /// Blocks) abgelegt werden kann. Wird jedoch ein gesamter Kapitel-Block
+    /// (<see cref="RowCaptionListItem"/>) verschoben, wird die Position über
+    /// <see cref="EnsureValidChapterInsertIndex"/> so korrigiert, dass der
+    /// Vorgänger weder ein anders lautender Kapitel-Header noch ein anderer
+    /// Spezial-Eintrag ist. Rückgabe -1 bedeutet: kein gültiges Ziel.
     /// </summary>
     private int CalculateRowSortInsertIndex(int controlY) {
         if (_sortedViewItems is not { Count: > 0 }) { return -1; }
+
+        var draggedChapter = _dragItem as RowCaptionListItem;
 
         for (var i = 0; i < _sortedViewItems.Count; i++) {
             var item = _sortedViewItems[i];
             if (!IsDroppableTarget(item)) { continue; }
 
             var pos = item.ControlPosition(Zoom, OffsetX, OffsetY);
-            if (controlY < pos.Top) { return i; }
+            if (controlY < pos.Top) {
+                return EnsureValidChapterInsertIndex(i, draggedChapter);
+            }
             if (controlY <= pos.Bottom) {
-                return controlY < pos.Top + pos.Height / 2 ? i : i + 1;
+                var raw = controlY < pos.Top + pos.Height / 2 ? i : i + 1;
+                return EnsureValidChapterInsertIndex(raw, draggedChapter);
             }
         }
 
-        return _sortedViewItems.Count;
-    }
-
-    /// <summary>
-    /// Ein Drop-Ziel ist jede sichtbare, nicht disposed Zeile oder jeder
-    /// Kapitel-Header. Letzterer wird wie eine Zeile behandelt, damit direkt
-    /// unter ihm abgelegt werden kann.
-    /// </summary>
-    private static bool IsDroppableTarget(RowBackground item)
-        => item is RowListItem or RowCaptionListItem && !item.IsDisposed && item.Visible;
-
-    /// <summary>
-    /// Erstes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
-    /// ab <paramref name="fromIndex"/> oder null.
-    /// </summary>
-    private RowBackground? FirstDroppableViewItem(int fromIndex) {
-        for (var i = Math.Max(0, fromIndex); i < _sortedViewItems.Count; i++) {
-            if (IsDroppableTarget(_sortedViewItems[i])) { return _sortedViewItems[i]; }
-        }
-        return null;
-    }
-
-    /// <summary>
-    /// Letztes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
-    /// oder null.
-    /// </summary>
-    private RowBackground? LastDroppableViewItem() {
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
-            if (IsDroppableTarget(_sortedViewItems[i])) { return _sortedViewItems[i]; }
-        }
-        return null;
+        return EnsureValidChapterInsertIndex(_sortedViewItems.Count, draggedChapter);
     }
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
@@ -3912,58 +3972,69 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
         if (sourceRows.Count == 0) { return; }
 
-        // Alle Zeilen in der aktuellen Sortierung sammeln
-        var sortedRows = SortUsed()?.SortedRows(tb.Row) ?? [.. tb.Row];
-        if (sortedRows.Count == 0) { return; }
+        // Alle CellSets in dieser Methode gebündelt feuern (Kapitel-Update +
+        // Neu-Nummerierung). Ohne Suppression löst JEDER CellSet synchron
+        // Cell_CellValueChanged aus — mit CurrentArrangement-Zugriff,
+        // ComputeAllColumnPositions, Invalidate_AllViewItems usw. Bei N Zeilen
+        // entstehen N teure Voll-Layouts hintereinander. ResumeEvents feuert
+        // einmalig ViewChanged → ein einziger Aufbau am Ende.
+        tb.SuppressEvents();
+        try {
+            // Alle Zeilen in der aktuellen Sortierung sammeln
+            var sortedRows = SortUsed()?.SortedRows(tb.Row) ?? [.. tb.Row];
+            if (sortedRows.Count == 0) { return; }
 
-        // Quell-Zeilen aus der Liste entfernen
-        foreach (var sr in sourceRows) {
-            if (sr is { IsDisposed: false }) { sortedRows.Remove(sr); }
-        }
-
-        // Einfüge-Position in der sortierten Liste bestimmen.
-        // insertIndex ist ein Index in _sortedViewItems (Header + Zeilen).
-        // Die Ziel-Position ist "vor" der ersten Zeile (RowListItem) ab
-        // insertIndex — ein Header als Drop-Ziel bedeutet "erste Zeile unter
-        // diesem Kapitel".
-        RowItem? targetRow = null;
-        for (var i = Math.Max(0, insertIndex); i < _sortedViewItems.Count; i++) {
-            if (_sortedViewItems[i] is RowListItem tRli && tRli.Row is { IsDisposed: false }) {
-                targetRow = tRli.Row;
-                break;
+            // Quell-Zeilen aus der Liste entfernen
+            foreach (var sr in sourceRows) {
+                if (sr is { IsDisposed: false }) { sortedRows.Remove(sr); }
             }
-        }
 
-        var targetIndexInSorted = targetRow is null ? sortedRows.Count : sortedRows.IndexOf(targetRow);
-        if (targetIndexInSorted < 0) { targetIndexInSorted = sortedRows.Count; }
+            // Einfüge-Position in der sortierten Liste bestimmen.
+            // insertIndex ist ein Index in _sortedViewItems (Header + Zeilen).
+            // Die Ziel-Position ist "vor" der ersten Zeile (RowListItem) ab
+            // insertIndex — ein Header als Drop-Ziel bedeutet "erste Zeile unter
+            // diesem Kapitel".
+            RowItem? targetRow = null;
+            for (var i = Math.Max(0, insertIndex); i < _sortedViewItems.Count; i++) {
+                if (_sortedViewItems[i] is RowListItem tRli && tRli.Row is { IsDisposed: false }) {
+                    targetRow = tRli.Row;
+                    break;
+                }
+            }
 
-        // Kapitel-Aktualisierung nur bei Einzelzeilen-Verschiebung.
-        // Bei einem Kapitel-Block (isChapterBlock) behalten alle Zeilen ihr Kapitel.
-        if (!isChapterBlock && sourceRows.Count == 1 && sourceRows[0] is { IsDisposed: false } singleRow) {
-            RowListItem? singleRli = null;
-            for (var i = 0; i < _cachedRowViewItems.Count; i++) {
-                if (_cachedRowViewItems[i].Row == singleRow) { singleRli = _cachedRowViewItems[i]; break; }
-            }
-            if (singleRli is { IsDisposed: false }) {
-                UpdateChapterOnRowSortMove(singleRli, mouseControlY);
-            }
-        }
+            var targetIndexInSorted = targetRow is null ? sortedRows.Count : sortedRows.IndexOf(targetRow);
+            if (targetIndexInSorted < 0) { targetIndexInSorted = sortedRows.Count; }
 
-        // Quell-Zeilen als zusammenhängenden Block an der neuen Position einfügen
-        foreach (var sr in sourceRows) {
-            if (sr is { IsDisposed: false }) {
-                sortedRows.Insert(Math.Min(targetIndexInSorted, sortedRows.Count), sr);
-                targetIndexInSorted++;
+            // Kapitel-Aktualisierung nur bei Einzelzeilen-Verschiebung.
+            // Bei einem Kapitel-Block (isChapterBlock) behalten alle Zeilen ihr Kapitel.
+            if (!isChapterBlock && sourceRows.Count == 1 && sourceRows[0] is { IsDisposed: false } singleRow) {
+                RowListItem? singleRli = null;
+                for (var i = 0; i < _cachedRowViewItems.Count; i++) {
+                    if (_cachedRowViewItems[i].Row == singleRow) { singleRli = _cachedRowViewItems[i]; break; }
+                }
+                if (singleRli is { IsDisposed: false }) {
+                    UpdateChapterOnRowSortMove(singleRli, mouseControlY);
+                }
             }
-        }
 
-        // Alle Zeilen neu nummerieren
-        var nr = 1;
-        foreach (var thisRow in sortedRows) {
-            if (thisRow is { IsDisposed: false }) {
-                thisRow.CellSet(sortCol, nr, "Drag/Drop Sortierung");
-                nr++;
+            // Quell-Zeilen als zusammenhängenden Block an der neuen Position einfügen
+            foreach (var sr in sourceRows) {
+                if (sr is { IsDisposed: false }) {
+                    sortedRows.Insert(Math.Min(targetIndexInSorted, sortedRows.Count), sr);
+                    targetIndexInSorted++;
+                }
             }
+
+            // Alle Zeilen neu nummerieren
+            var nr = 1;
+            foreach (var thisRow in sortedRows) {
+                if (thisRow is { IsDisposed: false }) {
+                    thisRow.CellSet(sortCol, nr, "Drag/Drop Sortierung");
+                    nr++;
+                }
+            }
+        } finally {
+            tb.ResumeEvents();
         }
     }
 
@@ -4113,6 +4184,36 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    /// <summary>
+    /// Korrigiert den Einfüge-Index beim Verschieben eines Kapitel-Blocks
+    /// (<see cref="RowCaptionListItem"/>). Der direkte Vorgänger der Zielposition
+    /// muss entweder eine feste Y-Position haben
+    /// (<see cref="RowBackground.IgnoreYOffset"/> — z. B. Spaltenkopf,
+    /// Neue-Zeile-Eintrag), ein <see cref="RowListItem"/> oder ein
+    /// <see cref="RowCaptionListItem"/> mit derselben Überschrift wie
+    /// <paramref name="draggedChapter"/> sein. Ein Kapitel-Header mit anderer
+    /// Überschrift als direkter Vorgänger ist verboten — der einzufügende
+    /// Kapitel-Header würde sonst einen leeren Block direkt unter einem anderen
+    /// Header erzeugen. Gleichnamige Kapitel dürfen jedoch direkt aufeinander
+    /// folgen (sie verschmelzen zu einem gemeinsamen Block). Die Position wird
+    /// dafür solange nach oben verschoben, bis ein gültiger Vorgänger gefunden
+    /// ist (bzw. der Listenanfang erreicht ist). Ist <paramref name="draggedChapter"/>
+    /// null (kein Kapitel-Block wird verschoben), wird <paramref name="index"/>
+    /// unverändert zurückgegeben.
+    /// </summary>
+    private int EnsureValidChapterInsertIndex(int index, RowCaptionListItem? draggedChapter) {
+        if (draggedChapter is null) { return index; }
+
+        while (index > 0) {
+            var predecessor = _sortedViewItems[index - 1];
+            if (predecessor.IgnoreYOffset || predecessor is RowListItem) { break; }
+            if (predecessor is RowCaptionListItem predChapter
+                && string.Equals(predChapter.ChapterText, draggedChapter.ChapterText, StringComparison.OrdinalIgnoreCase)) { break; }
+            index--;
+        }
+        return index;
+    }
+
     private bool EnsureVisible(RowBackground? rowdata) {
         if (rowdata is not RowListItem rli) { return false; }
 
@@ -4163,6 +4264,26 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void FilterCombined_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
 
+    /// <summary>
+    /// Filtert die übergebenen Zeilen auf solche, die per Drag/Drop verschoben
+    /// werden dürfen: nicht disposed, nicht angepinnt und editierbar.
+    /// </summary>
+    private List<RowItem> FilterDraggableRows(IEnumerable<RowItem> rows) {
+        var result = new List<RowItem>();
+        if (Table is not { IsDisposed: false } tb) { return result; }
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return result; }
+
+        foreach (var br in rows) {
+            if (br is { IsDisposed: false }
+                && !PinnedRows.Contains(br)
+                && string.IsNullOrEmpty(CellCollection.IsCellEditable(sortCol, br, br.ChunkValue))) {
+                result.Add(br);
+            }
+        }
+
+        return result;
+    }
+
     private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
     /// <summary>
@@ -4210,23 +4331,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     /// <summary>
-    /// Filtert die übergebenen Zeilen auf solche, die per Drag/Drop verschoben
-    /// werden dürfen: nicht disposed, nicht angepinnt und editierbar.
+    /// Erstes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
+    /// ab <paramref name="fromIndex"/> oder null.
     /// </summary>
-    private List<RowItem> FilterDraggableRows(IEnumerable<RowItem> rows) {
-        var result = new List<RowItem>();
-        if (Table is not { IsDisposed: false } tb) { return result; }
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return result; }
-
-        foreach (var br in rows) {
-            if (br is { IsDisposed: false }
-                && !PinnedRows.Contains(br)
-                && string.IsNullOrEmpty(CellCollection.IsCellEditable(sortCol, br, br.ChunkValue))) {
-                result.Add(br);
-            }
+    private RowBackground? FirstDroppableViewItem(int fromIndex) {
+        for (var i = Math.Max(0, fromIndex); i < _sortedViewItems.Count; i++) {
+            if (IsDroppableTarget(_sortedViewItems[i])) { return _sortedViewItems[i]; }
         }
-
-        return result;
+        return null;
     }
 
     /// <summary>
@@ -4238,38 +4350,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         switch (item) {
             case RowItem r:
                 return r.IsDisposed ? [] : FilterDraggableRows([r]);
+
             case RowCaptionListItem rcli:
                 return GetChapterBlockRows(rcli) is { } blockRows ? FilterDraggableRows(blockRows) : [];
+
             default:
                 return [];
         }
-    }
-
-    /// <summary>
-    /// Sucht den ersten und letzten Index in <see cref="_sortedViewItems"/>,
-    /// dessen Row in <paramref name="srcRows"/> enthalten ist. Wird ein
-    /// Kapitel-Block verschoben, gehört der Header (<see cref="RowCaptionListItem"/>
-    /// aus <see cref="_dragItem"/>) ebenfalls zum Quell-Bereich.
-    /// </summary>
-    private (int firstIdx, int lastIdx) SourceIndexRange(List<RowItem> srcRows) {
-        var first = -1;
-        var last = -1;
-
-        // Bei einem Kapitel-Block-Drag gehört der Header ebenfalls zum
-        // Quell-Bereich — er verbraucht einen eigenen Index in _sortedViewItems.
-        if (_dragItem is RowCaptionListItem rcli) {
-            var capIdx = _sortedViewItems.IndexOf(rcli);
-            if (capIdx >= 0) { first = capIdx; }
-        }
-
-        for (var i = 0; i < _sortedViewItems.Count; i++) {
-            if (_sortedViewItems[i] is RowListItem rli && srcRows.Contains(rli.Row)) {
-                if (first < 0 || i < first) { first = i; }
-                if (i > last) { last = i; }
-            }
-        }
-
-        return (first, last);
     }
 
     /// <summary>
@@ -4372,18 +4459,29 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return null;
     }
 
+    /// <summary>
+    /// Letztes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
+    /// oder null.
+    /// </summary>
+    private RowBackground? LastDroppableViewItem() {
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            if (IsDroppableTarget(_sortedViewItems[i])) { return _sortedViewItems[i]; }
+        }
+        return null;
+    }
+
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 
     //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                        // Bestehenden Code belassen
-                        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                            // Bestehenden Code belassen
+                            FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() =>
-                        // Bestehenden Code belassen
-                        PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+                            // Bestehenden Code belassen
+                            PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -4545,6 +4643,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return new RowSortDefinition(tb, sortCol, false);
         }
         return _sortDefinitionTemporary ?? Table?.SortDefinition;
+    }
+
+    /// <summary>
+    /// Sucht den ersten und letzten Index in <see cref="_sortedViewItems"/>,
+    /// dessen Row in <paramref name="srcRows"/> enthalten ist. Wird ein
+    /// Kapitel-Block verschoben, gehört der Header (<see cref="RowCaptionListItem"/>
+    /// aus <see cref="_dragItem"/>) ebenfalls zum Quell-Bereich.
+    /// </summary>
+    private (int firstIdx, int lastIdx) SourceIndexRange(List<RowItem> srcRows) {
+        var first = -1;
+        var last = -1;
+
+        // Bei einem Kapitel-Block-Drag gehört der Header ebenfalls zum
+        // Quell-Bereich — er verbraucht einen eigenen Index in _sortedViewItems.
+        if (_dragItem is RowCaptionListItem rcli) {
+            var capIdx = _sortedViewItems.IndexOf(rcli);
+            if (capIdx >= 0) { first = capIdx; }
+        }
+
+        for (var i = 0; i < _sortedViewItems.Count; i++) {
+            if (_sortedViewItems[i] is RowListItem rli && srcRows.Contains(rli.Row)) {
+                if (first < 0 || i < first) { first = i; }
+                if (i > last) { last = i; }
+            }
+        }
+
+        return (first, last);
     }
 
     private void Table_InvalidateView(object? sender, System.EventArgs e) {

@@ -76,12 +76,12 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
         }
     }
 
-    public EditorMode Mode { get; set; } = EditorMode.EditItem;
-
     public ReadOnlyCollection<string> Kontextmenu_Skripte {
         get => _cvc?.Kontextmenu_Skripte ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.Kontextmenu_Skripte = value; WriteBack(); } }
     }
+
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => _cvc?.PermissionGroups_Show ?? _emptyStrings;
@@ -103,6 +103,11 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
         set { if (_cvc is { } cvc) { cvc.ShowHead = value; WriteBack(); } }
     }
 
+    public bool StartCollapsed {
+        get => _cvc?.StartCollapsed ?? false;
+        set { if (_cvc is { } cvc) { cvc.StartCollapsed = value; WriteBack(); } }
+    }
+
     public EditorMode SupportedModes => EditorMode.EditItem;
 
     #endregion
@@ -110,23 +115,6 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
     #region Methods
 
     public object? CreateNewItem() => null;
-
-    /// <summary>
-    /// Schreibt die bearbeitete Ansicht in <see cref="Table.ColumnArrangements" />
-    /// zurück. Ansichten werden als serialisierte Daten verwaltet und beim
-    /// Editieren über <see cref="ColumnViewCollection.ParseAll" /> als Arbeitskopie
-    /// erzeugt. Ohne diesen Rückgriff wären alle Änderungen verloren.
-    /// </summary>
-    private void WriteBack() {
-        if (_cvc is not { Table: { IsDisposed: false } tb } cvc) { return; }
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        var idx = tcvc.FindIndex(c => string.Equals(c.KeyName, cvc.KeyName, StringComparison.OrdinalIgnoreCase));
-        if (idx < 0) { return; }
-
-        tcvc[idx] = cvc;
-        tb.ColumnArrangements = tcvc.AsReadOnly();
-    }
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         if (_cvc is not { Table: { IsDisposed: false } tb }) { return []; }
@@ -181,12 +169,30 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
             new FlexiControlForProperty<ScaleToFitMode>(() => ScaleToFit, ItemsOf(typeof(ScaleToFitMode))),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => ChapterColumn, chapterColumns),
+            new FlexiControlForProperty<bool>(() => StartCollapsed),
             new FlexiControlForProperty<string>(() => QuickInfo, 3),
             filterCtrl,
             scriptCtrl,
             contextCtrl,
             permissionCtrl,
         ];
+    }
+
+    /// <summary>
+    /// Schreibt die bearbeitete Ansicht in <see cref="Table.ColumnArrangements" />
+    /// zurück. Ansichten werden als serialisierte Daten verwaltet und beim
+    /// Editieren über <see cref="ColumnViewCollection.ParseAll" /> als Arbeitskopie
+    /// erzeugt. Ohne diesen Rückgriff wären alle Änderungen verloren.
+    /// </summary>
+    private void WriteBack() {
+        if (_cvc is not { Table: { IsDisposed: false } tb } cvc) { return; }
+
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        var idx = tcvc.FindIndex(c => string.Equals(c.KeyName, cvc.KeyName, StringComparison.OrdinalIgnoreCase));
+        if (idx < 0) { return; }
+
+        tcvc[idx] = cvc;
+        tb.ColumnArrangements = tcvc.AsReadOnly();
     }
 
     #endregion

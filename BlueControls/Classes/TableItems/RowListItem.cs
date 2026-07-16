@@ -302,11 +302,14 @@ public sealed class RowListItem : RowBackground {
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (Column is null) { return; }
 
-        //var stat = States.Standard;
-        //if (Focused()) { stat = States.Standard_HasFocus; }
+        // positionControl ist bereits um den Indent nach rechts verschoben
+        // (controlIndented). Der Cursor-Rahmen soll die gesamte Zeile von ganz
+        // links bis ganz rechts umfassen — daher den Indent-Offset wieder
+        // zur Breite addieren.
+        var indentOffset = IndentWidth.CanvasToControl(zoom) * Indent;
         var _tmpCursorRect = positionControl.ToRect();
         var pen = BorderDraw.GetPen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180), 1);
-        lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1)); }
+        lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + indentOffset + 2, _tmpCursorRect.Height - 1)); }
     }
 
     private string BuildColumnWidthsKey(int canvasTotalWidth) {

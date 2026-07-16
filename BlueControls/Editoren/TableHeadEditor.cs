@@ -545,7 +545,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         var hasSortIndex = tb.Column.SysRowSortIndex is { IsDisposed: false };
-        btnCustomSortEnable.Enabled = !hasSortIndex;
+        // Bei TableChunk ist die benutzerdefinierte Sortierung nicht erlaubt,
+        // da die Zeilen über Row-Chunks verteilt sind und keine durchgehende
+        // Sortiernummer pflegen können.
+        var sortActivatable = tb is not TableChunk;
+        btnCustomSortEnable.Enabled = sortActivatable && !hasSortIndex;
         btnCustomSortDisable.Enabled = hasSortIndex;
         rowSortDefinitionEditor.Enabled = !hasSortIndex;
 

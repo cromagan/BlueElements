@@ -116,15 +116,19 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
     /// <summary>
     /// Ermittelt die Spalten, in denen Ersetzungen durchgeführt werden sollen.
     /// Entweder nur die aktuell gewählte Spalte oder alle änderbaren Spalten.
+    /// Die SYS_ROWSORTINDEX-Spalte wird niemals einbezogen, da sie die
+    /// benutzerdefinierte Sortierung enthält und ausschließlich über Drag/Drop
+    /// verändert wird.
     /// </summary>
     private List<ColumnItem> CollectTargetColumns(Table tb) {
+        var sysSortIndex = tb.Column.SysRowSortIndex;
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_tableView?.CursorPosColumn?.Column is { IsDisposed: false } column) {
+            if (_tableView?.CursorPosColumn?.Column is { IsDisposed: false } column && column != sysSortIndex) {
                 return [column];
             }
             return [];
         }
-        return [.. tb.Column.Where(c => c?.CanBeChangedByRules() == true)];
+        return [.. tb.Column.Where(c => c?.CanBeChangedByRules() == true && c != sysSortIndex)];
     }
 
     /// <summary>
@@ -186,19 +190,28 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         var replaceCount = 0;
         var progress = Progressbar.Show("Ersetze...", targetRows.Count);
 
-        for (var i = 0; i < targetRows.Count; i++) {
-            progress.Update(i + 1);
+        // Jeder CellSet löst synchron Events aus, die die UI neu aufbauen.
+        // Bei vielen Ersetzungen entsteht pro Zelle ein voller Layout-Durchlauf.
+        // SuppressEvents hält die Events zurück, ResumeEvents macht am Ende
+        // einmalig den Aufbau.
+        tb.SuppressEvents();
+        try {
+            for (var i = 0; i < targetRows.Count; i++) {
+                progress.Update(i + 1);
 
-            foreach (var column in columns) {
-                var originalText = targetRows[i].CellGetString(column);
-                if (!MatchesSearchCriteria(originalText, suchText)) { continue; }
+                foreach (var column in columns) {
+                    var originalText = targetRows[i].CellGetString(column);
+                    if (!MatchesSearchCriteria(originalText, suchText)) { continue; }
 
-                var newText = ComputeReplacementText(originalText, suchText, ersetzText);
-                if (newText == originalText) { continue; }
+                    var newText = ComputeReplacementText(originalText, suchText, ersetzText);
+                    if (newText == originalText) { continue; }
 
-                replaceCount++;
-                targetRows[i].CellSet(column, newText, "Suchen und Ersetzen");
+                    replaceCount++;
+                    targetRows[i].CellSet(column, newText, "Suchen und Ersetzen");
+                }
             }
+        } finally {
+            tb.ResumeEvents();
         }
 
         progress.Close();

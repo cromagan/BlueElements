@@ -21,6 +21,7 @@ namespace BlueControls.Controls {
             this.btnAlleFilterAus = new BlueControls.Controls.Button();
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
+            this.btnCollapseChapters = new BlueControls.Controls.Button();
             this.btnViewManager = new BlueControls.Controls.Button();
             this.TableInternal = new BlueControls.Controls.TableView();
             this.grpBorder = new BlueControls.Controls.GroupBox();
@@ -82,14 +83,24 @@ namespace BlueControls.Controls {
             this.btnPinZurück.TabIndex = 54;
             this.btnPinZurück.Click += new System.EventHandler(this.btnPinZurück_Click);
             // 
+            // btnCollapseChapters
+            // 
+            this.btnCollapseChapters.ImageCode = "Gruppe|16";
+            this.btnCollapseChapters.Location = new System.Drawing.Point(368, 8);
+            this.btnCollapseChapters.Name = "btnCollapseChapters";
+            this.btnCollapseChapters.QuickInfo = "Alle Kapitel auf- oder zuklappen";
+            this.btnCollapseChapters.Size = new System.Drawing.Size(24, 24);
+            this.btnCollapseChapters.TabIndex = 56;
+            this.btnCollapseChapters.Click += new System.EventHandler(this.btnCollapseChapters_Click);
+            // 
             // btnViewManager
             // 
             this.btnViewManager.ImageCode = "Stern|18";
-            this.btnViewManager.Location = new System.Drawing.Point(368, 8);
+            this.btnViewManager.Location = new System.Drawing.Point(400, 8);
             this.btnViewManager.Name = "btnViewManager";
             this.btnViewManager.QuickInfo = "Gespeicherte Ansichten";
             this.btnViewManager.Size = new System.Drawing.Size(24, 24);
-            this.btnViewManager.TabIndex = 55;
+            this.btnViewManager.TabIndex = 57;
             this.btnViewManager.Click += new System.EventHandler(this.btnViewManager_Click);
             // 
             // TableInternal
@@ -120,6 +131,7 @@ namespace BlueControls.Controls {
             this.grpFilter.Controls.Add(this.btnPin);
             this.grpFilter.Controls.Add(this.btnAlleFilterAus);
             this.grpFilter.Controls.Add(this.btnPinZurück);
+            this.grpFilter.Controls.Add(this.btnCollapseChapters);
             this.grpFilter.Controls.Add(this.btnViewManager);
             this.grpFilter.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RoundRect;
             this.grpFilter.Location = new System.Drawing.Point(8, 8);
@@ -152,6 +164,7 @@ namespace BlueControls.Controls {
         private Button btnAlleFilterAus;
         private Button btnPin;
         private Button btnPinZurück;
+        private Button btnCollapseChapters;
         private Button btnViewManager;
         private TableView TableInternal;
         private GroupBox grpBorder;

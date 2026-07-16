@@ -109,22 +109,6 @@ Diese Klassen sind die bevorzugten Einstiegspunkte für gängige Aufgaben. Niema
 | **JsonExtensions.cs** | `JsonObject`, `JsonElement` | `GetBool()`, `GetInt()`, `GetString()`, `IsArray()`, `IsObject()` |
 | **ByteArrayExtension.cs** | `byte[]` | `IsZipped()`, `UnzipIt()`, `ZipIt()` |
 
-## Wichtige Hilfsklassen (andere Projekte)
-
-| Klasse | Projekt | Zweck |
-|--------|---------|-------|
-| **`Skin`** | BlueControls | Zentrales Theming: `Draw_Back()`, `Draw_Border()`, `Draw_FormatedText()`. Alle Zeichenoperationen in Controls laufen über Skin. |
-| **`BlueFont`** | BlueControls | Schriftverwaltung mit Caching: `Get()`, `GetBrush()`, `GetPen()`, `MeasureString()`. |
-| **`FormManager`** | BlueControls | Verwaltet alle offenen Formulare: `Forms`, `CloseAllForms()`, `GetFormByType<T>()`. |
-| **`Form`** | BlueControls | **Basisklasse für alle Formulare** (erbt `System.Windows.Forms.Form`, erzwingt `AutoScaleMode.None`). |
-| **`FloatingForm`** | BlueControls | Leichtgewichtiges Popup für Tooltips und Benachrichtigungen. |
-| **`Table`** | BlueTable | In-Memory-Tabelle: `Get()` (Singleton pro Key), `Save()`, `Load()`, Zellzugriff, Filter, Sortierung. |
-| **`CsvHelper`** | BlueTable | CSV-Import/Export: `ExportCSV()`, `ImportCSV()`. |
-| **`LanguageTool`** | BlueTable | Übersetzungssystem: `DoTranslate()`, `TranslateEnglish()`, `TranslateGerman()`. |
-| **`Script`** | BlueScript | Skript-Ausführung: `Start()`, `Execute()`, `ParseLine()`. |
-| **`VariableCollection`** | BlueScript | Skript-Variablen-Container: `Get()`, `Add()`, `Remove()`, `Exists()`. |
-| **`ParseableItem`** | BlueBasics | Abstrakte Basisklasse für serialisierbare Items: `NewByParsing<T>()`, `ICloneable`. |
-
 ## Verhalten bei Verbesserungsvorschlägen
 
 Wenn du während einer Sitzung eine Rückmeldung zum Stil, zu Konventionen oder zu Patterns erhältst (z.B. Code-Formatierung, Namenskonventionen, Architektur-Patterns), dann **nicht sofort übernehmen**. Stattdessen als ERSTES eine Frage mit Auswahlmöglichkeiten stellen, z.B.:
@@ -138,7 +122,9 @@ Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage
 
 ## GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!
-Nutze NIEMALS den Stash! Damkit machst du meine paralelle Arbeit kaputt. Lieber beende deine Arbeit und frage nach!
+Nutze NIEMALS den Stash! Damit machst du meine paralelle Arbeit kaputt. Lieber beende deine Arbeit und frage nach!
+Du darfst ohne meine Erlaubniss auch nicht im Git nachschauen. Du solltst die Aufgaben mit Logik lösen
+Kurzgesagt: Alle GIT Befehle sind für dich tabu, außer ich erlaube es dir. Du darfst mich aber um Erlaubniss fragen.
 
 ## Ratlos
 Wenn du ratlos bist, frage den User, ob du Develop.Diagnose Aufrufe einbauen sollst - und DiagFlag auf true setzen.

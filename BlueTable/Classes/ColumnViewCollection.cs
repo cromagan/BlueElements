@@ -67,6 +67,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public bool ShowHead { get; set; } = true;
 
+    /// <summary>
+    /// Wenn true, klappt die TableView beim Umschalten auf diese Ansicht
+    /// alle Kapitelüberschriften ein.
+    /// </summary>
+    public bool StartCollapsed { get; set; }
+
     public Table? Table {
         get;
         private set {
@@ -216,6 +222,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
+        result.ParseableAdd("StartCollapsed", StartCollapsed);
         result.ParseableAdd("ScaleToFit", ScaleToFit);
 
         result.ParseableAdd("FilterRows", FilterRows);
@@ -299,6 +306,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "showhead":
                 ShowHead = value.FromPlusMinus();
+                return true;
+
+            case "startcollapsed":
+                StartCollapsed = value.FromPlusMinus();
                 return true;
 
             case "fillwidth":

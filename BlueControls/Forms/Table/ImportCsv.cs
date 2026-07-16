@@ -76,8 +76,16 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
         }
         var m = "Tabellen-Fehler";
 
-        if (Table is { IsDisposed: false }) {
-            m = Table.ImportCsv(_originalImportText, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
+        if (Table is { IsDisposed: false } tb) {
+            // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
+            // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.
+            // SuppressEvents bündelt sie, ResumeEvents macht am Ende einen Aufbau.
+            tb.SuppressEvents();
+            try {
+                m = tb.ImportCsv(_originalImportText, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
+            } finally {
+                tb.ResumeEvents();
+            }
         }
 
         if (!string.IsNullOrEmpty(m)) {

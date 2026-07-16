@@ -143,41 +143,51 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
         var error = string.Empty;
 
-        foreach (var thisR in r) {
-            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
+        // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events
+        // (CellSet + Remove). Bei vielen Gruppen baut sich die UI wiederholt
+        // auf. SuppressEvents bündelt alles, ResumeEvents macht am Ende einen
+        // einzigen Aufbau. Die frühen `return` im Loop werden über finally
+        // sicher wieder freigegeben.
+        tb.SuppressEvents();
+        try {
+            foreach (var thisR in r) {
+                if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
 
-                #region Filtercol erstellen
+                    #region Filtercol erstellen
 
-                var f = new FilterCollection(tb, "Dupe Suche");
+                    var f = new FilterCollection(tb, "Dupe Suche");
 
-                foreach (var thisc in columns) {
-                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
-                }
+                    foreach (var thisc in columns) {
+                        f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                    }
 
-                #endregion
+                    #endregion
 
-                #region Zeilen ermitteln (rows)
+                    #region Zeilen ermitteln (rows)
 
-                var rows = f.Rows.Intersect(r).ToList();
+                    var rows = f.Rows.Intersect(r).ToList();
 
-                #endregion
+                    #endregion
 
-                if (rows.Count > 1) {
-                    if (optFülle.Checked) {
-                        error = tb.Row.Combine(rows).FailedReason;
-                    } else if (optLöschen.Checked) {
-                        error = tb.Row.RemoveYoungest(rows, false).FailedReason;
-                    } else {
-                        MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
+                    if (rows.Count > 1) {
+                        if (optFülle.Checked) {
+                            error = tb.Row.Combine(rows).FailedReason;
+                        } else if (optLöschen.Checked) {
+                            error = tb.Row.RemoveYoungest(rows, false).FailedReason;
+                        } else {
+                            MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
+                            return;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(error)) {
+                        MessageBox.Show($"Abbruch:\r\n{error}", ImageCode.Information, "OK");
                         return;
                     }
                 }
-
-                if (!string.IsNullOrEmpty(error)) {
-                    MessageBox.Show($"Abbruch:\r\n{error}", ImageCode.Information, "OK");
-                    return;
-                }
             }
+        } finally {
+            tb.ResumeEvents();
         }
     }
 
