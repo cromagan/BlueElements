@@ -638,7 +638,7 @@ public static class IO {
         // Wildcards (*) werden nicht unterstützt, stattdessen erfolgt
         // ein einfacher Teilstring-Abgleich (Instr) gegen den relativen Pfad.
         var ignorePatterns = new List<string>();
-        if (ignore != null) {
+        if (ignore is not null) {
             foreach (var p in ignore) {
                 ignorePatterns.Add(p.Replace('/', '\\'));
             }
@@ -677,7 +677,7 @@ public static class IO {
             Develop.Message(ErrorType.Info, null, "Datei synchronisieren", ImageCode.Datei, $"Synchronisiere {t} von {sourceFiles.Length}: {newFile.FileNameWithoutSuffix()}", 0);
             Develop.DoEvents();
 
-            if (sf != null && (nf == null ||
+            if (sf is not null && (nf is null ||
                 nf.Length != sf.Length ||
                 nf.LastWriteTime.Ticks != sf.LastWriteTime.Ticks)) {
                 if (DeleteFile(newFile, 60)) {

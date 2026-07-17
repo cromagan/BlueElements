@@ -17,8 +17,8 @@ public class ColumnFormatHolder_Bit : ColumnFormatHolder {
         EditableWithTextInput = false;
         DropDownItems = new(["+", "-"]);
         ShowValuesOfOtherCellsInDropdown = true;
-        DefaultRenderer = "ImageAndText";
-        RendererSettings = "{ClassId=\"ImageAndText\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}";
+        DefaultRenderer = "Bool";
+        RendererSettings = "{ClassId=\"Bool\"}";
     }
 
     #endregion
