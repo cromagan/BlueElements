@@ -155,37 +155,19 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     #region Methods
 
     /// <summary>
-    /// Erzeugt eine Spalte aus ihrer serialisierten Form. Erkennt virtuelle
-    /// Spalten am <c>ColumnName</c>-Tag (VIR_-Schlüssel) und legt den
-    /// korrekten Typ über <see cref="CreateVirtual" /> an. Alle anderen
-    /// Einträge werden als echte Spalte (<see cref="ColumnItem" />) geladen.
+    /// Erzeugt ein <see cref="ColumnViewItem" /> aus serialisierten Daten.
+    /// Virtuelle Spalten (ColumnName = VIR_…) werden über ihren ClassId-Namen
+    /// als echter Subtyp rekonstruiert — ohne Parse, da Renderer, Caption,
+    /// FixedWidth usw. im Subtyp fest codiert sind und die serialisierten
+    /// Werte (ViewType, FontHorizontal) den Konstruktor-Defaults entsprechen.
+    /// Echte Spalten werden als Basis-<see cref="ColumnViewItem" /> geparst.
     /// </summary>
-    public static ColumnViewItem CreateFromParsed(Table? table, string toParse) {
-        if (toParse.GetAllTags() is { } tags) {
-            foreach (var t in tags) {
-                if (t.Key == "columnname" && CreateVirtual(t.Value) is { } virtualItem) {
-                    virtualItem.Parse(toParse);
-                    return virtualItem;
-                }
-            }
-        }
+    public static ColumnViewItem Create(Table? table, string toParse) {
+        var colName = toParse.GetAllTags()?
+            .Find(kv => kv.Key.Equals("columnname", StringComparison.OrdinalIgnoreCase)).Value;
 
-        return new ColumnViewItem(table, toParse);
+        return ParseableItem.NewByTypeName<ColumnViewItem>(colName) ?? new ColumnViewItem(table, toParse);
     }
-
-    /// <summary>
-    /// Erzeugt eine persistente virtuelle Spalte anhand ihres
-    /// <see cref="StorageKey" /> (z. B. "VIR_PIN"). Liefert null, wenn der
-    /// Schlüssel keiner virtuellen Spalte entspricht. Die Konstruktoren der
-    /// virtuellen Spalten sind intern; diese Fabrik ist der öffentliche
-    /// Einstiegspunkt für andere Assemblies.
-    /// </summary>
-    public static ColumnViewItem? CreateVirtual(string storageKey) => storageKey.ToUpperInvariant() switch {
-        "VIR_PIN" => new PinColumnItem(),
-        "VIR_NUMBER" => new NumberColumnItem(),
-        "VIR_ADD" => new AddColumnItem(),
-        _ => null
-    };
 
     /// <summary>
     /// Liefert den darzustellenden Wert dieser Spalte für die angegebene
@@ -231,10 +213,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         switch (key) {
             case "column":
             case "columnname":
-                // Virtuelle Spalten haben kein echtes ColumnItem — der
-                // ColumnName ist ihr VIR_-Schlüssel, keine Spalten-Suche.
-                if (StorageKey is not null) { return true; }
-
                 if (Table is not { IsDisposed: false } tb) {
                     Develop.DebugError("Tabelle unbekannt");
                     return false;

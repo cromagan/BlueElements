@@ -268,7 +268,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                AddParsed(ColumnViewItem.CreateFromParsed(Table, value.FromNonCritical()));
+                Add(ColumnViewItem.Create(Table, value.FromNonCritical()));
                 return true;
 
             case "chaptercolumn":
@@ -513,18 +513,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public override string ToString() => ParseableItems().FinishParseable();
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
-
-    /// <summary>
-    /// Fügt ein Element beim Parsen am Ende von <see cref="_internal"/> hinzu,
-    /// ohne Sortierung oder Positions-Berechnung. Dadurch wird die in der
-    /// Serialisierung gespeicherte Reihenfolge (einschließlich virtueller
-    /// Spalten) exakt wiederhergestellt.
-    /// </summary>
-    private void AddParsed(ColumnViewItem columnViewItem) {
-        columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-        _internal.Add(columnViewItem);
-        Invalidated = true;
-    }
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
