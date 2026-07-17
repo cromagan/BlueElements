@@ -22,7 +22,7 @@ public sealed class AddColumnItem : ColumnViewItem {
 
     #region Constructors
 
-    internal AddColumnItem() : base((Table?)null) {
+    public AddColumnItem() : base((Table?)null) {
         ViewType = ViewType.DummyColumn;
         IsExpanded = true;
     }
@@ -31,6 +31,8 @@ public sealed class AddColumnItem : ColumnViewItem {
 
     #region Properties
 
+    public static string ClassId => "VIR_ADD";
+
     public override string Caption => "Neue Spalte";
     public override int FixedWidth => Width;
 
@@ -38,7 +40,7 @@ public sealed class AddColumnItem : ColumnViewItem {
 
     public override string RendererSettings => "{ClassId=\"Bool\", SymbolTrue=CheckBox_Checked, SymbolFalse=CheckBox}";
 
-    public override string? StorageKey => "VIR_ADD";
+    public override string? StorageKey => AddColumnItem.ClassId;
 
     #endregion
 

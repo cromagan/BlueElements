@@ -16,11 +16,13 @@ public sealed class PinColumnItem : ColumnViewItem {
 
     #region Constructors
 
-    internal PinColumnItem() : base((Table?)null) { }
+    public PinColumnItem() : base((Table?)null) { }
 
     #endregion
 
     #region Properties
+
+    public static string ClassId => "VIR_PIN";
 
     public override string Caption => "Pin";
 
@@ -28,7 +30,7 @@ public sealed class PinColumnItem : ColumnViewItem {
 
     public override string? Renderer => "Bool";
     public override string RendererSettings => "{ClassId=\"Bool\", SymbolTrue=Checkbox_Checked, SymbolFalse=Checkbox}";
-    public override string? StorageKey => "VIR_PIN";
+    public override string? StorageKey => PinColumnItem.ClassId;
 
     #endregion
 

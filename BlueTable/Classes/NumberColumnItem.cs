@@ -15,11 +15,13 @@ public sealed class NumberColumnItem : ColumnViewItem {
 
     #region Constructors
 
-    internal NumberColumnItem() : base((Table?)null) { }
+    public NumberColumnItem() : base((Table?)null) { }
 
     #endregion
 
     #region Properties
+
+    public static string ClassId => "VIR_NUMBER";
 
     public override string Caption => "Zeile";
 
@@ -29,7 +31,7 @@ public sealed class NumberColumnItem : ColumnViewItem {
 
     public override string RendererSettings => "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding={-4, -2}}";
 
-    public override string? StorageKey => "VIR_NUMBER";
+    public override string? StorageKey => NumberColumnItem.ClassId;
 
     #endregion
 

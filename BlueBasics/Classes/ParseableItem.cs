@@ -93,13 +93,16 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Erstellt eine neue Instanz anhand des Typnamens.
+    /// Erstellt eine neue Instanz anhand des Typnamens. Gesucht wird über
+    /// die statische <c>ClassId</c>-Property des Zieltyps; <typeparamref name="T" />
+    /// muss daher nur ein Referenztyp mit einer solchen Property sein (ein
+    /// Bezug zu <see cref="ParseableItem" /> ist nicht erforderlich).
     /// </summary>
-    /// <typeparam name="T">Der Zieltyp, muss von ParseableItem erben.</typeparam>
+    /// <typeparam name="T">Der Zieltyp (Referenztyp) mit einer statischen ClassId-Property.</typeparam>
     /// <param name="typname">Der ClassId-String des gesuchten Typs.</param>
     /// <param name="args">Konstruktor-Argumente für den Zieltyp.</param>
     /// <returns>Eine neue Instanz oder null, wenn der Typ nicht gefunden wurde.</returns>
-    public static T? NewByTypeName<T>(string? typname, params object[] args) where T : ParseableItem {
+    public static T? NewByTypeName<T>(string? typname, params object[] args) where T : class {
         if (string.IsNullOrEmpty(typname)) { return null; }
         var types = Generic.GetEnumerableOfType<T>();
 

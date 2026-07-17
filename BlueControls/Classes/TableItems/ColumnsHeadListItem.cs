@@ -332,7 +332,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
             tb.Column.GenerateAndAddSystem(sysKey);
             if (tb.Column[sysKey] is { } sysCol) { newCol = new ColumnViewItem(sysCol); }
         } else if (key.StartsWith("VIRADD:", StringComparison.OrdinalIgnoreCase)) {
-            newCol = ColumnViewItem.CreateVirtual("VIR_" + key[7..].ToUpperInvariant());
+            newCol = ParseableItem.NewByTypeName<ColumnViewItem>("VIR_" + key[7..].ToUpperInvariant());
         } else if (key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase)) {
             var parts = key[7..].Split('|');
             if (parts.Length == 2) {
