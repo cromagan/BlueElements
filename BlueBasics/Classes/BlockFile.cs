@@ -102,6 +102,7 @@ public sealed class BlockFile {
             }
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Lesen der Blockdatei: " + blkName, ex);
+            DeleteFile(blkName, false);
         }
         return null;
     }

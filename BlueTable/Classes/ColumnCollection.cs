@@ -13,6 +13,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #region Fields
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
+
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -168,6 +169,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem() {
         string[] w = [
+            SystemColumnKeys.CellNote,
             SystemColumnKeys.RowKey,
             SystemColumnKeys.RowState,
             SystemColumnKeys.DateChanged,

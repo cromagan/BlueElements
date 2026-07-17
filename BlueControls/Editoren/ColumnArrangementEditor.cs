@@ -162,8 +162,6 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
         permissionCtrl.MoveAllowed = true;
 
         return [
-            new FlexiControlForDelegate(tb),
-            new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
             new FlexiControlForProperty<ColumnHeaderMode>(() => ColumnHeaderMode, ItemsOf(typeof(ColumnHeaderMode))),
             new FlexiControlForProperty<ScaleToFitMode>(() => ScaleToFit, ItemsOf(typeof(ScaleToFitMode))),
