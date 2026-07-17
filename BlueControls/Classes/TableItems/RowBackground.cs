@@ -350,9 +350,9 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
         var indentOffset = IndentWidth.CanvasToControl(zoom) * Indent;
 
         for (var du = 0; du < 2; du++) {
-            foreach (var viewItem in Arrangement) {
+            foreach (var viewItem in Arrangement.RenderingItems) {
                 if (DoSpezialOrder && (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1)) { continue; }
-                if (viewItem.Column is null && !viewItem.IsDummyColumn) { continue; }
+                if (!viewItem.IsOk()) { continue; }
 
                 var left = viewItem.ControlColumnLeft((int)offsetX) + indentOffset;
 

@@ -584,7 +584,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
         }
 
-        if (fehler ==  ChapterColumnMultilineWithRowSort) {
+        if (fehler == ChapterColumnMultilineWithRowSort) {
             solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 
@@ -637,7 +637,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (fehler == SortOnlyMultiline) {
             solutions.Add(CreateSolution("'Mehrzeilige Einträge sortieren' deaktivieren", () => btnAutoEditAutoSort.Checked = false, btnAutoEditAutoSort));
         }
-
 
         if (fehler == RelationRequiresMultiline) {
             solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => chkRelation.Checked = false, chkRelation));
@@ -787,9 +786,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             tb.RepairAfterParse();
             var tcvc = ColumnViewCollection.ParseAll(tb);
 
-            tcvc[1].Add(sp);
-            tcvc[1].Add(b);
-            tcvc[1].Add(info);
+            tcvc[1].Add(new ColumnViewItem(sp));
+            tcvc[1].Add(new ColumnViewItem(b));
+            tcvc[1].Add(new ColumnViewItem(info));
             tb.ColumnArrangements = tcvc.AsReadOnly();
 
             tb.SortDefinition = new RowSortDefinition(tb, sp, false);

@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable {
+public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable {
 
     #region Fields
 
@@ -26,7 +26,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnViewItem(Table? table, string toParse) : this(table) => this.Parse(toParse);
 
-    private ColumnViewItem(Table? parent) : base() {
+    protected ColumnViewItem(Table? parent) : base() {
         Table = parent;
         ViewType = ViewType.None;
         Column = null;
@@ -45,38 +45,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Properties
 
+    /// <summary>
+    /// Horizontale Ausrichtung des Zellinhalts. Echte Spalten liefern die
+    /// Ausrichtung ihres <see cref="ColumnItem" />; virtuelle Spalten
+    /// standardmäßig links. Renderer wie <c>Button</c> ignorieren die
+    /// Ausrichtung (sie zentrieren selbst).
+    /// </summary>
+    public virtual AlignmentHorizontal Align => Column?.Align ?? AlignmentHorizontal.Links;
+
     public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
-    public Color BackColor_ColumnCell {
-        get => Column is not null && field.IsMagentaOrTransparent() ? Column.BackColor : field;
-        set {
-            if (field.ToArgb() == value.ToArgb()) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = Color.Transparent;
+    public Color BackColor_ColumnCell => Column?.BackColor ?? Color.White;
 
-    //public Color BackColor_ColumnHead {
-    //    get => Column is not null && field.IsMagentaOrTransparent()
-    //            ? Column.BackColor.MixColor(Color.LightGray, 0.6)
-    //            : field;
-
-    //    set {
-    //        if (field.ToArgb() == value.ToArgb()) { return; }
-    //        field = value;
-    //        OnPropertyChanged();
-    //    }
-    //} = Color.Transparent;
-
-    //public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
-
-    public string Caption => IsDummyColumn ? "Neue Spalte" : Column?.Caption ?? "[Spalte]";
-
-    //public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
-
-    //public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
-
-    //public string CaptionGroup3 => Column?.CaptionGroup3 ?? string.Empty;
+    public virtual string Caption => Column?.Caption ?? "[Spalte]";
 
     public ColumnItem? Column {
         get;
@@ -90,14 +71,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    //public Color FontColor_Caption {
-    //    get => Column is not null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
-    //    set {
-    //        if (field.ToArgb() == value.ToArgb()) { return; }
-    //        field = value;
-    //        OnPropertyChanged();
-    //    }
-    //} = Color.Transparent;
+    public string? ColumnName => Column?.KeyName ?? StorageKey;
+
+    /// <summary>
+    /// Feste Canvas-Breite der Spalte. Echte Spalten (0) berechnen ihre Breite
+    /// aus dem Inhalt; virtuelle Spalten liefern hier ihre konstante Breite.
+    /// </summary>
+    public virtual int FixedWidth => 0;
 
     public bool Horizontal {
         get;
@@ -119,7 +99,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             field = value;
             OnPropertyChanged();
         }
-    }
+    } = true;
 
     public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.Dünn;
 
@@ -130,33 +110,32 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
     }
 
-    //public string Renderer {
-    //    get;
-    //    set {
-    //        if (field == value) { return; }
-    //        field = value;
-    //        OnPropertyChanged();
-    //    }
-    //} = string.Empty;
+    /// <summary>
+    /// Name des Renderers (ClassId, z. B. "Button" oder "TextOneLine").
+    /// Echte Spalten liefern den Namen ihres
+    /// <see cref="ColumnItem.DefaultRenderer" />; virtuelle Spalten
+    /// überschreiben dies mit ihrem festen Renderer-Namen. Wird für die
+    /// Serialisierung standardisiert gespeichert.
+    /// </summary>
+    public virtual string? Renderer => Column?.DefaultRenderer;
 
-    //public string RendererSettings {
-    //    get;
-    //    set {
-    //        if (field == value) { return; }
-    //        field = value;
-    //        OnPropertyChanged();
-    //    }
-    //} = string.Empty;
+    /// <summary>
+    /// Serialisierte Renderer-Einstellungen (z. B.
+    /// <c>{ClassId="Button",ShowPic=+}</c>). Echte Spalten liefern die
+    /// Einstellungen ihres <see cref="ColumnItem.RendererSettings" />;
+    /// virtuelle Spalten überschreiben dies mit ihren festen Einstellungen.
+    /// </summary>
+    public virtual string RendererSettings => Column?.RendererSettings ?? string.Empty;
 
-    //[DefaultValue(Win11)]
-    //public string SheetStyle {
-    //    get;
-    //    set {
-    //        if (field == value) { return; }
-    //        field = value;
-    //        OnPropertyChanged();
-    //    }
-    //} = Win11;
+    /// <summary>
+    /// Schlüssel, unter dem diese Spalte in der ColumnViewCollection
+    /// serialisiert wird. Echte Spalten (und on-demand virtuelle Spalten)
+    /// liefern null und werden nicht über einen eigenen Schlüssel gespeichert.
+    /// Persistente virtuelle Spalten liefern ihren VIR_-Schlüssel
+    /// (z. B. "VIR_PIN"); ihre bloße Anwesenheit in der Collection bedeutet
+    /// "sichtbar".
+    /// </summary>
+    public virtual string? StorageKey => null;
 
     public Table? Table { get; }
 
@@ -175,55 +154,92 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
-    public static ColumnViewItem CreateDummy() => new((Table?)null) {
-        ViewType = ViewType.DummyColumn,
-        IsExpanded = true
+    /// <summary>
+    /// Erzeugt eine Spalte aus ihrer serialisierten Form. Erkennt virtuelle
+    /// Spalten am <c>ColumnName</c>-Tag (VIR_-Schlüssel) und legt den
+    /// korrekten Typ über <see cref="CreateVirtual" /> an. Alle anderen
+    /// Einträge werden als echte Spalte (<see cref="ColumnItem" />) geladen.
+    /// </summary>
+    public static ColumnViewItem CreateFromParsed(Table? table, string toParse) {
+        if (toParse.GetAllTags() is { } tags) {
+            foreach (var t in tags) {
+                if (t.Key == "columnname" && CreateVirtual(t.Value) is { } virtualItem) {
+                    virtualItem.Parse(toParse);
+                    return virtualItem;
+                }
+            }
+        }
+
+        return new ColumnViewItem(table, toParse);
+    }
+
+    /// <summary>
+    /// Erzeugt eine persistente virtuelle Spalte anhand ihres
+    /// <see cref="StorageKey" /> (z. B. "VIR_PIN"). Liefert null, wenn der
+    /// Schlüssel keiner virtuellen Spalte entspricht. Die Konstruktoren der
+    /// virtuellen Spalten sind intern; diese Fabrik ist der öffentliche
+    /// Einstiegspunkt für andere Assemblies.
+    /// </summary>
+    public static ColumnViewItem? CreateVirtual(string storageKey) => storageKey.ToUpperInvariant() switch {
+        "VIR_PIN" => new PinColumnItem(),
+        "VIR_NUMBER" => new NumberColumnItem(),
+        "VIR_ADD" => new AddColumnItem(),
+        _ => null
     };
+
+    /// <summary>
+    /// Liefert den darzustellenden Wert dieser Spalte für die angegebene
+    /// Zeile. Echte Spalten delegieren an <see cref="RowItem.CellGetString(ColumnItem)" />;
+    /// virtuelle Spalten überschreiben dies, um ihren Wert zu berechnen
+    /// (z. B. Pin-Bildcode, Zeilennummer). Beim Zeichnen ist dies der
+    /// einzige Unterschied zwischen echten und virtuellen Spalten.
+    /// </summary>
+    public virtual string CellGetString(RowItem? row, bool isPinned) {
+        if (row is null || Column is not { IsDisposed: false }) { return string.Empty; }
+        return row.CellGetString(Column);
+    }
 
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    public string ErrorReason() {
+        if (IsDisposed) { return "Objekt verworfen"; }
+
+        if (Column is not { IsDisposed: false } && string.IsNullOrEmpty(StorageKey)) { return "Keine Spalte zugeordnet."; }
+        return string.Empty;
+    }
+
     public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
-        if (IsDummyColumn) { return []; }
         List<string> result = [];
         result.ParseableAdd("Type", ViewType);
-        result.ParseableAdd("ColumnName", Column);
-
-        //if (Column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
-        //    result.ParseableAdd("Renderer", Renderer);
-        //    result.ParseableAdd("RendererSettings", RendererSettings);
-        //}
-
-        //if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != BackColor_ColumnHead.ToArgb || !BackColor_ColumnCell.IsMagentaOrTransparent()) {
-        //    result.ParseableAdd("BackColorColumnHead", BackColor_ColumnHead);
-        //    result.ParseableAdd("BackColorColumnCell", BackColor_ColumnCell);
-        //}
-
-        //if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != FontColor_Caption.ToArgb || !FontColor_Caption.IsMagentaOrTransparent()) {
-        //    result.ParseableAdd("FontColorCaption", FontColor_Caption);
-        //}
-
+        result.ParseableAdd("ColumnName", ColumnName);
         result.ParseableAdd("FontHorizontal", Horizontal);
 
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+        if (Column is not null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
+    }
 
     public bool ParseThis(string key, string value) {
-        if (Table is not { IsDisposed: false } tb) {
-            Develop.DebugError("Tabelle unbekannt");
-            return false;
-        }
-
         switch (key) {
             case "column":
             case "columnname":
+                // Virtuelle Spalten haben kein echtes ColumnItem — der
+                // ColumnName ist ihr VIR_-Schlüssel, keine Spalten-Suche.
+                if (StorageKey is not null) { return true; }
+
+                if (Table is not { IsDisposed: false } tb) {
+                    Develop.DebugError("Tabelle unbekannt");
+                    return false;
+                }
+
                 Column = tb.Column[value];
                 return true;
 
@@ -232,28 +248,21 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             case "type":
                 ViewType = (ViewType)IntParse(value);
-                if (ViewType == ViewType.DummyColumn) { return true; }
-                if (Column is not null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
             case "renderer":
-                //Renderer = value;
                 return true;
 
             case "renderersettings":
-                //RendererSettings = value.FromNonCritical();
                 return true;
 
             case "backcolorcolumnhead":
-                //BackColor_ColumnHead = ColorParse(value);
                 return true;
 
             case "backcolorcolumncell":
-                //BackColor_ColumnCell = ColorParse(value);
                 return true;
 
             case "fontcolorcaption":
-                //FontColor_Caption = ColorParse(value);
                 return true;
 
             case "fonthorizontal":
@@ -264,7 +273,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return false;
     }
 
-    public string ReadableText() => IsDummyColumn ? "Neue Spalte" : Column?.ReadableText() ?? "?";
+    public string ReadableText() => Column?.ReadableText() ?? Caption;
 
     public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
 

@@ -30,10 +30,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Fields
 
-    public const string Angepinnt = "Angepinnt";
     public const string CellDataFormat = "BlueElements.CellLink";
+
+    /// <summary>
+    /// Interner Chapter-Marker für angepinnte Zeilen. Erzeugt keinen
+    /// sichtbaren Header (AddCaptions legt nur Header für echte Chapter-Werte
+    /// der Kapitel-Spalte an). Sorgt dafür, dass angepinnte Zeilen ganz oben
+    /// gruppiert werden — ohne eigenen Überschrifts-Eintrag.
+    /// </summary>
+    public const string DummyPinned = "Angesetzt";
+
     public const string Ohne = "-?-";
-    public const string Weitere_Zeilen = "Weitere Zeilen";
     private readonly Dictionary<string, RowBackground> _allViewItems = [];
 
     /// <summary>
@@ -196,17 +203,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (ca is { IsDisposed: false }) {
                 ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
-                // Die Dummy-Spalte wird eingeblendet, wenn die Ansichtbearbeitung
-                // aktiv ist. Zusätzlich bei Admins, deren Ansicht keine echten Spalten
-                // enthält, damit sie eine neue Ansicht aufbauen können.
-                var showDummy = Ansichtbearbeitung
+                // On-demand virtuelle Spalten ein-/ausblenden:
+                // - Hinzufügen: bei Ansichtbearbeitung (oder Admin ohne echte Spalten)
+                // - Pin: wenn mindestens eine Zeile angepinnt ist
+                // Persistente virtuelle Spalten (VIR_…) stehen bereits in der
+                // Collection und werden vom Reconcile nicht angerührt.
+                // Die Number-Spalte hat keinen on-demand-Trigger.
+                var needAdd = Ansichtbearbeitung
                     || (tb.IsAdministrator() && tb.Column.Count > 0 && ca.First() is null);
+                var needPin = PinnedRows.Count > 0;
 
-                if (showDummy) {
-                    ca.EnsureDummyColumn();
-                } else {
-                    ca.RemoveDummyColumn();
-                }
+                ca.ReconcileVirtualColumns(needPin, needAdd);
             } else if (ca is { IsDisposed: true }) {
                 // Veraltete (disposete) Collection verwerfen, beim nächsten
                 // Zugriff wird neu aufgebaut.
@@ -261,18 +268,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Werden bei FilterCombined berücksichtigt und auch im FilterOutput weitergegeben.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
-
-    /// <summary>
-    /// Gibt an, ob das Anpinnen von Zeilen in der aktuellen Ansicht erlaubt ist.
-    /// Pinning ist deaktiviert, wenn eine Kapitel-Spalte (<see cref="ColumnViewCollection.ColumnForChapter"/>)
-    /// vorhanden ist oder eine benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public bool PinAllowed =>
-        Table is { IsDisposed: false }
-        && Table.Column.SysRowSortIndex is not { IsDisposed: false }
-        && CurrentArrangement?.ColumnForChapter is not { IsDisposed: false };
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -433,12 +428,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     #region Methods
 
     public static void ContextMenu_DataValidation(object? sender, ContextMenuEventArgs e) {
-        var (_, row, rows, _) = GetContextData(e.HotItem);
+        var (_, row, rows, _, _) = GetContextData(e.HotItem);
         DoScript(RowsFromContext(row, rows), true, null, "Datenüberprüfung");
     }
 
     public static void ContextMenu_DeleteRow(object? sender, ContextMenuEventArgs e) {
-        var (_, row, rows, _) = GetContextData(e.HotItem);
+        var (_, row, rows, _, _) = GetContextData(e.HotItem);
         var r = RowsFromContext(row, rows);
 
         if (r.Count == 0) {
@@ -462,7 +457,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        var (column, row, _, tableView, _) = GetContextData(e.HotItem);
 
         if (column is not { IsDisposed: false }) { return; }
 
@@ -502,7 +497,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
-        var (_, row, rows, tableView) = GetContextData(e.HotItem);
+        var (_, row, rows, tableView, _) = GetContextData(e.HotItem);
 
         if (tableView?.Table is not { IsDisposed: false } tb) { return; }
 
@@ -527,8 +522,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    public static object ContextMenuItemGenerate(TableView tableView, ColumnItem? column = null, RowItem? row = null, IReadOnlyList<RowItem>? visibleRows = null)
-        => new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView };
+    /// <summary>
+    /// Erzeugt den Kontext für ein Rechtsklick-Menü mit Angabe der
+    /// <see cref="ColumnViewItem" />. Dies ist für virtuelle Spalten
+    /// (Pin, Nummer, Hinzufügen) erforderlich, die kein eigenes
+    /// <see cref="ColumnItem" /> haben. Ist der ViewItem einer echten
+    /// Spalte zugeordnet, wird deren ColumnItem zusätzlich gesetzt.
+    /// </summary>
+    public static object ContextMenuItemGenerate(TableView tableView, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
+        return new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView, ViewItem = viewItem };
+    }
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung, Point cellScreen = default) {
         try {
@@ -671,15 +674,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return sb.ToString().TrimEnd('\r', '\n');
     }
 
-    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView) GetContextData(object? context) {
-        if (context is null) { return (null, null, [], null); }
+    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView, ColumnViewItem? viewItem) GetContextData(object? context) {
+        if (context is null) { return (null, null, [], null, null); }
         dynamic ctx = context;
         ColumnItem? column = ctx.Column;
         RowItem? row = ctx.Row;
         var visibleRows = (IReadOnlyList<RowItem>?)ctx.VisibleRows;
         var rows = visibleRows ?? [];
         TableView tableView = ctx.TableView;
-        return (column, row, rows, tableView);
+        ColumnViewItem? viewItem = ctx.ViewItem;
+        return (column, row, rows, tableView, viewItem);
     }
 
     public static void ImportCsv(Table table, string csvtxt) {
@@ -734,11 +738,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
         if (column is null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
+        return RendererOf(column.DefaultRenderer, column.RendererSettings, style);
+    }
 
-        var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+    /// <summary>
+    /// Erzeugt einen Renderer aus Typname und serialisierten Einstellungen.
+    /// Wird für virtuelle Spalten benötigt, die kein eigenes ColumnItem haben.
+    /// Bei ungültigem Typ oder fehlerhaften Einstellungen wird der
+    /// Standard-Renderer geliefert.
+    /// </summary>
+    public static Renderer_Abstract RendererOf(string? rendererString, string rendererSettings, string style) {
+        if (string.IsNullOrEmpty(rendererString)) { return Renderer_Abstract.Default; }
+
+        var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(rendererString);
         if (renderer is null) { return Renderer_Abstract.Default; }
 
-        if (!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
+        if (!renderer.Parse(rendererSettings)) { return Renderer_Abstract.Default; }
         renderer.SheetStyle = style;
 
         return renderer;
@@ -1064,7 +1079,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         List<AbstractListItem> contextMenu = [];
 
         if (ContextMenuDefault && Table is { IsDisposed: false } tb) {
-            var (column, row, _, _) = GetContextData(hotItem);
+            var (column, row, _, _, viewItem) = GetContextData(hotItem);
 
             if (CurrentArrangement is not { } ca) { return contextMenu; }
 
@@ -1081,11 +1096,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #region Pinnen
 
-            // Anpinnen ist deaktiviert, wenn Pinning generell nicht erlaubt ist
-            // (Kapitel-Spalte oder SYS_ROWSORTINDEX). In diesem Fall wird die
-            // komplette Sektion inkl. Überschrift weggelassen, damit im Kontextmenu
-            // keine Lücke entsteht.
-            if (row is not null && PinAllowed) {
+            if (row is not null) {
                 contextMenu.Add(ItemOf("Anheften", true));
                 if (PinnedRows.Contains(row)) {
                     contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
@@ -1134,21 +1145,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #region Spalte
 
-            if (column is not null) {
+            if (column is not null || viewItem?.StorageKey is not null) {
                 contextMenu.Add(ItemOf("Spalte", true));
-                contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
 
-                if (IsAnsicht0(ca)) {
-                    contextMenu.Add(ItemOf("Spalte permanent löschen", ImageCode.Papierkorb, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
-                } else {
+                if (viewItem?.StorageKey is not null) {
+                    // Virtuelle Spalten (Pin, Nummer, Hinzufügen) haben kein
+                    // ColumnItem. Sie können nur aus der aktuellen Anordnung
+                    // ausgeblendet werden; permanente Operationen, Eigenschaften,
+                    // Kopieren, Statistik etc. sind nicht möglich.
                     contextMenu.Add(ItemOf("Spalte ausblenden", ImageCode.Kreuz, ContextMenu_HideOrDeleteColumn, true));
-                }
+                } else {
+                    contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
 
-                contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
-                contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
+                    if (IsAnsicht0(ca)) {
+                        contextMenu.Add(ItemOf("Spalte permanent löschen", ImageCode.Papierkorb, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
+                    } else {
+                        contextMenu.Add(ItemOf("Spalte ausblenden", ImageCode.Kreuz, ContextMenu_HideOrDeleteColumn, true));
+                    }
+
+                    contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
+                    contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
+                }
             }
 
             #endregion
@@ -1254,8 +1274,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void Pin(IReadOnlyList<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
-        if (!PinAllowed) { return; }
-
         rows ??= [];
 
         rows = [.. rows.Distinct()];
@@ -1268,7 +1286,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinAdd(RowItem? row) {
-        if (!PinAllowed) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Add(row);
         Invalidate_AllViewItems(false);
@@ -1276,7 +1293,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinRemove(RowItem? row) {
-        if (!PinAllowed) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Remove(row);
         Invalidate_AllViewItems(false);
@@ -1945,9 +1961,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 // Bei einem Kapitel-Header werden alle Zeilen des Blocks verschoben.
                 _dragItem = null;
 
-                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca) && _mouseOverColumn?.Column is { IsDisposed: false } mc) {
-                    if (mc == Table.Column.SysRowSortIndex
-                        && _mouseOverRow is RowListItem dragRli
+                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca)
+                    && _mouseOverColumn is { IsDisposed: false } dragCvi && dragCvi.IsOk()) {
+                    var mc = dragCvi.Column;
+                    if (_mouseOverRow is RowListItem dragRli
                         && dragRli.Row is { IsDisposed: false } dragRow
                         && !PinnedRows.Contains(dragRow)
                         && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
@@ -1972,10 +1989,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             _dragItem = blockHeader;
                         }
                     } else if (_mouseOverRow is RowBackground { IgnoreYOffset: true } and not NewRowListItem
-                               && _mouseOverColumn is { IsDisposed: false } colCvi
-                               && colCvi.Column is not null
                                && Table.IsAdministrator()) {
-                        _dragItem = colCvi;
+                        _dragItem = dragCvi;
                     }
 
                     if (_dragItem is not null) {
@@ -2110,7 +2125,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (e.Button == MouseButtons.Right) {
-                ((IContextMenu)this).ContextMenuShow(ContextMenuItemGenerate(this, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
+                ((IContextMenu)this).ContextMenuShow(ContextMenuItemGenerate(this, _mouseOverColumn, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
             }
         }
     }
@@ -2173,13 +2188,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         sb.Append("\r\n");
     }
 
-    private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows, HashSet<string> parentCaps) {
+    private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, HashSet<string> parentCaps) {
         HashSet<string> allCaps = [];
 
-        // NumberStyle (SYS_ROWSORTINDEX aktiv): strikte Sortierung hat Vorrang,
-        // Pins sind verboten. Der Kapitel-Trenner '\' wird komplett ignoriert —
-        // jeder Kapitel-Wert ist ein flaches Kapitel auf einer Ebene, keine
-        // Hierarchie, keine Unterkapitel, keine "X\Ohne"-Sub-Section.
+        // NumberStyle (SYS_ROWSORTINDEX aktiv): strikte Sortierung hat Vorrang.
+        // Der Kapitel-Trenner '\' wird komplett ignoriert — jeder Kapitel-Wert
+        // ist ein flaches Kapitel auf einer Ebene, keine Hierarchie, keine
+        // Unterkapitel, keine "X\Ohne"-Sub-Section.
         var numberStyle = arrangement.Table is { IsDisposed: false } tb
                           && tb.Column.SysRowSortIndex is { IsDisposed: false };
 
@@ -2188,23 +2203,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             foreach (var capValue in caps) {
                 if (numberStyle) {
-                    // Flach: der gesamte Wert ist EIN Kapitel ('\' hat keine
-                    // Bedeutung). ChapterPathNormalize entfernt lediglich
-                    // führende/abschließende Trennzeichen und Leerzeichen.
                     allCaps.Add(capValue.ChapterPathNormalize());
                 } else {
-                    // Volle Pfad-Hierarchie aufbauen — für "A\B\C" werden "A",
-                    // "A\B" und "A\B\C" als eigenständige Captions angelegt.
                     allCaps.UnionWith(capValue.ChapterPathHierarchy());
                 }
             }
 
-            // Für Chapter-Werte, die selbst als Parent fungieren (für die es
-            // Unterpfade gibt), eine "X\Ohne"-Sub-Section anlegen. Rows mit
-            // Chapter "Pfad1" erscheinen dann unter "Pfad1 > Ohne" statt
-            // direkt unter dem Pfad1-Header (was verwirrend wäre, da Pfad1
-            // ja selbst ein Header ist). Im NumberStyle ohne Hierarchie
-            // bedeutungslos (parentCaps bleibt leer).
             if (!numberStyle) {
                 foreach (var capValue in caps) {
                     var norm = capValue.ChapterPathNormalize();
@@ -2217,30 +2221,29 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (caps.Count == 0) {
                 allCaps.Add(Ohne);
             }
-        } else if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
-            allCaps.Add(Weitere_Zeilen);
-        }
-
-        // "Angepinnt" ist im NumberStyle nicht relevant (Pins sind verboten).
-        if (!numberStyle && pinnedRows.Count > 0) {
-            allCaps.Add(Angepinnt);
         }
 
         foreach (var thisCap in allCaps) {
-            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out _)) {
-                RowBackground? capi = new RowCaptionListItem(thisCap, arrangement);
-                allItems.Add(capi.KeyName, capi);
+            var capId = RowCaptionListItem.Identifier(thisCap);
+            if (allItems.TryGetValue(capId, out var existingCap) && existingCap is RowCaptionListItem existingRcli) {
+                existingRcli.Arrangement = arrangement;
+            } else {
+                var capi = new RowCaptionListItem(thisCap, arrangement);
+                allItems[capi.KeyName] = capi;
             }
         }
 
         return allCaps;
     }
 
-    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> sortedRows, HashSet<string> allVisibleCaps) {
+    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> sortedRows) {
         var captionOrder = new List<string>();
 
-        // "Angepinnt" zuerst (falls vorhanden)
-        if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
+        // Angepinnte Zeilen erscheinen ganz oben — ihr Chapter-Marker
+        // (ohne eigenen Header) muss in captionOrder zuerst stehen.
+        if (sortedRows.Exists(x => string.Equals(x.AlignsToChapter, DummyPinned, StringComparison.OrdinalIgnoreCase))) {
+            captionOrder.Add(DummyPinned.ToUpperInvariant());
+        }
 
         // Caption-Reihenfolge aus der sortierten Liste ableiten.
         // Für jede Zeile die vollständige Pfad-Hierarchie eintragen — bei
@@ -2360,16 +2363,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
 
-        if (capsOfRow.Count == 0 && mustHaveACap && isfiltered) {
-            if (arrangement.ColumnForChapter is null) {
-                capsOfRow.Add(Weitere_Zeilen);
-            }
-        }
-
-        if (isPinned) { capsOfRow.Add(Angepinnt); }
-
         if (capsOfRow.Count == 0 && mustHaveACap && arrangement.ColumnForChapter is not null) {
             capsOfRow.Add(Ohne);
+        }
+
+        // Angepinnte Zeilen erscheinen doppelt: ganz oben (über den Marker
+        // "Angepinnt") UND an ihrem regulären Platz. Beide Male gelb markiert.
+        // Der Marker wird hier eingefügt, BEVOR Ohne/Empty-Fallbacks greifen —
+        // sonst würden nicht gefilterte angepinnte Zeilen fälschlich unter
+        // "Ohne" landen. Bei gefilterten Zeilen ohne Kapitel wird zusätzlich
+        // die reguläre Position (leerer String) gesichert.
+        if (isPinned) {
+            if (capsOfRow.Count == 0 && isfiltered) { capsOfRow.Add(string.Empty); }
+            capsOfRow.Add(DummyPinned);
         }
 
         if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
@@ -2378,7 +2384,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private static void ContextMenu_Note_Edit(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        var (column, row, _, tableView, _) = GetContextData(e.HotItem);
         if (column is null || row is null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
         if (tb.Column.SysCellNote is null) {
@@ -2404,7 +2410,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private static void ContextMenu_Note_Remove(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        var (column, row, _, tableView, _) = GetContextData(e.HotItem);
         if (column is null || row is null) { return; }
         if (column.Table is not { IsDisposed: false }) { return; }
 
@@ -2582,8 +2588,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// oder legt es neu an. Alle Kopf-Elemente liegen oberhalb des Scroll-Bereichs,
     /// daher wird <see cref="AbstractListItem.IgnoreYOffset"/> hier zentral auf <c>true</c> gesetzt.
     /// </summary>
-    private static T GetOrCreateHeadItem<T>(Dictionary<string, RowBackground> allItems, string identifier, Func<T> factory) where T : RowBackground {
+    private static T GetOrCreateHeadItem<T>(Dictionary<string, RowBackground> allItems, string identifier, ColumnViewCollection arrangement, Func<T> factory) where T : RowBackground {
         if (allItems.TryGetValue(identifier, out var existing) && existing is T typed) {
+            typed.Arrangement = arrangement;
             typed.IgnoreYOffset = true;
             return typed;
         }
@@ -3026,14 +3033,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
-        // Pins sind bei Kapitel-Spalte oder benutzerdefinierter Sortierung
-        // (SYS_ROWSORTINDEX) nicht erlaubt — sie würden die Gruppierung bzw.
-        // die strikte Sortierreihenfolge stören.
-        if (!PinAllowed && PinnedRows.Count > 0) {
-            PinnedRows.Clear();
-            OnPinnedChanged();
-        }
-
         List<RowItem> pinnedRows = [.. PinnedRows];
         // BUGFIX Performance: Bisher wurde hier sortused.SortedRows(FilterCombined.Rows) aufgerufen.
         // Das war eine verschwendete Sortierung: filteredRows wird unten NUR iterativ konsumiert
@@ -3073,7 +3072,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_NewRow(allItems, arrangement, tb, _newRowsAllowed, true, sortedItems);
 
-        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, pinnedRows, parentCaps);
+        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, parentCaps);
 
         var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused, filteredRows, parentCaps);
 
@@ -3081,7 +3080,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_HildeAllItems(allItems, arrangement);
 
-        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems, allVisibleCaps);
+        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems);
 
         CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, visibleRowListItems);
 
@@ -3113,6 +3112,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Trenner '\' wird ignoriert — Indent und Hierarchie entfallen
         // (siehe RowCaptionListItem-/RowListItem-Konstruktor).
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            // Angepinnte Zeilen ganz oben — ohne Kapitel-Header.
+            // Sie werden aus dem regulären Chapter-Fluss herausgelöst.
+            List<RowListItem> pinnedItems = [];
+            List<RowListItem> regularItems = [];
+            foreach (var rli in sortedRows) {
+                if (string.Equals(rli.AlignsToChapter, DummyPinned, StringComparison.OrdinalIgnoreCase)) {
+                    pinnedItems.Add(rli);
+                } else {
+                    regularItems.Add(rli);
+                }
+            }
+
+            sortedItems.AddRange(pinnedItems);
+
             var previousChapter = (string?)null;
             List<RowItem>? currentBlockRows = null;
             // Collapse-Zustand wird pro Block genau einmal (beim Kapitelwechsel
@@ -3122,7 +3135,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // jede Zeile würde daher nur die erste Zeile ausblenden (Bug).
             var blockCollapsed = false;
 
-            foreach (var rli in sortedRows) {
+            foreach (var rli in regularItems) {
                 var chapter = rli.AlignsToChapter;
 
                 // Header nur bei definiertem Kapitel und nur bei tatsächlichem
@@ -3218,7 +3231,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Bei ColumnHeaderMode.Ohne wird die Leiste gar nicht erst zu sortedItems hinzugefügt,
         // da CalculateAllViewItems_CalculateYPosition die Sichtbarkeit aller Items pauschal auf true setzt.
         if (arrangement.ColumnHeaderMode != ColumnHeaderMode.Ohne) {
-            var columnHeaderBar = GetOrCreateHeadItem(allItems, ColumnHeaderBarListItem.Identifier, () => new ColumnHeaderBarListItem(arrangement));
+            var columnHeaderBar = GetOrCreateHeadItem(allItems, ColumnHeaderBarListItem.Identifier, arrangement, () => new ColumnHeaderBarListItem(arrangement));
             columnHeaderBar.Visible = true;
             columnHeaderBar.SheetStyle = SheetStyle;
             columnHeaderBar.Mode = arrangement.ColumnHeaderMode;
@@ -3235,19 +3248,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // Caption 1 bis 3 Expand Button
             if (add) {
-                var captionBar = GetOrCreateHeadItem(allItems, CaptionBarListItem.Identifier(z), () => new CaptionBarListItem(arrangement, z));
+                var captionBar = GetOrCreateHeadItem(allItems, CaptionBarListItem.Identifier(z), arrangement, () => new CaptionBarListItem(arrangement, z));
                 captionBar.Visible = arrangement.ShowHead;
                 sortedItems.Add(captionBar);
             }
         }
 
         // Grüner Expand Button
-        var collapseBar = GetOrCreateHeadItem(allItems, CollapesBarListItem.Identifier, () => new CollapesBarListItem(arrangement));
+        var collapseBar = GetOrCreateHeadItem(allItems, CollapesBarListItem.Identifier, arrangement, () => new CollapesBarListItem(arrangement));
         collapseBar.Visible = arrangement.ShowHead;
         sortedItems.Add(collapseBar);
 
         // Spaltenköpfe direkt
-        var columnHead = GetOrCreateHeadItem(allItems, ColumnsHeadListItem.Identifier, () => new ColumnsHeadListItem(arrangement));
+        var columnHead = GetOrCreateHeadItem(allItems, ColumnsHeadListItem.Identifier, arrangement, () => new ColumnsHeadListItem(arrangement));
         columnHead.Visible = arrangement.ShowHead;
         sortedItems.Add(columnHead);
 
@@ -3261,14 +3274,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //sortedItems.Add(itemHeadx);
 
         // Die Sortierung
-        var sortAnzeige = GetOrCreateHeadItem(allItems, SortBarListItem.Identifier, () => new SortBarListItem(arrangement));
+        var sortAnzeige = GetOrCreateHeadItem(allItems, SortBarListItem.Identifier, arrangement, () => new SortBarListItem(arrangement));
         sortAnzeige.Visible = arrangement.ShowHead;
         sortAnzeige.FilterCombined = filterCombined;
         sortAnzeige.Sort = sortused;
         sortedItems.Add(sortAnzeige);
 
         // Filterleiste
-        var columnFilter = GetOrCreateHeadItem(allItems, FilterBarListItem.Identifier, () => new FilterBarListItem(arrangement));
+        var columnFilter = GetOrCreateHeadItem(allItems, FilterBarListItem.Identifier, arrangement, () => new FilterBarListItem(arrangement));
         columnFilter.Visible = arrangement.ShowHead;
         columnFilter.FilterCombined = filterCombined;
         columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
@@ -3276,7 +3289,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Ansichtbearbeitung-Leiste
         if (Ansichtbearbeitung) {
-            var editBar = GetOrCreateHeadItem(allItems, EditBarListItem.Identifier, () => new EditBarListItem(arrangement));
+            var editBar = GetOrCreateHeadItem(allItems, EditBarListItem.Identifier, arrangement, () => new EditBarListItem(arrangement));
             editBar.Visible = true;
             sortedItems.Add(editBar);
         }
@@ -3363,6 +3376,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     rowListItem = new RowListItem(thisRow, thisCap, arrangement);
                     allItems.Add(rowListItem.KeyName, rowListItem);
                 }
+                rowListItem.Arrangement = arrangement;
 
                 rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
                 rowListItem.Visible = false;
@@ -3384,8 +3398,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (CurrentArrangement is not { IsDisposed: false } ca) { return -1; }
 
         for (var i = 0; i < ca.Count; i++) {
-            var cvi = ca[i];
-            if (cvi?.Column is null) { continue; }
+            if (ca[i] is not { } cvi) { continue; }
+            if (cvi.Column is null && cvi.FixedWidth == 0) { continue; }
 
             var left = cvi.ControlColumnLeft(OffsetX);
             var right = cvi.ControlColumnRight(OffsetX);
@@ -3450,7 +3464,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (CurrentArrangement is { IsDisposed: false } ca) {
             if (SortUsed() is { } rsd) {
-                if (rsd.UsedForRowSort(e.Column) || e.Column == ca.ColumnForChapter) {
+                // Kapitel-Spalte direkt geändert — die Hierarchie kann sich
+                // verändert haben (neue Unter-/Überkapitel, z. B. "Gerüst" →
+                // "Gerüst\111"). Full clear wie bei der Header-Umbenennung,
+                // damit stale Captions (veralteter IsExpanded-Zustand etc.)
+                // die neue Hierarchie nicht behindern.
+                if (e.Column == ca.ColumnForChapter) {
+                    Invalidate_AllViewItems(true);
+                } else if (rsd.UsedForRowSort(e.Column)) {
                     Invalidate_AllViewItems(false);
                 }
             }
@@ -3690,7 +3711,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private ColumnViewItem? ColumnOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs? e) {
         if (ca is not { IsDisposed: false } || e is null) { return null; }
 
-        foreach (var thisViewItem in ca) {
+        foreach (var thisViewItem in ca.RenderingItems) {
             if (e.ControlX >= thisViewItem.ControlColumnLeft(OffsetX) && e.ControlX <= thisViewItem.ControlColumnRight(OffsetX)) { return thisViewItem; }
         }
 
@@ -3698,7 +3719,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, _) = GetContextData(e.HotItem);
+        var (column, row, _, _, _) = GetContextData(e.HotItem);
         var rli = GetRow(row, false);
         var cp = rli?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
         var vi = CurrentArrangement?[column];
@@ -3706,7 +3727,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentDelete(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, _) = GetContextData(e.HotItem);
+        var (column, row, _, _, _) = GetContextData(e.HotItem);
 
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenü");
@@ -3715,7 +3736,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void ContextMenu_ContentPaste(object? sender, ContextMenuEventArgs e) => PasteToCursor();
 
     private void ContextMenu_CopyAll(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
         var txt = Export_CSV(FirstRow.Without, column);
@@ -3729,7 +3750,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_CopyAllSorted(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
         var txt = Export_CSV(FirstRow.Without, column);
@@ -3744,8 +3765,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
-        if (column is not { IsDisposed: false }) { return; }
+        var (column, _, _, _, viewItem) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { } ca) { return; }
 
@@ -3754,6 +3774,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var tcvc = ColumnViewCollection.ParseAll(tb);
         var currentArr = tcvc.GetByKey(ca.KeyName);
         if (currentArr is null) { return; }
+
+        var virtualToRemove = currentArr.FirstOrDefault(x => x.StorageKey == viewItem?.StorageKey);
+        currentArr.Remove(virtualToRemove);
 
         if (IsAnsicht0(ca)) {
             if (Forms.MessageBox.Show($"Spalte <b>{column.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return; }
@@ -3770,7 +3793,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_KeyCopy(object? sender, ContextMenuEventArgs e) {
-        var (_, row, _, _) = GetContextData(e.HotItem);
+        var (_, row, _, _, _) = GetContextData(e.HotItem);
         if (row is null) { return; }
 
         if (CopytoClipboard(row.KeyName)) {
@@ -3786,12 +3809,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         ColumnsHeadListItem.ShowDummyColumnDropDown(ca, this, column);
     }
 
     private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {
-        var (_, row, _, _) = GetContextData(e.HotItem);
+        var (_, row, _, _, _) = GetContextData(e.HotItem);
 
         PinAdd(row);
     }
@@ -3801,7 +3824,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_RestorePreviousContent(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, _) = GetContextData(e.HotItem);
+        var (column, row, _, _, _) = GetContextData(e.HotItem);
 
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         DoUndo(column, row);
@@ -3813,21 +3836,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_SortAZ(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
     private void ContextMenu_SortZA(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
     private void ContextMenu_Statistics(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
         var split = false;
@@ -3838,7 +3861,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Sum(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _) = GetContextData(e.HotItem);
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
         var summe = column.Summe(FilterCombined);
@@ -3850,7 +3873,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Unpin(object? sender, ContextMenuEventArgs e) {
-        var (_, row, _, _) = GetContextData(e.HotItem);
+        var (_, row, _, _, _) = GetContextData(e.HotItem);
 
         PinRemove(row);
     }
@@ -3911,26 +3934,28 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var newIndex = ca.IndexOf(sourceCvi);
 
-        var hasPermanentAfter = false;
-        for (var i = newIndex + 1; i < ca.Count; i++) {
-            if (ca[i] is { Column: not null, Permanent: true }) {
-                hasPermanentAfter = true;
-                break;
-            }
-        }
-
-        if (hasPermanentAfter) {
-            sourceCvi.Permanent = true;
-        } else if (sourceCvi.Permanent) {
-            var hasNonPermanentBefore = false;
-            for (var i = 0; i < newIndex; i++) {
-                if (ca[i] is { Column: not null, Permanent: false }) {
-                    hasNonPermanentBefore = true;
+        if (!sourceCvi.IsDummyColumn) {
+            var hasPermanentAfter = false;
+            for (var i = newIndex + 1; i < ca.Count; i++) {
+                if (ca[i] is { Permanent: true } c && !c.IsDummyColumn) {
+                    hasPermanentAfter = true;
                     break;
                 }
             }
-            if (hasNonPermanentBefore) {
-                sourceCvi.Permanent = false;
+
+            if (hasPermanentAfter) {
+                sourceCvi.Permanent = true;
+            } else if (sourceCvi.Permanent) {
+                var hasNonPermanentBefore = false;
+                for (var i = 0; i < newIndex; i++) {
+                    if (ca[i] is { Permanent: false } c && !c.IsDummyColumn) {
+                        hasNonPermanentBefore = true;
+                        break;
+                    }
+                }
+                if (hasNonPermanentBefore) {
+                    sourceCvi.Permanent = false;
+                }
             }
         }
 
@@ -4070,7 +4095,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var area = AvailableControlPaintArea;
 
         // Entspricht die Einfüge-Position der aktuellen Position, die eigene Spalte markieren
-        if (_dragItem is ColumnViewItem { IsDisposed: false } srcCol) {
+        if (_dragItem is ColumnViewItem srcCol && srcCol.IsOk()) {
             var sourceIdx = ca.IndexOf(srcCol);
             if (sourceIdx >= 0 && (_dragInsertIndex == sourceIdx || _dragInsertIndex == sourceIdx + 1)) {
                 var left = srcCol.ControlColumnLeft(OffsetX);
@@ -4087,8 +4112,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Die Spalte finden, vor der eingefügt wird
         ColumnViewItem? targetCvi = null;
         for (var i = 0; i < ca.Count; i++) {
-            if (ca[i]?.Column is not null && i >= _dragInsertIndex) {
-                targetCvi = ca[i];
+            if (ca[i] is { } cvi && cvi.IsOk() && i >= _dragInsertIndex) {
+                targetCvi = cvi;
                 break;
             }
         }
@@ -4097,11 +4122,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var left = targetCvi.ControlColumnLeft(OffsetX);
             indicatorX = left - indicatorHalf;
         } else {
-            // Am Ende: nach der letzten echten Spalte
+            // Am Ende: nach der letzten sichtbaren Spalte
             ColumnViewItem? lastCvi = null;
             for (var i = ca.Count - 1; i >= 0; i--) {
-                if (ca[i]?.Column is not null) {
-                    lastCvi = ca[i];
+                if (ca[i] is { } cvi && cvi.IsOk()) {
+                    lastCvi = cvi;
                     break;
                 }
             }
@@ -4340,7 +4365,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _dragInsertIndex = -1;
 
         if (insertIndex >= 0) {
-            if (item is ColumnViewItem cvi && !cvi.IsDisposed) {
+            if (item is ColumnViewItem cvi && cvi.IsOk()) {
                 DoColumnSortReorder(cvi, insertIndex);
             } else if (item is RowItem or RowCaptionListItem) {
                 var srcRows = GetDragSourceRows(item);
@@ -4508,9 +4533,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             // Bestehenden Code belassen
                             FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnPinnedChanged() =>
-                            // Bestehenden Code belassen
-                            PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+    private void OnPinnedChanged() {
+        // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
+        // sind — daher Anordnung (inkl. virtueller Spalten) neu aufbauen.
+        Invalidate_CurrentArrangement();
+        PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+    }
 
     //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -4900,9 +4928,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        // Spezial-Kapitel (Angepinnt, Weitere_Zeilen) nicht als Ziel verwenden
-        if (string.Equals(targetChapterText, Angepinnt, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(targetChapterText, Weitere_Zeilen, StringComparison.OrdinalIgnoreCase)) { return; }
+        // Spezial-Kapitel (Angepinnt) nicht als Ziel verwenden
+        if (string.Equals(targetChapterText, DummyPinned, StringComparison.OrdinalIgnoreCase)) { return; }
 
         // Bei "Ohne" (-?-): Kapitel der Zeile leeren
         if (string.Equals(targetChapterText, Ohne, StringComparison.OrdinalIgnoreCase)) {

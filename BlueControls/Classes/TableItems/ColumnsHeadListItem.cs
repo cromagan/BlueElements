@@ -14,7 +14,6 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
     #region Fields
 
-    public const int DummyColumnWidth = 40;
     public const int HeadButtonSize = 16;
     public const string Identifier = "ColumnsHeadListItem";
 
@@ -123,6 +122,29 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
         #endregion
 
+        #region Virtuelle Spalten (Pin, Nummer, Hinzufügen)
+
+        var virtualAdded = false;
+
+        foreach (var (vKey, display, symbol) in new (string, string, ImageCode)[] {
+            ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel),
+            ("NUMBER", "Zeilennummer", ImageCode.Tabelle),
+            ("ADD", "Spalte zum Hinzufügen", ImageCode.PlusZeichen)
+        }) {
+            if (ca.Any(x => x.StorageKey == "VIR_" + vKey)) { continue; }
+
+            if (!virtualAdded) {
+                items.Add(ItemOf("Virtuelle Spalten", "Virtuelle Spalten", true, "3"));
+                virtualAdded = true;
+            }
+
+            var virtualItem = ItemOf(display, "VIRADD:" + vKey, QuickImage.Get(symbol, 16));
+            virtualItem.UserDefCompareKey = "3_" + vKey;
+            items.Add(virtualItem);
+        }
+
+        #endregion
+
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.SingleSelection, null, tableView, true, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
         dropDown.ItemClicked += (_, e) => HandleDummyColumnSelection(ca, e.Item, tableView, insertAfterColumn);
     }
@@ -135,16 +157,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.IsDummyColumn) {
-            var bs = HeadButtonSize.CanvasToControl(scale);
-            var btnRect = new Rectangle((int)(positionControl.X + (positionControl.Width - bs) / 2.0), (int)positionControl.Top + 2, bs, bs);
-            Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
-            Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
-            gr.DrawImageUnscaled(QuickImage.Get(ImageCode.PlusZeichen, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
-        }
-
         var column = viewItem.Column is { IsDisposed: false } c ? c : null;
-        if (column is null && !viewItem.IsDummyColumn) { return; }
 
         #region Roten Rand für Split-Spalten
 
@@ -158,7 +171,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
         #endregion
 
         var capTranslated = column is not null ? CaptionTranslated(column.Caption) : viewItem.Caption;
-        var headFont = viewItem.IsDummyColumn ? Font_Head_Default : Font_Head_Colored(viewItem);
+        var headFont = Font_Head_Colored(viewItem);
         var Font_Head_Default_Scaled = headFont.Scale(scale).MeasureString(capTranslated);
 
         if (column is not null && CaptionBitmap(column) is { IsError: false } cb) {
@@ -195,7 +208,6 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
-        if (viewItem.IsDummyColumn) { return; }
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
         if (!Arrangement?.Table.IsAdministrator() ?? true) { return; }
 
@@ -226,7 +238,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
         if (!ca.Table?.IsAdministrator() ?? true) { return false; }
 
-        if (clickedColumn?.IsDummyColumn == true) {
+        if (clickedColumn is AddColumnItem) {
             ShowDummyColumnDropDown(ca, tableView, null);
             return true;
         }
@@ -251,7 +263,6 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi.IsDummyColumn) { return "Neue Spalte hinzufügen"; }
         if (cvi.Column is not { IsDisposed: false } col) { return string.Empty; }
 
         if (!string.IsNullOrEmpty(col.ErrorReason()) && (Arrangement?.Table.IsAdministrator() ?? false)) {
@@ -296,16 +307,9 @@ public sealed class ColumnsHeadListItem : RowBackground {
         var f = Font_Head_Default;
 
         foreach (var thisC in Arrangement) {
-            if (thisC.IsDummyColumn) {
-                var capTranslated = "Neue Spalte";
-                var s = f.MeasureString(capTranslated);
-                minH = Math.Max(minH, (int)s.Width);
-            } else if (thisC.Column is { IsDisposed: false } column) {
-                var capTranslated = CaptionTranslated(column.Caption);
-                var s = f.MeasureString(capTranslated);
-
-                minH = Math.Max(minH, (int)s.Width);
-            }
+            var capTranslated = CaptionTranslated(thisC.Caption);
+            var s = f.MeasureString(capTranslated);
+            minH = Math.Max(minH, (int)s.Width);
         }
 
         return new(100, minH + 3);
@@ -317,47 +321,44 @@ public sealed class ColumnsHeadListItem : RowBackground {
         if (selectedItem is null) { return; }
 
         var key = selectedItem.KeyName;
-        var isNewColumn = key.StartsWith("SYSNEW:", StringComparison.OrdinalIgnoreCase) || key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase);
+        var currentArrName = ca.KeyName;
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        tableView.SetPendingSmoothScroll();
 
-        if (isNewColumn) { tableView.SetPendingSmoothScroll(); }
-
-        ColumnItem? newCol = null;
+        ColumnViewItem? newCol = null;
 
         if (key.StartsWith("SYSNEW:", StringComparison.OrdinalIgnoreCase)) {
             var sysKey = key[7..];
             tb.Column.GenerateAndAddSystem(sysKey);
-            newCol = tb.Column[sysKey];
+            if (tb.Column[sysKey] is { } sysCol) { newCol = new ColumnViewItem(sysCol); }
+        } else if (key.StartsWith("VIRADD:", StringComparison.OrdinalIgnoreCase)) {
+            newCol = ColumnViewItem.CreateVirtual("VIR_" + key[7..].ToUpperInvariant());
         } else if (key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase)) {
             var parts = key[7..].Split('|');
             if (parts.Length == 2) {
                 var formatName = parts[0];
                 var targetKey = parts[1];
                 var format = ColumnFormatHolder.AllFormats[formatName];
-                newCol = tb.Column.GenerateAndAdd(targetKey, targetKey, format);
+                if (tb.Column.GenerateAndAdd(targetKey, targetKey, format) is { } genCol) {
+                    newCol = new ColumnViewItem(genCol);
+                }
             }
         } else {
-            newCol = tb.Column[key];
+            if (tb.Column[key] is { } existCol) { newCol = new ColumnViewItem(existCol); }
         }
 
-        if (newCol is not { IsDisposed: false }) {
-            if (isNewColumn) { tableView.BeginSmoothScrollToColumn(tableView.OffsetX, tableView.OffsetY); }
-            return;
-        }
+        if (newCol is not { IsDisposed: false }) { return; }
 
-        newCol.Repair();
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        var currentArrName = ca.KeyName;
+        newCol.Column?.Repair();
 
         for (var z = 0; z < tcvc.Count; z++) {
-            if (tcvc[z][newCol] is null && (z == 0 || string.Equals(tcvc[z].KeyName, currentArrName, StringComparison.OrdinalIgnoreCase))) {
+            if (!tcvc[z].Any(v => string.Equals(v?.ColumnName, newCol.ColumnName, StringComparison.OrdinalIgnoreCase)) && (z == 0 || string.Equals(tcvc[z].KeyName, currentArrName, StringComparison.OrdinalIgnoreCase))) {
                 tcvc[z].Add(newCol, insertAfterColumn);
             }
         }
 
         ca.ComputeAllColumnPositions(tableView.AvailableControlPaintArea.Width, tableView.Zoom);
 
-        if (!isNewColumn) { tableView.SetPendingSmoothScroll(); }
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
         tableView.BeginInvoke(new Action(() => tableView.BeginSmoothScrollToColumn(int.MinValue, tableView.OffsetY)));

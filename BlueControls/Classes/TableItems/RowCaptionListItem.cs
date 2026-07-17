@@ -21,15 +21,6 @@ public sealed class RowCaptionListItem : RowBackground {
     /// </summary>
     public const char Kapiteltrenner = '\\';
 
-    /// <summary>
-    /// Ermittelt, ob das Arrangement im NumberStyle läuft (SYS_ROWSORTINDEX
-    /// aktiv). In diesem Modus wird der Kapitel-Trenner '\' ignoriert —
-    /// Kapitel werden flach auf einer Ebene dargestellt.
-    /// </summary>
-    internal static bool IsNumberStyle(ColumnViewCollection? arrangement)
-        => arrangement?.Table is { IsDisposed: false } tb
-           && tb.Column.SysRowSortIndex is { IsDisposed: false };
-
     #endregion
 
     #region Constructors
@@ -47,22 +38,24 @@ public sealed class RowCaptionListItem : RowBackground {
     #region Properties
 
     public string ChapterText { get; }
+
     public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Title);
+
     public bool IsExpanded { get; set; }
 
     /// <summary>
     /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Nur bei echten Kapiteln (nicht Angepinnt/Weitere Zeilen),
-    /// mit vorhandener Kapitel-Spalte, außerhalb von TableChunk
-    /// und wenn die Benutzerrechte es erlauben. Das Ohne-Kapitel (-?-)
-    /// ist ebenfalls bearbeitbar — es repräsentiert leere Kapitel-Werte.
+    /// Nur bei echten Kapiteln (nicht Angepinnt), mit vorhandener
+    /// Kapitel-Spalte, außerhalb von TableChunk und wenn die Benutzerrechte
+    /// es erlauben. Das Ohne-Kapitel (-?-) ist ebenfalls bearbeitbar —
+    /// es repräsentiert leere Kapitel-Werte.
     /// </summary>
     internal bool CanEditChapter {
         get {
             if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
             if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
             if (tb is TableChunk) { return false; }
-            if (ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
+            if (ChapterText == TableView.DummyPinned) { return false; }
             return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
         }
     }
@@ -98,6 +91,15 @@ public sealed class RowCaptionListItem : RowBackground {
 
         return displayText;
     }
+
+    /// <summary>
+    /// Ermittelt, ob das Arrangement im NumberStyle läuft (SYS_ROWSORTINDEX
+    /// aktiv). In diesem Modus wird der Kapitel-Trenner '\' ignoriert —
+    /// Kapitel werden flach auf einer Ebene dargestellt.
+    /// </summary>
+    internal static bool IsNumberStyle(ColumnViewCollection? arrangement)
+        => arrangement?.Table is { IsDisposed: false } tb
+           && tb.Column.SysRowSortIndex is { IsDisposed: false };
 
     /// <summary>
     /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).

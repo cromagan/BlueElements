@@ -19,7 +19,7 @@ public static class ColumnViewItemRenderingExtensions {
     #region Methods
 
     public static int CanvasContentWidth(this ColumnViewItem cvi, string style) {
-        if (cvi.IsDummyColumn) { return ColumnsHeadListItem.DummyColumnWidth; }
+        if (cvi.FixedWidth > 0) { return cvi.FixedWidth; }
         if (_renderingData.TryGetValue(cvi, out var data) && data.CanvasContentWidth is { } v) { return v; }
 
         var renderer = cvi.GetRenderer(style);
@@ -28,7 +28,7 @@ public static class ColumnViewItemRenderingExtensions {
         return v;
     }
 
-    public static bool CollapsableEnabled(this ColumnViewItem cvi, string style) => !cvi.IsDummyColumn && (cvi.CanvasContentWidth(style) > 40 || !cvi.IsExpanded);
+    public static bool CollapsableEnabled(this ColumnViewItem cvi, string style) => cvi.CanvasContentWidth(style) > 40 || !cvi.IsExpanded;
 
     public static void ComputeAllColumnPositions(this ColumnViewCollection cvc, int tableviewWith, float zoom) {
         var collData = _collectionRenderingData.GetOrCreateValue(cvc);
@@ -47,7 +47,7 @@ public static class ColumnViewItemRenderingExtensions {
         collData.LastUsedTableViewWidth = tableviewWith;
         var maxX = 0;
 
-        foreach (var thisViewItem in cvc) {
+        foreach (var thisViewItem in cvc.RenderingItems) {
             thisViewItem.ComputeLocation(cvc, maxX, tableviewWith, zoom);
 
             maxX = thisViewItem.ControlColumnRight(0);
@@ -63,7 +63,7 @@ public static class ColumnViewItemRenderingExtensions {
     }
 
     public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (cvi.Column is null && !cvi.IsDummyColumn) { return; }
+        if (!cvi.IsOk()) { return; }
 
         GetRenderingData(cvi).ControlColumnLeft = x;
         GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
@@ -89,7 +89,7 @@ public static class ColumnViewItemRenderingExtensions {
         var data = GetRenderingData(cvi);
         if (data.Renderer is not null) { return data.Renderer; }
 
-        data.Renderer = TableView.RendererOf(cvi.Column, style);
+        data.Renderer = TableView.RendererOf(cvi.Renderer, cvi.RendererSettings, style);
         return data.Renderer;
     }
 
@@ -124,10 +124,10 @@ public static class ColumnViewItemRenderingExtensions {
 
         if (parent is null) { return p16; }
 
-        if (cvi.IsDummyColumn) {
-            var dw = ColumnsHeadListItem.DummyColumnWidth.CanvasToControl(zoom);
-            GetRenderingData(cvi).ControlColumnWidth = dw;
-            return dw;
+        if (cvi.FixedWidth > 0) {
+            var vw = cvi.FixedWidth.CanvasToControl(zoom);
+            GetRenderingData(cvi).ControlColumnWidth = vw;
+            return vw;
         }
 
         if (cvi.Column is not { IsDisposed: false }) {
@@ -201,12 +201,14 @@ public static class ColumnViewItemRenderingExtensions {
                 break;
         }
 
-        var items = cvc.ToList();
+        var items = cvc.RenderingItems.ToList();
         var isEligible = new bool[items.Count];
 
         for (var i = 0; i < items.Count; i++) {
-            // Die SYS_ROWSORTINDEX-Spalte behält immer ihre feste Breite und wird nicht skaliert.
-            isEligible[i] = items[i].ControlColumnWidth() > widthThreshold
+            // Virtuelle Spalten (Pin, Nummer, Hinzufügen) und die SYS_ROWSORTINDEX-
+            // Spalte behalten immer ihre feste Breite und werden nicht skaliert.
+            isEligible[i] = items[i].FixedWidth == 0
+                && items[i].ControlColumnWidth() > widthThreshold
                 && items[i].Column?.KeyName != SystemColumnKeys.RowSortIndex;
         }
 
@@ -264,7 +266,7 @@ public static class ColumnViewItemRenderingExtensions {
 
         collData.ControlColumnsWidth = newMaxX;
         collData.ControlColumnsPermanentWidth = 0;
-        foreach (var cvi in cvc) {
+        foreach (var cvi in cvc.RenderingItems) {
             if (cvi.Permanent) {
                 collData.ControlColumnsPermanentWidth = Math.Max(cvi.ControlColumnRight(0), collData.ControlColumnsPermanentWidth);
             }

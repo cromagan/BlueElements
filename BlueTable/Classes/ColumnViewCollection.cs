@@ -12,6 +12,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Fields
 
     private readonly List<ColumnViewItem> _internal = [];
+    private readonly List<ColumnViewItem> _onDemand = [];
     private readonly List<string> _permissionGroups_show = [];
     private volatile int _isDisposedFlag;
 
@@ -32,16 +33,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Properties
 
     public bool Ansichtbearbeitung { get; set; }
+
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
 
     public ColumnItem? ColumnForChapter { get; set; }
     public ColumnHeaderMode ColumnHeaderMode { get; set; }
     public int Count => _internal.Count;
+
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
+
     public int FilterRows { get; set; } = 1;
+
     public bool Invalidated { get; set; } = true;
+
     public bool IsDisposed => _isDisposedFlag == 1;
+
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> Kontextmenu_Skripte { get; set; } = new List<string>().AsReadOnly();
@@ -59,6 +66,26 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string QuickInfo { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Alle für die Darstellung relevante Spalten: die persistenten
+    /// (<see cref="_internal" />) in ihrer gespeicherten Reihenfolge plus die
+    /// on-demand virtuellen (<see cref="_onDemand" />) an ihrer Standardposition
+    /// (Pin vorne, Hinzufügen hinten). Editier-Operationen
+    /// (Move/Remove/IndexOf) und die Serialisierung arbeiten weiterhin
+    /// ausschließlich auf den persistenten Spalten.
+    /// </summary>
+    public IEnumerable<ColumnViewItem> RenderingItems {
+        get {
+            var pin = _onDemand.FirstOrDefault(v => v is PinColumnItem);
+            var add = _onDemand.FirstOrDefault(v => v is AddColumnItem);
+
+            IEnumerable<ColumnViewItem> result = _internal;
+            if (add is not null) { result = result.Append(add); }
+            if (pin is not null) { result = result.Prepend(pin); }
+            return result;
+        }
+    }
 
     public ScaleToFitMode ScaleToFit { get; set; } = ScaleToFitMode.Normal;
 
@@ -120,18 +147,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return tcvc;
     }
 
-    public void Add(ColumnItem column) {
-        if (column is not { IsDisposed: false }) { return; }
-
-        Add(new ColumnViewItem(column), null);
-    }
-
-    public void Add(ColumnItem column, ColumnItem? insertAfterColumn) {
-        if (column is not { IsDisposed: false }) { return; }
-
-        Add(new ColumnViewItem(column), insertAfterColumn);
-    }
-
     public void Add(ColumnViewItem columnViewItem) => Add(columnViewItem, null);
 
     public void Add(ColumnViewItem columnViewItem, ColumnItem? insertAfterColumn) {
@@ -145,12 +160,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    public void EnsureDummyColumn() {
-        if (_internal.Exists(v => v?.IsDummyColumn == true)) { return; }
-        _internal.Add(ColumnViewItem.CreateDummy());
-        Invalidated = true;
     }
 
     public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column is not null);
@@ -229,7 +238,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
         result.ParseableAdd("ColumnHeaderMode", (int)ColumnHeaderMode);
-        result.ParseableAdd("Column", _internal.Where(v => !v.IsDummyColumn).ToList());
+        result.ParseableAdd("Column", _internal);
         result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
         result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
         result.ParseableAdd("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
@@ -244,6 +253,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void ParseFinished(string parsed) {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
+        Invalidated = true;
     }
 
     public bool ParseThis(string key, string value) {
@@ -258,7 +268,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                Add(new ColumnViewItem(Table, value.FromNonCritical()));
+                AddParsed(ColumnViewItem.CreateFromParsed(Table, value.FromNonCritical()));
                 return true;
 
             case "chaptercolumn":
@@ -288,11 +298,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "columns":
-                if (value.GetAllTags() is { } x) {
-                    foreach (var pair2 in x) {
-                        Add(new ColumnViewItem(Table, pair2.Value.FromNonCritical()));
-                    }
-                }
+                //if (value.GetAllTags() is { } x) {
+                //    foreach (var pair2 in x) {
+                //        AddParsed(ColumnViewItem.CreateFromParsed(Table, pair2.Value.FromNonCritical()));
+                //    }
+                //}
                 return true;
 
             case "permissiongroup":
@@ -319,6 +329,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 ScaleToFit = (ScaleToFitMode)IntParse(value);
                 return true;
 
+            //case "vir_pin":
+            //case "vir_number":
+            //case "vir_add":
+            //    if (ColumnViewItem.CreateVirtual(key) is { } v) {
+            //        v.Parse(value.FromNonCritical());
+            //        AddParsed(v);
+            //    }
+            //    return true;
+
             case "columnheadermode":
                 ColumnHeaderMode = (ColumnHeaderMode)IntParse(value);
                 return true;
@@ -340,6 +359,53 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string ReadableText() => KeyName;
+
+    /// <summary>
+    /// Stellt die on-demand virtuellen Spalten (Pin, Hinzufügen) gemäß den
+    /// übergebenen Bedingungen sicherhaft ein. Persistente virtuelle Spalten
+    /// (über ihren VIR_-Schlüssel in <see cref="_internal" />) werden NICHT
+    /// angerührt — sie bleiben unabhängig vom Bedarf erhalten. On-demand-
+    /// Spalten landen in <see cref="_onDemand" /> und werden nicht
+    /// serialisiert. Die Number-Spalte hat keinen on-demand-Trigger und
+    /// erscheint ausschließlich als VIR_NUMBER.
+    /// </summary>
+    public void ReconcileVirtualColumns(bool needPin, bool needAdd) {
+        var changed = false;
+
+        for (var z = _onDemand.Count - 1; z >= 0; z--) {
+            var v = _onDemand[z];
+
+            var want = v switch {
+                PinColumnItem => needPin,
+                AddColumnItem => needAdd,
+                _ => false
+            };
+
+            if (!want) {
+                v.PropertyChanged -= ColumnViewItem_PropertyChanged;
+                _onDemand.RemoveAt(z);
+                changed = true;
+            }
+        }
+
+        if (needPin && !_internal.OfType<PinColumnItem>().Any() && !_onDemand.OfType<PinColumnItem>().Any()) {
+            var p = new PinColumnItem {
+                Permanent = true
+            };
+            p.PropertyChanged += ColumnViewItem_PropertyChanged;
+            _onDemand.Add(p);
+            changed = true;
+        }
+
+        if (needAdd && !_internal.OfType<AddColumnItem>().Any() && !_onDemand.OfType<AddColumnItem>().Any()) {
+            var a = new AddColumnItem();
+            a.PropertyChanged += ColumnViewItem_PropertyChanged;
+            _onDemand.Add(a);
+            changed = true;
+        }
+
+        if (changed) { Invalidated = true; }
+    }
 
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
@@ -372,25 +438,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public void RemoveDummyColumn() {
-        var removed = false;
-        for (var z = _internal.Count - 1; z >= 0; z--) {
-            if (_internal[z]?.IsDummyColumn == true) {
-                _internal[z].PropertyChanged -= ColumnViewItem_PropertyChanged;
-                _internal.RemoveAt(z);
-                removed = true;
-            }
-        }
-        if (removed) { Invalidated = true; }
-    }
-
     public void Repair(int number) {
         if (Table is not { IsDisposed: false } tb) { return; }
 
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < _internal.Count; z++) {
-            if (_internal[z]?.IsDummyColumn == true) { continue; }
+            if (_internal[z]?.StorageKey is not null) { continue; }
             if (_internal[z]?.Column is null || !tb.Column.Contains(_internal[z]?.Column)) {
                 _internal.Remove(_internal[z]);
                 z--;
@@ -460,6 +514,18 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
+    /// <summary>
+    /// Fügt ein Element beim Parsen am Ende von <see cref="_internal"/> hinzu,
+    /// ohne Sortierung oder Positions-Berechnung. Dadurch wird die in der
+    /// Serialisierung gespeicherte Reihenfolge (einschließlich virtueller
+    /// Spalten) exakt wiederhergestellt.
+    /// </summary>
+    private void AddParsed(ColumnViewItem columnViewItem) {
+        columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
+        _internal.Add(columnViewItem);
+        Invalidated = true;
+    }
+
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
     /// <summary>
@@ -487,8 +553,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             foreach (var item in _internal) {
                 item.Dispose();
             }
+            foreach (var item in _onDemand) {
+                item.Dispose();
+            }
         }
         _internal.Clear();
+        _onDemand.Clear();
         Table = null;
     }
 

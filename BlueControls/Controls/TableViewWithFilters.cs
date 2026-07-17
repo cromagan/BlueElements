@@ -398,7 +398,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ((IContextMenu)TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()));
+        ((IContextMenu)TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, null, RowsVisibleUnique()));
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
@@ -406,16 +406,16 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Filter.Clear();
     }
 
+    private void btnCollapseChapters_Click(object? sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        TableInternal.ToggleAllChapters();
+    }
+
     private void btnPin_Click(object? sender, System.EventArgs e) => TableInternal.Pin(RowsVisibleUnique());
 
     private void btnPinZurück_Click(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         TableInternal.Pin(null);
-    }
-
-    private void btnCollapseChapters_Click(object? sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        TableInternal.ToggleAllChapters();
     }
 
     private void btnTextLöschen_Click(object? sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
@@ -485,14 +485,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var hasTB = Table is not null && Enabled;
 
-        // Pin nur aktivieren, wenn Pinning generell erlaubt ist (keine Kapitel-
-        // Spalte, kein SYS_ROWSORTINDEX). Die Sichtbarkeit wird in
-        // RepositionControls gesetzt, da sie das Layout beeinflusst.
-        var pinAllowed = hasTB && TableInternal.PinAllowed;
-
         // Status der Steuerelemente aktualisieren
-        btnPin.Enabled = pinAllowed;
-        btnPinZurück.Enabled = pinAllowed && TableInternal.PinnedRows.Count > 0;
+        btnPin.Enabled = hasTB;
+        btnPinZurück.Enabled = hasTB && TableInternal.PinnedRows.Count > 0;
         txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation is null;
         btnAlleFilterAus.Enabled = hasTB;
         btnCollapseChapters.Enabled = hasTB && CurrentArrangement?.ColumnForChapter is { IsDisposed: false };
@@ -541,7 +536,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region Pin Button
 
-        btnPinZurück.Enabled = TableInternal.PinAllowed && TableInternal.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = TableInternal.PinnedRows.Count > 0;
 
         #endregion
 
@@ -926,22 +921,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             btnCollapseChapters.Top = firstRowY;
             btnViewManager.Top = firstRowY;
 
-            // Button-Kette dynamisch aufbauen. Pin-Buttons werden ausgeblendet,
-            // wenn Pinning generell nicht möglich ist (Kapitel-Spalte oder
-            // SYS_ROWSORTINDEX). Der Kapitel-Button nur bei Kapitel-Spalte.
-            // Nicht sichtbare Buttons rutschen die nachfolgenden nach links.
-            var pinAllowed = TableInternal.PinAllowed;
-            if (pinAllowed) {
-                btnPin.Visible = true;
-                btnPinZurück.Visible = true;
-                btnPin.Left = btnAlleFilterAus.Right + 8;
-                btnPinZurück.Left = btnPin.Right;
-            } else {
-                btnPin.Visible = false;
-                btnPinZurück.Visible = false;
-            }
+            // Button-Kette dynamisch aufbauen. Pin-Buttons sind immer sichtbar.
+            // Der Kapitel-Button nur bei Kapitel-Spalte.
+            btnPin.Visible = true;
+            btnPinZurück.Visible = true;
+            btnPin.Left = btnAlleFilterAus.Right + 8;
+            btnPinZurück.Left = btnPin.Right;
 
-            var nextLeft = pinAllowed ? btnPinZurück.Right : btnAlleFilterAus.Right;
+            var nextLeft = btnPinZurück.Right;
 
             if (cu?.ColumnForChapter is { IsDisposed: false }) {
                 btnCollapseChapters.Left = nextLeft + 8;
