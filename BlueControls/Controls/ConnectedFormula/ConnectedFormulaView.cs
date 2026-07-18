@@ -253,7 +253,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
             if (table.FormulaFileName() is { } filename) {
-                var tmpFormula = ConnectedFormula.ConnectedFormula.Get(filename);
+                var tmpFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula.ConnectedFormula>(filename);
                 if (tmpFormula is { IsDisposed: false }) {
                     Page = tmpFormula.GetPage("Head");
                 }

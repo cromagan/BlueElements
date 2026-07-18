@@ -117,7 +117,7 @@ public class TableFile : Table {
         get {
             if (string.IsNullOrEmpty(Filename)) { return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc); }
 
-            var chunk = Chunk.Get(Filename);
+            var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
             if (chunk?.FileInfo is { Exists: true } fi) { return fi.LastWriteTimeUtc; }
 
             return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -306,7 +306,7 @@ public class TableFile : Table {
 
         if (InitialSavePending) { return string.Empty; }
 
-        var chunk = Chunk.Get(Filename);
+        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
         if (chunk is null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
         }
@@ -449,7 +449,7 @@ public class TableFile : Table {
             var result = SaveExtended(Filename, contentToWrite);
 
             if (result.IsSuccessful) {
-                Chunk.Get(Filename)?.Invalidate();
+                LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename)?.Invalidate();
             }
 
             return result;
@@ -511,7 +511,7 @@ public class TableFile : Table {
             return "Datei zu klein für Speicherung.";
         }
 
-        if (Chunk.Get(tbf.Filename) is null) {
+        if (LiveInstanceCacheHelper.GetLiveInstance<Chunk>(tbf.Filename) is null) {
             if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
             }
@@ -596,7 +596,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = Chunk.Get(Filename);
+        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
 
         if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");

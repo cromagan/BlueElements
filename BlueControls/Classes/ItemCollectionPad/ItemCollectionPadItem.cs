@@ -45,7 +45,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
-            var f = ConnectedFormula.Get(layoutFileName);
+            var f = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(layoutFileName);
 
             if (f is not null) {
                 this.Parse(Win1252.GetString(f.Content));

@@ -141,7 +141,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override void ParseJson(JsonObject json) {
         var parent = json.GetString("parent");
         if (parent is { Length: > 0 }) {
-            ParentFormula = ConnectedFormula.Get(parent);
+            ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(parent);
             ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
         }
         _child = json.GetString("child");
@@ -153,7 +153,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = ConnectedFormula.Get(value.FromNonCritical());
+                ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(value.FromNonCritical());
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 

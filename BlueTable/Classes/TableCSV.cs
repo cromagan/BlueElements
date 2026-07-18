@@ -179,7 +179,7 @@ public class TableCSV : TableFile {
                 var headFile = HeadFile();
 
                 if (_headChunk is null) {
-                    _headChunk = Chunk.Get(headFile) ?? new Chunk(headFile);
+                    _headChunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(headFile) ?? new Chunk(headFile);
                 }
 
                 if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
@@ -225,7 +225,7 @@ public class TableCSV : TableFile {
     private void LoadHeadChunk() {
         var headFile = HeadFile();
 
-        _headChunk = Chunk.Get(headFile);
+        _headChunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(headFile);
         if (_headChunk is null) { return; }
 
         _ = _headChunk.LoadContent();

@@ -282,7 +282,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            var newCf = ConnectedFormula.Get(SaveTab.FileName);
+            var newCf = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(SaveTab.FileName);
             if (newCf is null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
@@ -299,7 +299,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         const string path = @"D:\01_Data\test.json";
         if (!FileExists(path)) { return; }
 
-        var cf = ConnectedFormula.Get(path);
+        var cf = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(path);
         if (cf is null) { return; }
 
         var json = ReadAllText(path, Constants.Win1252);
@@ -426,7 +426,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = ConnectedFormula.Get(filename);
+        var tmpFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(filename);
         if (tmpFormula is null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);

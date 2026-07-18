@@ -15,19 +15,16 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
-public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged {
+public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged, ILiveInstanceCache<ConnectedFormula> {
 
     #region Fields
 
-    /// <summary>
-    /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen.
-    /// </summary>
-    public static readonly ConcurrentDictionary<string, ConnectedFormula> LiveInstances = new(StringComparer.OrdinalIgnoreCase);
-
     private static readonly object _lock = new();
+
     private static List<string>? _visibleFor_AllUsed;
+
     private readonly List<string> _notAllowedChilds = [];
+
     private bool _finishingParse;
 
     #endregion
@@ -58,6 +55,12 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
+    /// normalisiertem Dateinamen.
+    /// </summary>
+    public static ConcurrentDictionary<string, ConnectedFormula> LiveInstances { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public static string Type => "ConnectedFormula";
 
@@ -135,36 +138,10 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     #region Methods
 
     /// <summary>
-    /// Holt eine bestehende oder erstellt eine neue <see cref="ConnectedFormula"/>-Instanz für den
-    /// angegebenen Dateinamen. Nutzt das eigene <see cref="LiveInstances"/>-Register.
-    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
+    /// Factory für <see cref="LiveInstanceCacheHelper.GetLiveInstance{T}" />.
+    /// Der Konstruktor trägt die neue Instanz selbst in <see cref="LiveInstances" /> ein.
     /// </summary>
-    public static ConnectedFormula? Get(string filename) {
-        var normalizedFileName = filename.NormalizeFile();
-
-        if (!FileExists(normalizedFileName)) { return null; }
-
-        // Bestehende lebende Instanz zurückgeben
-        if (LiveInstances.TryGetValue(normalizedFileName, out var existing)) {
-            if (existing.IsDisposed) {
-                LiveInstances.TryRemove(normalizedFileName, out _);
-            } else {
-                return existing;
-            }
-        }
-
-        // Neue Instanz erzeugen. Der Konstruktor registriert in LiveInstances
-        // und im Polling-Register von BlockableFile.
-        var created = new ConnectedFormula(normalizedFileName);
-
-        // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
-        // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
-        var winner = LiveInstances.GetOrAdd(normalizedFileName, created);
-        if (!ReferenceEquals(winner, created)) {
-            created.Dispose();
-        }
-        return winner;
-    }
+    static ConnectedFormula ILiveInstanceCache<ConnectedFormula>.CreateInstance(string normalizedFileName) => new(normalizedFileName);
 
     public static void Invalidate_VisibleFor_AllUsed() {
         lock (_lock) {

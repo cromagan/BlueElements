@@ -9,7 +9,7 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
+public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInstanceCache<Chunk> {
 
     #region Fields
 
@@ -18,12 +18,6 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     /// Wird der Chunk wieder benötigt, laden die Daten automatisch neu.
     /// </summary>
     public const int SkipIfUnusedMinutes = 5;
-
-    /// <summary>
-    /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen.
-    /// </summary>
-    public static readonly ConcurrentDictionary<string, Chunk> LiveInstances = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Synchronisierungsobjekt für thread-sichere Zugriffe auf FileInfo und LoadFailed.</summary>
     private readonly object _lock = new();
@@ -60,6 +54,12 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
+    /// normalisiertem Dateinamen.
+    /// </summary>
+    public static ConcurrentDictionary<string, Chunk> LiveInstances { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public FileInfo? FileInfo {
         get => field ??= GetFileInfo(Filename);
@@ -105,45 +105,18 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     #region Methods
 
     /// <summary>
+    /// Factory für <see cref="LiveInstanceCacheHelper.GetLiveInstance{T}" />.
+    /// Der Konstruktor trägt die neue Instanz selbst in <see cref="LiveInstances" /> ein.
+    /// </summary>
+    static Chunk ILiveInstanceCache<Chunk>.CreateInstance(string normalizedFileName) => new(normalizedFileName);
+
+    /// <summary>
     /// Disposed alle lebenden Chunk-Instanzen. Wird beim Herunterfahren der Anwendung aufgerufen.
     /// </summary>
     public static void DisposeAll() {
         foreach (var chunk in LiveInstances.Values) {
             try { chunk.Dispose(); } catch { }
         }
-    }
-
-    /// <summary>
-    /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
-    /// angegebenen Dateinamen. Nutzt das eigene <see cref="LiveInstances"/>-Register.
-    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
-    /// </summary>
-    public static Chunk? Get(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return null; }
-
-        var normalizedFileName = filename.NormalizeFile();
-
-        if (!FileExists(normalizedFileName)) { return null; }
-
-        // Bestehende lebende Instanz zurückgeben
-        if (LiveInstances.TryGetValue(normalizedFileName, out var existing)) {
-            if (existing.IsDisposed) {
-                LiveInstances.TryRemove(normalizedFileName, out _);
-            } else {
-                return existing;
-            }
-        }
-
-        // Neue Instanz erzeugen. Der Konstruktor registriert in LiveInstances.
-        var created = new Chunk(normalizedFileName);
-
-        // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
-        // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
-        var winner = LiveInstances.GetOrAdd(normalizedFileName, created);
-        if (!ReferenceEquals(winner, created)) {
-            created.Dispose();
-        }
-        return winner;
     }
 
     /// <summary>
@@ -166,7 +139,7 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText {
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
     public static bool IsChunkRecentlyUsed(string filename) {
-        var chunk = Get(filename);
+        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(filename);
         if (chunk is null) { return false; }
         return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < SkipIfUnusedMinutes;
     }

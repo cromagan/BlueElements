@@ -228,3 +228,6 @@ ColumnViewCollection: Erstelle eine Eigenschaft: StartCollapsed. TableView soll 
 ## Aufgabe
 TableView: bei Indents wird die Markierte Zeile nicht korrekt mit den indents markiert. Es soll von ganz vorne bis ganz nach rechts über die gesamte Ansicht markiert werden.
 
+## Aufgabe
+Wird angepinnt, und sind keine Kapitel vorhanden, darf die Zeile nur einmal angezeigt werden.
+
