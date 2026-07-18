@@ -144,7 +144,7 @@ public static class ColumnViewItemRenderingExtensions {
             // SheetStyle des Parents verwenden, damit der Renderer mit dem korrekten
             // Style erzeugt wird (solange er noch nicht gecacht ist).
             var sheetStyle = parent?.SheetStyle ?? Win11;
-            cw = cvi.ViewType == ViewType.PermanentColumn
+            cw = cvi.Permanent
                 ? Math.Min(cvi.CanvasContentWidth(sheetStyle).CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.3))
                 : Math.Min(cvi.CanvasContentWidth(sheetStyle).CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
         }

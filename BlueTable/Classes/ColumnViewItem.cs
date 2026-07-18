@@ -20,7 +20,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public ColumnViewItem(ColumnItem column) : this(column.Table) {
         Column = column;
-        ViewType = ViewType.Column;
         //Renderer = string.Empty;
     }
 
@@ -28,7 +27,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     protected ColumnViewItem(Table? parent) : base() {
         Table = parent;
-        ViewType = ViewType.None;
         Column = null;
         IsExpanded = true;
         //Renderer = string.Empty;
@@ -90,8 +88,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public bool IsDummyColumn => ViewType == ViewType.DummyColumn;
-
     public bool IsExpanded {
         get;
         set {
@@ -106,8 +102,12 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
 
     public bool Permanent {
-        get => ViewType == ViewType.PermanentColumn;
-        set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>
@@ -141,15 +141,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public int? TmpIfFilterRemoved { get; set; }
 
-    public ViewType ViewType {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = ViewType.None;
-
     #endregion
 
     #region Methods
@@ -159,7 +150,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// Virtuelle Spalten (ColumnName = VIR_…) werden über ihren ClassId-Namen
     /// als echter Subtyp rekonstruiert — ohne Parse, da Renderer, Caption,
     /// FixedWidth usw. im Subtyp fest codiert sind und die serialisierten
-    /// Werte (ViewType, FontHorizontal) den Konstruktor-Defaults entsprechen.
+    /// Werte (Permanent, FontHorizontal) den Konstruktor-Defaults entsprechen.
     /// Echte Spalten werden als Basis-<see cref="ColumnViewItem" /> geparst.
     /// </summary>
     public static ColumnViewItem Create(Table? table, string toParse) {
@@ -198,7 +189,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
-        result.ParseableAdd("Type", ViewType);
+        result.ParseableAdd("Permanent", Permanent);
         result.ParseableAdd("ColumnName", ColumnName);
         result.ParseableAdd("FontHorizontal", Horizontal);
 
@@ -206,7 +197,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     }
 
     public void ParseFinished(string parsed) {
-        if (Column is not null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
+        // Keine Nachbearbeitung mehr nötig — Permanent hat einen gültigen Default.
     }
 
     public bool ParseThis(string key, string value) {
@@ -225,7 +216,13 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
                 return true;
 
             case "type":
-                ViewType = (ViewType)IntParse(value);
+                // Kompatibilität: Alter Serialisierungswert 2 (PermanentColumn)
+                // wird auf Permanent=true gesetzt.
+                if (IntParse(value) == 2) { Permanent = true; }
+                return true;
+
+            case "permanent":
+                Permanent = value.FromPlusMinus();
                 return true;
 
             case "renderer":

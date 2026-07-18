@@ -3934,28 +3934,26 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var newIndex = ca.IndexOf(sourceCvi);
 
-        if (!sourceCvi.IsDummyColumn) {
-            var hasPermanentAfter = false;
-            for (var i = newIndex + 1; i < ca.Count; i++) {
-                if (ca[i] is { Permanent: true } c && !c.IsDummyColumn) {
-                    hasPermanentAfter = true;
+        var hasPermanentAfter = false;
+        for (var i = newIndex + 1; i < ca.Count; i++) {
+            if (ca[i] is { Permanent: true }) {
+                hasPermanentAfter = true;
+                break;
+            }
+        }
+
+        if (hasPermanentAfter) {
+            sourceCvi.Permanent = true;
+        } else if (sourceCvi.Permanent) {
+            var hasNonPermanentBefore = false;
+            for (var i = 0; i < newIndex; i++) {
+                if (ca[i] is { Permanent: false }) {
+                    hasNonPermanentBefore = true;
                     break;
                 }
             }
-
-            if (hasPermanentAfter) {
-                sourceCvi.Permanent = true;
-            } else if (sourceCvi.Permanent) {
-                var hasNonPermanentBefore = false;
-                for (var i = 0; i < newIndex; i++) {
-                    if (ca[i] is { Permanent: false } c && !c.IsDummyColumn) {
-                        hasNonPermanentBefore = true;
-                        break;
-                    }
-                }
-                if (hasNonPermanentBefore) {
-                    sourceCvi.Permanent = false;
-                }
+            if (hasNonPermanentBefore) {
+                sourceCvi.Permanent = false;
             }
         }
 
@@ -4287,7 +4285,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         //var realhead = viewItem.RealHead(Zoom, OffsetX); // Filterleiste kann ignoriert werden, da nur ControlX-Koordinaten berechnet werden.
 
-        //if (viewItem.ViewType == ViewType.PermanentColumn) {
+        //if (viewItem.Permanent) {
         //    return realhead.Right <= dispR.Width;
         //}
 

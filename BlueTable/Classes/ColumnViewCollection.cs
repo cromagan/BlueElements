@@ -151,7 +151,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Add(ColumnViewItem columnViewItem, ColumnItem? insertAfterColumn) {
         columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-        _internal.Insert(ComputeInsertIndex(insertAfterColumn), columnViewItem);
+
+        var insertIndex = _internal.Count;
+        if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
+            insertIndex = _internal.IndexOf(afterViewItem) + 1;
+        }
+
+        _internal.Insert(insertIndex, columnViewItem);
         Invalidated = true;
     }
 
@@ -515,23 +521,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
-
-    /// <summary>
-    /// Bestimmt den Index, an dem eine neue Spalte eingefügt wird.
-    /// Ist <paramref name="insertAfterColumn"/> vorhanden und in dieser
-    /// Anordnung sichtbar, wird die Position direkt dahinter geliefert.
-    /// Andernfalls (auch bei null) wird die Position vor der Dummy-Spalte
-    /// bzw. am Ende gewählt.
-    /// </summary>
-    private int ComputeInsertIndex(ColumnItem? insertAfterColumn) {
-        if (insertAfterColumn is not null) {
-            var afterIdx = _internal.FindIndex(v => v?.Column == insertAfterColumn);
-            if (afterIdx >= 0) { return afterIdx + 1; }
-        }
-
-        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
-        return dummyIdx >= 0 ? dummyIdx : _internal.Count;
-    }
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }

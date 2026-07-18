@@ -252,10 +252,6 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Alignx, _zoom);
     public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
-        if (viewItem.IsDummyColumn) {
-            gr.FillRectangle(TableHeadOverlayBrush, positionControl);
-            return;
-        }
         var brush = BackgroundFill.GetBrush(viewItem.BackColor_ColumnCell);
         lock (brush) { gr.FillRectangle(brush, positionControl); }
     }

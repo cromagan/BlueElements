@@ -7,10 +7,8 @@ namespace BlueTable.Classes;
 /// Dropdown zum Einblenden/Anlegen echter Spalten. Hat kein
 /// <see cref="ColumnItem" /> und kann vom Benutzer frei innerhalb der
 /// Anordnung verschoben werden. Standardmäßig erscheint sie am Ende.
-/// Setzt ViewType auf DummyColumn, damit bestehende IsDummyColumn-Prüfungen
-/// weiterhin greifen. Erscheint entweder dauerhaft (als
-/// <see cref="StorageKey"/> VIR_ADD in der Collection gespeichert) oder
-/// on-demand während der Ansichtbearbeitung.
+/// (als <see cref="StorageKey"/> VIR_ADD in der Collection gespeichert)
+/// oder on-demand während der Ansichtbearbeitung.
 /// </summary>
 public sealed class AddColumnItem : ColumnViewItem {
 
@@ -23,7 +21,6 @@ public sealed class AddColumnItem : ColumnViewItem {
     #region Constructors
 
     public AddColumnItem() : base((Table?)null) {
-        ViewType = ViewType.DummyColumn;
         IsExpanded = true;
     }
 
