@@ -10,8 +10,9 @@ internal static class Program {
 
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
         try {
-            var ex = (Exception)e.ExceptionObject;
-            throw Develop.DebugError($"Allgemeiner unbehandelter Fehler unbekannter Herkunft: {ex.Message}");
+            if (e.ExceptionObject is Exception ex) {
+                throw Develop.DebugError($"Allgemeiner unbehandelter Fehler unbekannter Herkunft: {ex.Message}");
+            }
         } catch { }
         Develop.AbortExe(true);
     }

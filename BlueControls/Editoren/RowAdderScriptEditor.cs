@@ -304,19 +304,21 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
         // Bei TableChunk: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
-        if (Table is TableChunk) {
+        if (Table is TableChunk tc) {
             btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
             txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
+
+            if (tc.Row.Count == 0) { return; }
+        } else {
+            return;
         }
 
-        if (Table is not TableChunk || Table.Row.Count == 0) { return; }
-
         if (string.IsNullOrEmpty(txbChunk.Text)) {
-            var firstRow = Table.Row.First();
+            var firstRow = tc.Row.First();
             txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
         }
 
-        if (!string.IsNullOrEmpty(txbChunk.Text)) { Table.BeSureRowIsLoaded(txbChunk.Text); }
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { tc.BeSureRowIsLoaded(txbChunk.Text); }
     }
 
     private void UpdateChunkUiState() {

@@ -27,12 +27,16 @@ public class FlexiControlForDelegate : FlexiControl {
     /// </summary>
     /// <param name="editable"></param>
     public FlexiControlForDelegate(IEditable editable) {
-        if (editable is IReadableTextWithKey irt) {
-            Init(editable.Edit, $"{editable.CaptionForEditor} '{irt.KeyName}' bearbeiten", irt.SymbolForReadableText());
-        } else if (editable is IReadableText ir) {
-            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", ir.SymbolForReadableText());
-        } else {
-            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(BlueBasics.Enums.ImageCode.Smiley, 22));
+        switch (editable) {
+            case IReadableTextWithKey irt:
+                Init(editable.Edit, $"{editable.CaptionForEditor} '{irt.KeyName}' bearbeiten", irt.SymbolForReadableText());
+                break;
+            case IReadableText ir:
+                Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", ir.SymbolForReadableText());
+                break;
+            default:
+                Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(BlueBasics.Enums.ImageCode.Smiley, 22));
+                break;
         }
     }
 

@@ -147,34 +147,41 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         try {
             var myObject = Activator.CreateInstance(editortype);
 
-            if (myObject is Form frm) {
-                if (frm is IIsEditor frmEditor) {
-                    frmEditor.Mode = frmEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
-                }
-                mb = frm;
-            } else if (myObject is EditorEasy ea) {
-                ea.Mode = ea.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
-                mb = new InputBoxEditor(ea, supportsCancel, allowInvalid);
-            } else if (myObject is ISimpleEditor se) {
-                if (se is IIsEditor seEditor) {
-                    seEditor.Mode = seEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
-                    seEditor.InputItem = toEdit;
-                }
-                mb = new InputBoxEditor(se.GetControl(400), supportsCancel, allowInvalid);
+            switch (myObject) {
+                case Form frm:
+                    if (frm is IIsEditor frmEditor) {
+                        frmEditor.Mode = frmEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
+                    }
+                    mb = frm;
+                    break;
+                case EditorEasy ea:
+                    ea.Mode = ea.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
+                    mb = new InputBoxEditor(ea, supportsCancel, allowInvalid);
+                    break;
+                case ISimpleEditor se:
+                    if (se is IIsEditor seEditor) {
+                        seEditor.Mode = seEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
+                        seEditor.InputItem = toEdit;
+                    }
+                    mb = new InputBoxEditor(se.GetControl(400), supportsCancel, allowInvalid);
+                    break;
             }
         } catch { }
 
         if (mb is null) { return false; }
 
-        if (mb is IIsEditor ie) {
-            ie.InputItem = toEdit;
-        } else if (mb is InputBoxEditor ibe) {
-            foreach (var c in ibe.Controls) {
-                if (c is IIsEditor ie2) {
-                    ie2.InputItem = toEdit;
+        switch (mb) {
+            case IIsEditor ie:
+                ie.InputItem = toEdit;
+                break;
+            case InputBoxEditor ibe:
+                foreach (var c in ibe.Controls) {
+                    if (c is IIsEditor ie2) {
+                        ie2.InputItem = toEdit;
+                    }
                 }
-            }
-            ibe.UpdateButtons();
+                ibe.UpdateButtons();
+                break;
         }
 
         var ok = true;

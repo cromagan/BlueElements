@@ -336,13 +336,19 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     break;
 
                 default:
-
-                    if (_accessor.Get() is null) { } else if (_accessor.Get() is IEditable) { } else if (_accessor.Get() is Enum) {
-                        var ef = IntParse(Value);
-                        var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
-                        if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
-                    } else {
-                        Develop.DebugError("Art unbekannt!");
+                    switch (_accessor.Get()) {
+                        case null:
+                            break;
+                        case IEditable:
+                            break;
+                        case Enum:
+                            var ef = IntParse(Value);
+                            var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
+                            if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
+                            break;
+                        default:
+                            Develop.DebugError("Art unbekannt!");
+                            break;
                     }
                     break;
             }

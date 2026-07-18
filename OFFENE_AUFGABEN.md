@@ -163,7 +163,6 @@ Finde stellen, wo  die Dreierabfrage sinn mach
 if (Generic.Ending || IsDisposed || Disposing) { return; }
 und ergänze diese
 
-
 #Aufgabe
 Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern den Wert in der Tabelle. Nun soll es anders sein: Die Werte sollen in Table gespeichert werden. Und so auch die RowChecked Werte (Zeilenfarben etc.)
 
@@ -179,12 +178,8 @@ CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, Spli
 ##Aufgabe
 Alle ListItemAbstract Ableitungen komplett entfernen. Nur noch ein List-Item. Das aussehen wird durch die (vorhandenen) Renderer gemacht. Evtl. die Renderer erweitern. Evtl. neue Renderer einrichten.
 
-
 ##Aufgabe 
 Kontextmenu: Kapitel ändern
-
-#Aufgabe
-Chunk und ConnectedFormula das get vereinheitlichen
 
 ##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
@@ -231,12 +226,5 @@ Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nic
 ColumnViewCollection: Erstelle eine Eigenschaft: StartCollapsed. TableView soll dann beim umschalten auf diese Ansicht alle Überschriften einklappen
 
 ## Aufgabe
-TableView berechent die X-Max-Koordinate falsch: indents werden ignoriert.
-
-## Aufgabe
 TableView: bei Indents wird die Markierte Zeile nicht korrekt mit den indents markiert. Es soll von ganz vorne bis ganz nach rechts über die gesamte Ansicht markiert werden.
-
-## Aufgabe
-TableView: ist ein Benutzerdefiniertes Kontextmenu vorhanden, soll das anpinnen deaktiviert werden. Ebenso, wenn SysRowSort vorhanden ist. Und die Buttons in der Leiste komplett entftfernt (und der Bereich aufgefüllt werden)
-
 

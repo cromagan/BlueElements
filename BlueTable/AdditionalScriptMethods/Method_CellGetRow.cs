@@ -35,16 +35,20 @@ public class Method_CellGetRow : Method_TableGeneric {
 
         var l = new List<string>();
 
-        if (v is VariableListString vl) {
-            l.AddRange(vl.ValueList);
-        } else if (v is VariableString vs) {
-            var w = vs.ValueString;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else if (v is VariableDouble vf) {
-            var w = vf.ValueForReplace;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else {
-            return new DoItFeedback("Spaltentyp nicht unterstützt.", true);
+        switch (v) {
+            case VariableListString vl:
+                l.AddRange(vl.ValueList);
+                break;
+            case VariableString vs:
+                var w = vs.ValueString;
+                if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+                break;
+            case VariableDouble vf:
+                var wd = vf.ValueForReplace;
+                if (!string.IsNullOrEmpty(wd)) { l.Add(wd); }
+                break;
+            default:
+                return new DoItFeedback("Spaltentyp nicht unterstützt.", true);
         }
 
         return new DoItFeedback(string.Join('\r', l));

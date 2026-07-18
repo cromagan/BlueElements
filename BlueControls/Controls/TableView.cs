@@ -904,7 +904,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnArrangementSelector.Text = showingKey;
     }
 
-    public (ColumnViewItem? column, RowBackground? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), RowItemAtPosition(MouseDownData?.ControlY ?? 0));
+    public (ColumnViewItem? column, RowBackground? row) CellOnLastMouseDown() {
+        var row = RowItemAtPosition(MouseDownData?.ControlY ?? 0);
+        return (ColumnOnCoordinate(CurrentArrangement, MouseDownData, row), row);
+    }
 
     public void CheckView() {
         var tb = Table;
@@ -2047,7 +2050,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (_mouseOverColumn is { IsDisposed: false } &&
                     _mouseOverRowItem is RowBackground { } rbi &&
                     e.Button == MouseButtons.None) {
-                    var mxInCol = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX);
+                    var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * rbi.Indent;
+                    var mxInCol = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX) - indentOffset;
                     var myInCol = e.ControlY - rbi.ControlPosition(Zoom, OffsetX, OffsetY).Top;
                     QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn, mxInCol, myInCol, Zoom);
                 } else {
@@ -2110,7 +2114,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
 
                 if (_mouseOverRowItem is RowBackground rbli) {
-                    var mouseXinColumn = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX);
+                    var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * rbli.Indent;
+                    var mouseXinColumn = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX) - indentOffset;
                     var mouseYinColumn = e.ControlY - rbli.ControlPosition(Zoom, OffsetX, OffsetY).Top;
                     if (rbli.HandleClick(ca, _mouseOverColumn, mouseXinColumn, mouseYinColumn, Zoom, this)) {
                         Invalidate_CurrentArrangement();
@@ -3671,7 +3676,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.Focus();
     }
 
-    private (ColumnViewItem?, RowBackground?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), RowItemAtPosition(e.ControlY));
+    private (ColumnViewItem?, RowBackground?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) {
+        var row = RowItemAtPosition(e.ControlY);
+        return (ColumnOnCoordinate(ca, e, row), row);
+    }
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3708,11 +3716,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Column == CursorPosColumn?.Column) { CursorPos_Reset(); }
     }
 
-    private ColumnViewItem? ColumnOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs? e) {
+    private ColumnViewItem? ColumnOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs? e, RowBackground? row = null) {
         if (ca is not { IsDisposed: false } || e is null) { return null; }
 
+        // Eingerückte Zeilen verschieben alle Spalten beim Zeichnen nach
+        // rechts (RowBackground.DrawExplicit: indentOffset). Die Hit-Detection
+        // muss denselben Versatz berücksichtigen, sonst wird der Klick der
+        // falschen Spalte zugeordnet — z.B. trifft ein Klick auf den visuell
+        // verschobenen Pin-Button eine andere Spalte, während ein Klick in
+        // den leeren Indent-Bereich fälschlich als Pin-Klick gewertet wird.
+        var indentOffset = row is null ? 0 : RowBackground.IndentWidth.CanvasToControl(Zoom) * row.Indent;
+
         foreach (var thisViewItem in ca.RenderingItems) {
-            if (e.ControlX >= thisViewItem.ControlColumnLeft(OffsetX) && e.ControlX <= thisViewItem.ControlColumnRight(OffsetX)) { return thisViewItem; }
+            if (e.ControlX >= thisViewItem.ControlColumnLeft(OffsetX) + indentOffset && e.ControlX <= thisViewItem.ControlColumnRight(OffsetX) + indentOffset) { return thisViewItem; }
         }
 
         return null;

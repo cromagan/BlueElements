@@ -90,15 +90,20 @@ public class VariableTable : Variable {
 
     protected override void SetValue(object? x) {
         _pendingTableKey = null;
-        if (x is null) {
-            _table = null;
-        } else if (x is Table tb) {
-            _table = tb;
-        } else if (x is string key) {
-            _table = null;
-            _pendingTableKey = key;
-        } else {
-            Develop.DebugError("Variablenfehler!");
+        switch (x) {
+            case null:
+                _table = null;
+                break;
+            case Table tb:
+                _table = tb;
+                break;
+            case string key:
+                _table = null;
+                _pendingTableKey = key;
+                break;
+            default:
+                Develop.DebugError("Variablenfehler!");
+                break;
         }
         GetText();
     }

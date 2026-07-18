@@ -74,12 +74,16 @@ public class VariableRowItem : Variable {
     }
 
     protected override void SetValue(object? x) {
-        if (x is null) {
-            _row = null;
-        } else if (x is RowItem r) {
-            _row = r;
-        } else {
-            Develop.DebugError("Variablenfehler!");
+        switch (x) {
+            case null:
+                _row = null;
+                break;
+            case RowItem r:
+                _row = r;
+                break;
+            default:
+                Develop.DebugError("Variablenfehler!");
+                break;
         }
         GetText();
     }

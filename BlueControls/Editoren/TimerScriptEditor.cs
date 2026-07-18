@@ -39,20 +39,24 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
 
-            if (value is TimerPadItem cpi) {
-                tbcScriptEigenschaften.Enabled = true;
-                Script = cpi.Script;
-                _item = cpi;
-                _allReadOnly = true;
-            } else if (value is ScriptButtonPadItem sbpi) {
-                tbcScriptEigenschaften.Enabled = true;
-                Script = sbpi.Script;
-                _item = sbpi;
-                _allReadOnly = false;
-            } else {
-                tbcScriptEigenschaften.Enabled = false;
-                Script = string.Empty;
-                _allReadOnly = true;
+            switch (value) {
+                case TimerPadItem cpi:
+                    tbcScriptEigenschaften.Enabled = true;
+                    Script = cpi.Script;
+                    _item = cpi;
+                    _allReadOnly = true;
+                    break;
+                case ScriptButtonPadItem sbpi:
+                    tbcScriptEigenschaften.Enabled = true;
+                    Script = sbpi.Script;
+                    _item = sbpi;
+                    _allReadOnly = false;
+                    break;
+                default:
+                    tbcScriptEigenschaften.Enabled = false;
+                    Script = string.Empty;
+                    _allReadOnly = true;
+                    break;
             }
         }
     }

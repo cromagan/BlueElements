@@ -32,7 +32,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
     public override object? CreateNewItem() {
         if (Table is not { IsDisposed: false } tb) { return null; }
 
-        var colnam = lbxKeyColumns.CheckedItems.Select(thisk => ((ReadableListItem)thisk).Item as ColumnItem).Where(c => c is not null).Cast<ColumnItem>().ToList();
+        var colnam = lbxKeyColumns.CheckedItems.OfType<ReadableListItem>().Select(rli => rli.Item).OfType<ColumnItem>().ToList();
         return new UniqueValueDefinition(tb, colnam);
     }
 

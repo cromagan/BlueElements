@@ -84,12 +84,16 @@ public class VariableDouble : Variable {
     }
 
     protected override void SetValue(object? x) {
-        if (x is float val) {
-            _double = val;
-        } else if (x is double vald) {
-            _double = vald;
-        } else {
-            Develop.DebugError("Variablenfehler!");
+        switch (x) {
+            case float val:
+                _double = val;
+                break;
+            case double vald:
+                _double = vald;
+                break;
+            default:
+                Develop.DebugError("Variablenfehler!");
+                break;
         }
     }
 

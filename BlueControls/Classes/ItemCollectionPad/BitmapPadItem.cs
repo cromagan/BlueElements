@@ -226,26 +226,22 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
         if (!("~" + variable.KeyName + "~").Equals(Platzhalter_Für_Layout, StringComparison.OrdinalIgnoreCase)) { return false; }
 
-        Bitmap? ot;
-
-        if (variable is VariableBitmap vbmp) {
-            ot = vbmp.ValueBitmap;
-        } else if (variable is VariableString filn) {
-            if (FileExists(filn.ValueString)) {
-                ot = Image_FromFile(filn.ValueString) as Bitmap;
-            } else {
+        switch (variable) {
+            case VariableBitmap vbmp:
+                if (vbmp.ValueBitmap is { } bmp1) {
+                    Bitmap = bmp1;
+                    return true;
+                }
                 return false;
-            }
-        } else {
-            return false;
+            case VariableString filn:
+                if (FileExists(filn.ValueString) && Image_FromFile(filn.ValueString) is Bitmap bmp2) {
+                    Bitmap = bmp2;
+                    return true;
+                }
+                return false;
+            default:
+                return false;
         }
-
-        if (ot is not null) {
-            Bitmap = ot;
-            return true;
-        }
-
-        return false;
     }
 
     public bool ResetVariables() {

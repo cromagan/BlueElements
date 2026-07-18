@@ -718,9 +718,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
             case "image":
                 var file = (string)gb[1];
-                var item = lsbFiles[file];
-                if (item is null) { return; }
-                var bItem = (BitmapListItem)item;
+                if (lsbFiles[file] is not BitmapListItem bItem) { return; }
                 if (gb[2] is Bitmap bmp) {
                     bItem.Bitmap = bmp;
                     return;

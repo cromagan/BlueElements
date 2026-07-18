@@ -100,12 +100,16 @@ public class VariableListString : Variable {
     }
 
     protected override void SetValue(object? x) {
-        if (x is List<string> val) {
-            _list = val;
-        } else if (x is string[] val2) {
-            _list = [.. val2];
-        } else {
-            Develop.DebugError("Variablenfehler!");
+        switch (x) {
+            case List<string> val:
+                _list = val;
+                break;
+            case string[] val2:
+                _list = [.. val2];
+                break;
+            default:
+                Develop.DebugError("Variablenfehler!");
+                break;
         }
     }
 
