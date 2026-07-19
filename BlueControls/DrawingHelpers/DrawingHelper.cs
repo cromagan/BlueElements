@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.EventArgs;
+
 namespace BlueControls.DrawingHelpers;
 
 public abstract class DrawingHelper : IHasKeyName {
@@ -33,7 +35,7 @@ public abstract class DrawingHelper : IHasKeyName {
 
 	#region Methods
 
-	public abstract void Draw(in DrawingHelperContext ctx);
+	public abstract void Draw(Graphics gr, PositionEventArgs canvasCoords, float zoom, int offsetX, int offsetY, Bitmap? bmp, CanvasMouseEventArgs? mouseDownData, CanvasMouseEventArgs? currentMouseData, Rectangle availableControlPaintArea);
 
 	#endregion
 }

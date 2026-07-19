@@ -52,7 +52,7 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
     }
 
     public string GetCode(Form? form) {
-        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geklickt werden soll.", form, Helpers.None);
+        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geklickt werden soll.", form, []);
 
         if (c.Screen is null) { return string.Empty; }
 

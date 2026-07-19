@@ -3,6 +3,7 @@
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
+using BlueControls.DrawingHelpers;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -15,8 +16,6 @@ public partial class ZoomPic : CreativePad {
     #region Fields
 
     private const int DrawSize = 20;
-    private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
-    private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenCrosshairShadow = new(Color.FromArgb(10, 0, 0, 0), 3);
     private static readonly Pen PenCrosshairLine = new(Color.FromArgb(220, 100, 255, 100));
     private BitmapPadItem? _bmpItem;
@@ -96,15 +95,7 @@ public partial class ZoomPic : CreativePad {
 
     public override bool ControlMustPressedForZoomWithWheel => false;
 
-    [DefaultValue(Helpers.None)]
-    public Helpers Helper {
-        get => field;
-        set {
-            if (field == value) { return; }
-            field = value;
-            Invalidate();
-        }
-    } = Helpers.None;
+    public List<DrawingHelper> Helpers { get; } = [];
 
     [DefaultValue("")]
     public string InfoText {
@@ -171,95 +162,23 @@ public partial class ZoomPic : CreativePad {
             return;
         }
 
-        if (Helper.HasFlag(Helpers.HorizontalLine)) {
-            var p1 = new PointF(0, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-            var p2 = new PointF(Bmp.Width, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawLine(PenRotTransp, p1, p2);
-        }
+		foreach (var h in Helpers) {
+			if (!h.DrawsAfterOverlay) {
+				h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
+			}
+		}
 
-        if (Helper.HasFlag(Helpers.VerticalLine)) {
-            var p1 = new PointF(newCanvasCoords.X, 0).CanvasToControl(Zoom, OffsetX, OffsetY);
-            var p2 = new PointF(newCanvasCoords.X, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawLine(PenRotTransp, p1, p2);
-        }
+		gr.ResetClip();
 
-        if (Helper.HasFlag(Helpers.SymetricalHorizontal)) {
-            var h = Bmp.Width / 2;
-            var x = Math.Abs(h - newCanvasCoords.X);
-            var p1 = new PointF(h - x, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-            var p2 = new PointF(h + x, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawLine(PenRotTransp, p1, p2);
-        }
+		ActiveTool?.DrawOverlay(gr, Zoom, OffsetX, OffsetY, TrimmedMouseDownData, _trimmedCurrentMouseData);
 
-        if (Helper.HasFlag(Helpers.MouseDownPoint)) {
-            var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
-            if (MouseDownData is not null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-                gr.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
-                gr.DrawLine(PenRotTransp, mc1, md1);
-            }
-        }
+		PrintInfoText(gr, CurrentMouseData);
 
-        if (Helper.HasFlag(Helpers.FilledRectancle)) {
-            if (MouseDownData is not null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
-                gr.FillRectangle(BrushRotTransp, r);
-            }
-        }
-
-        // Rechteck zeichnen
-        if (Helper.HasFlag(Helpers.DrawRectangle)) {
-            if (MouseDownData is not null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
-                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
-                gr.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
-            }
-        }
-
-        // kleines Rechteck zeichnen
-        if (Helper.HasFlag(Helpers.Draw20x10)) {
-            if (CurrentMouseData is not null) {
-                var startPoint = new PointF(CurrentMouseData.CanvasX - 10, CurrentMouseData.CanvasY - 5);
-                var scaledStart = startPoint.CanvasToControl(Zoom, OffsetX, OffsetY);
-
-                var scaledWidth = 20 * Zoom;
-                var scaledHeight = 10 * Zoom;
-
-                gr.DrawRectangle(PenRotTransp,
-                    scaledStart.X,
-                    scaledStart.Y,
-                    scaledWidth,
-                    scaledHeight);
-            }
-        }
-
-        gr.ResetClip();
-
-        ActiveTool?.DrawOverlay(gr, Zoom, OffsetX, OffsetY, TrimmedMouseDownData, _trimmedCurrentMouseData);
-
-        PrintInfoText(gr, CurrentMouseData);
-
-        if (Helper.HasFlag(Helpers.Magnifier) && Bmp is not null && CurrentMouseData is not null) {
-            const int magnifierSize = 200;
-            const int magnifierMargin = 50;
-
-            var visibleArea = AvailableControlPaintArea;
-            var mouseControl = CurrentMouseData.ControlPoint;
-
-            var mx = mouseControl.X < visibleArea.Left + visibleArea.Width / 2.0
-                ? visibleArea.Right - magnifierMargin - magnifierSize
-                : visibleArea.Left + magnifierMargin;
-            var my = mouseControl.Y < visibleArea.Top + visibleArea.Height / 2.0
-                ? visibleArea.Bottom - magnifierMargin - magnifierSize
-                : visibleArea.Top + magnifierMargin;
-
-            Bmp.Magnify(CurrentMouseData.CanvasPoint, new Rectangle(mx, my, magnifierSize, magnifierSize), gr);
-        }
+		foreach (var h in Helpers) {
+			if (h.DrawsAfterOverlay) {
+				h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
+			}
+		}
     }
 
     protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {

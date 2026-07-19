@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.EventArgs;
+
 namespace BlueControls.DrawingHelpers;
 
 public sealed class DrawingHelper_VerticalLine : DrawingHelper {
@@ -20,10 +22,12 @@ public sealed class DrawingHelper_VerticalLine : DrawingHelper {
 
 	#region Methods
 
-	public override void Draw(in DrawingHelperContext ctx) {
-		var p1 = new PointF(ctx.CanvasCoords.X, 0).CanvasToControl(ctx.Zoom, ctx.OffsetX, ctx.OffsetY);
-		var p2 = new PointF(ctx.CanvasCoords.X, ctx.Bmp.Height).CanvasToControl(ctx.Zoom, ctx.OffsetX, ctx.OffsetY);
-		ctx.GR.DrawLine(PenRotTransp, p1, p2);
+	public override void Draw(Graphics gr, PositionEventArgs canvasCoords, float zoom, int offsetX, int offsetY, Bitmap? bmp, CanvasMouseEventArgs? mouseDownData, CanvasMouseEventArgs? currentMouseData, Rectangle availableControlPaintArea) {
+		if (bmp is null) { return; }
+
+		var p1 = new PointF(canvasCoords.X, 0).CanvasToControl(zoom, offsetX, offsetY);
+		var p2 = new PointF(canvasCoords.X, bmp.Height).CanvasToControl(zoom, offsetX, offsetY);
+		gr.DrawLine(PenRotTransp, p1, p2);
 	}
 
 	#endregion

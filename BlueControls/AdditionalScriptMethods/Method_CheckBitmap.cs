@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.DrawingHelpers;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
@@ -40,7 +41,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     }
 
     public string GetCode(Form? form) {
-        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form, Helpers.Draw20x10);
+        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form, [DrawingHelper_Draw20x10.Instance]);
 
         if (c.Screen is null) { return string.Empty; }
 

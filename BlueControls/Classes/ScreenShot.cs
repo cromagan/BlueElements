@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
+using BlueControls.DrawingHelpers;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
 using Form = System.Windows.Forms.Form;
@@ -15,7 +16,7 @@ public sealed partial class ScreenShot : Form {
 
     private readonly ScreenData _feedBack;
 
-    private readonly Helpers _helpers = Helpers.None;
+    private readonly List<DrawingHelper> _helpers = [];
 
     private readonly bool _onlyMouseDown;
 
@@ -28,10 +29,10 @@ public sealed partial class ScreenShot : Form {
         _feedBack = new ScreenData();
     }
 
-    private ScreenShot(string text, bool onlyMouseDown, Helpers helper) : this() {
+    private ScreenShot(string text, bool onlyMouseDown, IEnumerable<DrawingHelper> helpers) : this() {
         _drawText = text;
         _onlyMouseDown = onlyMouseDown;
-        _helpers = helper;
+        _helpers = [.. helpers];
     }
 
     #endregion
@@ -60,12 +61,12 @@ public sealed partial class ScreenShot : Form {
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(Form? frm) {
-        using var x = new ScreenShot("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
+        using var x = new ScreenShot("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, [DrawingHelper_DrawRectangle.Instance, DrawingHelper_Magnifier.Instance]);
         return x.Start(frm);
     }
 
-    internal static ScreenData GrabAndClick(string txt, Form? frm, Helpers helper) {
-        using var x = new ScreenShot(txt, true, helper);
+    internal static ScreenData GrabAndClick(string txt, Form? frm, IEnumerable<DrawingHelper> helpers) {
+        using var x = new ScreenShot(txt, true, helpers);
         return x.Start(frm);
     }
 
@@ -103,7 +104,8 @@ public sealed partial class ScreenShot : Form {
             zoomPic.Bmp = _feedBack.Screen;
             zoomPic.CanvasMargin = 0;
             zoomPic.InfoText = _drawText;
-            zoomPic.Helper = _helpers;
+            zoomPic.Helpers.Clear();
+            zoomPic.Helpers.AddRange(_helpers);
 
             // Zeige die Form
             ShowDialog();
