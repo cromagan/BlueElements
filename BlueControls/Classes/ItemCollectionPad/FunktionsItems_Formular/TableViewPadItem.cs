@@ -130,8 +130,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public override void ParseJson(JsonObject json) {
-        _defaultArrangement = json.GetString("defaultarrangement");
-        _borderStyle = json.GetEnum<GroupBoxStyle>("borderstyle");
+        _defaultArrangement = json.GetString("defaultarrangement", _defaultArrangement);
+        _borderStyle = json.GetEnum("borderstyle", _borderStyle);
         base.ParseJson(json);
     }
 

@@ -188,11 +188,11 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override void ParseJson(JsonObject json) {
-        _columnKey = json.GetString("columnkey");
-        _captionPosition = json.GetEnum<CaptionPosition>("caption");
-        _standard_Bei_Keiner_Eingabe = json.GetEnum<FlexiFilterDefaultOutput>("defaultemptyfilter");
-        _filterart_Bei_Texteingabe = json.GetEnum<FlexiFilterDefaultFilter>("defaulttextfilter");
-        _einschnappen = json.GetBool("snapfilter", true);
+        _columnKey = json.GetString("columnkey", _columnKey);
+        _captionPosition = json.GetEnum("caption", _captionPosition);
+        _standard_Bei_Keiner_Eingabe = json.GetEnum("defaultemptyfilter", _standard_Bei_Keiner_Eingabe);
+        _filterart_Bei_Texteingabe = json.GetEnum("defaulttextfilter", _filterart_Bei_Texteingabe);
+        _einschnappen = json.GetBool("snapfilter", _einschnappen);
         base.ParseJson(json);
     }
 

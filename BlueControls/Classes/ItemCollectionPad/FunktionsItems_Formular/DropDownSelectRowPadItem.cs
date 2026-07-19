@@ -125,10 +125,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     }
 
     public override void ParseJson(JsonObject json) {
-        _caption = json.GetString("captiontext");
-        _anzeige = json.GetString("showformat");
-        _bearbeitung = json.GetEnum<EditTypeFormula>("edittype");
-        _captionPosition = json.GetEnum<CaptionPosition>("caption");
+        _caption = json.GetString("captiontext", _caption);
+        _anzeige = json.GetString("showformat", _anzeige);
+        _bearbeitung = json.GetEnum("edittype", _bearbeitung);
+        _captionPosition = json.GetEnum("caption", _captionPosition);
         base.ParseJson(json);
     }
 

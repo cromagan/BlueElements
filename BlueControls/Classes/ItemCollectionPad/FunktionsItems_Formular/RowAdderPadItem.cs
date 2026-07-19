@@ -316,13 +316,13 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     public override void ParseJson(JsonObject json) {
-        _entityId = json.GetString("entityid");
-        _originIdColumnKey = json.GetString("originidcolumnkey");
-        _additionalInfoColumnKey = json.GetString("additionalinfocolumnkey");
-        _script_MenuGeneration = json.GetString("scriptmenu");
-        _script_Before = json.GetString("scriptbefore");
-        _script_After = json.GetString("scriptafter");
-        _lastFailedReason = json.GetString("lastfailedreason");
+        _entityId = json.GetString("entityid", _entityId);
+        _originIdColumnKey = json.GetString("originidcolumnkey", _originIdColumnKey);
+        _additionalInfoColumnKey = json.GetString("additionalinfocolumnkey", _additionalInfoColumnKey);
+        _script_MenuGeneration = json.GetString("scriptmenu", _script_MenuGeneration);
+        _script_Before = json.GetString("scriptbefore", _script_Before);
+        _script_After = json.GetString("scriptafter", _script_After);
+        _lastFailedReason = json.GetString("lastfailedreason", _lastFailedReason);
         _lastSavedVariables = json.GetList<Variable>("lastsavedvariables", true);
 
         base.ParseJson(json);

@@ -144,9 +144,9 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(parent);
             ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
         }
-        _child = json.GetString("child");
-        _borderStyle = json.GetEnum<GroupBoxStyle>("borderstyle");
-        Ausklappbar = json.GetBool("detachable");
+        _child = json.GetString("child", _child);
+        _borderStyle = json.GetEnum("borderstyle", _borderStyle);
+        Ausklappbar = json.GetBool("detachable", Ausklappbar);
         base.ParseJson(json);
     }
 

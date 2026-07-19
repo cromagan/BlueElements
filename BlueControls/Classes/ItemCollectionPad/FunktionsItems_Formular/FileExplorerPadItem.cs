@@ -154,11 +154,11 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     public override void ParseJson(JsonObject json) {
-        _pfad = json.GetString("path");
-        _mindest_pfad = json.GetString("pathmin");
-        _filter = json.GetString("filter");
-        _bei_Bedarf_Erzeugen = json.GetBool("createdir");
-        _leere_Ordner_Löschen = json.GetBool("deleteemptydir");
+        _pfad = json.GetString("path", _pfad);
+        _mindest_pfad = json.GetString("pathmin", _mindest_pfad);
+        _filter = json.GetString("filter", _filter);
+        _bei_Bedarf_Erzeugen = json.GetBool("createdir", _bei_Bedarf_Erzeugen);
+        _leere_Ordner_Löschen = json.GetBool("deleteemptydir", _leere_Ordner_Löschen);
         base.ParseJson(json);
     }
 

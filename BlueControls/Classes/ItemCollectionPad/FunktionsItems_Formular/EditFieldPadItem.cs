@@ -206,10 +206,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override void ParseJson(JsonObject json) {
         _columnKey = json.GetString("columnkey", _columnKey);
-        _bearbeitung = json.GetEnum<EditTypeFormula>("edittype", _bearbeitung);
-        _captionPosition = json.GetEnum<CaptionPosition>("caption", _captionPosition);
-        _autoX = json.GetBool("autodistance", true);
-        _autoNext = json.GetBool("autonext");
+        _bearbeitung = json.GetEnum("edittype", _bearbeitung);
+        _captionPosition = json.GetEnum("caption", _captionPosition);
+        _autoX = json.GetBool("autodistance", _autoX);
+        _autoNext = json.GetBool("autonext", _autoNext);
         base.ParseJson(json);
     }
 
