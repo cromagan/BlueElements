@@ -600,10 +600,15 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         var nd = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
         if (nd is { Enabled: false }) { return; }
 
-        if (e.Button == System.Windows.Forms.MouseButtons.Left && nd is not null) {
-            if (IsAppearanceClickable() && nd.IsClickable() && CheckBehavior != CheckBehavior.AllSelected) { ChangeCheck(nd); }
-            OnItemClicked(new AbstractListItemEventArgs(nd));
-            nd.LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(nd, HotItemForClick));
+        if (e.Button == System.Windows.Forms.MouseButtons.Left) {
+            if (nd is not null) {
+                if (IsAppearanceClickable() && nd.IsClickable() && CheckBehavior != CheckBehavior.AllSelected) { ChangeCheck(nd); }
+                OnItemClicked(new AbstractListItemEventArgs(nd));
+                nd.LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(nd, HotItemForClick));
+            } else if (IsAppearanceClickable() &&
+                       CheckBehavior is CheckBehavior.SingleSelection or CheckBehavior.MultiSelection) {
+                UncheckAll();
+            }
         } else if (e.Button == System.Windows.Forms.MouseButtons.Right) {
             ((IContextMenu)this).ContextMenuShow(nd);
         }

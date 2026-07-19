@@ -31,6 +31,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     public TableHeadEditor() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+        uniqueValueDefinitionEditor.PropertyChanged += UniqueValueDefinitionEditor_PropertyChanged;
         Table = null;
     }
 
@@ -499,11 +500,22 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             }
         }
 
+        // Eigener Check-Aufruf aus UniqueValueDefinitionEditor_PropertyChanged:
+        // _selectedUniqueValue wurde dort bereits auf das neue Item gesetzt.
+        // Wenn der angewählte Key identisch ist, nichts zu tun - verhindert
+        // die Endlosschleife (analog zum _item-Pattern im TableScriptEditor).
+        if (_selectedUniqueValue is not null &&
+            string.Equals(_selectedUniqueValue.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase)) {
+            return;
+        }
+
         WriteUniqueValuesBack();
 
         if (Table is not { IsDisposed: false } tb) {
-            _selectedUniqueValue = null;
-            uniqueValueDefinitionEditor.InputItem = null;
+            if (_selectedUniqueValue is not null) {
+                _selectedUniqueValue = null;
+                uniqueValueDefinitionEditor.InputItem = null;
+            }
             return;
         }
 
@@ -512,7 +524,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (!string.IsNullOrEmpty(newKeyName)) {
             _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
             uniqueValueDefinitionEditor.InputItem = _selectedUniqueValue;
-        } else {
+        } else if (_selectedUniqueValue is not null) {
+            // Nur clearen, wenn wirklich etwas gewählt war. Ist _selectedUniqueValue
+            // bereits null, ist dies ein transienter Zustand während UpdateList
+            // in UniqueValueDefinitionEditor_PropertyChanged (welches _selectedUniqueValue
+            // vorher auf null setzt, analog zum _item = null Pattern im TableScriptEditor).
             _selectedUniqueValue = null;
             uniqueValueDefinitionEditor.InputItem = null;
         }
@@ -533,6 +549,39 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         uniqueValueDefinitionEditor.InputItem = null;
 
         lstUniqueValues.UpdateList(tb.UniqueValues);
+    }
+
+    private void UniqueValueDefinitionEditor_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (_selectedUniqueValue is null) { return; }
+
+        WriteUniqueValuesBack();
+
+        // Da der KeyName aus den gewählten Spalten berechnet wird, kann er sich
+        // geändert haben. Das frische Objekt aus tb.UniqueValues holen.
+        UniqueValueDefinition? newSelection = null;
+        if (((IIsEditor)uniqueValueDefinitionEditor).OutputItem is UniqueValueDefinition edited) {
+            newSelection = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, edited.KeyName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // _selectedUniqueValue während UpdateList auf null setzen, damit der
+        // rekursive ItemCheckedChanged-Aufruf (den UpdateList über das verwaiste
+        // Check(wasChecked, true) beim Referenzwechsel auslöst) nicht destruktiv wird.
+        // Analog zum _item = null Pattern im TableScriptEditor.Item-Setter.
+        _selectedUniqueValue = null;
+        lstUniqueValues.UpdateList(tb.UniqueValues);
+
+        // Selektion wiederherstellen und neuen Key anwählen.
+        // Der rekursive Aufruf aus Check wird über den Early-Return in
+        // lstUniqueValues_ItemCheckedChanged erkannt (KeyName stimmt überein).
+        _selectedUniqueValue = newSelection;
+        if (_selectedUniqueValue is not null) {
+            // Check(IEnumerable, true) ersetzt die Selection, Check(string) würde
+            // nur hinzufügen. Da UpdateList verwaiste Referenzen in _checked nicht
+            // aufräumt, würde Check(string) ein zweites Item markieren und der
+            // ItemCheckedChanged-Handler die Selektion verwerfen.
+            lstUniqueValues.Check(new[] { _selectedUniqueValue.KeyName }, true);
+        }
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();

@@ -29,6 +29,7 @@ namespace BlueControls.Forms {
             lbxKeyColumns.Name = "lbxKeyColumns";
             lbxKeyColumns.Size = new Size(352, 368);
             lbxKeyColumns.TabIndex = 8;
+            lbxKeyColumns.ItemCheckedChanged += lbxKeyColumns_ItemCheckedChanged;
             // 
             // capKeyColumns
             // 

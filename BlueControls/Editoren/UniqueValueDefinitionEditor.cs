@@ -7,11 +7,17 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
+public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotifyPropertyChanged {
 
     #region Constructors
 
     public UniqueValueDefinitionEditor() : base() => InitializeComponent();
+
+    #endregion
+
+    #region Events
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -38,11 +44,6 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
 
     protected override void InitializeComponentDefaultValues() { }
 
-    protected override void SetEnabledState(bool enabled) {
-        base.SetEnabledState(enabled);
-        lbxKeyColumns.CheckBehavior = enabled ? CheckBehavior.MultiSelection : CheckBehavior.AllSelected;
-    }
-
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not UniqueValueDefinition { } uvd) { return false; }
 
@@ -55,6 +56,21 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
         }
 
         return true;
+    }
+
+    // EditorEasy.InputItem setzt field während Clear/SetValuesToFormula auf null
+    // (analog zum _item = null Pattern im TableScriptEditor).
+    // In dieser Phase keine Change-Events feuern.
+    private void lbxKeyColumns_ItemCheckedChanged(object? sender, System.EventArgs e) {
+        if (InputItem is null) { return; }
+
+        // EditCopy-Mode: das OutputItem ändert sich, weil es aus den
+        // angekreuzten Spalten neu erzeugt wird.
+        OnPropertyChanged("OutputItem");
+    }
+
+    private void OnPropertyChanged(string propertyName) {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     #endregion
