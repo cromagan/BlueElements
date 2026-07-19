@@ -180,6 +180,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? Loading;
 
+    public event EventHandler? ScriptChanged;
+
     public event EventHandler? SortParameterChanged;
 
     public event EventHandler? ViewChanged;
@@ -1687,6 +1689,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public void OnScriptChanged() {
+        if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
+        ScriptChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
     public void OnViewChanged() {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
@@ -2316,7 +2324,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 // InvalidateAllCheckData nur, wenn sich nicht ausschließlich die
                 // Laufzeit-Statistik (AverageRunTime/StoppedTimeCount) geändert hat -
                 // reine Statistikänderungen beeinflussen das Prüf-Ergebnis der Zeilen nicht.
-                if (!IsOnlyStatisticsUpdate(_eventScript, vess)) { Row.InvalidateAllCheckData(); }
+                if (!IsOnlyStatisticsUpdate(_eventScript, vess)) {
+                    Row.InvalidateAllCheckData();
+                    OnScriptChanged();
+                }
 
                 _hasValueChangedScript = null;
                 _mayAffectUser = null;
@@ -2524,6 +2535,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             InvalidateView = null;
             Loaded = null;
             Loading = null;
+            ScriptChanged = null;
             SortParameterChanged = null;
             ViewChanged = null;
             CellValueChanged = null;

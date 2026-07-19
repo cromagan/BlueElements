@@ -385,7 +385,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
                     FilterOutput.ChangeTo(nfc);
 
-                    btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && string.IsNullOrEmpty(tb.IsGenericEditable(false)) && !string.IsNullOrEmpty(tb.CheckScriptError());
+                    btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && string.IsNullOrEmpty(tb.IsGenericEditable(false)) && !string.IsNullOrEmpty(tb.CheckScriptError()) && !ParentHasSameTable(tb);
 
                     if (btnScript.Visible) { btnScript.BringToFront(); }
 
@@ -433,6 +433,27 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         } else {
             base.OnVisibleChanged(e);
         }
+    }
+
+    protected override void TableInput_Loaded(object? sender, System.EventArgs e) => HandleTableStateChanged();
+
+    protected override void TableInput_ScriptChanged(object? sender, System.EventArgs e) => HandleTableStateChanged();
+
+    private void HandleTableStateChanged() {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                Invoke(new Action(HandleTableStateChanged));
+                return;
+            } catch {
+                Develop.AbortAppIfStackOverflow();
+                HandleTableStateChanged();
+                return;
+            }
+        }
+
+        Invalidate_RowsInput();
     }
 
     private static void DoAutoX(List<FlexiControlForCell> autoc) {
@@ -522,6 +543,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             }
         }
     }
+
+    private bool ParentHasSameTable(Table table) =>
+        Parents.Exists(p => !p.IsDisposed && !p.FilterOutput.IsDisposed && p.FilterOutput.Table == table);
 
     private void Updater_Tick() {
         if (Generic.Ending || IsDisposed || Disposing) { return; }

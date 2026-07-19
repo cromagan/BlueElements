@@ -84,6 +84,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                     field.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
                     field.Row.RowChecked -= TableInput_RowChecked;
                     field.Loaded -= TableInput_Loaded;
+                    field.ScriptChanged -= TableInput_ScriptChanged;
                     field.Disposed -= TableInput_Disposed;
                 }
 
@@ -94,6 +95,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                     field.Column.ColumnPropertyChanged += TableInput_ColumnPropertyChanged;
                     field.Row.RowChecked += TableInput_RowChecked;
                     field.Loaded += TableInput_Loaded;
+                    field.ScriptChanged += TableInput_ScriptChanged;
                     field.Disposed += TableInput_Disposed;
                 }
             }
@@ -424,6 +426,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected void TableInput_Disposed(object? sender, System.EventArgs e) => TableInput = null;
 
     protected virtual void TableInput_Loaded(object? sender, System.EventArgs e) { }
+
+    protected virtual void TableInput_ScriptChanged(object? sender, System.EventArgs e) { }
 
     protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) { }
 
