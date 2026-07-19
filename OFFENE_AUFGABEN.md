@@ -11,9 +11,6 @@ Die Switch-Kaskaden in `SetValueFromProperty()` und `FillPropertyNow()` durch ge
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 		
 ##Aufgabe
-- **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.
-
-##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
 
 ##Aufgabe
@@ -23,6 +20,7 @@ Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und w
  ##Aufgabe
  Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
  Entferne OnColumnDisposed
+ Der Code muss trotzdem npch funktionieren
  
  ##Aufgabe
 ListItem, PadItems, Renderer, Cells, ExtChar kommt mir seltsam vor. Als ob die zusammengehören würden. Also ob man sie zusammenlegen könnte.
@@ -62,7 +60,7 @@ Der Editor von QuickImage muss überarbeitet werden und von EditorEasy abgeleite
 
 ##Aufgabe
 **InputItem-Konsistenz in IIsEditor-Implementierungen**
-- Auf EditorEasy umstellen: ColumnEditor, TableScriptEditor, TableHeadEditor, ConnectedFormulaEditor, TableViewForm, ColumnArrangementPadEditor
+- Auf EditorEasy umstellen: ColumnEditor, TableScriptEditor, TableHeadEditor, ConnectedFormulaEditor, TableViewForm
 
 ##Aufgabe
 ReadableListItem benötigt einen Dispose Pattern, dass das Item freigegeben werden kann.
@@ -167,12 +165,6 @@ und ergänze diese
 Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern den Wert in der Tabelle. Nun soll es anders sein: Die Werte sollen in Table gespeichert werden. Und so auch die RowChecked Werte (Zeilenfarben etc.)
 
 ##Aufgabe
-Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
-
-##Aufgabe
-CurrentArrangement mit dessen Logik ist alt und nicht effizienzt. Auch der Demstsprechende Editor
-
-##Aufgabe
 CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
 
 ##Aufgabe
@@ -185,21 +177,9 @@ Kontextmenu: Kapitel ändern
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
 
 ## Aufgabe
-Syntaxcheck ist nicht so gut:
-- Überarbeite, dass es mehr und sicherer prüft.
-
-## Aufgabe
 Mach ein neues Kontrol. Eine Mischung aus TabControl und Listbox.
 Das Control versteckt mit einer Regsiterkarte aussieht und sich Links Rechts oben oder unten "versteckt".
 Fährt man mit der Maus darüber fährt es raus.
-
-## Aufgabe
-Leite Textbox von Zoompad ab und erweitere ListboxCore, dass es Zoombar ist.
-Im Ordner NEU sind schon berarbeitete Dateien (außer Drawinghelper), die das können, aber noch nicht perfekt.
-Ersetze die origibal-Dateien mit denen Aus NEU. Lösche dann die DAteien da raus.
-
-## Aufgabe
-Drawing-Helpers nicht als Enum sondern als eigene Klassen. Ähnlich zu MarkRenderer.  Alle brauchen eine Statische funktion: Instance
 
 ## Aufgabe
 Alle Json wie diese json["type"] = MyClassId; zu json.Set (Hilfemethode) ändern.
@@ -210,10 +190,6 @@ KeyName = json.GetString("key", KeyName);
 
 Alle json Keys in kleinschreibung.
 
-## Aufgabe
-Mache DrawingHelper fertig. Die Dateien sind im Ordner NEU unter Drawinghelper. Nutze diese. Schiebe sie in den richtigen Ordner
-Entferne DrawingHelperContext und löse es anders.
-Entferne das Enum und löse es mit den neuen Klassen von DrawingHelper: Anstelle so: public Helpers Helper -> List<DrawingHelper> Helpers
 
 ## Aufgabe
 Ich denke, LogData ist nicht mehr nötig und einfach zu ersetzen.
@@ -223,11 +199,5 @@ Was meinst du?
 Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nicht.
 
 ## Aufgabe
-ColumnViewCollection: Erstelle eine Eigenschaft: StartCollapsed. TableView soll dann beim umschalten auf diese Ansicht alle Überschriften einklappen
-
-## Aufgabe
-TableView: bei Indents wird die Markierte Zeile nicht korrekt mit den indents markiert. Es soll von ganz vorne bis ganz nach rechts über die gesamte Ansicht markiert werden.
-
-## Aufgabe
-Wird angepinnt, und sind keine Kapitel vorhanden, darf die Zeile nur einmal angezeigt werden.
+Wird die Listbox gezoomt. verändern sich intern die Items nicht, sie werden immer mit Scale 1 gezeichnet
 

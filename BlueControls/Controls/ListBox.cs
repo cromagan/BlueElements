@@ -351,7 +351,20 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-    private void Core_ItemLayoutChanged(object? sender, System.EventArgs e) => ScheduleAddAreaUpdate();
+    private void Core_ItemLayoutChanged(object? sender, System.EventArgs e) {
+        ScheduleAddAreaUpdate();
+        // Bei Layout-Änderungen (insb. Zoom-Wechsel) müssen auch die Hover-Buttons
+        // sofort nachpositioniert werden, da ihre Koordinaten direkt aus der
+        // CanvasPosition des MouseOverItem abgeleitet sind.
+        // ItemsCanvasBottom() erzwingt ggf. eine frische ComputeAllItemPositions-
+        // Berechnung, damit UpdateItemButtons aktuelle Positionen vorfindet.
+        lstBox.ItemsCanvasBottom();
+        if (lstBox.MouseOverItem is not null) {
+            UpdateItemButtons();
+        } else {
+            HideAllButtons();
+        }
+    }
 
     private string CurrentAddText() {
         if (cbxAdd.Visible) { return cbxAdd.Text; }
@@ -509,6 +522,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         hidden.Visible = false;
         btnPlus.Text = string.Empty;
 
+        input.Zoom = lstBox.Zoom;
         if (input.Height != tbHeight) { input.Height = tbHeight; }
         input.Top = top;
         input.Left = padding;

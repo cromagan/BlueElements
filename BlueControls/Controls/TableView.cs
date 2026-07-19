@@ -3619,6 +3619,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         box.GetStyleFrom(viewItem.Column);
         box.QuickInfo = viewItem.Column.QuickInfo;
+        box.Zoom = Zoom;
 
         var (controlPos, contentHolderCellRow, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
 

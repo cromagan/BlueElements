@@ -76,19 +76,6 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public static Renderer_Abstract Renderer => Renderer_Abstract.Default;
 
-    /// <summary>
-    /// Wenn <c>true</c>, reserviert <see cref="CalculateCanvasMaxBounds"/> zusätzlichen Platz
-    /// am unteren Rand für den Add-Bereich des äußeren <see cref="ListBox"/>-Controls.
-    /// </summary>
-    internal bool AddAreaVisible {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            DoMouseMovement(-1, -1);
-        }
-    }
-
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
         get;
@@ -202,6 +189,19 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
+
+    /// <summary>
+    /// Wenn <c>true</c>, reserviert <see cref="CalculateCanvasMaxBounds"/> zusätzlichen Platz
+    /// am unteren Rand für den Add-Bereich des äußeren <see cref="ListBox"/>-Controls.
+    /// </summary>
+    internal bool AddAreaVisible {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            DoMouseMovement(-1, -1);
+        }
+    }
 
     /// <summary>
     /// Das HotItem, das an ContextMenuEventArgs.HotItem übergeben wird,
@@ -522,9 +522,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     internal int ItemsCanvasBottom() {
         if (_item.Count == 0) { return 0; }
         if (_maxNeededItemSize.IsEmpty) {
-            var areaControl = AvailableControlPaintArea;
             var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
-            ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestX, heightAdded, orientation, Renderer);
+            ComputeAllItemPositions(CanvasDrawArea(), biggestX, heightAdded, orientation, Renderer);
         }
         var max = 0;
         foreach (var item in _item) {
@@ -545,9 +544,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
-        var areaControl = AvailableControlPaintArea;
         var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
-        var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestX, heightAdded, orientation, Renderer);
+        var s = ComputeAllItemPositions(CanvasDrawArea(), biggestX, heightAdded, orientation, Renderer);
         return new RectangleF(0, 0, s.Width, s.Height + (AddAreaVisible ? 26 : 0));
     }
 
@@ -569,7 +567,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
         if (_maxNeededItemSize.IsEmpty) {
             var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
-            ComputeAllItemPositions(new Size(controPaintArea.Width, controPaintArea.Height), biggestX, heightAdded, orientation, Renderer);
+            ComputeAllItemPositions(CanvasDrawArea(), biggestX, heightAdded, orientation, Renderer);
         }
 
         Skin.Draw_Back(gr, _controlDesign, controlState, controPaintArea, this, true);
@@ -634,6 +632,18 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         base.OnVisibleChanged(e);
     }
 
+    protected override void OnZoomChanged() {
+        _maxNeededItemSize = Size.Empty;
+        _lastCheckedMaxSize = SizeF.Empty;
+        Invalidate_MaxBounds();
+        base.OnZoomChanged();
+        // Items haben sich durch den neuen Zoom faktisch neu positioniert —
+        // das äußere ListBox-Control muss Add-Area UND Hover-Buttons sofort
+        // nachführen. Die Items selbst zoomen nur über ihre Zeichen-Transformation,
+        // ihre CanvasPosition ist aber Grundlage für die Button-Positionierung.
+        OnItemLayoutChanged();
+    }
+
     private void AddAndRegister(AbstractListItem item) {
         lock (_itemLock) { _item.Add(item); }
         item.CompareKeyChanged += Item_CompareKeyChanged;
@@ -674,6 +684,11 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
         if (index % BreakAfterItems == 0) { return (prev.CanvasPosition.Right, 0); }
         return (prev.CanvasPosition.Left, prev.CanvasPosition.Bottom);
+    }
+
+    private Size CanvasDrawArea() {
+        var control = AvailableControlPaintArea;
+        return new Size((int)(control.Width / Zoom), (int)(control.Height / Zoom));
     }
 
     private void ChangeCheck(AbstractListItem ne) { if (IsChecked(ne)) { UnCheck(ne); } else { Check(ne); } }

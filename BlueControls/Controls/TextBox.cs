@@ -13,7 +13,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(TextBoxDesigner))]
 [DefaultEvent(nameof(TextChanged))]
-public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
+public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     #region Fields
 
@@ -31,6 +31,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private bool _doubleClicked;
 
+    private Size _lastCanvasSize = Size.Empty;
+
     private string _lastCheckedText = string.Empty;
 
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -43,16 +45,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private int _raiseChangeDelay;
 
-    private Slider? _sliderY;
-
     #endregion
 
     #region Constructors
 
-    public TextBox() : base(true, true, false) {
-        // Dieser Aufruf ist für den Designer erforderlich.
+    public TextBox() {
+        // ZoomPad-Konstruktor bereits übernommen (incl. InitializeComponent für Slider).
+        // TextBox-Initialisierung folgt nach dem Designer-Init.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+
+        // TextBox soll den Text oben links darstellen - nicht zentrieren,
+        // falls der Slider nicht sichtbar ist (Default von ZoomPad wäre AutoCenter = true).
+        AutoCenter = false;
 
         _eTxt = new ExtText(Design, States.Standard); // Design auf Standard setzen wegen Virtal member call
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
@@ -97,20 +101,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
+    /// <summary>
+    /// Zoom per Mausrad nur aktiv, wenn STRG gedrückt ist.
+    /// Ohne STRG wird (sofern vorhanden) der vertikale Slider bewegt.
+    /// </summary>
+    public override bool ControlMustPressedForZoomWithWheel => true;
+
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
-
-    /// <summary>
-    /// Hook für externe Erweiterungen des Kontextmenüs.
-    /// Wird zu Beginn von <see cref="GetContextMenuItems"/> aufgerufen;
-    /// die gelieferten Einträge werden vor den Standard-Einträgen eingefügt.
-    /// Wird z.B. von <see cref="TextBoxSuggestions"/> genutzt, um die Vorschläge
-    /// in das Kontextmenü der internen TextBox zu transferieren.
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    internal Func<object?, List<AbstractListItem>?>? AdditionalContextMenuItems { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -146,25 +144,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
-            if (_sliderY is not null) {
-                _sliderY.Visible = false;
-                _sliderY.Value = 0;
-            }
-            Invalidate();
+            Invalidate_MaxBounds();
         }
     }
-
-    [DefaultValue(0)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int OffsetX { get; set; }
-
-    [DefaultValue(0)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int OffsetY { get; set; }
 
     [DefaultValue(0)]
     public int RaiseChangeDelay {
@@ -261,13 +243,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         set {
             if (IsDisposed || field == value) { return; }
             field = value;
-            if (_sliderY is not null) {
-                _sliderY.Visible = false;
-                _sliderY.Value = 0;
-            }
-            Invalidate();
+            Invalidate_MaxBounds();
         }
     } = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+
+    /// <summary>
+    /// Hook für externe Erweiterungen des Kontextmenüs.
+    /// Wird zu Beginn von <see cref="GetContextMenuItems"/> aufgerufen;
+    /// die gelieferten Einträge werden vor den Standard-Einträgen eingefügt.
+    /// Wird z.B. von <see cref="TextBoxSuggestions"/> genutzt, um die Vorschläge
+    /// in das Kontextmenü der internen TextBox zu transferieren.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<object?, List<AbstractListItem>?>? AdditionalContextMenuItems { get; set; }
 
     internal int CursorPosition {
         get => Math.Max(0, Math.Max(_markStart, _markEnd));
@@ -279,6 +269,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected virtual Design Design => Design.TextBox;
+
+    /// <summary>
+    /// Horizontaler Slider wird von der TextBox nicht genutzt.
+    /// Horizontales Scrollen (z.B. Cursor-Verfolgung im Singleline-Modus)
+    /// erfolgt durch direktes Setzen von <see cref="ZoomPad.OffsetX"/>.
+    /// </summary>
+    protected override bool ShowSliderX => false;
+
+    protected override int SmallChangeY => 20;
 
     #endregion
 
@@ -481,6 +480,20 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
+    /// <summary>
+    /// Liefert die Canvas-Grenze, die ZoomPad für die Slider-Berechnung verwendet.
+    /// Beim Verhalten <see cref="SteuerelementVerhalten.Steuerelement_Anpassen"/>
+    /// wächst das Control statt zu scrollen - dort wird eine leere Grenze geliefert.
+    /// In allen anderen Fällen entspricht die Grenze der zuletzt gemessenen
+    /// Textgröße (Canvas-Koordinaten).
+    /// </summary>
+    protected override RectangleF CalculateCanvasMaxBounds() {
+        if (IsDisposed) { return RectangleF.Empty; }
+        if (Verhalten == SteuerelementVerhalten.Steuerelement_Anpassen) { return RectangleF.Empty; }
+        if (_lastCanvasSize.IsEmpty) { return RectangleF.Empty; }
+        return new RectangleF(0, 0, _lastCanvasSize.Width, _lastCanvasSize.Height);
+    }
+
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -503,59 +516,36 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
 
-        var effectWidth = Width;
-        var sliderVisible = MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height;
-        if (sliderVisible) { effectWidth = Width - 18; }
+        var controlArea = AvailableControlPaintArea;
+        var effectWidth = controlArea.Width;
 
         _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
         switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                _eTxt.TextDimensions = new Size(Width - (Skin.PaddingSmal * 2), -1);
-                if (MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height) {
-                    effectWidth = Width - 18;
-                    sliderVisible = true;
-                } else {
-                    effectWidth = Width;
-                    sliderVisible = false;
-                }
-                _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
-                _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, Height);
+                // Umbruchbreite in Canvas-Koordinaten angeben. Da der Text später mit
+                // Zoom gezeichnet wird, muss die Control-Breite durch Zoom geteilt werden,
+                // damit der Umbruch bei jedem Zoom-Faktor exakt in die sichtbare Breite passt.
+                _eTxt.TextDimensions = new Size((int)((effectWidth - (Skin.PaddingSmal * 2)) / Zoom), -1);
+                _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, controlArea.Height);
                 break;
 
             case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                var hp = HotPosition();
+            case SteuerelementVerhalten.Text_Abschneiden:
                 _eTxt.TextDimensions = Size.Empty;
-                _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, Height);
-
-                if (hp == 0) {
-                    OffsetX = Skin.PaddingSmal;
-                } else if (hp > _eTxt.Count - 1) {
-                    OffsetX = _eTxt.WidthControl > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.WidthControl - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
-                } else if (hp > 0) {
-                    var r = _eTxt.CursorCanvasPosX(hp);
-                    if (r.X > Width - (Skin.PaddingSmal * 4) - OffsetX) {
-                        OffsetX = Width - (Skin.PaddingSmal * 4) - r.X + 1;
-                    } else if (r.X + OffsetX < Skin.PaddingSmal * 2) {
-                        OffsetX = (Skin.PaddingSmal * 2) - r.X + 1;
-                    }
-                }
-                if (OffsetX > Skin.PaddingSmal) { OffsetX = Skin.PaddingSmal; }
+                _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, controlArea.Height);
                 break;
 
             case SteuerelementVerhalten.Steuerelement_Anpassen:
-                sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
-                Width = this is ComboBox
+                _eTxt.AreaControl = new Rectangle(0, 0, Width, Height);
+                var targetWidth = this is ComboBox
                     ? Math.Max(_eTxt.WidthControl + (Skin.PaddingSmal * 3) + 20, Width)
                     : Math.Max(_eTxt.WidthControl + (Skin.PaddingSmal * 3), Width);
-                Height = Math.Max(_eTxt.HeightControl + (Skin.PaddingSmal * 2), Height);
-                _eTxt.AreaControl = new Rectangle(0, 0, Width, Height);
-                break;
-
-            case SteuerelementVerhalten.Text_Abschneiden:
-                sliderVisible = false;
-                _eTxt.TextDimensions = Size.Empty;
-                _eTxt.AreaControl = new Rectangle(0, 0, Width, Height);
+                var targetHeight = Math.Max(_eTxt.HeightControl + (Skin.PaddingSmal * 2), Height);
+                if (targetWidth != Width || targetHeight != Height) {
+                    Width = targetWidth;
+                    Height = targetHeight;
+                }
                 break;
 
             default:
@@ -564,34 +554,26 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
 
-        if (sliderVisible) {
-            GenerateSlider();
-            if (_sliderY is not null) {
-                _sliderY.Visible = true;
-                _sliderY.Width = 18;
-                _sliderY.Height = Height;
-                _sliderY.Left = Width - _sliderY.Width;
-                _sliderY.Top = 0;
-                OffsetY = -(int)_sliderY.Value;
-                _sliderY.Maximum = _eTxt.HeightControl + 16 - DisplayRectangle.Height;
-            }
-        } else {
-            if (_sliderY is not null) {
-                _sliderY.Visible = false;
-                _sliderY.Value = 0;
-            }
-            OffsetY = Skin.PaddingSmal;
+        // Gemessene Textgröße cachen, damit CalculateCanvasMaxBounds beim nächsten
+        // UpdateSliderBounds-Aufruf korrekte Werte liefert.
+        var measured = new Size(_eTxt.WidthControl, _eTxt.HeightControl);
+        if (measured != _lastCanvasSize) {
+            _lastCanvasSize = measured;
+            Invalidate_MaxBounds();
         }
+
+        var drawOffsetX = OffsetX + Skin.PaddingSmal;
+        var drawOffsetY = OffsetY + Skin.PaddingSmal;
 
         _eTxt.UpdateBaseFont(Skin.GetBlueFont(Design, state));
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
         SetupSelectionZone();
-        DrawMarkings(gr, 1, OffsetX, OffsetY, true);
-        _eTxt.Draw(gr, 1, OffsetX, OffsetY);
-        DrawMarkings(gr, 1, OffsetX, OffsetY, false);
+        DrawMarkings(gr, Zoom, drawOffsetX, drawOffsetY, true);
+        _eTxt.Draw(gr, Zoom, drawOffsetX, drawOffsetY);
+        DrawMarkings(gr, Zoom, drawOffsetX, drawOffsetY, false);
 
         if (!string.IsNullOrEmpty(Suffix)) {
-            var r = new Rectangle(_eTxt.WidthControl + OffsetX, OffsetY, 1000, 1000);
+            var r = new Rectangle((int)(_eTxt.WidthControl * Zoom) + drawOffsetX, drawOffsetY, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
                 Skin.Draw_FormatedText(gr, Suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
@@ -600,7 +582,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
 
-        Cursor_Show(gr);
+        Cursor_Show(gr, drawOffsetX, drawOffsetY);
         Skin.Draw_Border(gr, Design, state, DisplayRectangle);
         if (_mustCheck && !IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
@@ -759,30 +741,30 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
     }
 
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(CanvasMouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseDown(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (!Enabled || e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
         _cursorVisible = true;
         _doubleClicked = false;
-        _markStart = Cursor_PosAt(e.X, e.Y);
+        _markStart = Cursor_PosAt(e.ControlX, e.ControlY);
         _markEnd = -1;
         Selection_Repair(false);
         Invalidate();
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(CanvasMouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseMove(e);
         if (e.Button != System.Windows.Forms.MouseButtons.Left || !Enabled) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
-        _markEnd = Cursor_PosAt(e.X, e.Y);
+        _markEnd = Cursor_PosAt(e.ControlX, e.ControlY);
         Selection_Repair(false);
         Invalidate();
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(CanvasMouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseUp(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -792,7 +774,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     var tags = new List<string>();
 
                     if (_markEnd < 0) {
-                        var cp = Cursor_PosAt(e.X, e.Y);
+                        var cp = Cursor_PosAt(e.ControlX, e.ControlY);
                         var ws = _eTxt.WordStart(cp);
                         tags.TagSet("MarkStart", cp.ToString1());
                         tags.TagSet("MarkEnd", "-1");
@@ -805,7 +787,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
                     ((IContextMenu)this).ContextMenuShow(tags);
                 } else if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-                    _markEnd = Cursor_PosAt(e.X, e.Y);
+                    _markEnd = Cursor_PosAt(e.ControlX, e.ControlY);
                     Selection_Repair(true);
                 }
             }
@@ -815,14 +797,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _markEnd = -1;
         }
         Invalidate();
-    }
-
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
-        if (IsDisposed) { return; }
-        base.OnMouseWheel(e);
-        if (_sliderY is not { Visible: true }) { return; }
-        _lastUserActionForSpellChecking = DateTime.UtcNow;
-        _sliderY.DoMouseWheel(e);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -982,25 +956,22 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     /// <summary>
-    /// Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
+    /// Sucht den aktuellen Buchstaben, der unter den angegeben Control-Koordinaten liegt.
     /// Wird auf die hintere Hälfte eines Zeichens gewählt, wird der nächste Buchstabe angegeben.
     /// </summary>
-    /// <remarks></remarks>
+    /// <remarks>Control-Koordinaten werden intern auf Canvas-Koordinaten umgerechnet.</remarks>
     private int Cursor_PosAt(int controlX, int controlY) {
-        if (controlX < OffsetX && controlY < OffsetY) { return 0; }
+        var canvasX = Math.Clamp((controlX - OffsetX - Skin.PaddingSmal) / Zoom, 0f, _eTxt.WidthControl);
+        var canvasY = Math.Clamp((controlY - OffsetY - Skin.PaddingSmal) / Zoom, 0f, _eTxt.HeightControl);
 
-        controlX = Math.Clamp(controlX, OffsetX, OffsetX + _eTxt.WidthControl);
-        controlY = Math.Clamp(controlY, OffsetY, OffsetY + _eTxt.HeightControl);
-
-        var canvasY = controlY - OffsetY;
-        var c = Math.Max(0, _eTxt.Char_Search(controlX - OffsetX, canvasY));
+        var c = Math.Max(0, _eTxt.Char_Search((int)canvasX, (int)canvasY));
 
         if (c < _eTxt.Count && canvasY > _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height) {
             while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY) { c++; }
             return c;
         }
 
-        var pos = c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
+        var pos = c < _eTxt.Count && canvasX > _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
 
         var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
 
@@ -1021,21 +992,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             } else {
                 _markStart = 0;
             }
-            //while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
-            //    _markStart++;
-            //while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
-            //    _markStart--;
         }
 
         if (y != 0) {
             var ri = _eTxt.CursorCanvasPosX(Math.Max(0, _markStart));
-            if (y > 0) {
-                _markStart = _markStart >= _eTxt.Count ? _eTxt.Count : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) + _eTxt[_markStart].SizeCanvas.Height + OffsetY));
-            } else if (y < 0) {
-                _markStart = _markStart >= _eTxt.Count
-                    ? (_eTxt.Count > 0 ? Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart - 1].SizeCanvas.Height + OffsetY)) : 0)
-                    : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart].SizeCanvas.Height + OffsetY));
-            }
+            var posY = (int)(ri.Top + (ri.Height / 2f) + (y > 0 ? _eTxt[Math.Min(_markStart, _eTxt.Count - 1)].SizeCanvas.Height : -_eTxt[Math.Max(0, _markStart - 1)].SizeCanvas.Height));
+            var controlX = (int)(ri.Left * Zoom) + OffsetX + Skin.PaddingSmal;
+            var controlY = (int)(posY * Zoom) + OffsetY + Skin.PaddingSmal;
+            _markStart = _markStart >= _eTxt.Count && y < 0
+                ? (_eTxt.Count > 0 ? Cursor_PosAt(controlX, controlY) : 0)
+                : Cursor_PosAt(controlX, controlY);
         }
 
         var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
@@ -1048,11 +1014,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _cursorVisible = true;
     }
 
-    private void Cursor_Show(Graphics gr) {
+    private void Cursor_Show(Graphics gr, int offsetX, int offsetY) {
         if (!_cursorVisible || _markStart < 0 || _markEnd > -1) { return; }
         var r = _eTxt.CursorCanvasPosX(_markStart);
         using var pen = new Pen(Color.Black);
-        gr.DrawLine(pen, r.Left + OffsetX, r.Top + OffsetY, r.Left + OffsetX, r.Bottom + OffsetY);
+        var x = (r.Left * Zoom) + offsetX;
+        var y1 = (r.Top * Zoom) + offsetY;
+        var y2 = (r.Bottom * Zoom) + offsetY;
+        gr.DrawLine(pen, x, y1, x, y2);
     }
 
     private void DrawMarkings(Graphics gr, float zoom, int offsetX, int offsetY, bool beforeText) {
@@ -1078,42 +1047,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         if (resetCoords) {
-            // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
-            if (_sliderY is not null) {
-                _sliderY.Visible = false;
-                _sliderY.Value = 0;
-            }
-            OffsetX = Skin.PaddingSmal;
-            OffsetY = Skin.PaddingSmal;
+            // Slider und Offset zurücksetzen; ZoomPad kümmert sich um die Slider-Logik.
+            OffsetX = 0;
+            OffsetY = 0;
             _eTxt.AreaControl = new Rectangle(0, 0, -1, -1);
             _eTxt.TextDimensions = Size.Empty;
+            _lastCanvasSize = Size.Empty;
+            Invalidate_MaxBounds();
         }
     }
-
-    private void GenerateSlider() {
-        if (IsDisposed || _sliderY is not null) { return; }
-
-        _sliderY = new Slider {
-            Dock = System.Windows.Forms.DockStyle.Right,
-            LargeChange = 10f,
-            Location = new Point(Width - 18, 0),
-            Maximum = 100f,
-            Minimum = 0f,
-            MouseChange = 1f,
-            Name = "SliderY",
-            Orientation = Orientation.Senkrecht,
-            Size = new Size(18, Height),
-            SmallChange = 48f,
-            TabIndex = 0,
-            TabStop = false,
-            Value = 0f,
-            Visible = true
-        };
-        _sliderY.ValueChanged += SliderY_ValueChange;
-        Controls.Add(_sliderY);
-    }
-
-    private int HotPosition() => _markStart > -1 ? (_markEnd < 0 ? _markStart : _markEnd) : -1;
 
     private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
 
@@ -1301,8 +1243,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _zones.RemoveAll(z => z.EndPos < 0 || z.EndPos < z.StartPos);
         }
     }
-
-    private void SliderY_ValueChange(object? sender, System.EventArgs e) => Invalidate();
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
         try {

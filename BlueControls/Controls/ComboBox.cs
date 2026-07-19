@@ -55,9 +55,9 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Events
 
-    public event EventHandler? DropDownShowing;
-
     public event EventHandler<AddItemEventArgs>? AddClicked;
+
+    public event EventHandler? DropDownShowing;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
@@ -188,7 +188,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         Invalidate();
     }
 
-    public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs e) {
+    public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs? e) {
         if (IsDisposed) { return; }
         btnEdit.Visible = false;
 
@@ -313,6 +313,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         btnDropDown.Invalidate();
     }
 
+    protected virtual void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
+
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);
         FloatingForm.Close(this);
@@ -331,8 +333,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
-
-    protected virtual void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
 
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
@@ -369,7 +369,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         btnEdit.Visible = false;
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(CanvasMouseEventArgs e) {
         if (e.Button == System.Windows.Forms.MouseButtons.Right) {
             var selectedItem = _items.GetByKey(Text);
             if (selectedItem is null && !string.IsNullOrEmpty(Text)) {
@@ -384,7 +384,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
-            ShowMenu(this, e);
+            ShowMenu(this, null);
         } else {
             base.OnMouseUp(e);
         }
@@ -421,6 +421,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         } catch { }
     }
 
+    private void DropDownMenu_AddClicked(object? sender, AddItemEventArgs e) => OnAddClicked(e);
+
     //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
     private void DropDownMenu_Cancel(object? sender, object mouseOver) {
         FloatingForm.Close(this);
@@ -431,8 +433,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (e.Item is { } ali) { _items.Add(ali); }
         OnItemAddedByClick(e);
     }
-
-    private void DropDownMenu_AddClicked(object? sender, AddItemEventArgs e) => OnAddClicked(e);
 
     private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (e.Item is { } bli) {
