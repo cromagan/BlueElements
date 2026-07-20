@@ -27,9 +27,9 @@ public sealed class RowCaptionListItem : RowBackground {
 
     public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.ChapterPathParent()) {
         ChapterText = chapterText.ChapterPathNormalize();
-        // NumberStyle (SYS_ROWSORTINDEX): Kapitel-Trenner wird ignoriert —
-        // flache Anzeige ohne Einrückung. Sonst Hierarchie-Tiefe als Indent.
-        Indent = IsNumberStyle(arrangement) ? 0 : ChapterText.ChapterPathDepth();
+        // Hierarchie-Tiefe als Indent — einheitliche Behandlung aller Strukturen,
+        // unabhängig vom Sortier-Modus (früher wurde NumberStyle flach dargestellt).
+        Indent = ChapterText.ChapterPathDepth();
         IsExpanded = true;
     }
 
@@ -45,26 +45,18 @@ public sealed class RowCaptionListItem : RowBackground {
 
     /// <summary>
     /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Nur bei echten Kapiteln (nicht Angepinnt), mit vorhandener
-    /// Kapitel-Spalte, außerhalb von TableChunk und wenn die Benutzerrechte
-    /// es erlauben. Das Ohne-Kapitel (-?-) ist ebenfalls bearbeitbar —
-    /// es repräsentiert leere Kapitel-Werte.
+    /// Nur bei echten Kapiteln (nicht leer), mit vorhandener Kapitel-Spalte,
+    /// außerhalb von TableChunk und wenn die Benutzerrechte es erlauben.
     /// </summary>
     internal bool CanEditChapter {
         get {
             if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
             if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
             if (tb is TableChunk) { return false; }
-            if (ChapterText == TableView.DummyPinned) { return false; }
+            if (string.IsNullOrEmpty(ChapterText)) { return false; }
             return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
         }
     }
-
-    /// <summary>
-    /// Letztes Pfad-Segment ist -?- (Ohne), d.h. die Zeilen haben kein
-    /// oder nur den Parent-Pfad als Kapitel-Wert.
-    /// </summary>
-    internal bool IsOhneChapter => string.Equals(ChapterText.ChapterPathLastName(), TableView.Ohne, StringComparison.OrdinalIgnoreCase);
 
     protected override bool DoSpezialOrder => true;
 
@@ -83,23 +75,13 @@ public sealed class RowCaptionListItem : RowBackground {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        var displayText = IsNumberStyle(Arrangement) ? ChapterText : ChapterText.ChapterPathLastName();
+        var displayText = ChapterText.ChapterPathLastName();
         if (CanEditChapter) {
-            if (IsOhneChapter) { displayText = "(leer)"; }
             return $"{displayText}\rDoppelklick zum Bearbeiten";
         }
 
         return displayText;
     }
-
-    /// <summary>
-    /// Ermittelt, ob das Arrangement im NumberStyle läuft (SYS_ROWSORTINDEX
-    /// aktiv). In diesem Modus wird der Kapitel-Trenner '\' ignoriert —
-    /// Kapitel werden flach auf einer Ebene dargestellt.
-    /// </summary>
-    internal static bool IsNumberStyle(ColumnViewCollection? arrangement)
-        => arrangement?.Table is { IsDisposed: false } tb
-           && tb.Column.SysRowSortIndex is { IsDisposed: false };
 
     /// <summary>
     /// Pfeil-Button-Rechteck in Control-Koordinaten (absolut).
@@ -133,13 +115,9 @@ public sealed class RowCaptionListItem : RowBackground {
         var bt = tableView.BTB;
         bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
         bt.MultiLine = false;
-        // Im Normalfall wird nur das letzte Pfad-Segment bearbeitet (analog zum
-        // Windows Explorer). Im NumberStyle ist der Kapitel-Trenner ohne
-        // Bedeutung — der gesamte Wert wird bearbeitet.
-        // Bei -?- (Ohne) leere Textbox anzeigen, da -?- "kein Kapitel" bedeutet.
-        bt.Text = IsOhneChapter ? string.Empty
-                  : IsNumberStyle(Arrangement) ? ChapterText
-                  : ChapterText.ChapterPathLastName();
+        // Nur das letzte Pfad-Segment bearbeiten (analog zum Windows Explorer).
+        // Die Hierarchie wird über den Parent-Pfad beibehalten.
+        bt.Text = ChapterText.ChapterPathLastName();
         bt.Location = new Point(0, capPos.Y);
         bt.Size = new Size(tableView.Width, capPos.Height);
         bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];
@@ -168,9 +146,7 @@ public sealed class RowCaptionListItem : RowBackground {
         var fontScaled = Font_RowChapter.Scale(zoom);
         // Nur das letzte Pfad-Segment anzeigen — die Hierarchie wird über
         // Indent optisch dargestellt (analog zum Windows Datei-Explorer).
-        // Im NumberStyle wird der Trenner ignoriert: der gesamte Kapitel-Wert
-        // ist flach und wird vollständig angezeigt.
-        var tmp = IsNumberStyle(Arrangement) ? ChapterText : ChapterText.ChapterPathLastName();
+        var tmp = ChapterText.ChapterPathLastName();
 
         var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);

@@ -80,6 +80,8 @@ public class AssemblyAwareCache<T> {
                     string key = t.FullName ?? t.Name;
                     if (result.ContainsKey(key)) { continue; }
                     if (!targetType.IsAssignableFrom(t)) { continue; }
+                    if (t.IsAbstract) { continue; }
+                    if (t.ContainsGenericParameters) { continue; }
                     if (t.GetConstructor(Type.EmptyTypes) is null) { continue; }
                     result[key] = t;
                 }

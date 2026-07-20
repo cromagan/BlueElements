@@ -88,6 +88,8 @@ public sealed class EditBarListItem : RowBackground {
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
         if (tableView.Table is not { IsDisposed: false }) { return false; }
 
+        if (!tableView.Table.IsAdministrator()) { return false; }
+
         var btnType = GetButtonType(clickedColumn, mouseXinColumn, zoom);
         if (btnType == EditButtonType.None) { return false; }
 

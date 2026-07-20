@@ -108,6 +108,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             if (TableView.Table is { IsDisposed: false } tbold) {
                 tbold.Loaded -= Tb_Loaded;
                 tbold.InvalidateView -= Tb_InvalidateView;
+                tbold.ScriptChanged -= Tb_ScriptChanged;
             }
 
             CFO.Page = null;
@@ -116,6 +117,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             if (value is { } tbnew) {
                 tbnew.Loaded += Tb_Loaded;
                 tbnew.InvalidateView += Tb_InvalidateView;
+                tbnew.ScriptChanged += Tb_ScriptChanged;
             }
 
             CheckButtons(true);
@@ -913,6 +915,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void Tb_InvalidateView(object? sender, System.EventArgs e) => TableView.Invalidate();
 
     private void Tb_Loaded(object? sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
+
+    private void Tb_ScriptChanged(object? sender, System.EventArgs e) => CheckButtons(true);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
         if (e.TabPage?.Tag is not List<object?> s) { return; }

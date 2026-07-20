@@ -1210,7 +1210,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return true;
     }
 
-    public List<string> Contents() => Contents(Table?.Row.ToList(), string.Empty);
+    public List<string> Contents() => Contents(Table?.Row.ToList());
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return []; }
@@ -1221,10 +1221,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (pinned is not null) { r2.AddIfNotExists(pinned); }
 
-        return Contents(r2, string.Empty);
+        return Contents(r2);
     }
 
-    public List<string> Contents(ICollection<RowItem>? rows, string empty) {
+    public List<string> Contents(ICollection<RowItem>? rows) {
         if (rows is null || rows.Count == 0) { return []; }
 
         var list = new List<string>();
@@ -1233,7 +1233,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 if (!_saveContent) { thisRowItem.CheckRow(); }
 
                 var t = thisRowItem.CellGetStringCore(this);
-                if (string.IsNullOrWhiteSpace(t)) { t = empty; }
 
                 if (!string.IsNullOrWhiteSpace(t)) {
                     if (_multiLine) {
@@ -1360,6 +1359,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         Table.OnViewChanged();
     }
 
+    /// <summary>
+    /// Gibt an, ob diese Spalte in mindestens einer Spaltenanordnung als Kapitel-Spalte
+    /// (<see cref="ColumnViewCollection.ColumnForChapter"/>) verwendet wird.
+    /// </summary>
+    public bool IsChapterColumn() {
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        foreach (var ca in tb.ColumnArrangements) {
+            if (ca.ColumnForChapter == this) { return true; }
+        }
+        return false;
+    }
+
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
         return tb.IsValueEditable(TableDataType.ColumnKey, string.Empty);
@@ -1376,18 +1387,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnKeys.RowState or
             SystemColumnKeys.RowKey or
             SystemColumnKeys.RowSortIndex;
-
-    /// <summary>
-    /// Gibt an, ob diese Spalte in mindestens einer Spaltenanordnung als Kapitel-Spalte
-    /// (<see cref="ColumnViewCollection.ColumnForChapter"/>) verwendet wird.
-    /// </summary>
-    public bool IsChapterColumn() {
-        if (Table is not { IsDisposed: false } tb) { return false; }
-        foreach (var ca in tb.ColumnArrangements) {
-            if (ca.ColumnForChapter == this) { return true; }
-        }
-        return false;
-    }
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -2363,6 +2362,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _permissionGroupsChangeCell.Clear();
     }
 
+    private string? ErrorReason_ChapterColumn() {
+        if (Table is not { IsDisposed: false } tb) { return null; }
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return null; }
+        if (!IsChapterColumn()) { return null; }
+        if (_multiLine) { return ChapterColumnMultilineWithRowSort; }
+        return null;
+    }
+
     private string? ErrorReason_Editing() {
         if (_spellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
         if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return EditDespiteLockNeedsMethod; }
@@ -2474,14 +2481,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isFirst) { return ValueRequiredMissingFirst; }
         }
 
-        return null;
-    }
-
-    private string? ErrorReason_ChapterColumn() {
-        if (Table is not { IsDisposed: false } tb) { return null; }
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return null; }
-        if (!IsChapterColumn()) { return null; }
-        if (_multiLine) { return ChapterColumnMultilineWithRowSort; }
         return null;
     }
 
