@@ -2210,68 +2210,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> sortedRows) {
-        var captionOrder = new List<string>();
-
-        // Caption-Reihenfolge aus der sortierten Liste ableiten.
-        // Für jede Zeile die vollständige Pfad-Hierarchie eintragen — bei
-        // "PFAD1\PFAD2" also sowohl "PFAD1" als auch "PFAD1\PFAD2". So werden
-        // auch die Parent-Header an der Position ihres ersten Unter-Eintrags
-        // eingefügt (analog zum Windows Datei-Explorer).
-        // Das bestimmt später nur noch die Geschwister-Reihenfolge INNERHALB einer Ebene.
-        var discovered = new List<string>();
-        foreach (var dataItem in sortedRows) {
-            // Leere Kapitel (auch der Angepinnt-Marker) überspringen — sie
-            // erhalten keinen Header und tauchen nicht in captionOrder auf.
-            if (string.IsNullOrEmpty(dataItem.AlignsToChapter)) { continue; }
-
-            var hierarchy = dataItem.AlignsToChapter.ChapterPathHierarchy();
-
-            if (hierarchy.Count == 0) {
-                discovered.AddIfNotExists(dataItem.AlignsToChapter);
-            } else {
-                foreach (var ancestor in hierarchy) {
-                    discovered.AddIfNotExists(ancestor);
-                }
-            }
-        }
-
-        // Hierarchisch (Tiefensuche) neu ordnen. Ohne diesen Schritt
-        // rutscht z.B. ein spät entdecktes Kind ans Ende der Gesamtliste.
-        var childrenByParent = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-        var topLevel = new List<string>();
-
-        foreach (var cap in discovered) {
-            var pos = cap.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
-            if (pos < 0) {
-                topLevel.AddIfNotExists(cap);
-            } else {
-                var parent = cap[..pos];
-                if (!childrenByParent.TryGetValue(parent, out var list)) {
-                    list = [];
-                    childrenByParent[parent] = list;
-                }
-                list.AddIfNotExists(cap);
-            }
-        }
-
-        void AddRecursive(string cap) {
-            captionOrder.AddIfNotExists(cap);
-
-            if (!childrenByParent.TryGetValue(cap, out var children)) { return; }
-
-            foreach (var child in children) {
-                AddRecursive(child);
-            }
-        }
-
-        foreach (var top in topLevel) {
-            AddRecursive(top);
-        }
-
-        return captionOrder;
-    }
-
     private static (int BiggestItemX, int BiggestItemY, int HeightAdded, BlueBasics.Enums.Orientation Orientation) CanvasItemData(IEnumerable<RowBackground> item, Design itemDesign) {
         try {
             var w = 16;
@@ -3005,9 +2943,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_HildeAllItems(allItems, arrangement);
 
-        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems);
-
-        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, visibleRowListItems);
+        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, visibleRowListItems);
 
         CalculateAllViewItems_NewRow(allItems, arrangement, tb, _newRowsAllowed, false, sortedItems);
         CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems);
@@ -3025,7 +2961,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, RowBackground> allItems, List<RowBackground> sortedItems, List<string> captionOrder, List<RowListItem> sortedRows) {
+    /// <summary>
+    /// Einheitlicher Caption- und Zeilen-Aufbau für beide Modi (NumberStyle
+    /// und hierarchisch). Die Zeilen werden in ihrer sortierten Reihenfolge
+    /// durchlaufen — die Sortierung ist die EINZIGE Unterscheidung zwischen
+    /// den Modi (siehe <see cref="CalculateAllViewItems_Rows"/>). Bei jedem
+    /// Kapitel-Wechsel werden die benötigten Header eingefügt, inkl. Hierarchie
+    /// (Unterkapitel). Im NumberStyle kann dasselbe Kapitel mehrfach auftreten,
+    /// wenn seine Zeilen verstreut sind — jeder Block ist unabhängig auf-/zuklappbar.
+    /// Im hierarchischen Modus sind die Zeilen nach Kapitel-Pfad sortiert,
+    /// sodass jedes Kapitel genau einmal erscheint.
+    /// </summary>
+    private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, RowBackground> allItems, List<RowBackground> sortedItems, List<RowListItem> sortedRows) {
         _chapterBlockRows.Clear();
 
         var numberStyle = Table is { IsDisposed: false } tbNs && tbNs.Column.SysRowSortIndex is { IsDisposed: false };
@@ -3039,71 +2986,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
 
-        if (numberStyle) {
-            CalculateAllViewItems_AddCaptionsAndRowsNumberStyle(allItems, sortedItems, sortedRows);
-        } else {
-            CalculateAllViewItems_AddCaptionsAndRowsHierarchical(allItems, sortedItems, captionOrder, sortedRows);
-        }
-    }
-
-    /// <summary>
-    /// Hierarchischer Modus (ohne SYS_ROWSORTINDEX): Zeilen werden nach
-    /// Kapiteln gruppiert. <paramref name="captionOrder"/> bestimmt die
-    /// Reihenfolge der Kapitel-Header (Hierarchie: Parent vor Kind). Jedes
-    /// Kapitel erscheint genau einmal mit seinen Zeilen direkt darunter.
-    /// Zeilen ohne Kapitelwert erscheinen auf der obersten Ebene ohne Header.
-    /// Angepinnte Zeilen werden ganz oben ausgegeben (siehe Aufrufer).
-    /// </summary>
-    private void CalculateAllViewItems_AddCaptionsAndRowsHierarchical(Dictionary<string, RowBackground> allItems, List<RowBackground> sortedItems, List<string> captionOrder, List<RowListItem> sortedRows) {
-        // Zeilen ohne Kapitel (nicht angepinnt) auf der obersten Ebene ausgeben,
-        // vor allen Kapitel-Headern. Sie erhalten keinen eigenen Header.
-        foreach (var rli in sortedRows) {
-            if (!rli.MarkYellow && string.IsNullOrEmpty(rli.AlignsToChapter)) {
-                sortedItems.Add(rli);
-            }
-        }
-
-        var grouped = sortedRows.ToLookup(x => x.AlignsToChapter);
-
         // _collapsed enthält nur die direkt eingeklappten Kapitel. Um auch
         // Nachfahren zu verbergen, zusätzlich auf eingeklappte Vorfahren prüfen.
         var collapsedSet = new HashSet<string>(_collapsed, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var captionKey in captionOrder) {
-            // Leere Kapitel überspringen — sie werden oben separat ausgegeben.
-            if (string.IsNullOrEmpty(captionKey)) { continue; }
-
-            // Vorfahr eingeklappt? → Header und Zeilen komplett überspringen.
-            // Der Parent-Header selbst wird weiterhin angezeigt (eingeklappt).
-            if (HasCollapsedAncestor(captionKey, collapsedSet)) { continue; }
-
-            allItems.TryGetValue(RowCaptionListItem.Identifier(captionKey), out var caption);
-            if (caption is RowCaptionListItem capRcli) {
-                sortedItems.Add(capRcli);
-                _chapterBlockRows[capRcli] = [.. grouped[captionKey].Where(x => x.Row is { IsDisposed: false }).Select(x => x.Row)];
-            } else if (caption is not null) {
-                sortedItems.Add(caption);
-            }
-
-            // Direkt eingeklappt? → Header ja, aber keine Zeilen darunter.
-            if (!collapsedSet.Contains(captionKey)) {
-                sortedItems.AddRange(grouped[captionKey]);
-            }
-        }
-    }
-
-    /// <summary>
-    /// NumberStyle (SYS_ROWSORTINDEX aktiv): strikte Sortierreihenfolge
-    /// beibehalten. Zeilen werden in ihrer sortierten Reihenfolge durchlaufen
-    /// — sie werden NICHT nach Kapiteln zusammengefasst. Bei jedem Wechsel des
-    /// Kapitels werden die benötigten Header eingefügt, inkl. Hierarchie
-    /// (Unterkapitel). So kann dasselbe Kapitel mehrfach auftreten, wenn seine
-    /// Zeilen verstreut sind. Jeder Block ist unabhängig auf-/zuklappbar.
-    /// </summary>
-    private void CalculateAllViewItems_AddCaptionsAndRowsNumberStyle(Dictionary<string, RowBackground> allItems, List<RowBackground> sortedItems, List<RowListItem> sortedRows) {
         string? lastChapter = null;
         List<RowItem>? currentBlockRows = null;
         var blockCollapsed = false;
+
+        // NumberStyle: aktives eingeklapptes Vorfahr-Kapitel, dessen
+        // Nachfahren ebenfalls verbergen werden. Im NumberStyle sind Blöcke
+        // zwar unabhängig auf-/zuklappbar, aber ein zugeklapptes Kapitel
+        // muss auch seine Sub-Kapitel verbergen (wie im hierarchischen Modus).
+        string? collapsedAncestor = null;
 
         foreach (var rli in sortedRows) {
             // Pinned-Top-Variante überspringen (bereits oben ausgegeben)
@@ -3117,6 +3012,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 lastChapter = null;
                 currentBlockRows = null;
                 blockCollapsed = false;
+                collapsedAncestor = null;
+                continue;
+            }
+
+            // NumberStyle: Zeile unter eingeklapptem Vorfahr? → komplett
+            // verbergen (Header und Zeile). Die Zeile wird dennoch in den
+            // Block des Vorfahrs aufgenommen, damit Drag/Drop des zugeklappten
+            // Vorfahrs alle Zeilen — inkl. Sub-Kapitel — bewegt.
+            if (numberStyle && collapsedAncestor is { Length: > 0 } anc
+                && chapter.StartsWith(anc + RowCaptionListItem.Kapiteltrenner, StringComparison.OrdinalIgnoreCase)) {
+                if (currentBlockRows is not null && rli.Row is { IsDisposed: false } descRow) {
+                    currentBlockRows.Add(descRow);
+                }
+                lastChapter = chapter;
                 continue;
             }
 
@@ -3140,28 +3049,47 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 for (var i = startDepth; i < hierarchy.Count; i++) {
                     var headerChapter = hierarchy[i];
 
+                    // Hierarchisch: Vorfahr eingeklappt? → Header und Zeilen
+                    // komplett überspringen. Der Parent-Header selbst wurde
+                    // bereits (eingeklappt) ausgegeben.
+                    if (!numberStyle && HasCollapsedAncestor(headerChapter, collapsedSet)) {
+                        blockCollapsed = true;
+                        break;
+                    }
+
                     // Original-Schreibweise aus dem gecachten Canonical-Item holen,
                     // da AlignsToChapter upper-cased ist.
                     RowCaptionListItem headerItem;
                     if (allItems.TryGetValue(RowCaptionListItem.Identifier(headerChapter), out var capItem) && capItem is RowCaptionListItem rcli) {
-                        headerItem = new RowCaptionListItem(rcli.ChapterText, rli.Arrangement);
+                        // NumberStyle: neue Instanz pro Block, da dasselbe Kapitel
+                        // mehrfach vorkommen kann. Hierarchisch: Original-Instanz
+                        // wiederverwenden, damit IsExpanded-Zustand erhalten bleibt.
+                        headerItem = numberStyle
+                            ? new RowCaptionListItem(rcli.ChapterText, rli.Arrangement)
+                            : rcli;
                     } else {
                         headerItem = new RowCaptionListItem(headerChapter, rli.Arrangement);
                     }
 
                     if (i == hierarchy.Count - 1) {
-                        // Leaf: Block beginnt hier. Collapse-Zustand pro Block
-                        // anhand der ersten Zeile bestimmen — so bleibt jeder
-                        // Block mit gleichem Chapter-Text unabhängig auf/zu klappbar.
-                        blockCollapsed = rli.Row is { IsDisposed: false } firstRow
-                                         && _collapsedBlockFirstRowKeys.Contains(firstRow.KeyName);
+                        // Leaf: Block beginnt hier. Collapse-Zustand bestimmen.
+                        if (numberStyle) {
+                            // NumberStyle: pro Block anhand der ersten Zeile —
+                            // so bleibt jeder Block unabhängig auf/zu klappbar.
+                            blockCollapsed = rli.Row is { IsDisposed: false } firstRow
+                                             && _collapsedBlockFirstRowKeys.Contains(firstRow.KeyName);
+                        } else {
+                            // Hierarchisch: pro Kapitel anhand des Chapter-Texts.
+                            blockCollapsed = collapsedSet.Contains(headerChapter);
+                        }
                         headerItem.IsExpanded = !blockCollapsed;
                         currentBlockRows = [];
                         _chapterBlockRows[headerItem] = currentBlockRows;
                     } else {
-                        // Vorfahr: Im NumberStyle hat der Vorfahr-Header keinen
-                        // eigenen Zustand — er ist nur optische Gliederung.
-                        headerItem.IsExpanded = true;
+                        // Vorfahr-Header: nur optische Gliederung.
+                        // NumberStyle: immer expanded. Hierarchisch: entsprechend
+                        // des Collapse-Zustands dieses Kapitels.
+                        headerItem.IsExpanded = numberStyle || !collapsedSet.Contains(headerChapter);
                     }
 
                     sortedItems.Add(headerItem);
@@ -3179,6 +3107,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // eines zugeklappten Blocks funktioniert.
             if (currentBlockRows is not null && rli.Row is { IsDisposed: false } blockRow) {
                 currentBlockRows.Add(blockRow);
+            }
+
+            // NumberStyle: eingeklappte Blöcke als Vorfahr merken, damit
+            // nachfolgende Sub-Kapitel ebenfalls verbergen werden. Ein
+            // nicht eingeklappter Block setzt den Vorfahr zurück — der
+            // sichtbare Block beendet den Gültigkeitsbereich des Vorfahrs.
+            if (numberStyle) {
+                collapsedAncestor = blockCollapsed ? chapter : null;
             }
         }
     }
@@ -3334,6 +3270,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var pinnedSet = new HashSet<RowItem>(pinnedRows);
         var filteredSet = new HashSet<RowItem>(filteredRows);
 
+        // NumberStyle (SysRowSortIndex aktiv): streng nach Index sortieren —
+        // Kapitel können verstreut sein, derselbe Header mehrfach auftreten.
+        // Hierarchisch: Kapitel-Pfad als primären Sortierschlüssel voranstellen,
+        // sodass alle Zeilen eines Kapitels (und ihrer Hierarchie) beieinander
+        // liegen. Der Caption-Aufbau läuft dann einheitlich über beide Modi.
+        var numberStyle = Table is { IsDisposed: false } tbNs && tbNs.Column.SysRowSortIndex is { IsDisposed: false };
+
         foreach (var thisRow in allrows) {
             var isPinned = pinnedSet.Contains(thisRow);
             var isFiltered = filteredSet.Contains(thisRow);
@@ -3347,7 +3290,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
                 rowListItem.Arrangement = arrangement;
 
-                rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
+                var rowKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
+                rowListItem.UserDefCompareKey = numberStyle
+                    ? rowKey
+                    : thisCap.ChapterPathSortKey() + Constants.FirstSortChar + rowKey;
                 rowListItem.Visible = false;
                 rowListItem.MarkYellow = isPinned;
                 visibleRowListItems.Add(rowListItem);
@@ -3355,8 +3301,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return sortused.Reverse
-              ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
-              : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
+              ? visibleRowListItems.OrderByDescending(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList()
+              : visibleRowListItems.OrderBy(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList();
     }
 
     /// <summary>

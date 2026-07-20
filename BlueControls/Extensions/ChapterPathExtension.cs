@@ -64,6 +64,20 @@ public static partial class Extensions {
     }
 
     /// <summary>
+    /// Erzeugt eine sortierfähige Repräsentation des Kapitel-Pfads, bei der
+    /// die Hierarchie-Reihenfolge korrekt abgebildet wird. Der
+    /// <see cref="RowCaptionListItem.Kapiteltrenner"/> ('\') wird durch
+    /// '/' (ASCII 47) ersetzt — ein Zeichen, das zwischen
+    /// <see cref="Constants.FirstSortChar"/> ('+', 43) und '0' (48) liegt.
+    /// Dadurch sortieren Kind-Kapitel direkt nach ihrem Eltern-Kapitel und
+    /// vor Präfix-Geschwistern (z. B. "Aktionen" &lt; "Aktionen\1" &lt; "AktionenGrundlagen").
+    /// </summary>
+    public static string ChapterPathSortKey(this string path) {
+        if (string.IsNullOrEmpty(path)) { return string.Empty; }
+        return path.ChapterPathNormalize().ToUpperInvariant().Replace(RowCaptionListItem.Kapiteltrenner, '/');
+    }
+
+    /// <summary>
     /// Gibt den Parent-Pfad zurück. Für "A\B" → "A". Für "A" → "".
     /// Das Ergebnis ist normalisiert (keine führenden/abschließenden Trennzeichen).
     /// </summary>
