@@ -201,3 +201,22 @@ Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nic
 ## Aufgabe
 Wird die Listbox gezoomt. verändern sich intern die Items nicht, sie werden immer mit Scale 1 gezeichnet
 
+## Aufgabe
+"Editor nicht gefunden" bei einer Table. Seit der Letzte (oder vorletzten) Git änderung. Schau im Git und Prüfe
+
+## Aufgabe
+In Skripten stimmen die Zeilennummern nicht.
+Wird innerhalb eines IFs ein Stop; gesetzt, wird die Zeilennummer des Ifs angezeigt.
+
+## Aufgabe
+Der neue Editor muss anders gestaltet werden:
+Leite von einer Listbox ab. Und diese Listbox soll mittels Property einen Editor erhalten. die Listbox soll den Editor steuern und alles selbst übernehmen.
+
+## Aufgabe
+Umbennennen in Explorer Soll eine Textbox IM angezeigten Explorer Fenster gehen.
+Zudem fehlt der Befehl Neuer Ordner
+Und F2, F5 und Entfernen muss funktionieren
+
+
+
+

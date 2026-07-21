@@ -573,24 +573,6 @@ public class TableChunk : TableFile {
         return CheckEditLock(chunkId);
     }
 
-    /// <summary>
-    /// Bei TableChunk ist die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX)
-    /// nicht erlaubt. Eine vorhandene Systemspalte wird während des Repars zu
-    /// einer normalen Spalte (ROWSORTINDEX) herabgestuft, damit sie nicht mehr
-    /// als Systemspalte erkannt wird. Die Umbenennung muss VOR
-    /// <see cref="Table.RepairAfterParse"/> erfolgen, damit
-    /// <see cref="ColumnCollection.GetSystems"/> die Spalte nicht registriert.
-    /// </summary>
-    public override void RepairAfterParse() {
-        if (string.IsNullOrEmpty(IsGenericEditable(false))) {
-            if (Column[SystemColumnKeys.RowSortIndex] is { IsDisposed: false } sortCol && Column["ROWSORTINDEX"] is null) {
-                sortCol.KeyName = "ROWSORTINDEX";
-            }
-        }
-
-        base.RepairAfterParse();
-    }
-
     public override bool LoadTableRows(bool oldest, int count) {
         if (!base.LoadTableRows(oldest, count)) { return false; }
 
@@ -628,6 +610,24 @@ public class TableChunk : TableFile {
         if (loaded) { OnLoaded(false, true); }
 
         return ok;
+    }
+
+    /// <summary>
+    /// Bei TableChunk ist die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX)
+    /// nicht erlaubt. Eine vorhandene Systemspalte wird während des Repars zu
+    /// einer normalen Spalte (ROWSORTINDEX) herabgestuft, damit sie nicht mehr
+    /// als Systemspalte erkannt wird. Die Umbenennung muss VOR
+    /// <see cref="Table.RepairAfterParse"/> erfolgen, damit
+    /// <see cref="ColumnCollection.GetSystems"/> die Spalte nicht registriert.
+    /// </summary>
+    public override void RepairAfterParse() {
+        if (string.IsNullOrEmpty(IsGenericEditable(false))) {
+            if (Column[SystemColumnKeys.RowSortIndex] is { IsDisposed: false } sortCol && Column["ROWSORTINDEX"] is null) {
+                sortCol.KeyName = "ROWSORTINDEX";
+            }
+        }
+
+        base.RepairAfterParse();
     }
 
     /// <summary>
