@@ -286,8 +286,17 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
 
     internal void InvalidateAllSizes() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        foreach (var thisColumn in tb.Column) {
-            thisColumn.Invalidate_ColumAndContent();
+        // Ohne Bündelung feuert JEDES Invalidate_ColumAndContent sofort OnViewChanged
+        // und löst damit in der TableView N teure Arrangement-Rebuilds aus
+        // (CurrentArrangement = null → CalculateCanvasContentWith über alle Zeilen).
+        // SuppressEvents hält die Events zurück, ResumeEvents macht am Ende einen Aufbau.
+        tb.SuppressEvents();
+        try {
+            foreach (var thisColumn in tb.Column) {
+                thisColumn.Invalidate_ColumAndContent();
+            }
+        } finally {
+            tb.ResumeEvents();
         }
     }
 
