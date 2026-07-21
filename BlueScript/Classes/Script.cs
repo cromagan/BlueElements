@@ -119,7 +119,7 @@ public class Script {
                 }
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue);
+                    return new DoItWithEndedPosFeedback(scx, f.ContinueOrErrorPosition);
                 }
             }
         }
@@ -143,13 +143,13 @@ public class Script {
                 }
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue);
+                    return new DoItWithEndedPosFeedback(scx, f.ContinueOrErrorPosition);
                 }
             }
         }
 
         if (firstResult is not null) {
-            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, firstResultPos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue);
+            return new DoItWithEndedPosFeedback(firstResult, firstResultPos);
         }
 
         #endregion
@@ -165,7 +165,7 @@ public class Script {
                 }
 
                 var scx = Method.VariablenBerechnung(varCol, ld, scp, varnam + "=" + f.NormalizedText + ";", false);
-                return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinuePosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue);
+                return new DoItWithEndedPosFeedback(scx, f.ContinuePosition);
             }
         }
 
@@ -246,9 +246,13 @@ public class Script {
                 var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
-                    // Echte Ausführung: Bei jedem Fehler stoppen
+                    // Echte Ausführung: Bei jedem Fehler stoppen.
+                    // Kommt der Fehler aus einem verschachtelten Block (if/foreach/do),
+                    // hat scx bereits die korrekte innere Zeile — diese hat Vorrang
+                    // vor der Zeile des äußeren Befehls (z.B. des if-Schlüsselworts).
+                    var errorLd = scx.Line > 0 ? new LogData(ld.Subname, scx.Line) : ld;
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
+                    return new ScriptEndedFeedback(varCol, errorLd, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
                 }
 
                 pos = scx.Position;

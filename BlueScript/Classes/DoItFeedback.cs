@@ -57,6 +57,15 @@ public class DoItFeedback {
     public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
     public string FailedReason { get; private set; } = string.Empty;
     public bool NeedsScriptFix { get; private set; }
+
+    /// <summary>
+    /// Zeilennummer des Fehlers. 0 bedeutet "keine spezifische Zeile bekannt".
+    /// Wird von <see cref="ScriptEndedFeedback"/> gesetzt und beim Wrappen in
+    /// <see cref="DoItWithEndedPosFeedback"/> durchgereicht, damit verschachtelte
+    /// Skript-Blöcke (if/foreach/do) die korrekte innere Zeile melden.
+    /// </summary>
+    public virtual int Line => 0;
+
     public bool ReturnFired { get; private set; }
     public Variable? ReturnValue { get; private set; }
 

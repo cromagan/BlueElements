@@ -299,17 +299,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             lock (_eventScriptLock) { return _eventScript; }
         }
         set {
+            var l = new List<TableScriptDescription>();
+            l.AddRange(value);
+            l.Sort();
+
+            string eventScriptOld;
+            var eventScriptNew = l.ToString(false);
             lock (_eventScriptLock) {
-                var l = new List<TableScriptDescription>();
-                l.AddRange(value);
-                l.Sort();
-
-                var eventScriptOld = _eventScript.ToString(false);
-                var eventScriptNew = l.ToString(false);
-
-                if (eventScriptOld == eventScriptNew) { return; }
-                ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
+                eventScriptOld = _eventScript.ToString(false);
             }
+
+            if (eventScriptOld == eventScriptNew) { return; }
+
+            // ChangeData außerhalb des Locks: feuert OnScriptChanged, dessen Subscriber
+            // (UI) synchron invoken. Unter dem Lock deadlockt das mit UI-Lesern des Getters.
+            ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
         }
     }
 
@@ -943,10 +947,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
 
+        List<TableScriptDescription> updatedScripts = [];
         lock (tb._eventScriptLock) {
             var found = false;
-
-            List<TableScriptDescription> updatedScripts = [];
 
             foreach (var existingScript in tb._eventScript) {
                 if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) {
@@ -999,9 +1002,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (!found) {
                 updatedScripts.Add(script);
             }
-
-            tb.EventScript = updatedScripts.AsReadOnly();
         }
+
+        // Außerhalb des Locks: der Setter ruft ChangeData -> OnScriptChanged,
+        // dessen Subscriber auf den UI-Thread invoken. Unter dem Lock deadlockt das.
+        tb.EventScript = updatedScripts.AsReadOnly();
 
         return true;
     }

@@ -40,7 +40,11 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     public bool GiveItAnotherTry { get; }
 
-    public int Line { get; }
+    /// <summary>
+    /// Überschreibt die virtuale <see cref="DoItFeedback.Line"/>. Wird beim
+    /// Konstruieren aus dem übergebenen <see cref="LogData"/> gesetzt.
+    /// </summary>
+    public override int Line { get; }
 
     /// <summary>
     /// Liefert den FailedReason inkl. Kontext-Informationen (Routine, Zeile),

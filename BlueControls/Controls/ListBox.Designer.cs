@@ -8,7 +8,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls
 {
-    public sealed partial class ListBox 
+    public partial class ListBox 
     {
 
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.

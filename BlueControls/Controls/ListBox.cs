@@ -17,7 +17,7 @@ namespace BlueControls.Controls;
 /// </summary>
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(ItemClicked))]
-public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBackgroundNone {
+public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBackgroundNone {
 
     #region Fields
 
