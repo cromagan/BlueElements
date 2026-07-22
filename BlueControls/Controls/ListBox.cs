@@ -232,10 +232,18 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     public void UpdateList(IEnumerable<IReadableTextWithKey> updateItems) => lstBox.UpdateList(updateItems);
 
+    protected virtual void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
+
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);
         UpdateAddArea();
     }
+
+    protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
+
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    protected virtual void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
@@ -349,7 +357,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     private void Core_ItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
 
-    private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => OnItemClicked(e);
 
     private void Core_ItemLayoutChanged(object? sender, System.EventArgs e) {
         ScheduleAddAreaUpdate();
@@ -417,12 +425,6 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
             && Suggestions.GetByKey(text) is null && Suggestions.Count > 0) { return false; }
         return true;
     }
-
-    private void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
-
-    private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
-
-    private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     private void OnUpDownClicked(int index1, int index2) => UpDownClicked?.Invoke(this, new SwapEventArgs(index1, index2));
 

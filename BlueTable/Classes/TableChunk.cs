@@ -235,7 +235,7 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.RowQuickInfo, tb.RowQuickInfo);
         SaveToByteList(result, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 
-        foreach (var columnitem in ColumnsInSaveOrder(tb)) {
+        foreach (var columnitem in tb.ColumnsInSaveOrder()) {
             SaveToByteList(result, columnitem);
         }
 
@@ -348,7 +348,7 @@ public class TableChunk : TableFile {
     public static List<byte> GenerateUsesChunk(TableFile tb) {
         List<byte> usesBytes = new();
 
-        foreach (var columnitem in ColumnsInSaveOrder(tb)) {
+        foreach (var columnitem in tb.ColumnsInSaveOrder()) {
             SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
         }
 
@@ -879,27 +879,6 @@ public class TableChunk : TableFile {
                 try { IO.DeleteFile(file, false); } catch { }
             }
         }
-    }
-
-    /// <summary>
-    /// Liefert die Spalten der Tabelle in der Speicherreihenfolge:
-    /// Zuerst die Spalten aus Ansicht 1 (Index 1) in deren Reihenfolge,
-    /// dann die verbleibenden Spalten alphabetisch nach KeyName.
-    /// </summary>
-    private static List<ColumnItem> ColumnsInSaveOrder(TableFile tb) {
-        var result = new List<ColumnItem>();
-
-        if (tb.ColumnArrangements.Count > 1) {
-            foreach (var col in tb.ColumnArrangements[1].ListOfUsedColumn()) {
-                if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
-            }
-        }
-
-        foreach (var col in tb.Column.OrderBy(t => t.KeyName)) {
-            if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
-        }
-
-        return result;
     }
 
     /// <summary>

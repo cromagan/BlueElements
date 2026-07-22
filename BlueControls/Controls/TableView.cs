@@ -4081,7 +4081,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (_dragInsertIndex < 0 || _dragInsertIndex > _sortedViewItems.Count) { return; }
 
         var columnsLeft = 0;
-        var columnsRight = (int)ca.ControlColumnsWidth() + columnsLeft;
+        var columnsRight = ca.ControlColumnsWidth() + columnsLeft;
         var rowsTop = RowsAreaTop();
 
         // Entspricht die Einfüge-Position dem aktuellen Block, den gesamten Block markieren

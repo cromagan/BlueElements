@@ -1149,6 +1149,27 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
+    /// Liefert die Spalten der Tabelle in der Speicherreihenfolge:
+    /// Zuerst die Spalten aus Ansicht 1 (Index 1) in deren Reihenfolge,
+    /// dann die verbleibenden Spalten alphabetisch nach KeyName.
+    /// </summary>
+    public List<ColumnItem> ColumnsInSaveOrder() {
+        var result = new List<ColumnItem>();
+
+        if (ColumnArrangements.Count > 1) {
+            foreach (var col in ColumnArrangements[1].ListOfUsedColumn()) {
+                if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
+            }
+        }
+
+        foreach (var col in Column.OrderBy(t => t.KeyName)) {
+            if (col is { IsDisposed: false } c && !string.IsNullOrEmpty(c.KeyName)) { result.AddIfNotExists(c); }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Stellt alle Kapitel-Spalten auf einzeilig um, indem MultiLine deaktiviert
     /// und alle \r in den Zellen durch '; ' ersetzt werden.
     /// Erforderlich, wenn die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.

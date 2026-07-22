@@ -173,7 +173,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
         _isAnimating = false;
         if (!IsHandleCreated || Disposing || IsDisposed) { return; }
         try {
-            ((ISynchronizeInvoke)this).BeginInvoke(new Action(UpdateLayout), null);
+            this.BeginInvoke(new Action(UpdateLayout), null);
         } catch (Exception ex) {
             Develop.DebugPrint("OnAnimationFinished: UpdateLayout konnte nicht gemarshalled werden", ex);
         }
