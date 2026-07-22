@@ -3569,6 +3569,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.GetStyleFrom(viewItem.Column);
         BTS.QuickInfo = viewItem.Column.QuickInfo;
         BTS.Suggestions = items.Select(s => s.KeyName).ToList().AsReadOnly();
+        BTS.Zoom = Zoom;
 
         var (controlPos, _, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
         var totalWidth = viewItem.ControlColumnWidth() + addWith;

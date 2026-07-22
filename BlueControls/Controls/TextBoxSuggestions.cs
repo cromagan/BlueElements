@@ -203,6 +203,14 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.Verhalten = value;
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public float Zoom {
+        get => _textBox.Zoom;
+        set => _textBox.Zoom = value;
+    }
+
     #endregion
 
     #region Methods
