@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
@@ -216,14 +215,14 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         f?.Opacity = 0f;
 
-        var tse = new TimerScriptEditor {
-            Object = this
-        };
-        tse.ShowDialog();
-
-        //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
-
-        f?.Opacity = 1f;
+        try {
+            var sd = new ScriptDescription(KeyName, _script);
+            if (InputBoxEditor.Edit(sd)) {
+                Script = sd.Script;
+            }
+        } finally {
+            f?.Opacity = 1f;
+        }
     }
 
     public override List<string> ParseableItems() {

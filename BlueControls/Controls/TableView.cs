@@ -851,10 +851,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (sender is not Table tbl) { return; }
         if (!FormManager.Running) { e.CancelReason = "Programm wird beendet"; return; }
 
-        foreach (var thisf in FormManager.Forms) {
-            if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
-            if (thisf is TableScriptEditor tbs && tbs.Table != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
-        }
+            foreach (var thisf in FormManager.Forms) {
+                if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
+                if (thisf is TableScriptEditorForm tsf && tsf.Object != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
+            }
     }
 
     //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabellex) {

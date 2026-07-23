@@ -166,10 +166,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         w.ShowDialog();
     }
 
-    public static TableScriptEditor? OpenScriptEditor(Table? tb) {
+    public static TableScriptEditorForm? OpenScriptEditor(Table? tb) {
         if (EditableErrorMessage(tb, null)) { return null; }
 
-        return IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+        return IUniqueWindowExtension.ShowOrCreate<TableScriptEditorForm>(tb);
     }
 
     [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", "Allgemeine Tabellen-Ansicht", 800)]

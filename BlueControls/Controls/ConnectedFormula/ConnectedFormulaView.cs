@@ -528,7 +528,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
-            IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+            IUniqueWindowExtension.ShowOrCreate<TableScriptEditorForm>(tb);
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }

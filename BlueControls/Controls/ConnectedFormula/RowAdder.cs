@@ -68,13 +68,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     public ColumnItem? OriginIDColumn { get; internal set; }
 
     [DefaultValue("")]
-    public string Script_After { get; set; } = string.Empty;
-
-    [DefaultValue("")]
-    public string Script_Before { get; set; } = string.Empty;
-
-    [DefaultValue("")]
-    public string Script_MenuGeneration { get; set; } = string.Empty;
+    public string Script { get; set; } = string.Empty;
 
     #endregion
 
@@ -226,7 +220,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         if (!string.IsNullOrEmpty(nowGeneratedId.msg)) { Fehler(nowGeneratedId.msg, ImageCode.Kritisch); return; }
 
-        if (string.IsNullOrEmpty(Script_MenuGeneration)) {
+        if (string.IsNullOrEmpty(Script)) {
             Fehler("Interner Fehler: Kein Skript vorhanden", ImageCode.Kritisch);
             return;
         }
@@ -443,17 +437,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     private void F_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
-        if (RowSingleOrNull() is not { IsDisposed: false } rowIn) { return; }
-
-        //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
-
-        var scf = ExecuteScript(Script_Before, false, Mode, EntityID, rowIn, false);
-        if (scf.Failed) {
-            SaveProductionErrorIfNeeded(scf);
-            Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
-            return;
-        }
-
         if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {
             if (f.Checked.Contains(rli.KeyName)) {
                 AdderItem.AddRowsToTable(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
@@ -472,13 +455,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.CanvasPosition.Width, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
-        }
-
-        scf = ExecuteScript(Script_After, false, Mode, EntityID, rowIn, false);
-        if (scf.Failed) {
-            SaveProductionErrorIfNeeded(scf);
-            Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
-            return;
         }
     }
 
@@ -504,7 +480,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         _infos = [];
 
-        var scf = ExecuteScript(Script_MenuGeneration, false, Mode, EntityID, rowIn, true);
+        var scf = ExecuteScript(Script, false, Mode, EntityID, rowIn, true);
 
         if (scf.Failed) {
             SaveProductionErrorIfNeeded(scf);

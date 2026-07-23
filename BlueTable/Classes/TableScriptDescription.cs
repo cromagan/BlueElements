@@ -61,7 +61,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     /// </summary>
     public long AverageRunTime {
         get;
-        private set {
+        set {
             // Beim Setzen auf 500 ms runden — so wird auch beim Parsen alter,
             // ungerundeter Daten normalisiert. Siehe RoundRunTime.
             value = RoundRunTime(value);
@@ -73,7 +73,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public ScriptEventTypes EventTypes {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -109,7 +109,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public bool NeedRow {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -121,7 +121,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     /// </summary>
     public int StoppedTimeCount {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -144,7 +144,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public bool ValuesReadOnly {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -384,6 +384,22 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         return QuickImage.Get(symb, 16, c, Color.Transparent, h);
+    }
+
+    /// <summary>
+    /// Übernimmt alle Werte von <paramref name="other"/> (Basis + Skript-spezifisch).
+    /// Wird beim Recycling in <see cref="Table.SetValueInternal"/> (case EventScript)
+    /// verwendet: Existierende Instanzen behalten ihre Identität, nur die Felder
+    /// werden aktualisiert. Der <see cref="MayAffectUser"/>-Cache wird invalidiert.
+    /// </summary>
+    internal void UpdateFrom(TableScriptDescription other) {
+        UpdateBaseFrom(other);
+        EventTypes = other.EventTypes;
+        NeedRow = other.NeedRow;
+        ValuesReadOnly = other.ValuesReadOnly;
+        StoppedTimeCount = other.StoppedTimeCount;
+        AverageRunTime = other.AverageRunTime;
+        _mayAffectUser = null;
     }
 
     protected override void Dispose(bool disposing) {

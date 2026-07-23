@@ -1,8 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
+using BlueScript.Classes;
 using BlueScript.Variables;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -17,6 +17,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     #region Fields
 
     private string _additionalInfoColumnKey = string.Empty;
+
+    private FlexiControlForDelegate? _button;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -44,9 +46,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     private string _originIdColumnKey = string.Empty;
 
-    private string _script_After = string.Empty;
-    private string _script_Before = string.Empty;
-    private string _script_MenuGeneration = string.Empty;
+    private string _script = string.Empty;
 
     #endregion
 
@@ -174,42 +174,16 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
     }
 
-    [Description("Skript, das ausgeführt wird, wenn der User einen Eintrag wählt - NACHDEM die Zeile(n) angelegt wurden.")]
-    public string Script_After {
-        get => _script_After;
-
-        set {
-            if (IsDisposed) { return; }
-            if (value == _script_After) { return; }
-            _script_After = value;
-            OnPropertyChanged();
-            OnPropertyChangedExt("scriptAfter", value);
-        }
-    }
-
-    [Description("Skript, das ausgeführt wird, wenn der User einen Eintrag wählt - BEVOR die Zeile(n) angelegt werden.")]
-    public string Script_Before {
-        get => _script_Before;
-
-        set {
-            if (IsDisposed) { return; }
-            if (value == _script_Before) { return; }
-            _script_Before = value;
-            OnPropertyChanged();
-            OnPropertyChangedExt("scriptBefore", value);
-        }
-    }
-
     [Description("Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.")]
-    public string Script_MenuGeneration {
-        get => _script_MenuGeneration;
+    public string Script {
+        get => _script;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _script_MenuGeneration) { return; }
-            _script_MenuGeneration = value;
+            if (value == _script) { return; }
+            _script = value;
             OnPropertyChanged();
-            OnPropertyChangedExt("scriptMenu", value);
+            OnPropertyChangedExt("script", value);
         }
     }
 
@@ -224,9 +198,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
             AdditionalInfoColumn = AdditionalInfoColumn,
-            Script_MenuGeneration = Script_MenuGeneration,
-            Script_Before = Script_Before,
-            Script_After = Script_After,
+            Script = Script,
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -254,7 +226,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return $"Die Zusatzinfo-Spalte '{aci.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 
-        if (string.IsNullOrEmpty(Script_MenuGeneration)) {
+        if (string.IsNullOrEmpty(Script)) {
             return "Kein Skript für die Menugenerierung definiert.";
         }
 
@@ -276,7 +248,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             entityFlex.Height = 24;
             entityFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
             result.Add(entityFlex);
-            result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+            _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
+            result.Add(_button);
         }
 
         if (TableOutput is { IsDisposed: false } tb) {
@@ -288,15 +261,31 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return result;
     }
 
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void OpenScriptEditor() {
+        var f = _button?.ParentForm;
+
+        f?.Opacity = 0f;
+
+        try {
+            var sd = new ScriptDescription(KeyName, _script);
+            if (InputBoxEditor.Edit(sd)) {
+                _script = sd.Script;
+            }
+        } finally {
+            f?.Opacity = 1f;
+        }
+    }
+
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnKey);
         result.ParseableAdd("AdditionalInfoColumnName", _additionalInfoColumnKey);
-        result.ParseableAdd("ScriptMenu", _script_MenuGeneration);
-        result.ParseableAdd("ScriptAfter", _script_After);
-        result.ParseableAdd("ScriptBefore", _script_Before);
+        result.ParseableAdd("ScriptMenu", _script);
         result.ParseableAdd("LastFailedReason", _lastFailedReason);
         result.ParseableAdd("LastSavedVariables", _lastSavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
         return result;
@@ -307,9 +296,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         json.Set("entityid", _entityId);
         json.Set("originidcolumnkey", _originIdColumnKey);
         json.Set("additionalinfocolumnkey", _additionalInfoColumnKey);
-        json.Set("scriptmenu", _script_MenuGeneration);
-        json.Set("scriptbefore", _script_Before);
-        json.Set("scriptafter", _script_After);
+        json.Set("scriptmenu", _script);
         json.Set("lastfailedreason", _lastFailedReason);
         json.SetArrayIfNotEmpty("lastsavedvariables", _lastSavedVariables?.SortByKeyName() ?? []);
         return json;
@@ -319,9 +306,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         _entityId = json.GetString("entityid", _entityId);
         _originIdColumnKey = json.GetString("originidcolumnkey", _originIdColumnKey);
         _additionalInfoColumnKey = json.GetString("additionalinfocolumnkey", _additionalInfoColumnKey);
-        _script_MenuGeneration = json.GetString("scriptmenu", _script_MenuGeneration);
-        _script_Before = json.GetString("scriptbefore", _script_Before);
-        _script_After = json.GetString("scriptafter", _script_After);
+        _script = json.GetString("scriptmenu", _script);
         _lastFailedReason = json.GetString("lastfailedreason", _lastFailedReason);
         _lastSavedVariables = json.GetList<Variable>("lastsavedvariables", true);
 
@@ -348,15 +333,13 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
             case "script":
             case "scriptmenu":
-                _script_MenuGeneration = value.FromNonCritical();
+                _script = value.FromNonCritical();
                 return true;
 
             case "scriptbefore":
-                _script_Before = value.FromNonCritical();
                 return true;
 
             case "scriptafter":
-                _script_After = value.FromNonCritical();
                 return true;
 
             case "lastfailedreason":
@@ -374,14 +357,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         const string txt = "Zeilengenerator: ";
 
         return txt + TableOutput?.Caption;
-    }
-
-    /// <summary>
-    /// Internes Skript
-    /// </summary>
-    public void Skript_Bearbeiten() {
-        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(this);
-        se.Table = TableInput;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

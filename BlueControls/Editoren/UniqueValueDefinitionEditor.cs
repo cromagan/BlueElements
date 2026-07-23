@@ -7,6 +7,14 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
+/// <summary>
+/// Editor für eine einzelne <see cref="UniqueValueDefinition"/> (EditCopy). Die
+/// anzuzeigenden Elemente liefert die Backend-Collection
+/// <see cref="Table.UniqueValues"/> direkt als
+/// <see cref="Editoren.EditorForIEnumerable.InputItem"/>. Neue Definitionen
+/// erzeugt das hostende Form über das AddClicked-Event des
+/// <see cref="Editoren.EditorForIEnumerable"/>.
+/// </summary>
 public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotifyPropertyChanged {
 
     #region Constructors
@@ -25,7 +33,12 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotif
 
     public override Type? EditorFor => typeof(UniqueValueDefinition);
     public override EditorMode SupportedModes => EditorMode.EditCopy | EditorMode.EditItem;
-    public Table? Table => InputItem is UniqueValueDefinition u ? u.Table : null;
+
+    /// <summary>
+    /// Die Tabelle, deren Unique-Value-Regeln bearbeitet werden. Unabhängig vom
+    /// selektierten Element — wird vom Host gesetzt.
+    /// </summary>
+    public Table? Table { get; set; }
 
     #endregion
 

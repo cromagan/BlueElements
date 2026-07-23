@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BlueScript.Classes;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable, INotifyPropertyChanged {
+public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -15,7 +15,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     #endregion
 
+
     #region Constructors
+
+    public ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly, string.Empty, null) { }
+
+    public ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty, null) { }
 
     protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, List<Variable>? savedVariables) {
         if (string.IsNullOrEmpty(name)) {
@@ -31,10 +36,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         FailedReason = failedReason;
         SavedVariables = savedVariables;
     }
-
-    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly, string.Empty, null) { }
-
-    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty, null) { }
 
     #endregion
 
@@ -58,7 +59,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string AdminInfo {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -69,7 +70,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string FailedReason {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -78,7 +79,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string Image {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -89,7 +90,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string KeyName {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -98,7 +99,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string QuickInfo {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -107,7 +108,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public List<Variable>? SavedVariables {
         get;
-        private set {
+        set {
             if (field?.SortByKeyName().ToString(true) == value?.SortByKeyName().ToString(true)) { return; }
             field = value;
             OnPropertyChanged();
@@ -116,7 +117,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public string Script {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -125,7 +126,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     public ReadOnlyCollection<string> UserGroups {
         get;
-        private set {
+        set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -142,9 +143,15 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         return true;
     }
 
-    public abstract List<string> Attributes();
+    public virtual List<string> Attributes() => [];
 
-    public abstract int CompareTo(object obj);
+    public virtual int CompareTo(object obj) {
+        if (obj is ScriptDescription other) {
+            return string.Compare(CompareKey, other.CompareKey, StringComparison.Ordinal);
+        }
+
+        return 0;
+    }
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -257,6 +264,23 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     }
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    /// <summary>
+    /// Übernimmt alle Basis-Properties von <paramref name="other"/> in diese Instanz.
+    /// Wird beim Recycling (siehe <c>Table.SetValueInternal</c>, case EventScript)
+    /// verwendet: Statt eine neue Instanz zu erzeugen, bleiben vorhandene Objekte
+    /// erhalten und nur ihre Felder werden aktualisiert — Referenzidentität bleibt gewahrt.
+    /// </summary>
+    protected void UpdateBaseFrom(ScriptDescription other) {
+        KeyName = other.KeyName;
+        Script = other.Script;
+        QuickInfo = other.QuickInfo;
+        AdminInfo = other.AdminInfo;
+        Image = other.Image;
+        UserGroups = other.UserGroups;
+        FailedReason = other.FailedReason;
+        SavedVariables = other.SavedVariables;
+    }
 
     #endregion
 }
