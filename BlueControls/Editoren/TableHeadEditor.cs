@@ -477,13 +477,15 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void lstUniqueValues_AddClicked(object? sender, AddItemEventArgs e) {
-        // Das Form erzeugt nur noch das neue Element und reicht es über
-        // AddItemEventArgs.NewItem zurück. EditorForIEnumerable übernimmt
-        // das Hinzufügen zur Arbeitskopie, die Aktualisierung der Anzeige
-        // und die Selektion. Das Backend wird beim Schließen über
-        // WriteInfosBack aus der Arbeitskopie aktualisiert.
+        // Das Form erzeugt das neue Element und übergibt es über Add direkt
+        // an den Sender (den EditorForIEnumerable). Dieser übernimmt das
+        // Hinzufügen zur Arbeitskopie, die Aktualisierung der Anzeige und die
+        // Selektion. Das Backend wird beim Schließen über WriteInfosBack aus
+        // der Arbeitskopie aktualisiert.
         if (Table is not { IsDisposed: false } tb) { return; }
-        e.NewItem = new UniqueValueDefinition(tb, []);
+        if (sender is not EditorForIEnumerable lst) { return; }
+
+        lst.Add(new UniqueValueDefinition(tb, []));
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();

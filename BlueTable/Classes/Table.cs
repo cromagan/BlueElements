@@ -2310,11 +2310,25 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _sortDefinition = new RowSortDefinition(this, value);
                 break;
 
-            case TableDataType.UniqueValues:
-                var uvs = value.ToUpperInvariant().SplitAndCutByCr().SortedDistinctList();
-                var uvsl = uvs.Select(t => new UniqueValueDefinition(this, t)).ToList();
-                _uniqueValues = uvsl.AsReadOnly();
-                break;
+            case TableDataType.UniqueValues: {
+                    var existingByKey = new Dictionary<string, UniqueValueDefinition>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var uv in _uniqueValues) { existingByKey.TryAdd(uv.KeyName, uv); }
+
+                    _uniqueValues = value.ToUpperInvariant()
+                        .SplitAndCutByCr()
+                        .SortedDistinctList()
+                        .Select(t => {
+                            var newItem = new UniqueValueDefinition(this, t);
+                            if (existingByKey.Remove(newItem.KeyName, out var existing)) {
+                                existing.UpdateFrom(newItem);
+                                return existing;
+                            }
+                            return newItem;
+                        })
+                        .ToList()
+                        .AsReadOnly();
+                    break;
+                }
 
             case TableDataType.Caption:
                 _caption = value;
@@ -2343,23 +2357,30 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _dictionaryWords.AddRange(value.SplitAndCutByCr());
                 break;
 
-            case TableDataType.EventScript:
-                var ves = value.SplitAndCutByCr();
-                var vess = ves.Select(t => new TableScriptDescription(this, t)).ToList();
+            case TableDataType.EventScript: {
+                    var parsed = value.SplitAndCutByCr().Select(t => new TableScriptDescription(this, t)).ToList();
 
-                // InvalidateAllCheckData nur, wenn sich nicht ausschließlich die
-                // Laufzeit-Statistik (AverageRunTime/StoppedTimeCount) geändert hat -
-                // reine Statistikänderungen beeinflussen das Prüf-Ergebnis der Zeilen nicht.
-                if (!IsOnlyStatisticsUpdate(_eventScript, vess)) {
-                    Row.InvalidateAllCheckData();
-                    OnScriptChanged();
+                    if (!IsOnlyStatisticsUpdate(_eventScript, parsed)) {
+                        Row.InvalidateAllCheckData();
+                        OnScriptChanged();
+                    }
+
+                    var existingByKey = new Dictionary<string, TableScriptDescription>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var s in _eventScript) { existingByKey.TryAdd(s.KeyName, s); }
+
+                    _eventScript = parsed.Select(newItem => {
+                        if (existingByKey.Remove(newItem.KeyName, out var existing)) {
+                            existing.UpdateFrom(newItem);
+                            return existing;
+                        }
+                        return newItem;
+                    }).ToList().AsReadOnly();
+
+                    _hasValueChangedScript = null;
+                    _mayAffectUser = null;
+                    _changesRowColor = null;
+                    break;
                 }
-
-                _hasValueChangedScript = null;
-                _mayAffectUser = null;
-                _eventScript = vess.AsReadOnly();
-                _changesRowColor = null;
-                break;
 
             case TableDataType.TableVariables:
                 _variables.Clear();

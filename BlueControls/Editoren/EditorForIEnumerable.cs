@@ -32,11 +32,10 @@ namespace BlueControls.Editoren;
 /// </list>
 /// <para />
 /// Das Hinzufügen neuer Elemente wird nicht durch den Editor erzeugt,
-/// sondern über <see cref="ListBox.AddClicked"/> an das Form durchgereicht.
-/// Das Form erzeugt lediglich das neue Element und reicht es über
-/// <see cref="EventArgs.AddItemEventArgs.NewItem"/> zurück; diese ListBox
-/// übernimmt es dann automatisch in ihre Arbeitskopie (<see cref="OutputItem"/>),
-/// aktualisiert die Anzeige und selektiert es. Das Entfernen übernimmt diese
+/// sondern über <see cref="Controls.ListBox.AddClicked"/> an das Form durchgereicht.
+/// Das Form erzeugt lediglich das neue Element und übergibt es über
+/// <see cref="Add"/> an diesen Editor; dieser übernimmt es dann automatisch in
+/// seine Arbeitskopie (<see cref="OutputItem"/>), aktualisiert die Anzeige und selektiert es. Das Entfernen übernimmt diese
 /// ListBox ebenfalls auf ihrer Arbeitskopie. Es wird kein Änderungs-Event
 /// gefeuert — der Host liest <see cref="OutputItem"/> aus, wenn er die
 /// Arbeitskopie braucht (üblicherweise beim Schließen oder vor einer Aktion
@@ -54,6 +53,19 @@ namespace BlueControls.Editoren;
 /// Undo/Redo).
 /// </summary>
 public partial class EditorForIEnumerable : ListBox {
+
+    #region Fields
+
+    /// <summary>
+    /// Während eines programmatischen Anzeige-Neuaufbaus (<see cref="UpdateList"/>
+    /// aus <see cref="Editor_PropertyChanged"/>) wird verhindert, dass das
+    /// Wiederherstellen der Selektion den Detail-Editor neu lädt. Bei EditCopy
+    /// würde <c>Editor.InputItem = SelectedItem</c> sonst die neue Instanz laden
+    /// und gepufferte Eingaben (z.B. den Text-Cursor im Skript-Editor) zerstören.
+    /// </summary>
+    private bool _suppressEditorInputOnCheck;
+
+    #endregion
 
     #region Events
 
@@ -160,6 +172,22 @@ public partial class EditorForIEnumerable : ListBox {
     #region Methods
 
     /// <summary>
+    /// Fügt der Arbeitskopie (<see cref="OutputItem"/>) ein neues Element hinzu,
+    /// aktualisiert die Anzeige und selektiert das Element. Typischerweise aus
+    /// dem <see cref="Controls.ListBox.AddClicked"/>-Handler des hostenden
+    /// Forms aufzurufen — der <paramref name="newItem"/> wird dabei als
+    /// <c>sender</c> übergeben (das ist die Instanz dieses Editors).
+    /// </summary>
+    public void Add(object newItem) {
+        if (IsDisposed || Disposing || newItem is null) { return; }
+
+        OutputItem ??= [];
+        OutputItem.Add(newItem);
+        UpdateList();
+        SelectByKey((newItem as IHasKeyName)?.KeyName);
+    }
+
+    /// <summary>
     /// Wählt das Element mit dem angegebenen Schlüssel und zeigt es im Editor an.
     /// Wird vom hostenden Form typischerweise nach dem Hinzufügen eines neuen
     /// Elements aufgerufen. Hat keine Wirkung, wenn der Schlüssel nicht vorhanden ist.
@@ -187,20 +215,10 @@ public partial class EditorForIEnumerable : ListBox {
         DemandEditorOutput();
 
         // Event durchreichen — das übergeordnete Form erzeugt das neue Element
-        // (AddClicked-Handler) und reicht es über AddItemEventArgs.NewItem
-        // zurück. Die Basis darf kein Text-Item automatisch einfügen.
+        // im AddClicked-Handler und übergibt es direkt über Add(sender) an
+        // diesen Editor. Die Basis darf kein Text-Item automatisch einfügen.
         base.OnAddClicked(e);
         e.Cancel = true;
-
-        if (e.NewItem is not { } newItem) { return; }
-
-        // Neues Element in die Arbeitskopie übernehmen, Anzeige aktualisieren
-        // und selektieren. Das Backend wird beim Zurückschreiben der
-        // Arbeitskopie (üblicherweise beim Schließen des Formulars) aktualisiert.
-        OutputItem ??= [];
-        OutputItem.Add(newItem);
-        UpdateList();
-        SelectByKey((newItem as IHasKeyName)?.KeyName);
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
@@ -216,6 +234,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// </summary>
     protected override void OnItemCheckedChanged(System.EventArgs e) {
         base.OnItemCheckedChanged(e);
+        if (_suppressEditorInputOnCheck) { return; }
         Editor?.InputItem = SelectedItem;
     }
 
@@ -314,6 +333,21 @@ public partial class EditorForIEnumerable : ListBox {
         // behandelt werden — der konkrete Name ist für die Reaktion ohne Belang.
         OnSelectionChanging();
         DemandEditorOutput();
+
+        // Anzeige aktualisieren, damit die Master-Liste die neue Instanz
+        // reflektiert (z.B. geänderte Spaltennamen). Ohne diesen Aufbau bliebe
+        // das angezeigte ReadableListItem bei der alten Instanz — Klicks darauf
+        // würden SelectedItem auf eine nicht mehr in OutputItem enthaltene
+        // Referenz setzen und nachfolgende DemandEditorOutput-Aufrufe wären
+        // wirkungslos (Änderungen gingen beim Schließen verloren). Der Editor
+        // wird dabei nicht neu geladen, damit gepufferte Eingaben erhalten
+        // bleiben.
+        _suppressEditorInputOnCheck = true;
+        try {
+            UpdateList();
+        } finally {
+            _suppressEditorInputOnCheck = false;
+        }
     }
 
     private object? FindItem(object? byReference, string? byKey) {

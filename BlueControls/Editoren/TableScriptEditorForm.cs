@@ -142,13 +142,14 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
     }
 
     private void LstEventScripts_AddClicked(object? sender, AddItemEventArgs e) {
-        // Das Form erzeugt nur noch das neue Element und reicht es über
-        // AddItemEventArgs.NewItem zurück. EditorForIEnumerable übernimmt
-        // das Hinzufügen zur Arbeitskopie, die Aktualisierung der Anzeige
-        // und die Selektion.
-        // Die Duplikatsprüfung erfolgt gegen die Arbeitskopie, da das Backend
-        // erst beim Schließen (bzw. vor einem Skript-Test) aktualisiert wird.
+        // Das Form erzeugt das neue Element und übergibt es über Add direkt
+        // an den Sender (den EditorForIEnumerable). Dieser übernimmt das
+        // Hinzufügen zur Arbeitskopie, die Aktualisierung der Anzeige und die
+        // Selektion. Die Duplikatsprüfung erfolgt gegen die Arbeitskopie, da
+        // das Backend erst beim Schließen (bzw. vor einem Skript-Test)
+        // aktualisiert wird.
         if (_table is not { IsDisposed: false } tb) { return; }
+        if (sender is not EditorForIEnumerable lst) { return; }
 
         var newItem = new TableScriptDescription(tb);
         if (lstEventScripts.OutputItem?.OfType<TableScriptDescription>().GetByKey(newItem.KeyName) is not null) {
@@ -156,7 +157,7 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
             return;
         }
 
-        e.NewItem = newItem;
+        lst.Add(newItem);
     }
 
     private void TableScriptEditor_Executing(object? sender, System.EventArgs e) => WriteBackEventScripts();
