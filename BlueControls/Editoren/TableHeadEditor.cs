@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
@@ -20,8 +19,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private bool _frmHeadEditorFormClosingIsin;
 
-    private UniqueValueDefinition? _selectedUniqueValue;
-
     private bool _writeAccessLost;
 
     #endregion
@@ -31,7 +28,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     public TableHeadEditor() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        uniqueValueDefinitionEditor.PropertyChanged += UniqueValueDefinitionEditor_PropertyChanged;
         Table = null;
     }
 
@@ -292,7 +288,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         variableEditor.InputItem = Table?.Variables;
 
-        lstUniqueValues.UpdateList(tb.UniqueValues);
+        uniqueValueDefinitionEditor.Table = Table;
+        lstUniqueValues.Editor = uniqueValueDefinitionEditor;
+        lstUniqueValues.InputItem = Table?.UniqueValues;
 
         txbDictionary.Text = string.Join('\r', tb.DictionaryWords);
 
@@ -418,7 +416,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnSkripte_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+        IUniqueWindowExtension.ShowOrCreate<TableScriptEditorForm>(tb);
         //var se = new_TableScriptEditor(db);
         //_ = se.ShowDialog();
     }
@@ -478,110 +476,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    private void lstUniqueValues_AddClicked(object sender, AddItemEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var newitem = new UniqueValueDefinition(tb, []);
-
-        List<UniqueValueDefinition> l = [.. tb.UniqueValues];
-        l.Add(newitem);
-        tb.UniqueValues = l.AsReadOnly();
-
-        lstUniqueValues.UpdateList(tb.UniqueValues);
-        lstUniqueValues.Check(newitem.KeyName);
-        e.Cancel = true;
-    }
-
-    private void lstUniqueValues_ItemCheckedChanged(object sender, System.EventArgs e) {
-        var newKeyName = string.Empty;
-        if (lstUniqueValues.Checked.Count == 1) {
-            if (lstUniqueValues[lstUniqueValues.Checked[0]] is ReadableListItem rli) {
-                newKeyName = rli.KeyName;
-            }
-        }
-
-        // Eigener Check-Aufruf aus UniqueValueDefinitionEditor_PropertyChanged:
-        // _selectedUniqueValue wurde dort bereits auf das neue Item gesetzt.
-        // Wenn der angewählte Key identisch ist, nichts zu tun - verhindert
-        // die Endlosschleife (analog zum _item-Pattern im TableScriptEditor).
-        if (_selectedUniqueValue is not null &&
-            string.Equals(_selectedUniqueValue.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase)) {
-            return;
-        }
-
-        WriteUniqueValuesBack();
-
-        if (Table is not { IsDisposed: false } tb) {
-            if (_selectedUniqueValue is not null) {
-                _selectedUniqueValue = null;
-                uniqueValueDefinitionEditor.InputItem = null;
-            }
-            return;
-        }
-
-        lstUniqueValues.UpdateList(tb.UniqueValues);
-
-        if (!string.IsNullOrEmpty(newKeyName)) {
-            _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
-            uniqueValueDefinitionEditor.InputItem = _selectedUniqueValue;
-        } else if (_selectedUniqueValue is not null) {
-            // Nur clearen, wenn wirklich etwas gewählt war. Ist _selectedUniqueValue
-            // bereits null, ist dies ein transienter Zustand während UpdateList
-            // in UniqueValueDefinitionEditor_PropertyChanged (welches _selectedUniqueValue
-            // vorher auf null setzt, analog zum _item = null Pattern im TableScriptEditor).
-            _selectedUniqueValue = null;
-            uniqueValueDefinitionEditor.InputItem = null;
-        }
-    }
-
-    private void lstUniqueValues_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (e.Item is not ReadableListItem rli || rli.Item is not UniqueValueDefinition uvd) { return; }
-
-        WriteUniqueValuesBack();
-
-        var toRemoveKey = uvd.KeyName;
-        var newList = tb.UniqueValues.Where(u => !string.Equals(u.KeyName, toRemoveKey, StringComparison.OrdinalIgnoreCase)).ToList();
-        tb.UniqueValues = newList.AsReadOnly();
-
-        _selectedUniqueValue = null;
-        uniqueValueDefinitionEditor.InputItem = null;
-
-        lstUniqueValues.UpdateList(tb.UniqueValues);
-    }
-
-    private void UniqueValueDefinitionEditor_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        if (_selectedUniqueValue is null) { return; }
-
-        WriteUniqueValuesBack();
-
-        // Da der KeyName aus den gewählten Spalten berechnet wird, kann er sich
-        // geändert haben. Das frische Objekt aus tb.UniqueValues holen.
-        UniqueValueDefinition? newSelection = null;
-        if (((IIsEditor)uniqueValueDefinitionEditor).OutputItem is UniqueValueDefinition edited) {
-            newSelection = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, edited.KeyName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        // _selectedUniqueValue während UpdateList auf null setzen, damit der
-        // rekursive ItemCheckedChanged-Aufruf (den UpdateList über das verwaiste
-        // Check(wasChecked, true) beim Referenzwechsel auslöst) nicht destruktiv wird.
-        // Analog zum _item = null Pattern im TableScriptEditor.Item-Setter.
-        _selectedUniqueValue = null;
-        lstUniqueValues.UpdateList(tb.UniqueValues);
-
-        // Selektion wiederherstellen und neuen Key anwählen.
-        // Der rekursive Aufruf aus Check wird über den Early-Return in
-        // lstUniqueValues_ItemCheckedChanged erkannt (KeyName stimmt überein).
-        _selectedUniqueValue = newSelection;
-        if (_selectedUniqueValue is not null) {
-            // Check(IEnumerable, true) ersetzt die Selection, Check(string) würde
-            // nur hinzufügen. Da UpdateList verwaiste Referenzen in _checked nicht
-            // aufräumt, würde Check(string) ein zweites Item markieren und der
-            // ItemCheckedChanged-Handler die Selektion verwerfen.
-            lstUniqueValues.Check(new[] { _selectedUniqueValue.KeyName }, true);
-        }
+    private void lstUniqueValues_AddClicked(object? sender, AddItemEventArgs e) {
+        // Das Form erzeugt nur noch das neue Element und reicht es über
+        // AddItemEventArgs.NewItem zurück. EditorForIEnumerable übernimmt
+        // das Hinzufügen zur Arbeitskopie, die Aktualisierung der Anzeige
+        // und die Selektion. Das Backend wird beim Schließen über
+        // WriteInfosBack aus der Arbeitskopie aktualisiert.
+        if (Table is not { IsDisposed: false } tb) { return; }
+        e.NewItem = new UniqueValueDefinition(tb, []);
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -635,11 +537,16 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             Table.SortDefinition = ((IIsEditor)rowSortDefinitionEditor).OutputItem as RowSortDefinition;
         }
 
-        WriteUniqueValuesBack();
-
         #region UniqueValues aufräumen
 
-        Table.UniqueValues = Table.UniqueValues.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
+        // Arbeitskopie (OutputItem) ins Backend übernehmen. Früher geschah das
+        // bei jeder Änderung über das ItemsModified-Event — jetzt zentral beim
+        // Schließen. Definitionen ohne Schlüsselspalten werden herausgefiltert.
+        Table.UniqueValues = (lstUniqueValues.OutputItem ?? [])
+            .Cast<UniqueValueDefinition>()
+            .Where(x => x.KeyColumns.Count > 0)
+            .ToList()
+            .AsReadOnly();
 
         #endregion
 
@@ -658,22 +565,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         #endregion
-    }
-
-    private void WriteUniqueValuesBack() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (_selectedUniqueValue is null || ((IIsEditor)uniqueValueDefinitionEditor).OutputItem is not UniqueValueDefinition edited) { return; }
-
-        var newList = new List<UniqueValueDefinition>();
-        foreach (var uv in tb.UniqueValues) {
-            if (string.Equals(uv.KeyName, _selectedUniqueValue.KeyName, StringComparison.OrdinalIgnoreCase)) {
-                newList.Add(edited);
-            } else {
-                newList.Add(uv);
-            }
-        }
-        tb.UniqueValues = newList.AsReadOnly();
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
@@ -35,7 +36,6 @@ namespace BlueControls.BlueTableDialogs {
             chkAuslöser_valuechangedThread = new Button();
             chkAuslöser_valuechanged = new Button();
             chkAuslöser_prepaireformula = new Button();
-            btnVerlauf = new Button();
             capName = new Caption();
             txbName = new TextBox();
             grpRow = new GroupBox();
@@ -47,8 +47,6 @@ namespace BlueControls.BlueTableDialogs {
             btnTestZeileDropDown = new Button();
             chkExtendend = new Button();
             btnTest = new Button();
-            grpVerfügbareSkripte = new GroupBox();
-            lstEventScripts = new ListBox();
             btnVersionErhöhen = new Button();
             btnTabelleKopf = new Button();
             btnSpaltenuebersicht = new Button();
@@ -56,13 +54,11 @@ namespace BlueControls.BlueTableDialogs {
             tbcScriptEigenschaften.SuspendLayout();
             tabStart.SuspendLayout();
             grpInjectVariables.SuspendLayout();
-            pnlStatusBar.SuspendLayout();
             tabKopfdaten.SuspendLayout();
             grpRechte.SuspendLayout();
             grpEigenschaften.SuspendLayout();
             grpAuslöser.SuspendLayout();
             grpRow.SuspendLayout();
-            grpVerfügbareSkripte.SuspendLayout();
             SuspendLayout();
             // 
             // btnAusführen
@@ -73,8 +69,8 @@ namespace BlueControls.BlueTableDialogs {
             // tbcScriptEigenschaften
             // 
             tbcScriptEigenschaften.Controls.Add(tabKopfdaten);
-            tbcScriptEigenschaften.Location = new Point(237, 108);
-            tbcScriptEigenschaften.Size = new Size(1015, 478);
+            tbcScriptEigenschaften.Location = new Point(0, 108);
+            tbcScriptEigenschaften.Size = new Size(1252, 478);
             tbcScriptEigenschaften.TabDefaultOrder = new string[]
     {
     "Skript-Editor",
@@ -82,7 +78,6 @@ namespace BlueControls.BlueTableDialogs {
     "Befehls-Assistent"
     };
             tbcScriptEigenschaften.TabIndex = 0;
-            tbcScriptEigenschaften.SelectedIndexChanged += GlobalTab_SelectedIndexChanged;
             tbcScriptEigenschaften.Controls.SetChildIndex(tabKopfdaten, 0);
             // 
             // tabStart
@@ -117,15 +112,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnSaveLoad.Location = new Point(504, 8);
             // 
-            // capStatusBar
-            // 
-            capStatusBar.Size = new Size(1252, 24);
-            // 
-            // pnlStatusBar
-            // 
-            pnlStatusBar.Location = new Point(0, 586);
-            pnlStatusBar.Size = new Size(1252, 24);
-            // 
             // tabKopfdaten
             // 
             tabKopfdaten.BackColor = Color.FromArgb(255, 255, 255);
@@ -138,7 +124,6 @@ namespace BlueControls.BlueTableDialogs {
             tabKopfdaten.Controls.Add(grpRechte);
             tabKopfdaten.Controls.Add(grpEigenschaften);
             tabKopfdaten.Controls.Add(grpAuslöser);
-            tabKopfdaten.Controls.Add(btnVerlauf);
             tabKopfdaten.Controls.Add(capName);
             tabKopfdaten.Controls.Add(txbName);
             tabKopfdaten.Location = new Point(4, 25);
@@ -343,19 +328,6 @@ namespace BlueControls.BlueTableDialogs {
             chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
             chkAuslöser_prepaireformula.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
-            // btnVerlauf
-            // 
-            btnVerlauf.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnVerlauf.Enabled = false;
-            btnVerlauf.ImageCode = "Undo|16";
-            btnVerlauf.Location = new Point(665, 8);
-            btnVerlauf.Name = "btnVerlauf";
-            btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
-            btnVerlauf.Size = new Size(100, 24);
-            btnVerlauf.TabIndex = 1;
-            btnVerlauf.Text = "Verlauf";
-            btnVerlauf.Click += btnVerlauf_Click;
-            // 
             // capName
             // 
             capName.CausesValidation = false;
@@ -476,32 +448,6 @@ namespace BlueControls.BlueTableDialogs {
             btnTest.Text = "Testen";
             btnTest.Click += btnTest_Click;
             // 
-            // grpVerfügbareSkripte
-            // 
-            grpVerfügbareSkripte.BackColor = Color.FromArgb(240, 240, 240);
-            grpVerfügbareSkripte.CausesValidation = false;
-            grpVerfügbareSkripte.Controls.Add(lstEventScripts);
-            grpVerfügbareSkripte.Dock = DockStyle.Left;
-            grpVerfügbareSkripte.Location = new Point(0, 108);
-            grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            grpVerfügbareSkripte.Size = new Size(237, 478);
-            grpVerfügbareSkripte.TabIndex = 2;
-            grpVerfügbareSkripte.TabStop = false;
-            grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
-            // 
-            // lstEventScripts
-            // 
-            lstEventScripts.AddAllowed = AddType.Suggestions;
-            lstEventScripts.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            lstEventScripts.Location = new Point(8, 16);
-            lstEventScripts.Name = "lstEventScripts";
-            lstEventScripts.RemoveAllowed = true;
-            lstEventScripts.Size = new Size(222, 455);
-            lstEventScripts.TabIndex = 0;
-            lstEventScripts.AddClicked += lstEventScripts_AddClicked;
-            lstEventScripts.ItemCheckedChanged += lstEventScripts_ItemCheckedChanged;
-            lstEventScripts.RemoveClicked += lstEventScripts_RemoveClicked;
-            // 
             // btnVersionErhöhen
             // 
             btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
@@ -547,36 +493,28 @@ namespace BlueControls.BlueTableDialogs {
             // TableScriptEditor
             // 
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1252, 610);
-            Controls.Add(grpVerfügbareSkripte);
             Controls.Add(grpRow);
             Name = "TableScriptEditor";
-            Text = "Tabellen-Eigenschaften";
+            Size = new Size(1252, 610);
             VariableDefinitions = "Attribut0, Attribut1, Attribut2, Attribut3, Attribut4, Attribut5";
             Controls.SetChildIndex(tabStart, 0);
             Controls.SetChildIndex(grpRow, 0);
             Controls.SetChildIndex(grpInjectVariables, 0);
-            Controls.SetChildIndex(pnlStatusBar, 0);
-            Controls.SetChildIndex(grpVerfügbareSkripte, 0);
             Controls.SetChildIndex(tbcScriptEigenschaften, 0);
             tbcScriptEigenschaften.ResumeLayout(false);
             tabStart.ResumeLayout(false);
             grpInjectVariables.ResumeLayout(false);
-            pnlStatusBar.ResumeLayout(false);
             tabKopfdaten.ResumeLayout(false);
             grpRechte.ResumeLayout(false);
             grpEigenschaften.ResumeLayout(false);
             grpAuslöser.ResumeLayout(false);
             grpRow.ResumeLayout(false);
-            grpVerfügbareSkripte.ResumeLayout(false);
             ResumeLayout(false);
 
         }
 
 
         private GroupBox grpRow;
-        private GroupBox grpVerfügbareSkripte;
-        private ListBox lstEventScripts;
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
@@ -588,7 +526,6 @@ namespace BlueControls.BlueTableDialogs {
         private Button chkAuslöser_valuechangedThread;
         private Button chkAuslöser_export;
         private Button btnVersionErhöhen;
-        private Button btnVerlauf;
         private Button btnZusatzDateien;
         private Button btnTest;
         private TabPage tabKopfdaten;

@@ -65,7 +65,7 @@ namespace BlueControls.BlueTableDialogs {
             tabUniqueValues = new TabPage();
             capUniqueInfo = new Caption();
             uniqueValueDefinitionEditor = new UniqueValueDefinitionEditor();
-            lstUniqueValues = new ListBox();
+            lstUniqueValues = new EditorForIEnumerable();
             tabVariablen = new TabPage();
             variableEditor = new VariableEditor();
             tabDictionary = new TabPage();
@@ -552,17 +552,13 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // lstUniqueValues
             // 
-            lstUniqueValues.AddAllowed = AddType.Suggestions;
             lstUniqueValues.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lstUniqueValues.FilterText = null;
             lstUniqueValues.Location = new Point(8, 80);
             lstUniqueValues.Name = "lstUniqueValues";
-            lstUniqueValues.RemoveAllowed = true;
             lstUniqueValues.Size = new Size(696, 592);
             lstUniqueValues.TabIndex = 0;
             lstUniqueValues.AddClicked += lstUniqueValues_AddClicked;
-            lstUniqueValues.ItemCheckedChanged += lstUniqueValues_ItemCheckedChanged;
-            lstUniqueValues.RemoveClicked += lstUniqueValues_RemoveClicked;
             // 
             // tabVariablen
             // 
@@ -718,7 +714,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnCustomSortEnable;
         private Button btnCustomSortDisable;
         private TabPage tabUniqueValues;
-        private ListBox lstUniqueValues;
+        private EditorForIEnumerable lstUniqueValues;
         private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;
         private Caption capUniqueInfo;
         private TabPage tabDictionary;

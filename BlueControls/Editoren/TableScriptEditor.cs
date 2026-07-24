@@ -6,30 +6,39 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
-using BlueScript.Variables;
-using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, IIsEditor {
+/// <summary>
+/// Editor für genau ein Tabellen-Skript (<see cref="TableScriptDescription"/>).
+/// Erbt die Skript-Bearbeitung von <see cref="ScriptEditor"/> und wird zusammen mit einem
+/// <see cref="Editoren.EditorForIEnumerable"/> im <see cref="TableScriptEditorForm"/> gehostet.
+/// <para />
+/// Der Editor ist ein reines Anzeige-Tool: er hält das aktuell gewählte
+/// <see cref="TableScriptDescription"/> in seiner Oberfläche. Sobald der Nutzer eine
+/// Eingabe tätigt, feuert er <see cref="INotifyPropertyChanged.PropertyChanged"/>
+/// (jeweils für <c>OutputItem</c>). Das <see cref="Editoren.EditorForIEnumerable"/>
+/// holt sich daraufhin über <see cref="IIsEditor.OutputItem"/> eine frische, vom
+/// Editor aus der aktuellen Oberfläche erzeugte Instanz (EditCopy-Modus), ersetzt
+/// das Element in seiner Arbeitskopie und benachrichtigt das hostende
+/// <see cref="TableScriptEditorForm"/>. Das Form schreibt die Collection ans Backend
+/// zurück — so entstehen saubere Undo-Einträge (old≠new). Die anzuzeigenden Elemente
+/// liefert die Backend-Collection <see cref="Table.EventScript"/> direkt als
+/// <see cref="Editoren.EditorForIEnumerable.InputItem"/>.
+/// Die Tabellen-Verwaltung (Lebenszyklus, Schreibrechte) übernimmt das hostende Form.
+/// </summary>
+public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
     #region Fields
 
     private bool _allowTemporay;
-
-    private bool _didMessage;
-
     private Controls.TextBox? _dropDownTarget;
     private TableScriptDescription? _item;
-
     private bool _loaded;
-
-    private bool _writeAccessLost;
 
     #endregion
 
@@ -46,131 +55,26 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     #region Properties
 
-    // EditorFor intentionally null — always invoked explicitly via EditItem(table, typeof(TableScriptEditor), isDialog)
-    public Type? EditorFor => null;
+    public override Type? EditorFor => typeof(TableScriptDescription);
 
-    public object? InputItem {
-        get => Table;
-        set {
-            Table = value as Table;
-        }
-    }
-
-    public TableScriptDescription? Item {
-        get => IsDisposed || Table is not { IsDisposed: false } ? null : _item;
-        set {
-            if (IsDisposed || Table is not { IsDisposed: false }) { value = null; }
-            if (_item == value) { return; }
-
-            _item = null; // Um keine werte zurück zu Schreiben während des Anzeigens
-
-            if (value is not null) {
-                tbcScriptEigenschaften.Enabled = true;
-                txbName.Text = value.KeyName;
-                txbQuickInfo.Text = value.QuickInfo;
-
-                cbxPic.Text = value.Image;
-
-                chkZeile.Checked = value.NeedRow;
-                txbTestZeile.Enabled = value.NeedRow;
-                grpRow.Enabled = value.NeedRow;
-                chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
-                chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
-                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
-                chkExtendend.Enabled = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
-                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
-                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
-                chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
-                chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
-                Script = value.Script;
-                LastFailedReason = value.FailedReason;
-                LastVariables = value.SavedVariables;
-                StoppedTimeCount = value.StoppedTimeCount;
-                lstPermissionExecute.ItemClear();
-                var l = TableView.Permission_AllUsed(false).ToList();
-                l.AddIfNotExists(Administrator);
-                lstPermissionExecute.ItemAddRange(l);
-                lstPermissionExecute.Check(value.UserGroups, true);
-                lstPermissionExecute.Suggestions.Clear();
-
-                _item = value;
-
-                btnVerlauf.Enabled = true;
-                btnAnzeigen_Click(null, System.EventArgs.Empty);
-                if (value.IsOk()) {
-                    capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
-                } else {
-                    capFehler.Text = "<imagecode=Warnung|16> " + value.ErrorReason();
-                }
-
-                if (value.StoppedTimeCount > 20) {
-                    capLaufzeit.Text = $"Geschätzte Laufzeit:  {Math.Round(value.AverageRunTime / 1000f, 2)} Sekunden";
-                } else {
-                    capLaufzeit.Text = string.Empty;
-                }
-            } else {
-                tbcScriptEigenschaften.Enabled = false;
-                txbTestZeile.Enabled = false;
-                chkReadOnly.Enabled = false;
-                grpRow.Enabled = false;
-                txbName.Text = string.Empty;
-                cbxPic.Text = string.Empty;
-                txbQuickInfo.Text = string.Empty;
-                Script = string.Empty;
-                StoppedTimeCount = 0;
-                LastFailedReason = string.Empty;
-                LastVariables = null;
-                chkAuslöser_newrow.Checked = false;
-                chkAuslöser_valuechanged.Checked = false;
-                chkAuslöser_prepaireformula.Checked = false;
-                chkAuslöser_valuechangedThread.Checked = false;
-                chkAuslöser_export.Checked = false;
-                chkAuslöser_deletingRow.Checked = false;
-                btnVerlauf.Enabled = false;
-                capFehler.Text = string.Empty;
-            }
-        }
-    }
-
-    public EditorMode Mode { get; set; } = EditorMode.EditItem;
-
-    public override object? Object {
-        get => ((IIsEditor)this).OutputItem;
-        set => InputItem = value;
-    }
-
-    public EditorMode SupportedModes => EditorMode.EditItem; // EditCopy nicht möglich: Skripte werden inline in Tabelle bearbeitet
+    public override EditorMode SupportedModes => EditorMode.EditCopy;
 
     public Table? Table {
         get;
-        private set {
+        set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            WriteInfosBack();
-            lstEventScripts.UncheckAll();
+            // Vor dem Wechseln/Clearing des Tables das aktuelle OutputItem
+            // anfordern — falls ein EditorForIEnumerable den Editor hostet,
+            // fängt dieser das Event ein und übernimmt ggf. gepufferte
+            // Eingaben (z.B. den Skript-Text) ins Backend.
+            if (field is not null) { OnPropertyChanged("Table"); }
 
-            if (field is not null) {
-                field.DisposingEvent -= _table_Disposing;
-                field.CanDoScript -= Table_CanDoScript;
-                field.Loaded -= Table_Loaded;
-                field.WriteAccessChanged -= _table_WriteAccessChanged;
-            }
+            field?.CanDoScript -= Table_CanDoScript;
             field = value;
+            field?.CanDoScript += Table_CanDoScript;
 
-            if (field is not null) {
-                field.DisposingEvent += _table_Disposing;
-                field.CanDoScript += Table_CanDoScript;
-                field.Loaded += Table_Loaded;
-                field.WriteAccessChanged += _table_WriteAccessChanged;
-
-                tbcScriptEigenschaften.Enabled = true;
-            } else {
-                tbcScriptEigenschaften.Enabled = false;
-            }
-
-            UpdateList();
             UpdateChunkUiState();
         }
     }
@@ -178,8 +82,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// <summary>
     /// Speicherschlüssel pro Tabelle — alle Skripte einer Tabelle teilen sich die Variablen-Sets,
     /// sodass die Werte unabhängig vom gewählten Skript geladen werden können.
-    /// Der Editor-Typ-Suffix stellt sicher, dass die Sets nicht mit anderen Skript-Editoren
-    /// (z.B. RowAdderScriptEditor) derselben Tabelle kollidieren.
+    /// Der Editor-Typ-Suffix stellt sicher, dass die Sets nicht mit anderen Editoren
+    /// derselben Tabelle kollidieren.
     /// </summary>
     public override string? VariablesStorageKey => Table?.KeyName is { Length: > 0 } k ? k + "|TableScript" : null;
 
@@ -190,7 +94,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// <summary>
     /// Erzeugt eine Liste von Chunk-Werten für das Dropdown-Menü.
     /// Chunk-IDs (Hash-Ordnernamen) können nicht verwendet werden, da
-    /// <see cref="TableChunk.BeSureRowIsLoaded(string"/> und
+    /// <see cref="TableChunk.BeSureRowIsLoaded(string)"/> und
     /// <see cref="TableChunk.GetChunkId"/> einen Chunk-<b>Wert</b> erwarten
     /// und diesen erneut hashen würden.
     /// </summary>
@@ -271,7 +175,59 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
              ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, false);
     }
 
-    public object? CreateNewItem() => null;
+    public override void Clear() {
+        _item = null;
+        tbcScriptEigenschaften.Enabled = false;
+        txbTestZeile.Enabled = false;
+        chkReadOnly.Enabled = false;
+        grpRow.Enabled = false;
+        txbName.Text = string.Empty;
+        cbxPic.Text = string.Empty;
+        txbQuickInfo.Text = string.Empty;
+        Script = string.Empty;
+        StoppedTimeCount = 0;
+        LastFailedReason = string.Empty;
+        LastVariables = null;
+        chkAuslöser_newrow.Checked = false;
+        chkAuslöser_valuechanged.Checked = false;
+        chkAuslöser_prepaireformula.Checked = false;
+        chkAuslöser_valuechangedThread.Checked = false;
+        chkAuslöser_export.Checked = false;
+        chkAuslöser_deletingRow.Checked = false;
+        capFehler.Text = string.Empty;
+    }
+
+    /// <summary>
+    /// Erzeugt aus dem aktuellen UI-Zustand eine neue <see cref="TableScriptDescription"/>.
+    /// Wird vom <see cref="Editoren.EditorForIEnumerable"/> über
+    /// <see cref="IIsEditor.OutputItem"/> abgefragt, sobald der Editor
+    /// <c>OutputItem</c>-Änderung signalisiert. Nicht editierte Backend-Werte
+    /// (AdminInfo, AverageRunTime, Table) werden vom geladenen <see cref="_item"/>
+    /// übernommen.
+    /// </summary>
+    public override object? CreateNewItem() {
+        if (_item is null || Table is not { IsDisposed: false } tb) { return null; }
+
+        var scc = ScriptChangedByUser ? Math.Min(10, StoppedTimeCount) : StoppedTimeCount;
+        ScriptChangedByUser = false;
+
+        return new TableScriptDescription(
+            tb,
+            txbName.Text,
+            Script,
+            cbxPic.Text.TrimEnd("|16"),
+            txbQuickInfo.Text,
+            _item.AdminInfo,
+            lstPermissionExecute.Checked.ToList().AsReadOnly(),
+            ComputeEventTypes(),
+            chkZeile.Checked,
+            chkReadOnly.Checked,
+            LastFailedReason,
+            LastVariables,
+            scc,
+            _item.AverageRunTime
+        );
+    }
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
@@ -286,7 +242,10 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         //    return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
         //}
 
-        WriteInfosBack();
+        // Flush (OnPropertyChanged(OutputItem)) und Host-Benachrichtigung (Executing) werden
+        // bereits in der Basis (ScriptEditor.TesteScript) vor diesem Aufruf
+        // erledigt: Das hostende Form hat OutputItem ins Backend geschrieben und
+        // _item auf die frische Backend-Instanz aktualisiert.
 
         RowItem? r = null;
 
@@ -325,46 +284,68 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return f;
     }
 
-    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || _writeAccessLost || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
-
-        if (_item is null) {
-            capFehler.Text = string.Empty;
-            return;
-        }
-
-        var tmpname = keyName ?? _item.KeyName;
-
-        // Backend-Update
-        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, savedVariables, isDisposed, readOnly, stoppedtimecount, averageruntime);
-        UpdateList();
-
-        Item = tb.EventScript.GetByKey(tmpname, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public override void WriteInfosBack() {
-        var scc = StoppedTimeCount;
-        if (ScriptChangedByUser) {
-            scc = Math.Min(10, StoppedTimeCount);
-            ScriptChangedByUser = false;
-        }
-
-        UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, savedVariables: LastVariables, stoppedtimecount: scc);
-    }
-
-    protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        Item = null; // erst das Item!
-        Table = null;
-    }
-
-    protected override void OnLoad(System.EventArgs e) {
-        base.OnLoad(e);
-
+    /// <summary>
+    /// Befüllt die ComboBox mit allen verfügbaren Bildern. Wird einmalig beim ersten Laden ausgeführt.
+    /// </summary>
+    protected override void InitializeComponentDefaultValues() {
         var im = QuickImage.Images();
         foreach (var thisIm in im) {
             cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
+    }
+
+    /// <summary>
+    /// Befüllt die UI aus dem übergebenen <see cref="TableScriptDescription"/>-Skript.
+    /// </summary>
+    protected override bool SetValuesToFormula(object? toEdit) {
+        if (toEdit is not TableScriptDescription value) { return true; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return true; }
+
+        tbcScriptEigenschaften.Enabled = true;
+        txbName.Text = value.KeyName;
+        txbQuickInfo.Text = value.QuickInfo;
+
+        cbxPic.Text = value.Image;
+
+        chkZeile.Checked = value.NeedRow;
+        txbTestZeile.Enabled = value.NeedRow;
+        grpRow.Enabled = value.NeedRow;
+        chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
+        chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
+        chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
+        chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+        chkExtendend.Enabled = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
+        chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
+        chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
+        chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
+        chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
+        Script = value.Script;
+        LastFailedReason = value.FailedReason;
+        LastVariables = value.SavedVariables;
+        StoppedTimeCount = value.StoppedTimeCount;
+        lstPermissionExecute.ItemClear();
+        var l = TableView.Permission_AllUsed(false).ToList();
+        l.AddIfNotExists(Administrator);
+        lstPermissionExecute.ItemAddRange(l);
+        lstPermissionExecute.Check(value.UserGroups, true);
+        lstPermissionExecute.Suggestions.Clear();
+
+        _item = value;
+
+        btnAnzeigen_Click(null, System.EventArgs.Empty);
+        if (value.IsOk()) {
+            capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
+        } else {
+            capFehler.Text = "<imagecode=Warnung|16> " + value.ErrorReason();
+        }
+
+        if (value.StoppedTimeCount > 20) {
+            capLaufzeit.Text = $"Geschätzte Laufzeit:  {Math.Round(value.AverageRunTime / 1000f, 2)} Sekunden";
+        } else {
+            capLaufzeit.Text = string.Empty;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -429,27 +410,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) {
-        // _writeAccessLost verhindert WriteInfosBack-Zugriffe auf die
-        // gerade verworfenen Tabelle während Table = null (Setter).
-        _writeAccessLost = true;
-        Table = null;
-        // Close asynchron, damit die Disposing-Verarbeitung der Tabelle
-        // nicht durch synchrone Form-Schließung unterbrochen wird.
-        if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
-    }
-
-    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
-        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
-        _writeAccessLost = true;
-        Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
-        // Close asynchron ausführen, um Re-Entrancy während der Event-
-        // Verarbeitung der Tabelle (z.B. Freeze/OnWriteAccessChanged) zu
-        // vermeiden. Ein synchrones Close würde Table = null im Setter
-        // auslösen, während die Tabelle noch im Event-Invoke steckt.
-        if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
-    }
-
     private void btnChunkDropDown_Click(object sender, System.EventArgs e) {
         if (Table is not { IsDisposed: false }) { return; }
         var items = BuildChunkDropdownItems(Table);
@@ -485,46 +445,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
     }
 
-    private void btnVerlauf_Click(object sender, System.EventArgs e) {
-        // Überprüfen, ob die Tabelle oder die Instanz selbst verworfen wurde
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        // Das ausgewählte Skript aus der Liste abrufen
-        if (lstEventScripts.Checked.Count != 1) { return; }
-
-        var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (TableScriptDescription)item.Item : null;
-        var l = new List<string>();
-        // Durchlaufen aller Undox-Operationen in der Tabelle
-
-        var sortedUndoItems = tb.Undo.Where(item => item.Command is TableDataType.EventScript).OrderByDescending(item => item.DateTimeUtc);
-
-        foreach (var thisUndo in sortedUndoItems) {
-            l.Add("############################################################################");
-            l.Add("############################################################################");
-            l.Add("############################################################################");
-            l.Add("############################################################################");
-            l.Add("############################################################################");
-            l.Add(thisUndo.DateTimeUtc.ToString7() + " " + thisUndo.User);
-
-            l.Add("Art: " + thisUndo.Command);
-            // Überprüfen, ob das Skript geändert wurde
-            var found = false;
-            foreach (var t in thisUndo.ChangedTo.SplitAndCutByCr()) {
-                var s = new TableScriptDescription(tb, t);
-                if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.Script != s.Script) {
-                    l.Add(s.Script);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                l.Add("    -> Keine Änderung am gewählten Skript");
-            }
-        }
-        // Schreiben der Liste in eine temporäre Datei
-        l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
-    }
-
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
@@ -538,33 +458,24 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         ExecuteFile(tb.AssetFolderWhole());
     }
 
-    private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(image: cbxPic.Text.TrimEnd("|16"));
+    private void cbxPic_TextChanged(object sender, System.EventArgs e) {
+        if (_item is null) { return; }
+        OnPropertyChanged("Picture");
+    }
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (_item is null) { return; }
-
-        ScriptEventTypes tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
-        if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
-        if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
-        if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
-        if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
-
-        UpdateSelectedItem(eventTypes: tmp);
+        OnPropertyChanged("Trigger");
     }
 
     private void chkReadOnly_CheckedChanged(object sender, System.EventArgs e) {
         if (_item is null) { return; }
-
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        UpdateSelectedItem(readOnly: chkReadOnly.Checked);
+        OnPropertyChanged("ReadOnly");
     }
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
         if (_item is null) { return; }
-
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         if (chkZeile.Checked && !Table.IsRowScriptPossible()) {
@@ -573,9 +484,20 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             return;
         }
 
-        UpdateSelectedItem(needRow: chkZeile.Checked);
+        OnPropertyChanged("RowScript");
         txbTestZeile.Enabled = chkZeile.Checked;
         grpRow.Enabled = chkZeile.Checked;
+    }
+
+    private ScriptEventTypes ComputeEventTypes() {
+        ScriptEventTypes tmp = 0;
+        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
+        if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
+        if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
+        if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
+        if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
+        return tmp;
     }
 
     private bool EnableScript() {
@@ -594,69 +516,10 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return true;
     }
 
-    private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
-
-    private void lstEventScripts_AddClicked(object sender, AddItemEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var newitem = new TableScriptDescription(Table);
-
-        if (tb.EventScript.GetByKey(newitem.KeyName) is not null) {
-            QuickNote.Show(NoteSymbols.Warning, "Skript existiert bereits");
-            return;
-        }
-
-        List<TableScriptDescription> l = [.. tb.EventScript];
-        l.Add(newitem);
-        tb.EventScript = l.AsReadOnly();
-
-        UpdateList();
-        lstEventScripts.Check(newitem.KeyName);
-        e.Cancel = true;
+    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (_item is null) { return; }
+        OnPropertyChanged("Permission");
     }
-
-    private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
-        var newItem = string.Empty;
-
-        if (lstEventScripts.Checked.Count == 1 && !_writeAccessLost) {
-            if (TableViewForm.EditableErrorMessage(Table, null)) {
-                // Chunk gesperrt — Editor schließen. _writeAccessLost verhindert
-                // weitere Lock-Prüfungen (und MessageBoxen) während des Schließens.
-                _writeAccessLost = true;
-                if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
-                return;
-            }
-
-            if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
-                newItem = rli.KeyName;
-            }
-        }
-
-        WriteInfosBack();
-
-        Item = Table?.EventScript.GetByKey(newItem);
-    }
-
-    private void lstEventScripts_RemoveClicked(object sender, AbstractListItemEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (e.Item is not ReadableListItem rli || rli.Item is not TableScriptDescription dsd) { return; }
-
-        var toDelete = dsd.KeyName;
-
-        if (dsd != _item) { WriteInfosBack(); }
-
-        //lstEventScripts.UncheckAll();
-
-        var toDel = tb.EventScript.GetByKey(toDelete);
-
-        if (toDel is null) { return; }
-
-        Table.UpdateScript(toDel, isDisposed: true);
-        UpdateList();
-    }
-
-    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateSelectedItem(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
 
     private void ScriptEditorDropDown_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (_dropDownTarget is { IsDisposed: false } tbx && e.Item is { } item) {
@@ -665,23 +528,10 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
+        // Während der Editor geöffnet ist, werden Skripte der gleichen Tabelle
+        // blockiert - außer bei der Test-Ausführung durch den Editor selbst.
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
-    }
-
-    private void Table_Loaded(object? sender, FirstEventArgs e) {
-        // Bei externen Aktualisierungen (Server-Sync, Undo/Redo) werden alle
-        // TableScriptDescription-Objekte neu erstellt. Liste aktualisieren,
-        // damit keine veralteten Referenzen mehr angezeigt werden.
-        UpdateList();
-
-        // Aktuell ausgewähltes Item auf das neue Objekt migrieren.
-        if (_item is { IsDisposed: false } old && Table is { IsDisposed: false } tb) {
-            var fresh = tb.EventScript.GetByKey(old.KeyName, StringComparison.OrdinalIgnoreCase);
-            if (fresh is not null && !ReferenceEquals(fresh, old)) {
-                Item = fresh;
-            }
-        }
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
@@ -704,19 +554,19 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (_item is null) { return; }
-
         if (!ScriptDescription.IsValidName(txbName.Text)) { return; }
+        if (string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) { return; }
+        if (Table.EventScript.GetByKey(txbName.Text, StringComparison.OrdinalIgnoreCase) is not null) { return; }
 
-        if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
-            if (tb.EventScript.GetByKey(txbName.Text, StringComparison.OrdinalIgnoreCase) is not null) { return; }
-        }
-
-        UpdateSelectedItem(keyName: txbName.Text);
+        OnPropertyChanged("Name");
     }
 
-    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(quickInfo: txbQuickInfo.Text);
+    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
+        if (_item is null) { return; }
+        OnPropertyChanged("QuickInfo");
+    }
 
     private void UpdateChunkUiState() {
         var isChunk = Table is TableChunk;
@@ -728,34 +578,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         // bevor das Zeilen-Dropdown aktiv wird.
         btnTestZeileDropDown.Enabled = !isChunk || !string.IsNullOrEmpty(txbChunk.Text);
         txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
-    }
-
-    private void UpdateList() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) {
-            lstEventScripts.ItemClear();
-            return;
-        }
-
-        lstEventScripts.UpdateList(tb.EventScript);
-
-        foreach (var thisSet in tb.EventScript) {
-            if (thisSet is null) { continue; }
-
-            var cap = thisSet.EventTypes != 0 ? thisSet.EventTypes.ToString() : "Sonstige";
-
-            if (lstEventScripts[thisSet.KeyName] is ReadableListItem rli) {
-                rli.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
-            }
-
-            if (lstEventScripts[cap] is null) {
-                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
-            }
-
-            if (!_didMessage && thisSet.NeedRow && !tb.IsRowScriptPossible()) {
-                _didMessage = true;
-                EnableScript();
-            }
-        }
     }
 
     #endregion

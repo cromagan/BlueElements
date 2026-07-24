@@ -241,6 +241,12 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
+    /// <summary>
+    /// Löst das <see cref="ItemCheckedChanged"/>-Event aus. Abgeleitete Klassen
+    /// können dies überschreiben, um auf Prüfzustandsänderungen zu reagieren.
+    /// </summary>
+    protected virtual void OnItemCheckedChanged(System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
+
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     protected virtual void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
@@ -355,7 +361,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         }
     }
 
-    private void Core_ItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
+    private void Core_ItemCheckedChanged(object? sender, System.EventArgs e) => OnItemCheckedChanged(e);
 
     private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => OnItemClicked(e);
 

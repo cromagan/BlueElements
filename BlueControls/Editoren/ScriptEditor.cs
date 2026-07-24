@@ -11,6 +11,7 @@ using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -22,9 +23,9 @@ namespace BlueControls.BlueTableDialogs;
 /// kann also über den Default-Aufruf (<see cref="InputBoxEditor"/>) in einem Dialog gehostet werden.
 /// Ist zudem direkt als Editor für <see cref="ScriptDescription"/> einsetzbar. Abgeleitete Klassen
 /// überschreiben <see cref="Clear"/>, <see cref="SetValuesToFormula"/>,
-/// <see cref="InitializeComponentDefaultValues"/>, <see cref="ExecuteScript"/> und <see cref="WriteInfosBack"/>.
+/// <see cref="InitializeComponentDefaultValues"/> und <see cref="ExecuteScript"/>.
 /// </summary>
-public partial class ScriptEditor : EditorEasy, IContextMenu {
+public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyChanged {
 
     #region Fields
 
@@ -48,6 +49,30 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
 
     #endregion
 
+    #region Events
+
+    /// <summary>
+    /// Wird unmittelbar vor der Ausführung eines Skripts gefeuert (aus
+    /// <see cref="TesteScript"/>). Ein hostendes Form kann hier die Arbeitskopie
+    /// (z.B. <see cref="EditorForIEnumerable.OutputItem"/>) ins Backend
+    /// durchstellen, bevor das Skript läuft — etwa damit der Test gegen den
+    /// committeten Stand erfolgt und <c>_item</c> auf die frische Backend-Instanz
+    /// aktualisiert wird.
+    /// </summary>
+    public event EventHandler? Executing;
+
+    /// <summary>
+    /// Wird gefeuert, wenn sich eine für das Host relevante Eigenschaft ändert.
+    /// Abgeleitete Editoren lösen <see cref="OnPropertyChanged"/> typischerweise
+    /// mit <c>nameof(<see cref="IIsEditor.OutputItem"/>)</c> aus, sobald die
+    /// Oberfläche eine neue Edit-Kopie liefern soll. Ein hostendes
+    /// <see cref="EditorForIEnumerable"/> fragt daraufhin
+    /// <see cref="IIsEditor.OutputItem"/> ab.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    #endregion
+
     #region Properties
 
     [DefaultValue(true)]
@@ -56,11 +81,10 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
+    public override Type? EditorFor => typeof(ScriptDescription);
     public string LastFailedReason { get; set; } = string.Empty;
 
     public List<Variable>? LastVariables { get; set; }
-
-    public override Type? EditorFor => typeof(ScriptDescription);
 
     public string Script {
         get => txtSkript.Text.TrimEnd(' ').Replace("\r\n", "\r");
@@ -99,6 +123,14 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
 
     #region Methods
 
+    /// <summary>Setzt die Oberfläche zurück. Abgeleitete Editoren überschreiben dies und base aufrufen.</summary>
+    public override void Clear() {
+        tbcScriptEigenschaften.Enabled = false;
+        Script = string.Empty;
+        LastFailedReason = string.Empty;
+        LastVariables = null;
+    }
+
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
@@ -132,6 +164,11 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
     public void TesteScript(bool testmode) {
         UpdateState("Starte Skript", null, false);
 
+        // Dem Host die Möglichkeit geben, die Arbeitskopie ins Backend zu
+        // schreiben (z.B. TableScriptEditorForm schreibt OutputItem in
+        // Table.EventScript zurück und lädt _item auf die frische Backend-Instanz).
+        OnExecuting(System.EventArgs.Empty);
+
         var f = ExecuteScript(testmode);
 
         WriteCommandsToList();
@@ -159,11 +196,47 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
         }
     }
 
-    public virtual void WriteInfosBack() {
-        if (InputItem is ScriptDescription { IsDisposed: false } sd) {
-            sd.Script = Script;
+    protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
+        if (string.IsNullOrEmpty(LastFailedReason)) {
+            UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
+        } else {
+            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen während des Auftretens werden angezeigt", LastVariables, true);
         }
     }
+
+    /// <summary>
+    /// Überschrieben, damit beim Verwerfen des UserControls Hilfsfenster geschlossen werden.
+    /// </summary>
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            CloseComandList();
+
+            components?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    protected VariableCollection GetEditorVariables() {
+        var vc = new VariableCollection();
+        foreach (var c in grpInjectVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                vc.Add(new VariableString(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
+            }
+        }
+        return vc;
+    }
+
+    /// <summary>Basis-Default: tut nichts. Abgeleitete Editoren füllen hier einmalig Dropdowns etc.</summary>
+    protected override void InitializeComponentDefaultValues() { }
+
+    protected virtual void OnExecuting(System.EventArgs e) => Executing?.Invoke(this, e);
+
+    /// <summary>
+    /// Löst <see cref="PropertyChanged"/> aus. Wird von abgeleiteten Editoren
+    /// genutzt, um Änderungen — meist <c>nameof(<see cref="IIsEditor.OutputItem"/>)</c> —
+    /// an ein hostendes <see cref="EditorForIEnumerable"/> zu melden.
+    /// </summary>
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
     /// Lädt das übergebene <see cref="ScriptDescription"/>-Item in die Oberfläche.
@@ -177,59 +250,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
         LastFailedReason = sd.FailedReason;
         LastVariables = sd.SavedVariables;
         return true;
-    }
-
-    /// <summary>Setzt die Oberfläche zurück. Abgeleitete Editoren überschreiben dies und base aufrufen.</summary>
-    public override void Clear() {
-        tbcScriptEigenschaften.Enabled = false;
-        Script = string.Empty;
-        LastFailedReason = string.Empty;
-        LastVariables = null;
-    }
-
-    /// <summary>Basis-Default: tut nichts. Abgeleitete Editoren füllen hier einmalig Dropdowns etc.</summary>
-    protected override void InitializeComponentDefaultValues() { }
-
-    protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
-        if (string.IsNullOrEmpty(LastFailedReason)) {
-            UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
-        } else {
-            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen während des Auftretens werden angezeigt", LastVariables, true);
-        }
-    }
-
-    protected VariableCollection GetEditorVariables() {
-        var vc = new VariableCollection();
-        foreach (var c in grpInjectVariables.Controls) {
-            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                vc.Add(new VariableString(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
-            }
-        }
-        return vc;
-    }
-
-    /// <summary>
-    /// Überschrieben, damit beim Verwerfen des UserControls (und damit beim Schließen
-    /// des hostenden Dialogs) die Werte zurückgeschrieben und Hilfsfenster geschlossen werden.
-    /// </summary>
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            WriteInfosBack();
-
-            CloseComandList();
-
-            components?.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-
-
-    private static void CloseComandList() {
-        if (_befehlsReferenz is { Visible: true }) {
-            _befehlsReferenz.Close();
-            _befehlsReferenz.Dispose();
-            _befehlsReferenz = null;
-        }
     }
 
     /// <summary>
@@ -269,6 +289,14 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
         }
     }
 
+    private static void CloseComandList() {
+        if (_befehlsReferenz is { Visible: true }) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz.Dispose();
+            _befehlsReferenz = null;
+        }
+    }
+
     private static JsonObject? DummyJson(List<Variable>? variables) {
         if (variables is null) { return null; }
 
@@ -295,14 +323,11 @@ public partial class ScriptEditor : EditorEasy, IContextMenu {
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         LastFailedReason = string.Empty;
         LastVariables = null;
-        WriteInfosBack();
         btnAnzeigen_Click(null, System.EventArgs.Empty);
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
-
-        WriteInfosBack();
         FormManager.SaveAllFiles();
         btnSaveLoad.Enabled = true;
     }

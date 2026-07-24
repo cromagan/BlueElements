@@ -79,7 +79,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotif
 
         // EditCopy-Mode: das OutputItem ändert sich, weil es aus den
         // angekreuzten Spalten neu erzeugt wird.
-        OnPropertyChanged("OutputItem");
+        OnPropertyChanged("Columns");
     }
 
     private void OnPropertyChanged(string propertyName) {
