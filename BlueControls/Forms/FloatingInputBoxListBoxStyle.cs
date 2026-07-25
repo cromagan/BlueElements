@@ -51,9 +51,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Events
 
-    public event EventHandler? Cancel;
-
     public event EventHandler<AddItemEventArgs>? AddClicked;
+
+    public event EventHandler? Cancel;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
@@ -90,6 +90,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
             translate, controlDesign, itemDesign, autosort, removeAllowed, addAllowed, moveAllowed, false, null, null);
 
+    /// <summary>
+    /// Zeigt eine Mini-Toolbar an der übergebenen Bildschirm-Position.
+    /// Wird von <see cref="Interfaces.IMiniToolbar.MiniToolbarShow"/> verwendet.
+    /// </summary>
+    public static FloatingInputBoxListBoxStyle ShowAtPosition(List<AbstractListItem> items, Point screenPosition, Control? connectedControl, object? hotItem) => new(items, CheckBehavior.NoSelection, null, screenPosition.X, screenPosition.Y, -1, connectedControl,
+            false, ListBoxAppearance.MiniToolbar, Design.Item_MiniToolbar, false, false, AddType.None, false, false, null, hotItem);
+
     public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, false, false, customContextMenuItems, null);
 
     public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, moveAllowed, itemEditAllowed, customContextMenuItems, null);
@@ -97,6 +104,15 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool moveAllowed, bool itemEditAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 26; }
+
+        // MiniToolbar: horizontales Layout — Breite = Summe aller Item-Breiten
+        if (controlDesign == ListBoxAppearance.MiniToolbar) {
+            const int itemSize = 16;
+            var visibleCount = items.Count(i => i.Visible);
+            biggestItemX = Math.Max(biggestItemX, visibleCount * itemSize);
+            heightAdded = itemSize;
+        }
+
         lstbx.Appearance = controlDesign;
         lstbx.Translate = translate;
         lstbx.AutoSort = autosort;
@@ -139,17 +155,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
     }
 
-    /// <summary>
-    /// Berechnet die Größe des Fensters anhand der aktuellen Items neu.
-    /// Die aktuelle Breite wird als Minimum beibehalten, damit das Fenster
-    /// beim Löschen eines Items nicht schrumpft und beim Hinzufügen wächst.
-    /// </summary>
-    private void RecalcFormSize() {
-        var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
-        if (lstbx.AddAllowed != AddType.None) { heightAdded += 26; }
-        AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));
-    }
-
     private void ListBox1_AddClicked(object? sender, AddItemEventArgs e) => AddClicked?.Invoke(this, e);
 
     private void ListBox1_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) {
@@ -183,6 +188,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+
+    /// <summary>
+    /// Berechnet die Größe des Fensters anhand der aktuellen Items neu.
+    /// Die aktuelle Breite wird als Minimum beibehalten, damit das Fenster
+    /// beim Löschen eines Items nicht schrumpft und beim Hinzufügen wächst.
+    /// </summary>
+    private void RecalcFormSize() {
+        var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
+        if (lstbx.AddAllowed != AddType.None) { heightAdded += 26; }
+        AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));
+    }
 
     #endregion
 }

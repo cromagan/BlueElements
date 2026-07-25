@@ -50,11 +50,13 @@ public enum Design {
     Form_Progressbar,
     Form_AutoFilter,
     Form_ContextMenu,
+    Form_MiniToolbar,
     Form_SelectBox_Dropdown,
 
     Item_DropdownMenu,
     Item_ContextMenu,
     Item_ContextMenu_Caption,
+    Item_MiniToolbar,
     Item_AutoFilter,
     Item_ListBox,
     Item_ListBox_Caption,

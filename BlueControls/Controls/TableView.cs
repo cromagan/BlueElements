@@ -25,7 +25,7 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(SelectedRowChanged))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IStyleable {
+public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslateable, IHasTable, IStyleable {
 
     #region Fields
 
@@ -258,6 +258,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Werden bei FilterCombined berücksichtigt und auch im FilterOutput weitergegeben.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
+
+    [DefaultValue(true)]
+    public bool MiniToolbarDefault { get; set; } = true;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1187,6 +1190,38 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return contextMenu;
+    }
+
+    public List<AbstractListItem>? GetMiniToolbarItems(object? hotItem) {
+        List<AbstractListItem> miniToolbar = [];
+
+        if (!MiniToolbarDefault || Table is not { IsDisposed: false } tb) { return miniToolbar; }
+
+        var (column, row, _, _, _) = GetContextData(hotItem);
+
+        #region Pinnen
+
+        if (row is not null) {
+            if (PinnedRows.Contains(row)) {
+                miniToolbar.Add(ItemOf(string.Empty, "Unpin", ImageCode.Pinnadel, ContextMenu_Unpin, true, "Zeile nicht mehr pinnen"));
+            } else {
+                miniToolbar.Add(ItemOf(string.Empty, "Pin", ImageCode.Pinnadel, ContextMenu_Pin, true, "Zeile anpinnen"));
+            }
+        }
+
+        #endregion
+
+        #region Notiz
+
+        if (column is not null && row is not null && tb.Column.SysCellNote is not null) {
+            var existingNote = CellNoteHelper.GetNoteData(column, row);
+            miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", ImageCode.Stift, ContextMenu_Note_Edit, true, "Notiz bearbeiten"));
+            miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", ImageCode.Kreuz, ContextMenu_Note_Remove, existingNote is not null, "Notiz entfernen"));
+        }
+
+        #endregion
+
+        return miniToolbar;
     }
 
     public void ImportClipboard() {
@@ -2123,6 +2158,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (isRealColumn && _mouseOverRow?.Row is { IsDisposed: false } r) {
                     OnCellClicked(new CellEventArgs(_mouseOverColumn.Column!, r));
                     Invalidate();
+
+                    var screenX = Cursor.Position.X - e.ControlX;
+                    var screenY = Cursor.Position.Y - e.ControlY;
+                    var posX = screenX + _mouseOverColumn.ControlColumnLeft(OffsetX);
+                    var posY = screenY + (_mouseOverRowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? e.ControlY) + 2;
+                    ((IMiniToolbar)this).MiniToolbarShow(new Point(posX, posY),
+                        ContextMenuItemGenerate(this, _mouseOverColumn, _mouseOverColumn.Column, r, RowsVisibleUnique()));
                 }
             }
 

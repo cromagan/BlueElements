@@ -12,6 +12,7 @@ public enum ListBoxAppearance {
     DropdownSelectbox = Design.Form_SelectBox_Dropdown,
     Autofilter = Design.Form_AutoFilter,
     KontextMenu = Design.Form_ContextMenu,
+    MiniToolbar = Design.Form_MiniToolbar,
     ComboBox_Textbox = Design.ComboBox_TextBox,
 
     //Dropdown = enDesign.Form_SelectBox_Dropdown

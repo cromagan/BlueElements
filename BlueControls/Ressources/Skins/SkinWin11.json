@@ -1487,6 +1487,15 @@
       "BOC1": "000000"
     }
   },
+  "Form_MiniToolbar": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "F0F0F0",
+      "Border": "Solid1Px",
+      "BOC1": "000000"
+    }
+  },
   "Form_SelectBox_Dropdown": {
     "Standard": {
       "Contour": "Rectangle",
@@ -1571,6 +1580,30 @@
       "Border": "Solid1Px",
       "BOC1": "4DA1B5",
       "Font": "{Name=Calibri, Size=10.15, Bold=true}"
+    }
+  },
+  "Item_MiniToolbar": {
+    "Standard": {
+      "Font": "{Name=Calibri, Size=10.15}"
+    },
+    "Standard_Disabled": {
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
+    },
+    "Standard_MouseOver": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "CCE8FF",
+      "Border": "Solid1Px",
+      "BOC1": "99D1FF",
+      "Font": "{Name=Calibri, Size=10.15}"
+    },
+    "Standard_MousePressed": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "99D1FF",
+      "Border": "Solid1Px",
+      "BOC1": "0072BC",
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Item_AutoFilter": {

@@ -307,6 +307,10 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
                 ItemDesign = Design.Item_ContextMenu;
                 break;
 
+            case ListBoxAppearance.MiniToolbar:
+                ItemDesign = Design.Item_MiniToolbar;
+                break;
+
             case ListBoxAppearance.ComboBox_Textbox:
                 ItemDesign = Design.ComboBox_TextBox;
                 break;
@@ -710,6 +714,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ListBoxAppearance.Gallery => (area.Width < 5 ? 200 : Math.Min(200, area.Width), area.Width < 5 ? 200 : Math.Min(200, area.Width)),
         ListBoxAppearance.FileSystem => (110, 110),
         ListBoxAppearance.ButtonList => (64, 80),
+        ListBoxAppearance.MiniToolbar => (16, 16),
         _ => CalculateDefaultDimensions(area, biggestX)
     };
 

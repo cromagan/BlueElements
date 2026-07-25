@@ -1801,10 +1801,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _editAllowedDespiteLock = true; // Elementar für Verschiebe funktion
                 _editableWithTextInput = true; // Elementar für Verschiebe funktion
                 _ignoreAtRowFilter = true;
+                _scriptType = ScriptType.Nicht_vorhanden; // Keine Änderungen an der Zeile erkennen
 
                 this.GetStyleFrom(FormatHolder_LongOnlyPositive.Instance);
                 if (allDefaultValues) {
-                    ScriptType = ScriptType.Nicht_vorhanden;
                     Align = AlignmentHorizontal.Rechts;
                     Caption = "Zeile";
                     DefaultRenderer = "Button";
