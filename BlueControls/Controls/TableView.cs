@@ -13,7 +13,6 @@ using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -851,10 +850,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (sender is not Table tbl) { return; }
         if (!FormManager.Running) { e.CancelReason = "Programm wird beendet"; return; }
 
-            foreach (var thisf in FormManager.Forms) {
-                if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
-                if (thisf is TableScriptEditorForm tsf && tsf.Object != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
-            }
+        foreach (var thisf in FormManager.Forms) {
+            if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
+            if (thisf is TableScriptEditorForm tsf && tsf.Object != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
+        }
     }
 
     //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabellex) {
@@ -1607,7 +1606,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (_sortedViewItems is { Count: > 0 }) {
-            (_, _, y, _) = CanvasItemData(_sortedViewItems, Design.Item_ListBox);
+            // Höhe aus den bereits berechneten CanvasPosition-Werten ableiten.
+            // CalculateAllViewItems_CalculateYPosition hat die Positionen mit
+            // dem korrekten Zoom berechnet (HeightInControl mit echter Canvas-
+            // Gesamtbreite). Der frühere Weg über CanvasItemData bzw.
+            // UntrimmedCanvasSize rechnete stets mit Zoom 1 und lieferte bei
+            // Zoom > 100 % eine zu kleine Gesamthöhe — die letzte Zeile ließ
+            // sich dann nicht mehr erreichen.
+            y = _sortedViewItems.Max(i => i.CanvasPosition.Bottom);
         }
 
         return new RectangleF(0, 0, x + 8, y + 8);
@@ -2210,30 +2216,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private static (int BiggestItemX, int BiggestItemY, int HeightAdded, BlueBasics.Enums.Orientation Orientation) CanvasItemData(IEnumerable<RowBackground> item, Design itemDesign) {
-        try {
-            var w = 16;
-            var h = 0;
-            var hall = 0;
-            PreComputeSize(item, itemDesign);
-
-            foreach (var thisItem in item) {
-                if (thisItem is { Visible: true }) {
-                    var s = thisItem.UntrimmedCanvasSize(itemDesign);
-                    w = Math.Max(w, s.Width);
-                    h = Math.Max(h, s.Height);
-                    hall += s.Height;
-                }
-            }
-
-            // RowBackgroundListItem ist nie eine TextListItem -> waagerechte Orientierung.
-            return (w, h, hall, BlueBasics.Enums.Orientation.Waagerecht);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return CanvasItemData(item, itemDesign);
-        }
-    }
-
     /// <summary>
     /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss.
     /// Eine Zeile gehört direkt zu ihrem Kapitel — auch wenn dasselbe Kapitel
@@ -2511,15 +2493,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
         QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
-    }
-
-    private static void PreComputeSize(IEnumerable<RowBackground> item, Design itemDesign) {
-        try {
-            Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            PreComputeSize(item, itemDesign);
-        }
     }
 
     /// <summary>
