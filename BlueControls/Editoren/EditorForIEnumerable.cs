@@ -54,19 +54,6 @@ namespace BlueControls.Editoren;
 /// </summary>
 public partial class EditorForIEnumerable : ListBox {
 
-    #region Fields
-
-    /// <summary>
-    /// Während eines programmatischen Anzeige-Neuaufbaus (<see cref="UpdateList"/>
-    /// aus <see cref="Editor_PropertyChanged"/>) wird verhindert, dass das
-    /// Wiederherstellen der Selektion den Detail-Editor neu lädt. Bei EditCopy
-    /// würde <c>Editor.InputItem = SelectedItem</c> sonst die neue Instanz laden
-    /// und gepufferte Eingaben (z.B. den Text-Cursor im Skript-Editor) zerstören.
-    /// </summary>
-    private bool _suppressEditorInputOnCheck;
-
-    #endregion
-
     #region Events
 
     /// <summary>
@@ -131,6 +118,7 @@ public partial class EditorForIEnumerable : ListBox {
                 : [];
 
             UpdateList();
+            PushSelectionToEditor();
         }
     }
 
@@ -146,24 +134,34 @@ public partial class EditorForIEnumerable : ListBox {
 
     /// <summary>
     /// Das aktuell selektierte Element (oder <c>null</c>). Beim Setzen wird das
-    /// entsprechende Listen-Item visuell als aktiviert markiert, was über
-    /// <see cref="ListBox.OnItemCheckedChanged"/> den Editor aktualisiert.
-    /// Überwiegend für das hostende Form gedacht, das z.B. Backend-Aktionen für
-    /// das gewählte Element ausführen muss (Verlauf anzeigen, Element löschen).
+    /// entsprechende Listen-Item visuell als aktiviert markiert; eine
+    /// bestehende visuelle Selection wird dabei aufgehoben (auch bei
+    /// <c>null</c> oder wenn das Element (noch) nicht in der Anzeige steht).
+    /// Die Übernahme in den verknüpften Editor erfolgt bewusst NICHT hier,
+    /// sondern explizit über <see cref="PushSelectionToEditor"/> an den
+    /// Stellen, die eine Auswahl initiieren. Überwiegend für das hostende Form
+    /// gedacht, das z.B. Backend-Aktionen für das gewählte Element ausführen
+    /// muss (Verlauf anzeigen, Element löschen).
     /// </summary>
     public object? SelectedItem {
         get;
         private set {
             if (ReferenceEquals(field, value)) { return; }
             field = value;
-            if (value is null) { return; }
 
             for (var i = 0; i < ItemCount; i++) {
                 if (this[i] is ReadableListItem rli && ReferenceEquals(rli.Item, value)) {
-                    Check(rli);
+                    Check(rli); // SingleSelection entkreuzt das bisherige automatisch
                     return;
                 }
             }
+
+            // value ist null oder (noch) nicht angelegt — z.B. eine neue Instanz
+            // aus DemandEditorOutput vor dem nächsten UpdateList. Check oben
+            // kreuzt nur neu an, wählt aber nichts ab. Damit die Anzeige mit
+            // field konsistent bleibt, wird eine bestehende Selection hier
+            // aufgehoben.
+            if (Checked.Count > 0) { UncheckAll(); }
         }
     }
 
@@ -199,6 +197,7 @@ public partial class EditorForIEnumerable : ListBox {
         if (item is null) { return; }
 
         SelectedItem = item;
+        PushSelectionToEditor();
     }
 
     protected override void Dispose(bool disposing) {
@@ -226,18 +225,6 @@ public partial class EditorForIEnumerable : ListBox {
         RefreshEditor();
     }
 
-    /// <summary>
-    /// Reagiert auf Prüfzustandsänderungen der Liste und aktualisiert den
-    /// verknüpften Editor mit dem aktuell selektierten Element. Da
-    /// <see cref="SelectedItem"/> vor dem visuellen Aktivieren gesetzt wird,
-    /// ist die Referenz beim Eintreffen des Events aktuell.
-    /// </summary>
-    protected override void OnItemCheckedChanged(System.EventArgs e) {
-        base.OnItemCheckedChanged(e);
-        if (_suppressEditorInputOnCheck) { return; }
-        Editor?.InputItem = SelectedItem;
-    }
-
     protected override void OnItemClicked(AbstractListItemEventArgs e) {
         base.OnItemClicked(e);
 
@@ -257,7 +244,7 @@ public partial class EditorForIEnumerable : ListBox {
         if (SelectedItem is not null && current is not null && ReferenceEquals(SelectedItem, current)) { return; }
 
         SelectedItem = current;
-        Editor?.InputItem = current;
+        PushSelectionToEditor();
     }
 
     protected override void OnRemoveClicked(AbstractListItemEventArgs e) {
@@ -276,7 +263,7 @@ public partial class EditorForIEnumerable : ListBox {
 
         if (SelectedItem is not null && ReferenceEquals(SelectedItem, item)) {
             SelectedItem = null;
-            Editor?.InputItem = null;
+            PushSelectionToEditor();
         }
     }
 
@@ -340,14 +327,11 @@ public partial class EditorForIEnumerable : ListBox {
         // würden SelectedItem auf eine nicht mehr in OutputItem enthaltene
         // Referenz setzen und nachfolgende DemandEditorOutput-Aufrufe wären
         // wirkungslos (Änderungen gingen beim Schließen verloren). Der Editor
-        // wird dabei nicht neu geladen, damit gepufferte Eingaben erhalten
-        // bleiben.
-        _suppressEditorInputOnCheck = true;
-        try {
-            UpdateList();
-        } finally {
-            _suppressEditorInputOnCheck = false;
-        }
+        // wird nicht neu geladen: UpdateList stellt nur die Selektion per Check
+        // wieder her, und OnItemCheckedChanged pusht die Auswahl bewusst nicht
+        // mehr an den Editor (sonst gingen gepufferte Eingaben wie der
+        // Text-Cursor im Skript-Editor verloren).
+        UpdateList();
     }
 
     private object? FindItem(object? byReference, string? byKey) {
@@ -369,6 +353,18 @@ public partial class EditorForIEnumerable : ListBox {
 
     private void OnSelectionChanging() => SelectionChanging?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Übernimmt das aktuell selektierte Element in den verknüpften Editor.
+    /// Der bewusste Aufruf erfolgt nur an Stellen, die eine Auswahl explizit
+    /// initiieren (Nutzer-Klick, Add/SelectByKey, Backend-Update). Das
+    /// <see cref="ListBox.ItemCheckedChanged"/>-Event pusht die Auswahl
+    /// absichtlich NICHT mehr — es feuert auch beim programmatischen
+    /// Wiederherstellen der Selektion innerhalb von <see cref="UpdateList"/>
+    /// und würde sonst gepufferte Eingaben (z.B. den Text-Cursor im
+    /// Skript-Editor) zerstören.
+    /// </summary>
+    private void PushSelectionToEditor() => Editor?.InputItem = SelectedItem;
+
     private void RefreshEditor() {
         UpdateAddAllowed();
         if (Editor is not { } e) { return; }
@@ -377,7 +373,7 @@ public partial class EditorForIEnumerable : ListBox {
             ? EditorMode.OnlyShow
             : (e.SupportedModes.HasFlag(EditorMode.EditCopy) ? EditorMode.EditCopy : EditorMode.EditItem);
 
-        Editor?.InputItem = SelectedItem;
+        PushSelectionToEditor();
     }
 
     private void UpdateAddAllowed() {
@@ -396,8 +392,8 @@ public partial class EditorForIEnumerable : ListBox {
     private void UpdateList() {
         if (IsDisposed || Disposing) { return; }
 
-        // SelectedItem während des Neu-Aufbaus null setzen, damit das
-        // ausgelöste ItemCheckedChanged nicht fälschlich einen Wechsel annimmt.
+        // SelectedItem während des Neu-Aufbaus null setzen, damit der alte
+        // Check-Zustand beim ItemClear keine Reaktionen auslöst.
         var merkItem = SelectedItem;
         var merkKeyName = (merkItem as IHasKeyName)?.KeyName;
         SelectedItem = null;
@@ -409,8 +405,9 @@ public partial class EditorForIEnumerable : ListBox {
         }
 
         // Selektion wiederherstellen: erst über Referenz, dann über KeyName.
-        // Der Setter übernimmt das visuelle Aktivieren; OnItemCheckedChanged
-        // aktualisiert den Editor auf die ggf. neue Instanz.
+        // Der Setter übernimmt nur das visuelle Aktivieren (Check). Die
+        // Übernahme in den Editor erfolgt bewusst NICHT hier — Aufrufer wie
+        // der InputItem-Setter rufen dafür PushSelectionToEditor.
         SelectedItem = FindItem(merkItem, merkKeyName);
 
         OnListBuilt();

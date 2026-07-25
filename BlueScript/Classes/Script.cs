@@ -214,8 +214,9 @@ public class Script {
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, AbortReason? abort) {
         var ifFound = scp.AllowedMethods.Any(thisC => string.Equals(thisC.Command, "if", StringComparison.Ordinal));
+        var stringFound = varCol.Any(thisV => thisV is VariableString);
 
-        if (!ifFound) {
+        if (!ifFound || !stringFound) {
             return new ScriptEndedFeedback("Interner Fehler: Programm nicht korrekt gestartet, bitte neu starten!", false, false, scp.ScriptName);
         }
 

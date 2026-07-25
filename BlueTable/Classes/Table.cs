@@ -1423,6 +1423,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (gn is not null) { meth.Add(gn); }
             }
 
+            #region Diagnose-Variablen bei Skript-Fehlern
+
+            var varCount = vars.Count;
+            vars.Add(new VariableDouble("AvailableMethodCount", meth.Count, true, "Anzahl der verfügbaren Methoden. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
+            vars.Add(new VariableDouble("AvailableVariableCount", varCount, true, "Anzahl der verfügbaren Variablen. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
+
+            #endregion
+
             #region Script ausführen
 
             var ki = Caption;
