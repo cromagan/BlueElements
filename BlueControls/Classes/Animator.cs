@@ -61,10 +61,7 @@ public static class Animator {
     /// <summary>
     /// Liefert die aktuelle Mausposition direkt via Win32 — thread-safe.
     /// </summary>
-    public static Point GetCursorPos() {
-        var pt = default(Point32);
-        return GetCursorPos(out pt) ? new Point(pt.X, pt.Y) : Point.Empty;
-    }
+    public static Point GetCursorPos() => GetCursorPos(out var pt) ? new Point(pt.X, pt.Y) : Point.Empty;
 
     /// <summary>
     /// Liefert das systemweite Vordergrundfenster — thread-safe via Win32.
@@ -341,9 +338,8 @@ public static class Animator {
 
         public Func<TimeSpan, AnimationFrame> Compute { get; } = compute;
         public IntPtr Hwnd { get; } = hwnd;
-        public Action? OnFinished { get; } = onFinished;
         public bool Layered { get; } = layered;
-
+        public Action? OnFinished { get; } = onFinished;
         public DateTime StartTime { get; } = startTime;
 
         #endregion

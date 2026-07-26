@@ -85,27 +85,27 @@ public abstract class Method : IReadableTextWithKey {
     /// </summary>
     /// <param name="scriptText"></param>
     /// <param name="start"></param>
-    /// <returns></returns>
-    public static (string codeblock, string errorreason) GetCodeBlockText(string scriptText, int start) {
+    /// <returns>Ein <see cref="OperationResult"/>, dessen <see cref="OperationResult.Value"/> bei Erfolg den Codeblock enthält.</returns>
+    public static OperationResult GetCodeBlockText(string scriptText, int start) {
         var maxl = scriptText.Length;
 
         var tmp = start;
 
         do {
-            if (tmp >= maxl) { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
+            if (tmp >= maxl) { return OperationResult.Failed("Keinen nachfolgenden Codeblock gefunden."); }
             if (scriptText[tmp] == '{') { break; }
-            if (scriptText[tmp] != '¶') { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
+            if (scriptText[tmp] != '¶') { return OperationResult.Failed("Keinen nachfolgenden Codeblock gefunden."); }
             tmp++;
         } while (true);
 
         var (posek, _) = NextText(scriptText, start, BracketCurlyClose, false, false, Brackets);
         if (posek < start) {
-            return (string.Empty, "Kein Codeblock Ende gefunden.");
+            return OperationResult.Failed("Kein Codeblock Ende gefunden.");
         }
 
         var s = scriptText[start..tmp] + scriptText[(tmp + 1)..posek];
 
-        return (s, string.Empty);
+        return new OperationResult(s);
     }
 
     public static GetEndFeedback GetEnd(string scriptText, int startpos, int lengthStartSequence, string endSequence) {
@@ -485,9 +485,9 @@ public abstract class Method : IReadableTextWithKey {
                 var cont = f.ContinuePosition;
                 var codebltxt = string.Empty;
                 if (GetCodeBlockAfter) {
-                    var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
-                    if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(f.ContinuePosition, errorreason, true, ld); }
-                    codebltxt = codeblock;
+                    var cbr = GetCodeBlockText(scriptText, cont);
+                    if (cbr.IsFailed) { return new CanDoFeedback(f.ContinuePosition, cbr.FailedReason, true, ld); }
+                    codebltxt = cbr.Value as string ?? string.Empty;
                     cont = cont + codebltxt.Length + 2;
                 }
 

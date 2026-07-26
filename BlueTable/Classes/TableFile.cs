@@ -110,6 +110,15 @@ public class TableFile : Table {
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
+    /// Gibt an, ob die Tabelle vor kurzem aktiv verwendet wurde und daher
+    /// in die periodische Aktualisierung (<see cref="TableUpdater"/>) einbezogen
+    /// werden soll. Die Basisklasse prüft dies über die zugehörige Chunk-LiveInstance.
+    /// Unterklassen mit eigener Chunk-Verwaltung (z.B. <see cref="TableChunk"/>)
+    /// überschreiben dies, da sie keine Chunk-LiveInstances verwenden.
+    /// </summary>
+    public virtual bool IsRecentlyUsed => Chunk.IsChunkRecentlyUsed(Filename);
+
+    /// <summary>
     /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
     /// Wird aus dem FileInfo (LastWriteTimeUtc) des zugehörigen Chunk ermittelt.
     /// </summary>
@@ -216,11 +225,10 @@ public class TableFile : Table {
         }
 
         if (backupBytes.IsZipped()) {
-            backupBytes = backupBytes.UnzipIt();
-            if (backupBytes is null) {
-                //Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (Unzip Failed), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+            if (backupBytes.UnzipIt() is not { } unzipped) {
                 return false;
             }
+            backupBytes = unzipped;
         }
 
         if (!HasValidEofMarker(backupBytes)) {
@@ -672,7 +680,7 @@ public class TableFile : Table {
                 // dessen Instanz-Timer pausiert ist — kein Reload anstoßen.
                 if (thisTb.IsTimerPaused) { continue; }
 
-                if (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !tbf.MasterNeeded) { continue; }
+                if (!tbf.IsRecentlyUsed && !tbf.MasterNeeded) { continue; }
 
                 filtered.Add(thisTb);
             }

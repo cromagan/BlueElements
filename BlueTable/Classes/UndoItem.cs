@@ -2,7 +2,7 @@
 
 namespace BlueTable.Classes;
 
-public class UndoItem : IParseable {
+public class UndoItem : IParseable, IJsonParseable {
 
     #region Constructors
 
@@ -22,6 +22,14 @@ public class UndoItem : IParseable {
     public UndoItem(string tablename, TableDataType command, string column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
 
     public UndoItem(string s) => this.Parse(s);
+
+    public UndoItem() { }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -171,6 +179,42 @@ public class UndoItem : IParseable {
         return table.Column[ColName] is { IsDisposed: false, SaveContent: true } c &&
              c != table.Column.SysRowChanger &&
              c != table.Column.SysRowChangeDate;
+    }
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("table", TableName);
+        json.Set("command", (int)Command);
+        json.Set("datetimeutc", DateTimeUtc.ToString("o"));
+        json.Set("user", User);
+        json.Set("colname", ColName);
+        json.Set("rowkey", RowKey);
+        json.Set("previousvalue", PreviousValue);
+        json.Set("changedto", ChangedTo);
+        json.Set("comment", Comment);
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        TableName = json.GetString("table", TableName);
+        if (json["command"] is JsonValue v && v.TryGetValue(out int i)) { Command = (TableDataType)i; }
+        var dt = json.GetString("datetimeutc", string.Empty);
+        if (dt is { Length: > 0 }) { DateTimeUtc = DateTimeParse(dt); }
+        User = json.GetString("user", User);
+        ColName = json.GetString("colname", ColName);
+        RowKey = json.GetString("rowkey", RowKey);
+        PreviousValue = json.GetString("previousvalue", PreviousValue);
+        ChangedTo = json.GetString("changedto", ChangedTo);
+        Comment = json.GetString("comment", Comment);
     }
 
     #endregion

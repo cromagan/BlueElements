@@ -200,6 +200,7 @@ public sealed partial class ExportDialog : IHasTable {
 
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
         if (padSchachteln.Items is not { IsDisposed: false }) { return; }
+        if (_rowsForExport is not { Count: > 0 } rows) { return; }
 
         FloatTryParse(flxBreite.Value, out var b);
         FloatTryParse(flxHöhe.Value, out var h);
@@ -214,15 +215,15 @@ public sealed partial class ExportDialog : IHasTable {
         _itemNrForPrint = 0;
         do {
             var nr = _itemNrForPrint;
-            _itemNrForPrint = GeneratePrintPad(padSchachteln, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, ab);
+            _itemNrForPrint = GeneratePrintPad(padSchachteln, _itemNrForPrint, cbxLayoutWahl.Text, rows, ab);
 
-            var x = TempFile(_zielPfad, _rowsForExport[0].Table.Caption + "_" + b + "x" + h + "_" + ab, "png");
+            var x = TempFile(_zielPfad, (rows[0].Table?.Caption ?? string.Empty) + "_" + b + "x" + h + "_" + ab, "png");
             padSchachteln.Items.BackColor = Color.Transparent;
             padSchachteln.ShowInPrintMode = true;
             padSchachteln.Items.SaveAsBitmap(x);
             l.Add(x);
             if (nr == _itemNrForPrint) { break; }
-            if (_itemNrForPrint >= _rowsForExport.Count) { break; }
+            if (_itemNrForPrint >= rows.Count) { break; }
         } while (true);
         tabStart.Enabled = false;
         tabBildSchachteln.Enabled = false;
@@ -306,10 +307,11 @@ public sealed partial class ExportDialog : IHasTable {
     private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) => _itemNrForPrint = 0;
 
     private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
+        if (_rowsForExport is not { } rows) { return; }
         var l = _itemNrForPrint;
-        _itemNrForPrint = GeneratePrintPad(padPrint, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, 0);
+        _itemNrForPrint = GeneratePrintPad(padPrint, _itemNrForPrint, cbxLayoutWahl.Text, rows, 0);
         if (l == _itemNrForPrint) { return; }
-        e.HasMorePages = _itemNrForPrint < _rowsForExport.Count;
+        e.HasMorePages = _itemNrForPrint < rows.Count;
     }
 
     private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e) {

@@ -23,7 +23,6 @@ public abstract class ExtChar : IDisposableExtended {
     protected ExtChar(ExtText parent, List<string> overrideTags) {
         OverrideTags = [.. overrideTags];
         _parent = parent;
-        _parent.StyleChanged += _parent_StyleChanged;
     }
 
     protected ExtChar(ExtText parent, int styleFromPos) {
@@ -184,7 +183,6 @@ public abstract class ExtChar : IDisposableExtended {
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         OverrideTags = [.. tags];
         _parent = parent;
-        _parent.StyleChanged += _parent_StyleChanged;
     }
 
     internal void InvalidateFont() {
@@ -198,15 +196,12 @@ public abstract class ExtChar : IDisposableExtended {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            _parent?.StyleChanged -= _parent_StyleChanged;
             _parent = null;
             InvalidateFont();
         }
     }
 
     protected void SetSize(SizeF size) => _size = size;
-
-    private void _parent_StyleChanged(object? sender, System.EventArgs e) => InvalidateFont();
 
     private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, OverrideTags);
 

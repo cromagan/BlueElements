@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
+public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable, IJsonParseable {
 
     #region Fields
 
@@ -139,6 +139,27 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Schloss, 16);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("type", "UniqueValueDefinition");
+        json.SetArrayIfNotEmpty("columns", _internal.Select(c => c.KeyName));
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) {
+        SortColumnsBySaveOrder();
+        KeyName = RebuildKeyName();
+    }
+
+    public void ParseJson(JsonObject json) {
+        if (json["columns"] is JsonArray arr) {
+            _internal.Clear();
+            foreach (var item in arr) {
+                if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
+            }
+        }
+    }
 
     private string RebuildKeyName() => _internal.Count == 0
             ? "LEER"

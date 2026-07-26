@@ -292,7 +292,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
         var allchilds = ParentFormula?.AllKnownChilds(notUse.AsReadOnly());
         childs.Suggestions.Clear();
-        childs.Suggestions.AddRange(allchilds);
+        if (allchilds is not null) { childs.Suggestions.AddRange(allchilds); }
 
         foreach (var thisc in tmp) {
             childs.AddAndCheck(ItemOf(thisc));

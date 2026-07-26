@@ -144,7 +144,7 @@ public class ComicCompPadItem : AbstractPadItem {
         return true;
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
+    public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender == P1 || sender == P2) {
             CalculateJointMiddle(P1, P2);
         }

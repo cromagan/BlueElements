@@ -53,9 +53,13 @@ internal class ExtCharImageCode : ExtChar {
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
         var resolvedFont = ResolveFont(parent.BaseFont, tags);
-        _qi = string.IsNullOrEmpty(attribut) || !attribut.Contains('|')
-            ? QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1))
-            : QuickImage.Get(attribut);
+        if (attribut is null) {
+            _qi = null;
+        } else if (!attribut.Contains('|')) {
+            _qi = QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1));
+        } else {
+            _qi = QuickImage.Get(attribut);
+        }
     }
 
     protected override SizeF CalculateSizeCanvas() => _qi is null ? SizeF.Empty : new SizeF(_qi.Width + 1, _qi.Height + 1);

@@ -177,8 +177,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         heightAdded = Math.Max(heightAdded, 16);
         biggestItemX = Math.Max(biggestItemX, 16);
         biggestItemX = Math.Max(biggestItemX, minWidth);
-        var maxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-        var maxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+        var primary = Screen.PrimaryScreen;
+        var primaryWi = primary is null ? 1920 : primary.Bounds.Size.Width;
+        var primaryHe = primary is null ? 1080 : primary.Bounds.Size.Height;
+        var maxWi = (int)(primaryWi * 0.7);
+        var maxHe = (int)(primaryHe * 0.7);
         if (biggestItemX > maxWi) { biggestItemX = maxWi; }
         if (heightAdded > maxHe) {
             heightAdded = maxHe;

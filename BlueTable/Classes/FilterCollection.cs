@@ -151,7 +151,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         get {
             // LINQ ist hübscher, aber foreach performanter
             foreach (var fi in _internal) {
-                if (fi?.Column == column && fi.IsOk()) { return fi; }
+                if (fi.Column == column && fi.IsOk()) { return fi; }
             }
             return null;
         }

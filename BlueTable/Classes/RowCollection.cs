@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
-public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable {
+public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable, IJsonParseable {
 
     #region Fields
 
@@ -51,6 +51,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public event EventHandler<RowEventArgs>? RowRemoved;
 
     public event EventHandler<RowEventArgs>? RowRemoving;
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -383,7 +385,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             myRow = r[0];
         }
 
-        return OperationResult.SuccessValue(myRow);
+        return new OperationResult(myRow);
     }
 
     public OperationResult Clear(string comment) {
@@ -769,6 +771,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             RowChecked = null;
             RowRemoved = null;
             RowRemoving = null;
+            PropertyChangedExt = null;
         }
 
         try {
@@ -853,26 +856,72 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         InvalidatedRowsManager.AddInvalidatedRow(nRow);
 
-        return OperationResult.SuccessValue(nRow);
+        return new OperationResult(nRow);
     }
 
     private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
-        if (Table.IsEventsSuppressed) { return; }
+        e.Row.PropertyChangedExt += OnRowPropertyChangedExt;
+        if (Table is { IsEventsSuppressed: true }) { return; }
         RowAdded?.Invoke(this, e);
     }
 
     private void OnRowChecked(object? sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
     private void OnRowRemoved(RowEventArgs e) {
-        if (Table.IsEventsSuppressed) { return; }
+        if (Table is { IsEventsSuppressed: true }) { return; }
         RowRemoved?.Invoke(this, e);
+    }
+
+    private void OnRowPropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
+        if (sender is not RowItem r) { return; }
+        OnPropertyChangedExt($"Rows[{r.KeyName}].{e.RelativePath}", e.Partial);
     }
 
     private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
-        if (Table.IsEventsSuppressed) { return; }
+        e.Row.PropertyChangedExt -= OnRowPropertyChangedExt;
+        if (Table is { IsEventsSuppressed: true }) { return; }
         RowRemoving?.Invoke(this, e);
+    }
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Rows", StringComparison.OrdinalIgnoreCase)) {
+            return GetByKey(key);
+        }
+        return null;
+    }
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        JsonArray rows = [];
+        foreach (var row in _internal.Values) {
+            if (row is not { IsDisposed: false }) { continue; }
+            rows.Add(row.ParseableJson());
+        }
+        if (rows.Count > 0) { json["rows"] = rows; }
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        // Zeilen werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
+        // Hier nur die Eigenschaften aktualisieren, falls Zeilen bereits existieren.
+        if (Table is not { IsDisposed: false }) { return; }
+        if (json["rows"] is not JsonArray rows) { return; }
+
+        foreach (var item in rows) {
+            if (item is not JsonObject jo) { continue; }
+            var key = jo.GetString("key", string.Empty);
+            if (key is not { Length: > 0 }) { continue; }
+            if (GetByKey(key) is { } r) { r.ParseJson(jo); }
+        }
     }
 
     #endregion

@@ -40,11 +40,11 @@ internal class Method_Call : Method_TableGeneric {
             }
         }
 
-        var (f, error) = Script.NormalizedText(script.Script);
-
-        if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true);
+        var nr = Script.NormalizedText(script.Script);
+        if (nr.IsFailed) {
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + nr.FailedReason, true);
         }
+        var f = nr.Value as string ?? string.Empty;
 
         #region Attributliste erzeugen
 

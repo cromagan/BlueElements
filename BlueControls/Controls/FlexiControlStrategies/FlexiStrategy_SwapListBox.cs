@@ -46,7 +46,9 @@ public class FlexiStrategySwapListBox : FlexiStrategyBase {
 
     protected override void SetValueToControlInternal(string value) => _control?.Check(value.SplitAndCutByCr());
 
-    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(string.Join('\r', _control.Checked));
+    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) {
+        if (_control is { } c) { OnValueChanged(string.Join('\r', c.Checked)); }
+    }
 
     #endregion
 }

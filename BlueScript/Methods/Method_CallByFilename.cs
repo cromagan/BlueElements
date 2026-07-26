@@ -102,11 +102,11 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback($"Fehler beim Lesen der Datei: {file}", true);
         }
 
-        (scripttxt, var error) = Script.NormalizedText(scripttxt);
-
-        if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback($"Fehler in Datei {file}: {error}", true);
+        var nr = Script.NormalizedText(scripttxt);
+        if (nr.IsFailed) {
+            return new DoItFeedback($"Fehler in Datei {file}: {nr.FailedReason}", true);
         }
+        scripttxt = nr.Value as string ?? string.Empty;
 
         #region Attributliste erzeugen
 

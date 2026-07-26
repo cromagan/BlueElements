@@ -184,8 +184,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
         var tb = Table.Get();
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder_TextOneLine.Instance);
-        var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance);
-        f.IsFirst = true;
+        if (tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance) is { } f) {
+            f.IsFirst = true;
+        }
         tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder_TextOneLine.Instance);
         tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolder_TextOneLine.Instance);
         tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder_TextOneLine.Instance);

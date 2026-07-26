@@ -36,8 +36,11 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
         capText.Text = text;
         capText.FitSize();
         capText.Location = new Point(Skin.PaddingMedium, Skin.PaddingMedium);
-        _cachedWidth = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.5), capText.Right + Skin.PaddingMedium);
-        _cachedHeight = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.5), capText.Bottom + Skin.PaddingMedium);
+        var primary = Screen.PrimaryScreen;
+        var primaryWi = primary is null ? 1920 : primary.Bounds.Size.Width;
+        var primaryHe = primary is null ? 1080 : primary.Bounds.Size.Height;
+        _cachedWidth = Math.Min((int)(primaryWi * 0.5), capText.Right + Skin.PaddingMedium);
+        _cachedHeight = Math.Min((int)(primaryHe * 0.5), capText.Bottom + Skin.PaddingMedium);
         Size = new Size(_cachedWidth, _cachedHeight);
 
         _screens = Screen.AllScreens.Select(s => (s.Bounds, s.WorkingArea)).ToArray();

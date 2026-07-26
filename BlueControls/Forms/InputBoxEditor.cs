@@ -233,7 +233,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         }
 
         var ok = Show(toEdit, editorType, true, supportsCancel, false, mode, out var res);
-        return ok ? OperationResult.SuccessValue(res) : OperationResult.Failed("Bearbeitung abgebrochen");
+        return ok ? new OperationResult(res) : OperationResult.Failed("Bearbeitung abgebrochen");
     }
 
     internal void UpdateButtons() {

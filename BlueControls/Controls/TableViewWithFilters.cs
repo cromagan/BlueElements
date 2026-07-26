@@ -25,6 +25,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private bool _doingControls;
     private bool _scriptButtonsCorrect;
 
+    private Table? _subscribedTable;
+
     #endregion
 
     #region Constructors
@@ -64,6 +66,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     #region Events
 
     public event EventHandler<CellEventArgs>? CellClicked;
+
+    public event EventHandler? InvalidateView;
+
+    public event EventHandler<FirstEventArgs>? Loaded;
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
@@ -301,6 +307,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                if (_subscribedTable is { IsDisposed: false } tbOld) {
+                    tbOld.Loaded -= Table_Loaded;
+                    tbOld.InvalidateView -= Table_InvalidateView;
+                    _subscribedTable = null;
+                }
                 FilterFix.Dispose();
                 TableInternal.Dispose();
             }
@@ -388,6 +399,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     protected virtual void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
 
     protected virtual void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
+
+    protected virtual void OnLoaded(FirstEventArgs e) => Loaded?.Invoke(this, e);
+
+    protected virtual void OnInvalidateView() => InvalidateView?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         OnTableChanged();
@@ -986,6 +1001,23 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_SelectedRowChanged(object? sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
 
     private void TableInternal_TableChanged(object? sender, System.EventArgs e) {
+        // Loaded- und InvalidateView-Events der jeweiligen Table weiterleiten.
+        // Die Verwaltung muss hier erfolgen, da das Table-Swap bereits stattgefunden hat.
+        // _subscribedTable ist die vorherige Referenz.
+        if (_subscribedTable is not null && _subscribedTable != Table) {
+            if (_subscribedTable is { IsDisposed: false } tbOld) {
+                tbOld.Loaded -= Table_Loaded;
+                tbOld.InvalidateView -= Table_InvalidateView;
+            }
+            _subscribedTable = null;
+        }
+
+        if (Table is { IsDisposed: false } tbNew && _subscribedTable != tbNew) {
+            tbNew.Loaded += Table_Loaded;
+            tbNew.InvalidateView += Table_InvalidateView;
+            _subscribedTable = tbNew;
+        }
+
         // Eigenen FilterFix an die neue Tabelle anpassen.
         // TableInternal.FilterFix wird durch das nachfolgende HandleChangesNow korrekt gesetzt.
         FilterFix.Table = Table;
@@ -1022,6 +1054,16 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void TableInternal_VisibleRowsChanged(object? sender, System.EventArgs e) => OnVisibleRowsChanged();
+
+    private void Table_InvalidateView(object? sender, System.EventArgs e) {
+        Invalidate_Controls();
+        OnInvalidateView();
+    }
+
+    private void Table_Loaded(object? sender, FirstEventArgs e) {
+        Invalidate_Controls();
+        OnLoaded(e);
+    }
 
     private void txbZeilenFilter_Enter(object? sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
 

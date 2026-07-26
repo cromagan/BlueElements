@@ -590,12 +590,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     private void _Items_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
-        OnPropertyChanged(e.PropertyName);
+        if (e.PropertyName is not null) { OnPropertyChanged(e.PropertyName); }
         Invalidate_MaxBounds();
         // Beim Ziehen eines Elements über den Rand wächst der CanvasUsedArea
         // (UsedAreaOfItems). Würde hier ZoomFit() aufgerufen, verkleinert das
         // den Zoom kontinuierlich - das Element "läuft" vor der Maus weg.
-        if (!_items.Any() || (Fitting && !MousePressing)) {
+        if (_items is null || !_items.Any() || (Fitting && !MousePressing)) {
             ZoomFit();
         } else {
             Invalidate();
@@ -704,8 +704,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         e.HasMorePages = false;
         OnPrintPage(e);
         var i = _items?.ToBitmap(3);
-        if (i is null) { return; }
-        e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
+        if (i is null || e.Graphics is not { } g) { return; }
+        g.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
     private (float zoom, float offsetX, float offsetY) GetEffectiveViewForItem(AbstractPadItem item) {

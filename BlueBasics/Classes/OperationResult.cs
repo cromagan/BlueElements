@@ -139,12 +139,5 @@ public readonly struct OperationResult {
     /// <returns>Eine wiederholbare fehlgeschlagene OperationResult.</returns>
     public static OperationResult FailedRetryable(Exception ex) => new(null, true, ex.Message);
 
-    /// <summary>
-    /// Erstellt eine erfolgreiche Operation mit einem benutzerdefinierten Rückgabewert.
-    /// </summary>
-    /// <param name="returnValue">Der Rückgabewert der erfolgreichen Operation.</param>
-    /// <returns>Eine erfolgreiche OperationResult mit dem angegebenen Wert.</returns>
-    public static OperationResult SuccessValue(object returnValue) => new(returnValue, false, string.Empty);
-
     #endregion
 }

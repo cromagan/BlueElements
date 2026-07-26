@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class CellCollection : IDisposableExtended, IHasTable {
+public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParseable {
 
     #region Fields
 
@@ -25,6 +25,12 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     ~CellCollection() {
         Dispose(false);
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -280,6 +286,52 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         GC.SuppressFinalize(this);
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        JsonArray cells = [];
+        foreach (var kvp in _internal) {
+            if (string.IsNullOrEmpty(kvp.Value.Value)) { continue; }
+            if (kvp.Key.column.IsDisposed || kvp.Key.row.IsDisposed) { continue; }
+            var cellJson = new JsonObject();
+            cellJson.Set("column", kvp.Key.column.KeyName);
+            cellJson.Set("row", kvp.Key.row.KeyName);
+            cellJson.Set("value", kvp.Value.Value);
+            cells.Add(cellJson);
+        }
+        if (cells.Count > 0) { json["cells"] = cells; }
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (json["cells"] is not JsonArray cells) { return; }
+
+        foreach (var item in cells) {
+            if (item is not JsonObject jo) { continue; }
+            var colName = jo.GetString("column", string.Empty);
+            var rowKey = jo.GetString("row", string.Empty);
+            var value = jo.GetString("value", string.Empty);
+            if (string.IsNullOrEmpty(colName)) { continue; }
+
+            var c = tb.Column[colName];
+            if (c is null) { continue; }
+
+            var r = tb.Row.GetByKey(rowKey);
+            if (r is null) { continue; }
+
+            r.CellSetInMemory(c, value);
+        }
+    }
+
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal void Clear() => _internal.Clear();
@@ -367,7 +419,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
                 }
             }
 
-            return OperationResult.SuccessValue(fi);
+            return new OperationResult(fi);
         } catch (Exception ex) {
             fi.Dispose();
             return OperationResult.Failed(ex);
@@ -379,7 +431,9 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        if (disposing) { }
+        if (disposing) {
+            PropertyChangedExt = null;
+        }
         Table = null;
         _internal.Clear();
     }

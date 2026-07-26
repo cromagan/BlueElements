@@ -288,8 +288,10 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     private void btnDown_Click(object sender, System.EventArgs e) {
         for (var z = lstBox.ItemCount - 2; z >= 0; z--) {
-            if (lstBox[z] == lstBox.MouseOverItem) {
-                if (lstBox[z].MoveLocked || lstBox[z + 1].MoveLocked) { return; }
+            if (lstBox[z] is not { } current) { continue; }
+            if (current == lstBox.MouseOverItem) {
+                if (lstBox[z + 1] is not { } next) { return; }
+                if (current.MoveLocked || next.MoveLocked) { return; }
                 lstBox.Swap(z, z + 1);
                 OnUpDownClicked(z, z + 1);
                 return;
@@ -342,8 +344,10 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     private void btnUp_Click(object sender, System.EventArgs e) {
         for (var i = 1; i < lstBox.ItemCount; i++) {
-            if (lstBox[i] == lstBox.MouseOverItem) {
-                if (lstBox[i].MoveLocked || lstBox[i - 1].MoveLocked) { return; }
+            if (lstBox[i] is not { } current) { continue; }
+            if (current == lstBox.MouseOverItem) {
+                if (lstBox[i - 1] is not { } prev) { return; }
+                if (current.MoveLocked || prev.MoveLocked) { return; }
                 lstBox.Swap(i, i - 1);
                 OnUpDownClicked(i, i - 1);
                 return;
@@ -576,8 +580,8 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
             for (var i = 0; i < lstBox.ItemCount; i++) {
                 if (ReferenceEquals(lstBox[i], mh)) { mouseIndex = i; break; }
             }
-            var downEnabled = mouseIndex >= 0 && mouseIndex < lstBox.ItemCount - 1 && !lstBox[mouseIndex + 1].MoveLocked;
-            var upEnabled = mouseIndex > 0 && !lstBox[mouseIndex - 1].MoveLocked;
+            var downEnabled = mouseIndex >= 0 && mouseIndex < lstBox.ItemCount - 1 && lstBox[mouseIndex + 1] is { } di && !di.MoveLocked;
+            var upEnabled = mouseIndex > 0 && lstBox[mouseIndex - 1] is { } ui && !ui.MoveLocked;
             if (downEnabled) { UpdateButton(btnDown, cp.Top, ref right, p16, true); } else { btnDown.Visible = false; }
             if (upEnabled) { UpdateButton(btnUp, cp.Top, ref right, p16, true); } else { btnUp.Visible = false; }
         } else { btnDown.Visible = btnUp.Visible = false; }

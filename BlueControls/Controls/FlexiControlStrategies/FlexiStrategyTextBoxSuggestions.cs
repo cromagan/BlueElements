@@ -51,7 +51,9 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
         }
     }
 
-    protected override void SetValueToControlInternal(string value) => _control.Text = value;
+    protected override void SetValueToControlInternal(string value) {
+        if (_control is { } c) { c.Text = value; }
+    }
 
     private void ValueChanged_TextBoxSuggestions(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
 

@@ -196,6 +196,25 @@ public partial class FloatingForm : Form {
         }
     }
 
+    /// <summary>
+    /// Schließt alle aktuell sichtbaren FloatingForms mit
+    /// <see cref="DismissMode.OnOutsideClick"/> (z.B. AutoFilter, MiniToolbar,
+    /// Dropdowns). Forms mit <see cref="DismissMode.ManualOnly"/> (QuickInfo,
+    /// Notification, Progressbar) bleiben geöffnet.
+    /// Aufgerufen wird dies, wenn das übergeordnete Fenster den Fokus verliert
+    /// (z.B. Aktivieren eines anderen Fensters über die Taskleiste), damit die
+    /// Popups nicht als "Geister" über dem verdeckten Programm stehen bleiben.
+    /// </summary>
+    internal static void CloseAllOutsideClick() {
+        foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed && f.DismissMode == DismissMode.OnOutsideClick).ToList()) {
+            try {
+                thisForm.Close();
+            } catch (Exception ex) {
+                Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
+            }
+        }
+    }
+
     internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm.ConnectedControl);
 
     protected static List<FloatingForm> GetActiveForms() => AllBoxes;

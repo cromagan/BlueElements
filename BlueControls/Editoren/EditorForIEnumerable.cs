@@ -259,7 +259,9 @@ public partial class EditorForIEnumerable : ListBox {
             DemandEditorOutput();
         }
 
-        OutputItem.RemoveAll(x => ReferenceEquals(x, item));
+        if (OutputItem is { } output) {
+            output.RemoveAll(x => ReferenceEquals(x, item));
+        }
 
         if (SelectedItem is not null && ReferenceEquals(SelectedItem, item)) {
             SelectedItem = null;
@@ -288,10 +290,11 @@ public partial class EditorForIEnumerable : ListBox {
         if (SelectedItem is null || Editor is null) { return; }
         if (Editor.OutputItem is not { } edited) { return; }
         if (ReferenceEquals(edited, SelectedItem)) { return; }
+        if (OutputItem is not { } output) { return; }
 
-        var idx = OutputItem.FindIndex(x => ReferenceEquals(x, SelectedItem));
+        var idx = output.FindIndex(x => ReferenceEquals(x, SelectedItem));
         if (idx >= 0) {
-            OutputItem[idx] = edited;
+            output[idx] = edited;
             SelectedItem = edited;
         }
     }

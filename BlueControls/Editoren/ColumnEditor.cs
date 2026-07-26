@@ -50,7 +50,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
         foreach (var thisItem in ColumnFormatHolder.AllFormats.Instances) {
-            var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
+            var bli = new BitmapListItem(thisItem.SymbolForReadableText() is { } s ? (Bitmap)s : null, thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
                 QuickInfo = thisItem.QuickInfo
             };
@@ -858,7 +858,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (chf is null) { return; }
 
         if (!AllOk()) { return; }
-        ((ColumnItem)InputItem).GetStyleFrom(chf);
+        if (InputItem is not ColumnItem c) { return; }
+        c.GetStyleFrom(chf);
         Column_DatenAuslesen();
     }
 

@@ -11,7 +11,7 @@ using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText, IJsonParseable {
 
     #region Fields
 
@@ -38,6 +38,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #region Events
 
     public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -1159,6 +1161,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (disposing) {
             Table = null;
             RowChecked = null;
+            PropertyChangedExt = null;
         }
     }
 
@@ -1254,6 +1257,43 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         return false;
+    }
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("key", KeyName);
+
+        if (Table is { IsDisposed: false } tb) {
+            JsonObject cells = [];
+            foreach (var thisColumn in tb.Column) {
+                if (thisColumn is not { IsDisposed: false }) { continue; }
+                var val = CellGetStringCore(thisColumn);
+                if (!string.IsNullOrEmpty(val)) { cells[thisColumn.KeyName] = val; }
+            }
+            if (cells.Count > 0) { json["cells"] = cells; }
+        }
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        // KeyName is read-only via constructor; only cells are applied here.
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (json["cells"] is not JsonObject cellsJson) { return; }
+
+        foreach (var kvp in cellsJson) {
+            if (kvp.Value is not JsonValue v) { continue; }
+            if (!v.TryGetValue(out string? s)) { continue; }
+            if (tb.Column[kvp.Key] is { } c) { CellSetInMemory(c, s); }
+        }
     }
 
     #endregion

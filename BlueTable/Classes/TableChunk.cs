@@ -148,6 +148,26 @@ public class TableChunk : TableFile {
     #region Properties
 
     /// <summary>
+    /// TableChunk verwaltet seine eigenen Chunk-Zugriffszeiten über
+    /// <c>_lastUsed</c> und nicht über Chunk-LiveInstances.
+    /// Die Tabelle gilt als "recently used", wenn mindestens ein Chunk
+    /// in den letzten <see cref="Chunk.SkipIfUnusedMinutes"/> verwendet wurde.
+    /// Ohne diese Überschreibung würde der periodische TableUpdater die Tabelle
+    /// immer überspringen, da <see cref="Chunk.IsChunkRecentlyUsed"/> für
+    /// .tblh-Dateien niemals eine Chunk-LiveInstance findet.
+    /// </summary>
+    public override bool IsRecentlyUsed {
+        get {
+            if (_lastUsed.IsEmpty) { return false; }
+            var threshold = DateTime.UtcNow.AddMinutes(-Chunk.SkipIfUnusedMinutes);
+            foreach (var kvp in _lastUsed) {
+                if (kvp.Value > threshold) { return true; }
+            }
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Letzter UTC-Zeitpunkt der letzten Speicherung der Hauptdatei.
     /// Liest direkt vom Dateisystem (ohne Caching-Schicht).
     /// </summary>
@@ -556,7 +576,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
-    /// auf LiveInstanceCache.GetLiveInstance<Chunk>(Filename) zurückgreift, was für .tblh-Dateien
+    /// auf LiveInstanceCache.GetLiveInstance&lt;Chunk&gt;(Filename) zurückgreift, was für .tblh-Dateien
     /// nicht funktioniert (Suffix wird nicht von Chunk unterstützt).
     /// </summary>
     public override string IsValueEditable(TableDataType type, string? chunkValue) {
@@ -843,6 +863,12 @@ public class TableChunk : TableFile {
                     _processedFile[chunkId] = path;
                     _lastUsed[chunkId] = DateTime.UtcNow;
                     CleanupOldFilesInFolder(GetChunkFilesOrderedByTime(folder).ToArray());
+                    // Ordner-Zeitstempel NACH dem Schreiben + Cleanup cachen, damit
+                    // der Schnellpfad beim nächsten Load korrekt trifft und nicht
+                    // fälschlich durch Stale-Cache ins Leere läuft.
+                    if (IO.GetFolderWriteTimeUtc(folder) is DateTime wtSave) {
+                        _lastFolderWriteTimeUtc[chunkId] = wtSave;
+                    }
                 }
             }
 
@@ -1157,7 +1183,7 @@ public class TableChunk : TableFile {
         // und damit den Zeitstempel verändern). So ist der nächste Schnellpfad korrekt.
         if (IO.GetFolderWriteTimeUtc(folder) is DateTime wtAfterLoad) { _lastFolderWriteTimeUtc[chunkId] = wtAfterLoad; }
 
-        return OperationResult.SuccessValue(true);
+        return new OperationResult(true);
     }
 
     /// <summary>
@@ -1188,6 +1214,8 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Aktualisiert alle geladenen Row-Chunks: Prüft für jeden, ob eine neuere
     /// Datei im Ordner existiert und lädt diese ggf. neu.
+    /// Entdeckt außerdem neue Row-Chunk-Ordner, die andere Benutzer seit dem
+    /// letzten Refresh angelegt haben (z.B. Zeilen in einem neuen Chunk-Wert).
     /// Chunks, die länger als <see cref="Chunk.SkipIfUnusedMinutes"/> nicht verwendet wurden,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).

@@ -375,7 +375,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             : new Size(w + 1, h + 1);
     }
 
-    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnStyleChanged() {
+        StyleChanged?.Invoke(this, System.EventArgs.Empty);
+        foreach (var c in _internal) { c.InvalidateFont(); }
+    }
 
     public int SearchCharIndex(int direction, Type? charType, int fromPosition) {
         if (direction != 1 && direction != -1) { return -1; }

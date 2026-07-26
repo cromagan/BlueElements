@@ -209,7 +209,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
-        if (!Arrangement?.Table.IsAdministrator() ?? true) { return; }
+        if (Arrangement?.Table is not { } table || !table.IsAdministrator()) { return; }
 
         var errorReason = column.ErrorReason();
         if (string.IsNullOrEmpty(errorReason)) { return; }
@@ -265,7 +265,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { IsDisposed: false } col) { return string.Empty; }
 
-        if (!string.IsNullOrEmpty(col.ErrorReason()) && (Arrangement?.Table.IsAdministrator() ?? false)) {
+        if (!string.IsNullOrEmpty(col.ErrorReason()) && Arrangement?.Table is { } table && table.IsAdministrator()) {
             var bs = HeadButtonSize.CanvasToControl(scale);
             var btnX = (int)((cvi.ControlColumnWidth() - bs) / 2.0);
             if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
@@ -339,7 +339,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
                 var formatName = parts[0];
                 var targetKey = parts[1];
                 var format = ColumnFormatHolder.AllFormats[formatName];
-                if (tb.Column.GenerateAndAdd(targetKey, targetKey, format) is { } genCol) {
+                if (format is not null && tb.Column.GenerateAndAdd(targetKey, targetKey, format) is { } genCol) {
                     newCol = new ColumnViewItem(genCol);
                 }
             }

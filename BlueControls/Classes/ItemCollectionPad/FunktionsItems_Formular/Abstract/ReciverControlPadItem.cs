@@ -406,7 +406,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
+    public override void PointMoved(object? sender, MoveEventArgs e) {
         if (_xPosition == XPosition.frei ||
             Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {
             base.PointMoved(sender, e);

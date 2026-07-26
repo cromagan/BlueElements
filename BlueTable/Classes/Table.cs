@@ -19,7 +19,7 @@ using static BlueScript.Classes.Script;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
+public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJsonParseable {
 
     #region Fields
 
@@ -179,6 +179,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public event EventHandler<FirstEventArgs>? Loaded;
 
     public event EventHandler? Loading;
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     public event EventHandler? ScriptChanged;
 
@@ -734,7 +736,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="onlyTopLevel">Wenn true, wird nur die eigene Zelle geprüft (nicht die verknüpfte)</param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string newChunkValue, bool onlyTopLevel) {
-        if (column.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
+        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
 
         var f = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -1607,8 +1609,32 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (IsDisposed) { return null; }
+
+        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
+            return Column[key];
+        }
+
+        if (string.Equals(containerName, "Rows", StringComparison.OrdinalIgnoreCase)) {
+            return Row.GetByKey(key);
+        }
+
+        if (string.Equals(containerName, "Variables", StringComparison.OrdinalIgnoreCase)) {
+            return Variables.GetByKey(key);
+        }
+
+        if (string.Equals(containerName, "ColumnArrangements", StringComparison.OrdinalIgnoreCase)) {
+            var idx = 0;
+            if (int.TryParse(key, out var i)) { idx = i; }
+            return idx >= 0 && idx < _columnArrangements.Count ? _columnArrangements[idx] : null;
+        }
+
+        return null;
+    }
+
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
-                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                            CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
                     CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
@@ -1721,6 +1747,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
     }
 
     public void OnScriptChanged() {
@@ -1853,6 +1884,78 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         Develop.Diagnose("VARS", $"Parse ENDE: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
         return true;
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("key", KeyName);
+        json.Set("caption", _caption);
+        json.Set("creator", _creator);
+        json.Set("createdate", _createDate);
+        json.Set("version", TableVersion);
+        json.Set("assetfolder", _assetFolder);
+        json.Set("globalshowpass", _globalShowPass);
+        json.Set("rowquickinfo", _rowQuickInfo);
+        json.Set("standardformulafile", _standardFormulaFile);
+        json.Set("temporarytablemasterapp", _temporaryTableMasterApp);
+        json.Set("temporarytablemasterid", _temporaryTableMasterId);
+        json.Set("temporarytablemastermachine", _temporaryTableMasterMachine);
+        json.Set("temporarytablemastertimeutc", _temporaryTableMasterTimeUtc);
+        json.Set("temporarytablemasteruser", _temporaryTableMasterUser);
+
+        json.SetArrayIfNotEmpty("tags", _tags);
+        json.SetArrayIfNotEmpty("dictionarywords", _dictionaryWords);
+        json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow);
+        json.SetArrayIfNotEmpty("tableadmin", _tableAdmin);
+
+        if (SortDefinition is { } sd) { json["sortdefinition"] = sd.ParseableJson(); }
+        json.SetArrayIfNotEmpty("uniquevalues", _uniqueValues);
+        json.SetArrayIfNotEmpty("eventscript", _eventScript);
+        json.SetArrayIfNotEmpty("columnarrangements", _columnArrangements.Where(c => !c.IsDisposed));
+
+        json["eventscriptversion"] = _eventScriptVersion.ToString("o");
+        json.Set("poweredittime", _powerEditTime.ToString("o"));
+        json.Set("lastchange", LastChange.ToString("o"));
+
+        if (_variables is { Count: > 0 }) {
+            json["variables"] = new VariableCollection(_variables.ToList(), false).ParseableJson();
+        }
+
+        // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert
+        if (Column is { IsDisposed: false, Count: > 0 }) { json["columns"] = Column.ParseableJson()["columns"]; }
+        if (Row is { IsDisposed: false, Count: > 0 }) { json["rows"] = Row.ParseableJson()["rows"]; }
+        if (Cell is { IsDisposed: false } && Cell.ParseableJson() is { Count: > 0 } cells) {
+            foreach (var kvp in cells) { json[kvp.Key] = kvp.Value; }
+        }
+
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        // Table ist über ChangeData zentral gesteuert. Diese Implementierung
+        // spiegelt den Zustand wider, ohne die bestehenden Lade-Routinen zu
+        // ersetzen. Sie ist rein additiv und für Partial-Updates geeignet.
+        if (IsDisposed) { return; }
+
+        if (json["columns"] is JsonArray cols) {
+            foreach (var item in cols) {
+                if (item is JsonObject jo) { Column?.ParseJson(new JsonObject { ["columns"] = jo }); }
+            }
+        }
+
+        if (json["rows"] is JsonArray rows) {
+            foreach (var item in rows) {
+                if (item is JsonObject jo) { Row?.ParseJson(new JsonObject { ["rows"] = jo }); }
+            }
+        }
+
+        if (json["variables"] is JsonObject varsJson) {
+            var vars = new VariableCollection();
+            vars.ParseJson(varsJson);
+            Variables = vars;
+        }
     }
 
     public bool PermissionCheck(IList<string>? allowed, RowItem? row, bool adminValue) {
@@ -2594,6 +2697,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             SortParameterChanged = null;
             ViewChanged = null;
             CellValueChanged = null;
+            PropertyChangedExt = null;
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Abmelden der Events", ex);
         }

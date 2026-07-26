@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable {
+public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable, IJsonParseable {
 
     #region Fields
 
@@ -38,6 +38,8 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     #region Events
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -265,11 +267,41 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
         if (disposing) {
             PropertyChanged = null;
+            PropertyChangedExt = null;
             Column = null;
         }
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("columnname", ColumnName);
+        json.Set("permanent", Permanent);
+        json.Set("fonthorizontal", Horizontal);
+        if (IsExpanded is false) { json.Set("isexpanded", IsExpanded); }
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        Permanent = json.GetBool("permanent", Permanent);
+        Horizontal = json.GetBool("fonthorizontal", Horizontal);
+        IsExpanded = json.GetBool("isexpanded", IsExpanded);
+
+        var colName = json.GetString("columnname", string.Empty);
+        if (colName is { Length: > 0 } && Table is { IsDisposed: false } tb) {
+            Column = tb.Column[colName];
+        }
+    }
 
     private void RegisterEvents() {
         if (Column is not null) {

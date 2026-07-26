@@ -43,7 +43,9 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
         _control?.Checked = value.FromPlusMinus();
     }
 
-    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(_control.Checked.ToPlusMinus());
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) {
+        if (_control is { } c) { OnValueChanged(c.Checked.ToPlusMinus()); }
+    }
 
     #endregion
 }

@@ -210,7 +210,12 @@ public class Script {
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], true);
     }
 
-    public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
+    /// <summary>
+    /// Normalisiert den übergebenen Skript-Text. Das <see cref="OperationResult.Value"/>
+    /// enthält bei Erfolg den normalisierten Text, andernfalls wird in
+    /// <see cref="OperationResult.FailedReason"/> der Grund angegeben.
+    /// </summary>
+    public static OperationResult NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, AbortReason? abort) {
         var ifFound = scp.AllowedMethods.Any(thisC => string.Equals(thisC.Command, "if", StringComparison.Ordinal));
@@ -289,11 +294,10 @@ public class Script {
     }
 
     public ScriptEndedFeedback Parse(int lineadd, string subname, AbortReason? abort) {
-        (NormalizedScriptText, var error) = NormalizedText(ScriptText);
-
-        return !string.IsNullOrEmpty(error)
-            ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, abort);
+        var nr = NormalizedText(ScriptText);
+        if (nr.IsFailed) { return new ScriptEndedFeedback(nr.FailedReason, false, true, subname); }
+        NormalizedScriptText = nr.Value as string ?? string.Empty;
+        return Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, abort);
     }
 
     #endregion

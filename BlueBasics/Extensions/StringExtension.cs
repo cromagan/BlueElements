@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -639,8 +640,15 @@ public static partial class Extensions {
         } while (true);
     }
 
-    public static (string normalizedText, string error) NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, bool removesallpace, char lineBreakReplacement) {
-        if (string.IsNullOrEmpty(txt)) { return (string.Empty, string.Empty); }
+    /// <summary>
+    /// Normalisiert den Text: entfernt Kommentare, normalisiert Whitespace und ersetzt Zeilenumbrüche.
+    /// Gibt ein <see cref="OperationResult"/> zurück, dessen <see cref="OperationResult.Value"/>
+    /// bei Erfolg den normalisierten Text enthält. Schlägt die Normalisierung fehl (z. B. wegen
+    /// fehlerhafter Anführungszeichen), ist das Ergebnis fehlerhaft und <see cref="OperationResult.FailedReason"/>
+    /// beschreibt den Grund.
+    /// </summary>
+    public static OperationResult NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, bool removesallpace, char lineBreakReplacement) {
+        if (string.IsNullOrEmpty(txt)) { return new OperationResult(string.Empty); }
 
         var result = new StringBuilder();
         var inQuotes = false;
@@ -659,7 +667,7 @@ public static partial class Extensions {
                 } else if (currentChar == '\r') {
                     // Zeilenumbruch innerhalb von Anführungszeichen ist ein Fehler
                     var errorText = result.ToString();
-                    return (errorText, $"Fehler mit Anführungszeichen in Zeile {errorText.CountChar('¶', pos) + 1}");
+                    return OperationResult.Failed($"Fehler mit Anführungszeichen in Zeile {errorText.CountChar('¶', pos) + 1}");
                 }
             } else {
                 // Außerhalb von Anführungszeichen
@@ -704,10 +712,10 @@ public static partial class Extensions {
 
         if (inQuotes) {
             var errorText = result.ToString();
-            return (errorText, $"Nicht geschlossene Anführungszeichen in Zeile {errorText.CountChar('¶', txt.Length - 1) + 1}");
+            return OperationResult.Failed($"Nicht geschlossene Anführungszeichen in Zeile {errorText.CountChar('¶', txt.Length - 1) + 1}");
         }
 
-        return (result.ToString().Trim(), string.Empty);
+        return new OperationResult(result.ToString().Trim());
     }
 
     /// <summary>

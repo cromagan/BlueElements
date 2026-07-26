@@ -63,12 +63,13 @@ public class TabControl : AbstractTabControl {
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
 
     private void AddedControlInTabPage(object? sender, ControlEventArgs e) {
-        if (e.Control is TabPage) { return; }
+        if (e.Control is not { } control) { return; }
+        if (control is TabPage) { return; }
 
-        if (e.Control is TabControl sfc) {
+        if (control is TabControl sfc) {
             sfc.ChildGotFocus += Sfc_ChildGotFocus;
         }
-        e.Control.GotFocus += ControlInTabPage_GotFocus;
+        control.GotFocus += ControlInTabPage_GotFocus;
     }
 
     private void ControlInTabPage_GotFocus(object? sender, System.EventArgs e) {
@@ -79,12 +80,13 @@ public class TabControl : AbstractTabControl {
     private void OnChildGotFocus(ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
 
     private void RemovedControlInTabPage(object? sender, ControlEventArgs e) {
-        if (e.Control is TabPage) { return; }
+        if (e.Control is not { } control) { return; }
+        if (control is TabPage) { return; }
 
-        if (e.Control is TabControl sfc) {
+        if (control is TabControl sfc) {
             sfc.ChildGotFocus -= Sfc_ChildGotFocus;
         }
-        e.Control.GotFocus -= ControlInTabPage_GotFocus;
+        control.GotFocus -= ControlInTabPage_GotFocus;
     }
 
     private void Sfc_ChildGotFocus(object? sender, ControlEventArgs e) => OnChildGotFocus(e);

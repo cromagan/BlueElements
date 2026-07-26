@@ -262,7 +262,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
     [DefaultValue(true)]
-    public bool MiniToolbarEnabled { get; set; } = true;
+    public bool MiniToolbarEnabled { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -893,7 +893,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         columnArrangementSelector.Enabled = columnArrangementSelector.ItemCount > 1;
 
         if (columnArrangementSelector[showingKey] is null) {
-            showingKey = columnArrangementSelector.ItemCount > 1 ? columnArrangementSelector[1].KeyName ?? string.Empty : string.Empty;
+            showingKey = columnArrangementSelector.ItemCount > 1 && columnArrangementSelector[1] is { } second ? second.KeyName ?? string.Empty : string.Empty;
         }
 
         columnArrangementSelector.Text = showingKey;
@@ -1218,34 +1218,34 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         #region Notiz
 
-        if (column is not null && row is not null && tb.Column.SysCellNote is not null) {
+        if (column is not null && row is not null) {
+            var notenabled = tb.Column.SysCellNote is not null;
             var existingNote = CellNoteHelper.GetNoteData(column, row);
             if (existingNote is null) {
-                miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, true, "Notiz bearbeiten"));
+                miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, notenabled, "Notiz bearbeiten"));
             } else {
-                miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, true, "Notiz entfernen"));
+                miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, notenabled, "Notiz entfernen"));
             }
         }
 
         #endregion
 
-        #region Zeile löschen
+        //#region Zeile löschen
 
-        if (row is not null) {
-            var canDelete = tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true);
-            miniToolbar.Add(ItemOf(string.Empty, "DeleteRow", QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, canDelete, "Zeile löschen"));
-        }
+        //if (row is not null) {
+        //    var canDelete = tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true);
+        //    miniToolbar.Add(ItemOf(string.Empty, "DeleteRow", QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, canDelete, "Zeile löschen"));
+        //}
 
-        #endregion
+        //#endregion
 
         #region Neue Zeile im selben Kapitel (nur bei aktiver SysRowSortIndex)
 
-        if (row is not null && tb.Column.SysRowSortIndex is { IsDisposed: false }
-            && CurrentArrangement?.ColumnForChapter is { IsDisposed: false }) {
+        if (row is not null) {
             var canAdd = string.IsNullOrEmpty(tb.IsNowNewRowPossible(row.ChunkValue, true));
             miniToolbar.Add(ItemOf(string.Empty, "NewRowInChapter",
                 QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.PlusZeichen),
-                ContextMenu_NewRowInChapter, canAdd, "Neue Zeile unter dieser Überschrift"));
+                ContextMenu_NewRowInChapter, canAdd, "Leere Zeile einfügen"));
         }
 
         #endregion
@@ -2560,6 +2560,27 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private static bool IsDroppableTarget(RowBackground item)
         => item is RowListItem or RowCaptionListItem && !item.IsDisposed && item.Visible;
 
+    /// <summary>
+    /// Ermittelt den nächsten freien Default-Wert "NEU_X" für die angegebene
+    /// Spalte. X startet bei 1 und wird hochgezählt, bis ein Wert gefunden ist,
+    /// der in keiner bestehenden Zeile der Tabelle in dieser Spalte vorkommt.
+    /// </summary>
+    private static string NextNewDefaultValue(Table tb, ColumnItem column) {
+        var n = 1;
+        while (true) {
+            var candidate = "NEU_" + n.ToString1();
+            var exists = false;
+            foreach (var r in tb.Row) {
+                if (r is { IsDisposed: false } && string.Equals(r.CellGetString(column), candidate, StringComparison.OrdinalIgnoreCase)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) { return candidate; }
+            n++;
+        }
+    }
+
     private static void NotEditableInfo(string reason) {
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
@@ -2581,8 +2602,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
+        if (contentHolderCellRow is { IsDisposed: false } cellRow && contentHolderCellColumn.RelationType == RelationType.CellValues) {
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
             if (contentHolderCellColumn is null || contentHolderCellRow is null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
 
@@ -2675,7 +2696,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contentHolderCellRow.CheckRow();
             }
 
-            if (table.Table == cellInThisTableColumn.Column?.Table) { table.CursorPos_Set(cellInThisTableColumn, cellInThisTableRow, false); }
+            if (cellInThisTableColumn is { } citc && table.Table == citc.Column?.Table) { table.CursorPos_Set(citc, cellInThisTableRow, false); }
         }
 
         return string.Empty;
@@ -3103,16 +3124,21 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                     // Original-Schreibweise aus dem gecachten Canonical-Item holen,
                     // da AlignsToChapter upper-cased ist.
+                    if (rli.Arrangement is not { } rliArr) {
+                        blockCollapsed = true;
+                        break;
+                    }
+
                     RowCaptionListItem headerItem;
                     if (allItems.TryGetValue(RowCaptionListItem.Identifier(headerChapter), out var capItem) && capItem is RowCaptionListItem rcli) {
                         // NumberStyle: neue Instanz pro Block, da dasselbe Kapitel
                         // mehrfach vorkommen kann. Hierarchisch: Original-Instanz
                         // wiederverwenden, damit IsExpanded-Zustand erhalten bleibt.
                         headerItem = numberStyle
-                            ? new RowCaptionListItem(rcli.ChapterText, rli.Arrangement)
+                            ? new RowCaptionListItem(rcli.ChapterText, rliArr)
                             : rcli;
                     } else {
-                        headerItem = new RowCaptionListItem(headerChapter, rli.Arrangement);
+                        headerItem = new RowCaptionListItem(headerChapter, rliArr);
                     }
 
                     if (i == hierarchy.Count - 1) {
@@ -3456,8 +3482,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var contentHolderCellRow = (rowItem as RowListItem)?.Row;
 
-        if (contentHolderCellRow is { IsDisposed: false } && viewItem.Column.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
+        if (contentHolderCellRow is { IsDisposed: false } cellRow && viewItem.Column.RelationType == RelationType.CellValues) {
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
         }
 
         if (contentHolderCellColumn is not { IsDisposed: false }) {
@@ -3739,6 +3765,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, viewItem) = GetContextData(e.HotItem);
+        if (column is null) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { } ca) { return; }
 
@@ -3795,23 +3822,49 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void ContextMenu_NewRowInChapter(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
-        // Nur im NumberStyle (aktiver SysRowSortIndex) — siehe Schalter in GetMiniToolbarItems.
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return; }
-        if (ca.ColumnForChapter is not { IsDisposed: false } chapterCol) { return; }
+
 
         var (_, row, _, _, _) = GetContextData(e.HotItem);
         if (row is not { IsDisposed: false } srcRow) { return; }
 
-        var chapterValue = srcRow.CellGetString(chapterCol);
-        if (string.IsNullOrEmpty(chapterValue)) {
-            NotEditableInfo("Die Zeile gehört keinem Kapitel zu.");
-            return;
-        }
+        // Neue Zeilen sind unabhängig vom Kapitel möglich. Gehört die Zeile
+        // keinem Kapitel an (oder gibt es keine Kapitel-Spalte), bleibt das
+        // Kapitel einfach leer.
+        ColumnItem? chapterCol = ca.ColumnForChapter is { IsDisposed: false } cc ? cc : null;
+        var chapterValue = chapterCol is not null ? srcRow.CellGetString(chapterCol) : string.Empty;
 
-        // Filter bauen: bestehende Filter übernehmen + Chapter-Wert setzen.
+        // Filter bauen: bestehende Filter (inkl. aktiver Chunk-Filterung)
+        // übernehmen. Der Chunk-Wert für die neue Zeile wird daraus erkannt.
         using var fc = new FilterCollection(tb, "Neue Zeile aus Mini-Toolbar");
         fc.AddIfNotExists(FilterCombined);
-        fc.RemoveOtherAndAdd(new FilterItem(chapterCol, FilterType.Istgleich, chapterValue));
+
+        if (chapterValue is { Length: > 0 } && chapterCol is not null) {
+            fc.RemoveOtherAndAdd(new FilterItem(chapterCol, FilterType.Istgleich, chapterValue));
+        } else if (chapterCol is not null) {
+            // Kein Kapitel — bestehenden Kapitel-Filter entfernen, damit die
+            // neue Zeile ohne Kapitel angelegt wird.
+            fc.Remove(chapterCol);
+        }
+
+        // Alle zwingenden Spalten befüllen, für die noch kein Filter existiert:
+        // Die First-Spalte sowie jede Spalte einer UniqueValueDefinition
+        // erhält den nächsten freien Default-Wert "NEU_X". Bereits gesetzte
+        // Filter (z. B. Chunk-Filter aus FilterCombined) haben Vorrang.
+        var defaultColumns = new HashSet<ColumnItem>(ReferenceEqualityComparer.Instance);
+        if (tb.Column.First is { IsDisposed: false } firstCol) {
+            defaultColumns.Add(firstCol);
+        }
+
+        foreach (var uvd in tb.UniqueValues) {
+            foreach (var keyCol in uvd.KeyColumns) {
+                if (keyCol is { IsDisposed: false }) { defaultColumns.Add(keyCol); }
+            }
+        }
+
+        foreach (var col in defaultColumns) {
+            if (fc[col] is not null) { continue; }
+            fc.RemoveOtherAndAdd(new FilterItem(col, FilterType.Istgleich, NextNewDefaultValue(tb, col)));
+        }
 
         var nr = tb.Row.GenerateAndAdd([.. fc], "Neue Zeile aus Mini-Toolbar");
         if (nr.IsFailed || nr.Value is not RowItem newRow) {
@@ -3819,8 +3872,37 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
 
-        if (View_ColumnFirst() is { } firstCol) {
-            CursorPos_Set(firstCol, GetRow(newRow, false), true);
+        // Bei aktivem SysRowSortIndex (NumberStyle): neue Zeile direkt UNTER
+        // der Quell-Zeile einsortieren. GenerateAndAdd hat sie ans Ende gelegt
+        // (max+1) — wir verschieben sie jetzt auf srcIdx+1 und schieben alle
+        // nachfolgenden Zeilen um eine Position nach unten.
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            var srcIdx = srcRow.CellGetInteger(sortCol);
+
+            tb.SuppressEvents();
+            try {
+                foreach (var r in tb.Row) {
+                    if (r is not { IsDisposed: false } || ReferenceEquals(r, newRow)) { continue; }
+                    var v = r.CellGetInteger(sortCol);
+                    if (v > srcIdx) { r.CellSet(sortCol, v + 1, "Neue Zeile oberhalb eingefügt"); }
+                }
+                newRow.CellSet(sortCol, srcIdx + 1, "Neue Zeile aus Mini-Toolbar");
+            } finally {
+                tb.ResumeEvents();
+            }
+        }
+
+        if (!FilterCombined.Rows.Contains(newRow)) {
+            if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
+                PinAdd(newRow);
+            }
+        }
+
+        // Cursor auf die neue Zeile setzen. GetRow löst über _ = AllViewItems
+        // den view-Aufbau aus, sodass die neue Zeile in _rowLookup liegt.
+        var newRowItem = GetRow(newRow, false);
+        if (View_ColumnFirst() is { } firstViewCol && newRowItem is not null) {
+            CursorPos_Set(firstViewCol, newRowItem, true);
         }
     }
 

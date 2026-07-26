@@ -21,13 +21,19 @@ public static class TableScriptDescriptionExtension {
     #endregion
 }
 
-public sealed class TableScriptDescription : ScriptDescription, IHasTable {
+public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJsonParseable {
 
     #region Fields
 
     public const string CellValuesReadOnly = "CellValuesReadOnly";
 
     private bool? _mayAffectUser;
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -406,6 +412,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                PropertyChangedExt = null;
             }
             Table = null;
         }
@@ -414,6 +421,53 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     }
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("key", KeyName);
+        json.Set("script", Script);
+        json.Set("image", Image);
+        json.Set("quickinfo", QuickInfo);
+        json.Set("admininfo", AdminInfo);
+        json.Set("failedreason", FailedReason);
+        json.Set("events", (int)EventTypes);
+        json.Set("needrow", NeedRow);
+        json.Set("valuesreadonly", ValuesReadOnly);
+        json.Set("stoppedtimecount", StoppedTimeCount);
+        json.Set("averageruntime", AverageRunTime);
+        json.SetArrayIfNotEmpty("usergroups", UserGroups);
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) {
+        if (MustBeReadonly(EventTypes)) {
+            ValuesReadOnly = true;
+        }
+    }
+
+    public void ParseJson(JsonObject json) {
+        if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { KeyName = s; }
+        Script = json.GetString("script", Script);
+        Image = json.GetString("image", Image);
+        QuickInfo = json.GetString("quickinfo", QuickInfo);
+        AdminInfo = json.GetString("admininfo", AdminInfo);
+        FailedReason = json.GetString("failedreason", FailedReason);
+        EventTypes = json.GetEnum("events", EventTypes);
+        NeedRow = json.GetBool("needrow", NeedRow);
+        ValuesReadOnly = json.GetBool("valuesreadonly", ValuesReadOnly);
+        StoppedTimeCount = json.GetInt("stoppedtimecount", StoppedTimeCount);
+        AverageRunTime = json.GetInt("averageruntime", (int)AverageRunTime);
+        if (json["usergroups"] is JsonArray arr) {
+            UserGroups = arr.ToStringList().AsReadOnly();
+        }
+    }
 
     #endregion
 }

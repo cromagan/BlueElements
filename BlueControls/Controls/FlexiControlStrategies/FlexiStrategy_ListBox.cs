@@ -96,7 +96,9 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.Check(values, true);
     }
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(string.Join('\r', _control.Checked));
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) {
+        if (_control is { } c) { OnValueChanged(string.Join('\r', c.Checked)); }
+    }
 
     private void ListBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 

@@ -171,7 +171,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
+    public override void PointMoved(object? sender, MoveEventArgs e) {
         base.PointMoved(sender, e);
         InvalidateText();
     }

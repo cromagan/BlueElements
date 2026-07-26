@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using System.Windows.Forms;
+using WndMsg = BlueControls.Enums.WndProc;
 
 namespace BlueControls.Forms;
 
@@ -158,6 +159,22 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+
+    protected override void WndProc(ref Message m) {
+        // WM_ACTIVATEAPP (wParam=false) wird nur gesendet, wenn ein Fenster
+        // EINER ANDEREN Anwendung aktiviert wird — nicht bei Fokuswechseln
+        // innerhalb der eigenen App (z.B. Klick auf eine FloatingForm wie
+        // AutoFilter, MiniToolbar oder Dropdown). Genau dann müssen die
+        // automatisch-schließenden Popups geschlossen werden, da sie über
+        // EX_TOPMOST verfügen und sonst über dem verdeckten Programm stehen
+        // bleiben. QuickInfo/Notification/Progressbar (ManualOnly) bleiben unberührt.
+        if (this is not FloatingForm
+            && m.Msg == (int)WndMsg.WM_ACTIVATEAPP
+            && m.WParam == IntPtr.Zero) {
+            FloatingForm.CloseAllOutsideClick();
+        }
+        base.WndProc(ref m);
+    }
 
     #endregion
 }
