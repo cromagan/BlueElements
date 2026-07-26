@@ -160,6 +160,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
+    [DefaultValue(false)]
+    public bool MiniToolbarEnabled {
+        get => TableInternal.MiniToolbarEnabled;
+        set => TableInternal.MiniToolbarEnabled = value;
+    }
+
     public bool PowerEdit {
         get => TableInternal.PowerEdit;
         set => TableInternal.PowerEdit = value;

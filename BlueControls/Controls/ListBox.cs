@@ -130,6 +130,13 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     public int ItemCount => lstBox.ItemCount;
     public Design ItemDesign => lstBox.ItemDesign;
 
+    /// <inheritdoc cref="ListBoxCore.ItemPadding"/>
+    [DefaultValue(0)]
+    public int ItemPadding {
+        get => lstBox.ItemPadding;
+        set => lstBox.ItemPadding = value;
+    }
+
     [DefaultValue(false)]
     public bool ItemEditAllowed {
         get => lstBox.ItemEditAllowed;

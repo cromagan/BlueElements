@@ -51,13 +51,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
 
         if (btnAnsichtZoom is not null) {
-            btnAnsichtZoom.ItemClear();
-            btnAnsichtZoom.ItemAdd(ItemOf("Zoom vergrößern", QuickImage.Get(ImageCode.LupePlus, 28), Ansicht_ZoomIn, true, string.Empty));
-            btnAnsichtZoom.ItemAdd(ItemOf("Zoom verkleinern", QuickImage.Get(ImageCode.LupeMinus, 28), Ansicht_ZoomOut, true, string.Empty));
-            btnAnsichtZoom.ItemAdd(ItemOf("Zoom 1:1", QuickImage.Get(ImageCode.ZoomFit, 28), Ansicht_ZoomFit, true, string.Empty));
-            btnAnsichtZoom.ItemAdd(Separator());
-            btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel öffnen", QuickImage.Get(ImageCode.Pfeil_Unten_Scrollbar, 16), Ansicht_ExpandAll, true, string.Empty));
-            btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel schließen", QuickImage.Get(ImageCode.Pfeil_Oben_Scrollbar, 16), Ansicht_CollapseAll, true, string.Empty));
+            btnAnsichtZoom.DropDownShowing += btnAnsichtZoom_DropDownShowing;
         }
 
         if (btnEinstellungen is not null) {
@@ -498,6 +492,26 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void Ansicht_ZoomIn(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(true);
 
     private void Ansicht_ZoomOut(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(false);
+
+    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) {
+        TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
+    }
+
+    private void btnAnsichtZoom_DropDownShowing(object? sender, System.EventArgs e) {
+        btnAnsichtZoom.ItemClear();
+        btnAnsichtZoom.ItemAdd(ItemOf("Zoom vergrößern", QuickImage.Get(ImageCode.LupePlus, 18), Ansicht_ZoomIn, true, string.Empty));
+        btnAnsichtZoom.ItemAdd(ItemOf("Zoom verkleinern", QuickImage.Get(ImageCode.LupeMinus, 18), Ansicht_ZoomOut, true, string.Empty));
+        btnAnsichtZoom.ItemAdd(ItemOf("Zoom 1:1", QuickImage.Get(ImageCode.ZoomFit, 18), Ansicht_ZoomFit, true, string.Empty));
+        btnAnsichtZoom.ItemAdd(Separator());
+        btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel öffnen", QuickImage.Get(ImageCode.Pfeil_Unten_Scrollbar, 18), Ansicht_ExpandAll, true, string.Empty));
+        btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel schließen", QuickImage.Get(ImageCode.Pfeil_Oben_Scrollbar, 18), Ansicht_CollapseAll, true, string.Empty));
+        btnAnsichtZoom.ItemAdd(Separator());
+        btnAnsichtZoom.ItemAdd(ItemOf(
+            TableView.MiniToolbarEnabled ? "MiniToolbar aus" : "MiniToolbar ein",
+            "MiniToolbar",
+            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.Häkchen : ImageCode.Kreis2, 18),
+            Ansicht_ToggleMiniToolbar, true, string.Empty));
+    }
 
     private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
         TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;

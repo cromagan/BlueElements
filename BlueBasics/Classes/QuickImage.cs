@@ -228,6 +228,14 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
 
+    /// <summary>
+    /// Erzeugt ein QuickImage mit Zweitsymbol (z. B. Spalte + Kreuz).
+    /// </summary>
+    public static QuickImage Get(ImageCode image, int squareWidth, ImageCode? zweitsymbol) {
+        var zs = zweitsymbol is null ? string.Empty : (Enum.GetName(zweitsymbol.GetType(), zweitsymbol) ?? string.Empty);
+        return Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, zs));
+    }
+
     public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
 
     public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));

@@ -18,6 +18,7 @@ using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Classes.Table;
 using BlueControls.Classes.TableItems;
+using static BlueControls.Interfaces.MiniToolbarExtension;
 
 namespace BlueControls.Controls;
 
@@ -79,6 +80,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private bool _isinMouseDown;
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
+
     private bool _mustDoAllViewItems = true;
     private string _newRowsAllowed = string.Empty;
     private bool _pendingRowAddedRebuild;
@@ -260,7 +262,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
     [DefaultValue(true)]
-    public bool MiniToolbarDefault { get; set; } = true;
+    public bool MiniToolbarEnabled { get; set; } = true;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1095,9 +1097,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (row is not null) {
                 contextMenu.Add(ItemOf("Anheften", true));
                 if (PinnedRows.Contains(row)) {
-                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
+                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", QuickImage.Get(ImageCode.Pinnadel, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_Unpin, true));
                 } else {
-                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true));
+                    contextMenu.Add(ItemOf("Zeile anpinnen", QuickImage.Get(ImageCode.Pinnadel, IContextMenu.IconSize, ImageCode.Häkchen), ContextMenu_Pin, true));
                 }
             }
 
@@ -1106,8 +1108,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (column is not null && row is not null) {
                 contextMenu.Add(ItemOf("Notiz", true));
                 var existingNote = CellNoteHelper.GetNoteData(column, row);
-                contextMenu.Add(ItemOf("Notiz bearbeiten", ImageCode.Stift, ContextMenu_Note_Edit, true));
-                contextMenu.Add(ItemOf("Notiz entfernen", ImageCode.Kreuz, ContextMenu_Note_Remove, existingNote is not null));
+                if (existingNote is null) {
+                    contextMenu.Add(ItemOf("Notiz bearbeiten", QuickImage.Get(ImageCode.Textdatei, IContextMenu.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, true));
+                } else {
+                    contextMenu.Add(ItemOf("Notiz entfernen", QuickImage.Get(ImageCode.Textdatei, IContextMenu.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, true));
+                }
             }
 
             #region Sortierung
@@ -1132,8 +1137,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, editable && column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, editable && column.CanBeChangedByRules()));
-                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
-                contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
+                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, IContextMenu.IconSize), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
+                contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
             }
 
@@ -1149,20 +1154,20 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     // ColumnItem. Sie können nur aus der aktuellen Anordnung
                     // ausgeblendet werden; permanente Operationen, Eigenschaften,
                     // Kopieren, Statistik etc. sind nicht möglich.
-                    contextMenu.Add(ItemOf("Spalte ausblenden", ImageCode.Kreuz, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Spalte ausblenden", QuickImage.Get(ImageCode.Spalte, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
                 } else {
-                    contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", QuickImage.Get(ImageCode.Spalte, IContextMenu.IconSize, ImageCode.Stift), ContextMenu_EditColumnProperties, tb.IsAdministrator()));
 
                     if (IsAnsicht0(ca)) {
                         contextMenu.Add(ItemOf("Spalte permanent löschen", ImageCode.Papierkorb, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
                     } else {
-                        contextMenu.Add(ItemOf("Spalte ausblenden", ImageCode.Kreuz, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
+                        contextMenu.Add(ItemOf("Spalte ausblenden", QuickImage.Get(ImageCode.Spalte, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
                     }
 
                     contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
                     contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
                     contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
-                    contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
+                    contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, IContextMenu.IconSize), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
                     contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
                 }
             }
@@ -1172,8 +1177,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (row is not null) {
                 contextMenu.Add(ItemOf("Zeile", true));
 
-                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
-                contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
+                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Zeile, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
+                contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, IContextMenu.IconSize), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
@@ -1195,7 +1200,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public List<AbstractListItem>? GetMiniToolbarItems(object? hotItem) {
         List<AbstractListItem> miniToolbar = [];
 
-        if (!MiniToolbarDefault || Table is not { IsDisposed: false } tb) { return miniToolbar; }
+        if (Table is not { IsDisposed: false } tb) { return miniToolbar; }
 
         var (column, row, _, _, _) = GetContextData(hotItem);
 
@@ -1203,9 +1208,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (row is not null) {
             if (PinnedRows.Contains(row)) {
-                miniToolbar.Add(ItemOf(string.Empty, "Unpin", ImageCode.Pinnadel, ContextMenu_Unpin, true, "Zeile nicht mehr pinnen"));
+                miniToolbar.Add(ItemOf(string.Empty, "Unpin", QuickImage.Get(ImageCode.Pinnadel, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_Unpin, true, "Zeile nicht mehr pinnen"));
             } else {
-                miniToolbar.Add(ItemOf(string.Empty, "Pin", ImageCode.Pinnadel, ContextMenu_Pin, true, "Zeile anpinnen"));
+                miniToolbar.Add(ItemOf(string.Empty, "Pin", QuickImage.Get(ImageCode.Pinnadel, IMiniToolbar.IconSize, ImageCode.Häkchen), ContextMenu_Pin, true, "Zeile anpinnen"));
             }
         }
 
@@ -1215,8 +1220,32 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (column is not null && row is not null && tb.Column.SysCellNote is not null) {
             var existingNote = CellNoteHelper.GetNoteData(column, row);
-            miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", ImageCode.Stift, ContextMenu_Note_Edit, true, "Notiz bearbeiten"));
-            miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", ImageCode.Kreuz, ContextMenu_Note_Remove, existingNote is not null, "Notiz entfernen"));
+            if (existingNote is null) {
+                miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, true, "Notiz bearbeiten"));
+            } else {
+                miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, true, "Notiz entfernen"));
+            }
+        }
+
+        #endregion
+
+        #region Zeile löschen
+
+        if (row is not null) {
+            var canDelete = tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true);
+            miniToolbar.Add(ItemOf(string.Empty, "DeleteRow", QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, canDelete, "Zeile löschen"));
+        }
+
+        #endregion
+
+        #region Neue Zeile im selben Kapitel (nur bei aktiver SysRowSortIndex)
+
+        if (row is not null && tb.Column.SysRowSortIndex is { IsDisposed: false }
+            && CurrentArrangement?.ColumnForChapter is { IsDisposed: false }) {
+            var canAdd = string.IsNullOrEmpty(tb.IsNowNewRowPossible(row.ChunkValue, true));
+            miniToolbar.Add(ItemOf(string.Empty, "NewRowInChapter",
+                QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.PlusZeichen),
+                ContextMenu_NewRowInChapter, canAdd, "Neue Zeile unter dieser Überschrift"));
         }
 
         #endregion
@@ -1920,6 +1949,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     case Keys.Home:
                     case Keys.End:
                         CursorPos_Reset();
+                        HideMiniToolbar();
                         break;
 
                     case Keys.C:
@@ -2002,6 +2032,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     if (_mouseOverRow is RowListItem dragRli
                         && dragRli.Row is { IsDisposed: false } dragRow
                         && !PinnedRows.Contains(dragRow)
+                        && Table.Column.SysRowSortIndex is { IsDisposed: false }
                         && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
                         _dragItem = dragRow;
                     } else if (_mouseOverRow is RowCaptionListItem dragRcli
@@ -2159,12 +2190,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     OnCellClicked(new CellEventArgs(_mouseOverColumn.Column!, r));
                     Invalidate();
 
-                    var screenX = Cursor.Position.X - e.ControlX;
-                    var screenY = Cursor.Position.Y - e.ControlY;
-                    var posX = screenX + _mouseOverColumn.ControlColumnLeft(OffsetX);
-                    var posY = screenY + (_mouseOverRowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? e.ControlY) + 2;
-                    ((IMiniToolbar)this).MiniToolbarShow(new Point(posX, posY),
-                        ContextMenuItemGenerate(this, _mouseOverColumn, _mouseOverColumn.Column, r, RowsVisibleUnique()));
+                    // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
+                    // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
+                    // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
+                    ShowMiniToolbarAt(_mouseOverColumn, _mouseOverRowItem, r);
                 }
             }
 
@@ -3620,6 +3649,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         FloatingForm.Close(this);
         AutoFilter_Close();
         Forms.QuickInfo.Close();
+        HideMiniToolbar();
     }
 
     private void CollapseThis(string[] t) {
@@ -3762,6 +3792,38 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         ColumnsHeadListItem.ShowDummyColumnDropDown(ca, this, column);
     }
 
+    private void ContextMenu_NewRowInChapter(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
+        // Nur im NumberStyle (aktiver SysRowSortIndex) — siehe Schalter in GetMiniToolbarItems.
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return; }
+        if (ca.ColumnForChapter is not { IsDisposed: false } chapterCol) { return; }
+
+        var (_, row, _, _, _) = GetContextData(e.HotItem);
+        if (row is not { IsDisposed: false } srcRow) { return; }
+
+        var chapterValue = srcRow.CellGetString(chapterCol);
+        if (string.IsNullOrEmpty(chapterValue)) {
+            NotEditableInfo("Die Zeile gehört keinem Kapitel zu.");
+            return;
+        }
+
+        // Filter bauen: bestehende Filter übernehmen + Chapter-Wert setzen.
+        using var fc = new FilterCollection(tb, "Neue Zeile aus Mini-Toolbar");
+        fc.AddIfNotExists(FilterCombined);
+        fc.RemoveOtherAndAdd(new FilterItem(chapterCol, FilterType.Istgleich, chapterValue));
+
+        var nr = tb.Row.GenerateAndAdd([.. fc], "Neue Zeile aus Mini-Toolbar");
+        if (nr.IsFailed || nr.Value is not RowItem newRow) {
+            NotEditableInfo(nr.FailedReason);
+            return;
+        }
+
+        if (View_ColumnFirst() is { } firstCol) {
+            CursorPos_Set(firstCol, GetRow(newRow, false), true);
+        }
+    }
+
     private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {
         var (_, row, _, _, _) = GetContextData(e.HotItem);
 
@@ -3861,6 +3923,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         CursorPos_Set(newColumn, newRow, true);
+
+        // Die Mini-Toolbar erscheint ausschließlich bei Mausklick auf eine
+        // Zelle. Tastatur-Navigation blendet sie lediglich aus.
+        HideMiniToolbar();
     }
 
     private void CursorPos_Reset() => CursorPos_Set(null, null, false);
@@ -4477,8 +4543,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                            // Bestehenden Code belassen
-                            FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                                // Bestehenden Code belassen
+                                FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
@@ -4640,6 +4706,23 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             && cachedRcli != rcli) {
             cachedRcli.IsExpanded = expanded;
         }
+    }
+
+    /// <summary>
+    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an. Die Entscheidung,
+    /// ob die Toolbar tatsächlich erscheint (oder ob sie bei einem erneuten
+    /// Klick auf dieselbe Zelle ausgeschaltet bleibt), trifft
+    /// <see cref="IMiniToolbar.MiniToolbarShow"/> anhand des übergebenen HotItems.
+    /// </summary>
+    private void ShowMiniToolbarAt(ColumnViewItem column, RowBackground? rowItem, RowItem row) {
+        if (column.Column is not { IsDisposed: false }) { return; }
+
+        var screenOrigin = PointToScreen(Point.Empty);
+        var posX = screenOrigin.X + column.ControlColumnLeft(OffsetX);
+        var posY = screenOrigin.Y + (rowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? 0) + 2;
+
+        this.MiniToolbarShow(new Point(posX, posY),
+             ContextMenuItemGenerate(this, column, column.Column, row, RowsVisibleUnique()));
     }
 
     private RowSortDefinition? SortUsed() {

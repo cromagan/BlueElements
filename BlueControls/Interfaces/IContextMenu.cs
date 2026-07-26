@@ -35,6 +35,11 @@ public interface IContextMenu {
     /// </summary>
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
+    /// <summary>
+    /// Größe der Icons im Kontextmenü.
+    /// </summary>
+    public const int IconSize = 16;
+
     #endregion
 
     #region Methods

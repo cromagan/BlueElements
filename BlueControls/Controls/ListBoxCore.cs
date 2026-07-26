@@ -100,6 +100,23 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public int BreakAfterItems { get; private set; }
 
+    /// <summary>
+    /// Zusätzlicher Abstand (in Pixeln) zwischen den Items — wird in
+    /// <see cref="CalculateItemPosition"/> zwischen aufeinanderfolgende
+    /// Items eingefügt. Wirkt sich auf alle Appearance-Modi aus, nicht
+    /// nur auf <see cref="ListBoxAppearance.MiniToolbar"/>. Default ist 0
+    /// (Items liegen bündig aneinander, wie bisher).
+    /// </summary>
+    [DefaultValue(0)]
+    public int ItemPadding {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            InvalidateItemOrder();
+        }
+    } = 0;
+
     [DefaultValue(CheckBehavior.SingleSelection)]
     public CheckBehavior CheckBehavior {
         get => _checkBehavior;
@@ -680,14 +697,15 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     private (int X, int Y) CalculateItemPosition(AbstractListItem current, AbstractListItem? prev, int index, Orientation layout, Size area, int colWidth) {
         if (prev is null) { return (0, 0); }
         var isCaption = current is TextListItem { IsCaption: true };
+        var pad = ItemPadding;
 
         if (layout == Orientation.Waagerecht) {
-            if (prev.CanvasPosition.Right + colWidth > area.Width || isCaption) { return (0, prev.CanvasPosition.Bottom); }
-            return (prev.CanvasPosition.Right, prev.CanvasPosition.Top);
+            if (prev.CanvasPosition.Right + colWidth + pad > area.Width || isCaption) { return (0, prev.CanvasPosition.Bottom + pad); }
+            return (prev.CanvasPosition.Right + pad, prev.CanvasPosition.Top);
         }
 
-        if (index % BreakAfterItems == 0) { return (prev.CanvasPosition.Right, 0); }
-        return (prev.CanvasPosition.Left, prev.CanvasPosition.Bottom);
+        if (index % BreakAfterItems == 0) { return (prev.CanvasPosition.Right + pad, 0); }
+        return (prev.CanvasPosition.Left, prev.CanvasPosition.Bottom + pad);
     }
 
     private Size CanvasDrawArea() {
@@ -714,7 +732,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ListBoxAppearance.Gallery => (area.Width < 5 ? 200 : Math.Min(200, area.Width), area.Width < 5 ? 200 : Math.Min(200, area.Width)),
         ListBoxAppearance.FileSystem => (110, 110),
         ListBoxAppearance.ButtonList => (64, 80),
-        ListBoxAppearance.MiniToolbar => (16, 16),
+        ListBoxAppearance.MiniToolbar => (IMiniToolbar.IconSize, IMiniToolbar.IconSize),
         _ => CalculateDefaultDimensions(area, biggestX)
     };
 
