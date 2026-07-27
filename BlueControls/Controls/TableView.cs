@@ -2882,7 +2882,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             //    }
 
             case "doclipboard": {
-                    var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
+                    var clipTmp = Clipboard.GetText().Replace('\n','\r').RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
                     Filter.Remove(e.Column);
 
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
