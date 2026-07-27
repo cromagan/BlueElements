@@ -1677,11 +1677,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var x = AvailableControlPaintArea.Width;
         var y = AvailableControlPaintArea.Height;
 
-        // AllViewItems sicherstellen, damit _sortedViewItems befüllt ist.
-        // Ohne diesen Aufruf wäre _sortedViewItems leer, weil DrawControl
-        // erst NACH base.DrawControl() auf AllViewItems zugreift.
-        _ = AllViewItems;
-
+        // WICHTIG: CurrentArrangement VOR AllViewItems abfragen.
+        // CurrentArrangement ruft ComputeAllColumnPositions mit der
+        // aktuellen AvailableControlPaintArea-Breite auf und aktualisiert
+        // damit den Spaltenbreiten-Cache. AllViewItems/CalculateAllViewItems
+        // liest diesen Cache (ControlColumnsWidth), um die CanvasPosition-
+        // Breite jeder Zeile zu setzen. Wäre AllViewItems zuerst dran,
+        // würde mit einer veralteten (z. B. schmaleren) Breite gerechnet -
+        // die Folge: nach einem Slider-Visibility-Wechsel bleibt
+        // CanvasPosition.Width zu klein und DrawExplicit übermalt das
+        // rechte Ende der letzten Spalte mit der Hintergrundfarbe.
         if (CurrentArrangement is { } ca) {
             // Indent wird beim Zeichnen zu den Spalten-Positionen addiert
             // (RowBackground.DrawExplicit). Daher muss der maximale Indent aller
@@ -1689,6 +1694,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // werden eingerückte Spalten am rechten Rand abgeschnitten.
             x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom) + RowBackground.IndentWidth * MaxIndentOfRows;
         }
+
+        // AllViewItems sicherstellen, damit _sortedViewItems befüllt ist.
+        // Ohne diesen Aufruf wäre _sortedViewItems leer, weil DrawControl
+        // erst NACH base.DrawControl() auf AllViewItems zugreift.
+        _ = AllViewItems;
 
         if (_sortedViewItems is { Count: > 0 }) {
             // Höhe aus den bereits berechneten CanvasPosition-Werten ableiten.
@@ -2275,6 +2285,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     protected override void OnZoomChanged() {
         Invalidate_CurrentArrangement();
         base.OnZoomChanged();
+    }
+
+    protected override void OnSliderVisibilityChanged() {
+        // Wenn ein Slider ein-/ausgeblendet wird, ändert sich die
+        // AvailableControlPaintArea-Breite. Die View-Items müssen neu
+        // aufgebaut werden, damit CanvasPosition.Width jeder Zeile mit der
+        // nun gültigen ControlColumnsWidth berechnet wird. Ohne diesen
+        // Reset würde DrawExplicit (RowBackground) beim späteren Zeichnen
+        // das rechte Ende der letzten Spalte mit der Hintergrundfarbe übermalen.
+        _mustDoAllViewItems = true;
+        _sortedViewItems = [];
     }
 
     protected override void WndProc(ref Message m) {

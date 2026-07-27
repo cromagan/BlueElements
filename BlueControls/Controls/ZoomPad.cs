@@ -444,6 +444,15 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected virtual void OnOffsetYChanged() => Invalidate();
 
+    /// <summary>
+    /// Wird aufgerufen, wenn sich die Sichtbarkeit eines Sliders (X oder Y)
+    /// während <see cref="UpdateSliderBounds"/> geändert hat. Abgeleitete
+    /// Klassen können hier abhängige Größen (z. B. View-Item-Caches)
+    /// invalidieren, damit beim unmittelbar folgenden Neuaufbau von
+    /// <see cref="CanvasMaxBounds"/> die korrekte Zeichenbreite verwendet wird.
+    /// </summary>
+    protected virtual void OnSliderVisibilityChanged() { }
+
     protected override void OnSizeChanged(System.EventArgs e) {
         if (!SlideAndZoomAllowed || Fitting) {
             ZoomFit();
@@ -475,6 +484,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                          (SliderY.Visible ? freiraumBoth.X < 0 : freiraumNoSliders.X < 0);
 
         if (SliderY.Visible != oldSliderYVisible || SliderX.Visible != oldSliderXVisible) {
+            // Abgeleiteten Klassen Gelegenheit geben, abhängige Caches
+            // (z. B. View-Items) zu invalidieren, BEVOR CanvasMaxBounds
+            // neu berechnet wird. So wird die Neuberechnung mit der nun
+            // gültigen AvailableControlPaintArea-Breite durchgeführt.
+            OnSliderVisibilityChanged();
             CanvasMaxBounds = RectangleF.Empty;
             tmpCanvasMaxBounds = CanvasMaxBounds;
         }
