@@ -424,7 +424,7 @@ namespace BlueControls.Forms {
             this.PadDesign.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                      | AnchorStyles.Right)));
             this.PadDesign.Cursor = Cursors.IBeam;
-            this.PadDesign.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.PadDesign.DropDownStyle = DropDownMode.DropDownList;
             this.PadDesign.Location = new Point(112, 24);
             this.PadDesign.Name = "PadDesign";
             this.PadDesign.RegexCheck = null;

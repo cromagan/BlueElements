@@ -48,7 +48,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
     public override bool WasValueClicked() => _control?.WasThisValueClicked() ?? false;
 
     protected override void ApplyStyle() {
-        _control?.DropDownStyle = TextInputAllowed ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
+        _control?.DropDownStyle = TextInputAllowed ? DropDownMode.DropDown : DropDownMode.DropDownList;
 
         _control?.GetStyleFrom(this);
 

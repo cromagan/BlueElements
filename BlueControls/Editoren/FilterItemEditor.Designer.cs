@@ -43,7 +43,7 @@ namespace BlueTable.Editoren
             // cmbMethod
             // 
             cmbMethod.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            cmbMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            cmbMethod.DropDownStyle = DropDownMode.DropDownList;
             cmbMethod.Location = new Point(168, 24);
             cmbMethod.Name = "cmbMethod";
             cmbMethod.Size = new Size(176, 21);
@@ -52,7 +52,7 @@ namespace BlueTable.Editoren
             // cmbLogic
             // 
             cmbLogic.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            cmbLogic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            cmbLogic.DropDownStyle = DropDownMode.DropDownList;
             cmbLogic.Location = new Point(168, 55);
             cmbLogic.Name = "cmbLogic";
             cmbLogic.Size = new Size(176, 21);

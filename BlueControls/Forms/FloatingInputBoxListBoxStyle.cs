@@ -90,6 +90,16 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     /// </summary>
     public ReadOnlyCollection<AbstractListItem> Items => lstbx.Items;
 
+    /// <inheritdoc cref="Controls.ListBox.ItemPadding"/>
+    public int ItemPadding {
+        get => lstbx.ItemPadding;
+        set {
+            if (lstbx.ItemPadding == value) { return; }
+            lstbx.ItemPadding = value;
+            RecalcFormSize();
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -115,9 +125,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle ShowAtPosition(List<AbstractListItem> items, Point screenPosition, Control? connectedControl, object? hotItem) => new(items, CheckBehavior.NoSelection, null, screenPosition.X, screenPosition.Y, -1, connectedControl,
             false, ListBoxAppearance.MiniToolbar, Design.Item_MiniToolbar, false, false, AddType.None, false, false, null, hotItem);
 
-    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, false, false, customContextMenuItems, null);
+    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, check is null ? CheckBehavior.NoSelection : CheckBehavior.SingleSelection, check is null ? null : [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, false, false, customContextMenuItems, null);
 
-    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, CheckBehavior.SingleSelection, [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, moveAllowed, itemEditAllowed, customContextMenuItems, null);
+    public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<AbstractListItem> items, string? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) => new(items, check is null ? CheckBehavior.NoSelection : CheckBehavior.SingleSelection, check is null ? null : [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, moveAllowed, itemEditAllowed, customContextMenuItems, null);
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool moveAllowed, bool itemEditAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);
@@ -232,6 +242,10 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private void RecalcFormSize() {
         var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
         if (lstbx.AddAllowed != AddType.None) { heightAdded += 26; }
+        if (lstbx.Appearance != ListBoxAppearance.MiniToolbar) {
+            var visibleCount = lstbx.Items.Count(i => i.Visible);
+            heightAdded += Math.Max(0, visibleCount - 1) * lstbx.ItemPadding;
+        }
         AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));
         if (lstbx.Appearance == ListBoxAppearance.MiniToolbar) {
             lstbx.Size = new Size(Size.Width - (lstbx.Left * 2), Size.Height - (lstbx.Top * 2));

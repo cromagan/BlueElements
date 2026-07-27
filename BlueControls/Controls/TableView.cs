@@ -874,7 +874,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         columnArrangementSelector.AutoSort = false;
 
         columnArrangementSelector.ItemClear();
-        columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+        columnArrangementSelector.DropDownStyle = DropDownMode.DropDownList;
 
         if (table is { IsDisposed: false } tb) {
             var tcvc = ColumnViewCollection.ParseAll(tb);
@@ -1215,6 +1215,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         #endregion
+
+        if (!IsAdministrator()) { return miniToolbar; }
 
         #region Notiz
 
@@ -3822,7 +3824,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void ContextMenu_NewRowInChapter(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
-
 
         var (_, row, _, _, _) = GetContextData(e.HotItem);
         if (row is not { IsDisposed: false } srcRow) { return; }

@@ -327,7 +327,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
 
         var marked = markEnd > markStart;
-        if (this is not ComboBox { DropDownStyle: not System.Windows.Forms.ComboBoxStyle.DropDown }) {
+        if (this is not ComboBox { DropDownStyle: not DropDownMode.DropDown }) {
             contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, marked));
             contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, marked));
             contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, System.Windows.Forms.Clipboard.ContainsText() && Enabled));

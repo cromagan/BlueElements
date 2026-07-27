@@ -155,7 +155,7 @@ namespace BlueControls.Forms {
             // 
             this.btnLastFiles.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.btnLastFiles.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.btnLastFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLastFiles.DropDownStyle = DropDownMode.DropDownList;
             this.btnLastFiles.Enabled = false;
             this.btnLastFiles.ImageCode = "Ordner";
             this.btnLastFiles.Location = new System.Drawing.Point(136, 2);

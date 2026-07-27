@@ -44,7 +44,31 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (newScriptContent != script.Script) {
                         count++;
-                        Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: Math.Min(10, script.StoppedTimeCount));
+                        Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: Math.Min(20, script.StoppedTimeCount));
+                    }
+                }
+            }
+        }
+
+        MessageBox.Show(count + " Skript(e) bearbeitet.", ImageCode.Information, "OK");
+        _isWorking = false;
+    }
+
+    private void btnFehler_Click(object sender, System.EventArgs e) {
+        if (_isWorking) { return; }
+        _isWorking = true;
+
+        var count = 0;
+
+        foreach (var thisTb in Table.AllFiles) {
+            if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
+                foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
+
+                    if (!string.IsNullOrEmpty(script.FailedReason)) {
+
+
+                        count++;
+                        Table.UpdateScript(script, failedReason: string.Empty, stoppedtimecount: Math.Min(20, script.StoppedTimeCount));
                     }
                 }
             }

@@ -200,7 +200,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxBackground
             // 
             cbxBackground.Cursor = Cursors.IBeam;
-            cbxBackground.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxBackground.DropDownStyle = DropDownMode.DropDownList;
             cbxBackground.Location = new Point(280, 96);
             cbxBackground.Name = "cbxBackground";
             cbxBackground.RegexCheck = null;
@@ -219,7 +219,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             cbxRenderer.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cbxRenderer.Cursor = Cursors.IBeam;
-            cbxRenderer.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxRenderer.DropDownStyle = DropDownMode.DropDownList;
             cbxRenderer.Location = new Point(416, 24);
             cbxRenderer.Name = "cbxRenderer";
             cbxRenderer.RegexCheck = null;
@@ -352,7 +352,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxTranslate
             // 
             cbxTranslate.Cursor = Cursors.IBeam;
-            cbxTranslate.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxTranslate.DropDownStyle = DropDownMode.DropDownList;
             cbxTranslate.Location = new Point(104, 168);
             cbxTranslate.Name = "cbxTranslate";
             cbxTranslate.RegexCheck = null;
@@ -386,7 +386,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxAlign
             // 
             cbxAlign.Cursor = Cursors.IBeam;
-            cbxAlign.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxAlign.DropDownStyle = DropDownMode.DropDownList;
             cbxAlign.Location = new Point(104, 136);
             cbxAlign.Name = "cbxAlign";
             cbxAlign.RegexCheck = null;
@@ -396,7 +396,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxRandLinks
             // 
             cbxRandLinks.Cursor = Cursors.IBeam;
-            cbxRandLinks.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxRandLinks.DropDownStyle = DropDownMode.DropDownList;
             cbxRandLinks.Location = new Point(8, 96);
             cbxRandLinks.Name = "cbxRandLinks";
             cbxRandLinks.RegexCheck = null;
@@ -423,7 +423,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxRandRechts
             // 
             cbxRandRechts.Cursor = Cursors.IBeam;
-            cbxRandRechts.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxRandRechts.DropDownStyle = DropDownMode.DropDownList;
             cbxRandRechts.Location = new Point(144, 96);
             cbxRandRechts.Name = "cbxRandRechts";
             cbxRandRechts.RegexCheck = null;
@@ -441,7 +441,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxScriptType
             // 
             cbxScriptType.Cursor = Cursors.IBeam;
-            cbxScriptType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxScriptType.DropDownStyle = DropDownMode.DropDownList;
             cbxScriptType.Location = new Point(232, 288);
             cbxScriptType.Name = "cbxScriptType";
             cbxScriptType.RegexCheck = null;
@@ -468,7 +468,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxAdditionalCheck
             // 
             cbxAdditionalCheck.Cursor = Cursors.IBeam;
-            cbxAdditionalCheck.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxAdditionalCheck.DropDownStyle = DropDownMode.DropDownList;
             cbxAdditionalCheck.Location = new Point(232, 248);
             cbxAdditionalCheck.Name = "cbxAdditionalCheck";
             cbxAdditionalCheck.RegexCheck = null;
@@ -486,7 +486,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxChunk
             // 
             cbxChunk.Cursor = Cursors.IBeam;
-            cbxChunk.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxChunk.DropDownStyle = DropDownMode.DropDownList;
             cbxChunk.Location = new Point(840, 8);
             cbxChunk.Name = "cbxChunk";
             cbxChunk.RegexCheck = null;
@@ -961,7 +961,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxSort
             // 
             cbxSort.Cursor = Cursors.IBeam;
-            cbxSort.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxSort.DropDownStyle = DropDownMode.DropDownList;
             cbxSort.Location = new Point(232, 328);
             cbxSort.Name = "cbxSort";
             cbxSort.RegexCheck = null;
@@ -1278,7 +1278,7 @@ namespace BlueControls.BlueTableDialogs {
             // cbxRelationType
             // 
             cbxRelationType.Cursor = Cursors.IBeam;
-            cbxRelationType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxRelationType.DropDownStyle = DropDownMode.DropDownList;
             cbxRelationType.Location = new Point(248, 8);
             cbxRelationType.Name = "cbxRelationType";
             cbxRelationType.RegexCheck = null;
@@ -1307,7 +1307,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             cbxTargetColumn.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cbxTargetColumn.Cursor = Cursors.IBeam;
-            cbxTargetColumn.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxTargetColumn.DropDownStyle = DropDownMode.DropDownList;
             cbxTargetColumn.Location = new Point(248, 80);
             cbxTargetColumn.Name = "cbxTargetColumn";
             cbxTargetColumn.RegexCheck = null;

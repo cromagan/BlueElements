@@ -39,7 +39,7 @@ namespace BlueControls.Forms
             this.cbxText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxText.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxText.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxText.DropDownStyle = DropDownMode.DropDownList;
             this.cbxText.Location = new System.Drawing.Point(8, 32);
             this.cbxText.Name = "cbxText";
             this.cbxText.Size = new System.Drawing.Size(232, 24);

@@ -165,7 +165,7 @@ namespace BlueControls.Forms {
             // Format
             // 
             this.Format.Cursor = Cursors.IBeam;
-            this.Format.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.Format.DropDownStyle = DropDownMode.DropDownList;
             this.Format.Location = new Point(64, 24);
             this.Format.Name = "Format";
             this.Format.Size = new Size(288, 24);

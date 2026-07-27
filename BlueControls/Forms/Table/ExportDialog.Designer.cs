@@ -79,7 +79,7 @@ namespace BlueControls.Forms {
             this.cbxLayoutWahl.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
                                                          | AnchorStyles.Right)));
             this.cbxLayoutWahl.Cursor = Cursors.IBeam;
-            this.cbxLayoutWahl.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.cbxLayoutWahl.DropDownStyle = DropDownMode.DropDownList;
             this.cbxLayoutWahl.Location = new Point(232, 48);
             this.cbxLayoutWahl.Name = "cbxLayoutWahl";
             this.cbxLayoutWahl.Size = new Size(623, 24);

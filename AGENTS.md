@@ -1,5 +1,10 @@
 # BlueElements — Agent-Anweisungen
 
+
+## WICHTIGSTE REGEL
+Beginne JEDE Antwort mit meinem Namen: Christian
+
+
 ## Build & Ausführung
 
 ```bash

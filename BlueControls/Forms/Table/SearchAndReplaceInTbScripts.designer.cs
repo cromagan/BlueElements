@@ -16,134 +16,140 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.btnErsetzen = new BlueControls.Controls.Button();
-            this.txbNeu = new BlueControls.Controls.TextBox();
-            this.txbAlt = new BlueControls.Controls.TextBox();
-            this.grpSuche = new BlueControls.Controls.GroupBox();
-            this.btnSuche = new BlueControls.Controls.Button();
-            this.grpErsetzen = new BlueControls.Controls.GroupBox();
-            this.grpSonderzeichen = new BlueControls.Controls.GroupBox();
-            this.capSonderzeichen = new BlueControls.Controls.Caption();
-            this.grpSuche.SuspendLayout();
-            this.grpErsetzen.SuspendLayout();
-            this.grpSonderzeichen.SuspendLayout();
-            this.SuspendLayout();
+            btnErsetzen = new Button();
+            txbNeu = new TextBox();
+            txbAlt = new TextBox();
+            grpSuche = new GroupBox();
+            btnSuche = new Button();
+            grpErsetzen = new GroupBox();
+            grpSonderzeichen = new GroupBox();
+            capSonderzeichen = new Caption();
+            btnFehler = new Button();
+            grpSuche.SuspendLayout();
+            grpErsetzen.SuspendLayout();
+            grpSonderzeichen.SuspendLayout();
+            SuspendLayout();
             // 
             // btnErsetzen
             // 
-            this.btnErsetzen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnErsetzen.Enabled = false;
-            this.btnErsetzen.ImageCode = "Stift|20";
-            this.btnErsetzen.Location = new System.Drawing.Point(448, 96);
-            this.btnErsetzen.Name = "btnErsetzen";
-            this.btnErsetzen.Size = new System.Drawing.Size(120, 32);
-            this.btnErsetzen.TabIndex = 4;
-            this.btnErsetzen.Text = "Ersetzen";
-            this.btnErsetzen.Click += new System.EventHandler(this.btnErsetzen_Click);
+            btnErsetzen.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnErsetzen.Enabled = false;
+            btnErsetzen.ImageCode = "Stift|20";
+            btnErsetzen.Location = new Point(448, 96);
+            btnErsetzen.Name = "btnErsetzen";
+            btnErsetzen.Size = new Size(120, 32);
+            btnErsetzen.TabIndex = 4;
+            btnErsetzen.Text = "Ersetzen";
+            btnErsetzen.Click += btnErsetzen_Click;
             // 
             // txbNeu
             // 
-            this.txbNeu.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbNeu.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbNeu.Location = new System.Drawing.Point(8, 16);
-            this.txbNeu.Name = "txbNeu";
-            this.txbNeu.Size = new System.Drawing.Size(560, 72);
-            this.txbNeu.TabIndex = 3;
-            this.txbNeu.TextChanged += new System.EventHandler(this.AltNeu_TextChanged);
+            txbNeu.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbNeu.Cursor = Cursors.IBeam;
+            txbNeu.Location = new Point(8, 16);
+            txbNeu.Name = "txbNeu";
+            txbNeu.Size = new Size(560, 72);
+            txbNeu.TabIndex = 3;
+            txbNeu.TextChanged += AltNeu_TextChanged;
             // 
             // txbAlt
             // 
-            this.txbAlt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbAlt.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAlt.Location = new System.Drawing.Point(8, 16);
-            this.txbAlt.Name = "txbAlt";
-            this.txbAlt.Size = new System.Drawing.Size(560, 64);
-            this.txbAlt.TabIndex = 2;
-            this.txbAlt.TextChanged += new System.EventHandler(this.AltNeu_TextChanged);
+            txbAlt.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbAlt.Cursor = Cursors.IBeam;
+            txbAlt.Location = new Point(8, 16);
+            txbAlt.Name = "txbAlt";
+            txbAlt.Size = new Size(560, 64);
+            txbAlt.TabIndex = 2;
+            txbAlt.TextChanged += AltNeu_TextChanged;
             // 
             // grpSuche
             // 
-            this.grpSuche.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpSuche.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpSuche.CausesValidation = false;
-            this.grpSuche.Controls.Add(this.btnSuche);
-            this.grpSuche.Controls.Add(this.txbAlt);
-            this.grpSuche.Location = new System.Drawing.Point(8, 8);
-            this.grpSuche.Name = "grpSuche";
-            this.grpSuche.Size = new System.Drawing.Size(575, 128);
-            this.grpSuche.TabIndex = 3;
-            this.grpSuche.TabStop = false;
-            this.grpSuche.Text = "Suche";
+            grpSuche.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpSuche.BackColor = Color.FromArgb(240, 240, 240);
+            grpSuche.CausesValidation = false;
+            grpSuche.Controls.Add(btnSuche);
+            grpSuche.Controls.Add(txbAlt);
+            grpSuche.Location = new Point(8, 8);
+            grpSuche.Name = "grpSuche";
+            grpSuche.Size = new Size(575, 128);
+            grpSuche.TabIndex = 3;
+            grpSuche.TabStop = false;
+            grpSuche.Text = "Suche";
             // 
             // btnSuche
             // 
-            this.btnSuche.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSuche.Enabled = false;
-            this.btnSuche.ImageCode = "Lupe|20";
-            this.btnSuche.Location = new System.Drawing.Point(448, 88);
-            this.btnSuche.Name = "btnSuche";
-            this.btnSuche.Size = new System.Drawing.Size(120, 32);
-            this.btnSuche.TabIndex = 5;
-            this.btnSuche.Text = "Suchen";
-            this.btnSuche.Click += new System.EventHandler(this.btnSuche_Click);
+            btnSuche.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnSuche.Enabled = false;
+            btnSuche.ImageCode = "Lupe|20";
+            btnSuche.Location = new Point(448, 88);
+            btnSuche.Name = "btnSuche";
+            btnSuche.Size = new Size(120, 32);
+            btnSuche.TabIndex = 5;
+            btnSuche.Text = "Suchen";
+            btnSuche.Click += btnSuche_Click;
             // 
             // grpErsetzen
             // 
-            this.grpErsetzen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpErsetzen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpErsetzen.CausesValidation = false;
-            this.grpErsetzen.Controls.Add(this.txbNeu);
-            this.grpErsetzen.Controls.Add(this.btnErsetzen);
-            this.grpErsetzen.Location = new System.Drawing.Point(8, 136);
-            this.grpErsetzen.Name = "grpErsetzen";
-            this.grpErsetzen.Size = new System.Drawing.Size(575, 136);
-            this.grpErsetzen.TabIndex = 2;
-            this.grpErsetzen.TabStop = false;
-            this.grpErsetzen.Text = "Ersetzen";
+            grpErsetzen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpErsetzen.BackColor = Color.FromArgb(240, 240, 240);
+            grpErsetzen.CausesValidation = false;
+            grpErsetzen.Controls.Add(txbNeu);
+            grpErsetzen.Controls.Add(btnErsetzen);
+            grpErsetzen.Location = new Point(8, 136);
+            grpErsetzen.Name = "grpErsetzen";
+            grpErsetzen.Size = new Size(575, 136);
+            grpErsetzen.TabIndex = 2;
+            grpErsetzen.TabStop = false;
+            grpErsetzen.Text = "Ersetzen";
             // 
             // grpSonderzeichen
             // 
-            this.grpSonderzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpSonderzeichen.CausesValidation = false;
-            this.grpSonderzeichen.Controls.Add(this.capSonderzeichen);
-            this.grpSonderzeichen.Location = new System.Drawing.Point(8, 272);
-            this.grpSonderzeichen.Name = "grpSonderzeichen";
-            this.grpSonderzeichen.Size = new System.Drawing.Size(160, 56);
-            this.grpSonderzeichen.TabIndex = 0;
-            this.grpSonderzeichen.TabStop = false;
-            this.grpSonderzeichen.Text = "Sonderzeichen";
+            grpSonderzeichen.BackColor = Color.FromArgb(240, 240, 240);
+            grpSonderzeichen.CausesValidation = false;
+            grpSonderzeichen.Controls.Add(capSonderzeichen);
+            grpSonderzeichen.Location = new Point(8, 272);
+            grpSonderzeichen.Name = "grpSonderzeichen";
+            grpSonderzeichen.Size = new Size(160, 56);
+            grpSonderzeichen.TabIndex = 0;
+            grpSonderzeichen.TabStop = false;
+            grpSonderzeichen.Text = "Sonderzeichen";
             // 
             // capSonderzeichen
             // 
-            this.capSonderzeichen.CausesValidation = false;
-            this.capSonderzeichen.Location = new System.Drawing.Point(8, 16);
-            this.capSonderzeichen.Name = "capSonderzeichen";
-            this.capSonderzeichen.Size = new System.Drawing.Size(128, 32);
-            this.capSonderzeichen.Text = "\\r = Zeilenumbruch<br>\\t = Tabulator";
+            capSonderzeichen.CausesValidation = false;
+            capSonderzeichen.Location = new Point(8, 16);
+            capSonderzeichen.Name = "capSonderzeichen";
+            capSonderzeichen.Size = new Size(128, 32);
+            capSonderzeichen.Text = "\\r = Zeilenumbruch<br>\\t = Tabulator";
+            // 
+            // btnFehler
+            // 
+            btnFehler.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnFehler.ImageCode = "Warnung|20";
+            btnFehler.Location = new Point(184, 288);
+            btnFehler.Name = "btnFehler";
+            btnFehler.Size = new Size(168, 32);
+            btnFehler.TabIndex = 5;
+            btnFehler.Text = "Alle Fehler zurücksetzen";
+            btnFehler.Click += btnFehler_Click;
             // 
             // SearchAndReplaceInTbScripts
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(589, 336);
-            this.Controls.Add(this.grpSonderzeichen);
-            this.Controls.Add(this.grpErsetzen);
-            this.Controls.Add(this.grpSuche);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "SearchAndReplaceInTbScripts";
-            this.ShowInTaskbar = false;
-            this.Text = "Suchen und Ersetzen in allen Tabelle Skripten";
-            this.TopMost = true;
-            this.grpSuche.ResumeLayout(false);
-            this.grpErsetzen.ResumeLayout(false);
-            this.grpSonderzeichen.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.None;
+            ClientSize = new Size(589, 336);
+            Controls.Add(btnFehler);
+            Controls.Add(grpSonderzeichen);
+            Controls.Add(grpErsetzen);
+            Controls.Add(grpSuche);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Name = "SearchAndReplaceInTbScripts";
+            ShowInTaskbar = false;
+            Text = "Suchen und Ersetzen in allen Tabelle Skripten";
+            TopMost = true;
+            grpSuche.ResumeLayout(false);
+            grpErsetzen.ResumeLayout(false);
+            grpSonderzeichen.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
         private TextBox txbAlt;
@@ -154,5 +160,6 @@ namespace BlueControls.BlueTableDialogs {
         private GroupBox grpSonderzeichen;
         private Caption capSonderzeichen;
         private Button btnSuche;
+        private Button btnFehler;
     }
 }

@@ -220,7 +220,7 @@ namespace BlueControls.Forms {
             // btnLetzteDateien
             // 
             btnLetzteDateien.DrawStyle = ComboboxStyle.RibbonBar;
-            btnLetzteDateien.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnLetzteDateien.DropDownStyle = DropDownMode.ClickableMenu;
             btnLetzteDateien.Enabled = false;
             btnLetzteDateien.ImageCode = "Ordner";
             btnLetzteDateien.Location = new Point(128, 2);
@@ -325,7 +325,7 @@ namespace BlueControls.Forms {
             // 
             btnAnsichtZoom.AutoSort = false;
             btnAnsichtZoom.DrawStyle = ComboboxStyle.RibbonBar;
-            btnAnsichtZoom.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnAnsichtZoom.DropDownStyle = DropDownMode.ClickableMenu;
             btnAnsichtZoom.ImageCode = "Lupe";
             btnAnsichtZoom.Location = new Point(216, 2);
             btnAnsichtZoom.Name = "btnAnsichtZoom";
@@ -355,7 +355,7 @@ namespace BlueControls.Forms {
             // cbxColumnArr
             // 
             cbxColumnArr.Cursor = Cursors.IBeam;
-            cbxColumnArr.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxColumnArr.DropDownStyle = DropDownMode.DropDownList;
             cbxColumnArr.Location = new Point(8, 24);
             cbxColumnArr.Margin = new Padding(4);
             cbxColumnArr.Name = "cbxColumnArr";
@@ -385,7 +385,7 @@ namespace BlueControls.Forms {
             // 
             btnEinstellungen.AutoSort = false;
             btnEinstellungen.DrawStyle = ComboboxStyle.RibbonBar;
-            btnEinstellungen.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnEinstellungen.DropDownStyle = DropDownMode.ClickableMenu;
             btnEinstellungen.ImageCode = "Zahnrad";
             btnEinstellungen.Location = new Point(80, 2);
             btnEinstellungen.Name = "btnEinstellungen";
@@ -661,7 +661,7 @@ namespace BlueControls.Forms {
             // 
             btnDrucken.AutoSort = false;
             btnDrucken.DrawStyle = ComboboxStyle.RibbonBar;
-            btnDrucken.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnDrucken.DropDownStyle = DropDownMode.ClickableMenu;
             btnDrucken.ImageCode = "Drucker";
             btnDrucken.Location = new Point(136, 2);
             btnDrucken.Name = "btnDrucken";

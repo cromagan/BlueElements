@@ -124,7 +124,7 @@ namespace BlueControls.Forms {
             // 
             this.btnLastFormulas.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.btnLastFormulas.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.btnLastFormulas.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLastFormulas.DropDownStyle = DropDownMode.DropDownList;
             this.btnLastFormulas.Enabled = false;
             this.btnLastFormulas.ImageCode = "Ordner";
             this.btnLastFormulas.Location = new System.Drawing.Point(64, 2);

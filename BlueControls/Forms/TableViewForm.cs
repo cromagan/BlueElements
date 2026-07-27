@@ -503,7 +503,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnAnsichtZoom_DropDownShowing(object? sender, System.EventArgs e) {
         btnAnsichtZoom.ItemClear();
-        btnAnsichtZoom.Padding = new Padding(10);
+        btnAnsichtZoom.ItemPadding = 3;
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom vergrößern", QuickImage.Get(ImageCode.LupePlus, 18), Ansicht_ZoomIn, true, string.Empty));
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom verkleinern", QuickImage.Get(ImageCode.LupeMinus, 18), Ansicht_ZoomOut, true, string.Empty));
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom 1:1", QuickImage.Get(ImageCode.ZoomFit, 18), Ansicht_ZoomFit, true, string.Empty));
@@ -528,17 +528,18 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnEinstellungen_DropDownShowing(object? sender, System.EventArgs e) {
         btnEinstellungen.ItemClear();
+        btnEinstellungen.ItemPadding = 3;
         btnEinstellungen.ItemAdd(ItemOf(
-            "Zell-Klick = In Zwischenablage kopieren",
+            " Zell-Klick = In Zwischenablage kopieren",
             "clipboard",
-            QuickImage.Get(_zellenClickInsClipboard ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 16),
+            QuickImage.Get(_zellenClickInsClipboard ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 14),
             Einstellungen_ToggleClipboard, true, string.Empty));
 
         //btnAnsichtZoom.ItemAdd(Separator());
         btnEinstellungen.ItemAdd(ItemOf(
-            "MiniToolbar aktiv",
+            " MiniToolbar aktiv",
             "MiniToolbar",
-            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 18),
+            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 14),
             Ansicht_ToggleMiniToolbar, true, string.Empty));
     }
 
