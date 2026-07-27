@@ -167,7 +167,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     }
 
     private void SetLastFilesStyle() {
-        if (DrawStyle == ComboboxStyle.TextBox) { DrawStyle = ComboboxStyle.Button; }
+        if (DrawStyle == ComboboxDrawStyle.TextBox) { DrawStyle = ComboboxDrawStyle.Button; }
         if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
         if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
     }

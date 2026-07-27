@@ -219,7 +219,7 @@ namespace BlueControls.Forms {
             // 
             // btnLetzteDateien
             // 
-            btnLetzteDateien.DrawStyle = ComboboxStyle.RibbonBar;
+            btnLetzteDateien.DrawStyle = ComboboxDrawStyle.RibbonBar;
             btnLetzteDateien.DropDownStyle = DropDownMode.ClickableMenu;
             btnLetzteDateien.Enabled = false;
             btnLetzteDateien.ImageCode = "Ordner";
@@ -324,7 +324,7 @@ namespace BlueControls.Forms {
             // btnAnsichtZoom
             // 
             btnAnsichtZoom.AutoSort = false;
-            btnAnsichtZoom.DrawStyle = ComboboxStyle.RibbonBar;
+            btnAnsichtZoom.DrawStyle = ComboboxDrawStyle.RibbonBar;
             btnAnsichtZoom.DropDownStyle = DropDownMode.ClickableMenu;
             btnAnsichtZoom.ImageCode = "Lupe";
             btnAnsichtZoom.Location = new Point(216, 2);
@@ -384,7 +384,7 @@ namespace BlueControls.Forms {
             // btnEinstellungen
             // 
             btnEinstellungen.AutoSort = false;
-            btnEinstellungen.DrawStyle = ComboboxStyle.RibbonBar;
+            btnEinstellungen.DrawStyle = ComboboxDrawStyle.RibbonBar;
             btnEinstellungen.DropDownStyle = DropDownMode.ClickableMenu;
             btnEinstellungen.ImageCode = "Zahnrad";
             btnEinstellungen.Location = new Point(80, 2);
@@ -660,7 +660,7 @@ namespace BlueControls.Forms {
             // btnDrucken
             // 
             btnDrucken.AutoSort = false;
-            btnDrucken.DrawStyle = ComboboxStyle.RibbonBar;
+            btnDrucken.DrawStyle = ComboboxDrawStyle.RibbonBar;
             btnDrucken.DropDownStyle = DropDownMode.ClickableMenu;
             btnDrucken.ImageCode = "Drucker";
             btnDrucken.Location = new Point(136, 2);

@@ -175,7 +175,7 @@ namespace BluePaint
             // btnLetzteDateien
             // 
             this.btnLetzteDateien.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.btnLetzteDateien.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
+            this.btnLetzteDateien.DrawStyle = BlueControls.Enums.ComboboxDrawStyle.RibbonBar;
             this.btnLetzteDateien.DropDownStyle = DropDownMode.ClickableMenu;
             this.btnLetzteDateien.Enabled = false;
             this.btnLetzteDateien.ImageCode = "Ordner";

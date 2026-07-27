@@ -432,7 +432,7 @@ namespace BlueControls.Forms {
             // 
             // btnLetzteFormulare
             // 
-            btnLetzteFormulare.DrawStyle = ComboboxStyle.RibbonBar;
+            btnLetzteFormulare.DrawStyle = ComboboxDrawStyle.RibbonBar;
             btnLetzteFormulare.DropDownStyle = DropDownMode.DropDownList;
             btnLetzteFormulare.Enabled = false;
             btnLetzteFormulare.ImageCode = "Ordner";

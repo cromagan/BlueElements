@@ -84,8 +84,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     } = true;
 
-    [DefaultValue(ComboboxStyle.TextBox)]
-    public ComboboxStyle DrawStyle {
+    [DefaultValue(ComboboxDrawStyle.TextBox)]
+    public ComboboxDrawStyle DrawStyle {
         get;
         set {
             if (field != value) {
@@ -94,7 +94,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             }
             SetStyle();
         }
-    } = ComboboxStyle.TextBox;
+    } = ComboboxDrawStyle.TextBox;
 
     [DefaultValue(DropDownMode.DropDown)]
     public DropDownMode DropDownStyle {
@@ -258,14 +258,14 @@ public partial class ComboBox : TextBox, ITranslateable {
         // DropDownShowing-Event lazy geladen. Eine leere Liste darf hier
         // NICHT als Disabled gezeichnet werden, sonst wirken die Buttons
         // deaktiviert, bis sie einmal angeklickt wurden.
-        if (DrawStyle == ComboboxStyle.TextBox
+        if (DrawStyle == ComboboxDrawStyle.TextBox
             && _dropDownStyle == DropDownMode.DropDownList) {
             if (_items.Count == 0) {
                 state = States.Standard_Disabled;
             }
         }
 
-        if (DrawStyle != ComboboxStyle.TextBox) {
+        if (DrawStyle != ComboboxDrawStyle.TextBox) {
             btnEdit.Visible = false;
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
@@ -480,7 +480,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        if (DrawStyle != ComboboxStyle.TextBox) {
+        if (DrawStyle != ComboboxDrawStyle.TextBox) {
             Cursor = System.Windows.Forms.Cursors.Arrow;
             if (_dropDownStyle == DropDownMode.DropDown) { _dropDownStyle = DropDownMode.DropDownList; }
             btnDropDown.Visible = false;
