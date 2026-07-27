@@ -141,6 +141,16 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     /// <summary>
+    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
+    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen.
+    /// </summary>
+    [DefaultValue("")]
+    public string DoubleClickScript {
+        get => TableInternal.DoubleClickScript;
+        set => TableInternal.DoubleClickScript = value;
+    }
+
+    /// <summary>
     /// Zusammengeführter Filter aus Benutzerfilter + Fixfilter + FilterInput.
     /// Dies ist der tatsächlich aktive Filter. Wird von TableView automatisch berechnet.
     /// </summary>

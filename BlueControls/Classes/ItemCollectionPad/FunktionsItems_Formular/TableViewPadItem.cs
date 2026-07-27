@@ -19,6 +19,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     private GroupBoxStyle _borderStyle = GroupBoxStyle.Nothing;
     private string _defaultArrangement = string.Empty;
+    private string _doubleClickScript = string.Empty;
 
     #endregion
 
@@ -41,6 +42,21 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public bool AutoSizeableHeight => true;
 
     public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
+
+    /// <summary>
+    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
+    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen.
+    /// </summary>
+    [DefaultValue("")]
+    public string Doppelklick_Skript {
+        get => _doubleClickScript;
+        set {
+            if (IsDisposed) { return; }
+            if (_doubleClickScript == value) { return; }
+            _doubleClickScript = value;
+            OnPropertyChanged();
+        }
+    }
 
     public override bool InputMustBeOneRow => false;
 
@@ -84,11 +100,23 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         return u2;
     }
 
+    public static List<AbstractListItem> AllAvailableRowScripts(Table db) {
+        var u = new List<AbstractListItem>();
+        u.Add(ItemOf("Keins", string.Empty));
+        foreach (var thisS in db.EventScript) {
+            if (thisS is { IsDisposed: false } && thisS.IsOk() && thisS.NeedRow) {
+                u.Add(ItemOf(thisS as IReadableTextWithKey));
+            }
+        }
+        return u;
+    }
+
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TableViewWithFilters();
         con.Table = TableOutput;
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
+        con.DoubleClickScript = _doubleClickScript;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         con.GroupBoxStyle = _borderStyle;
         return con;
@@ -104,6 +132,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
         if (TableOutput is { IsDisposed: false } tb) {
             result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(tb)));
+            result.Add(new FlexiControlForProperty<string>(() => Doppelklick_Skript, AllAvailableRowScripts(tb)));
         }
 
         //if (TableOutput is { IsDisposed: false }) {
@@ -119,6 +148,9 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         result.ParseableAdd("BorderStyle", _borderStyle);
+        if (!string.IsNullOrEmpty(_doubleClickScript)) {
+            result.ParseableAdd("DoubleClickScript", _doubleClickScript);
+        }
         return result;
     }
 
@@ -126,12 +158,14 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         var json = base.ParseableJson();
         json.Set("defaultarrangement", _defaultArrangement);
         json.Set("borderstyle", (int)_borderStyle);
+        json.Set("doubleclickscript", _doubleClickScript);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
         _defaultArrangement = json.GetString("defaultarrangement", _defaultArrangement);
         _borderStyle = json.GetEnum("borderstyle", _borderStyle);
+        _doubleClickScript = json.GetString("doubleclickscript", _doubleClickScript);
         base.ParseJson(json);
     }
 
@@ -146,6 +180,10 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
             case "borderstyle":
                 _borderStyle = (GroupBoxStyle)IntParse(value);
+                return true;
+
+            case "doubleclickscript":
+                _doubleClickScript = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

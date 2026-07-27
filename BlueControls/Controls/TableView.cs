@@ -215,7 +215,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             if (ca is not null) {
                 ca.SheetStyle = SheetStyle;
-                ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+                // Indent-Breite abziehen, damit ScaleToFit die Spalten so
+                // skaliert, dass eingerückte Zeilen vollständig sichtbar bleiben.
+                var availWidth = AvailableControlPaintArea.Width - RowBackground.IndentWidth.CanvasToControl(Zoom) * MaxIndentOfRows;
+                ca.ComputeAllColumnPositions(Math.Max(16, availWidth), Zoom);
             }
 
             return ca;
@@ -246,6 +249,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             btnEdit.Visible = field;
         }
     }
+
+    /// <summary>
+    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
+    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen. Leerer String
+    /// bedeutet: normales Bearbeitungsverhalten (Textbox/Dropdown).
+    /// </summary>
+    [DefaultValue("")]
+    public string DoubleClickScript { get; set; } = string.Empty;
 
     /// <summary>
     /// Zusammengeführtes Ergebnis aus Filter und FilterFix.
@@ -1653,6 +1664,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _mustDoAllViewItems = true;
     }
 
+    /// <summary>
+    /// Maximaler Indent aller aktuell in <see cref="_sortedViewItems"/>
+    /// enthaltenen Zeilen. Wird für die Breitenberechnung von
+    /// <see cref="ColumnViewItemRenderingExtensions.ComputeAllColumnPositions"/>
+    /// und <see cref="CalculateCanvasMaxBounds"/> benötigt, damit beim
+    /// Aufklappen von Kapiteln die eingerückten Spalten nicht abgeschnitten werden.
+    /// </summary>
+    internal int MaxIndentOfRows => _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
+
     protected override RectangleF CalculateCanvasMaxBounds() {
         var x = AvailableControlPaintArea.Width;
         var y = AvailableControlPaintArea.Height;
@@ -1667,8 +1687,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // (RowBackground.DrawExplicit). Daher muss der maximale Indent aller
             // sichtbaren Zeilen auch in die Canvas-Breite einfließen — sonst
             // werden eingerückte Spalten am rechten Rand abgeschnitten.
-            var maxIndent = _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
-            x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom) + RowBackground.IndentWidth * maxIndent;
+            x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom) + RowBackground.IndentWidth * MaxIndentOfRows;
         }
 
         if (_sortedViewItems is { Count: > 0 }) {
@@ -1805,7 +1824,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
             ca.SheetStyle = SheetStyle;
-            ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+            // Indent-Breite abziehen, damit ScaleToFit die Spalten so
+            // skaliert, dass eingerückte Zeilen vollständig sichtbar bleiben.
+            var availWidth = AvailableControlPaintArea.Width - RowBackground.IndentWidth.CanvasToControl(Zoom) * MaxIndentOfRows;
+            ca.ComputeAllColumnPositions(Math.Max(16, availWidth), Zoom);
 
             // Haupt-Aufbau-Routine ------------------------------------
             // Zuerst Zeilen (ohne IgnoreYOffset) zeichnen, dann Kopfzeilen (mit IgnoreYOffset) darüber,
@@ -1862,6 +1884,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             _isinDoubleClick = true;
             try {
                 var (_mouseOverColumn, _mouseOverRow) = CellOnLastMouseDown();
+
+                // Wenn ein DoubleClickScript definiert ist, wird bei Doppelklick
+                // auf eine Datenzeile das Script ausgeführt statt bearbeitet.
+                if (DoubleClickScript is { Length: > 0 } scriptKey
+                    && _mouseOverRow is RowListItem dclRli) {
+                    ContextMenu_ExecuteScript(this, new ContextMenuEventArgs(
+                        ItemOf(scriptKey),
+                        ContextMenuItemGenerate(this, null, null, dclRli.Row, RowsVisibleUnique())));
+                    return;
+                }
 
                 if (_mouseOverRow is RowListItem rli) {
                     Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);
@@ -2980,7 +3012,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (arrangement.ControlColumnsWidth() <= 0 && arrangement.Count > 0) {
             arrangement.Invalidated = true;
-            arrangement.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+            var availWidth = AvailableControlPaintArea.Width - RowBackground.IndentWidth.CanvasToControl(Zoom) * MaxIndentOfRows;
+            arrangement.ComputeAllColumnPositions(Math.Max(16, availWidth), Zoom);
         }
 
         _newRowsAllowed = UserEdit_NewRowAllowed();
@@ -3605,7 +3638,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var (controlPos, contentHolderCellRow, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
 
-        box.Location = new Point(viewItem.ControlColumnLeft(OffsetX), controlPos.Y);
+        // Indent wie beim Zeichnen (RowBackground.DrawExplicit) zur X-Position
+        // addieren, damit die Textbox exakt über der gezeichneten Zelle liegt.
+        var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * (cellInThisTableRow?.Indent ?? 0);
+
+        box.Location = new Point(viewItem.ControlColumnLeft(OffsetX) + indentOffset, controlPos.Y);
         box.Size = new Size(viewItem.ControlColumnWidth() + addWith, controlPos.Height);
         box.Text = cellText;
         box.Tag = (List<object?>)[viewItem, cellInThisTableRow];
@@ -3646,8 +3683,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var (controlPos, _, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
         var totalWidth = viewItem.ControlColumnWidth() + addWith;
 
+        // Indent wie beim Zeichnen (RowBackground.DrawExplicit) zur X-Position
+        // addieren, damit die Textbox exakt über der gezeichneten Zelle liegt.
+        var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * (cellInThisTableRow?.Indent ?? 0);
+
         BTS.TextboxSize = new Size(totalWidth, controlPos.Height);
-        BTS.Location = new Point(viewItem.ControlColumnLeft(OffsetX), controlPos.Y);
+        BTS.Location = new Point(viewItem.ControlColumnLeft(OffsetX) + indentOffset, controlPos.Y);
         BTS.Size = new Size(totalWidth, BTS.GetEstimatedHeight(totalWidth, controlPos.Height));
         BTS.Text = cellText;
         BTS.Verhalten = controlPos.Height > 20

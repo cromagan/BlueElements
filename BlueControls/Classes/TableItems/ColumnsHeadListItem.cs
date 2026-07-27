@@ -357,7 +357,8 @@ public sealed class ColumnsHeadListItem : RowBackground {
             }
         }
 
-        ca.ComputeAllColumnPositions(tableView.AvailableControlPaintArea.Width, tableView.Zoom);
+        var availWidth = tableView.AvailableControlPaintArea.Width - RowBackground.IndentWidth.CanvasToControl(tableView.Zoom) * tableView.MaxIndentOfRows;
+        ca.ComputeAllColumnPositions(Math.Max(16, availWidth), tableView.Zoom);
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
