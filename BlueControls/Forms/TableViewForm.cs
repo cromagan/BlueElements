@@ -21,7 +21,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private bool _switchingTabs;
 
-    private bool _zeilenClickInsClipboard;
+    private bool _zellenClickInsClipboard;
 
     #endregion
 
@@ -331,7 +331,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     protected virtual void OnSelectedCellChanged(object sender, CellExtEventArgs e) {
-        if (_zeilenClickInsClipboard) {
+        if (_zellenClickInsClipboard) {
             BlueControls.Controls.TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
 
             TableView.Focus();
@@ -487,34 +487,29 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void Ansicht_ExpandAll(object? sender, ContextMenuEventArgs e) => TableView.ExpandAll();
 
+    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) {
+        TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
+    }
+
     private void Ansicht_ZoomFit(object? sender, ContextMenuEventArgs e) => TableView.Zoom = 1f;
 
     private void Ansicht_ZoomIn(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(true);
 
     private void Ansicht_ZoomOut(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(false);
 
-    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) {
-        TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
+    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
+        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
     }
 
     private void btnAnsichtZoom_DropDownShowing(object? sender, System.EventArgs e) {
         btnAnsichtZoom.ItemClear();
+        btnAnsichtZoom.Padding = new Padding(10);
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom vergrößern", QuickImage.Get(ImageCode.LupePlus, 18), Ansicht_ZoomIn, true, string.Empty));
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom verkleinern", QuickImage.Get(ImageCode.LupeMinus, 18), Ansicht_ZoomOut, true, string.Empty));
         btnAnsichtZoom.ItemAdd(ItemOf("Zoom 1:1", QuickImage.Get(ImageCode.ZoomFit, 18), Ansicht_ZoomFit, true, string.Empty));
         btnAnsichtZoom.ItemAdd(Separator());
         btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel öffnen", QuickImage.Get(ImageCode.Pfeil_Unten_Scrollbar, 18), Ansicht_ExpandAll, true, string.Empty));
         btnAnsichtZoom.ItemAdd(ItemOf("Alle Kapitel schließen", QuickImage.Get(ImageCode.Pfeil_Oben_Scrollbar, 18), Ansicht_CollapseAll, true, string.Empty));
-        btnAnsichtZoom.ItemAdd(Separator());
-        btnAnsichtZoom.ItemAdd(ItemOf(
-            TableView.MiniToolbarEnabled ? "MiniToolbar aus" : "MiniToolbar ein",
-            "MiniToolbar",
-            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.Häkchen : ImageCode.Kreis2, 18),
-            Ansicht_ToggleMiniToolbar, true, string.Empty));
-    }
-
-    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
-        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
     }
 
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
@@ -534,10 +529,17 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void btnEinstellungen_DropDownShowing(object? sender, System.EventArgs e) {
         btnEinstellungen.ItemClear();
         btnEinstellungen.ItemAdd(ItemOf(
-            _zeilenClickInsClipboard ? "Zeilenclick = Clipboard deaktivieren" : "Zeilenclick = Clipboard aktivieren",
+            "Zell-Klick = In Zwischenablage kopieren",
             "clipboard",
-            QuickImage.Get(_zeilenClickInsClipboard ? ImageCode.Häkchen : ImageCode.Kreis2, 16),
+            QuickImage.Get(_zellenClickInsClipboard ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 16),
             Einstellungen_ToggleClipboard, true, string.Empty));
+
+        //btnAnsichtZoom.ItemAdd(Separator());
+        btnEinstellungen.ItemAdd(ItemOf(
+            "MiniToolbar aktiv",
+            "MiniToolbar",
+            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 18),
+            Ansicht_ToggleMiniToolbar, true, string.Empty));
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -786,7 +788,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) {
-        _zeilenClickInsClipboard = !_zeilenClickInsClipboard;
+        _zellenClickInsClipboard = !_zellenClickInsClipboard;
     }
 
     private void ExportCSV_Click(object? sender, ContextMenuEventArgs e) {
