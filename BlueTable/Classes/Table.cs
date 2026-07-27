@@ -520,7 +520,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             foreach (var thisv in l) {
                 thisv.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
             }
-            if (_variableTmp == l.ToString(true)) { return; }
+
+            // Serialisierung VOR dem Dispose berechnen. DisposeContent kann bei
+            // einigen Variablen-Typen (VariableTable, VariableRowItem) die
+            // internen Referenzen nullen - danach wuerde ValueForReplace nur
+            // noch Platzhalter ({TBL:?}, {ROW:?}) liefern und die Referenz
+            // waere beim naechsten Laden verloren.
+            var serialized = l.ToString(true);
+            if (_variableTmp == serialized) { return; }
 
             #region Kritische Variablen Disposen
 
@@ -530,7 +537,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
             #endregion
 
-            ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
+            ChangeData(TableDataType.TableVariables, null, _variableTmp, serialized);
         }
     }
 
@@ -2495,8 +2502,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
             case TableDataType.TableVariables:
                 _variables.Clear();
-                _variables.AddRange(VariableCollection.ParseVariable(value, true));
-                _variables.SortByKeyName();
+                // SortByKeyName liefert eine neue Liste - direkt als sortierte
+                // Quelle fuer AddRange verwenden. Ohne diese Sortierung waere
+                // _variableTmp (CheckOrder+KeyName) nie identisch mit der
+                // Serialisierung im Setter (KeyName), und jede Zuweisung wuerde
+                // ueberfluessig ein ChangeData/Fragment schreiben.
+                _variables.AddRange(VariableCollection.ParseVariable(value, true).SortByKeyName());
                 _variableTmp = _variables.ToString(true);
                 break;
 

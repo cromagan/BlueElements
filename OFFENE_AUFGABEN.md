@@ -13,10 +13,6 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
 
-##Aufgabe
- _parent?.StyleChanged -= _parent_StyleChanged
- entfernen. Das Parent sollte das Child pushen
- 
  ##Aufgabe
  Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
  Entferne OnColumnDisposed
@@ -131,7 +127,7 @@ Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ers
 Ergänze die bereits geprüfte Datei hier und ignoriere diese:
 
 ##Aufgabe
-Setze Pattern-Matching ein, wo möglich
+Setze Inline Deklartionen ein, wo geht.  Ich meine so: ... is {} x. Oder auch mit den Typen
 
 ##Aufgabe
 Überprüfe Tulples, String und Bool Rückgaben, ob diese Durch OperationResult verbessert werden können.
@@ -161,9 +157,6 @@ Finde stellen, wo  die Dreierabfrage sinn mach
 if (Generic.Ending || IsDisposed || Disposing) { return; }
 und ergänze diese
 
-#Aufgabe
-Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern den Wert in der Tabelle. Nun soll es anders sein: Die Werte sollen in Table gespeichert werden. Und so auch die RowChecked Werte (Zeilenfarben etc.)
-
 ##Aufgabe
 CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
 
@@ -171,7 +164,7 @@ CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, Spli
 Alle ListItemAbstract Ableitungen komplett entfernen. Nur noch ein List-Item. Das aussehen wird durch die (vorhandenen) Renderer gemacht. Evtl. die Renderer erweitern. Evtl. neue Renderer einrichten.
 
 ##Aufgabe 
-Kontextmenu: Kapitel ändern
+MiniToolbar: Kapitel ändern
 
 ##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
@@ -190,6 +183,10 @@ KeyName = json.GetString("key", KeyName);
 
 Alle json Keys in kleinschreibung.
 
+## Aufgabe
+In Table ist das Json laden nicht nicht implementiert.
+Und TableFragments muss auf das neue Json Format geändert werden.
+
 
 ## Aufgabe
 Ich denke, LogData ist nicht mehr nötig und einfach zu ersetzen.
@@ -200,13 +197,6 @@ Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nic
 
 ## Aufgabe
 Wird die Listbox gezoomt. verändern sich intern die Items nicht, sie werden immer mit Scale 1 gezeichnet
-
-## Aufgabe
-"Editor nicht gefunden" bei einer Table. Seit der Letzte (oder vorletzten) Git änderung. Schau im Git und Prüfe
-
-## Aufgabe
-In Skripten stimmen die Zeilennummern nicht.
-Wird innerhalb eines IFs ein Stop; gesetzt, wird die Zeilennummer des Ifs angezeigt.
 
 ## Aufgabe
 Der neue Editor muss anders gestaltet werden:

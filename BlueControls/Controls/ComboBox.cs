@@ -249,7 +249,12 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
-        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
+        // Bei RibbonBar-/Button-Stilen werden die Items häufig erst per
+        // DropDownShowing-Event lazy geladen. Eine leere Liste darf hier
+        // NICHT als Disabled gezeichnet werden, sonst wirken die Buttons
+        // deaktiviert, bis sie einmal angeklickt wurden.
+        if (DrawStyle == ComboboxStyle.TextBox
+            && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
             if (_items.Count == 0) {
                 state = States.Standard_Disabled;
             }
