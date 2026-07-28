@@ -179,6 +179,10 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
                     if (c is IIsEditor ie2) {
                         ie2.InputItem = toEdit;
                     }
+                    if (c is EditorEasy ee && ee.OpenMaximized) {
+                        ibe.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                        ibe.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                    }
                 }
                 ibe.UpdateButtons();
                 break;
@@ -276,13 +280,17 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         if (Canceled) { return true; }
 
         foreach (var thisc in Controls) {
-            if (thisc is EditorEasy ee && ((IIsEditor)ee).OutputItem is IErrorCheckable ec) {
-                if (ec.IsOk()) { return true; }
+            if (thisc is EditorEasy ee) {
+                // EditItem-Editoren müssen selbst für Live-Sync ins InputItem sorgen
+                // (z.B. via Setter). OutputItem liefert im EditItem-Modus das InputItem direkt.
+                if (((IIsEditor)ee).OutputItem is IErrorCheckable ec) {
+                    if (ec.IsOk()) { return true; }
 
-                var b = MessageBox.Show($"<b><u>Es sind noch Fehler vorhanden:</u></b>\r\n\r\n{ec.ErrorReason()}\r\n\r\nMöchten sie diese beheben?", ImageCode.Warnung, "Beheben", "Verwerfen");
+                    var b = MessageBox.Show($"<b><u>Es sind noch Fehler vorhanden:</u></b>\r\n\r\n{ec.ErrorReason()}\r\n\r\nMöchten sie diese beheben?", ImageCode.Warnung, "Beheben", "Verwerfen");
 
-                if (b == 0) { return false; }
-                Canceled = true;
+                    if (b == 0) { return false; }
+                    Canceled = true;
+                }
             }
         }
 

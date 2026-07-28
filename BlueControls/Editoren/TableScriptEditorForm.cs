@@ -160,34 +160,6 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
         lst.Add(newItem);
     }
 
-    private void TableScriptEditor_Executing(object? sender, System.EventArgs e) => WriteBackEventScripts();
-
-    /// <summary>
-    /// Schreibt die Arbeitskopie (<see cref="EditorForIEnumerable.OutputItem"/>)
-    /// in das Backend (<see cref="Table.EventScript"/>) zurück. Wird beim
-    /// Schließen des Formulars sowie vor jedem Test/Ausführen (über das
-    /// <see cref="ScriptEditor.Executing"/>-Event) aufgerufen.
-    /// </summary>
-    private void WriteBackEventScripts() {
-        if (_table is not { IsDisposed: false } tb) { return; }
-        if (lstEventScripts.OutputItem is null) { return; }
-
-        // Gepufferte Eingaben (insb. den Skript-Text, der keinen
-        // PropertyChanged auslöst) vom Editor in die Arbeitskopie übernehmen,
-        // bevor diese ans Backend geht.
-        lstEventScripts.FlushEditor();
-
-        tb.EventScript = lstEventScripts.OutputItem
-            .Cast<TableScriptDescription>()
-            .ToList()
-            .AsReadOnly();
-
-        // Backend tauscht die Collection-Referenz aus — Quelle neu setzen löst
-        // den Neuaufbau aus (mit Selektionserhalt) und aktualisiert _item im
-        // Editor auf die frische Backend-Instanz.
-        lstEventScripts.InputItem = tb.EventScript;
-    }
-
     private void LstEventScripts_ListBuilt(object? sender, System.EventArgs e) {
         if (IsDisposed || _table is not { IsDisposed: false } tb) { return; }
 
@@ -221,6 +193,34 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
         if (e.IsEditable || IsDisposed) { return; }
         Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
+    }
+
+    private void TableScriptEditor_Executing(object? sender, System.EventArgs e) => WriteBackEventScripts();
+
+    /// <summary>
+    /// Schreibt die Arbeitskopie (<see cref="EditorForIEnumerable.OutputItem"/>)
+    /// in das Backend (<see cref="Table.EventScript"/>) zurück. Wird beim
+    /// Schließen des Formulars sowie vor jedem Test/Ausführen (über das
+    /// <see cref="ScriptEditor.Executing"/>-Event) aufgerufen.
+    /// </summary>
+    private void WriteBackEventScripts() {
+        if (_table is not { IsDisposed: false } tb) { return; }
+        if (lstEventScripts.OutputItem is null) { return; }
+
+        // Gepufferte Eingaben (insb. den Skript-Text, der keinen
+        // PropertyChanged auslöst) vom Editor in die Arbeitskopie übernehmen,
+        // bevor diese ans Backend geht.
+        lstEventScripts.DemandEditorOutput();
+
+        tb.EventScript = lstEventScripts.OutputItem
+            .Cast<TableScriptDescription>()
+            .ToList()
+            .AsReadOnly();
+
+        // Backend tauscht die Collection-Referenz aus — Quelle neu setzen löst
+        // den Neuaufbau aus (mit Selektionserhalt) und aktualisiert _item im
+        // Editor auf die frische Backend-Instanz.
+        lstEventScripts.InputItem = tb.EventScript;
     }
 
     #endregion

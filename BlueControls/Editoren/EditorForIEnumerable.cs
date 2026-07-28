@@ -185,6 +185,19 @@ public partial class EditorForIEnumerable : ListBox {
         SelectByKey((newItem as IHasKeyName)?.KeyName);
     }
 
+    public void DemandEditorOutput() {
+        if (SelectedItem is null || Editor is null) { return; }
+        if (Editor.OutputItem is not { } edited) { return; }
+        if (ReferenceEquals(edited, SelectedItem)) { return; }
+        if (OutputItem is not { } output) { return; }
+
+        var idx = output.FindIndex(x => ReferenceEquals(x, SelectedItem));
+        if (idx >= 0) {
+            output[idx] = edited;
+            SelectedItem = edited;
+        }
+    }
+
     /// <summary>
     /// Wählt das Element mit dem angegebenen Schlüssel und zeigt es im Editor an.
     /// Wird vom hostenden Form typischerweise nach dem Hinzufügen eines neuen
@@ -283,19 +296,6 @@ public partial class EditorForIEnumerable : ListBox {
     private void AttachPropertyChanged(IIsEditor? editor) {
         if (editor is INotifyPropertyChanged pcn) {
             pcn.PropertyChanged += Editor_PropertyChanged;
-        }
-    }
-
-    private void DemandEditorOutput() {
-        if (SelectedItem is null || Editor is null) { return; }
-        if (Editor.OutputItem is not { } edited) { return; }
-        if (ReferenceEquals(edited, SelectedItem)) { return; }
-        if (OutputItem is not { } output) { return; }
-
-        var idx = output.FindIndex(x => ReferenceEquals(x, SelectedItem));
-        if (idx >= 0) {
-            output[idx] = edited;
-            SelectedItem = edited;
         }
     }
 

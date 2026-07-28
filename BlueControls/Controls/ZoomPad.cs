@@ -87,9 +87,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int OffsetX {
-        get => ShowSliderX && SlideAndZoomAllowed ? field : 0;
+        get => (ShowSliderX || AllowScrollWithoutSliderX) && SlideAndZoomAllowed ? field : 0;
         set {
-            if (!ShowSliderX || !SlideAndZoomAllowed) { value = 0; }
+            if ((!ShowSliderX && !AllowScrollWithoutSliderX) || !SlideAndZoomAllowed) { value = 0; }
 
             value = (int)Math.Clamp(value, -SliderX.Maximum, -SliderX.Minimum);
 
@@ -164,6 +164,16 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
         private set;
     }
+
+    /// <summary>
+    /// Wenn <c>true</c>, kann <see cref="OffsetX"/> auch dann frei gesetzt werden,
+    /// wenn <see cref="ShowSliderX"/> <c>false</c> ist und der horizontale Slider
+    /// damit unsichtbar bleibt. Die Begrenzungen (SliderX.Minimum/Maximum) werden
+    /// in <see cref="UpdateSliderBounds"/> trotzdem berechnet, sodass der Offset
+    /// sauber geclampt wird. Wird z.B. von der TextBox für die Cursor-Verfolgung
+    /// im Singleline-Modus genutzt.
+    /// </summary>
+    protected virtual bool AllowScrollWithoutSliderX => false;
 
     protected abstract bool ShowSliderX { get; }
 
@@ -496,9 +506,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var controlArea = AvailableControlPaintArea;
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
-        if (SliderX.Visible) {
-            SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
-            SliderX.Maximum = tmpCanvasMaxBounds.Left.CanvasToControl(Zoom) - controlArea.Left;
+        if (SliderX.Visible || AllowScrollWithoutSliderX) {
+            // Struktur analog zu SliderY (unten): Maximum ist die "große" Distanz,
+            // Minimum die "kleine". Vertauschte Formeln würden Minimum > Maximum
+            // ergeben, wodurch Math.Clamp im OffsetX-Setter eine ArgumentException werfen würde.
+            SliderX.Maximum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
+            SliderX.Minimum = tmpCanvasMaxBounds.Left.CanvasToControl(Zoom) - controlArea.Left;
             SliderX.LargeChange = controlArea.Width;
             SliderX.Value = -OffsetX;
         } else {

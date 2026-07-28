@@ -107,6 +107,13 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     public virtual object? CreateNewItem() => null;
 
     /// <summary>
+    /// Wenn true, öffnet der Host-Dialog (z.B. <see cref="Forms.InputBoxEditor"/>)
+    /// das Fenster maximiert als normales Fenster. Große Editoren wie der
+    /// Skript-Editor überschreiben dies mit true.
+    /// </summary>
+    public virtual bool OpenMaximized => false;
+
+    /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);

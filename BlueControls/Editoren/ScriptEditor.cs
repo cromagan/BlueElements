@@ -84,7 +84,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public override Type? EditorFor => typeof(ScriptDescription);
 
     /// <summary>
-    /// Delegate für die Test-Ausführung des Skripts. Wird beim Laden eines
+    /// Delegate für die Test-Ausführung des Skripts. Wird beim Laden einer
     /// <see cref="ScriptDescription"/>-Items aus dessen
     /// <see cref="ScriptDescription.ExecuteScript"/> übernommen.
     /// Parameter: Skripttext, Testmodus.
@@ -94,6 +94,12 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public string LastFailedReason { get; set; } = string.Empty;
 
     public List<Variable>? LastVariables { get; set; }
+
+    /// <summary>
+    /// Der Skript-Editor öffnet maximiert als normales Fenster, da Skripte
+    /// viel Platz für Code, Variablen und Assistent benötigen.
+    /// </summary>
+    public override bool OpenMaximized => true;
 
     public string Script {
         get => txtSkript.Text.TrimEnd(' ').Replace("\r\n", "\r");
@@ -496,7 +502,10 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
-    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => ScriptChangedByUser = true;
+    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) {
+        ScriptChangedByUser = true;
+        if (Mode == EditorMode.EditItem && InputItem is ScriptDescription sd) { sd.Script = Script; }
+    }
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
         try {

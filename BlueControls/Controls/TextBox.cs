@@ -272,10 +272,13 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     /// <summary>
     /// Horizontaler Slider wird von der TextBox nicht genutzt.
-    /// Horizontales Scrollen (z.B. Cursor-Verfolgung im Singleline-Modus)
-    /// erfolgt durch direktes Setzen von <see cref="ZoomPad.OffsetX"/>.
+    /// Horizontales Scrollen (Cursor-Verfolgung im Singleline-Modus) erfolgt
+    /// durch direktes Setzen von <see cref="ZoomPad.OffsetX"/>, siehe
+    /// <see cref="EnsureCursorVisible"/>.
     /// </summary>
     protected override bool ShowSliderX => false;
+
+    protected override bool AllowScrollWithoutSliderX => true;
 
     protected override int SmallChangeY => 20;
 
@@ -560,7 +563,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (measured != _lastCanvasSize) {
             _lastCanvasSize = measured;
             Invalidate_MaxBounds();
+            // SliderX-Grenzen mit der aktualisierten Canvas-Größe neu berechnen,
+            // damit EnsureCursorVisible im selben Draw-Zyklus korrekt clampt.
+            // Ohne diesen Aufruf scrollt der Cursor beim Tippen immer einen
+            // Frame zu spät nach (SliderX-Min/Max basieren sonst noch auf der
+            // Textbreite des vorherigen Frames).
+            UpdateSliderBounds();
         }
+
+        EnsureCursorVisible();
 
         var drawOffsetX = OffsetX + Skin.PaddingSmal;
         var drawOffsetY = OffsetY + Skin.PaddingSmal;
@@ -1031,6 +1042,60 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         foreach (var zone in sorted) {
             zone.Render(_eTxt, gr, zoom, offsetX, offsetY);
         }
+    }
+
+    /// <summary>
+    /// Passt den horizontalen Scroll-Offset so an, dass der Cursor im sichtbaren
+    /// Bereich bleibt. Nur im Singleline-Modus ohne Textumbruch aktiv.
+    /// </summary>
+    private void EnsureCursorVisible() {
+        if (IsDisposed) { return; }
+
+        // Nur im Singleline-Modus ohne Textumbruch wird horizontal gescrollt
+        if (MultiLine || Verhalten != SteuerelementVerhalten.Scrollen_ohne_Textumbruch) {
+            if (OffsetX != 0) { OffsetX = 0; }
+            return;
+        }
+
+        if (_markStart < 0) { return; }
+
+        var controlArea = AvailableControlPaintArea;
+        var padding = Skin.PaddingSmal;
+        var innerWidth = controlArea.Width - (padding * 2);
+        var textWidthControl = _eTxt.WidthControl * Zoom;
+
+        // Wenn der Text vollständig in das Control passt, kein Scrollen nötig
+        if (textWidthControl <= innerWidth) {
+            if (OffsetX != 0) { OffsetX = 0; }
+            return;
+        }
+
+        // Cursor-X in Control-Koordinaten (absolut)
+        var cursorRect = _eTxt.CursorCanvasPosX(_markStart);
+        var cursorXControl = (cursorRect.Left * Zoom) + OffsetX + padding;
+
+        // Sichtbarer Bereich (Control-Koordinaten) mit margin-Vorlauf.
+        // Der Cursor wird schon nachgeschoben, sobald er in den margin-Bereich
+        // am Rand kommt - nicht erst, wenn er vollständig verschwunden ist.
+        // Rechts werden 3 * PaddingSmal abgezogen (analog zur Breitenberechnung
+        // der TextBox): Padding + Cursor-Platz + Border.
+        const float margin = 15f;
+        var visibleLeft = (float)padding;
+        var visibleRight = controlArea.Width - padding * 3;
+
+        var newOffset = OffsetX;
+        if (cursorXControl < visibleLeft + margin) {
+            // Cursor nähert sich dem linken Rand - nach rechts scrollen,
+            // bis er margin-Abstand vom linken Rand hat
+            newOffset += (int)Math.Ceiling(visibleLeft + margin - cursorXControl);
+        } else if (cursorXControl > visibleRight - margin) {
+            // Cursor nähert sich dem rechten Rand - nach links scrollen,
+            // bis er margin-Abstand vom rechten Rand hat
+            newOffset -= (int)Math.Ceiling(cursorXControl - (visibleRight - margin));
+        }
+
+        // Begrenzungen übernimmt der OffsetX-Setter (via SliderX-Min/Max in UpdateSliderBounds)
+        if (newOffset != OffsetX) { OffsetX = newOffset; }
     }
 
     /// <summary>
