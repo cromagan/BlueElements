@@ -38,7 +38,7 @@ public class VariableDouble : Variable {
     /// </summary>
     public override string ReadableText => _double.ToString1_5();
 
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => true;
 
     public override string ValueForCell {

@@ -38,11 +38,6 @@ public class VariableString : Variable {
     /// </summary>
     public override string ReadableText => _valueString;
 
-    /// <summary>
-    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
-    /// </summary>
-    public override string SearchValue => _valueString;
-
     public override bool ToStringPossible => true;
 
     public override string ValueForCell {

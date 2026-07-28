@@ -38,7 +38,7 @@ public class VariableUnknown : Variable {
     /// </summary>
     public override string ReadableText => "[unknown]";
 
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
 
     /// <summary>

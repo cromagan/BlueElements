@@ -32,11 +32,6 @@ public class VariableBool : Variable {
     public override bool IsNullOrEmpty => false;
     public override string ReadableText => _valuebool.ToString();
 
-    /// <summary>
-    /// Der Wert + oder -
-    /// </summary>
-    public override string SearchValue => _valuebool.ToPlusMinus();
-
     public override bool ToStringPossible => true;
 
     public bool ValueBool {

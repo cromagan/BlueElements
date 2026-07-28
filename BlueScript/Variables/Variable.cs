@@ -65,8 +65,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public bool ReadOnly { get; set; }
 
-    public abstract string SearchValue { get; }
-
     /// <summary>
     /// Wichtig für Boolsche Vergleiche
     /// </summary>

@@ -40,7 +40,7 @@ public class VariableTable : Variable {
     /// </summary>
     public override string ReadableText => _lastText;
 
-    public override string SearchValue => ReadableText;
+
 
     public Table? Table {
         get {

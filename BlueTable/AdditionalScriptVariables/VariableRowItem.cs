@@ -49,7 +49,7 @@ public class VariableRowItem : Variable {
         }
     }
 
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => true;
     public override string ValueForCell => string.Empty;
 

@@ -29,7 +29,7 @@ public abstract class Method_TableGeneric : Method {
         if (c is null) { return null; }
 
         if (c.KeyName.StartsWith("ID_", StringComparison.OrdinalIgnoreCase)) {
-            return MyTable(scp)?.Column[c.SearchValue];
+            return MyTable(scp)?.Column[c.ValueForCell];
         }
 
         return MyTable(scp)?.Column[c.KeyName];

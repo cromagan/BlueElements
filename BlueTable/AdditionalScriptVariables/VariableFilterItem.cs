@@ -44,7 +44,7 @@ public class VariableFilterItem : Variable {
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _filter?.IsOk() != true;
     public override string ReadableText => _lastText;
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
     public override string ValueForCell => string.Empty;
 

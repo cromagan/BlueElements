@@ -38,7 +38,7 @@ public class VariableListRow : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _list.Count == 0;
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
     public override string ValueForCell => string.Empty;
 

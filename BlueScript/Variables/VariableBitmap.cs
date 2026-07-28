@@ -32,7 +32,7 @@ public class VariableBitmap : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp is null;
-    public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
 
     public Bitmap? ValueBitmap {
