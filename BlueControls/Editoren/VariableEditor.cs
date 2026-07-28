@@ -31,7 +31,24 @@ public partial class VariableEditor : EditorEasy {
         if (tableVariablen.Table is not { IsDisposed: false } tb) { return list; }
 
         foreach (var thisr in tb.Row) {
-            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
+            var name = thisr.CellGetString("Name");
+            if (string.IsNullOrEmpty(name)) { continue; }
+
+            var typId = thisr.CellGetString("Typ");
+            var inhalt = thisr.CellGetString("Inhalt");
+            var kommentar = thisr.CellGetString("Kommentar");
+
+            var v = ParseableItem.NewByTypeName<Variable>(typId);
+            if (v is null) {
+                Develop.DebugPrint($"Unbekannter Variablentyp '{typId}' – erzeuge VariableString.");
+                v = new VariableString(name, inhalt, false, kommentar);
+            } else {
+                v.KeyName = name;
+                v.Comment = kommentar;
+                v.ReadOnly = false; // notwendig, damit ValueForCell den Wert übernehmen darf
+                v.ValueForCell = inhalt;
+            }
+
             list.Add(v);
         }
 
@@ -112,7 +129,7 @@ public partial class VariableEditor : EditorEasy {
                     ro.CellSet("typ", thisv.MyClassId, string.Empty);
                     ro.CellSet("RO", thisv.ReadOnly, string.Empty);
 
-                    var tmpi = thisv.ReadableText;
+                    var tmpi = thisv.ValueForCell;
                     if (Mode == EditorMode.OnlyShow && tmpi.Length > 3990) {
                         tmpi = tmpi[..3990] + "...";
                     }
