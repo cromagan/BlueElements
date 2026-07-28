@@ -94,7 +94,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             }
             return field;
         }
-        private set { field = value; }
+
+        private set => field = value;
     }
 
     public FilterType FilterType { get; private set; }

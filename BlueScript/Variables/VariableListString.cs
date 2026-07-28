@@ -61,7 +61,12 @@ public class VariableListString : Variable {
 
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
-    public override string ValueForCell => string.Join('\r', _list);
+
+    public override string ValueForCell {
+        get => string.Join('\r', _list);
+        set => ValueList = [.. value.SplitAndCutByCr()];
+    }
+
     public override string ValueForReplace => ReadableText;
 
     public List<string> ValueList {
@@ -104,9 +109,11 @@ public class VariableListString : Variable {
             case List<string> val:
                 _list = val;
                 break;
+
             case string[] val2:
                 _list = [.. val2];
                 break;
+
             default:
                 Develop.DebugError("Variablenfehler!");
                 break;

@@ -512,9 +512,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     }
 
     public VariableCollection Variables {
-        get {
-            return [.. _variables];
-        }
+        get => [.. _variables];
         set {
             var l = value.ToStringableListVariable();
             foreach (var thisv in l) {

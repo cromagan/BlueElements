@@ -87,9 +87,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             field = FindForm();
             return field;
         }
-        private set {
-            field = value;
-        }
+
+        private set => field = value;
     }
 
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]

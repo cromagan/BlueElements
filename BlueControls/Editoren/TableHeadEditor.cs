@@ -39,9 +39,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public object? InputItem {
         get => Table;
-        set {
-            Table = value as Table;
-        }
+        set => Table = value as Table;
     }
 
     public EditorMode Mode { get; set; } = EditorMode.EditItem;

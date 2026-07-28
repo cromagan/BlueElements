@@ -72,7 +72,20 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     /// </summary>
     public abstract bool ToStringPossible { get; }
 
-    public abstract string ValueForCell { get; }
+    /// <summary>
+    /// Liefert den Zellwert für die Anzeige (z. B. im Variablen-Editor) bzw.
+    /// übernimmt einen Zelltext. Das Format ist bei Get und Set identisch.
+    /// Basistypen ohne bearbeitbaren Inhalt (z. B. Bitmap) ignorieren den Set-Aufruf.
+    /// </summary>
+    public virtual string ValueForCell {
+        get {
+            Develop.DebugPrint_RoutineMussUeberschriebenWerden(true);
+            return MyClassId;
+        }
+        set {
+            Develop.DebugError("Unbekannter Typ");
+        }
+    }
 
     /// <summary>
     /// Wichtig für Boolsche Vergleiche

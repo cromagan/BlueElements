@@ -48,7 +48,11 @@ public class VariableBool : Variable {
         }
     }
 
-    public override string ValueForCell => _valuebool.ToPlusMinus();
+    public override string ValueForCell {
+        get => _valuebool.ToPlusMinus();
+        set => ValueBool = value.FromPlusMinus();
+    }
+
     public override string ValueForReplace => _valuebool ? "true" : "false";
 
     #endregion

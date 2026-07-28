@@ -16,11 +16,11 @@ public class VariableString : Variable {
 
     public VariableString(string name, string value, bool ronly, string comment) : base(name, ronly, comment) => _valueString = value.RestoreCriticalVariableChars();
 
-    public VariableString(string name) : this(name, string.Empty, true, string.Empty) {}
+    public VariableString(string name) : this(name, string.Empty, true, string.Empty) { }
 
-    public VariableString() : this(string.Empty, string.Empty, true, string.Empty) {}
+    public VariableString() : this(string.Empty, string.Empty, true, string.Empty) { }
 
-    public VariableString(string name, string value) : this(name, value, true, string.Empty) {}
+    public VariableString(string name, string value) : this(name, value, true, string.Empty) { }
 
     #endregion
 
@@ -44,7 +44,11 @@ public class VariableString : Variable {
     public override string SearchValue => _valueString;
 
     public override bool ToStringPossible => true;
-    public override string ValueForCell => _valueString;
+
+    public override string ValueForCell {
+        get => _valueString;
+        set => ValueString = value;
+    }
 
     /// <summary>
     /// Der Wert mit " Anfang/Ende und entfernten kritischen Zeichen.
@@ -70,7 +74,7 @@ public class VariableString : Variable {
 
     #region Methods
 
-    public override void DisposeContent() {}
+    public override void DisposeContent() { }
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableString v) { return VerschiedeneTypen(variable); }

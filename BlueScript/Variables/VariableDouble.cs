@@ -41,7 +41,10 @@ public class VariableDouble : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
 
-    public override string ValueForCell => ReadableText;
+    public override string ValueForCell {
+        get => ReadableText;
+        set => ValueNum = Converter.DoubleParse(value);
+    }
 
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)
@@ -88,9 +91,11 @@ public class VariableDouble : Variable {
             case float val:
                 _double = val;
                 break;
+
             case double vald:
                 _double = vald;
                 break;
+
             default:
                 Develop.DebugError("Variablenfehler!");
                 break;
