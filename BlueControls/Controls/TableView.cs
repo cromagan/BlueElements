@@ -3128,13 +3128,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             var chapter = rli.AlignsToChapter;
 
             if (string.IsNullOrEmpty(chapter)) {
-                // Zeile ohne Kapitel: oberste Ebene, kein Header.
-                sortedItems.Add(rli);
-                lastChapter = null;
-                currentBlockRows = null;
-                blockCollapsed = false;
-                collapsedAncestor = null;
-                continue;
+                // NumberStyle mit Kapitel-Spalte: auch ein leerer Kapitel-Wert
+                // wird als eigener Block behandelt — ohne Überschrift, aber
+                // auf-/zuklappbar. Sonst: Zeile ohne Header auf oberster Ebene.
+                if (!numberStyle || rli.Arrangement?.ColumnForChapter is not { IsDisposed: false }) {
+                    sortedItems.Add(rli);
+                    lastChapter = null;
+                    currentBlockRows = null;
+                    blockCollapsed = false;
+                    collapsedAncestor = null;
+                    continue;
+                }
             }
 
             // NumberStyle: Zeile unter eingeklapptem Vorfahr? → komplett
@@ -3153,6 +3157,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // Kapitel-Wechsel? Header einfügen.
             if (!string.Equals(chapter, lastChapter, StringComparison.OrdinalIgnoreCase)) {
                 var hierarchy = chapter.ChapterPathHierarchy();
+                if (hierarchy.Count == 0) {
+                    // Leeres Kapitel (nur im NumberStyle mit Kapitel-Spalte
+                    // erreichbar): einzelner Header auf Ebene 0.
+                    hierarchy = [string.Empty];
+                }
                 var lastHierarchy = string.IsNullOrEmpty(lastChapter) ? [] : lastChapter.ChapterPathHierarchy();
 
                 // LCP-Tiefe (Longest Common Prefix) der beiden Hierarchien.

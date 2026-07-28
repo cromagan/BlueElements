@@ -118,27 +118,49 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row, bool produktiv, List<string>? args) {
-        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-
-        VariableCollection vars =
+    /// <summary>
+    /// Führt das übergebene Skript aus und erzeugt dabei alle benötigten Variablen
+    /// (Basis-, Tabellen-, Zeilen-, Filter- und Feld-Variablen) selbst.
+    /// <para>
+    /// Im Produktivmodus (<paramref name="produktiv"/> = true) werden virtuelle
+    /// Spalten (z.B. RowColor) erzeugt und die echten Filter verwendet. Im Testmodus
+    /// (<paramref name="produktiv"/> = false) entfallen virtuelle Spalten und es
+    /// werden die übergebenen (ggf. Dummy-) <paramref name="filterItems"/> genutzt.
+    /// </para>
+    /// Die erzeugte VariableCollection wird im zurückgegebenen
+    /// <see cref="ScriptEndedFeedback"/>.Variables bereitgestellt.
+    /// </summary>
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, List<string>? args,
+                                                    RowItem? row, Table? table, IEnumerable<FilterItem>? filterItems,
+                                                    IEnumerable<IHasFieldVariable>? fieldSources) {
+        VariableCollection generatedVars =
         [
             new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
             new VariableString("User", Generic.UserName, true,
                 "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
-
             new VariableString("Usergroup", Generic.UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
             new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
-        BlueScript.Classes.Script.AddAttributes(vars, args ?? []);
-        vars.AddRange(fields);
+        BlueScript.Classes.Script.AddAttributes(generatedVars, args ?? []);
+
+        if (row?.Table is { IsDisposed: false } rowTb) {
+            generatedVars.AddRange(rowTb.CreateVariableCollection(row, false, false, produktiv, true, filterItems));
+        } else if (table is { IsDisposed: false }) {
+            generatedVars.AddRange(table.CreateVariableCollection(null, false, false, produktiv, true, filterItems));
+        }
+
+        if (fieldSources is not null) {
+            foreach (var hfv in fieldSources) {
+                if (hfv.GetFieldVariable() is { } v) { generatedVars.Add(v); }
+            }
+        }
 
         var scp = new ScriptProperties("ScriptButton", Method.AllMethods.Instances, produktiv, [], row, "ScriptButton", "ScriptButton in Formular");
 
-        var sc = new Script(vars, scp) {
+        var sc = new Script(generatedVars, scp) {
             ScriptText = scripttext
         };
         return sc.Parse(0, "Main", null);
@@ -217,6 +239,9 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         try {
             var sd = new ScriptDescription(KeyName, _script);
+
+            sd.ExecuteScript = ExecuteScriptTest;
+
             if (InputBoxEditor.Edit(sd)) {
                 Script = sd.Script;
             }
@@ -308,6 +333,33 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
+    }
+
+    /// <summary>
+    /// Führt das Skript für den Testmodus im Editor aus. Stellt die Roh-Zutaten
+    /// bereit: Eingehende Zeile, Dummy-Filter (damit Filter-abhängige Variablen
+    /// erzeugt werden können) und die Field-Variablen-Quellen des Formulars.
+    /// </summary>
+    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
+        var row = TableInput?.Row?.First();
+
+        List<FilterItem>? fi = null;
+        if (Parents.Count > 0 && TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
+            fi = [];
+            for (var co = 0; co < Parents.Count; co++) {
+                fi.Add(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
+            }
+        }
+
+        List<IHasFieldVariable>? fieldSources = null;
+        if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+            fieldSources = [];
+            foreach (var thisCon in icpi) {
+                if (thisCon is IHasFieldVariable hfv) { fieldSources.Add(hfv); }
+            }
+        }
+
+        return ExecuteScript(script, "Testmodus", !testmode, null, row, TableInput, fi, fieldSources);
     }
 
     #endregion

@@ -229,61 +229,6 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         );
     }
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) {
-            return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
-        }
-
-        if (_item is null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
-        }
-
-        //if (!_item.IsOk()) {
-        //    return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
-        //}
-
-        // Flush (OnPropertyChanged(OutputItem)) und Host-Benachrichtigung (Executing) werden
-        // bereits in der Basis (ScriptEditor.TesteScript) vor diesem Aufruf
-        // erledigt: Das hostende Form hat OutputItem ins Backend geschrieben und
-        // _item auf die frische Backend-Instanz aktualisiert.
-
-        RowItem? r = null;
-
-        if (_item.NeedRow) {
-            if (tb.Row.Count == 0) {
-                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-            }
-
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = tb.Row.First()?.CellFirstString() ?? string.Empty;
-            }
-
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = tb.Row.First()?.KeyName ?? string.Empty;
-            }
-
-            r = tb.Row[txbTestZeile.Text] ?? tb.Row.GetByKey(txbTestZeile.Text);
-            if (r is not { IsDisposed: false }) {
-                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
-            }
-        }
-        var produktiv = !testmode;
-
-        if (produktiv) {
-            if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
-                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
-            }
-        }
-
-        var ext = chkExtendend is { Checked: true, Enabled: true };
-
-        _allowTemporay = true;
-        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true);
-        _allowTemporay = false;
-
-        return f;
-    }
-
     /// <summary>
     /// Befüllt die ComboBox mit allen verfügbaren Bildern. Wird einmalig beim ersten Laden ausgeführt.
     /// </summary>
@@ -300,6 +245,10 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not TableScriptDescription value) { return true; }
         if (IsDisposed || Table is not { IsDisposed: false }) { return true; }
+
+        // Eigene Test-Logik an den Editor binden (Basis-Delegate ignorieren,
+        // TableScriptEditor kennt Tabellenkontext und Zeile).
+        ExecuteScript = ExecuteScriptCore;
 
         tbcScriptEigenschaften.Enabled = true;
         txbName.Text = value.KeyName;
@@ -514,6 +463,61 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             return false;
         }
         return true;
+    }
+
+    private ScriptEndedFeedback ExecuteScriptCore(string script, bool testmode) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) {
+            return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
+        }
+
+        if (_item is null) {
+            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+        }
+
+        //if (!_item.IsOk()) {
+        //    return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
+        //}
+
+        // Flush (OnPropertyChanged(OutputItem)) und Host-Benachrichtigung (Executing) werden
+        // bereits in der Basis (ScriptEditor.TesteScript) vor diesem Aufruf
+        // erledigt: Das hostende Form hat OutputItem ins Backend geschrieben und
+        // _item auf die frische Backend-Instanz aktualisiert.
+
+        RowItem? r = null;
+
+        if (_item.NeedRow) {
+            if (tb.Row.Count == 0) {
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+            }
+
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = tb.Row.First()?.CellFirstString() ?? string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = tb.Row.First()?.KeyName ?? string.Empty;
+            }
+
+            r = tb.Row[txbTestZeile.Text] ?? tb.Row.GetByKey(txbTestZeile.Text);
+            if (r is not { IsDisposed: false }) {
+                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
+            }
+        }
+        var produktiv = !testmode;
+
+        if (produktiv) {
+            if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
+                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
+            }
+        }
+
+        var ext = chkExtendend is { Checked: true, Enabled: true };
+
+        _allowTemporay = true;
+        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true);
+        _allowTemporay = false;
+
+        return f;
     }
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {

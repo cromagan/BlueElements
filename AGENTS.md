@@ -85,6 +85,7 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 - **DPI-Awareness ist global deaktiviert.** Niemals `DpiMode`-Setter aufrufen. Das Manifest setzt `dpiAware=false`. `Skin.Scale` ist hart auf `1.0f` kodiert.
 - **LangVersion ist `preview`** — aktuelle C#-Features sind aktiviert.
 - **Nullable Reference Types** sind aktiviert (`Nullable=enable`). Warnungen niemals mit `!` unterdrücken.
+- **Lambda Ausdrücke** - Lambda Ausdrücke wenn möglich vermeiden. Sind sie von Vorteil informiere den User vorab, ob er das so will
 
 ## Wichtige Hilfsklassen (BlueBasics)
 
@@ -121,9 +122,6 @@ Wenn du während einer Sitzung eine Rückmeldung zum Stil, zu Konventionen oder 
 - *„Diesen Stil für die aktuelle Datei übernehmen und nicht merken"*
 - *„Diesen Stil projektweit in die AGENTS.md aufnehmen und für diese Datei(en) anwenden"*
 - *„Nicht übernehmen"*
-
-## Feedback
-Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage hast, stelle mir genau ein, die dich dann per Multiple Choice dir nennen kann. Hast du weiter Fragen, eine neue Multiple Choice Frage. 
 
 ## GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!

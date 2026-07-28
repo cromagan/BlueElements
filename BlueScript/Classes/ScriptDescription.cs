@@ -3,9 +3,16 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace BlueScript.Classes;
+
+/// <summary>
+/// Delegate für die Test-Ausführung eines Skripts aus einem Editor oder
+/// PadItem heraus. Parameter: Skripttext, Testmodus. Rückgabe: Feedback.
+/// </summary>
+public delegate ScriptEndedFeedback ExecuteScriptDelegate(string script, bool testmode);
 
 public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable, INotifyPropertyChanged {
 
@@ -14,7 +21,6 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     private volatile int _isDisposedFlag;
 
     #endregion
-
 
     #region Constructors
 
@@ -67,6 +73,17 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     }
 
     public string CompareKey => KeyName;
+
+    /// <summary>
+    /// Optionaler Delegate für die Test-Ausführung des Skripts aus einem
+    /// Editor heraus. Wird vom Ersteller der <see cref="ScriptDescription"/>
+    /// (z.B. einem PadItem) gesetzt, wenn das Skript mit spezifischen
+    /// Eingangsvariablen und Methoden getestet werden soll.
+    /// Parameter: Skripttext, Testmodus. Rückgabe: Feedback der Ausführung.
+    /// Wird NICHT serialisiert — reine Laufzeit-Information.
+    /// </summary>
+    [JsonIgnore]
+    public ExecuteScriptDelegate? ExecuteScript { get; set; }
 
     public string FailedReason {
         get;

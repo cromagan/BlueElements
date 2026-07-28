@@ -79,7 +79,6 @@ public class VariableAi : Variable {
         }
     }
 
-    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
     public override string ValueForCell => string.Empty;
 

@@ -172,6 +172,11 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
         if (_table is not { IsDisposed: false } tb) { return; }
         if (lstEventScripts.OutputItem is null) { return; }
 
+        // Gepufferte Eingaben (insb. den Skript-Text, der keinen
+        // PropertyChanged auslöst) vom Editor in die Arbeitskopie übernehmen,
+        // bevor diese ans Backend geht.
+        lstEventScripts.FlushEditor();
+
         tb.EventScript = lstEventScripts.OutputItem
             .Cast<TableScriptDescription>()
             .ToList()

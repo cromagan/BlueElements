@@ -271,6 +271,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
         try {
             var sd = new ScriptDescription(KeyName, _script);
+
+            sd.ExecuteScript = ExecuteScriptTest;
+
             if (InputBoxEditor.Edit(sd)) {
                 _script = sd.Script;
             }
@@ -381,6 +384,20 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
+    }
+
+    /// <summary>
+    /// Führt das Skript für den Testmodus im Editor aus. Für den Test wird eine
+    /// Eingangs-Zeile benötigt, aus der die Entity-ID generiert werden kann.
+    /// RowAdder verlangt zwingend genau eine Eingangs-Zeile (InputMustBeOneRow).
+    /// </summary>
+    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
+        var row = TableInput?.Row.FirstOrDefault();
+        if (row is not { IsDisposed: false }) {
+            return new ScriptEndedFeedback("Keine Eingangs-Zeile zum Testen vorhanden.", false, false, "Allgemein");
+        }
+
+        return RowAdder.ExecuteScript(script, !testmode, "Testmodus", _entityId, row, true);
     }
 
     #endregion

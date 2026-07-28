@@ -82,6 +82,15 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public override Type? EditorFor => typeof(ScriptDescription);
+
+    /// <summary>
+    /// Delegate für die Test-Ausführung des Skripts. Wird beim Laden eines
+    /// <see cref="ScriptDescription"/>-Items aus dessen
+    /// <see cref="ScriptDescription.ExecuteScript"/> übernommen.
+    /// Parameter: Skripttext, Testmodus.
+    /// </summary>
+    public ExecuteScriptDelegate? ExecuteScript { get; set; }
+
     public string LastFailedReason { get; set; } = string.Empty;
 
     public List<Variable>? LastVariables { get; set; }
@@ -131,8 +140,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         LastVariables = null;
     }
 
-    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
-
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
@@ -169,7 +176,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         // Table.EventScript zurück und lädt _item auf die frische Backend-Instanz).
         OnExecuting(System.EventArgs.Empty);
 
-        var f = ExecuteScript(testmode);
+        var f = ExecuteScript(Script, testmode);
 
         WriteCommandsToList();
 
@@ -244,6 +251,12 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     /// </summary>
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not ScriptDescription sd) { return true; }
+
+        // ExecuteScriptDelegate übernehmen, damit der Editor das Skript
+        // mit dem vom Ersteller vorgesehenen Kontext testen kann.
+        // TableScriptEditor setzt ExecuteScript in seinem eigenen
+        // SetValuesToFormula auf ExecuteScriptCore und ignoriert diesen Delegate.
+        ExecuteScript = sd.ExecuteScript;
 
         tbcScriptEigenschaften.Enabled = true;
         Script = sd.Script;

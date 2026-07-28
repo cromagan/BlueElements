@@ -3,7 +3,6 @@
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;

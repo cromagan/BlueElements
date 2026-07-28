@@ -185,6 +185,9 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         try {
             var sd = new ScriptDescription(KeyName, Script);
+
+            sd.ExecuteScript = ExecuteScriptTest;
+
             if (InputBoxEditor.Edit(sd)) {
                 Script = sd.Script;
             }
@@ -267,7 +270,13 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) =>
-        gr.DrawImage(SymbolForReadableText(), positionControl);
+            gr.DrawImage(SymbolForReadableText(), positionControl);
+
+    /// <summary>
+    /// Führt das Skript für den Testmodus im Editor aus.
+    /// </summary>
+    private static ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) =>
+        ExecuteScript(script, "Testmodus", string.Empty, string.Empty, string.Empty, !testmode, null);
 
     #endregion
 

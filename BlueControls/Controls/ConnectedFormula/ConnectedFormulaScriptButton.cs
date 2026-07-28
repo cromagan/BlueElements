@@ -2,7 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls.ConnectedFormula;
-using BlueScript.Variables;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -100,40 +99,29 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         HandleChangesNow();
 
-        #region Variablen erstellen
-
-        VariableCollection vars;
+        #region Zutaten für ExecuteScript sammeln
 
         var row = RowSingleOrNull();
-        Table? tb = null;
+        Table? tb = row?.Table is { IsDisposed: false } rowTb ? rowTb : FilterInput?.Table is { IsDisposed: false } fiTb ? fiTb : null;
 
-        if (row?.Table is { IsDisposed: false } row_tb) {
-            tb = row_tb;
-            vars = tb.CreateVariableCollection(row, false, false, true, true, FilterInput);
-        } else if (FilterInput?.Table is { IsDisposed: false } fi_tb) {
-            tb = fi_tb;
-            vars = tb.CreateVariableCollection(null, false, false, true, true, FilterInput);
-        } else {
-            vars = [];
-        }
-
-        var rowstamp = row?.RowStamp();
-
-        if (Parent is IHasFieldVariable hfvp && hfvp.GetFieldVariable() is { } v2) {
-            vars.Add(v2);
-        }
-
-        if (Parent?.Controls is { } pControls) {
-            foreach (var thisCon in pControls) {
-                if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
-                    vars.Add(v);
+        // Field-Variablen-Quellen: Parent selbst (falls IHasFieldVariable) und
+        // alle Child-Controls, die IHasFieldVariable implementieren.
+        List<IHasFieldVariable>? fieldSources = null;
+        if (Parent is not null) {
+            fieldSources = [];
+            if (Parent is IHasFieldVariable hfvp) { fieldSources.Add(hfvp); }
+            if (Parent.Controls is { } pControls) {
+                foreach (var thisCon in pControls) {
+                    if (thisCon is IHasFieldVariable hfv) { fieldSources.Add(hfv); }
                 }
             }
         }
 
+        var rowstamp = row?.RowStamp();
+
         #endregion
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars, row, true, null);
+        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, true, null, row, tb, FilterInput, fieldSources);
 
         var errorreason = string.Empty;
 
@@ -141,13 +129,13 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         if (t.Failed) { errorreason = t.ProtocolText; }
 
-        if (string.IsNullOrEmpty(errorreason)) {
+        if (string.IsNullOrEmpty(errorreason) && t.Variables is { } vars) {
 
             #region Variablen zurückschreiben
 
-            if (Parent is not null) {
-                foreach (var thisCon in Parent.Controls) {
-                    if (thisCon is IHasFieldVariable hfv && vars.GetByKey(hfv.FieldName) is { ReadOnly: false } v) {
+            if (fieldSources is not null) {
+                foreach (var hfv in fieldSources) {
+                    if (vars.GetByKey(hfv.FieldName) is { ReadOnly: false } v) {
                         hfv.SetValueFromVariable(v);
                     }
                 }
