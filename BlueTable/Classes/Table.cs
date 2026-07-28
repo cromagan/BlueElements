@@ -1271,7 +1271,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
         if (tableHeadVariables) {
             foreach (var thisvar in Variables.ToStringableListVariable()) {
-                var v = new VariableString("TB_" + thisvar.KeyName, thisvar.ValueForCell, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
+                // Typ der Original-Variable erhalten (VariableBool, VariableDouble, …),
+                // damit WriteBackVariables -> Combine den Wert typsicher zurückschreiben kann.
+                // NewByTypeName + GetValueFrom statt Clone: gleicher Mechanismus wie in
+                // VariableCollection.Combine, ohne Serialisierungs-Roundtrip.
+                var v = ParseableItem.NewByTypeName<Variable>(thisvar.MyClassId);
+                if (v is null) {
+                    Develop.DebugPrint(nameof(CreateVariableCollection) + ": Typ " + thisvar.MyClassId + " konnte nicht erzeugt werden.");
+                    continue;
+                }
+                v.KeyName = "TB_" + thisvar.KeyName;
+                v.ReadOnly = false; // notwendig, damit GetValueFrom den Wert setzen darf
+                _ = v.GetValueFrom(thisvar);
+                v.Comment = "Tabellen-Kopf-Variable\r\n" + thisvar.Comment;
                 vars.Add(v);
             }
         }

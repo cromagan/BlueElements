@@ -123,10 +123,15 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     public object Clone() {
-        if (NewByParsing<ParseableItem>(ParseableItems().FinishParseable()) is { } clone) {
-            return clone;
+        // GetType() liefert den konkreten Typ direkt - kein Umweg nötig über
+        // NewByParsing, das sonst über ALLE ParseableItem-Typen iteriert und
+        // bei Klassen ohne parameterlosen Konstruktor (z. B. Variable) schon
+        // vor dem Finden des richtigen Typs eine MissingMethodException wirft.
+        if (Activator.CreateInstance(GetType()) is not ParseableItem clone) {
+            throw Develop.DebugError("Clonen fehlgeschlagen");
         }
-        throw Develop.DebugError("Clonen fehlgeschlagen");
+        clone.Parse(ParseableItems().FinishParseable());
+        return clone;
     }
 
     public void Dispose() {
