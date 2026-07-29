@@ -207,6 +207,10 @@ Umbennennen in Explorer Soll eine Textbox IM angezeigten Explorer Fenster gehen.
 Zudem fehlt der Befehl Neuer Ordner
 Und F2, F5 und Entfernen muss funktionieren
 
-
+## Aufgabe
+public static ColumnViewItem Create(Table? table, string toParse) 
+dauert ewig lange. Ich denke, das liegt an NewByTypeName.
+Kann man das irgendwie cachen? Also NewByTypeName global mit AssemblyAwareCache?
+Ich hab schon ein bisschen optimiert.
 
 
