@@ -241,6 +241,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
+    /// <summary>
+    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
+    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen. Leerer String
+    /// bedeutet: normales Bearbeitungsverhalten (Textbox/Dropdown).
+    /// </summary>
+    [DefaultValue("")]
+    public string DoubleClickScript { get; set; } = string.Empty;
+
     [DefaultValue(false)]
     public bool EditButton {
         get;
@@ -250,14 +258,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             btnEdit.Visible = field;
         }
     }
-
-    /// <summary>
-    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
-    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen. Leerer String
-    /// bedeutet: normales Bearbeitungsverhalten (Textbox/Dropdown).
-    /// </summary>
-    [DefaultValue("")]
-    public string DoubleClickScript { get; set; } = string.Empty;
 
     /// <summary>
     /// Zusammengeführtes Ergebnis aus Filter und FilterFix.
@@ -402,6 +402,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Werden zusammen mit FilterFix in FilterCombined zusammengeführt.
     /// </summary>
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
+
+    /// <summary>
+    /// Maximaler Indent aller aktuell in <see cref="_sortedViewItems"/>
+    /// enthaltenen Zeilen. Wird für die Breitenberechnung von
+    /// <see cref="ColumnViewItemRenderingExtensions.ComputeAllColumnPositions"/>
+    /// und <see cref="CalculateCanvasMaxBounds"/> benötigt, damit beim
+    /// Aufklappen von Kapiteln die eingerückten Spalten nicht abgeschnitten werden.
+    /// </summary>
+    internal int MaxIndentOfRows => _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
 
     protected override bool ShowSliderX => true;
 
@@ -1665,15 +1674,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _mustDoAllViewItems = true;
     }
 
-    /// <summary>
-    /// Maximaler Indent aller aktuell in <see cref="_sortedViewItems"/>
-    /// enthaltenen Zeilen. Wird für die Breitenberechnung von
-    /// <see cref="ColumnViewItemRenderingExtensions.ComputeAllColumnPositions"/>
-    /// und <see cref="CalculateCanvasMaxBounds"/> benötigt, damit beim
-    /// Aufklappen von Kapiteln die eingerückten Spalten nicht abgeschnitten werden.
-    /// </summary>
-    internal int MaxIndentOfRows => _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
-
     protected override RectangleF CalculateCanvasMaxBounds() {
         var x = AvailableControlPaintArea.Width;
         var y = AvailableControlPaintArea.Height;
@@ -1869,6 +1869,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             // Rahmen um die gesamte Tabelle zeichnen
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
+
+            if (Develop.AllowDuplicateTableLoad) {
+                CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, $"ID: {tb.MyId}", States.Standard);
+            }
         } catch {
             _tableDrawError = DateTime.UtcNow;
             DrawWaitScreen(gr, string.Empty);
@@ -2279,15 +2283,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
-    protected void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
-
-    protected void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
-
-    protected override void OnZoomChanged() {
-        Invalidate_CurrentArrangement();
-        base.OnZoomChanged();
-    }
-
     protected override void OnSliderVisibilityChanged() {
         // Wenn ein Slider ein-/ausgeblendet wird, ändert sich die
         // AvailableControlPaintArea-Breite. Die View-Items müssen neu
@@ -2297,6 +2292,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         // das rechte Ende der letzten Spalte mit der Hintergrundfarbe übermalen.
         _mustDoAllViewItems = true;
         _sortedViewItems = [];
+    }
+
+    protected void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
+
+    protected void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
+
+    protected override void OnZoomChanged() {
+        Invalidate_CurrentArrangement();
+        base.OnZoomChanged();
     }
 
     protected override void WndProc(ref Message m) {
@@ -2883,7 +2887,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             //    }
 
             case "doclipboard": {
-                    var clipTmp = Clipboard.GetText().Replace('\n','\r').RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
+                    var clipTmp = Clipboard.GetText().Replace('\n', '\r').RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
                     Filter.Remove(e.Column);
 
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();

@@ -663,13 +663,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             Table? ok = null;
             lock (AllFilesLocker) {
                 foreach (var thisFile in AllFiles) {
+                    // folder VOR dem KeyName-Check befüllen: ist AllowDuplicateTableLoad
+                    // aktiv, wird ok unten nicht zurückgegeben und der Code benötigt
+                    // den folder, um die Datei neu zu laden.
+                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                        folder.AddIfNotExists(tbf.Filename.FilePath());
+                    }
+
                     if (string.Equals(thisFile.KeyName, file, StringComparison.OrdinalIgnoreCase)) {
                         ok = thisFile;
                         break;
-                    }
-
-                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                        folder.AddIfNotExists(tbf.Filename.FilePath());
                     }
                 }
             }
@@ -1130,8 +1133,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             var cv = row.ChunkValue;
             if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(changedTo)) { cv = changedTo; }
             if (IsValueEditable(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
+            if (PrepareForEdit(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } df) { return df; }
         } else {
             if (IsValueEditable(type, string.Empty) is { Length: > 0 } f) { return f; }
+            if (PrepareForEdit(type, string.Empty) is { Length: > 0 } df) { return df; }
         }
 
         var colName = column?.KeyName ?? string.Empty;
@@ -1739,6 +1744,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     }
 
     public virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
+
+    /// <summary>
+    /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
+    /// laden und Edit-Lock prüfen). Wird ausschließlich bei akuter Bearbeitungsabsicht
+    /// — in <see cref="ChangeData"/> — aufgerufen, nicht bei reinen UI-Abfragen über
+    /// <see cref="IsValueEditable"/>. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
+    /// </summary>
+    protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
 
     /// <summary>
     /// Lädt Zeilen der Tabelle nach. Je nach Tabellentyp werden andere Funktionen unterstützt

@@ -46,12 +46,6 @@ public class TableChunk : TableFile {
     /// </summary>
     public const int DeleteOldFilesAfterHours = 2;
 
-    /// <summary>
-    /// Wert in Minuten. Eine Benutzer-Datei, die jünger ist, blockiert andere Benutzer.
-    /// Nur der Ersteller der Datei darf in diesem Zeitraum bearbeiten.
-    /// </summary>
-    public const int EditLockMinutes = 5;
-
     public static readonly string Chunk_AdditionalUseCases = "_uses";
 
     /// <summary>
@@ -83,17 +77,6 @@ public class TableChunk : TableFile {
     /// identischen Duplikate erzeugen).
     /// </summary>
     private readonly ConcurrentDictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// chunkId (lowercase) → zuletzt beobachteter UTC-LastWriteTime des Chunk-Ordners.
-    /// Ist der Wert unverändert, wurde seit dem letzten Load keine Datei hinzugefügt
-    /// oder entfernt — da Chunks write-once sind, bedeutet das zwingend, dass kein
-    /// neuer Inhalt vorliegen kann. In diesem Fall kann die teure Ordner-Enumeration
-    /// in <see cref="LoadChunkWithChunkId"/> und <see cref="RefreshLoadedChunks"/>
-    /// übersprungen werden. Auf Windows wird der Zeitstempel nur auf Ebene des
-    /// Ordners aktualisiert (nicht rekursiv), was für die flachen Chunk-Ordner passt.
-    /// </summary>
-    private readonly ConcurrentDictionary<string, DateTime> _lastFolderWriteTimeUtc = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern, Refresh).
@@ -146,6 +129,13 @@ public class TableChunk : TableFile {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Wert in Sekunden. Eine Benutzer-Datei, die jünger ist, blockiert andere Benutzer.
+    /// Nur der Ersteller der Datei darf in diesem Zeitraum bearbeiten.
+    /// Wird während des Develop-Stresstests reduziert (siehe btnStresstest).
+    /// </summary>
+    public static int EditLockSeconds { get; set; } = 300;
 
     /// <summary>
     /// TableChunk verwaltet seine eigenen Chunk-Zugriffszeiten über
@@ -671,6 +661,32 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
+    /// Tiefenprüfung auf Dateiebene: lädt den Chunk vom Laufwerk und prüft den
+    /// Edit-Lock. Wird nur bei akuter Bearbeitungsabsicht aus
+    /// <see cref="Table.ChangeData"/> aufgerufen.
+    /// </summary>
+    protected override string PrepareForEdit(TableDataType type, string? chunkValue) {
+        if (InitialSavePending) { return string.Empty; }
+
+        if (type == TableDataType.Command_AddRow && string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
+
+        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
+        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
+
+        // Regel 1: Bevor das Bearbeiten erlaubt wird (man 'Bearbeiter' des
+        // Chunks wird), muss der Chunk vom Laufwerk geladen sein — sonst würde
+        // auf einem veralteten Stand gearbeitet und eine spätere Speicherung
+        // fremde Änderungen überdecken. Bei unverändertem Ordner ist
+        // LoadChunkWithChunkId ein schneller Frühpfad (ein Folder-Stat).
+        var loadResult = LoadChunkWithChunkId(chunkId);
+        if (loadResult.IsFailed) {
+            return $"Chunk '{chunkId}' konnte nicht geladen werden: {loadResult.FailedReason}";
+        }
+
+        return CheckEditLock(chunkId);
+    }
+
+    /// <summary>
     /// Speichert alle Chunks direkt auf die Festplatte.
     /// Nach dem Speichern werden alle generierten Daten verworfen.
     /// Jeder Chunk ist ein Einweg — eine einmal gespeicherte Datei wird nie
@@ -713,6 +729,10 @@ public class TableChunk : TableFile {
             var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             // chunkIds mit echten Änderungen (für EditLock Re-Check vor dem Schreiben)
             var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // true, wenn mindestens ein Row-Chunk durch die Edit-Sperre blockiert
+            // wurde. In diesem Fall bleibt SaveRequired true, damit der nächste
+            // Speicherversuch die ungespeicherten Zeilen erneut versucht.
+            var rowChunksSkipped = false;
 
             void AddChunk(string chunkId, List<byte> data) {
                 var idLower = chunkId.ToLowerInvariant();
@@ -720,11 +740,14 @@ public class TableChunk : TableFile {
 
                 // Per-Chunk-Editierbarkeit: ist der Chunk durch einen anderen
                 // Benutzer gesperrt, wird er übersprungen — die anderen Chunks
-                // werden weiter gespeichert. Die Änderungen am gesperrten Chunk
-                // gelten damit als verworfen (werden nicht erneut versucht).
+                // werden weiter gespeichert. Bei Row-Chunks bleibt SaveRequired
+                // aktiv, damit die ungespeicherten Zeilen beim nächsten Versuch
+                // erneut gespeichert werden (und nicht durch RemoveObsoleteRows
+                // beim nächsten Refresh gelöscht werden).
                 // MainLite ist eine write-once-Datei ohne Chunk-Ordner und wird
                 // nicht über CheckEditLock geprüft.
                 if (!isMainLite && !string.IsNullOrEmpty(CheckEditLock(chunkId))) {
+                    if (IsRowChunk(chunkId)) { rowChunksSkipped = true; }
                     return;
                 }
 
@@ -857,12 +880,6 @@ public class TableChunk : TableFile {
                     _processedFile[chunkId] = path;
                     _lastUsed[chunkId] = DateTime.UtcNow;
                     CleanupOldFilesInFolder(GetChunkFilesOrderedByTime(folder).ToArray());
-                    // Ordner-Zeitstempel NACH dem Schreiben + Cleanup cachen, damit
-                    // der Schnellpfad beim nächsten Load korrekt trifft und nicht
-                    // fälschlich durch Stale-Cache ins Leere läuft.
-                    if (IO.GetFolderWriteTimeUtc(folder) is DateTime wtSave) {
-                        _lastFolderWriteTimeUtc[chunkId] = wtSave;
-                    }
                 }
             }
 
@@ -871,7 +888,11 @@ public class TableChunk : TableFile {
                 _lastContentHash[kvp.Key] = kvp.Value;
             }
 
-            SaveRequired = false;
+            // SaveRequired nur zurücksetzen, wenn alle Row-Chunks gespeichert
+            // wurden. Wurden Row-Chunks durch die Edit-Sperre blockiert, bleibt
+            // SaveRequired true — der nächste Speicherversuch (Checker-Tick)
+            // versucht es erneut, sobald die Sperre abgelaufen ist.
+            SaveRequired = rowChunksSkipped;
             InitialSavePending = false;
 
             return string.Empty;
@@ -989,20 +1010,6 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
-    /// TableChunk-Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
-    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session
-    /// oder andere Instanz im selben Prozess — z.B. Develop-Stresstest).
-    /// </summary>
-    private bool IsFileFromCurrentUser(string filePath) {
-        var creator = ExtractUserNameFromFileName(filePath);
-        if (!string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
-
-        var creatorHash = ExtractMachineInstanceHashFromFileName(filePath);
-        return string.Equals(creatorHash, MyId, StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// C:\xxx\[Tablename]\
     /// </summary>
     /// <returns></returns>
@@ -1010,7 +1017,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Prüft die Edit-Sperre für einen Chunk: Wenn die neueste Datei im Ordner
-    /// jünger als EditLockMinutes ist und nicht vom aktuellen Benutzer stammt,
+    /// jünger als EditLockSeconds ist und nicht vom aktuellen Benutzer stammt,
     /// wird das Bearbeiten blockiert.
     /// </summary>
     private string CheckEditLock(string chunkId) {
@@ -1022,7 +1029,7 @@ public class TableChunk : TableFile {
         var fileDate = ExtractDateFromFileName(newestFile);
         if (!fileDate.HasValue) { return "Datums-Fehler in Dateien"; }
 
-        if (DateTime.UtcNow.Subtract(fileDate.Value).TotalMinutes >= EditLockMinutes) {
+        if (DateTime.UtcNow.Subtract(fileDate.Value).TotalSeconds >= EditLockSeconds) {
             return string.Empty;
         }
 
@@ -1031,7 +1038,7 @@ public class TableChunk : TableFile {
         var creator = ExtractUserNameFromFileName(newestFile);
         var creatorHash = ExtractMachineInstanceHashFromFileName(newestFile);
         var creatorDisplay = string.IsNullOrEmpty(creatorHash) ? creator : $"{creator} - {creatorHash}";
-        return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(fileDate.Value).TotalMinutes:0} Minuten von '{creatorDisplay}' bearbeitet";
+        return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(fileDate.Value).TotalSeconds:0} Sekunden von '{creatorDisplay}' bearbeitet";
     }
 
     /// <summary>
@@ -1069,6 +1076,20 @@ public class TableChunk : TableFile {
     private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
     /// <summary>
+    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
+    /// TableChunk-Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
+    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session
+    /// oder andere Instanz im selben Prozess — z.B. Develop-Stresstest).
+    /// </summary>
+    private bool IsFileFromCurrentUser(string filePath) {
+        var creator = ExtractUserNameFromFileName(filePath);
+        if (!string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+
+        var creatorHash = ExtractMachineInstanceHashFromFileName(filePath);
+        return string.Equals(creatorHash, MyId, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// Lädt einen Chunk direkt von der Festplatte.
     /// Vor dem Parsen wird <see cref="TableFile.HasValidEofMarker"/> geprüft,
     /// damit nur komplett gespeicherte Chunks eingelesen werden. Nach dem
@@ -1083,20 +1104,6 @@ public class TableChunk : TableFile {
 
         var folder = GetChunkFolder(chunkId);
 
-        // Schnellpfad: Ist der Ordner-Zeitstempel unverändert zur letzten Verarbeitung,
-        // wurde keine Datei hinzugefügt oder entfernt. Da Chunks write-once sind,
-        // bedeutet das zwingend, dass kein neuer Inhalt vorliegen kann — die teure
-        // Ordner-Enumeration kann dann komplett übersprungen werden.
-        // (Auf manchen Netzwerk-Shares wird LastWriteTime u.U. verzögert propagiert;
-        // in diesem Fall fällt der Code durch und macht die reguläre Prüfung.)
-        if (_processedFile.ContainsKey(chunkId)
-            && IO.GetFolderWriteTimeUtc(folder) is DateTime folderWriteTime
-            && _lastFolderWriteTimeUtc.TryGetValue(chunkId, out var lastFolderWriteTime)
-            && lastFolderWriteTime == folderWriteTime) {
-            _lastUsed[chunkId] = DateTime.UtcNow;
-            return OperationResult.SuccessFalse;
-        }
-
         // Neueste Datei im Ordner ermitteln — entscheidend für den Multi-User-Abgleich.
         // Ein anderer Benutzer konnte zwischenzeitlich eine neuere .tblc-Datei ablegen.
         var chunkFiles = IO.DirectoryExists(folder) ? GetChunkFilesOrderedByTime(folder).ToArray() : [];
@@ -1107,8 +1114,6 @@ public class TableChunk : TableFile {
             _processedFile.TryGetValue(chunkId, out var lastFile) &&
             string.Equals(lastFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
             _lastUsed[chunkId] = DateTime.UtcNow;
-            // Ordner-Zeitstempel cachen, damit der nächste Aufruf den Schnellpfad trifft.
-            if (IO.GetFolderWriteTimeUtc(folder) is DateTime wt) { _lastFolderWriteTimeUtc[chunkId] = wt; }
             return OperationResult.SuccessFalse;
         }
 
@@ -1169,14 +1174,9 @@ public class TableChunk : TableFile {
         // Chunk nach dem Parsen verwerfen — nur Dateiname und Hash tracken
         _processedFile[chunkId] = newestFile;
         _lastUsed[chunkId] = DateTime.UtcNow;
-        //_lastContentHash[chunkId] = Constants.Win1252.GetString(chunkContent);
         _lastContentHash[chunkId] = Generic.GetSHA256HashString(chunkContent);
 
         CleanupOldFilesInFolder(chunkFiles);
-
-        // Ordner-Zeitstempel NACH Cleanup cachen (Cleanup kann alte Dateien löschen
-        // und damit den Zeitstempel verändern). So ist der nächste Schnellpfad korrekt.
-        if (IO.GetFolderWriteTimeUtc(folder) is DateTime wtAfterLoad) { _lastFolderWriteTimeUtc[chunkId] = wtAfterLoad; }
 
         return new OperationResult(true);
     }
@@ -1201,7 +1201,16 @@ public class TableChunk : TableFile {
             return false;
         }
 
-        Row.RemoveObsoleteRows(RowsOfChunk(this, chunkId), parsedRowKeys);
+        // SaveRequired-Schutz: Hat diese Instanz ungespeicherte Änderungen
+        // (SaveRequired), ist die geladene Datei nicht autoritativ — lokal
+        // erstellte Zeilen, die noch nicht gespeichert wurden (z.B. weil die
+        // Edit-Sperre das Speichern des Chunks blockiert hat), würden durch
+        // RemoveObsoleteRows fälschlich gelöscht. Die Bereinigung erfolgt
+        // nach der nächsten erfolgreichen Speicherung, wenn SaveRequired
+        // wieder false ist.
+        if (!SaveRequired) {
+            Row.RemoveObsoleteRows(RowsOfChunk(this, chunkId), parsedRowKeys);
+        }
 
         return true;
     }
@@ -1217,48 +1226,45 @@ public class TableChunk : TableFile {
     /// </summary>
     private bool RefreshLoadedChunks(bool firstTime) {
         if (string.IsNullOrEmpty(Filename)) { return false; }
-        var chunkFolder = BaseChunkFolder();
-        if (!IO.DirectoryExists(chunkFolder)) { return false; }
 
         var loaded = false;
 
-        //// Neue Row-Chunk-Ordner entdecken (z.B. neue Zeilen anderer Benutzer).
-        //// Neue Ordner werden nicht automatisch erkannt.
-        //foreach (var subDir in IO.GetDirectories(chunkFolder)) {
-        //    var newChunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
-        //    if (IsRowChunk(newChunkId) && !_processedFile.ContainsKey(newChunkId)) {
-        //        var result = LoadChunkWithChunkId(newChunkId);
-        //        loaded = loaded || result.Value is true;
-        //    }
-        //}
-
+        // Gezielter Zugriff pro bekanntem Chunk (alle im Speicher befindlichen
+        // Chunk-IDs aus _processedFile). Keine Ordner-Enumeration (GetDirectories),
+        // kein Ordner-Zeitstempel-Schnellpfad — der ist auf manchen Dateisystemen
+        // unzuverlässig (LastWriteTime des Ordners wird nicht zuverlässig
+        // aktualisiert) und führte dazu, dass Änderungen anderer Instanzen nicht
+        // erkannt wurden. Stattdessen wird die neueste Datei direkt mit der
+        // zuletzt verarbeiteten verglichen.
         foreach (var chunkId in _processedFile.Keys.ToList()) {
+            // System-Chunks (maindata, _master, _vars, _uses, _rowdata, _maindatalite)
+            // werden in BeSureToBeUpToDate vor diesem Refresh explizit geladen.
+            if (!IsRowChunk(chunkId)) { continue; }
+
+            if (!firstTime && _lastUsed.TryGetValue(chunkId, out var lastUsed)
+                && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= SkipIfUnusedMinutes) {
+                continue;
+            }
+
             var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
 
-            if (!firstTime && _lastUsed.TryGetValue(chunkId, out var lastUsed) && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= SkipIfUnusedMinutes) { continue; }
-
-            // Schnellpfad: Unveränderter Ordner-Zeitstempel → keine neue Datei seit
-            // dem letzten Load. Da Chunks write-once sind, ist der verarbeitete
-            // Stand noch aktuell, eine Enumeration erübrigt sich.
-            if (IO.GetFolderWriteTimeUtc(folder) is DateTime currentWt
-                && _lastFolderWriteTimeUtc.TryGetValue(chunkId, out var lastWt)
-                && lastWt == currentWt) { continue; }
-
+            // Neueste Datei ermitteln und mit der zuletzt verarbeiteten vergleichen.
             if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { continue; }
 
             var processedFile = _processedFile[chunkId];
 
-            // Reload wenn eine andere Datei die neueste ist.
-            // Da Chunks write-once sind, bedeutet ein anderer Dateiname zwingend
-            // anderen Inhalt — keine zusätzlichen Stale-Checks nötig.
-            if (!string.Equals(processedFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
-                var result = LoadChunkWithChunkId(chunkId);
-                if (result.IsFailed) {
-                    Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
-                }
-                loaded = loaded || result.Value is true;
+            // Reload wenn eine andere Datei die neueste ist. Da Chunks write-once
+            // sind, bedeutet ein anderer Dateiname zwingend anderen Inhalt.
+            if (string.Equals(processedFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
+                continue;
             }
+
+            var result = LoadChunkWithChunkId(chunkId);
+            if (result.IsFailed) {
+                Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
+            }
+            loaded = loaded || result.Value is true;
         }
 
         return loaded;
