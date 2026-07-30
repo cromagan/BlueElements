@@ -790,7 +790,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         btnAnsichtbearbeitung.Checked = TableView.Ansichtbearbeitung;
 
         grpImport.Enabled = combi;
-        tabAdmin.Enabled = combi;
+        grpAdminZeilen.Enabled = combi;
+        grpAdminBearbeiten.Enabled = combi;
 
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
@@ -1042,8 +1043,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
         if (btnStresstest.Checked) {
-            // Schalter aktivieren: beim nächsten LoadFromFile wird das doppelte
-            // Laden erlaubt und danach automatisch zurückgesetzt.
+            // Schalter aktivieren: doppeltes Laden der gleichen Tabelle wird
+            // erlaubt, bis der Button wieder ausgeschaltet wird.
             Develop.AllowDuplicateTableLoad = true;
 
             _stressTestTimer ??= new System.Windows.Forms.Timer();

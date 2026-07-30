@@ -52,9 +52,11 @@ public static class Develop {
 
     /// <summary>
     /// Develop-Stresstest: Wenn TRUE, wird das doppelte Laden der gleichen Tabellen-Datei
-    /// im selben Prozess erlaubt (<see cref="BlueTable.Classes.TableFile.IsFileAllowedToLoad"/>).
-    /// Wird nach jedem <see cref="BlueTable.Classes.TableFile.LoadFromFile"/> automatisch
-    /// zurückgesetzt, damit der Schalter bewusst pro Ladevorgang gesetzt werden muss.
+    /// im selben Prozess erlaubt (<see cref="BlueTable.Classes.TableFile.IsFileAllowedToLoad"/>
+    /// und <see cref="BlueTable.Classes.Table.Get(string, BlueBasics.Interfaces.NeedPassword)"/>).
+    /// Bleibt aktiv, bis der Stresstest-Button (btnStresstest) ihn ausschaltet — ein
+    /// automatisches Zurücksetzen nach LoadFromFile gibt es nicht mehr, da der Öffnen-
+    /// Vorgang einer Tabelle mehrere Table.Get-Aufrufe benötigt.
     /// </summary>
     public static bool AllowDuplicateTableLoad { get; set; }
 

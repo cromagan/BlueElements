@@ -678,8 +678,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             // bereits geladene Instanz NICHT zurückgegeben werden — es soll eine
             // zweite, unabhängige Instanz mit eigener MyId erzeugt werden. Ohne
             // diese Prüfung würde der KeyName-Treffer oben stets zuschlagen und
-            // IsFileAllowedToLoad/LoadFromFile (wo das Flag ausgewertet wird)
-            // nie erreicht. Das Flag wird in LoadFromFile wieder zurückgesetzt.
+            // IsFileAllowedToLoad/LoadFromFile (wo das Flag ebenfalls ausgewertet
+            // wird) nie erreicht. Das Flag bleibt aktiv, bis der Stresstest-Button
+            // es ausschaltet (mehrfache Table.Get-Aufrufe pro Öffnen-Vorgang).
             if (ok is { } okt && !Develop.AllowDuplicateTableLoad) {
                 if (!LoadingOnThisThread.Contains(okt)) {
                     okt.WaitInitialDone();
