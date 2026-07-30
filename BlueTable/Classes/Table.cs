@@ -674,7 +674,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
                 }
             }
 
-            if (ok is { } okt) {
+            // Develop-Stresstest: ist AllowDuplicateTableLoad gesetzt, darf die
+            // bereits geladene Instanz NICHT zurückgegeben werden — es soll eine
+            // zweite, unabhängige Instanz mit eigener MyId erzeugt werden. Ohne
+            // diese Prüfung würde der KeyName-Treffer oben stets zuschlagen und
+            // IsFileAllowedToLoad/LoadFromFile (wo das Flag ausgewertet wird)
+            // nie erreicht. Das Flag wird in LoadFromFile wieder zurückgesetzt.
+            if (ok is { } okt && !Develop.AllowDuplicateTableLoad) {
                 if (!LoadingOnThisThread.Contains(okt)) {
                     okt.WaitInitialDone();
                 }

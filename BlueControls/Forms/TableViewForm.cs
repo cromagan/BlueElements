@@ -782,7 +782,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         cbxColumnArr.MoveAllowed = combi;
         cbxColumnArr.AddAllowed = combi ? AddType.Text : AddType.None;
         MessageBoxOnError = combi;
-        grpAdminAllgemein.Enabled = combi;
+        btnPowerBearbeitung.Enabled = combi;
+        btnAnsichtbearbeitung.Enabled = combi;
+        btnSpaltenUebersicht.Enabled = combi;
 
         btnPowerBearbeitung.Checked = tb?.PowerEdit ?? false;
         btnAnsichtbearbeitung.Checked = TableView.Ansichtbearbeitung;
