@@ -127,6 +127,22 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Ungleich leer: Das Pad ist schreibgeschützt. Der Text wird als Hinweis
+    /// über allen Items eingeblendet und jegliche Bearbeitung (Maus, Tastatur,
+    /// Kontextmenü) wird unterbunden. Zoom und Verschieben bleiben möglich.
+    /// </summary>
+    public string NotEditableReason {
+        get;
+        set {
+            value ??= string.Empty;
+            if (field == value) { return; }
+            field = value;
+            if (!string.IsNullOrEmpty(value)) { Unselect(); }
+            Invalidate();
+        }
+    } = string.Empty;
+
     [DefaultValue(false)]
     public bool ShowInPrintMode {
         get;
@@ -154,28 +170,37 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
-    /// <summary>
-    /// Ungleich leer: Das Pad ist schreibgeschützt. Der Text wird als Hinweis
-    /// über allen Items eingeblendet und jegliche Bearbeitung (Maus, Tastatur,
-    /// Kontextmenü) wird unterbunden. Zoom und Verschieben bleiben möglich.
-    /// </summary>
-    public string NotEditableReason {
-        get;
-        set {
-            value ??= string.Empty;
-            if (field == value) { return; }
-            field = value;
-            if (!string.IsNullOrEmpty(value)) { Unselect(); }
-            Invalidate();
-        }
-    } = string.Empty;
-
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 
     #endregion
 
     #region Methods
+
+    public static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text, States state) {
+        // Halbtransparenter Schleier signalisiert die Schreibsperre,
+        // lässt die Items darunter aber erkennbar.
+        using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
+        gr.FillRectangle(veil, drawArea);
+
+        var maxWidth = Math.Max(50, Math.Min(drawArea.Width - 20, 600) - (2 * Skin.Padding));
+
+        using var extText = new ExtText(Design.Badge_Warning, state) {
+            Ausrichtung = Alignment.Top_Left,
+            TextDimensions = new Size(maxWidth, 500),
+            HtmlText = $"<Imagecode={imageCode}> " + text
+        };
+
+        var bannerRect = new Rectangle(
+            drawArea.X + ((drawArea.Width - extText.WidthControl - (2 * Skin.Padding)) / 2),
+            drawArea.Y + (3 * Skin.Padding),
+            extText.WidthControl + (2 * Skin.Padding),
+            extText.HeightControl + (2 * Skin.Padding));
+
+        Skin.Draw_Back(gr, Design.Badge_Warning, state, bannerRect, null, false);
+        extText.Draw(gr, 1, bannerRect.X + Skin.Padding, bannerRect.Y + Skin.Padding);
+        Skin.Draw_Border(gr, Design.Badge_Warning, state, bannerRect);
+    }
 
     public void CopyPrinterSettingsToWorkingArea() {
         if (_items is not { IsDisposed: false }) { return; }
@@ -385,32 +410,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #endregion
     }
 
-    public static void DrawNotEditableOverlay(Graphics gr, Rectangle drawArea, ImageCode imageCode, string text, States state) {
-        // Halbtransparenter Schleier signalisiert die Schreibsperre,
-        // lässt die Items darunter aber erkennbar.
-        using var veil = new SolidBrush(Color.FromArgb(210, 255, 255, 255));
-        gr.FillRectangle(veil, drawArea);
-
-        const int padding = 12;
-        var maxWidth = Math.Max(50, Math.Min(drawArea.Width - 20, 600) - (2 * padding));
-
-        using var extText = new ExtText(Design.Badge_Warning, state) {
-            Ausrichtung = Alignment.Top_Left,
-            TextDimensions = new Size(maxWidth, 500),
-            HtmlText = $"<Imagecode={imageCode}> " + text
-        };
-
-        var bannerRect = new Rectangle(
-            drawArea.X + ((drawArea.Width - extText.WidthControl - (2 * padding)) / 2),
-            drawArea.Y + 10,
-            extText.WidthControl + (2 * padding),
-            extText.HeightControl + (2 * padding));
-
-        Skin.Draw_Back(gr, Design.Badge_Warning, state, bannerRect, null, false);
-        extText.Draw(gr, 1, bannerRect.X + padding, bannerRect.Y + padding);
-        Skin.Draw_Border(gr, Design.Badge_Warning, state, bannerRect);
-    }
-
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e is null || Items is null) { return null; }
 
@@ -453,15 +452,15 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             case System.Windows.Forms.Keys.Delete:
 
             case System.Windows.Forms.Keys.Back: {
-                var itemsDoDelete = _itemsToMove.OfType<AbstractPadItem>().ToList();
-                Unselect();
-                foreach (var bi in itemsDoDelete) {
-                    if (bi.Parent is ItemCollectionPadItem { IsDisposed: false } p) {
-                        p.Remove(bi);
+                    var itemsDoDelete = _itemsToMove.OfType<AbstractPadItem>().ToList();
+                    Unselect();
+                    foreach (var bi in itemsDoDelete) {
+                        if (bi.Parent is ItemCollectionPadItem { IsDisposed: false } p) {
+                            p.Remove(bi);
+                        }
                     }
+                    break;
                 }
-                break;
-            }
 
             case System.Windows.Forms.Keys.Up:
                 MoveItems(0, -multi, false);

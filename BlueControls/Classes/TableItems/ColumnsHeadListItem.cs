@@ -3,6 +3,7 @@
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.TableItems;
@@ -322,6 +323,23 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
         var key = selectedItem.KeyName;
         var currentArrName = ca.KeyName;
+
+        // Schreibschutz prüfen, bevor Änderungen versucht werden.
+        // Echte Spalten (Systemspalten neu, Vorlagenspalten) benötigen das
+        // Recht zum Hinzufügen von Spalten; virtuelle/existierende Spalten
+        // nur das Recht zum Ändern des Arrangements.
+        var createsColumn = key.StartsWith("SYSNEW:", StringComparison.OrdinalIgnoreCase)
+                         || key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase);
+
+        var editReason = createsColumn
+            ? tb.IsValueEditable(TableDataType.Command_AddColumnByName, string.Empty)
+            : tb.IsValueEditable(TableDataType.ColumnArrangement, string.Empty);
+
+        if (editReason is { Length: > 0 }) {
+            Notification.Show("Spalte konnte nicht hinzugefügt werden:<br>" + editReason, ImageCode.Warnung);
+            return;
+        }
+
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tableView.SetPendingSmoothScroll();
 

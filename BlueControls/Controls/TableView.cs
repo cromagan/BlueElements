@@ -196,13 +196,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
                 // On-demand virtuelle Spalten ein-/ausblenden:
-                // - Hinzufügen: bei Ansichtbearbeitung (oder Admin ohne echte Spalten)
+                // - Hinzufügen: NUR bei Admins — bei Ansichtbearbeitung
+                //   (oder wenn die Tabelle Spalten hat, aber keine im Arrangement liegt)
                 // - Pin: wenn mindestens eine Zeile angepinnt ist
                 // Persistente virtuelle Spalten (VIR_…) stehen bereits in der
                 // Collection und werden vom Reconcile nicht angerührt.
                 // Die Number-Spalte hat keinen on-demand-Trigger.
-                var needAdd = Ansichtbearbeitung
-                    || (tb.IsAdministrator() && tb.Column.Count > 0 && ca.First() is null);
+                var needAdd = tb.IsAdministrator()
+                    && (Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
                 var needPin = PinnedRows.Count > 0;
 
                 ca.ReconcileVirtualColumns(needPin, needAdd);
@@ -1789,7 +1790,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 return;
             }
 
-            if (ca.Count < 1) {
+            if (!ca.RenderingItems.Any()) {
                 if (tb.Column.Count > 0) {
                     DrawWaitScreen(gr, "Ansicht nicht definiert");
                     return;
