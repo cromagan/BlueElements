@@ -10,15 +10,18 @@ public static class ParseableExtension {
 
     public static bool Parse(this IParseable parsable, string toParse, char bracketOpen, char bracketClose, char separator) {
         if (toParse.GetAllTags(bracketOpen, bracketClose, separator) is not { } x) { return false; }
+        return parsable.Parse(x, toParse);
+    }
 
-        foreach (var pair in x) {
+    public static bool Parse(this IParseable parsable, List<KeyValuePair<string, string>> allTags, string originalParse) {
+        foreach (var pair in allTags) {
             var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
 
             if (!i) {
                 Develop.DebugPrint("Kann nicht geparsed werden: " + pair.Key + " = " + pair.Value + Develop.ContextInfo(parsable));
             }
         }
-        parsable.ParseFinished(toParse);
+        parsable.ParseFinished(originalParse);
         return true;
     }
 

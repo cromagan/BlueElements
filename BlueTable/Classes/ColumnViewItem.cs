@@ -12,6 +12,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     #region Fields
 
+    public static readonly AssemblyAwareCache<ColumnViewItem> AllTypes = new();
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -23,7 +24,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         //Renderer = string.Empty;
     }
 
-    public ColumnViewItem(Table? table, string toParse) : this(table) => this.Parse(toParse);
+    public ColumnViewItem(Table? table, List<KeyValuePair<string, string>> allTags, string originalParse) : this(table) => this.Parse(allTags, originalParse);
 
     protected ColumnViewItem(Table? parent) : base() {
         Table = parent;
@@ -155,11 +156,14 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// Werte (Permanent, FontHorizontal) den Konstruktor-Defaults entsprechen.
     /// Echte Spalten werden als Basis-<see cref="ColumnViewItem" /> geparst.
     /// </summary>
-    public static ColumnViewItem Create(Table? table, string toParse) {
-        var colName = toParse.GetAllTags()?
-            .Find(kv => kv.Key.Equals("columnname", StringComparison.OrdinalIgnoreCase)).Value;
+    public static ColumnViewItem? Create(Table? table, string toParse) {
+        if (toParse.GetAllTags() is not { } x) { return null; }
 
-        return ParseableItem.NewByTypeName<ColumnViewItem>(colName) ?? new ColumnViewItem(table, toParse);
+        var colName = x.Find(kv => kv.Key.Equals("columnname", StringComparison.OrdinalIgnoreCase)).Value;
+
+        if (colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) { return ParseableItem.NewByTypeName<ColumnViewItem>(colName); }
+
+        return new ColumnViewItem(table, x, toParse);
     }
 
     /// <summary>
@@ -186,7 +190,14 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         return string.Empty;
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
     public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -198,8 +209,30 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         return result;
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("columnname", ColumnName);
+        json.Set("permanent", Permanent);
+        json.Set("fonthorizontal", Horizontal);
+        if (IsExpanded is false) { json.Set("isexpanded", IsExpanded); }
+        return json;
+    }
+
     public void ParseFinished(string parsed) {
         // Keine Nachbearbeitung mehr nötig — Permanent hat einen gültigen Default.
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        Permanent = json.GetBool("permanent", Permanent);
+        Horizontal = json.GetBool("fonthorizontal", Horizontal);
+        IsExpanded = json.GetBool("isexpanded", IsExpanded);
+
+        var colName = json.GetString("columnname", string.Empty);
+        if (colName is { Length: > 0 } && Table is { IsDisposed: false } tb) {
+            Column = tb.Column[colName];
+        }
     }
 
     public bool ParseThis(string key, string value) {
@@ -273,35 +306,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("columnname", ColumnName);
-        json.Set("permanent", Permanent);
-        json.Set("fonthorizontal", Horizontal);
-        if (IsExpanded is false) { json.Set("isexpanded", IsExpanded); }
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonElement parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        Permanent = json.GetBool("permanent", Permanent);
-        Horizontal = json.GetBool("fonthorizontal", Horizontal);
-        IsExpanded = json.GetBool("isexpanded", IsExpanded);
-
-        var colName = json.GetString("columnname", string.Empty);
-        if (colName is { Length: > 0 } && Table is { IsDisposed: false } tb) {
-            Column = tb.Column[colName];
-        }
-    }
 
     private void RegisterEvents() {
         if (Column is not null) {

@@ -18,12 +18,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
-
-    #endregion
-
     #region Constructors
 
     public ColumnViewCollection(Table? table, string toParse) {
@@ -33,6 +27,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public ColumnViewCollection(Table table, string toParse, string newname) : this(table, toParse) => KeyName = newname;
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -181,6 +181,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
+            return _internal.FirstOrDefault(i => string.Equals(i.ColumnName, key, StringComparison.OrdinalIgnoreCase));
+        }
+        return null;
+    }
+
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
             if (thisViewItem is not null && (thisViewItem.Column is null || thisViewItem.Column.IsSystemColumn())) {
@@ -238,6 +245,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         } while (true);
     }
 
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
@@ -263,10 +275,77 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return result;
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("name", KeyName);
+        json.Set("showhead", ShowHead);
+        json.Set("startcollapsed", StartCollapsed);
+        json.Set("scaletofit", (int)ScaleToFit);
+        json.Set("filterrows", FilterRows);
+        json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
+        json.Set("quickinfo", QuickInfo);
+        json.Set("columnheadermode", (int)ColumnHeaderMode);
+        json.SetArrayIfNotEmpty("columns", _internal.Where(c => c.StorageKey is not null).Cast<IJsonStringable>());
+        json.SetArrayIfNotEmpty("columnkeys", _internal.Where(c => c.StorageKey is null && c.Column is not null).Select(c => c.Column!.KeyName));
+        json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
+        json.SetArrayIfNotEmpty("executeablescripts", Ausführbare_Skripte);
+        json.SetArrayIfNotEmpty("columnsshowalwaysfilter", Filter_immer_Anzeigen);
+        var perm = PermissionGroups_Show.SortedDistinctList();
+        perm.RemoveString(Administrator, false);
+        json.SetArrayIfNotEmpty("permissiongroups", perm);
+        return json;
+    }
+
     public void ParseFinished(string parsed) {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
         Invalidated = true;
+    }
+
+    public void ParseFinishedJson(JsonElement parsed) {
+        if (FilterRows < 0) { FilterRows = 0; }
+        if (FilterRows > 10) { FilterRows = 10; }
+        Invalidated = true;
+    }
+
+    public void ParseJson(JsonObject json) {
+        KeyName = json.GetString("name", KeyName);
+        ShowHead = json.GetBool("showhead", ShowHead);
+        StartCollapsed = json.GetBool("startcollapsed", StartCollapsed);
+        ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
+        FilterRows = json.GetInt("filterrows", FilterRows);
+        var chapter = json.GetString("chaptercolumn", string.Empty);
+        if (chapter is { Length: > 0 }) { ColumnForChapter = Table?.Column[chapter]; }
+        QuickInfo = json.GetString("quickinfo", QuickInfo);
+        ColumnHeaderMode = json.GetEnum("columnheadermode", ColumnHeaderMode);
+        Kontextmenu_Skripte = json.GetStringList("contextmenuscripts").AsReadOnly();
+        Ausführbare_Skripte = json.GetStringList("executeablescripts").AsReadOnly();
+        Filter_immer_Anzeigen = json.GetStringList("columnsshowalwaysfilter").AsReadOnly();
+        if (json["permissiongroups"] is JsonArray parr) {
+            _permissionGroups_show.Clear();
+            _permissionGroups_show.AddRange(parr.ToStringList());
+        }
+
+        if (Table is not null) {
+            if (json["columnkeys"] is JsonArray ckArr) {
+                foreach (var item in ckArr) {
+                    if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) {
+                        Add(new ColumnViewItem(c));
+                    }
+                }
+            }
+            if (json["columns"] is JsonArray colsArr) {
+                foreach (var item in colsArr) {
+                    if (item is not JsonObject jo) { continue; }
+                    var colName = jo.GetString("columnname", string.Empty);
+                    if (colName is { Length: > 0 } && Table.Column[colName] is { } c) {
+                        var cvi = new ColumnViewItem(c);
+                        cvi.ParseJson(jo);
+                        Add(cvi);
+                    }
+                }
+            }
+        }
     }
 
     public bool ParseThis(string key, string value) {
@@ -555,85 +634,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         _internal.Clear();
         _onDemand.Clear();
         Table = null;
-    }
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
-            return _internal.FirstOrDefault(i => string.Equals(i.ColumnName, key, StringComparison.OrdinalIgnoreCase));
-        }
-        return null;
-    }
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("name", KeyName);
-        json.Set("showhead", ShowHead);
-        json.Set("startcollapsed", StartCollapsed);
-        json.Set("scaletofit", (int)ScaleToFit);
-        json.Set("filterrows", FilterRows);
-        json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
-        json.Set("quickinfo", QuickInfo);
-        json.Set("columnheadermode", (int)ColumnHeaderMode);
-        json.SetArrayIfNotEmpty("columns", _internal.Where(c => c.StorageKey is not null).Cast<IJsonStringable>());
-        json.SetArrayIfNotEmpty("columnkeys", _internal.Where(c => c.StorageKey is null && c.Column is not null).Select(c => c.Column!.KeyName));
-        json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
-        json.SetArrayIfNotEmpty("executeablescripts", Ausführbare_Skripte);
-        json.SetArrayIfNotEmpty("columnsshowalwaysfilter", Filter_immer_Anzeigen);
-        var perm = PermissionGroups_Show.SortedDistinctList();
-        perm.RemoveString(Administrator, false);
-        json.SetArrayIfNotEmpty("permissiongroups", perm);
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonElement parsed) {
-        if (FilterRows < 0) { FilterRows = 0; }
-        if (FilterRows > 10) { FilterRows = 10; }
-        Invalidated = true;
-    }
-
-    public void ParseJson(JsonObject json) {
-        KeyName = json.GetString("name", KeyName);
-        ShowHead = json.GetBool("showhead", ShowHead);
-        StartCollapsed = json.GetBool("startcollapsed", StartCollapsed);
-        ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
-        FilterRows = json.GetInt("filterrows", FilterRows);
-        var chapter = json.GetString("chaptercolumn", string.Empty);
-        if (chapter is { Length: > 0 }) { ColumnForChapter = Table?.Column[chapter]; }
-        QuickInfo = json.GetString("quickinfo", QuickInfo);
-        ColumnHeaderMode = json.GetEnum("columnheadermode", ColumnHeaderMode);
-        Kontextmenu_Skripte = json.GetStringList("contextmenuscripts").AsReadOnly();
-        Ausführbare_Skripte = json.GetStringList("executeablescripts").AsReadOnly();
-        Filter_immer_Anzeigen = json.GetStringList("columnsshowalwaysfilter").AsReadOnly();
-        if (json["permissiongroups"] is JsonArray parr) {
-            _permissionGroups_show.Clear();
-            _permissionGroups_show.AddRange(parr.ToStringList());
-        }
-
-        if (Table is not null) {
-            if (json["columnkeys"] is JsonArray ckArr) {
-                foreach (var item in ckArr) {
-                    if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) {
-                        Add(new ColumnViewItem(c));
-                    }
-                }
-            }
-            if (json["columns"] is JsonArray colsArr) {
-                foreach (var item in colsArr) {
-                    if (item is not JsonObject jo) { continue; }
-                    var colName = jo.GetString("columnname", string.Empty);
-                    if (colName is { Length: > 0 } && Table.Column[colName] is { } c) {
-                        var cvi = new ColumnViewItem(c);
-                        cvi.ParseJson(jo);
-                        Add(cvi);
-                    }
-                }
-            }
-        }
     }
 
     #endregion
