@@ -6,6 +6,8 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
@@ -22,6 +24,17 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private bool _switchingTabs;
 
     private bool _zellenClickInsClipboard;
+
+    /// <summary>
+    /// Develop-Stresstest: Timer, der im 20-Sekunden-Takt prüft, ob in der
+    /// geladenen TableChunk (mit gesetzter Chunk-Spalte) eine neue Zeile mit
+    /// der eigenen Instanz-ID angelegt werden kann. Bei Erfolg wird der Timer
+    /// gestoppt und nach 6 Minuten (Hintergrund-Thread) wieder gestartet.
+    /// </summary>
+    private System.Windows.Forms.Timer? _stressTestTimer;
+
+    /// <summary>Lfd. Nummer für die vom Stresstest erzeugten Zeilen.</summary>
+    private int _stressTestCounter;
 
     #endregion
 
@@ -315,6 +328,14 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         TableView.SaveCurrentView(ViewManager.Last);
+
+        if (_stressTestTimer is { } stressTimer) {
+            stressTimer.Stop();
+            stressTimer.Tick -= StressTestTimer_Tick;
+            stressTimer.Dispose();
+            _stressTestTimer = null;
+            Develop.AllowDuplicateTableLoad = false;
+        }
 
         base.OnFormClosing(e);
 
@@ -1015,6 +1036,75 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;
+    }
+
+    private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
+        if (btnStresstest.Checked) {
+            // Schalter aktivieren: beim nächsten LoadFromFile wird das doppelte
+            // Laden erlaubt und danach automatisch zurückgesetzt.
+            Develop.AllowDuplicateTableLoad = true;
+
+            _stressTestTimer ??= new System.Windows.Forms.Timer();
+            // Defensive Abonnierung: falls der Timer aus einem früheren Lauf
+            // noch angehängt ist, nicht doppelt abonnieren.
+            _stressTestTimer.Tick -= StressTestTimer_Tick;
+            _stressTestTimer.Tick += StressTestTimer_Tick;
+            _stressTestTimer.Interval = 20000;
+            _stressTestTimer.Start();
+        } else {
+            if (_stressTestTimer is { } t) { t.Stop(); }
+            Develop.AllowDuplicateTableLoad = false;
+        }
+    }
+
+    private void StressTestTimer_Tick(object? sender, System.EventArgs e) {
+        if (IsDisposed || _stressTestTimer is not { } timer) { return; }
+
+        // Aktuelle Tabelle muss eine TableChunk mit gesetzter Chunk-Spalte sein.
+        if (TableView.Table is not TableChunk tc) { return; }
+        if (tc.Column.ChunkValueColumn is not { IsDisposed: false } cvc) { return; }
+
+        // Ein aktiver Chunk-Filter ist zwingend nötig — ohne ihn wüsste eine neue
+        // Zeile nicht, zu welchem Chunk sie gehört. Der Chunk-Wert wird aus dem
+        // kombinierten Filter des TableView übernommen.
+        if (TableView.FilterCombined[cvc] is not { } chunkFilter) { return; }
+
+        // Filter für die neue Zeile aufbauen: First-Spalte (Eindeutigkeit über
+        // Instanz-ID + Zähler) und der übernommene Chunk-Filter. Ist die Chunk-
+        // Spalte gleichzeitig die erste Spalte, fällt beides zusammen und der
+        // Chunk-Wert bestimmt die erste Spalte.
+        List<FilterItem> filter = [chunkFilter];
+        if (tc.Column.First is { IsDisposed: false } cf && cf != cvc) {
+            filter.Insert(0, new FilterItem(cf, FilterType.Istgleich, $"{tc.MyId}_{_stressTestCounter}"));
+        }
+
+        if (tc.Row.GenerateAndAdd([.. filter], "Stresstest").Value is not RowItem row) {
+            // Zeile konnte nicht erstellt werden (z.B. Edit-Sperre durch andere
+            // Instanz) — nichts tun, der nächste Tick kommt in 20 s wieder.
+            return;
+        }
+
+        _stressTestCounter++;
+
+        // Erfolg: Timer stoppen und 6 Minuten im Hintergrund warten, damit die
+        // UI nicht blockiert. Anschließend wird der Timer wieder gestartet.
+        timer.Stop();
+        Task.Run(StressTestPause);
+    }
+
+    private void StressTestPause() {
+        Thread.Sleep(TimeSpan.FromMinutes(6));
+
+        if (IsDisposed) { return; }
+        if (_stressTestTimer is not { } timer) { return; }
+
+        try {
+            // Invoke wirft InvalidOperationException, wenn das Fenster kein
+            // Handle mehr hat; ObjectDisposedException (abgeleitet) wenn der
+            // Timer zwischenzeitlich disposed wurde. Beide ignorieren — der
+            // Stresstest wird dann beim Schließen ohnehin beendet.
+            Invoke(new Action(timer.Start));
+        } catch (InvalidOperationException) { }
     }
 
     #endregion

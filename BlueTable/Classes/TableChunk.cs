@@ -184,13 +184,6 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    /// <summary>
-    /// Generiert einen 3-stelligen Hash aus MachineName und Instanz-ID (MyId).
-    /// Unterscheidet verschiedene Maschinen/Instanzen bei gleichem Benutzernamen
-    /// auf dem Dateisystem.
-    /// </summary>
-    private static string MachineInstanceHash => $"{Environment.MachineName}|{MyId}".GetMD5Hash()[..3].ToUpperInvariant();
-
     #endregion
 
     #region Methods
@@ -654,9 +647,10 @@ public class TableChunk : TableFile {
     /// Generiert den Timestamp-String für Chunk-Dateinamen im Format
     /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash. Wird beim Speichern von Row-Chunks
     /// verwendet, um einheitliche, zeitlich sortierbare Dateinamen zu erzeugen.
+    /// Instanz-Methode, da der Hash pro TableChunk-Instanz einmalig erzeugt wird.
     /// </summary>
-    internal static string GenerateChunkTimestamp() =>
-        $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MachineInstanceHash}";
+    internal string GenerateChunkTimestamp() =>
+        $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MyId}";
 
     protected override bool LoadMainData() {
         EnsureDummyFileExists();
@@ -996,15 +990,16 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
-    /// Maschine/Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
-    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session).
+    /// TableChunk-Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
+    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session
+    /// oder andere Instanz im selben Prozess — z.B. Develop-Stresstest).
     /// </summary>
-    private static bool IsFileFromCurrentUser(string filePath) {
+    private bool IsFileFromCurrentUser(string filePath) {
         var creator = ExtractUserNameFromFileName(filePath);
         if (!string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         var creatorHash = ExtractMachineInstanceHashFromFileName(filePath);
-        return string.Equals(creatorHash, MachineInstanceHash, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(creatorHash, MyId, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

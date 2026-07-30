@@ -102,12 +102,6 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     private volatile bool _hasWriteAccess;
 
     /// <summary>
-    /// Zuletzt festgestellte Blocker-Meldung. Dient dem Polling dazu, Änderungen
-    /// des Sperrstatus zu erkennen und <see cref="BlockStatusChanged"/> zu werfen.
-    /// </summary>
-    private string _lastBlockerMessage = string.Empty;
-
-    /// <summary>
     /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
     /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
     /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
@@ -116,6 +110,12 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     private bool _isDirty;
 
     private volatile int _isDisposedFlag;
+
+    /// <summary>
+    /// Zuletzt festgestellte Blocker-Meldung. Dient dem Polling dazu, Änderungen
+    /// des Sperrstatus zu erkennen und <see cref="BlockStatusChanged"/> zu werfen.
+    /// </summary>
+    private string _lastBlockerMessage = string.Empty;
 
     #endregion
 
@@ -143,14 +143,12 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     #region Events
 
     /// <summary>
-    /// Ereignis, das beim Laden der Datei ausgelöst wird.
+    /// Ereignis, das ausgelöst wird, wenn sich der Multi-User-Sperrstatus
+    /// (Blockdatei) geändert hat - etwa weil ein anderer Benutzer die Sperre
+    /// übernommen oder freigegeben hat. Abonnenten ermitteln den aktuellen
+    /// Status über <see cref="BlockerMessage"/> bzw. <see cref="AcquireWriteAccess"/>.
     /// </summary>
-    public event EventHandler? Loaded;
-
-    /// <summary>
-    /// Ereignis, das nach erfolgreichem Speichern ausgelöst wird.
-    /// </summary>
-    public event EventHandler? Saved;
+    public event EventHandler? BlockStatusChanged;
 
     /// <summary>
     /// Ereignis, das ausgelöst wird, wenn der gecachte Inhalt invalidiert wurde
@@ -160,12 +158,14 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     public event EventHandler? Invalidated;
 
     /// <summary>
-    /// Ereignis, das ausgelöst wird, wenn sich der Multi-User-Sperrstatus
-    /// (Blockdatei) geändert hat - etwa weil ein anderer Benutzer die Sperre
-    /// übernommen oder freigegeben hat. Abonnenten ermitteln den aktuellen
-    /// Status über <see cref="BlockerMessage"/> bzw. <see cref="AcquireWriteAccess"/>.
+    /// Ereignis, das beim Laden der Datei ausgelöst wird.
     /// </summary>
-    public event EventHandler? BlockStatusChanged;
+    public event EventHandler? Loaded;
+
+    /// <summary>
+    /// Ereignis, das nach erfolgreichem Speichern ausgelöst wird.
+    /// </summary>
+    public event EventHandler? Saved;
 
     #endregion
 
@@ -323,6 +323,11 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// </summary>
     public abstract bool MustZipped { get; }
 
+    /// <summary>
+    /// Pro Instanz einmalig generierter Hash aus MachineName und einer Guid.
+    /// </summary>
+    public string MyId { get; } = $"{Environment.MachineName}|{Guid.NewGuid()}".GetMD5Hash()[..3].ToUpperInvariant();
+
     #endregion
 
     #region Methods
@@ -425,10 +430,10 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         if (Develop.AllReadOnly) { return string.Empty; }
 
         if (!IsMyLock()) {
-            var blocker = BlockFile.BlockerMessage(Filename);
+            var blocker = BlockFile.BlockerMessage(Filename, MyId);
             if (blocker.Length > 0) { return blocker; }
 
-            BlockFile.AcquireWriteAccessFor(Filename);
+            BlockFile.AcquireWriteAccessFor(Filename, MyId);
             if (!IsMyLock()) { return "Schreibrecht konnte nicht erworben werden"; }
         }
 
@@ -441,7 +446,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Liefert eine Blocker-Meldung, falls ein anderer Benutzer die Datei sperrt;
     /// <see cref="string.Empty"/> wenn frei.
     /// </summary>
-    public string BlockerMessage() => BlockFile.BlockerMessage(Filename);
+    public string BlockerMessage() => BlockFile.BlockerMessage(Filename, MyId);
 
     /// <summary>
     /// Disposed alle zugeordneten Ressourcen. Trägt die Instanz aus dem
@@ -513,7 +518,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// <summary>
     /// Prüft, ob der aktuelle Prozess die aktive Sperre für diese Datei hält.
     /// </summary>
-    public bool IsMyLock() => BlockFile.IsMyLockFor(Filename);
+    public bool IsMyLock() => BlockFile.IsMyLockFor(Filename, MyId);
 
     /// <summary>
     /// Prüft, ob die Datei aktuell bearbeitet werden darf.
@@ -617,7 +622,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         OnReleasingWriteAccess();
 
         _hasWriteAccess = false;
-        BlockFile.RevokeFor(Filename);
+        BlockFile.RevokeFor(Filename, MyId);
         _writeAccessHolders.TryRemove(Filename, out _);
     }
 

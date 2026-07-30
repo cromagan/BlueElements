@@ -384,6 +384,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
     public bool MainChunkLoadDone { get; protected set; }
 
+    /// <summary>
+    /// Pro Instanz einmalig generierter Hash aus MachineName und einer Guid.
+    /// Unterscheidet verschiedene Tabellen-Instanzen — auch im selben Prozess
+    /// (z.B. für den Develop-Stresstest mit mehrfach geladener gleicher Tabelle).
+    /// Taucht im Dateinamen der .tblc-Dateien auf und in der Master-Id.
+    /// </summary>
+    public string MyId { get; } = $"{Environment.MachineName}|{Guid.NewGuid()}".GetMD5Hash()[..3].ToUpperInvariant();
+
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
         set {

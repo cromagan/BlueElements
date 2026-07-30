@@ -182,6 +182,10 @@ public class TableFile : Table {
     }
 
     public static bool IsFileAllowedToLoad(string fileName) {
+        // Develop-Stresstest: doppeltes Laden explizit erlaubt.
+        // Das Flag wird in LoadFromFile nach dem Ladeversuch wieder zurückgesetzt.
+        if (Develop.AllowDuplicateTableLoad) { return true; }
+
         lock (AllFilesLocker) {
             foreach (var thisFile in AllFiles) {
                 if (thisFile is TableFile { IsDisposed: false } tbf) {
@@ -329,7 +333,13 @@ public class TableFile : Table {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { throw DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
-        if (!IsFileAllowedToLoad(fileNameToLoad)) {
+        var allowed = IsFileAllowedToLoad(fileNameToLoad);
+        // Schalter konsumieren: er ist einmalig pro LoadFromFile-Aufruf gedacht
+        // (Develop-Stresstest) und muss nach der Auswertung immer zurückgesetzt
+        // werden, damit er nicht versehentlich für Folge-Ladevorgänge aktiv bleibt.
+        Develop.AllowDuplicateTableLoad = false;
+
+        if (!allowed) {
             // Eine andere Instanz lädt diese Datei bereits (Race-Condition).
             // Diese Instanz ist ein "Ghost" — ohne Freeze/MainChunkLoadDone
             // würde WaitInitialDone 120 s hängen.

@@ -71,6 +71,7 @@ namespace BlueControls.Forms {
             btnPowerBearbeitung = new Button();
             btnAnsichtbearbeitung = new Button();
             btnSpaltenUebersicht = new Button();
+            btnStresstest = new Button();
             grpAdminBearbeiten = new GroupBox();
             btnSuchInScript = new Button();
             btnSkripteBearbeiten = new Button();
@@ -425,7 +426,7 @@ namespace BlueControls.Forms {
             grpAdminZeilen.Controls.Add(btnZeileLöschen);
             grpAdminZeilen.Dock = DockStyle.Left;
             grpAdminZeilen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAdminZeilen.Location = new Point(688, 0);
+            grpAdminZeilen.Location = new Point(744, 0);
             grpAdminZeilen.Name = "grpAdminZeilen";
             grpAdminZeilen.Size = new Size(232, 81);
             grpAdminZeilen.TabIndex = 8;
@@ -477,11 +478,12 @@ namespace BlueControls.Forms {
             grpAdminAllgemein.Controls.Add(btnPowerBearbeitung);
             grpAdminAllgemein.Controls.Add(btnAnsichtbearbeitung);
             grpAdminAllgemein.Controls.Add(btnSpaltenUebersicht);
+            grpAdminAllgemein.Controls.Add(btnStresstest);
             grpAdminAllgemein.Dock = DockStyle.Left;
             grpAdminAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminAllgemein.Location = new Point(312, 0);
             grpAdminAllgemein.Name = "grpAdminAllgemein";
-            grpAdminAllgemein.Size = new Size(376, 81);
+            grpAdminAllgemein.Size = new Size(432, 81);
             grpAdminAllgemein.TabIndex = 7;
             grpAdminAllgemein.TabStop = false;
             grpAdminAllgemein.Text = "Allgemein";
@@ -556,6 +558,18 @@ namespace BlueControls.Forms {
             btnSpaltenUebersicht.TabIndex = 36;
             btnSpaltenUebersicht.Text = "Spalten-Übersicht";
             btnSpaltenUebersicht.Click += btnSpaltenUebersicht_Click;
+            // 
+            // btnStresstest
+            // 
+            btnStresstest.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
+            btnStresstest.ImageCode = "Blitz";
+            btnStresstest.Location = new Point(376, 2);
+            btnStresstest.Name = "btnStresstest";
+            btnStresstest.QuickInfo = resources.GetString("btnStresstest.QuickInfo");
+            btnStresstest.Size = new Size(48, 66);
+            btnStresstest.TabIndex = 47;
+            btnStresstest.Text = "Stress-test";
+            btnStresstest.CheckedChanged += btnStresstest_CheckedChanged;
             // 
             // grpAdminBearbeiten
             // 
@@ -945,5 +959,6 @@ namespace BlueControls.Forms {
         private Button btnUserInfo;
         private Button btnSuchInScript;
         private Button btnMonitoring;
+        private Button btnStresstest;
     }
 }

@@ -60,8 +60,6 @@ public static class Generic {
 
     public static bool Ending { get; set; }
 
-    public static string MyId { get; } = Guid.NewGuid().ToString();
-
     public static string UserGroup { get; set; } = Constants.Everybody;
 
     public static string UserName {

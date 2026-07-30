@@ -50,6 +50,14 @@ public static class Develop {
 
     public static bool AllReadOnly { get; set; }
 
+    /// <summary>
+    /// Develop-Stresstest: Wenn TRUE, wird das doppelte Laden der gleichen Tabellen-Datei
+    /// im selben Prozess erlaubt (<see cref="BlueTable.Classes.TableFile.IsFileAllowedToLoad"/>).
+    /// Wird nach jedem <see cref="BlueTable.Classes.TableFile.LoadFromFile"/> automatisch
+    /// zurückgesetzt, damit der Schalter bewusst pro Ladevorgang gesetzt werden muss.
+    /// </summary>
+    public static bool AllowDuplicateTableLoad { get; set; }
+
     public static bool DiagFlag { get; set; }
 
     [DefaultValue(false)]

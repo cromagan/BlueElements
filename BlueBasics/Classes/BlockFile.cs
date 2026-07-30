@@ -21,11 +21,13 @@ public sealed class BlockFile {
     /// <summary>Ab diesem Alter gilt die Sperre als abgelaufen und kann überschrieben werden.</summary>
     private const double SaveTimeInMinutes = 9;
 
+    private readonly string _myId = string.Empty;
+
     #endregion
 
     #region Constructors
 
-    private BlockFile() { }
+    private BlockFile(string id) { _myId = id; }
 
     #endregion
 
@@ -46,25 +48,30 @@ public sealed class BlockFile {
     #region Methods
 
     /// <summary>Schreibt die .blk-Sperre für die angegebene Datei mit den aktuellen Prozessdaten.</summary>
-    public static void AcquireWriteAccessFor(string filename) {
+    /// <param name="myId">Prozess-spezifische ID des Aufrufers (<see cref="BlockableFile.MyId"/>).</param>
+    public static void AcquireWriteAccessFor(string filename, string myId) {
         var blkName = BlockFilename(filename);
-        if (Read(blkName) is { } bf && !bf.IsExpired() && bf.MessageForOther().Length > 0) { return; }
-        WriteBlockFile(blkName);
+        if (Read(blkName, myId) is { } bf && !bf.IsExpired() && bf.MessageForOther().Length > 0) { return; }
+        WriteBlockFile(blkName, myId);
     }
 
     /// <summary>Liefert eine Blocker-Meldung falls ein anderer die Datei sperrt, sonst <see cref="string.Empty"/>.</summary>
-    public static string BlockerMessage(string filename) => Read(BlockFilename(filename))?.MessageForOther() ?? string.Empty;
+    /// <param name="filename"></param>
+    /// <param name="myId">Prozess-spezifische ID des Aufrufers (<see cref="BlockableFile.MyId"/>).</param>
+    public static string BlockerMessage(string filename, string myId) => Read(BlockFilename(filename), myId)?.MessageForOther() ?? string.Empty;
 
     /// <summary>Prüft, ob der aktuelle Prozess die aktive Sperre für die angegebene Datei hält.</summary>
-    public static bool IsMyLockFor(string filename) => Read(BlockFilename(filename)) is { } bf && !bf.IsExpired() && bf.MessageForOther().Length == 0;
+    /// <param name="myId">Prozess-spezifische ID des Aufrufers (<see cref="BlockableFile.MyId"/>).</param>
+    public static bool IsMyLockFor(string filename, string myId) => Read(BlockFilename(filename), myId) is { } bf && !bf.IsExpired() && bf.MessageForOther().Length == 0;
 
     /// <summary>
     /// Entfernt die Sperre, wenn sie dem aktuellen Prozess gehört.
     /// <paramref name="onReleasing"/> wird nach erfolgreichem Löschen aufgerufen.
     /// </summary>
-    public static void RevokeFor(string filename, Action? onReleasing = null) {
+    /// <param name="myId">Prozess-spezifische ID des Aufrufers (<see cref="BlockableFile.MyId"/>).</param>
+    public static void RevokeFor(string filename, string myId, Action? onReleasing = null) {
         var blkName = BlockFilename(filename);
-        if (Read(blkName) is not { } bf || bf.IsExpired() || bf.MessageForOther().Length > 0) { return; }
+        if (Read(blkName, myId) is not { } bf || bf.IsExpired() || bf.MessageForOther().Length > 0) { return; }
         if (!DeleteFile(blkName, false)) { return; }
 
         onReleasing?.Invoke();
@@ -86,13 +93,13 @@ public sealed class BlockFile {
             ? filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk"
             : string.Empty;
 
-    private static BlockFile? Read(string blkName) {
+    private static BlockFile? Read(string blkName, string myId) {
         var result = ReadAllBytes(blkName, 5);
         if (result.IsFailed || result.Value is not byte[] content || content.Length == 0) { return null; }
 
         try {
             if (JsonNode.Parse(Encoding.UTF8.GetString(content)) is JsonObject data) {
-                return new BlockFile {
+                return new BlockFile(myId) {
                     User = data["user"]?.GetValue<string>() ?? string.Empty,
                     TimeUtc = data["timeutc"]?.GetValue<DateTime>() ?? DateTime.MinValue,
                     MachineName = data["machinename"]?.GetValue<string>() ?? string.Empty,
@@ -107,13 +114,13 @@ public sealed class BlockFile {
         return null;
     }
 
-    private static void WriteBlockFile(string blkName) {
+    private static void WriteBlockFile(string blkName, string myId) {
         var json = new JsonObject()
             .Set("user", UserName)
             .Set("timeutc", DateTime.UtcNow)
             .Set("machinename", Environment.MachineName)
             .Set("app", Develop.AppExe())
-            .Set("id", MyId)
+            .Set("id", myId)
             .ToJsonString();
 
         WriteAllBytes(blkName, Encoding.UTF8.GetBytes(json));
@@ -139,7 +146,7 @@ public sealed class BlockFile {
         if (User != UserName) { return $"Aktueller Bearbeiter: {User} noch bis {deadline}"; }
         if (!string.Equals(App, Develop.AppExe(), StringComparison.OrdinalIgnoreCase)) { return $"Anderes Programm bearbeitet: {App.FileNameWithoutSuffix()} noch bis {deadline}"; }
         if (MachineName != Environment.MachineName) { return $"Anderer Computer bearbeitet: {MachineName} - {User} noch bis {deadline}"; }
-        if (Id != MyId) { return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {deadline}."; }
+        if (Id != _myId) { return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {deadline}."; }
         return string.Empty;
     }
 
