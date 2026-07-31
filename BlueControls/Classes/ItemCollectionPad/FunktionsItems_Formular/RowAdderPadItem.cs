@@ -16,37 +16,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     #region Fields
 
-    private string _additionalInfoColumnKey = string.Empty;
-
     private FlexiControlForDelegate? _button;
-
-    /// <summary>
-    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
-    /// Dadurch können verschiedene Datensätze gespeichert werden.
-    /// Beispiele: Rezeptname, Personenname, Beleg-Nummer
-    /// </summary>
-    private string _entityId = string.Empty;
-
-    /// <summary>
-    /// Letzter Skript-Fehlertext, der beim Testen aufgetreten ist.
-    /// Wird im Editor über "anzeigen" wieder sichtbar gemacht.
-    /// </summary>
-    private string _lastFailedReason = string.Empty;
 
     /// <summary>
     /// Variablen zum Zeitpunkt des letzten Fehlers.
     /// </summary>
     private List<Variable>? _lastSavedVariables;
-
-    /// <summary>
-    /// Eine Spalte in der Ziel-Tabelle.
-    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
-    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
-    /// </summary>
-    private string _originIdColumnKey = string.Empty;
-
-    private string _script = string.Empty;
 
     #endregion
 
@@ -68,22 +43,22 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         get {
             if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = tb.Column[_additionalInfoColumnKey];
+            var c = tb.Column[AdditionalInfoColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
     [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string AdditionalInfoColumnKey {
-        get => _additionalInfoColumnKey;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_additionalInfoColumnKey == value) { return; }
-            _additionalInfoColumnKey = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnPropertyChangedExt("additionalInfoColumnKey", value);
         }
-    }
+    } = string.Empty;
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
@@ -100,15 +75,15 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
     public string EntityID {
-        get => _entityId;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_entityId == value) { return; }
-            _entityId = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnPropertyChangedExt("entityId", value);
         }
-    }
+    } = string.Empty;
 
     public override bool InputMustBeOneRow => true;
 
@@ -117,14 +92,14 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// Wird im Editor über "anzeigen" wieder sichtbar gemacht.
     /// </summary>
     public string LastFailedReason {
-        get => _lastFailedReason;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _lastFailedReason) { return; }
-            _lastFailedReason = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     /// <summary>
     /// Variablen zum Zeitpunkt des letzten Fehlers.
@@ -151,7 +126,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         get {
             if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = tb.Column[_originIdColumnKey];
+            var c = tb.Column[OriginIDColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -164,28 +139,28 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnKey {
-        get => _originIdColumnKey;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_originIdColumnKey == value) { return; }
-            _originIdColumnKey = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnPropertyChangedExt("originIdColumnKey", value);
         }
-    }
+    } = string.Empty;
 
     [Description("Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.")]
     public string Script {
-        get => _script;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _script) { return; }
-            _script = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
             OnPropertyChangedExt("script", value);
         }
-    }
+    } = string.Empty;
 
     public override bool TableInputMustMatchOutputTable => false;
 
@@ -207,8 +182,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     public override string ErrorReason() {
-        if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
-        if (!_entityId.Contains('~')) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(EntityID)) { return "Id-Generierung fehlt"; }
+        if (!EntityID.Contains('~')) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
         if (OriginIDColumn is not { IsDisposed: false } oic) {
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
@@ -270,12 +245,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         f?.Opacity = 0f;
 
         try {
-            var sd = new ScriptDescription(KeyName, _script);
+            var sd = new ScriptDescription(KeyName, Script);
 
             sd.ExecuteScript = ExecuteScriptTest;
 
             if (InputBoxEditor.Edit(sd)) {
-                _script = sd.Script;
+                Script = sd.Script;
             }
         } finally {
             f?.Opacity = 1f;
@@ -285,33 +260,33 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("EntityID", _entityId);
-        result.ParseableAdd("OriginIDColumnName", _originIdColumnKey);
-        result.ParseableAdd("AdditionalInfoColumnName", _additionalInfoColumnKey);
-        result.ParseableAdd("ScriptMenu", _script);
-        result.ParseableAdd("LastFailedReason", _lastFailedReason);
-        result.ParseableAdd("LastSavedVariables", _lastSavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
+        result.ParseableAdd("EntityID", EntityID);
+        result.ParseableAdd("OriginIDColumnName", OriginIDColumnKey);
+        result.ParseableAdd("AdditionalInfoColumnName", AdditionalInfoColumnKey);
+        result.ParseableAdd("ScriptMenu", Script);
+        result.ParseableAdd("LastFailedReason", LastFailedReason);
+        result.ParseableAdd("LastSavedVariables", LastSavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("entityid", _entityId);
-        json.Set("originidcolumnkey", _originIdColumnKey);
-        json.Set("additionalinfocolumnkey", _additionalInfoColumnKey);
-        json.Set("scriptmenu", _script);
-        json.Set("lastfailedreason", _lastFailedReason);
-        json.SetArrayIfNotEmpty("lastsavedvariables", _lastSavedVariables?.SortByKeyName() ?? []);
+        json.Set("entityid", EntityID);
+        json.Set("originidcolumnkey", OriginIDColumnKey);
+        json.Set("additionalinfocolumnkey", AdditionalInfoColumnKey);
+        json.Set("scriptmenu", Script);
+        json.Set("lastfailedreason", LastFailedReason);
+        json.SetArrayIfNotEmpty("lastsavedvariables", LastSavedVariables?.SortByKeyName() ?? []);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _entityId = json.GetString("entityid", _entityId);
-        _originIdColumnKey = json.GetString("originidcolumnkey", _originIdColumnKey);
-        _additionalInfoColumnKey = json.GetString("additionalinfocolumnkey", _additionalInfoColumnKey);
-        _script = json.GetString("scriptmenu", _script);
-        _lastFailedReason = json.GetString("lastfailedreason", _lastFailedReason);
-        _lastSavedVariables = json.GetList<Variable>("lastsavedvariables", true);
+        EntityID = json.GetString("entityid", EntityID);
+        OriginIDColumnKey = json.GetString("originidcolumnkey", OriginIDColumnKey);
+        AdditionalInfoColumnKey = json.GetString("additionalinfocolumnkey", AdditionalInfoColumnKey);
+        Script = json.GetString("scriptmenu", Script);
+        LastFailedReason = json.GetString("lastfailedreason", LastFailedReason);
+        LastSavedVariables = json.GetList<Variable>("lastsavedvariables", true);
 
         base.ParseJson(json);
     }
@@ -319,24 +294,24 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "entityid":
-                _entityId = value.FromNonCritical();
+                EntityID = value.FromNonCritical();
                 return true;
 
             case "originidcolum":
             case "originidcolumkey":
             case "originidcolumnname":
-                _originIdColumnKey = value.FromNonCritical();
+                OriginIDColumnKey = value.FromNonCritical();
                 return true;
 
             case "additionalinfocolumn":
             case "additionalinfocolumnkey":
             case "additionalinfocolumnname":
-                _additionalInfoColumnKey = value.FromNonCritical();
+                AdditionalInfoColumnKey = value.FromNonCritical();
                 return true;
 
             case "script":
             case "scriptmenu":
-                _script = value.FromNonCritical();
+                Script = value.FromNonCritical();
                 return true;
 
             case "scriptbefore":
@@ -346,11 +321,11 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
                 return true;
 
             case "lastfailedreason":
-                _lastFailedReason = value.FromNonCritical();
+                LastFailedReason = value.FromNonCritical();
                 return true;
 
             case "lastsavedvariables":
-                _lastSavedVariables = VariableCollection.ParseVariable(value.FromNonCritical(), true);
+                LastSavedVariables = VariableCollection.ParseVariable(value.FromNonCritical(), true);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -397,7 +372,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return new ScriptEndedFeedback("Keine Eingangs-Zeile zum Testen vorhanden.", false, false, "Allgemein");
         }
 
-        return RowAdder.ExecuteScript(script, !testmode, "Testmodus", _entityId, row, true);
+        return RowAdder.ExecuteScript(script, !testmode, "Testmodus", EntityID, row, true);
     }
 
     #endregion

@@ -30,6 +30,8 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
@@ -46,10 +48,10 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -426,12 +428,16 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         }
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed(); 
+            Disposed = null;
             PropertyChangedExt = null;
         }
         Table = null;

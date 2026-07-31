@@ -15,6 +15,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
@@ -97,6 +99,9 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// die statische <c>ClassId</c>-Property des Zieltyps; <typeparamref name="T" />
     /// muss daher nur ein Referenztyp mit einer solchen Property sein (ein
     /// Bezug zu <see cref="ParseableItem" /> ist nicht erforderlich).
+    /// Die Typsuche ist über <see cref="Generic.GetTypeByClassId{T}" /> gecacht,
+    /// sodass der Reflection-Zugriff auf <c>ClassId</c> nur einmal pro Target-Typ
+    /// und Assembly-Generation erfolgt.
     /// </summary>
     /// <typeparam name="T">Der Zieltyp (Referenztyp) mit einer statischen ClassId-Property.</typeparam>
     /// <param name="typname">Der ClassId-String des gesuchten Typs.</param>
@@ -104,22 +109,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// <returns>Eine neue Instanz oder null, wenn der Typ nicht gefunden wurde.</returns>
     public static T? NewByTypeName<T>(string? typname, params object[] args) where T : class {
         if (string.IsNullOrEmpty(typname)) { return null; }
-        var types = Generic.GetEnumerableOfType<T>();
-
-        if (!types.Any()) { return null; }
-
-        foreach (var thist in types) {
-            if (thist is not null) {
-                var v = thist.GetProperty("ClassId")?.GetValue(null, null);
-                if (v is string tn && tn.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
-                    var created = Activator.CreateInstance(thist, args);
-                    if (created is null) { return null; }
-                    var ni = (T)created;
-                    return ni;
-                }
-            }
-        }
-        return null;
+        if (GetTypeByClassId<T>(typname) is not { } type) { return null; }
+        return Activator.CreateInstance(type, args) as T;
     }
 
     public object Clone() {
@@ -175,12 +166,16 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed();
+            Disposed = null;
             PropertyChangedExt = null;
             PropertyChanged = null;
         }
     }
 
     protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

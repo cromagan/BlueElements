@@ -13,7 +13,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     #region Fields
 
     private string _lastQuickInfo = string.Empty;
-    private string _layoutFileName;
     private string _rowKey;
     private string _tmpQuickInfo = string.Empty;
 
@@ -28,7 +27,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public RowFormulaPadItem(string keyName, Table? table, string rowkey, string layoutFileName) : base(keyName) {
         Table = table;
         _rowKey = rowkey;
-        _layoutFileName = layoutFileName;
+        Layout_Dateiname = layoutFileName;
     }
 
     #endregion
@@ -43,13 +42,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     /// Namen so lassen, wegen Kontextmenu
     /// </summary>
     public string Layout_Dateiname {
-        get => _layoutFileName;
+        get;
         set {
-            if (value == _layoutFileName) { return; }
-            _layoutFileName = value;
+            if (value == field) { return; }
+            field = value;
             RemovePic();
+            OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override string QuickInfo {
         get {
@@ -79,10 +79,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -110,7 +110,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("LayoutFileName", _layoutFileName);
+        result.ParseableAdd("LayoutFileName", Layout_Dateiname);
         result.ParseableAdd("Table", Table);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
@@ -121,7 +121,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         switch (key) {
             case "layoutfilename":
             case "layoutid":
-                _layoutFileName = value.FromNonCritical();
+                Layout_Dateiname = value.FromNonCritical();
                 return true;
 
             case "database":
@@ -159,12 +159,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
     protected override void GeneratePic() {
-        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Table is not { IsDisposed: false } tb) {
+        if (IsDisposed || string.IsNullOrEmpty(Layout_Dateiname) || Table is not { IsDisposed: false } tb) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
 
-        var icp = new ItemCollectionPadItem(_layoutFileName);
+        var icp = new ItemCollectionPadItem(Layout_Dateiname);
 
         if (!icp.Any()) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
@@ -176,7 +176,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         GeneratedBitmap = icp.ToBitmap(1);
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) {
+    private void _table_Disposed(object? sender, System.EventArgs e) {
         Table = null;
         RemovePic();
     }

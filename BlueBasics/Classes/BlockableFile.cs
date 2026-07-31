@@ -150,6 +150,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// </summary>
     public event EventHandler? BlockStatusChanged;
 
+    public event EventHandler? Disposed;
+
     /// <summary>
     /// Ereignis, das ausgelöst wird, wenn der gecachte Inhalt invalidiert wurde
     /// (z. B. weil die Datei auf der Festplatte geändert wurde). Abonnenten können
@@ -464,10 +466,13 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         // Ab hier thread-sicher und idempotent.
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
+        OnDisposed();
+
         Loaded = null;
         Saved = null;
         Invalidated = null;
         BlockStatusChanged = null;
+        Disposed = null;
 
         Invalidate();
 
@@ -929,6 +934,8 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         if (!IsDisposed) { OnLoaded(); }
         return processedContent;
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {

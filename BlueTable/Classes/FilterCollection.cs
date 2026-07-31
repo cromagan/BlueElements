@@ -65,7 +65,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Events
 
-    public event EventHandler? DisposingEvent;
+    public event EventHandler? Disposed;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -676,7 +676,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     private void _table_Loaded(object? sender, System.EventArgs e) => Invalidate_FilteredRows();
 
@@ -722,9 +722,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (disposing) {
             lock (_internal) {
-                OnDisposingEvent();
+                OnDisposed(); 
 
-                DisposingEvent = null;
+                Disposed = null;
                 PropertyChanged = null;
                 RowsChanged = null;
 
@@ -736,7 +736,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
     }
 
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
@@ -746,7 +746,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void RegisterTableEvents() {
         if (_table is not null) {
             _table.Loaded += _table_Loaded;
-            _table.DisposingEvent += _table_Disposing;
+            _table.Disposed += _table_Disposed;
             _table.Row.RowRemoved += Row_RowRemoved;
             //_table.Row.RowRemoved += Row_RowRemoving;
             _table.Row.RowAdded += Row_Added;
@@ -769,7 +769,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void UnRegisterTableEvents() {
         if (_table is not null) {
             _table.Loaded -= _table_Loaded;
-            _table.DisposingEvent -= _table_Disposing;
+            _table.Disposed -= _table_Disposed;
             _table.Row.RowRemoved -= Row_RowRemoved;
             _table.Row.RowAdded -= Row_Added;
             _table.CellValueChanged -= _Table_CellValueChanged;

@@ -101,7 +101,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 field.ItemRemoved -= _page_ItemRemoved;
 
                 if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } tb) {
-                    tb.DisposingEvent -= _table_Disposing;
+                    tb.Disposed -= _table_Disposed;
                 }
             }
             field = value;
@@ -114,7 +114,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 field.ItemAdded += _page_ItemAdded;
                 field.ItemRemoved += _page_ItemRemoved;
                 if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } tb) {
-                    tb.DisposingEvent += _table_Disposing;
+                    tb.Disposed += _table_Disposed;
                 }
             }
 
@@ -296,7 +296,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 _createControlDepth--;
             }
 
-            // Page kann während CreateControl (z.B. durch _table_Disposing) null geworden sein
+            // Page kann während CreateControl (z.B. durch _table_Disposed) null geworden sein
             if (Page is null) {
                 c?.Dispose();
                 return null;
@@ -492,7 +492,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     private void _page_PropertyChanged(object? sender, PropertyChangedEventArgs e) => InvalidateView();
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Page = null;
+    private void _table_Disposed(object? sender, System.EventArgs e) => Page = null;
 
     private void btnAufklappen_Click(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

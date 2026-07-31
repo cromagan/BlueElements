@@ -1,18 +1,29 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using Microsoft.Win32;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace BlueBasics.ClassesStatic;
 
 public static class Generic {
 
     #region Fields
+
+    /// <summary>
+    /// Cache für <see cref="GetTypeByClassId{T}" />: pro Target-Typ eine Map
+    /// ClassId → Type. Der Eintrag gilt nur für die zugehörige Generation
+    /// (<see cref="_allTypesAssemblyCount" />); bei Assembly-Reload wird der
+    /// Eintrag verworfen und neu aufgebaut. Vermeidet den mehrfachen Reflection-
+    /// Zugriff auf die statische <c>ClassId</c>-Property bei jedem Aufruf von
+    /// <see cref="Classes.ParseableItem.NewByTypeName{T}" />.
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, (int Generation, Dictionary<string, Type> Map)> _classIdByTargetType = new();
 
     private static readonly List<Action> _trimActions = new();
     private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
@@ -223,6 +234,44 @@ public static class Generic {
         return ToHex(hashBytes);
     }
 
+    /// <summary>
+    /// Liefert den konkreten, instanziierbaren Typ, dessen statische
+    /// <c>ClassId</c>-Property mit <paramref name="classId" /> übereinstimmt —
+    /// gecacht pro Target-Typ <typeparamref name="T" />. Entspricht funktional
+    /// einer Suche über <see cref="GetEnumerableOfType{T}" /> inkl. Abruf der
+    /// <c>ClassId</c>-Property, vermeidet aber den wiederholten Reflection-
+    /// Zugriff pro Aufruf. Die Cache-Gültigkeit ist an
+    /// <see cref="AllTypes" /> gekoppelt: Sobald sich die Anzahl geladener
+    /// Assemblies ändert, gilt der Cache als veraltet und wird beim nächsten
+    /// Zugriff neu aufgebaut.
+    /// </summary>
+    /// <typeparam name="T">Der Basistyp, dessen Subtypen durchsucht werden.</typeparam>
+    /// <param name="classId">Der gesuchte ClassId-String (Groß-/Kleinschreibung egal).</param>
+    /// <returns>Der gefundene Typ oder <c>null</c>.</returns>
+    public static Type? GetTypeByClassId<T>(string classId) where T : class {
+        // Während des Aufbaus von AllTypes liefert dessen Getter [] zurück —
+        // in diesem seltenen Fall ohne Cache suchen, um keinen leeren Eintrag
+        // zu persistieren.
+        if (_allTypesLoading) { return LookupClassIdUncached<T>(classId); }
+
+        var targetType = typeof(T);
+        var generation = _allTypesAssemblyCount;
+
+        if (_classIdByTargetType.TryGetValue(targetType, out var existing) && existing.Generation == generation) {
+            return existing.Map.TryGetValue(classId, out var cached) ? cached : null;
+        }
+
+        var map = BuildClassIdMap<T>();
+        _classIdByTargetType[targetType] = (generation, map);
+
+        // Hat sich die Generation während des Aufbaus geändert (anderer Thread
+        // lädt gerade Assemblies), verwerfen wir das Ergebnis und suchen einmal
+        // direkt — beim nächsten Aufruf ist der Cache dann stabil.
+        if (_allTypesAssemblyCount != generation || _allTypesLoading) { return LookupClassIdUncached<T>(classId); }
+
+        return map.TryGetValue(classId, out var found) ? found : null;
+    }
+
     public static string GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = $"{type}\r\n{UserName}\r\n{Environment.CurrentManagedThreadId}\r\n{Environment.MachineName}";
@@ -364,6 +413,22 @@ public static class Generic {
         }
     }
 
+    private static Dictionary<string, Type> BuildClassIdMap<T>() where T : class {
+        var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        var targetType = typeof(T);
+
+        foreach (var t in AllTypes) {
+            if (!t.IsClass || t.IsAbstract || !targetType.IsAssignableFrom(t)) { continue; }
+
+            if (t.GetProperty("ClassId", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    ?.GetValue(null, null) is string cid) {
+                map[cid] = t;
+            }
+        }
+
+        return map;
+    }
+
     private static bool HasMatchingConstructor(Type type, object?[] constructorArgs) {
         try {
             // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
@@ -380,6 +445,18 @@ public static class Generic {
         } catch {
             return false;
         }
+    }
+
+    private static Type? LookupClassIdUncached<T>(string classId) where T : class {
+        foreach (var t in GetEnumerableOfType<T>()) {
+            if (t.GetProperty("ClassId", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    ?.GetValue(null, null) is string cid
+                && cid.Equals(classId, StringComparison.OrdinalIgnoreCase)) {
+                return t;
+            }
+        }
+
+        return null;
     }
 
     private static string ToHex(this byte[] bytes) {

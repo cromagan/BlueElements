@@ -15,20 +15,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     #region Fields
 
-    private Alignment _ausrichtung;
-    private PadStyles _style = PadStyles.Standard;
-
-    /// <summary>
-    /// Der Original-Text. Bei änderungen deses Textes wird die Variable _text_replaced ebenfalls zurückgesetzt.
-    /// </summary>
-    private string _textOriginal;
-
     /// <summary>
     /// Kopie von _text_original - aber mit evtl. ersetzten Variablen
     /// </summary>
     private string _textReplaced;
-
-    private float _textScale = 3.07f;
 
     /// <summary>
     /// Dieses Element ist nur temporär und ist der tatsächlich angezeigte Text - mit Bildern, verschieden Größen, etc.
@@ -44,8 +34,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     public TextPadItem(string keyName, string visibleText) : base(keyName) {
         _textReplaced = visibleText;
-        _textOriginal = visibleText;
-        _ausrichtung = Alignment.Top_Left;
+        Text = visibleText;
+        Ausrichtung = Alignment.Top_Left;
         InvalidateText();
     }
 
@@ -56,15 +46,15 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public static string ClassId => "TEXT";
 
     public Alignment Ausrichtung {
-        get => _ausrichtung;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _ausrichtung) { return; }
-            _ausrichtung = value;
+            if (field == value) { return; }
+            field = value;
             InvalidateText();
             OnPropertyChanged();
         }
-    }
+    } = Alignment.Top_Left;
 
     public override string Description => string.Empty;
 
@@ -73,41 +63,38 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
-        get => _style;
+        get;
         set {
-            if (_style == value) { return; }
-            _style = value;
+            if (field == value) { return; }
+            field = value;
             InvalidateText();
             OnPropertyChanged();
         }
-    }
+    } = PadStyles.Standard;
 
-    /// <summary>
-    ///
-    /// </summary>
     [Description("Text der angezeigt werden soll.<br>Alternativ kann ein (oder mehrere) Variablenname im Format ~Name~ angegeben werden.")]
     public string Text {
-        get => _textOriginal;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _textOriginal) { return; }
-            _textOriginal = value;
+            if (value == field) { return; }
+            field = value;
             _textReplaced = value;
             InvalidateText();
             //CalculateSlavePoints();
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public float TextScale {
-        get => _textScale;
+        get;
         set {
             value = Math.Clamp(value, 0.01f, 20);
-            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
-            _textScale = value;
+            if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = 3.07f;
 
     protected override int SaveOrder => 999;
 
@@ -137,10 +124,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("ReadableText", _textOriginal.EscapeUnicode());
-        result.ParseableAdd("Alignment", _ausrichtung);
-        result.ParseableAdd("AdditionalScale", _textScale);
-        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("ReadableText", Text.EscapeUnicode());
+        result.ParseableAdd("Alignment", Ausrichtung);
+        result.ParseableAdd("AdditionalScale", TextScale);
+        result.ParseableAdd("Style", Style);
         return result;
     }
 
@@ -152,20 +139,19 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "readabletext":
-                _textReplaced = value.FromNonCritical().UnEscapeUnicode();
-                _textOriginal = _textReplaced;
+                Text = value.FromNonCritical().UnEscapeUnicode();
                 return true;
 
             case "alignment":
-                _ausrichtung = (Alignment)byte.Parse(value, CultureInfo.InvariantCulture);
+                Ausrichtung = (Alignment)byte.Parse(value, CultureInfo.InvariantCulture);
                 return true;
 
             case "style":
-                _style = (PadStyles)IntParse(value);
+                Style = (PadStyles)IntParse(value);
                 return true;
 
             case "additionalscale":
-                _textScale = FloatParse(value.FromNonCritical());
+                TextScale = FloatParse(value.FromNonCritical());
                 return true;
         }
         return base.ParseThis(key, value);
@@ -196,8 +182,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
-        if (_textOriginal == _textReplaced) { return false; }
-        _textReplaced = _textOriginal;
+        if (Text == _textReplaced) { return false; }
+        _textReplaced = Text;
         InvalidateText();
         OnPropertyChanged("Variables");
         return true;
@@ -215,7 +201,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     //    InvalidateText();
     //}
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefined) {
+        if (Style != PadStyles.Undefined) {
             gr.SetClip(positionControl);
             var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
@@ -229,7 +215,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
                 _txt.AreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
-                    _txt.Draw(gr, zoom * _textScale, offsetX2, offsetY2);
+                    _txt.Draw(gr, zoom * TextScale, offsetX2, offsetY2);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -260,20 +246,20 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     private void MakeNewETxt() {
         _txt = null;
-        if (_style != PadStyles.Undefined) {
+        if (Style != PadStyles.Undefined) {
             if (Parent is null) {
                 Develop.DebugError("Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 return;
             }
 
-            _txt = new ExtText(SheetStyle, _style) {
+            _txt = new ExtText(SheetStyle, Style) {
                 HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}",
                 //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
                 //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
                 //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-                TextDimensions = new Size((int)(CanvasUsedArea.Width / _textScale), -1),
-                Ausrichtung = _ausrichtung
+                TextDimensions = new Size((int)(CanvasUsedArea.Width / TextScale), -1),
+                Ausrichtung = Ausrichtung
             };
         }
     }

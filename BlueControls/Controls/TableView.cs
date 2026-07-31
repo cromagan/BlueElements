@@ -187,7 +187,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
 
             // Lokale Kopie des Backing-Fields: Invalidate_CurrentArrangement kann
-            // (z. B. über Table-DisposingEvent oder synchrones Refresh im Table-Setter)
+            // (z. B. über Table-Disposed oder synchrones Refresh im Table-Setter)
             // field zwischen den einzelnen Zugriffen auf null setzen. Mit der lokalen
             // Variablen wird auf einer konsistenten Momentaufnahme gearbeitet.
             var ca = field;
@@ -346,7 +346,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 tb1.Column.ColumnRemoving -= Column_ItemRemoving;
                 tb1.Column.ColumnRemoved -= _Table_ViewChanged;
                 tb1.Column.ColumnAdded -= _Table_ViewChanged;
-                tb1.DisposingEvent -= _table_Disposing;
+                tb1.Disposed -= _table_Disposed;
                 tb1.InvalidateView -= Table_InvalidateView;
                 SaveAll();
             }
@@ -381,7 +381,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 tb2.Column.ColumnAdded += _Table_ViewChanged;
                 tb2.Column.ColumnRemoving += Column_ItemRemoving;
                 tb2.Column.ColumnRemoved += _Table_ViewChanged;
-                tb2.DisposingEvent += _table_Disposing;
+                tb2.Disposed += _table_Disposed;
                 tb2.InvalidateView += Table_InvalidateView;
             }
 
@@ -2762,7 +2762,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return string.Empty;
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Table = null;
+    private void _table_Disposed(object? sender, System.EventArgs e) => Table = null;
 
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 

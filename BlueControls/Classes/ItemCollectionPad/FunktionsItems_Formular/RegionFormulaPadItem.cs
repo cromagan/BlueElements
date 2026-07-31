@@ -13,13 +13,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 /// </summary>
 public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private GroupBoxStyle _borderStyle = GroupBoxStyle.Normal;
-    private string _child = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public RegionFormulaPadItem() : this(string.Empty, null) { }
@@ -48,14 +41,14 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public bool AutoSizeableHeight => true;
 
     public string Child {
-        get => _child;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_child == value) { return; }
-            _child = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
     public override bool InputMustBeOneRow => true;
@@ -63,13 +56,13 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {
-        get => _borderStyle;
+        get;
         set {
-            if (_borderStyle == value) { return; }
-            _borderStyle = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = GroupBoxStyle.Normal;
 
     public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 1000;
@@ -79,14 +72,14 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var icpi = GetChild(_child);
+        var icpi = GetChild(Child);
 
         var con = new ConnectedFormulaView(mode, icpi) {
-            GroupBoxStyle = _borderStyle,
+            GroupBoxStyle = RahmenStil,
             Detachable = Ausklappbar
         };
 
-        if (_borderStyle != GroupBoxStyle.Nothing) {
+        if (RahmenStil != GroupBoxStyle.Nothing) {
             con.Text = icpi?.BestCaption() ?? "?";
         }
 
@@ -96,7 +89,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override string ErrorReason() {
-        if (string.IsNullOrEmpty(_child)) {
+        if (string.IsNullOrEmpty(Child)) {
             return "Keine Formular gewählt.";
         }
 
@@ -123,8 +116,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         List<string> result = [.. base.ParseableItems()];
 
         result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
-        result.ParseableAdd("Child", _child);
-        result.ParseableAdd("BorderStyle", _borderStyle);
+        result.ParseableAdd("Child", Child);
+        result.ParseableAdd("BorderStyle", RahmenStil);
         result.ParseableAdd("Detachable", Ausklappbar);
         return result;
     }
@@ -132,8 +125,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
         json.Set("parent", ParentFormula?.Filename ?? string.Empty);
-        json.Set("child", _child);
-        json.Set("borderstyle", (int)_borderStyle);
+        json.Set("child", Child);
+        json.Set("borderstyle", (int)RahmenStil);
         json.Set("detachable", Ausklappbar);
         return json;
     }
@@ -144,8 +137,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(parent);
             ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
         }
-        _child = json.GetString("child", _child);
-        _borderStyle = json.GetEnum("borderstyle", _borderStyle);
+        Child = json.GetString("child", Child);
+        RahmenStil = json.GetEnum("borderstyle", RahmenStil);
         Ausklappbar = json.GetBool("detachable", Ausklappbar);
         base.ParseJson(json);
     }
@@ -158,11 +151,11 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
                 return true;
 
             case "child":
-                _child = value.FromNonCritical();
+                Child = value.FromNonCritical();
                 return true;
 
             case "borderstyle":
-                _borderStyle = (GroupBoxStyle)IntParse(value);
+                RahmenStil = (GroupBoxStyle)IntParse(value);
                 return true;
 
             case "detachable":
@@ -202,7 +195,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         if (IsDisposed) { return; }
         if (ParentFormula is null) { return; }
 
-        if (ParentFormula.NotAllowedChilds.Contains(_child)) {
+        if (ParentFormula.NotAllowedChilds.Contains(Child)) {
             Child = string.Empty;
         }
 

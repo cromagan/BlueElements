@@ -437,7 +437,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return false;
     }
 
-    private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
+    private void FilterInput_Disposed(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
     private void FilterInput_RowsChanged(object? sender, System.EventArgs e) => Invalidate_RowsInput();
 
@@ -485,7 +485,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private void RegisterEvents() {
         if (_filterInput is not { IsDisposed: false }) { return; }
         _filterInput.RowsChanged += FilterInput_RowsChanged;
-        _filterInput.DisposingEvent += FilterInput_DisposingEvent;
+        _filterInput.Disposed += FilterInput_Disposed;
     }
 
     private void UnRegisterFilterInputAndDispose() {
@@ -493,7 +493,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         // Events zuerst entfernen
         _filterInput.RowsChanged -= FilterInput_RowsChanged;
-        _filterInput.DisposingEvent -= FilterInput_DisposingEvent;
+        _filterInput.Disposed -= FilterInput_Disposed;
 
         var filterToDispose = _filterInput;
 

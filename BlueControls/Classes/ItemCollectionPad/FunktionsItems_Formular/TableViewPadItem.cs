@@ -15,14 +15,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private GroupBoxStyle _borderStyle = GroupBoxStyle.Nothing;
-    private string _defaultArrangement = string.Empty;
-    private string _doubleClickScript = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public TableViewPadItem() : this(string.Empty, null, null) { }
@@ -49,14 +41,14 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     /// </summary>
     [DefaultValue("")]
     public string Doppelklick_Skript {
-        get => _doubleClickScript;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_doubleClickScript == value) { return; }
-            _doubleClickScript = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool InputMustBeOneRow => false;
 
@@ -64,24 +56,24 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {
-        get => _borderStyle;
+        get;
         set {
-            if (_borderStyle == value) { return; }
-            _borderStyle = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = GroupBoxStyle.Nothing;
 
     [DefaultValue("")]
     public string Standard_Ansicht {
-        get => _defaultArrangement;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_defaultArrangement == value) { return; }
-            _defaultArrangement = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool TableInputMustMatchOutputTable => true;
 
@@ -115,10 +107,10 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         var con = new TableViewWithFilters();
         con.Table = TableOutput;
         con.DoDefaultSettings(parent, this, mode);
-        con.Arrangement = _defaultArrangement;
-        con.DoubleClickScript = _doubleClickScript;
+        con.Arrangement = Standard_Ansicht;
+        con.DoubleClickScript = Doppelklick_Skript;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-        con.GroupBoxStyle = _borderStyle;
+        con.GroupBoxStyle = RahmenStil;
         return con;
     }
 
@@ -146,26 +138,26 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("DefaultArrangement", _defaultArrangement);
-        result.ParseableAdd("BorderStyle", _borderStyle);
-        if (!string.IsNullOrEmpty(_doubleClickScript)) {
-            result.ParseableAdd("DoubleClickScript", _doubleClickScript);
+        result.ParseableAdd("DefaultArrangement", Standard_Ansicht);
+        result.ParseableAdd("BorderStyle", RahmenStil);
+        if (!string.IsNullOrEmpty(Doppelklick_Skript)) {
+            result.ParseableAdd("DoubleClickScript", Doppelklick_Skript);
         }
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("defaultarrangement", _defaultArrangement);
-        json.Set("borderstyle", (int)_borderStyle);
-        json.Set("doubleclickscript", _doubleClickScript);
+        json.Set("defaultarrangement", Standard_Ansicht);
+        json.Set("borderstyle", (int)RahmenStil);
+        json.Set("doubleclickscript", Doppelklick_Skript);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _defaultArrangement = json.GetString("defaultarrangement", _defaultArrangement);
-        _borderStyle = json.GetEnum("borderstyle", _borderStyle);
-        _doubleClickScript = json.GetString("doubleclickscript", _doubleClickScript);
+        Standard_Ansicht = json.GetString("defaultarrangement", Standard_Ansicht);
+        RahmenStil = json.GetEnum("borderstyle", RahmenStil);
+        Doppelklick_Skript = json.GetString("doubleclickscript", Doppelklick_Skript);
         base.ParseJson(json);
     }
 
@@ -175,15 +167,15 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
                 return true;
 
             case "defaultarrangement":
-                _defaultArrangement = value.FromNonCritical();
+                Standard_Ansicht = value.FromNonCritical();
                 return true;
 
             case "borderstyle":
-                _borderStyle = (GroupBoxStyle)IntParse(value);
+                RahmenStil = (GroupBoxStyle)IntParse(value);
                 return true;
 
             case "doubleclickscript":
-                _doubleClickScript = value.FromNonCritical();
+                Doppelklick_Skript = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

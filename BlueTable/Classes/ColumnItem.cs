@@ -14,7 +14,7 @@ using static BlueTable.Classes.Table;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable, IHasSettings, IJsonParseable {
+public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtended, IEditable, IHasSettings, IJsonParseable {
 
     #region Fields
 
@@ -215,7 +215,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     #region Events
 
-    public event EventHandler? DisposingEvent;
+    public event EventHandler? Disposed;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -713,7 +713,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (newTable is not null) {
                 // Event-Registrierung vor dem Lock
                 newTable.CellValueChanged += LinkedTable_CellValueChanged;
-                newTable.DisposingEvent += LinkedTable_Disposing;
+                newTable.Disposed += LinkedTable_Disposed;
             }
 
             lock (_linkedTableLock) {
@@ -926,10 +926,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -2327,7 +2327,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return txt;
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For.Clear();
@@ -2351,8 +2351,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            OnDisposingEvent();
-            DisposingEvent = null;
+            OnDisposed(); 
+            Disposed = null;
             PropertyChanged = null;
             PropertyChangedExt = null;
             Table = null;
@@ -2579,7 +2579,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             } catch { }
 
             try {
-                tableToCleanup.DisposingEvent -= LinkedTable_Disposing;
+                tableToCleanup.Disposed -= LinkedTable_Disposed;
             } catch { }
         }
     }
@@ -2601,9 +2601,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    private void LinkedTable_Disposing(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
+    private void LinkedTable_Disposed(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
 
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

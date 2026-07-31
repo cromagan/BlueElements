@@ -7,12 +7,6 @@ namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
 public abstract class RectanglePadItem : AbstractPadItem {
 
-    #region Fields
-
-    private int _drehwinkel;
-
-    #endregion
-
     #region Constructors
 
     protected RectanglePadItem(string keyName) : base(keyName) {
@@ -55,17 +49,18 @@ public abstract class RectanglePadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
             Pru.X = Plo.X + MmToPixel(value, ItemCollectionPadItem.Dpi);
+            OnPropertyChanged();
         }
     }
 
     public int Drehwinkel {
-        get => _drehwinkel;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_drehwinkel == value) { return; }
-            _drehwinkel = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
-            OnPropertyChangedExt("rotation", _drehwinkel);
+            OnPropertyChangedExt("rotation", field);
         }
     }
 
@@ -76,6 +71,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
             Pru.Y = Plo.Y + MmToPixel(value, ItemCollectionPadItem.Dpi);
+            OnPropertyChanged();
         }
     }
 
@@ -127,7 +123,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("rotation", _drehwinkel);
+        json.Set("rotation", Drehwinkel);
         return json;
     }
 
@@ -137,7 +133,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        _drehwinkel = json.GetInt("rotation", _drehwinkel);
+        Drehwinkel = json.GetInt("rotation", Drehwinkel);
         base.ParseJson(json);
         CalculateSlavePoints();
     }
@@ -149,7 +145,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
                 return true;
 
             case "rotation":
-                _drehwinkel = IntParse(value);
+                Drehwinkel = IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

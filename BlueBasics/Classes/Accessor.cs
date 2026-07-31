@@ -103,6 +103,8 @@ public class Accessor<T> : IDisposableExtended {
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler? ValueChanged;
 
     #endregion
@@ -122,11 +124,14 @@ public class Accessor<T> : IDisposableExtended {
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
+        OnDisposed();
+
         if (_target is INotifyPropertyChanged inpc) {
             inpc.PropertyChanged -= OnTargetPropertyChanged;
         }
 
         ValueChanged = null;
+        Disposed = null;
         GC.SuppressFinalize(this);
     }
 
@@ -143,6 +148,8 @@ public class Accessor<T> : IDisposableExtended {
             Develop.DebugPrint("Setter ist null!");
         }
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (e.PropertyName == Name || string.IsNullOrEmpty(e.PropertyName)) {

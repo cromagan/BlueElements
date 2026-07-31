@@ -8,13 +8,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private bool _bearbeitbar;
-    private string _bild_dateiname = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public EasyPicPadItem() : this(string.Empty, null) { }
@@ -31,27 +24,27 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public bool AutoSizeableHeight => true;
 
     public bool Bearbeitbar {
-        get => _bearbeitbar;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _bearbeitbar) { return; }
-            _bearbeitbar = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
     [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {
-        get => _bild_dateiname;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _bild_dateiname) { return; }
-            _bild_dateiname = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public override bool InputMustBeOneRow => true;
@@ -89,32 +82,32 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ImageName", _bild_dateiname);
-        result.ParseableAdd("Editable", _bearbeitbar);
+        result.ParseableAdd("ImageName", Bild_Dateiname);
+        result.ParseableAdd("Editable", Bearbeitbar);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("imagename", _bild_dateiname);
-        json.Set("editable", _bearbeitbar);
+        json.Set("imagename", Bild_Dateiname);
+        json.Set("editable", Bearbeitbar);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _bild_dateiname = json.GetString("imagename", _bild_dateiname);
-        _bearbeitbar = json.GetBool("editable", _bearbeitbar);
+        Bild_Dateiname = json.GetString("imagename", Bild_Dateiname);
+        Bearbeitbar = json.GetBool("editable", Bearbeitbar);
         base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "imagename":
-                _bild_dateiname = value.FromNonCritical();
+                Bild_Dateiname = value.FromNonCritical();
                 return true;
 
             case "editable":
-                _bearbeitbar = value.FromPlusMinus();
+                Bearbeitbar = value.FromPlusMinus();
                 return true;
         }
 

@@ -30,9 +30,18 @@ namespace BlueBasics.Interfaces;
 
 public interface IDisposableExtended : IDisposable {
 
+    #region Events
+
+    /// <summary>
+    /// Wird ausgelöst, wenn Dispose aufgerufen wird. IsDisposed ist zu diesem
+    /// Zeitpunkt bereits true, die Events werden aber erst im Anschluss genullet.
+    /// </summary>
+    event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
-    //public bool Disposing { get; }
     bool IsDisposed { get; }
 
     #endregion

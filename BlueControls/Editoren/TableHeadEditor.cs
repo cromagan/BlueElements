@@ -51,11 +51,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field?.WriteAccessChanged -= _table_WriteAccessChanged;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
             field?.WriteAccessChanged += _table_WriteAccessChanged;
         }
     }
@@ -332,7 +332,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         return result;
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) {
+    private void _table_Disposed(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }

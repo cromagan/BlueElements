@@ -35,9 +35,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     private readonly PointM _textPoint = new(null, "Mitte Text", 0, 0);
 
     private float _länge;
-
-    private PadStyles _style = PadStyles.Standard;
-    private float _textScale = 3.07f;
     private float _winkel;
 
     #endregion
@@ -62,7 +59,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         Text_Unten = string.Empty;
         Nachkommastellen = 1;
 
-        _style = PadStyles.Alternative;
+        Style = PadStyles.Alternative;
         _point1.Parent = this;
         _point2.Parent = this;
         _textPoint.Parent = this;
@@ -95,27 +92,42 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
 
     public int Nachkommastellen { get; set; }
 
-    public string Präfix { get; set; } = string.Empty;
+    public string Präfix {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
-        get => _style;
+        get;
         set {
-            if (_style == value) { return; }
-            _style = value;
+            if (field == value) { return; }
+            field = value;
             this.InvalidateFont();
             OnPropertyChanged();
         }
-    }
+    } = PadStyles.Standard;
 
-    public string Suffix { get; set; } = string.Empty;
+    public string Suffix {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     public string Text_Oben {
         get;
         set {
             if (IsDisposed) { return; }
-            if (field == Länge_In_Mm.ToString1_3()) { value = string.Empty; }
+            if (value == Länge_In_Mm.ToString1_3()) { value = string.Empty; }
+            if (field == value) { return; }
             field = value;
             OnPropertyChanged();
         }
@@ -125,21 +137,21 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         get;
         set {
             if (IsDisposed) { return; }
-            if (field == value) { value = string.Empty; }
+            if (field == value) { return; }
             field = value;
             OnPropertyChanged();
         }
     } = string.Empty;
 
     public float TextScale {
-        get => _textScale;
+        get;
         set {
             value = Math.Clamp(value, 0.01f, 20);
-            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
-            _textScale = value;
+            if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = 3.07f;
 
     protected override int SaveOrder => 999;
 
@@ -221,8 +233,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         result.ParseableAdd("Decimal", Nachkommastellen);
         result.ParseableAdd("refix", Präfix);
         result.ParseableAdd("Suffix", Suffix);
-        result.ParseableAdd("AdditionalScale", _textScale);
-        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("AdditionalScale", TextScale);
+        result.ParseableAdd("Style", Style);
         return result;
     }
 
@@ -260,11 +272,11 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
                 return true;
 
             case "additionalscale":
-                _textScale = FloatParse(value.FromNonCritical());
+                TextScale = FloatParse(value.FromNonCritical());
                 return true;
 
             case "style":
-                _style = (PadStyles)IntParse(value);
+                Style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -287,8 +299,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     protected override RectangleF CalculateCanvasUsedArea() {
-        if (_style == PadStyles.Undefined) { return new RectangleF(0, 0, 0, 0); }
-        var f2 = this.GetFont(_textScale);
+        if (Style == PadStyles.Undefined) { return new RectangleF(0, 0, 0, 0); }
+        var f2 = this.GetFont(TextScale);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -309,10 +321,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefined) {
-            var geszoom = (float)Math.Round(_textScale * zoom, 2, MidpointRounding.AwayFromZero); 
-            
-
+        if (Style != PadStyles.Undefined) {
+            var geszoom = (float)Math.Round(TextScale * zoom, 2, MidpointRounding.AwayFromZero);
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;
@@ -375,7 +385,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
 
     private void CalculateOtherPoints() {
         var tmppW = -90;
-        var mhlAb = MmToPixel(1.5f * _textScale / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+        var mhlAb = MmToPixel(1.5f * TextScale / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
         ComputeData();
 
         //Gegeben sind:

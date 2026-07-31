@@ -19,14 +19,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     private static readonly Pen TinyItemPen = new(Color.Gray, 3);
 
-    /// <summary>
-    /// Soll es gedruckt werden?
-    /// </summary>
-    /// <remarks></remarks>
-    private bool _beiExportSichtbar = true;
-
     private RectangleF _canvasUsedArea;
-    private bool _enabled = true;
 
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
@@ -71,15 +64,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
     public bool Bei_Export_sichtbar {
-        get => _beiExportSichtbar;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_beiExportSichtbar == value) { return; }
-            _beiExportSichtbar = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
-            OnPropertyChangedExt("print", _beiExportSichtbar);
+            OnPropertyChangedExt("print", field);
         }
-    }
+    } = true;
 
     /// <summary>
     /// Gibt die aktuellen Koordinaten des Objektes zurück. Unabhängig von der aktuellen Ansicht.
@@ -102,15 +95,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     [Description("Gibt an, ob das Element interaktiv ist (auswählbar, verschiebbar, Kontextmenü).")]
     public bool Enabled {
-        get => _enabled;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_enabled == value) { return; }
-            _enabled = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
-            OnPropertyChangedExt("enabled", _enabled);
+            OnPropertyChangedExt("enabled", field);
         }
-    }
+    } = true;
 
     /// <summary>
     /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
@@ -270,7 +263,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (forPrinting && !_beiExportSichtbar && !ShowAlways || zoom < 0.00001) { return; }
+        if (forPrinting && !Bei_Export_sichtbar && !ShowAlways || zoom < 0.00001) { return; }
 
         var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
 
@@ -297,7 +290,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     lock (ZoomPad.PenGray) { gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right)); }
                 }
 
-                if (!_beiExportSichtbar) {
+                if (!Bei_Export_sichtbar) {
                     var q = QuickImage.Get("Drucker|16||1");
                     var qBmp = (Bitmap)q;
                     lock (qBmp) { gr.DrawImageUnscaled(qBmp, positionControl.X, positionControl.Y); }
@@ -385,8 +378,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Enabled", _enabled);
-        result.ParseableAdd("Print", _beiExportSichtbar);
+        result.ParseableAdd("Enabled", Enabled);
+        result.ParseableAdd("Print", Bei_Export_sichtbar);
         result.ParseableAdd("QuickInfo", QuickInfo);
         //result.ParseableAdd("ZoomPadding", _zoomPadding);
 
@@ -411,8 +404,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         var json = new JsonObject();
         json.Set("type", MyClassId);
         json.Set("key", KeyName);
-        json.Set("enabled", _enabled);
-        json.Set("print", _beiExportSichtbar);
+        json.Set("enabled", Enabled);
+        json.Set("print", Bei_Export_sichtbar);
         json.Set("quickinfo", QuickInfo);
         json.Set("page", Page);
 
@@ -435,8 +428,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         // "type": Klassenkennung, nur formal - der Dispatcher hat sie bereits
         // zum Konstruieren der richtigen Klasse genutzt.
         KeyName = json.GetString("key", KeyName);
-        _enabled = json.GetBool("enabled", _enabled);
-        _beiExportSichtbar = json.GetBool("print", _beiExportSichtbar);
+        Enabled = json.GetBool("enabled", Enabled);
+        Bei_Export_sichtbar = json.GetBool("print", Bei_Export_sichtbar);
         QuickInfo = json.GetString("quickinfo", QuickInfo);
         Page = json.GetString("page", Page);
 
@@ -477,7 +470,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return value.ToNonCritical() == MyClassId;
 
             case "enabled":
-                _enabled = value.FromPlusMinus();
+                Enabled = value.FromPlusMinus();
                 return true;
 
             case "checked":
@@ -488,7 +481,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "print":
-                _beiExportSichtbar = value.FromPlusMinus();
+                Bei_Export_sichtbar = value.FromPlusMinus();
                 return true;
 
             case "point":

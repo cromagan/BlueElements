@@ -72,6 +72,8 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler<MoveEventArgs>? Moved;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -153,8 +155,12 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public Point CanvasToControl(float zoom, float offsetX, float offsetY) => new Point(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed(); 
+        Disposed = null;
         PropertyChanged = null;
         Moved = null;
         PropertyChangedExt = null;

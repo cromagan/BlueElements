@@ -27,7 +27,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     private readonly List<string> _getFilterFromKeys = [];
     private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
-    private XPosition _xPosition = XPosition.frei;
 
     #endregion
 
@@ -56,7 +55,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public abstract bool InputMustBeOneRow { get; }
 
-    public override bool MoveXByMouse => _xPosition == XPosition.frei && base.MoveXByMouse;
+    public override bool MoveXByMouse => X_Position == XPosition.frei && base.MoveXByMouse;
 
     public abstract bool MustBeInDrawingArea { get; }
 
@@ -126,19 +125,19 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     } = new([]);
 
     public XPosition X_Position {
-        get => _xPosition;
+        get;
 
         set {
-            if (_xPosition == value) { return; }
-            _xPosition = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
-            OnPropertyChangedExt("xlock", (int)_xPosition);
+            OnPropertyChangedExt("xlock", (int)field);
 
-            if (_xPosition != XPosition.frei) {
+            if (field != XPosition.frei) {
                 PointMoved(Plo, new MoveEventArgs(false));
             }
         }
-    }
+    } = XPosition.frei;
 
     protected override int SaveOrder => 3;
 
@@ -332,7 +331,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             result.ParseableAdd("VisibleFor", VisibleFor, false);
         }
 
-        result.ParseableAdd("XLock", _xPosition);
+        result.ParseableAdd("XLock", X_Position);
 
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
@@ -343,7 +342,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
         json.Set("version", Version);
-        json.Set("xlock", (int)_xPosition);
+        json.Set("xlock", (int)X_Position);
         json.SetArrayIfNotEmpty("getfilterfromkeys", _getFilterFromKeys);
 
         if (MustBeInDrawingArea) {
@@ -355,7 +354,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public override void ParseJson(JsonObject json) {
         Version = json.GetInt("version", Version);
-        _xPosition = json.GetEnum("xlock", _xPosition);
+        X_Position = json.GetEnum("xlock", X_Position);
 
         if (json["getfilterfromkeys"] is JsonArray gff) {
             _getFilterFromKeys.Clear();
@@ -386,7 +385,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 return true;
 
             case "xlock":
-                _xPosition = (XPosition)IntParse(value);
+                X_Position = (XPosition)IntParse(value);
                 return true;
 
             case "getvaluefrom":
@@ -407,14 +406,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public override void PointMoved(object? sender, MoveEventArgs e) {
-        if (_xPosition == XPosition.frei ||
+        if (X_Position == XPosition.frei ||
             Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {
             base.PointMoved(sender, e);
             return;
         }
 
-        var anzahlSpaltenImFormular = (int)_xPosition / 100;
-        var aufXPosition = (int)(_xPosition - anzahlSpaltenImFormular * 100);
+        var anzahlSpaltenImFormular = (int)X_Position / 100;
+        var aufXPosition = (int)(X_Position - anzahlSpaltenImFormular * 100);
 
         var wi = (icpi.CanvasUsedArea.Width - AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1)) / anzahlSpaltenImFormular;
         var xpos = wi * (aufXPosition - 1) + AutosizableExtension.GridSize * (aufXPosition - 1);

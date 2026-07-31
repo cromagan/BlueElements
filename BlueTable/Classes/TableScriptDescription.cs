@@ -140,10 +140,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
             OnPropertyChanged();
         }
     }
@@ -420,7 +420,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         base.Dispose(disposing);
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
 

@@ -53,7 +53,7 @@ public interface IJsonParseable : IJsonStringable {
     /// Übernimmt den Zustand aus dem übergebenen <paramref name="json" />.
     /// Pendant zu <see cref="IJsonStringable.ParseableJson" /> — selbe Spiegel-Richtung:
     /// die Implementierung liest ihre eigenen Keys direkt (z.B.
-    /// <c>_drehwinkel = json.GetInt("rotation");</c>) und reicht das gleiche
+    /// <c>Drehwinkel = json.GetInt("rotation");</c>) und reicht das gleiche
     /// <paramref name="json" /> anschließend an <c>base.ParseJson(json)</c> weiter.
     /// Damit funktioniert auch ein Partial-Update (<c>{ "rotation": 45 }</c>)
     /// automatisch — alle nicht vorhandenen Keys werden schlicht übersprungen.

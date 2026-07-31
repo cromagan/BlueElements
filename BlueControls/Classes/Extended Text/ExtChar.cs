@@ -38,6 +38,12 @@ public abstract class ExtChar : IDisposableExtended {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     public BlueFont BaseFont => _parent?.BaseFont ?? BlueFont.DefaultFont;
@@ -194,14 +200,18 @@ public abstract class ExtChar : IDisposableExtended {
 
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed();
 
         if (disposing) {
             _parent = null;
             InvalidateFont();
+            Disposed = null;
         }
     }
 
     protected void SetSize(SizeF size) => _size = size;
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, OverrideTags);
 

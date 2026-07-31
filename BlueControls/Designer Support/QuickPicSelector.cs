@@ -17,6 +17,12 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposableExtended {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     public bool IsDisposed => _isDisposedFlag == 1;
@@ -25,8 +31,12 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposableExtended {
 
     #region Methods
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed(); 
+        Disposed = null;
         _fqp?.Dispose();
         GC.SuppressFinalize(this);
     }

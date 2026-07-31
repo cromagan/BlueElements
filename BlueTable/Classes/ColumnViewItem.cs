@@ -38,6 +38,8 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
@@ -295,10 +297,14 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         if (e.Column == Column) { InvalidateLayout(); }
     }
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed(); 
+            Disposed = null;
             PropertyChanged = null;
             PropertyChangedExt = null;
             Column = null;

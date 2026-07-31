@@ -26,6 +26,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler<ColumnEventArgs>? ColumnAdded;
 
     public event EventHandler<ColumnEventArgs>? ColumnDisposed;
@@ -93,10 +95,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -470,21 +472,25 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return "Befehl unbekannt";
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
-    private void Column_DisposingEvent(object? sender, System.EventArgs e) {
+    private void Column_Disposed(object? sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
-            c.DisposingEvent -= Column_DisposingEvent;
+            c.Disposed -= Column_Disposed;
             _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
-            OnColumnDisposed(new ColumnEventArgs(c));
+            ColumnDisposed?.Invoke(this, new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed(); 
+            Disposed = null;
             ColumnAdded = null;
             ColumnDisposed = null;
             ColumnPropertyChanged = null;
@@ -538,11 +544,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void OnColumnAdded(ColumnEventArgs e) {
         e.Column.PropertyChanged += OnColumnPropertyChanged;
         e.Column.PropertyChangedExt += OnColumnPropertyChangedExt;
-        e.Column.DisposingEvent += Column_DisposingEvent;
+        e.Column.Disposed += Column_Disposed;
         ColumnAdded?.Invoke(this, e);
     }
-
-    private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
 
     private void OnColumnPropertyChanged(object? sender, System.EventArgs e) {
         if (sender is ColumnItem ci) { ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs(ci)); }
@@ -558,7 +562,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void OnColumnRemoving(ColumnEventArgs e) {
         e.Column.PropertyChanged -= OnColumnPropertyChanged;
         e.Column.PropertyChangedExt -= OnColumnPropertyChangedExt;
-        e.Column.DisposingEvent -= Column_DisposingEvent;
+        e.Column.Disposed -= Column_Disposed;
         ColumnRemoving?.Invoke(this, e);
     }
 

@@ -108,7 +108,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     [DefaultValue(false)]
     public string Caption {
-        get => field;
+        get;
         set {
             if (field == value) { return; }
             field = value;
@@ -238,7 +238,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     [DefaultValue(false)]
     public SnapMode SnapMode {
-        get => field;
+        get;
         set {
             if (IsDisposed) { return; }
             if (field == value) { return; }

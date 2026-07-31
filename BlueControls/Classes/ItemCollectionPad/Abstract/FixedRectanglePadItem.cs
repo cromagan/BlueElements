@@ -74,6 +74,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
             CanvasSize = _canvassize with { Width = MmToPixel(value, ItemCollectionPadItem.Dpi) };
+            OnPropertyChanged();
         }
     }
 
@@ -97,6 +98,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
             CanvasSize = _canvassize with { Height = MmToPixel(value, ItemCollectionPadItem.Dpi) };
+            OnPropertyChanged();
         }
     }
 

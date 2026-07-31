@@ -8,16 +8,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private bool _bei_Bedarf_Erzeugen;
-    private string _filter = string.Empty;
-    private bool _leere_Ordner_Löschen;
-    private string _mindest_pfad = string.Empty;
-    private string _pfad = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public FileExplorerPadItem() : this(string.Empty, null) { }
@@ -34,12 +24,12 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     [Description("Ob das Verzeichnis bei Bedarf erzeugt werden soll.")]
     public bool Bei_Bedarf_erzeugen {
-        get => _bei_Bedarf_Erzeugen;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _bei_Bedarf_Erzeugen) { return; }
-            _bei_Bedarf_Erzeugen = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -47,55 +37,55 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
     public string Filter {
-        get => _filter;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _filter) { return; }
-            _filter = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool InputMustBeOneRow => true;
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
-        get => _leere_Ordner_Löschen;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _leere_Ordner_Löschen) { return; }
-            _leere_Ordner_Löschen = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
     [Description("Bis zu diesem Pfad kann maximal zurück gegangen werden.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Mindest_Pfad {
-        get => _mindest_pfad;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _mindest_pfad) { return; }
-            _mindest_pfad = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool MustBeInDrawingArea => true;
 
     [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Pfad {
-        get => _pfad;
+        get;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _pfad) { return; }
-            _pfad = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 4;
@@ -109,8 +99,8 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             Var_Directory = Pfad,
             Var_DirectoryMin = Mindest_Pfad,
             Filter = Filter,
-            CreateDir = _bei_Bedarf_Erzeugen,
-            DeleteDir = _leere_Ordner_Löschen
+            CreateDir = Bei_Bedarf_erzeugen,
+            DeleteDir = Leere_Ordner_löschen
         };
         con.DoDefaultSettings(parent, this, mode);
 
@@ -135,30 +125,30 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Path", _pfad);
-        result.ParseableAdd("PathMin", _mindest_pfad);
-        result.ParseableAdd("Filter", _filter);
-        result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
-        result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
+        result.ParseableAdd("Path", Pfad);
+        result.ParseableAdd("PathMin", Mindest_Pfad);
+        result.ParseableAdd("Filter", Filter);
+        result.ParseableAdd("CreateDir", Bei_Bedarf_erzeugen);
+        result.ParseableAdd("DeleteDir", Leere_Ordner_löschen);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("path", _pfad);
-        json.Set("pathmin", _mindest_pfad);
-        json.Set("filter", _filter);
-        json.Set("createdir", _bei_Bedarf_Erzeugen);
-        json.Set("deleteemptydir", _leere_Ordner_Löschen);
+        json.Set("path", Pfad);
+        json.Set("pathmin", Mindest_Pfad);
+        json.Set("filter", Filter);
+        json.Set("createdir", Bei_Bedarf_erzeugen);
+        json.Set("deleteemptydir", Leere_Ordner_löschen);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _pfad = json.GetString("path", _pfad);
-        _mindest_pfad = json.GetString("pathmin", _mindest_pfad);
-        _filter = json.GetString("filter", _filter);
-        _bei_Bedarf_Erzeugen = json.GetBool("createdir", _bei_Bedarf_Erzeugen);
-        _leere_Ordner_Löschen = json.GetBool("deleteemptydir", _leere_Ordner_Löschen);
+        Pfad = json.GetString("path", Pfad);
+        Mindest_Pfad = json.GetString("pathmin", Mindest_Pfad);
+        Filter = json.GetString("filter", Filter);
+        Bei_Bedarf_erzeugen = json.GetBool("createdir", Bei_Bedarf_erzeugen);
+        Leere_Ordner_löschen = json.GetBool("deleteemptydir", Leere_Ordner_löschen);
         base.ParseJson(json);
     }
 
@@ -166,23 +156,23 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         switch (key) {
             case "path":
             case "pfad":
-                _pfad = value.FromNonCritical();
+                Pfad = value.FromNonCritical();
                 return true;
 
             case "filter":
-                _filter = value.FromNonCritical();
+                Filter = value.FromNonCritical();
                 return true;
 
             case "pathmin":
-                _mindest_pfad = value.FromNonCritical();
+                Mindest_Pfad = value.FromNonCritical();
                 return true;
 
             case "createdir":
-                _bei_Bedarf_Erzeugen = value.FromPlusMinus();
+                Bei_Bedarf_erzeugen = value.FromPlusMinus();
                 return true;
 
             case "deletedir":
-                _leere_Ordner_Löschen = value.FromPlusMinus();
+                Leere_Ordner_löschen = value.FromPlusMinus();
                 return true;
         }
 

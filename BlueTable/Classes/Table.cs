@@ -19,7 +19,7 @@ using static BlueScript.Classes.Script;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJsonParseable {
+public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable {
 
     #region Fields
 
@@ -171,8 +171,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     public event EventHandler<CellEventArgs>? CellValueChanged;
 
     public event EventHandler? Disposed;
-
-    public event EventHandler? DisposingEvent;
 
     public event EventHandler? InvalidateView;
 
@@ -1746,14 +1744,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     public virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     /// <summary>
-    /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
-    /// laden und Edit-Lock prüfen). Wird ausschließlich bei akuter Bearbeitungsabsicht
-    /// — in <see cref="ChangeData"/> — aufgerufen, nicht bei reinen UI-Abfragen über
-    /// <see cref="IsValueEditable"/>. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
-    /// </summary>
-    protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
-
-    /// <summary>
     /// Lädt Zeilen der Tabelle nach. Je nach Tabellentyp werden andere Funktionen unterstützt
     /// </summary>
     /// <param name="oldest">True wird versucht, die ältesten Zeilen zu laden. Im normalfall langsamer, das Stände verglichen werden müssen</param>
@@ -1982,7 +1972,82 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
         // Table ist über ChangeData zentral gesteuert. Diese Implementierung
         // spiegelt den Zustand wider, ohne die bestehenden Lade-Routinen zu
         // ersetzen. Sie ist rein additiv und für Partial-Updates geeignet.
+        // Felder werden direkt gesetzt (analog zu ColumnItem/RowItem.ParseJson),
+        // damit beim Laden/Parsen keine Platten-Schreibvorgänge oder Undo-Einträge
+        // entstehen. Für echte Benutzeränderungen sind die öffentlichen Setter
+        // bzw. ChangeData zu verwenden.
+
         if (IsDisposed) { return; }
+
+        #region Skalare Properties
+
+        _caption = json.GetString("caption", _caption);
+        _creator = json.GetString("creator", _creator);
+        _createDate = json.GetString("createdate", _createDate);
+        LoadedVersion = json.GetString("version", LoadedVersion);
+        _globalShowPass = json.GetString("globalshowpass", _globalShowPass);
+        _rowQuickInfo = json.GetString("rowquickinfo", _rowQuickInfo);
+        _standardFormulaFile = json.GetString("standardformulafile", _standardFormulaFile);
+        _temporaryTableMasterApp = json.GetString("temporarytablemasterapp", _temporaryTableMasterApp);
+        _temporaryTableMasterId = json.GetString("temporarytablemasterid", _temporaryTableMasterId);
+        _temporaryTableMasterMachine = json.GetString("temporarytablemastermachine", _temporaryTableMasterMachine);
+        _temporaryTableMasterTimeUtc = json.GetString("temporarytablemastertimeutc", _temporaryTableMasterTimeUtc);
+        _temporaryTableMasterUser = json.GetString("temporarytablemasteruser", _temporaryTableMasterUser);
+
+        if (json["assetfolder"] is not null) {
+            _assetFolder = json.GetString("assetfolder", _assetFolder);
+            _assetFolderTemp = null; // Cache verwerfen, da sich der Ordner geändert haben könnte
+        }
+
+        if (json["poweredittime"] is JsonValue pe && pe.TryGetValue(out string? pes)) {
+            var pdt = DateTimeParse(pes);
+            if (pdt > DateTime.MinValue) { _powerEditTime = pdt; }
+        }
+
+        if (json["eventscriptversion"] is JsonValue esv && esv.TryGetValue(out string? esvs)) {
+            var esvdt = DateTimeParse(esvs);
+            if (esvdt > DateTime.MinValue) { _eventScriptVersion = esvdt; }
+        }
+
+        #endregion
+
+        #region String-Listen
+
+        if (json["tags"] is JsonArray tagsArr) {
+            _tags.Clear();
+            _tags.AddRange(tagsArr.ToStringList());
+        }
+
+        if (json["dictionarywords"] is JsonArray dwArr) {
+            _dictionaryWords.Clear();
+            _dictionaryWords.AddRange(dwArr.ToStringList());
+        }
+
+        if (json["permissiongroupsnewrow"] is JsonArray pgnrArr) {
+            _permissionGroupsNewRow.Clear();
+            _permissionGroupsNewRow.AddRange(RepairUserGroups(pgnrArr.ToStringList()));
+        }
+
+        if (json["tableadmin"] is JsonArray taArr) {
+            _tableAdmin.Clear();
+            _tableAdmin.AddRange(RepairUserGroups(taArr.ToStringList()));
+        }
+
+        #endregion
+
+        #region Variablen
+
+        if (json["variables"] is JsonObject varsJson) {
+            var vars = new VariableCollection();
+            vars.ParseJson(varsJson);
+            _variables.Clear();
+            _variables.AddRange(vars.SortByKeyName());
+            _variableTmp = _variables.ToString(true);
+        }
+
+        #endregion
+
+        #region Struktur-Sub-Bäume (Columns, Rows, Cells)
 
         if (json["columns"] is JsonArray cols) {
             foreach (var item in cols) {
@@ -1996,11 +2061,56 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             }
         }
 
-        if (json["variables"] is JsonObject varsJson) {
-            var vars = new VariableCollection();
-            vars.ParseJson(varsJson);
-            Variables = vars;
+        Cell?.ParseJson(json);
+
+        #endregion
+
+        #region Definitions-Sub-Bäume (benötigen Columns)
+
+        if (json["sortdefinition"] is JsonObject sdJson) {
+            var sd = new RowSortDefinition(this, (ColumnItem?)null, false);
+            sd.ParseJson(sdJson);
+            _sortDefinition = sd;
         }
+
+        if (json["uniquevalues"] is JsonArray uvArr) {
+            var uvs = new List<UniqueValueDefinition>();
+            foreach (var item in uvArr) {
+                if (item is not JsonObject ujo) { continue; }
+                var uv = new UniqueValueDefinition(this, string.Empty);
+                uv.ParseJson(ujo);
+                uvs.Add(uv);
+            }
+            _uniqueValues = uvs.AsReadOnly();
+        }
+
+        if (json["eventscript"] is JsonArray esArr) {
+            var scripts = new List<TableScriptDescription>();
+            foreach (var item in esArr) {
+                if (item is not JsonObject ejo) { continue; }
+                var script = new TableScriptDescription(this);
+                script.ParseJson(ejo);
+                scripts.Add(script);
+            }
+            scripts.Sort();
+            _eventScript = scripts.AsReadOnly();
+            _hasValueChangedScript = null;
+            _mayAffectUser = null;
+            _changesRowColor = null;
+        }
+
+        if (json["columnarrangements"] is JsonArray caArr) {
+            var cas = new List<ColumnViewCollection>();
+            foreach (var item in caArr) {
+                if (item is not JsonObject cjo) { continue; }
+                var cvc = new ColumnViewCollection(this, string.Empty);
+                cvc.ParseJson(cjo);
+                cas.Add(cvc);
+            }
+            _columnArrangements = cas.AsReadOnly();
+        }
+
+        #endregion
     }
 
     public bool PermissionCheck(IList<string>? allowed, RowItem? row, bool adminValue) {
@@ -2087,7 +2197,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     }
 
     /// <summary>
-    /// Unterbricht die Auslösung aller Events (außer Disposed/DisposingEvent).
+    /// Unterbricht die Auslösung aller Events (außer Disposed).
     /// Mehrfache Aufrufe sind möglich und müssen durch entsprechend viele ResumeEvents-Aufrufe aufgehoben werden.
     /// </summary>
     public void SuppressEvents() {
@@ -2274,7 +2384,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
         if (disposing) {
             try {
-                OnDisposingEvent();
+                OnDisposed();
                 UnregisterEvents();
 
                 // Timer zuerst disposen
@@ -2305,8 +2415,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             } catch (Exception ex) {
                 Develop.DebugError("Fehler beim Dispose: " + ex.Message);
             }
-
-            OnDisposed();
         }
     }
 
@@ -2339,6 +2447,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
     }
 
     protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);
+
+    /// <summary>
+    /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
+    /// laden und Edit-Lock prüfen). Wird ausschließlich bei akuter Bearbeitungsabsicht
+    /// — in <see cref="ChangeData"/> — aufgerufen, nicht bei reinen UI-Abfragen über
+    /// <see cref="IsValueEditable"/>. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
+    /// </summary>
+    protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
 
     protected void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
 
@@ -2718,8 +2834,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
@@ -2738,7 +2852,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable, IJson
             AdditionalRepair = null;
             CanDoScript = null;
             Disposed = null;
-            DisposingEvent = null;
             InvalidateView = null;
             Loaded = null;
             Loading = null;

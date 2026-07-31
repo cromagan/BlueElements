@@ -86,14 +86,14 @@ public class GenericControlReciverSender : GenericControlReciver {
     protected override void OnCreateControl() {
         base.OnCreateControl();
         FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
-        FilterOutput.DisposingEvent += FilterOutput_DisposingEvent;
+        FilterOutput.Disposed += FilterOutput_Disposed;
     }
 
-    private void FilterOutput_DisposingEvent(object? sender, System.EventArgs e) {
+    private void FilterOutput_Disposed(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
         FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
-        FilterOutput.DisposingEvent -= FilterOutput_DisposingEvent;
+        FilterOutput.Disposed -= FilterOutput_Disposed;
         FilterOutput.Table = null;
     }
 

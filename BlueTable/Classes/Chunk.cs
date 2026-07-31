@@ -53,6 +53,12 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -294,8 +300,13 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
     /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
     /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
     /// </summary>
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        OnDisposed(); 
+        Disposed = null;
 
         LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
 

@@ -16,19 +16,9 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Fields
 
-    private string _beschriftung = string.Empty;
-
     private FlexiControlForDelegate? _button;
 
-    private ButtonArgs _enabledwhenrows;
-
     private ExtText? _eTxt;
-
-    private string _image = string.Empty;
-
-    private string _quickinfo = string.Empty;
-
-    private string _script = string.Empty;
 
     #endregion
 
@@ -50,46 +40,46 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     [Description("Die Beschriftung der Schaltfläche.")]
     public string Beschriftung {
-        get => _beschriftung;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_beschriftung == value) { return; }
-            _beschriftung = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     [Description("Ein Bild für die Schaltfläche. Beispiel: PlusZeichen|16")]
     public string Bild {
-        get => _image;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_image == value) { return; }
-            _image = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     [Description("Eine Information, die dem Benutzer angezeigt wird,\r\nwenn er den Mauszeiger über die Schaltfläche bewegt.")]
     public string ButtonQuickInfo {
-        get => _quickinfo;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_quickinfo == value) { return; }
-            _quickinfo = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und dann ein Skript gestartet wird.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
     public ButtonArgs Drückbar_wenn {
-        get => _enabledwhenrows;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_enabledwhenrows == value) { return; }
-            _enabledwhenrows = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -100,15 +90,14 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public override bool MustBeInDrawingArea => true;
 
     public string Script {
-        get => _script;
+        get;
 
         set {
-            if (value == _script) { return; }
-            _script = value;
-            this.RaiseVersion();
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool TableInputMustMatchOutputTable => false;
 
@@ -168,10 +157,10 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaScriptButton {
-            Text = _beschriftung,
-            ImageCode = _image + "|16",
-            Drückbar_wenn = _enabledwhenrows,
-            Script = _script,
+            Text = Beschriftung,
+            ImageCode = Bild + "|16",
+            Drückbar_wenn = Drückbar_wenn,
+            Script = Script,
             QuickInfo = ButtonQuickInfo
         };
 
@@ -181,10 +170,10 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     public override string ErrorReason() {
-        if (string.IsNullOrEmpty(_script)) {
+        if (string.IsNullOrEmpty(Script)) {
             return "Kein Skript angegeben.";
         }
-        if (string.IsNullOrEmpty(_quickinfo)) {
+        if (string.IsNullOrEmpty(ButtonQuickInfo)) {
             return "Keine Quickinfo angegeben.";
         }
 
@@ -238,7 +227,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         f?.Opacity = 0f;
 
         try {
-            var sd = new ScriptDescription(KeyName, _script);
+            var sd = new ScriptDescription(KeyName, Script);
 
             sd.ExecuteScript = ExecuteScriptTest;
 
@@ -254,41 +243,41 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Caption", _beschriftung);
-        result.ParseableAdd("Image", _image);
-        result.ParseableAdd("Script", _script);
-        result.ParseableAdd("QuickInfo", _quickinfo);
-        result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
+        result.ParseableAdd("Caption", Beschriftung);
+        result.ParseableAdd("Image", Bild);
+        result.ParseableAdd("Script", Script);
+        result.ParseableAdd("QuickInfo", ButtonQuickInfo);
+        result.ParseableAdd("EnableWhenRows", Drückbar_wenn);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("caption", _beschriftung);
-        json.Set("image", _image);
-        json.Set("script", _script);
-        json.Set("quickinfo", _quickinfo);
-        json.Set("enablewhenrows", (int)_enabledwhenrows);
+        json.Set("caption", Beschriftung);
+        json.Set("image", Bild);
+        json.Set("script", Script);
+        json.Set("quickinfo", ButtonQuickInfo);
+        json.Set("enablewhenrows", (int)Drückbar_wenn);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _beschriftung = json.GetString("caption", _beschriftung);
-        _image = json.GetString("image", _image);
-        _script = json.GetString("script", _script);
-        _quickinfo = json.GetString("quickinfo", _quickinfo);
-        _enabledwhenrows = json.GetEnum("enablewhenrows", _enabledwhenrows);
+        Beschriftung = json.GetString("caption", Beschriftung);
+        Bild = json.GetString("image", Bild);
+        Script = json.GetString("script", Script);
+        ButtonQuickInfo = json.GetString("quickinfo", ButtonQuickInfo);
+        Drückbar_wenn = json.GetEnum("enablewhenrows", Drückbar_wenn);
         base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "caption":
-                _beschriftung = value.FromNonCritical();
+                Beschriftung = value.FromNonCritical();
                 return true;
 
             case "image":
-                _image = value.FromNonCritical();
+                Bild = value.FromNonCritical();
                 return true;
 
             case "version":
@@ -296,15 +285,15 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
                 return true;
 
             case "script":
-                _script = value.FromNonCritical();
+                Script = value.FromNonCritical();
                 return true;
 
             case "quickinfo":
-                _quickinfo = value.FromNonCritical();
+                ButtonQuickInfo = value.FromNonCritical();
                 return true;
 
             case "enablewhenrows":
-                _enabledwhenrows = (ButtonArgs)IntParse(value);
+                Drückbar_wenn = (ButtonArgs)IntParse(value);
                 return true;
 
             case "style":
@@ -324,7 +313,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionControl.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(Bild), Alignment.Horizontal_Vertical_Center, false, _eTxt, Beschriftung, positionControl.ToRect(), false);
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, false, false, true);

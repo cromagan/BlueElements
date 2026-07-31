@@ -125,14 +125,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //if (Table != table) {
         //    if (Table is not null) {
                 //        RemoveRow();
-                //        Table.DisposingEvent -= _table_Disposing;
+                //        Table.Disposed -= _table_Disposed;
                 //        Table.Row.RowRemoving -= Row_RowRemoving;
         //    }
         //    InvalidateView();
         //    Table = table;
 
         //    if (Table is not null) {
-                //        Table.DisposingEvent += _table_Disposing;
+                //        Table.Disposed += _table_Disposed;
                 //        Table.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}

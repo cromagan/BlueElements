@@ -34,10 +34,10 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -50,7 +50,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
         base.OnClosing(e);
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) {
+    private void _table_Disposed(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }

@@ -21,8 +21,6 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
 
-    private PadStyles _style = PadStyles.Standard;
-
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -42,7 +40,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         MovablePoint.Add(_point2);
         PointsForSuccessfullyMove.AddRange(MovablePoint);
         CalculateJointMiddle(_point1, _point2);
-        _style = format;
+        Style = format;
         _tempPoints = [];
         Linien_Verhalten = ConnectorStyle.Direct;
     }
@@ -57,19 +55,26 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     public BlueFont? Font { get; set; }
 
-    public ConnectorStyle Linien_Verhalten { get; set; }
+    public ConnectorStyle Linien_Verhalten {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
-        get => _style;
+        get;
         set {
-            if (_style == value) { return; }
-            _style = value;
+            if (field == value) { return; }
+            field = value;
             this.InvalidateFont();
             OnPropertyChanged();
         }
-    }
+    } = PadStyles.Standard;
 
     protected override int SaveOrder => 999;
 
@@ -137,7 +142,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Connection", Linien_Verhalten);
-        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("Style", Style);
         return result;
     }
 
@@ -148,7 +153,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                 return true;
 
             case "style":
-                _style = (PadStyles)IntParse(value);
+                Style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -195,7 +200,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefined) {
+        if (Style != PadStyles.Undefined) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent is null) { return; }
 

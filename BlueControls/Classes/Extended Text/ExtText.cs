@@ -88,6 +88,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler? StyleChanged;
@@ -315,8 +317,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed();
         PropertyChanged = null;
         StyleChanged = null;
+        Disposed = null;
         foreach (var c in _internal) { c.Dispose(); }
         _internal.Clear();
 
@@ -964,6 +968,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         };
         return Skin.GetBlueFont(SheetStyle, padStyle) ?? BaseFont;
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

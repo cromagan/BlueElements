@@ -95,7 +95,7 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
 
     private void AttachTable(Table? tb) {
         if (tb is null) { return; }
-        tb.DisposingEvent += Table_Disposing;
+        tb.Disposed += Table_Disposed;
         tb.Loaded += Table_Loaded;
         tb.WriteAccessChanged += Table_WriteAccessChanged;
     }
@@ -136,7 +136,7 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
 
     private void DetachTable(Table? tb) {
         if (tb is null) { return; }
-        tb.DisposingEvent -= Table_Disposing;
+        tb.Disposed -= Table_Disposed;
         tb.Loaded -= Table_Loaded;
         tb.WriteAccessChanged -= Table_WriteAccessChanged;
     }
@@ -178,7 +178,7 @@ public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUn
         }
     }
 
-    private void Table_Disposing(object? sender, System.EventArgs e) {
+    private void Table_Disposed(object? sender, System.EventArgs e) {
         Object = null;
         if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }

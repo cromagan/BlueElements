@@ -32,6 +32,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
@@ -112,10 +114,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -608,7 +610,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
@@ -622,6 +624,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed();
+            Disposed = null;
             PropertyChangedExt = null;
             Table = null;
             foreach (var item in _internal) {
@@ -635,6 +639,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         _onDemand.Clear();
         Table = null;
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

@@ -19,6 +19,8 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler? DropDownShowing;
 
     public event EventHandler? ExecuteComand;
@@ -278,8 +280,11 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     public abstract void CreateControl();
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed(); 
 
         UnsubscribeEvents();
 
@@ -288,6 +293,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         ItemRemoved = null;
         NavigateToNext = null;
         ValueChanged = null;
+        Disposed = null;
 
         if (Control is { IsDisposed: false } control) {
             control.Visible = false;

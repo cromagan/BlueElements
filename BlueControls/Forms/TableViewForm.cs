@@ -446,7 +446,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
-            TableView.TableView.ResetView();
+            TableView.ResetView();
             Table = tb;
 
             if (s[1] is JsonObject root) {
@@ -648,7 +648,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
 
     private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
-        if (IsAdministrator()) { return; }
+        if (!IsAdministrator()) { return; }
 
         if (btnStresstest.Checked) {
             // Schalter aktivieren: doppeltes Laden der gleichen Tabelle wird
@@ -700,7 +700,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
-        => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, null, TableView.RowsVisibleUnique()));
+            => TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, null, null, null, TableView.RowsVisibleUnique());
 
     private void cbxColumnArr_AddClicked(object? sender, AddItemEventArgs e) {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
@@ -833,6 +833,35 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         btnSuchenUndErsetzen.Enabled = combi;
 
         UpdateScripts(tb);
+    }
+
+    /// <summary>
+    /// Click-Handler für das Aufgaben-Item "Komplette Datenüberprüfung".
+    /// </summary>
+    private void ContextMenu_DataValidation(object? sender, ContextMenuEventArgs e)
+        => TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DataValidation, null, null, null, null, TableView.RowsVisibleUnique());
+
+    /// <summary>
+    /// Click-Handler für Aufgaben-Items, die eine bestimmte Spalte betreffen
+    /// (z. B. "Spalte reparieren" oder "doppelt als erste Spalte").
+    /// Die betroffene Spalte wird über den KeyName des geklickten Items ermittelt.
+    /// </summary>
+    private void ContextMenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
+        if (TableView.Table is not { IsDisposed: false } tb) { return; }
+        if (tb.Column[e.Item.KeyName] is not { IsDisposed: false } column) { return; }
+
+        TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, column, null, column, null, null);
+    }
+
+    /// <summary>
+    /// Click-Handler für Aufgaben-Items, die ein Event-Skript auslösen.
+    /// Das betroffene Skript wird über den KeyName des geklickten Items ermittelt.
+    /// </summary>
+    private void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
+        if (TableView.Table is not { IsDisposed: false } tb) { return; }
+        if (tb.EventScript.FirstOrDefault(s => s.KeyName == e.Item.KeyName) is not { } script) { return; }
+
+        TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, null, null, null, TableView.RowsVisibleUnique());
     }
 
     private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) {
@@ -1066,9 +1095,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                void OnClickRepair(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, thisColumnItem, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, thisColumnItem, null, null));
-
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickRepair, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), ContextMenu_EditColumnProperties, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
                 ok = false;
             }
             if (!ok) {
@@ -1081,8 +1108,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                void OnClickFirst(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, thisColumnItem, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, thisColumnItem, null, null));
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickFirst, tb.IsAdministrator(), "Doppelt vorhanden!"));
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), ContextMenu_EditColumnProperties, tb.IsAdministrator(), "Doppelt vorhanden!"));
             }
 
             lstAufgaben.Enabled = true;
@@ -1099,13 +1125,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, tb.IsAdministrator()));
         }
 
-        void OnClickValidation(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DataValidation, null, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, null, TableView.TableView.RowsVisibleUnique()));
-
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), OnClickValidation, tb.CanDoValueChangedScript(true), string.Empty));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            void OnScriptClick(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, null, TableView.TableView.RowsVisibleUnique()));
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), OnScriptClick, tb.PermissionCheck(script.UserGroups, null, true) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.KeyName, script.SymbolForReadableText(), ContextMenu_ExecuteScript, tb.PermissionCheck(script.UserGroups, null, true) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 
         if (addedit) {

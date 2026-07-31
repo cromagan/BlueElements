@@ -63,10 +63,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         foreach (var thisTb in Table.AllFiles) {
             if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
                 foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
-
                     if (!string.IsNullOrEmpty(script.FailedReason)) {
-
-
                         count++;
                         Table.UpdateScript(script, failedReason: string.Empty, stoppedtimecount: Math.Min(20, script.StoppedTimeCount));
                     }

@@ -14,16 +14,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable, IHasFieldVariable {
 
-    #region Fields
-
-    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
-    private string _columnKey = string.Empty;
-    private bool _einschnappen = true;
-    private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
-    private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-
-    #endregion
-
     #region Constructors
 
     public OutputFilterPadItem() : this(string.Empty, null, null) {}
@@ -41,44 +31,44 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public bool AutoSizeableHeight => false;
 
     public CaptionPosition CaptionPosition {
-        get => _captionPosition;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_captionPosition == value) { return; }
-            _captionPosition = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = CaptionPosition.Über_dem_Feld;
 
     public ColumnItem? Column {
         get {
-            var c = TableOutput?.Column[_columnKey];
+            var c = TableOutput?.Column[ColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
     public string ColumnKey {
-        get => _columnKey;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_columnKey == value) { return; }
-            _columnKey = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
-    }
+    } = string.Empty;
 
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.\r\nWerte können mit 'Skript-Knöpfen' abgefragt und manipuluert werden.";
 
     public bool Einschnappen {
-        get => _einschnappen;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_einschnappen == value) { return; }
-            _einschnappen = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = true;
 
     public string FieldName {
         get {
@@ -88,27 +78,27 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
-        get => _filterart_Bei_Texteingabe;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_filterart_Bei_Texteingabe == value) { return; }
-            _filterart_Bei_Texteingabe = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = FlexiFilterDefaultFilter.Textteil;
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _standard_Bei_Keiner_Eingabe;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_standard_Bei_Keiner_Eingabe == value) { return; }
-            _standard_Bei_Keiner_Eingabe = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     public override bool TableInputMustMatchOutputTable => true;
     protected override int SaveOrder => 1;
@@ -118,7 +108,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlForFilter(Column, _captionPosition, _standard_Bei_Keiner_Eingabe, _filterart_Bei_Texteingabe, _einschnappen, true) {
+        var con = new FlexiControlForFilter(Column, CaptionPosition, Standard_bei_keiner_Eingabe, Filterart_bei_Texteingabe, Einschnappen, true) {
             SavesSettings = true
         };
 
@@ -166,33 +156,33 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ColumnName", _columnKey);
+        result.ParseableAdd("ColumnName", ColumnKey);
         //result.ParseableAdd("CaptionText", _überschrift);
         //result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("Caption", _captionPosition);
-        result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
-        result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
-        result.ParseableAdd("SnapFilter", _einschnappen);
+        result.ParseableAdd("Caption", CaptionPosition);
+        result.ParseableAdd("DefaultEmptyFilter", Standard_bei_keiner_Eingabe);
+        result.ParseableAdd("DefaultTextFilter", Filterart_bei_Texteingabe);
+        result.ParseableAdd("SnapFilter", Einschnappen);
 
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("columnkey", _columnKey);
-        json.Set("caption", (int)_captionPosition);
-        json.Set("defaultemptyfilter", (int)_standard_Bei_Keiner_Eingabe);
-        json.Set("defaulttextfilter", (int)_filterart_Bei_Texteingabe);
-        json.Set("snapfilter", _einschnappen);
+        json.Set("columnkey", ColumnKey);
+        json.Set("caption", (int)CaptionPosition);
+        json.Set("defaultemptyfilter", (int)Standard_bei_keiner_Eingabe);
+        json.Set("defaulttextfilter", (int)Filterart_bei_Texteingabe);
+        json.Set("snapfilter", Einschnappen);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _columnKey = json.GetString("columnkey", _columnKey);
-        _captionPosition = json.GetEnum("caption", _captionPosition);
-        _standard_Bei_Keiner_Eingabe = json.GetEnum("defaultemptyfilter", _standard_Bei_Keiner_Eingabe);
-        _filterart_Bei_Texteingabe = json.GetEnum("defaulttextfilter", _filterart_Bei_Texteingabe);
-        _einschnappen = json.GetBool("snapfilter", _einschnappen);
+        ColumnKey = json.GetString("columnkey", ColumnKey);
+        CaptionPosition = json.GetEnum("caption", CaptionPosition);
+        Standard_bei_keiner_Eingabe = json.GetEnum("defaultemptyfilter", Standard_bei_keiner_Eingabe);
+        Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
+        Einschnappen = json.GetBool("snapfilter", Einschnappen);
         base.ParseJson(json);
     }
 
@@ -203,25 +193,25 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 return true;
 
             case "caption":
-                _captionPosition = (CaptionPosition)IntParse(value);
+                CaptionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "column":
             case "columnkey":
             case "columnname":
-                _columnKey = value;
+                ColumnKey = value;
                 return true;
 
             case "defaultemptyfilter":
-                _standard_Bei_Keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
+                Standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
                 return true;
 
             case "defaulttextfilter":
-                _filterart_Bei_Texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
+                Filterart_bei_Texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
                 return true;
 
             case "snapfilter":
-                _einschnappen = value.FromPlusMinus();
+                Einschnappen = value.FromPlusMinus();
                 return true;
 
                 //case "captiontext":

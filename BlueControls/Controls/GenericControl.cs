@@ -7,7 +7,7 @@ using BlueControls.Classes;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedWithEvent {
+public class GenericControl : System.Windows.Forms.Control, IDisposableExtended {
 
     #region Fields
 
@@ -47,8 +47,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     #region Events
 
     public event EventHandler<System.Windows.Forms.ControlEventArgs>? ChildGotFocus;
-
-    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -231,8 +229,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
-        OnDisposingEvent();
-        DisposingEvent = null;
         ChildGotFocus = null;
 
         if (disposing) {
@@ -468,8 +464,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     private void OnChildGotFocus(System.Windows.Forms.ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
-
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     private void Sfc_ChildGotFocus(object? sender, System.Windows.Forms.ControlEventArgs e) => OnChildGotFocus(e);
 

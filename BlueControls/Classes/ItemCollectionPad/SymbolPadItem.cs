@@ -8,12 +8,6 @@ namespace BlueControls.Classes.ItemCollectionPad;
 
 public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
-    #region Fields
-
-    private PadStyles _style = PadStyles.Standard;
-
-    #endregion
-
     #region Constructors
 
     public SymbolPadItem() : base(string.Empty) {
@@ -33,25 +27,53 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
     public BlueFont? Font { get; set; }
 
-    public Color Hintergrundfarbe { get; set; }
-
-    public float Randdicke { get; set; }
-
-    public Color Randfarbe { get; set; }
-
-    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
-
-    public PadStyles Style {
-        get => _style;
+    public Color Hintergrundfarbe {
+        get;
         set {
-            if (_style == value) { return; }
-            _style = value;
-            this.InvalidateFont();
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
-    public Contour Symbol { get; set; }
+    public float Randdicke {
+        get;
+        set {
+            if (Math.Abs(field - value) < Constants.DefaultTolerance) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Color Randfarbe {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
+
+    public PadStyles Style {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            this.InvalidateFont();
+            OnPropertyChanged();
+        }
+    } = PadStyles.Standard;
+
+    public Contour Symbol {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -78,7 +100,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
         result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
         result.ParseableAdd("BorderWidth", Randdicke);
-        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("Style", Style);
         return result;
     }
 
@@ -103,7 +125,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 return true;
 
             case "style":
-                _style = (PadStyles)IntParse(value);
+                Style = (PadStyles)IntParse(value);
                 return true;
 
             case "fill": // alt: 28.11.2019

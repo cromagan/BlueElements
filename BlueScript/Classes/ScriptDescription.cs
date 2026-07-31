@@ -57,6 +57,8 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
@@ -276,6 +278,8 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed();
+            Disposed = null;
             PropertyChanged = null;
         }
     }
@@ -298,6 +302,8 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         FailedReason = other.FailedReason;
         SavedVariables = other.SavedVariables;
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

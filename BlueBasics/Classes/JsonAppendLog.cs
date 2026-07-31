@@ -35,6 +35,12 @@ public sealed class JsonAppendLog : IDisposableExtended {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     public bool IsDisposed { get; private set; }
@@ -129,6 +135,9 @@ public sealed class JsonAppendLog : IDisposableExtended {
         if (IsDisposed) { return; }
         IsDisposed = true;
 
+        OnDisposed();
+        Disposed = null;
+
         try {
             _semaphore.Wait();
             try {
@@ -188,6 +197,8 @@ public sealed class JsonAppendLog : IDisposableExtended {
             Develop.DebugPrint("JsonAppendLog.EnsureWriter fehlgeschlagen: " + _filename);
         }
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

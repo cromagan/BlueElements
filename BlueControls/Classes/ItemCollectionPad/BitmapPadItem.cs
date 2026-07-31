@@ -13,14 +13,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     #region Fields
 
-    private SizeModes _bild_modus;
     private Bitmap? _bitmap;
-    private bool _pixelGenau;
-
-    [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-    private string _platzhalter_für_layout = string.Empty;
-
-    private PadStyles _style;
 
     #endregion
 
@@ -32,8 +25,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         _bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
         Hintergrund_Weiß_Füllen = true;
-        _bild_modus = SizeModes.EmptySpace;
-        _style = PadStyles.Undefined; // Kein Rahmen
+        Bild_Modus = SizeModes.EmptySpace;
+        Style = PadStyles.Undefined; // Kein Rahmen
     }
 
     #endregion
@@ -43,15 +36,17 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public static string ClassId => "IMAGE";
 
     public SizeModes Bild_Modus {
-        get => _bild_modus; set {
-            if (_bild_modus == value) { return; }
-            _bild_modus = value;
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = SizeModes.EmptySpace;
 
     public Bitmap? Bitmap {
-        get => _bitmap; set {
+        get => _bitmap;
+        set {
             if (_bitmap == value) { return; }
             _bitmap = value;
             OnPropertyChanged();
@@ -62,32 +57,41 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     public BlueFont? Font { get; set; }
 
-    public bool Hintergrund_Weiß_Füllen { get; set; }
+    public bool Hintergrund_Weiß_Füllen {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool PixelGenau {
-        get => _pixelGenau;
+        get;
         set {
-            if (_pixelGenau == value) { return; }
-            _pixelGenau = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
+    [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
     public string Platzhalter_Für_Layout {
-        get => _platzhalter_für_layout; set {
-            if (_platzhalter_für_layout == value) { return; }
-            _platzhalter_für_layout = value;
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
-        get => _style;
+        get;
         set {
-            if (_style == value) { return; }
-            _style = value;
+            if (field == value) { return; }
+            field = value;
             this.InvalidateFont();
             OnPropertyChanged();
         }
@@ -178,10 +182,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         result.ParseableAdd("Modus", Bild_Modus);
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
-        result.ParseableAdd("PixelPerfect", _pixelGenau);
+        result.ParseableAdd("PixelPerfect", PixelGenau);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
         result.ParseableAdd("Image", Bitmap);
-        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("Style", Style);
 
         return result;
     }
@@ -189,7 +193,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "modus":
-                _bild_modus = (SizeModes)IntParse(value);
+                Bild_Modus = (SizeModes)IntParse(value);
                 return true;
 
             case "whiteback":
@@ -197,7 +201,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 return true;
 
             case "pixelperfect":
-                _pixelGenau = value.FromPlusMinus();
+                PixelGenau = value.FromPlusMinus();
                 return true;
 
             case "padding":
@@ -209,11 +213,11 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 return true;
 
             case "placeholder":
-                _platzhalter_für_layout = value.FromNonCritical();
+                Platzhalter_Für_Layout = value.FromNonCritical();
                 return true;
 
             case "style":
-                _style = (PadStyles)IntParse(value);
+                Style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -233,12 +237,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                     return true;
                 }
                 return false;
+
             case VariableString filn:
                 if (FileExists(filn.ValueString) && Image_FromFile(filn.ValueString) is Bitmap bmp2) {
                     Bitmap = bmp2;
                     return true;
                 }
                 return false;
+
             default:
                 return false;
         }
@@ -279,7 +285,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         //RectangleF r1 = new(positionControl.Left , positionControl.Top , positionControl.Width , positionControl.Height );
         var r2 = new RectangleF();
         var r3 = new RectangleF();
-        var tmpPixelPerfekt = _pixelGenau;
+        var tmpPixelPerfekt = PixelGenau;
 
         if (Bitmap is not null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
@@ -333,7 +339,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         } catch {
             Generic.CollectGarbage();
         }
-        if (_style != PadStyles.Undefined) {
+        if (Style != PadStyles.Undefined) {
             gr.DrawRectangle(this.GetFont().Pen(zoom), r1);
         }
 

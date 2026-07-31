@@ -9,15 +9,17 @@ public static class BackgroundFill {
 
     #region Fields
 
-    private static readonly ConcurrentCache<GradientKey, LinearGradientBrush> _gradientCache = new(500);
     private static readonly ConcurrentCache<int, SolidBrush> _brushCache = new(500);
-    private static Brush? _deleteBackBrush;
+    private static readonly ConcurrentCache<GradientKey, LinearGradientBrush> _gradientCache = new(500);
 
     #endregion
 
     #region Properties
 
-    public static Brush DeleteBackBrush => _deleteBackBrush ??= new SolidBrush(Color.FromArgb(220, 255, 255, 255));
+    public static Brush? DeleteBackBrush {
+        get => field ??= new SolidBrush(Color.FromArgb(220, 255, 255, 255));
+        private set;
+    }
 
     #endregion
 
@@ -26,9 +28,8 @@ public static class BackgroundFill {
     public static void ClearAll() {
         _gradientCache.Clear();
         _brushCache.Clear();
-        _deleteBackBrush = null;
+        DeleteBackBrush = null;
     }
-
 
     public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
 
@@ -134,10 +135,6 @@ public static class BackgroundFill {
             }
         }
     }
-
-    #endregion
-
-    #region Private Methods
 
     private static LinearGradientBrush CreateGradient(GradientKey k) {
         var rect = new Rectangle(0, 0, k.W, k.H);

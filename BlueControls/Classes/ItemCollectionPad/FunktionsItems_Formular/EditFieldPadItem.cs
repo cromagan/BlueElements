@@ -14,16 +14,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 /// </summary>
 public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private bool _autoNext;
-    private bool _autoX = true;
-    private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
-    private string _columnKey = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public EditFieldPadItem() : this(string.Empty, null) { }
@@ -41,22 +31,22 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     [DefaultValue(false)]
     [System.ComponentModel.Description("Wenn aktiv, springt der Fokus automatisch zum nächsten Steuerelement, wenn am Ende des Textes die Rechts-Taste gedrückt wird.")]
     public bool AutoNext {
-        get => _autoNext;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_autoNext == value) { return; }
-            _autoNext = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
     public bool AutoSizeableHeight {
         get {
-            if (_bearbeitung == EditTypeFormula.nur_als_Text_anzeigen) {
+            if (EditType == EditTypeFormula.nur_als_Text_anzeigen) {
                 return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
-            if (_captionPosition is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
+            if (CaptionPosition is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
                 return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthTextBox;
             }
 
@@ -67,54 +57,54 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     [DefaultValue(true)]
     [System.ComponentModel.Description("Richtet die Eingabefelder aller Steuerelemente auf gleicher horizontaler Ebene automatisch an der breitesten Beschriftung aus.")]
     public bool AutoX {
-        get => _autoX;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_autoX == value) { return; }
-            _autoX = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = true;
 
     public CaptionPosition CaptionPosition {
-        get => _captionPosition;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_captionPosition == value) { return; }
-            _captionPosition = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = CaptionPosition.Über_dem_Feld;
 
     public ColumnItem? Column {
         get {
-            var c = TableInput?.Column[_columnKey];
+            var c = TableInput?.Column[ColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
     public string ColumnKey {
-        get => _columnKey;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_columnKey == value) { return; }
-            _columnKey = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
-    }
+    } = string.Empty;
 
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
-        get => _bearbeitung;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_bearbeitung == value) { return; }
-            _bearbeitung = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = EditTypeFormula.Textfeld;
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
@@ -141,10 +131,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell {
-            ColumnKey = _columnKey,
+            ColumnKey = ColumnKey,
             EditType = EditType,
             CaptionPosition = CaptionPosition,
-            AutoNext = _autoNext,
+            AutoNext = AutoNext,
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -186,30 +176,30 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ColumnName", _columnKey);
-        result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _captionPosition);
-        result.ParseableAdd("AutoDistance", _autoX);
-        result.ParseableAdd("AutoNext", _autoNext);
+        result.ParseableAdd("ColumnName", ColumnKey);
+        result.ParseableAdd("EditType", EditType);
+        result.ParseableAdd("Caption", CaptionPosition);
+        result.ParseableAdd("AutoDistance", AutoX);
+        result.ParseableAdd("AutoNext", AutoNext);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("columnkey", _columnKey);
-        json.Set("edittype", (int)_bearbeitung);
-        json.Set("caption", (int)_captionPosition);
-        json.Set("autodistance", _autoX);
-        json.Set("autonext", _autoNext);
+        json.Set("columnkey", ColumnKey);
+        json.Set("edittype", (int)EditType);
+        json.Set("caption", (int)CaptionPosition);
+        json.Set("autodistance", AutoX);
+        json.Set("autonext", AutoNext);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _columnKey = json.GetString("columnkey", _columnKey);
-        _bearbeitung = json.GetEnum("edittype", _bearbeitung);
-        _captionPosition = json.GetEnum("caption", _captionPosition);
-        _autoX = json.GetBool("autodistance", _autoX);
-        _autoNext = json.GetBool("autonext", _autoNext);
+        ColumnKey = json.GetString("columnkey", ColumnKey);
+        EditType = json.GetEnum("edittype", EditType);
+        CaptionPosition = json.GetEnum("caption", CaptionPosition);
+        AutoX = json.GetBool("autodistance", AutoX);
+        AutoNext = json.GetBool("autonext", AutoNext);
         base.ParseJson(json);
     }
 
@@ -218,26 +208,26 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             case "column":
             case "columnkey":
             case "columnname":
-                _columnKey = value;
+                ColumnKey = value;
                 return true;
 
             case "fieldid":
                 return true;
 
             case "edittype":
-                _bearbeitung = (EditTypeFormula)IntParse(value);
+                EditType = (EditTypeFormula)IntParse(value);
                 return true;
 
             case "caption":
-                _captionPosition = (CaptionPosition)IntParse(value);
+                CaptionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "autodistance":
-                _autoX = value.FromPlusMinus();
+                AutoX = value.FromPlusMinus();
                 return true;
 
             case "autonext":
-                _autoNext = value.FromPlusMinus();
+                AutoNext = value.FromPlusMinus();
                 return true;
 
             case "nosave":

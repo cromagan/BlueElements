@@ -216,14 +216,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.Table = value;
     }
 
-    /// <summary>
-    /// Interne TableView-Instanz.
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public TableView TableView => TableInternal;
-
     [DefaultValue(true)]
     public bool Translate {
         get => TableInternal.Translate;
@@ -250,6 +242,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public (ColumnViewItem?, RowBackground?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
 
     public void CollapesAll() => TableInternal.CollapesAll();
+
+    /// <summary>
+    /// Führt ein Kontextmenü-Kommando über die interne TableView aus,
+    /// ohne die TableView-Instanz nach außen zu geben.
+    /// </summary>
+    public void ExecuteContextMenuComand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
+        var hotItem = TableView.ContextMenuItemGenerate(TableInternal, viewItem, column, row, visibleRows);
+        ((IContextMenu)TableInternal).ExecuteContextMenuComand(click, additional, hotItem);
+    }
+
+    public void ResetView() => TableInternal.ResetView();
 
     public void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
 
@@ -429,7 +432,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ((IContextMenu)TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, null, RowsVisibleUnique()));
+        ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, null, null, null, RowsVisibleUnique());
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

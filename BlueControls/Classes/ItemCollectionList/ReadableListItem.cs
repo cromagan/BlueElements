@@ -41,8 +41,8 @@ public class ReadableListItem : AbstractListItem {
                 npc.PropertyChanged -= Item_PropertyChanged;
             }
 
-            if (field is IDisposableExtendedWithEvent disposable) {
-                disposable.DisposingEvent -= Item_DisposingEvent;
+            if (field is IDisposableExtended disposable) {
+                disposable.Disposed -= Item_Disposed;
             }
 
             field = value;
@@ -52,8 +52,8 @@ public class ReadableListItem : AbstractListItem {
                 npc2.PropertyChanged += Item_PropertyChanged;
             }
 
-            if (field is IDisposableExtendedWithEvent disposable2) {
-                disposable2.DisposingEvent += Item_DisposingEvent;
+            if (field is IDisposableExtended disposable2) {
+                disposable2.Disposed += Item_Disposed;
             }
         }
     }
@@ -157,7 +157,7 @@ public class ReadableListItem : AbstractListItem {
 
     private bool HasError() => !string.IsNullOrEmpty(ErrorText());
 
-    private void Item_DisposingEvent(object? sender, System.EventArgs e) => Item = null;
+    private void Item_Disposed(object? sender, System.EventArgs e) => Item = null;
 
     private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Update();
 

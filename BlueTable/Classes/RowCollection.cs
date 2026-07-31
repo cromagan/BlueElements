@@ -44,6 +44,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler<RowEventArgs>? RowAdded;
 
     public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
@@ -75,10 +77,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.DisposingEvent -= _table_Disposing;
+            field?.Disposed -= _table_Disposed;
             field = value;
 
-            field?.DisposingEvent += _table_Disposing;
+            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -759,12 +761,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (sender is BackgroundWorker bw) { Pendingworker.Remove(bw); }
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
+    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            OnDisposed(); 
+            Disposed = null;
             Table = null;
             Parallel.ForEach(_internal.Values, row => row.Dispose());
             RowAdded = null;

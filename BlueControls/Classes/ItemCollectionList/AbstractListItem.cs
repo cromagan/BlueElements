@@ -380,6 +380,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Events
 
+    public event EventHandler? Disposed;
+
     public event EventHandler? CompareKeyChanged;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -565,13 +567,17 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed(); 
 
         if (disposing) {
             PropertyChanged = null;
             CompareKeyChanged = null;
             LeftClickExecute = null;
+            Disposed = null;
         }
     }
 

@@ -10,15 +10,6 @@ namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private string _fehlerText = string.Empty;
-    private string _filterSpalte = string.Empty;
-    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_schreibungsneutral;
-    private string _filterwert = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public FilterConverterElementPadItem() : this(string.Empty, null, null) { }
@@ -40,14 +31,14 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
     [DefaultValue("")]
     public string Fehler_Text {
-        get => _fehlerText;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _fehlerText) { return; }
-            _fehlerText = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     //[Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
     //[DefaultValue("")]
@@ -64,38 +55,38 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     [Description("Dieser Filter-Typ wird angewendet.")]
     [DefaultValue(FilterTypeRowInputItem.Ist_schreibungsneutral)]
     public FilterTypeRowInputItem Filter {
-        get => _filtertype;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _filtertype) { return; }
-            _filtertype = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = FilterTypeRowInputItem.Ist_schreibungsneutral;
 
     [Description("Auf diese Spalte wird der Filter angewendet.")]
     [DefaultValue("")]
     public string Filter_Spalte {
-        get => _filterSpalte;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _filterSpalte) { return; }
-            _filterSpalte = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     [Description("Nach diesem Wert wird gefiltert. Es können Variablen der eingehenden Zeile benutzt werden.")]
     [DefaultValue("")]
     public string Filter_Wert {
-        get => _filterwert;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _filterwert) { return; }
-            _filterwert = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
@@ -117,9 +108,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var o = TableOutput?.Column[_filterSpalte];
-        var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype) {
-            ErrorText = _fehlerText
+        var o = TableOutput?.Column[Filter_Spalte];
+        var con = new InputRowOutputFilterControl(Filter_Wert, o, Filter) {
+            ErrorText = Fehler_Text
         };
         con.DoDefaultSettings(parent, this, mode);
 
@@ -129,7 +120,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override string ErrorReason() {
         if (base.ErrorReason() is { Length: > 0 } f) { return f; }
 
-        if (TableOutput?.Column[_filterSpalte] is null) {
+        if (TableOutput?.Column[Filter_Spalte] is null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
 
@@ -174,11 +165,11 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Value", _filterwert);
+        result.ParseableAdd("Value", Filter_Wert);
         //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
-        result.ParseableAdd("OutputColumn", _filterSpalte);
-        result.ParseableAdd("Filter", _filtertype);
-        result.ParseableAdd("errortext", _fehlerText);
+        result.ParseableAdd("OutputColumn", Filter_Spalte);
+        result.ParseableAdd("Filter", Filter);
+        result.ParseableAdd("errortext", Fehler_Text);
 
         //if (TableInput is not Table dbin || dbin.IsDisposed) {
         //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
@@ -191,18 +182,18 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("value", _filterwert);
-        json.Set("outputcolumn", _filterSpalte);
-        json.Set("filter", (int)_filtertype);
-        json.Set("errortext", _fehlerText);
+        json.Set("value", Filter_Wert);
+        json.Set("outputcolumn", Filter_Spalte);
+        json.Set("filter", (int)Filter);
+        json.Set("errortext", Fehler_Text);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _filterwert = json.GetString("value", _filterwert);
-        _filterSpalte = json.GetString("outputcolumn", _filterSpalte);
-        _filtertype = json.GetEnum("filter", _filtertype);
-        _fehlerText = json.GetString("errortext", _fehlerText);
+        Filter_Wert = json.GetString("value", Filter_Wert);
+        Filter_Spalte = json.GetString("outputcolumn", Filter_Spalte);
+        Filter = json.GetEnum("filter", Filter);
+        Fehler_Text = json.GetString("errortext", Fehler_Text);
         base.ParseJson(json);
     }
 
@@ -213,23 +204,23 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
                 return true;
 
             case "errortext":
-                _fehlerText = value.FromNonCritical();
+                Fehler_Text = value.FromNonCritical();
                 return true;
 
             case "value":
-                _filterwert = value.FromNonCritical();
+                Filter_Wert = value.FromNonCritical();
                 return true;
 
             case "inputcolumn":
-                _filterwert = "~" + value.FromNonCritical() + "~";
+                Filter_Wert = "~" + value.FromNonCritical() + "~";
                 return true;
 
             case "outputcolumn":
-                _filterSpalte = value;
+                Filter_Spalte = value;
                 return true;
 
             case "filter":
-                _filtertype = (FilterTypeRowInputItem)IntParse(value);
+                Filter = (FilterTypeRowInputItem)IntParse(value);
                 return true;
 
             case "defaultemptyfilter":

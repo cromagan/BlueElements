@@ -85,6 +85,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Methods
 
     public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) {
@@ -192,8 +198,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed(); 
+        Disposed = null;
         _font?.Dispose();
         _fontOl?.Dispose();
         _sampleTextSym?.Dispose();

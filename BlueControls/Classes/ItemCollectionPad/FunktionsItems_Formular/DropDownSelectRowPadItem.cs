@@ -11,10 +11,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Fields
 
-    private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private string _caption = string.Empty;
-    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -36,36 +33,36 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     public string Anzeige {
-        get => _anzeige;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_anzeige == value) { return; }
-            _anzeige = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public bool AutoSizeableHeight => false;
 
     public string Caption {
-        get => _caption;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_caption == value) { return; }
-            _caption = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public CaptionPosition CaptionPosition {
-        get => _captionPosition;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_captionPosition == value) { return; }
-            _captionPosition = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = CaptionPosition.Über_dem_Feld;
 
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
@@ -78,7 +75,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlForRowSelector(TableOutput, _caption, _anzeige) {
+        var con = new FlexiControlForRowSelector(TableOutput, Caption, Anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };
@@ -106,10 +103,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("CaptionText", _caption);
-        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("CaptionText", Caption);
+        result.ParseableAdd("ShowFormat", Anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _captionPosition);
+        result.ParseableAdd("Caption", CaptionPosition);
         //result.ParseableAdd("ID", ColorId);
 
         return result;
@@ -117,18 +114,18 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("captiontext", _caption);
-        json.Set("showformat", _anzeige);
+        json.Set("captiontext", Caption);
+        json.Set("showformat", Anzeige);
         json.Set("edittype", (int)_bearbeitung);
-        json.Set("caption", (int)_captionPosition);
+        json.Set("caption", (int)CaptionPosition);
         return json;
     }
 
     public override void ParseJson(JsonObject json) {
-        _caption = json.GetString("captiontext", _caption);
-        _anzeige = json.GetString("showformat", _anzeige);
+        Caption = json.GetString("captiontext", Caption);
+        Anzeige = json.GetString("showformat", Anzeige);
         _bearbeitung = json.GetEnum("edittype", _bearbeitung);
-        _captionPosition = json.GetEnum("caption", _captionPosition);
+        CaptionPosition = json.GetEnum("caption", CaptionPosition);
         base.ParseJson(json);
     }
 
@@ -143,15 +140,15 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
                 return true;
 
             case "caption":
-                _captionPosition = (CaptionPosition)IntParse(value);
+                CaptionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "captiontext":
-                _caption = value.FromNonCritical();
+                Caption = value.FromNonCritical();
                 return true;
 
             case "showformat":
-                _anzeige = value.FromNonCritical();
+                Anzeige = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);
@@ -168,10 +165,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionControl, zoom, forPrinting, OutputColorId);
-            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
             DrawColorScheme(gr, positionControl, zoom, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
         base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
