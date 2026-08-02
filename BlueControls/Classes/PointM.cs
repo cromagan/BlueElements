@@ -238,7 +238,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public void ParseFinished(string parsed) { }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         KeyName = json.GetString("key", KeyName);

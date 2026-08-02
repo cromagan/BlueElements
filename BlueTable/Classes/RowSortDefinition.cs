@@ -147,7 +147,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         Reverse = json.GetBool("reverse", Reverse);

@@ -167,7 +167,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         return json;
     }
 
-    public virtual void ParseFinishedJson(JsonElement parsed) { }
+    public virtual void ParseFinishedJson(JsonObject parsed) { }
 
     /// <summary>
     /// JSON-Pendant zu <see cref="ParseThis" />. Liest die gemeinsamen Metadaten.

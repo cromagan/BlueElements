@@ -488,9 +488,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
         var savedSets = EditorVariablesManager.GetSets(VariablesStorageKey);
         var entry = savedSets.Find(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase));
-        if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return false; }
-
-        if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } data) { return false; }
+        if (entry?.JsonData is not { } data) { return false; }
 
         VariablesToSpecialField(data, true);
         return true;

@@ -131,9 +131,31 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("text", Text);
+        json.Set("alignment", (int)Ausrichtung);
+        json.Set("additionalscale", TextScale);
+        json.Set("style", (int)Style);
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         InvalidateText();
+    }
+
+    public override void ParseFinishedJson(JsonObject parsed) {
+        base.ParseFinishedJson(parsed);
+        InvalidateText();
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Text = json.GetString("text", Text);
+        Ausrichtung = json.GetEnum("alignment", Ausrichtung);
+        TextScale = json.GetFloat("additionalscale", TextScale);
+        Style = json.GetEnum("style", Style);
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

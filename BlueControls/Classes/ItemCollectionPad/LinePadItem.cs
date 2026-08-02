@@ -146,6 +146,19 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("connection", (int)Linien_Verhalten);
+        json.Set("style", (int)Style);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Linien_Verhalten = json.GetEnum("connection", Linien_Verhalten);
+        Style = json.GetEnum("style", Style);
+        base.ParseJson(json);
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "connection":

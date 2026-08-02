@@ -147,7 +147,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) {
+    public void ParseFinishedJson(JsonObject parsed) {
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
     }

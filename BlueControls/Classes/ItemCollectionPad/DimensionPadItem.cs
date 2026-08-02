@@ -238,9 +238,37 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         return result;
     }
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("text1", Text_Oben);
+        json.Set("text2", Text_Unten);
+        json.Set("decimal", Nachkommastellen);
+        json.Set("prefix", Präfix);
+        json.Set("suffix", Suffix);
+        json.Set("additionalscale", TextScale);
+        json.Set("style", (int)Style);
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         CalculateOtherPoints();
+    }
+
+    public override void ParseFinishedJson(JsonObject parsed) {
+        base.ParseFinishedJson(parsed);
+        CalculateOtherPoints();
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Text_Oben = json.GetString("text1", Text_Oben);
+        Text_Unten = json.GetString("text2", Text_Unten);
+        Nachkommastellen = json.GetInt("decimal", Nachkommastellen);
+        Präfix = json.GetString("prefix", Präfix);
+        Suffix = json.GetString("suffix", Suffix);
+        TextScale = json.GetFloat("additionalscale", TextScale);
+        Style = json.GetEnum("style", Style);
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

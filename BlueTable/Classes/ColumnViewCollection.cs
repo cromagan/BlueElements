@@ -304,7 +304,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         Invalidated = true;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) {
+    public void ParseFinishedJson(JsonObject parsed) {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
         Invalidated = true;

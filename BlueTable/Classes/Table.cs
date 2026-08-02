@@ -29,6 +29,12 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
     public static readonly object AllFilesLocker = new object();
 
+    // Race-Condition-Schutz für Table.Get: hält pro normalisiertem Tabellennamen
+    // ein eigenes Lock-Objekt vor, damit parallele Get-Aufrufe für dieselbe
+    // Tabelle serialisiert werden — die Datei wird nur einmal geladen und beide
+    // Aufrufer erhalten dieselbe Instanz. Verwaltet unter AllFilesLocker.
+    private static readonly Dictionary<string, object> _loadLocks = new();
+
     internal readonly object _undoLock = new();
 
     ///// <summary>
@@ -647,8 +653,6 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
                 }
             }
 
-            #region Schauen, ob die Tabelle bereits geladen ist
-
             var folder = new List<string>();
 
             if (file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
@@ -658,87 +662,113 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
             file = FormatHolder_SystemName.MakeValid(file);
 
-            Table? ok = null;
+            // Race-Condition-Schutz für parallele Get-Aufrufe: pro normiertem
+            // Tabellennamen ein eigenes Lock-Objekt unter AllFilesLocker ermitteln.
+            // Der Such-/Ladeblock läuft anschließend innerhalb dieses Locks, damit
+            // ein zweiter Aufrufer für dieselbe Tabelle die fertig geladene Instanz
+            // in AllFiles vorfindet, statt selbst noch einmal zu laden.
+            // Im Develop-Stresstest (AllowDuplicateTableLoad) bewusst deaktiviert.
+            object perNameLock;
             lock (AllFilesLocker) {
-                foreach (var thisFile in AllFiles) {
-                    // folder VOR dem KeyName-Check befüllen: ist AllowDuplicateTableLoad
-                    // aktiv, wird ok unten nicht zurückgegeben und der Code benötigt
-                    // den folder, um die Datei neu zu laden.
-                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                        folder.AddIfNotExists(tbf.Filename.FilePath());
-                    }
-
-                    if (string.Equals(thisFile.KeyName, file, StringComparison.OrdinalIgnoreCase)) {
-                        ok = thisFile;
-                        break;
-                    }
+                if (!_loadLocks.TryGetValue(file, out var existing)) {
+                    existing = new object();
+                    _loadLocks[file] = existing;
                 }
+                perNameLock = existing;
             }
 
-            // Develop-Stresstest: ist AllowDuplicateTableLoad gesetzt, darf die
-            // bereits geladene Instanz NICHT zurückgegeben werden — es soll eine
-            // zweite, unabhängige Instanz mit eigener MyId erzeugt werden. Ohne
-            // diese Prüfung würde der KeyName-Treffer oben stets zuschlagen und
-            // IsFileAllowedToLoad/LoadFromFile (wo das Flag ebenfalls ausgewertet
-            // wird) nie erreicht. Das Flag bleibt aktiv, bis der Stresstest-Button
-            // es ausschaltet (mehrfache Table.Get-Aufrufe pro Öffnen-Vorgang).
-            if (ok is { } okt && !Develop.AllowDuplicateTableLoad) {
-                if (!LoadingOnThisThread.Contains(okt)) {
-                    okt.WaitInitialDone();
-                }
-                return okt;
+            if (Develop.AllowDuplicateTableLoad) {
+                return FindOrLoadTable();
+            }
+            lock (perNameLock) {
+                return FindOrLoadTable();
             }
 
-            #endregion
+            Table? FindOrLoadTable() {
+                #region Schauen, ob die Tabelle bereits geladen ist
 
-            var attemptedPaths = new List<string>();
-
-            foreach (var thisfolder in folder) {
-                var f = thisfolder + file;
-
-                foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
-                    var fs = f + suffix;
-
-                    if (!FileExists(fs)) {
-                        if (fs.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                            attemptedPaths.Add(fs);
+                Table? ok = null;
+                lock (AllFilesLocker) {
+                    foreach (var thisFile in AllFiles) {
+                        // folder VOR dem KeyName-Check befüllen: ist AllowDuplicateTableLoad
+                        // aktiv, wird ok unten nicht zurückgegeben und der Code benötigt
+                        // den folder, um die Datei neu zu laden.
+                        if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                            folder.AddIfNotExists(tbf.Filename.FilePath());
                         }
 
-                        continue;
+                        if (string.Equals(thisFile.KeyName, file, StringComparison.OrdinalIgnoreCase)) {
+                            ok = thisFile;
+                            break;
+                        }
                     }
-
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-
-                    if (Activator.CreateInstance(type, file) is not TableFile tb) { return null; }
-
-                    LoadingOnThisThread.Push(tb);
-                    try {
-                        tb.LoadFromFile(fs, needPassword, string.Empty);
-                    } finally {
-                        LoadingOnThisThread.Pop();
-                    }
-
-                    return tb;
                 }
+
+                // Develop-Stresstest: ist AllowDuplicateTableLoad gesetzt, darf die
+                // bereits geladene Instanz NICHT zurückgegeben werden — es soll eine
+                // zweite, unabhängige Instanz mit eigener MyId erzeugt werden. Ohne
+                // diese Prüfung würde der KeyName-Treffer oben stets zuschlagen und
+                // IsFileAllowedToLoad/LoadFromFile (wo das Flag ebenfalls ausgewertet
+                // wird) nie erreicht. Das Flag bleibt aktiv, bis der Stresstest-Button
+                // es ausschaltet (mehrfache Table.Get-Aufrufe pro Öffnen-Vorgang).
+                if (ok is { } okt && !Develop.AllowDuplicateTableLoad) {
+                    if (!LoadingOnThisThread.Contains(okt)) {
+                        okt.WaitInitialDone();
+                    }
+                    return okt;
+                }
+
+                #endregion
+
+                var attemptedPaths = new List<string>();
+
+                foreach (var thisfolder in folder) {
+                    var f = thisfolder + file;
+
+                    foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
+                        var fs = f + suffix;
+
+                        if (!FileExists(fs)) {
+                            if (fs.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                                attemptedPaths.Add(fs);
+                            }
+
+                            continue;
+                        }
+
+                        if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
+
+                        if (Activator.CreateInstance(type, file) is not TableFile tb) { return null; }
+
+                        LoadingOnThisThread.Push(tb);
+                        try {
+                            tb.LoadFromFile(fs, needPassword, string.Empty);
+                        } finally {
+                            LoadingOnThisThread.Pop();
+                        }
+
+                        return tb;
+                    }
+                }
+
+                //// Zweite Instanz: Recovery für alle Pfade, die nicht existierten
+                //foreach (var fne in attemptedPaths) {
+                //    // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
+                //    if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
+                //        if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
+                //            continue;
+                //        }
+                //    }
+
+                //    if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
+                //        // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
+                //        _recentRecoveryAttempts[fne] = DateTime.UtcNow;
+                //        return Get(fileOrTableName, needPassword);
+                //    }
+                //}
+
+                return null;
             }
-
-            //// Zweite Instanz: Recovery für alle Pfade, die nicht existierten
-            //foreach (var fne in attemptedPaths) {
-            //    // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
-            //    if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
-            //        if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
-            //            continue;
-            //        }
-            //    }
-
-            //    if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
-            //        // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
-            //        _recentRecoveryAttempts[fne] = DateTime.UtcNow;
-            //        return Get(fileOrTableName, needPassword);
-            //    }
-            //}
-
-            return null;
         } catch {
             Develop.AbortAppIfStackOverflow();
             // Rekursion im catch entfernt, um StackOverflow bei permanenten Fehlern zu vermeiden
@@ -1966,7 +1996,7 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         // Table ist über ChangeData zentral gesteuert. Diese Implementierung

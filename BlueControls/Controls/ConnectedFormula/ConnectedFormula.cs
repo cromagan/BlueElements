@@ -25,6 +25,8 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
     private readonly List<string> _notAllowedChilds = [];
 
+    private readonly List<ItemCollectionPadItem> _pages = [];
+
     private bool _finishingParse;
 
     #endregion
@@ -105,29 +107,12 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         }
     }
 
-    public ItemCollectionPadItem? Pages {
+    public IReadOnlyList<ItemCollectionPadItem> Pages {
         get {
             if (!IsParsed) {
                 this.Parse(Constants.Win1252.GetString(Content));
             }
-            return field;
-        }
-        private set {
-            if (IsDisposed) { value = null; }
-            if (field == value) { return; }
-            field?.PropertyChangedExt -= Pages_PropertyChangedExt;
-            field?.PropertyChanged -= Pages_PropertyChanged;
-
-            field = value;
-            if (IsDisposed) { return; }
-
-            if (field is not null) {
-                field.Parent = this;
-                field.PropertyChangedExt += Pages_PropertyChangedExt;
-                field.PropertyChanged += Pages_PropertyChanged;
-            }
-
-            OnPropertyChanged();
+            return _pages.AsReadOnly();
         }
     }
 
@@ -160,8 +145,11 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             List<string> tempResult = []; // Lokale Liste, um den Cache erst am Ende zu füllen
 
             foreach (var thisCf in LiveInstances.Values) {
-                if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
-                    tempResult.AddRange(icp.VisibleFor_AllUsed());
+                if (thisCf is not { IsDisposed: false }) { continue; }
+                foreach (var icp in thisCf._pages) {
+                    if (icp is { IsDisposed: false }) {
+                        tempResult.AddRange(icp.VisibleFor_AllUsed());
+                    }
                 }
             }
 
@@ -171,9 +159,27 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     }
 
     // Das Schloss für die Threadsicherheit
-    public ItemCollectionPadItem? AddPage(string headname) {
-        if (Pages is not { IsDisposed: false }) { return null; }
 
+    private void RegisterPage(ItemCollectionPadItem page) {
+        page.Parent = this;
+        page.PropertyChangedExt += Pages_PropertyChangedExt;
+        page.PropertyChanged += Pages_PropertyChanged;
+    }
+
+    private void UnregisterPage(ItemCollectionPadItem page) {
+        page.PropertyChangedExt -= Pages_PropertyChangedExt;
+        page.PropertyChanged -= Pages_PropertyChanged;
+    }
+
+    private void ClearPages() {
+        foreach (var page in _pages) {
+            UnregisterPage(page);
+            page.Dispose();
+        }
+        _pages.Clear();
+    }
+
+    public ItemCollectionPadItem AddPage(string headname) {
         // Ein Gitterkästchen in mm - konsistent zu ParseFinished.
         var gridMm = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
 
@@ -182,24 +188,25 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             Breite = 100 * gridMm,
             Höhe = 100 * gridMm,
             GridShow = gridMm,
-            GridSnap = gridMm,
-            Parent = Pages
+            GridSnap = gridMm
         };
 
         var it = new RowEntryPadItem();
         p.Add(it);
-        Pages.Add(p);
+
+        RegisterPage(p);
+        _pages.Add(p);
+        OnPropertyChanged();
 
         return p;
     }
 
     public List<string> AllPages() {
         var p = new List<string>();
-        if (Pages is null) { return p; }
 
-        foreach (var thisp in Pages) {
-            if (thisp is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icp) {
-                p.AddIfNotExists(icp.Caption);
+        foreach (var thisp in _pages) {
+            if (thisp is { IsDisposed: false, HasItems: true }) {
+                p.AddIfNotExists(thisp.Caption);
             }
         }
 
@@ -219,27 +226,37 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
         base.Dispose();
 
-        Pages?.Dispose();
-        Pages = null;
+        ClearPages();
     }
 
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {
         if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
 
-        if (Pages is not { IsDisposed: false } pg) { return null; }
+        foreach (var icp in _pages) {
+            if (icp is not { IsDisposed: false }) { continue; }
+            if (string.Equals(icp.KeyName, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp; }
+            if (string.Equals(icp.Caption, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp; }
+        }
 
-        return pg.GetSubItemCollection(keyOrCaption);
+        return null;
     }
 
     /// <summary>
-    /// ConnectedFormula ist die Wurzel des Baums und löst keine Container-Pfade
-    /// direkt auf. Pfad-Abstiege über <see cref="JsonParseableExtension.ApplyPartialJson" />
-    /// erreichen diese Methode nicht, weil nach oben kein Partial-Json gepusht wird.
-    /// Gibt daher stets <c>null</c> zurück.
+    /// ConnectedFormula ist die Wurzel des Baums. Pfad-Abstiege über
+    /// <see cref="JsonParseableExtension.ApplyPartialJson" /> erreichen diese Methode
+    /// nicht, weil nach oben kein Partial-Json gepusht wird. Einzige Ausnahme ist der
+    /// Container <c>pages</c>, über den eine einzelne Page anhand ihres KeyNames
+    /// aufgelöst wird.
     /// </summary>
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "pages", StringComparison.OrdinalIgnoreCase)) {
+            return GetPage(key);
+        }
+        return null;
+    }
 
     public override void Invalidate() {
+        ClearPages();
         IsParsed = false;
         base.Invalidate();
     }
@@ -270,8 +287,10 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
         result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
 
-        if (Pages is not null) {
-            result.ParseableAdd("Page", Pages as IStringable);
+        foreach (var p in _pages) {
+            if (!p.IsDisposed) {
+                result.ParseableAdd("Page", p as IStringable);
+            }
         }
 
         return result;
@@ -285,7 +304,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     ///   <item><description><c>CreateName</c> → <c>creator</c></description></item>
     ///   <item><description><c>CreateDate</c> → <c>createdate</c></description></item>
     ///   <item><description><c>NotAllowedChilds</c> als JSON-Array statt \r-getrennter String</description></item>
-    ///   <item><description><c>Page</c> als echtes JSON-Sub-Objekt (über <see cref="ItemCollectionPadItem" />)</description></item>
+    ///   <item><description>Pages als flaches JSON-Array <c>pages</c> statt verschachteltem <c>page</c>-Container</description></item>
     /// </list>
     /// </summary>
     public JsonObject ParseableJson() {
@@ -297,118 +316,56 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
         json.SetArrayIfNotEmpty("notallowedchilds", _notAllowedChilds);
 
-        if (Pages is { IsDisposed: false } pages) {
-            json.Set("page", pages.ParseableJson());
-        }
+        json.SetArrayIfNotEmpty("pages", _pages.Where(p => !p.IsDisposed));
 
         return json;
     }
 
     /// <summary>
-    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
+    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist. Die Pages wurden
+    /// bereits in <see cref="ParseThis" /> oder <see cref="ParseJson" /> direkt
+    /// in <c>_pages</c> eingetragen. Hier erfolgen nur noch Standard-Sicherungen
+    /// (Default-Head, RowEntryItem, GridShow/GridSnap) und die Receiver-Reparatur.
     /// </summary>
     public void ParseFinished(string parsed) {
         _finishingParse = true;
         IsParsed = true;
 
         try {
+            #region Default-Head sicherstellen
 
-            #region Sicherstellen, das Pages initialisiert ist
-
-            if (Pages is null) {
-                Pages = [];
-                Pages.Breite = 100;
-                Pages.Höhe = 100;
-
+            if (_pages.Count == 0) {
                 AddPage("Head");
             }
 
-            Pages.Parent = this;
-
-            Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
-
             #endregion
 
-            #region Sicherstellen, dass in Pages auch nur Seiten sind
+            #region Pro Page: RowEntryItem sicherstellen, GridShow/GridSnap setzen
 
-            var tmpPages = new List<AbstractPadItem>();
-            tmpPages.AddRange(Pages);
+            var gridMm = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
 
-            var moveToOtherPage = new List<AbstractPadItem>();
+            foreach (var icpi in _pages) {
+                if (icpi is not { IsDisposed: false }) { continue; }
 
-            foreach (var thisIt in tmpPages) {
-                if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                    if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
-                    icpi.Parent = Pages;
-                } else {
-                    Pages.Remove(thisIt);
-                    moveToOtherPage.Add(thisIt);
-                }
-            }
+                if (icpi.IsHead() || icpi.Any()) {
+                    var found = icpi.GetRowEntryItem();
 
-            #endregion
-
-            #region Items, die irgendwie in den Pages waren, zu der richtigen Page schieben
-
-            foreach (var thisIt in moveToOtherPage) {
-
-                #region Sicherstellen, dass die Page  vorhanden ist
-
-                var pagen = thisIt.Page;
-                if (string.IsNullOrEmpty(pagen)) { pagen = "Head"; }
-                var mypage = GetPage(pagen);
-
-                if (mypage is null) {
-                    mypage = new ItemCollectionPadItem {
-                        Caption = pagen,
-                        Breite = Pages.Breite,
-                        Höhe = Pages.Höhe,
-                        SheetStyle = Pages.SheetStyle,
-                        RandinMm = Pages.RandinMm,
-                        GridShow = Pages.GridShow,
-                        GridSnap = Pages.GridSnap,
-                        Parent = Pages
-                    };
-                    Pages.Add(mypage);
-                }
-
-                #endregion
-
-                mypage.Add(thisIt);
-            }
-
-            #endregion
-
-            RepairReciver(Pages);
-
-            #region Sicherstellen, dass jede Page ein RowEntryItem hat
-
-            foreach (var thisP in Pages) {
-                if (thisP is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                    if (icpi.IsHead() || icpi.Any()) {
-                        var found = icpi.GetRowEntryItem();
-
-                        if (found is null) {
-                            found = new RowEntryPadItem();
-                            icpi.Add(found);
-                        }
-
-                        found.SetCoordinates(new RectangleF(icpi.CanvasUsedArea.Width / 2 - 150, -30, 300, 30));
-                        found.Bei_Export_sichtbar = false;
+                    if (found is null) {
+                        found = new RowEntryPadItem();
+                        icpi.Add(found);
                     }
+
+                    found.SetCoordinates(new RectangleF(icpi.CanvasUsedArea.Width / 2 - 150, -30, 300, 30));
+                    found.Bei_Export_sichtbar = false;
                 }
+
+                icpi.GridShow = gridMm;
+                icpi.GridSnap = gridMm;
             }
 
             #endregion
 
-            if (Pages is not null) {
-                foreach (var page in Pages) {
-                    if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
-                        icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                        icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                    }
-                }
-            }
+            RepairRecivers();
         } finally {
             _finishingParse = false;
         }
@@ -420,7 +377,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         MarkCurrentContentAsLoaded();
     }
 
-    public void ParseFinishedJson(JsonElement parsed) => ParseFinished(parsed.GetRawText());
+    public void ParseFinishedJson(JsonObject parsed) => ParseFinished(parsed.ToJsonString());
 
     public void ParseJson(JsonObject json) {
         CreateDate = json.GetString("createdate", CreateDate);
@@ -431,10 +388,15 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             _notAllowedChilds.AddRange(na.ToStringList());
         }
 
-        if (json["page"] is JsonObject po) {
-            var tmp = new ItemCollectionPadItem();
-            tmp.ParseJson(po);
-            Pages = tmp;
+        if (json["pages"] is JsonArray pa) {
+            foreach (var pageJson in pa) {
+                if (pageJson is not JsonObject po) { continue; }
+                var page = new ItemCollectionPadItem();
+                page.ParseJson(po);
+                page.ParseFinishedJson(po);
+                RegisterPage(page);
+                _pages.Add(page);
+            }
         }
     }
 
@@ -464,9 +426,24 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
             case "page":
             case "paditemdata":
-                var tmpPages = new ItemCollectionPadItem();
-                tmpPages.Parse(value.FromNonCritical());
-                Pages = tmpPages;
+                var container = new ItemCollectionPadItem();
+                container.Parse(value.FromNonCritical());
+
+                // Altes Container-Format: direkte Kinder sind ausschließlich
+                // ItemCollectionPadItem → als einzelne Pages übernehmen.
+                // Sonst den Container selbst als eine Page behandeln.
+                if (container.Any() && container.All(it => it is ItemCollectionPadItem)) {
+                    foreach (var child in container.ToList()) {
+                        if (child is ItemCollectionPadItem { IsDisposed: false } page) {
+                            container.Remove(child);
+                            RegisterPage(page);
+                            _pages.Add(page);
+                        }
+                    }
+                } else {
+                    RegisterPage(container);
+                    _pages.Add(container);
+                }
                 return true;
 
             case "databasefiles":
@@ -510,13 +487,9 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
             }
         }
 
-        if (Pages is not null) {
-            foreach (var thisf in Pages) {
-                if (thisf is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) {
-                    if (!notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {
-                        list.Add(ItemOf(icpi));
-                    }
-                }
+        foreach (var icpi in _pages) {
+            if (icpi is { IsDisposed: false, HasItems: true } && !notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {
+                list.Add(ItemOf(icpi));
             }
         }
 
@@ -574,6 +547,14 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         if (IsDisposed) { return; }
         OnPropertyChanged();
         OnPropertyChangedExt(e.RelativePath, e.Partial);
+    }
+
+    private void RepairRecivers() {
+        foreach (var page in _pages) {
+            if (page is { IsDisposed: false }) {
+                RepairReciver(page);
+            }
+        }
     }
 
     private void RepairReciver(ItemCollectionPadItem icpi) {

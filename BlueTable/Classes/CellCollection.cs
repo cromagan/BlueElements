@@ -311,7 +311,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         if (Table is not { IsDisposed: false } tb) { return; }

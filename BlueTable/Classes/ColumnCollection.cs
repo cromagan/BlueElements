@@ -584,7 +584,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         // Spalten werden über den normalen Ladevorgang (Table.ChangeData) angelegt.

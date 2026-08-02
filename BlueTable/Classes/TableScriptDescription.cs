@@ -446,7 +446,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) {
+    public void ParseFinishedJson(JsonObject parsed) {
         if (MustBeReadonly(EventTypes)) {
             ValuesReadOnly = true;
         }

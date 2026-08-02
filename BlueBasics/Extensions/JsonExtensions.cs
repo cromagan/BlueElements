@@ -9,27 +9,25 @@ public static partial class Extensions {
     #region Methods
 
     /// <summary>
-    /// Interpretiert das aktuelle <see cref="JsonElement" /> selbst als Padding-Objekt
-    /// (Felder <c>left</c>, <c>top</c>, <c>right</c>, <c>bottom</c>).
+    /// Liest ein von <see cref="Set" /> geschriebenes Base64-PNG unter
+    /// <paramref name="key" />. Fehlt der Key, ist er kein String oder leer, wird
+    /// <paramref name="defaultValue" /> geliefert - so bleiben Partial-Updates
+    /// möglich, ohne bestehende Bilder zu überschreiben.
     /// </summary>
-    public static System.Windows.Forms.Padding AsPadding(this JsonElement json) =>
-        json.ValueKind != JsonValueKind.Object ? System.Windows.Forms.Padding.Empty
-            : new System.Windows.Forms.Padding(json.GetInt("left"), json.GetInt("top"), json.GetInt("right"), json.GetInt("bottom"));
-
-    /// <summary>
-    /// Interpretiert das aktuelle <see cref="JsonElement" /> selbst als SizeF-Objekt
-    /// (Felder <c>width</c>, <c>height</c>).
-    /// </summary>
-    public static SizeF AsSizeF(this JsonElement json) =>
-        json.ValueKind != JsonValueKind.Object ? SizeF.Empty : new SizeF(json.GetFloat("width"), json.GetFloat("height"));
-
-    public static bool GetBool(this JsonElement json, string key, bool defaultValue = false) {
-        if (json.TryGetProperty(key, out var elem) && elem.ValueKind is JsonValueKind.True or JsonValueKind.False) { return elem.GetBoolean(); }
+    public static Bitmap? GetBitmap(this JsonObject json, string key, Bitmap? defaultValue = null) {
+        if (json[key] is JsonValue v && v.TryGetValue(out string? s) && s is { Length: > 0 }) {
+            return Base64ToBitmap(s);
+        }
         return defaultValue;
     }
 
     public static bool GetBool(this JsonObject json, string key, bool defaultValue = false) {
         if (json[key] is JsonValue v && v.TryGetValue(out bool f)) { return f; }
+        return defaultValue;
+    }
+
+    public static double GetDouble(this JsonObject json, string key, double defaultValue = 0d) {
+        if (json[key] is JsonValue v && v.TryGetValue(out double d)) { return d; }
         return defaultValue;
     }
 
@@ -69,22 +67,8 @@ public static partial class Extensions {
         return defaultValue;
     }
 
-    public static float GetFloat(this JsonElement? json, string key, float defaultValue = 0f) => json.HasValue ? json.Value.GetFloat(key, defaultValue) : defaultValue;
-
     public static float GetFloat(this JsonObject json, string key, float defaultValue = 0f) {
         if (json[key] is JsonValue v && v.TryGetValue(out float f)) { return f; }
-        return defaultValue;
-    }
-
-    public static double GetDouble(this JsonElement json, string key, double defaultValue = 0d) {
-        if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Number) { return elem.GetDouble(); }
-        return defaultValue;
-    }
-
-    public static double GetDouble(this JsonElement? json, string key, double defaultValue = 0d) => json.HasValue ? json.Value.GetDouble(key, defaultValue) : defaultValue;
-
-    public static double GetDouble(this JsonObject json, string key, double defaultValue = 0d) {
-        if (json[key] is JsonValue v && v.TryGetValue(out double d)) { return d; }
         return defaultValue;
     }
 
@@ -95,16 +79,12 @@ public static partial class Extensions {
         return defaultValue;
     }
 
-    public static int GetInt(this JsonElement? json, string key, int defaultValue = 0) => json.HasValue ? json.Value.GetInt(key, defaultValue) : defaultValue;
-
     public static int GetInt(this JsonObject json, string key, int defaultValue = 0) {
         if (json[key] is JsonValue v && v.TryGetValue(out int i)) { return i; }
         return defaultValue;
     }
 
     public static JsonElement? GetJson(this JsonElement json, string key) => json.TryGetProperty(key, out var elem) ? elem : null;
-
-    public static JsonElement? GetJson(this JsonElement? json, string key) => json.HasValue ? json.Value.GetJson(key) : null;
 
     public static JsonNode? GetJson(this JsonObject json, string key) => json[key];
 
@@ -122,7 +102,7 @@ public static partial class Extensions {
         if (json[key] is JsonArray arr) {
             foreach (var item in arr) {
                 if (item is not JsonObject jo) { continue; }
-                if (ParseableItem.NewByParsingJson<T>(jo.ToJsonElement()) is { } created) { result.Add(created); }
+                if (ParseableItem.NewByParsingJson<T>(jo) is { } created) { result.Add(created); }
             }
             if (sort) { result.Sort(); }
         }
@@ -130,33 +110,23 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Liest ein vom <see cref="SetPadding" /> geschriebenes verschachteltes Objekt
-    /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird <see cref="System.Windows.Forms.Padding.Empty" /> geliefert.
+    /// Liest ein vom <see cref="Set" /> geschriebenes verschachteltes Objekt
+    /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
+    /// <paramref name="defaultValue" /> geliefert.
     /// </summary>
-    public static System.Windows.Forms.Padding GetPadding(this JsonElement json, string key) {
-        if (!json.TryGetProperty(key, out var elem) || elem.ValueKind != JsonValueKind.Object) { return System.Windows.Forms.Padding.Empty; }
-        return new System.Windows.Forms.Padding(elem.GetInt("left"), elem.GetInt("top"), elem.GetInt("right"), elem.GetInt("bottom"));
-    }
-
-    /// <inheritdoc cref="GetPadding(JsonElement, string)" />
     public static System.Windows.Forms.Padding GetPadding(this JsonObject json, string key, System.Windows.Forms.Padding defaultValue) {
         if (json[key] is not JsonObject jo) { return defaultValue; }
-        return jo.ToJsonElement().AsPadding();
+        return new System.Windows.Forms.Padding(jo.GetInt("left"), jo.GetInt("top"), jo.GetInt("right"), jo.GetInt("bottom"));
     }
 
     /// <summary>
-    /// Liest ein vom <see cref="SetSizeF" /> geschriebenes verschachteltes Objekt
-    /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird <see cref="SizeF.Empty" /> geliefert.
+    /// Liest ein vom <see cref="Set" /> geschriebenes verschachteltes Objekt
+    /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
+    /// <paramref name="defaultValue" /> geliefert.
     /// </summary>
-    public static SizeF GetSizeF(this JsonElement json, string key) {
-        if (!json.TryGetProperty(key, out var elem) || elem.ValueKind != JsonValueKind.Object) { return SizeF.Empty; }
-        return new SizeF(elem.GetFloat("width"), elem.GetFloat("height"));
-    }
-
-    /// <inheritdoc cref="GetSizeF(JsonElement, string)" />
     public static SizeF GetSizeF(this JsonObject json, string key, SizeF defaultValue) {
         if (json[key] is not JsonObject jo) { return defaultValue; }
-        return jo.ToJsonElement().AsSizeF();
+        return new SizeF(jo.GetFloat("width"), jo.GetFloat("height"));
     }
 
     public static string GetString(this JsonElement json, string key, string defaultValue = "") {
@@ -164,53 +134,61 @@ public static partial class Extensions {
         return defaultValue;
     }
 
-    public static string GetString(this JsonElement? json, string key, string defaultValue = "") => json.HasValue ? json.Value.GetString(key, defaultValue) : defaultValue;
-
     public static string GetString(this JsonObject json, string key, string defaultValue = "") {
         if (json[key] is JsonValue v && v.TryGetValue(out string? s)) { return s ?? defaultValue; }
         return defaultValue;
     }
 
     /// <summary>
-    /// Liest ein JSON-Array von Strings unter dem angegebenen Key und gibt es als Liste zurück.
-    /// Fehlt der Key oder ist er kein Array, wird eine leere Liste geliefert.
-    /// Null-Elemente innerhalb des Arrays werden als leerer String interpretiert.
+    /// Liest ein JSON-Array von Strings unter dem angegebenen Key und gibt es als
+    /// Liste zurück. Fehlt der Key oder ist er kein Array, wird eine leere Liste
+    /// geliefert. Null-Elemente innerhalb des Arrays werden als leerer String
+    /// interpretiert.
     /// </summary>
-    public static List<string> GetStringList(this JsonElement json, string key) {
-        if (!json.TryGetProperty(key, out var elem) || elem.ValueKind != JsonValueKind.Array) { return []; }
-
-        List<string> result = new(elem.GetArrayLength());
-        foreach (var item in elem.EnumerateArray()) {
-            result.Add(item.ValueKind == JsonValueKind.String ? item.GetString() ?? string.Empty : string.Empty);
-        }
-        return result;
-    }
-
-    /// <inheritdoc cref="GetStringList(JsonElement, string)" />
     public static List<string> GetStringList(this JsonObject json, string key) =>
         json[key] is JsonArray arr ? arr.ToStringList() : [];
-
-    /// <summary>
-    /// Konvertiert ein <see cref="JsonArray" /> in eine Liste von Strings.
-    /// Elemente, die keine String-<see cref="JsonValue" /> sind, werden als
-    /// leerer String interpretiert.
-    /// </summary>
-    public static List<string> ToStringList(this JsonArray arr) {
-        List<string> result = new(arr.Count);
-        foreach (var item in arr) {
-            result.Add(item is JsonValue v && v.TryGetValue(out string? s) ? s ?? string.Empty : string.Empty);
-        }
-        return result;
-    }
 
     public static bool IsArray(this JsonElement json) => json.ValueKind == JsonValueKind.Array;
 
     public static bool IsObject(this JsonElement json) => json.ValueKind == JsonValueKind.Object;
 
-    public static bool IsObject(this JsonElement? json) => json.HasValue && json.Value.IsObject();
-
     public static JsonObject Set(this JsonObject json, string key, JsonNode? value) {
         json[key] = value;
+        return json;
+    }
+
+    /// <summary>
+    /// Serialisiert ein <see cref="Bitmap" /> unter <paramref name="key" /> als
+    /// Base64-kodiertes PNG. Bei <c>null</c> wird der Key nicht gesetzt, sodass
+    /// das Ziel-JSON unverändert bleibt (kein <c>null</c>-Eintrag).
+    /// </summary>
+    public static JsonObject Set(this JsonObject json, string key, Bitmap? bmp) {
+        if (bmp is null) { return json; }
+        json[key] = BitmapToBase64(bmp, ImageFormat.Png);
+        return json;
+    }
+
+    /// <summary>
+    /// Serialisiert ein <see cref="System.Windows.Forms.Padding" /> unter <paramref name="key" /> als
+    /// verschachteltes Objekt mit den Feldern <c>left</c>, <c>top</c>, <c>right</c>, <c>bottom</c>.
+    /// </summary>
+    public static JsonObject Set(this JsonObject json, string key, System.Windows.Forms.Padding padding) {
+        json[key] = new JsonObject()
+            .Set("left", padding.Left)
+            .Set("top", padding.Top)
+            .Set("right", padding.Right)
+            .Set("bottom", padding.Bottom);
+        return json;
+    }
+
+    /// <summary>
+    /// Serialisiert ein <see cref="SizeF" /> unter <paramref name="key" /> als
+    /// verschachteltes Objekt mit den Feldern <c>width</c> und <c>height</c>.
+    /// </summary>
+    public static JsonObject Set(this JsonObject json, string key, SizeF size) {
+        json[key] = new JsonObject()
+            .Set("width", size.Width)
+            .Set("height", size.Height);
         return json;
     }
 
@@ -242,40 +220,6 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Serialisiert ein <see cref="System.Windows.Forms.Padding" /> unter <paramref name="key" /> als
-    /// verschachteltes Objekt mit den Feldern <c>left</c>, <c>top</c>, <c>right</c>, <c>bottom</c>.
-    /// </summary>
-    public static JsonObject SetPadding(this JsonObject json, string key, System.Windows.Forms.Padding padding) {
-        json[key] = new JsonObject()
-            .Set("left", padding.Left)
-            .Set("top", padding.Top)
-            .Set("right", padding.Right)
-            .Set("bottom", padding.Bottom);
-        return json;
-    }
-
-    /// <summary>
-    /// Serialisiert ein <see cref="SizeF" /> unter <paramref name="key" /> als
-    /// verschachteltes Objekt mit den Feldern <c>width</c> und <c>height</c>.
-    /// </summary>
-    public static JsonObject SetSizeF(this JsonObject json, string key, SizeF size) {
-        json[key] = new JsonObject()
-            .Set("width", size.Width)
-            .Set("height", size.Height);
-        return json;
-    }
-
-    /// <summary>
-    /// Konvertiert einen <see cref="JsonNode" /> (z.B. <see cref="JsonObject" />,
-    /// <see cref="JsonArray" />) in ein <see cref="JsonElement" />, sodass er an
-    /// APIs übergeben werden kann, die auf <see cref="JsonElement" /> arbeiten
-    /// (z.B. die <c>AsPadding</c>-/<c>AsSizeF</c>-Erweiterungen). <c>null</c> liefert
-    /// <see cref="JsonValueKind.Undefined" />.
-    /// </summary>
-    public static JsonElement ToJsonElement(this JsonNode? node) =>
-        node is null ? default : JsonDocument.Parse(node.ToJsonString()).RootElement.Clone();
-
-    /// <summary>
     /// Konvertiert ein <see cref="JsonElement" /> (z. B. aus <see cref="System.Text.Json.JsonDocument" />
     /// oder <see cref="System.Text.Json.JsonElement.Clone" />) in einen <see cref="JsonNode" />,
     /// sodass es direkt in ein übergeordnetes <see cref="JsonObject" /> / <see cref="JsonArray" />
@@ -285,6 +229,19 @@ public static partial class Extensions {
     /// </summary>
     public static JsonNode? ToJsonNode(this JsonElement element) =>
         element.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null ? null : JsonNode.Parse(element.GetRawText());
+
+    /// <summary>
+    /// Konvertiert ein <see cref="JsonArray" /> in eine Liste von Strings.
+    /// Elemente, die keine String-<see cref="JsonValue" /> sind, werden als
+    /// leerer String interpretiert.
+    /// </summary>
+    public static List<string> ToStringList(this JsonArray arr) {
+        List<string> result = new(arr.Count);
+        foreach (var item in arr) {
+            result.Add(item is JsonValue v && v.TryGetValue(out string? s) ? s ?? string.Empty : string.Empty);
+        }
+        return result;
+    }
 
     #endregion
 }

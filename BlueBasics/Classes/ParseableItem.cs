@@ -66,22 +66,19 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     /// <summary>
     /// JSON-Pendant zu <see cref="NewByParsing{T}" />. Erzeugt anhand des
-    /// <c>type</c>- bzw. <c>classid</c>-Feldes im JSON-Element über die
-    /// <c>ClassId</c>-Registry die passende Instanz und parst anschließend das Element.
-    /// Gibt <c>null</c> zurück, wenn der Typ nicht ermittelt werden konnte oder kein
-    /// JSON-Objekt übergeben wurde.
+    /// <c>type</c>- bzw. <c>classid</c>-Feldes im JSON-Objekt über die
+    /// <c>ClassId</c>-Registry die passende Instanz und parst anschließend das Objekt.
+    /// Gibt <c>null</c> zurück, wenn der Typ nicht ermittelt werden konnte.
     /// </summary>
-    public static T? NewByParsingJson<T>(JsonElement element, params object[] args) where T : ParseableItem, IJsonParseable {
-        if (element.ValueKind != JsonValueKind.Object) { return null; }
-
+    public static T? NewByParsingJson<T>(JsonObject element, params object[] args) where T : ParseableItem, IJsonParseable {
         var typeName = string.Empty;
 
-        foreach (var prop in element.EnumerateObject()) {
-            switch (prop.Name.ToLowerInvariant()) {
+        foreach (var prop in element) {
+            switch (prop.Key.ToLowerInvariant()) {
                 case "type":
                 case "classid":
-                    if (prop.Value.ValueKind == JsonValueKind.String) {
-                        typeName = prop.Value.GetString() ?? string.Empty;
+                    if (prop.Value is JsonValue v && v.TryGetValue(out string? s)) {
+                        typeName = s ?? string.Empty;
                     }
                     break;
             }

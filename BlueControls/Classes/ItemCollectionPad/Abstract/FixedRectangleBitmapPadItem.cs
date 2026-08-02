@@ -39,6 +39,11 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         SizeChanged();
     }
 
+    public override void ParseFinishedJson(JsonObject parsed) {
+        base.ParseFinishedJson(parsed);
+        SizeChanged();
+    }
+
     protected override RectangleF CalculateCanvasUsedArea() {
         if (_generatedBitmap is null) { GeneratePic(); } // Um die CanvasSize zu erhalten
 

@@ -416,7 +416,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return json;
     }
 
-    public virtual void ParseFinishedJson(JsonElement parsed) { }
+    public virtual void ParseFinishedJson(JsonObject parsed) { }
 
     /// <summary>
     /// Default-Implementation für <see cref="IJsonParseable" />. Subklassen

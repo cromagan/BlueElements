@@ -66,11 +66,9 @@ public static class ViewManager {
         }
     }
 
-    public static void SaveView(string tableKey, string viewName, JsonNode? viewData) {
+    public static void SaveView(string tableKey, string viewName, JsonObject? viewData) {
         lock (_lock) {
             InitializeIfNeeded();
-
-            var element = viewData is { } ? JsonSerializer.SerializeToElement(viewData) : default;
 
             if (!_views.TryGetValue(tableKey, out var list)) {
                 list = [];
@@ -78,10 +76,10 @@ public static class ViewManager {
             }
 
             if (list.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
-                existing.JsonData = element;
+                existing.JsonData = viewData;
                 existing.Modified = DateTime.Now;
             } else {
-                list.Add(new JsonEntry(viewName, element));
+                list.Add(new JsonEntry(viewName, viewData));
             }
 
             Save();
@@ -169,7 +167,7 @@ public static class ViewManager {
                 foreach (var view in kvp.Value) {
                     var viewObj = new JsonObject()
                         .Set("name", view.KeyName)
-                        .Set("data", view.JsonData.ToJsonNode())
+                        .Set("data", view.JsonData?.DeepClone())
                         .Set("modified", view.Modified.ToString("o"));
                     arr.Add(viewObj);
                 }

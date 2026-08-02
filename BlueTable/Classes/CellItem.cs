@@ -42,7 +42,7 @@ public class CellItem : IJsonParseable {
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         Value = json.GetString("value", Value);

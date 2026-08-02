@@ -202,7 +202,7 @@ public class UndoItem : IParseable, IJsonParseable {
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         TableName = json.GetString("table", TableName);

@@ -914,7 +914,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         // Zeilen werden über den normalen Ladevorgang (Table.ChangeData) angelegt.

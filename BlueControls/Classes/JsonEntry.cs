@@ -8,7 +8,7 @@ public sealed class JsonEntry : IHasKeyName {
 
     #region Constructors
 
-    public JsonEntry(string name, JsonElement data) {
+    public JsonEntry(string name, JsonObject? data) {
         KeyName = name;
         JsonData = data;
         Modified = DateTime.Now;
@@ -18,7 +18,7 @@ public sealed class JsonEntry : IHasKeyName {
 
     #region Properties
 
-    public JsonElement JsonData { get; set; }
+    public JsonObject? JsonData { get; set; }
     public string KeyName { get; set; }
     public DateTime Modified { get; set; }
 
@@ -32,11 +32,11 @@ public sealed class JsonEntry : IHasKeyName {
         var name = element.GetString("name");
         if (string.IsNullOrEmpty(name)) { return null; }
 
-        // Clone ist Pflicht: das JsonElement stammt aus einem JsonDocument,
-        // das der Aufrufer per using-disposed. Ohne Clone wäre JsonData nach
-        // Rückkehr invalid (ObjectDisposedException bei jedem späteren Zugriff).
+        // ToJsonNode liefert null bei Undefined/Null, sonst den geparsten Knoten.
+        // Da das Daten-Feld ein JSON-Objekt sein soll, casten wir direkt auf JsonObject.
+        // Clone entfällt: JsonObject ist mutable und unabhängig vom JsonDocument.
         var data = element.GetJson("data");
-        return new JsonEntry(name, data.HasValue ? data.Value.Clone() : default);
+        return new JsonEntry(name, data?.ToJsonNode() as JsonObject);
     }
 
     #endregion

@@ -15,8 +15,8 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
+    private string _tableOutputHintPath = string.Empty;
     private bool _tableOutputLoaded;
-
     private string _tableOutputName = string.Empty;
 
     #endregion
@@ -50,11 +50,22 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (string.IsNullOrEmpty(_tableOutputName)) {
                 field = null;
+                _tableOutputLoaded = true;
             } else {
                 field = Table.Get(_tableOutputName, TableView.Table_NeedPassword);
-            }
 
-            _tableOutputLoaded = true;
+                // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
+                // (z. B. weil noch keine andere Tabelle geladen ist und der
+                // Name kein Dateipfad ist), versuche es mit dem HintPath.
+                if (field is null && !string.IsNullOrEmpty(_tableOutputHintPath)) {
+                    field = Table.Get(_tableOutputHintPath, TableView.Table_NeedPassword);
+                }
+
+                // Nur als geladen markieren, wenn die Tabelle gefunden wurde.
+                // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
+                // könnte zwischenzeitlich in den Cache geladen worden sein.
+                _tableOutputLoaded = field is not null;
+            }
 
             return field;
         }
@@ -156,6 +167,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     }
 
     public override JsonObject ParseableJson() {
+        if (TableOutput is TableFile tf) {
+            _tableOutputHintPath = tf.Filename;
+        }
+
         var json = base.ParseableJson();
 
         if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } tb) {
@@ -163,6 +178,8 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         } else {
             json.Set("outputtable", _tableOutputName);
         }
+
+        json.Set("outputtablehintpath", _tableOutputHintPath);
 
         return json;
     }
@@ -173,6 +190,9 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             _tableOutputName = name;
             _tableOutputLoaded = false;
         }
+
+        _tableOutputHintPath = json.GetString("outputtablehintpath", _tableOutputHintPath);
+
         base.ParseJson(json);
     }
 
@@ -183,17 +203,9 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             case "outputtable":
                 _tableOutputName = value.FromNonCritical();
                 _tableOutputLoaded = false;
-
                 return true;
 
             case "senttochildids":
-                //value = value.Replace("\r", "|");
-
-                //var tmp = value.FromNonCritical().SplitBy("|");
-                //_childIds.Clear();
-                //foreach (var thiss in tmp) {
-                //    _childIds.Add(thiss.FromNonCritical());
-                //}
                 return true;
         }
         return base.ParseThis(key, value);

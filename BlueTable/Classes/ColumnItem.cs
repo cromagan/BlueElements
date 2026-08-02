@@ -2674,7 +2674,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return json;
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { _keyName = s.ToUpperInvariant(); }

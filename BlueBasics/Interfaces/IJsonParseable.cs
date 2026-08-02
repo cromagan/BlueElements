@@ -46,8 +46,8 @@ public interface IJsonParseable : IJsonStringable {
     /// abschließende Validierungen und Reparaturen. Pendant zu
     /// <see cref="IParseable.ParseFinished" />.
     /// </summary>
-    /// <param name="parsed">Das komplette JSON-Element, das ursprünglich übergeben wurde.</param>
-    void ParseFinishedJson(JsonElement parsed);
+    /// <param name="parsed">Das komplette JSON-Objekt, das ursprünglich übergeben wurde.</param>
+    void ParseFinishedJson(JsonObject parsed);
 
     /// <summary>
     /// Übernimmt den Zustand aus dem übergebenen <paramref name="json" />.
@@ -171,18 +171,18 @@ public static class JsonParseableExtension {
         }
 
         parsable.ParseJson(jo);
-        parsable.ParseFinishedJson(toParse);
+        parsable.ParseFinishedJson(jo);
     }
 
     /// <summary>
     /// Pendant zu <see cref="ParseJson(IJsonParseable, JsonElement)" /> für
     /// Aufrufer, die bereits ein <see cref="JsonObject" /> haben. Ruft
     /// <see cref="IJsonParseable.ParseJson" /> direkt auf und reicht das
-    /// Objekt (konvertiert) an <see cref="IJsonParseable.ParseFinishedJson" /> weiter.
+    /// gleiche Objekt an <see cref="IJsonParseable.ParseFinishedJson" /> weiter.
     /// </summary>
     public static void ParseJson(this IJsonParseable parsable, JsonObject toParse) {
         parsable.ParseJson(toParse);
-        parsable.ParseFinishedJson(toParse.ToJsonElement());
+        parsable.ParseFinishedJson(toParse);
     }
 
     /// <summary>

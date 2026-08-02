@@ -302,11 +302,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
         var savedViews = ViewManager.GetViews(tbf.KeyName);
         var entry = savedViews.Find(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry is not null && entry.JsonData.ValueKind != JsonValueKind.Undefined) {
-            if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is { } viewObj) {
-                SetView(viewObj);
-                return true;
-            }
+        if (entry?.JsonData is { } viewObj) {
+            SetView(viewObj);
+            return true;
         }
         return false;
     }
@@ -1098,9 +1096,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var viewName = e.Item.KeyName;
         var savedViews = GetViews(tbf.KeyName);
         var entry = savedViews.Find(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return; }
+        if (entry?.JsonData is not { } viewObj) { return; }
 
-        if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } viewObj) { return; }
         SetView(viewObj);
         QuickNote.Show(NoteSymbols.Ok, "Geladen");
     }

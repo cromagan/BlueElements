@@ -44,6 +44,18 @@ public interface ILiveInstanceCache<T> where T : class, IDisposableExtended {
 /// </summary>
 public static class LiveInstanceCacheHelper {
 
+    #region Fields
+
+    // Race-Condition-Schutz für parallele GetLiveInstance-Aufrufe: pro
+    // normalisiertem Dateinamen ein eigenes Lock-Objekt, damit die Datei
+    // nur von einem Thread geladen wird. Der zweite Aufrufer findet die
+    // fertig konstruierte Instanz in LiveInstances vor.
+    private static readonly Dictionary<string, object> _loadLocks = new();
+
+    private static readonly object _loadLocksLocker = new object();
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -53,7 +65,8 @@ public static class LiveInstanceCacheHelper {
     /// Gibt <c>null</c> zurück, wenn <paramref name="filename" /> leer ist oder die
     /// Datei nicht existiert.
     /// Race-Safe: konstruieren zwei Threads gleichzeitig eine Instanz für dieselbe
-    /// Datei, gewinnt der zuerst eingetragene. Die unterlegene Instanz wird verworfen.
+    /// Datei, serialisiert ein Per-Dateiname-Lock die Konstruktion. Die Datei
+    /// wird nur einmal geladen, beide Aufrufer erhalten dieselbe Instanz.
     /// </summary>
     /// <typeparam name="T">Typ der Live-Instanz. Muss <see cref="ILiveInstanceCache{T}" /> implementieren.</typeparam>
     /// <param name="filename">Dateipfad der zu holenden Instanz. Wird normalisiert.</param>
@@ -64,7 +77,9 @@ public static class LiveInstanceCacheHelper {
 
         if (!FileExists(normalizedFileName)) { return null; }
 
-        // Bestehende lebende Instanz zurückgeben
+        // Fast Path: bestehende lebende Instanz ohne Lock zurückgeben.
+        // Der teure Konstruktions-/Lade-Pfad wird nur betreten, wenn wirklich
+        // keine verwendbare Instanz existiert.
         if (T.LiveInstances.TryGetValue(normalizedFileName, out var existing)) {
             if (existing.IsDisposed) {
                 T.LiveInstances.TryRemove(normalizedFileName, out _);
@@ -73,16 +88,42 @@ public static class LiveInstanceCacheHelper {
             }
         }
 
-        // Neue Instanz erzeugen. Die Factory (bzw. der Konstruktor) registriert in LiveInstances.
-        var created = T.CreateInstance(normalizedFileName);
-
-        // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
-        // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
-        var winner = T.LiveInstances.GetOrAdd(normalizedFileName, created);
-        if (!ReferenceEquals(winner, created)) {
-            created.Dispose();
+        // Per-Dateiname-Lock ermitteln. Serialisiert parallele
+        // Konstruktionsversuche für dieselbe Datei, damit die Factory
+        // (und damit das Laden der Datei) nur einmal aufgerufen wird.
+        object perNameLock;
+        lock (_loadLocksLocker) {
+            if (!_loadLocks.TryGetValue(normalizedFileName, out var lk)) {
+                lk = new object();
+                _loadLocks[normalizedFileName] = lk;
+            }
+            perNameLock = lk;
         }
-        return winner;
+
+        lock (perNameLock) {
+            // Double-Check: ein anderer Thread könnte die Instanz inzwischen
+            // konstruiert und eingetragen haben.
+            if (T.LiveInstances.TryGetValue(normalizedFileName, out var raceWinner)) {
+                if (raceWinner.IsDisposed) {
+                    T.LiveInstances.TryRemove(normalizedFileName, out _);
+                } else {
+                    return raceWinner;
+                }
+            }
+
+            // Neue Instanz erzeugen. Die Factory (bzw. der Konstruktor)
+            // registriert sich selbst in LiveInstances.
+            var created = T.CreateInstance(normalizedFileName);
+
+            // Sicherheitshalber GetOrAdd: falls trotz Lock ein anderer Thread
+            // eingetragen hat, gewinnt der bereits eingetragene. Die eigene
+            // Instanz wird verworfen.
+            var winner = T.LiveInstances.GetOrAdd(normalizedFileName, created);
+            if (!ReferenceEquals(winner, created)) {
+                created.Dispose();
+            }
+            return winner;
+        }
     }
 
     #endregion

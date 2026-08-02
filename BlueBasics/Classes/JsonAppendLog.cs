@@ -54,8 +54,8 @@ public sealed class JsonAppendLog : IDisposableExtended {
     /// nicht existierender Datei). Andere Log-Dateien im selben Verzeichnis
     /// mit gleichem Basismuster werden ebenfalls gelesen (Multi-User-Support).
     /// </summary>
-    public static List<(string Path, JsonElement Value)> ReadAllChanges(string filename) {
-        var result = new List<(string Path, JsonElement Value)>();
+    public static List<(string Path, JsonNode? Value)> ReadAllChanges(string filename) {
+        var result = new List<(string Path, JsonNode? Value)>();
 
         if (!FileExists(filename)) { return result; }
 
@@ -67,12 +67,11 @@ public sealed class JsonAppendLog : IDisposableExtended {
                 if (line.StartsWith('-')) { continue; }
 
                 try {
-                    using var doc = JsonDocument.Parse(line);
-                    var root = doc.RootElement;
-                    var p = root.GetString("path");
+                    var root = JsonNode.Parse(line);
+                    var p = root?["path"]?.GetValue<string>();
                     if (string.IsNullOrEmpty(p)) { continue; }
-                    if (root.TryGetProperty("value", out var v)) {
-                        result.Add((p, v.Clone()));
+                    if (root?["value"] is { } v) {
+                        result.Add((p, v.DeepClone()));
                     }
                 } catch {
                     Develop.DebugPrint("JsonAppendLog: ungültige Zeile übersprungen");

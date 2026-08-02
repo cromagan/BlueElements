@@ -239,7 +239,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable, 
 
     public void ParseFinished(string parsed) { }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         ReadOnly = json.GetBool("readonly", ReadOnly);

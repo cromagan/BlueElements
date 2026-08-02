@@ -322,14 +322,12 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnRegisterKarte_Click(object sender, System.EventArgs e) {
         if (Formula is not { IsDisposed: false } cf) { return; }
-        if (cf.Pages is not { IsDisposed: false }) { return; }
 
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        if (cf.AddPage(n) is { } p) {
-            Pad.Items = p;
-        }
+        var p = cf.AddPage(n);
+        Pad.Items = p;
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => FormManager.SaveAllFiles();
@@ -399,10 +397,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             lstPages.ItemClear();
 
-            if (Formula?.Pages is not { IsDisposed: false } pg) { return; }
+            if (Formula is not { IsDisposed: false }) { return; }
 
-            foreach (var thisp in pg) {
-                if (thisp is not ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) { continue; }
+            foreach (var icpi in Formula.Pages) {
+                if (icpi is not { IsDisposed: false, HasItems: true }) { continue; }
 
                 var item = new PagePreviewListItem(icpi);
                 lstPages.ItemAdd(item);
@@ -466,18 +464,18 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     /// leer oder nicht vorhanden, wird die Head-Seite gewählt.
     /// </summary>
     private void ShowPage(string? preferredCaption) {
-        if (Formula?.Pages is { IsDisposed: false } pg) {
+        if (Formula is { IsDisposed: false }) {
             if (!string.IsNullOrEmpty(preferredCaption)) {
-                foreach (var thisp in pg) {
-                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.Caption == preferredCaption) {
+                foreach (var icpi in Formula.Pages) {
+                    if (icpi is { IsDisposed: false } && icpi.Caption == preferredCaption) {
                         Pad.Items = icpi;
                         return;
                     }
                 }
             }
 
-            foreach (var thisp in pg) {
-                if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
+            foreach (var icpi in Formula.Pages) {
+                if (icpi is { IsDisposed: false } && icpi.IsHead()) {
                     Pad.Items = icpi;
                     return;
                 }
@@ -566,32 +564,28 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
     private void lstPages_AddClicked(object sender, AddItemEventArgs e) {
-        // Auto-Erstellung eines TextItems unterbinden - die Page wird hier angelegt.
+        // Auto-Erstellung eines TextItem unterbinden - die Page wird hier angelegt.
         e.Cancel = true;
 
         if (!string.IsNullOrEmpty(NotEditableReason)) { return; }
         if (Formula is not { IsDisposed: false } cf) { return; }
-        if (cf.Pages is not { IsDisposed: false }) { return; }
 
         if (string.IsNullOrWhiteSpace(e.Text)) { return; }
 
-        if (cf.AddPage(e.Text) is { } p) {
-            Pad.Items = p; // triggert Pad_GotNewItemCollection -> DoPages
-        }
+        var p = cf.AddPage(e.Text);
+        Pad.Items = p; // triggert Pad_GotNewItemCollection -> DoPages
     }
 
     private void lstPages_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Formula?.Pages is not { IsDisposed: false } pg) {
+        if (Formula is not { IsDisposed: false }) {
             Pad.Items = null;
             return;
         }
 
-        foreach (var thisp in pg) {
-            if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
-                if (e.Item.KeyName == icp.KeyName) {
-                    Pad.Items = icp;
-                    break;
-                }
+        foreach (var icp in Formula.Pages) {
+            if (icp is { IsDisposed: false } && e.Item.KeyName == icp.KeyName) {
+                Pad.Items = icp;
+                break;
             }
         }
     }

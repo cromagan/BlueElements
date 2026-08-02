@@ -57,11 +57,9 @@ public static class EditorVariablesManager {
         }
     }
 
-    public static void SaveSet(string storageKey, string setName, JsonNode? variableData) {
+    public static void SaveSet(string storageKey, string setName, JsonObject? variableData) {
         lock (_lock) {
             InitializeIfNeeded();
-
-            var element = variableData is { } ? JsonSerializer.SerializeToElement(variableData) : default;
 
             if (!_sets.TryGetValue(storageKey, out var list)) {
                 list = [];
@@ -69,10 +67,10 @@ public static class EditorVariablesManager {
             }
 
             if (list.FirstOrDefault(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
-                existing.JsonData = element;
+                existing.JsonData = variableData;
                 existing.Modified = DateTime.Now;
             } else {
-                list.Add(new JsonEntry(setName, element));
+                list.Add(new JsonEntry(setName, variableData));
             }
 
             Save();
@@ -122,7 +120,7 @@ public static class EditorVariablesManager {
                 foreach (var set in kvp.Value) {
                     var setObj = new JsonObject()
                         .Set("name", set.KeyName)
-                        .Set("data", set.JsonData.ToJsonNode())
+                        .Set("data", set.JsonData?.DeepClone())
                         .Set("modified", set.Modified.ToString("o"));
                     arr.Add(setObj);
                 }

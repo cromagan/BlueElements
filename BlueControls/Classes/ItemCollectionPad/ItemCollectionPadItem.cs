@@ -769,7 +769,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             .Set("gridshow", GridShow)
             .Set("gridsnap", GridSnap)
             .Set("editmode", (int)EditMode)
-            .SetPadding("printarea", RandinMm)
+            .Set("printarea", RandinMm)
             .Set("width", Breite)
             .Set("height", Höhe);
 

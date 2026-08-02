@@ -14,6 +14,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     private string _lastQuickInfo = string.Empty;
     private string _rowKey;
+    private Table? _table;
+    private string _tableName = string.Empty;
+    private bool _tableLoaded;
     private string _tmpQuickInfo = string.Empty;
 
     #endregion
@@ -74,15 +77,35 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public Table? Table {
-        get;
+        get {
+            if (_tableLoaded) { return _table; }
+
+            _table?.Disposed -= _table_Disposed;
+
+            if (string.IsNullOrEmpty(_tableName)) {
+                _table = null;
+            } else {
+                _table = Table.Get(_tableName, TableView.Table_NeedPassword);
+            }
+
+            _table?.Disposed += _table_Disposed;
+            _tableLoaded = true;
+
+            return _table;
+        }
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == field) { return; }
+            if (value == _table && _tableLoaded) { return; }
 
-            field?.Disposed -= _table_Disposed;
-            field = value;
+            _table?.Disposed -= _table_Disposed;
+            _table = value;
 
-            field?.Disposed += _table_Disposed;
+            _tableName = value?.KeyName ?? string.Empty;
+            _tableLoaded = true;
+
+            _table?.Disposed += _table_Disposed;
+            RemovePic();
+            OnPropertyChanged();
         }
     }
 
@@ -111,10 +134,31 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("LayoutFileName", Layout_Dateiname);
-        result.ParseableAdd("Table", Table);
+        result.ParseableAdd("Table", _tableName);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
         return result;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("layoutfilename", Layout_Dateiname);
+        if (!string.IsNullOrEmpty(_tableName)) { json.Set("table", _tableName); }
+        if (!string.IsNullOrEmpty(_rowKey)) { json.Set("rowkey", _rowKey); }
+        // FirstValue bewusst nicht serialisieren: abgeleiteter Zustand, keine Konfiguration.
+        // ParseThis zeigt beim Laden zudem eine MessageBox, was beim Beta-Laden stört.
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Layout_Dateiname = json.GetString("layoutfilename", Layout_Dateiname);
+        var name = json.GetString("table", string.Empty);
+        if (name is { Length: > 0 }) {
+            _tableName = name;
+            _tableLoaded = false;
+        }
+        _rowKey = json.GetString("rowkey", _rowKey);
+        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {
@@ -126,7 +170,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
             case "database":
             case "table":
-                Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword);
+                _tableName = value.FromNonCritical();
+                _tableLoaded = false;
                 return true;
 
             case "rowid": // TODO: alt
@@ -177,8 +222,13 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     }
 
     private void _table_Disposed(object? sender, System.EventArgs e) {
-        Table = null;
+        if (_table != null) {
+            _table.Disposed -= _table_Disposed;
+            _table = null;
+        }
+        _tableLoaded = true;
         RemovePic();
+        OnPropertyChanged();
     }
 
     #endregion

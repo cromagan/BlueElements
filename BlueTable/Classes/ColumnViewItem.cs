@@ -224,7 +224,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         // Keine Nachbearbeitung mehr nötig — Permanent hat einen gültigen Default.
     }
 
-    public void ParseFinishedJson(JsonElement parsed) { }
+    public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
         Permanent = json.GetBool("permanent", Permanent);
