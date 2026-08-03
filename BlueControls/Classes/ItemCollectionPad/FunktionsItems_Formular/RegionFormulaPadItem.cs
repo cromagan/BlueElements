@@ -32,6 +32,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public bool Ausklappbar {
         get;
         set {
+            if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -58,6 +59,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public GroupBoxStyle RahmenStil {
         get;
         set {
+            if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -134,7 +136,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override void ParseJson(JsonObject json) {
         var parent = json.GetString("parent");
         if (parent is { Length: > 0 }) {
-            ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(parent);
+            ParentFormula = ConnectedFormula.Get(parent);
             ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
         }
         Child = json.GetString("child", Child);
@@ -146,7 +148,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(value.FromNonCritical());
+                ParentFormula = ConnectedFormula.Get(value.FromNonCritical());
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 
@@ -177,10 +179,10 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Groupbox);
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
         if (disposing) {
             ParentFormula?.PropertyChanged -= ParentFormula_PropertyChanged;
         }
+        base.Dispose(disposing);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {

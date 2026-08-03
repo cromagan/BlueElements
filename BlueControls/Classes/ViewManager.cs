@@ -66,26 +66,6 @@ public static class ViewManager {
         }
     }
 
-    public static void SaveView(string tableKey, string viewName, JsonObject? viewData) {
-        lock (_lock) {
-            InitializeIfNeeded();
-
-            if (!_views.TryGetValue(tableKey, out var list)) {
-                list = [];
-                _views[tableKey] = list;
-            }
-
-            if (list.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
-                existing.JsonData = viewData;
-                existing.Modified = DateTime.Now;
-            } else {
-                list.Add(new JsonEntry(viewName, viewData));
-            }
-
-            Save();
-        }
-    }
-
     /// <summary>
     /// Ordnet die gespeicherten Ansichten neu anhand der übergebenen Reihenfolge.
     /// Ansichten, die nicht in <paramref name="orderedNames"/> enthalten sind,
@@ -112,6 +92,26 @@ public static class ViewManager {
             }
 
             _views[tableKey] = reordered;
+            Save();
+        }
+    }
+
+    public static void SaveView(string tableKey, string viewName, JsonObject? viewData) {
+        lock (_lock) {
+            InitializeIfNeeded();
+
+            if (!_views.TryGetValue(tableKey, out var list)) {
+                list = [];
+                _views[tableKey] = list;
+            }
+
+            if (list.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
+                existing.JsonData = viewData;
+                existing.Modified = DateTime.Now;
+            } else {
+                list.Add(new JsonEntry(viewName, viewData));
+            }
+
             Save();
         }
     }

@@ -86,6 +86,7 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 - **LangVersion ist `preview`** — aktuelle C#-Features sind aktiviert.
 - **Nullable Reference Types** sind aktiviert (`Nullable=enable`). Warnungen niemals mit `!` unterdrücken.
 - **Lambda Ausdrücke** - Lambda Ausdrücke wenn möglich vermeiden. Sind sie von Vorteil informiere den User vorab, ob er das so will
+- **Events** - nicht als Action oder Funct
 
 ## Wichtige Hilfsklassen (BlueBasics)
 
@@ -115,13 +116,15 @@ Diese Klassen sind die bevorzugten Einstiegspunkte für gängige Aufgaben. Niema
 | **JsonExtensions.cs** | `JsonObject`, `JsonElement` | `GetBool()`, `GetInt()`, `GetString()`, `IsArray()`, `IsObject()` |
 | **ByteArrayExtension.cs** | `byte[]` | `IsZipped()`, `UnzipIt()`, `ZipIt()` |
 
-## Verhalten bei Verbesserungsvorschlägen
+### Caching & Instanz-Verwaltung (BlueBasics)
 
-Wenn du während einer Sitzung eine Rückmeldung zum Stil, zu Konventionen oder zu Patterns erhältst (z.B. Code-Formatierung, Namenskonventionen, Architektur-Patterns), dann **nicht sofort übernehmen**. Stattdessen als ERSTES eine Frage mit Auswahlmöglichkeiten stellen, z.B.:
+| Klasse | Kurzbeschreibung |
+|--------|------------------|
+| **`AssemblyAwareCache<T>`** | Thread-sicherer Cache, der über alle geladenen Assemblies hinweg konkrete `T`-kompatible Typen mit parameterlosem Konstruktor sammelt, Instanzen lazy erzeugt (Key = `IHasKeyName.KeyName` oder voller Typname) und sich bei neu geladenen Assemblies automatisch erneuert. |
+| **`ConcurrentCache<TKey, TValue>`** | Thread-sicherer Cache auf `ConcurrentDictionary`-Basis mit konfigurierbarem Eintragsmaximum; `IDisposable`-Werte werden beim Entfernen/`Trim` automatisch disposed, jede Instanz registriert sich bei `Generic.RegisterCacheTrim` (Reaktion auf Memory-Pressure). |
+| **`LiveInstanceCache<T>`** | Abstrakte CRTP-Basis für Typen mit eigenem Live-Register (z. B. `Chunk`, `ConnectedFormula`, `Table`); liefert statische `LiveInstances`/`AllInstances()`, ein `Added`-Event, das Sync-Root `AllFilesLocker` und eine race-safe `GetOrCreate`-Factory. |
+| **`ParseableItem`** | Abstrakte Basis für serialisierbare Objekte (`IParseable`/`ICloneable`/`INotifyPropertyChanged`/`IDisposableExtended`) mit `ParseableItems()`/`ParseThis()`/`Parse()` sowie statischen Factories `NewByParsing`/`NewByParsingJson`/`NewByTypeName` anhand der statischen `ClassId`-Property. |
 
-- *„Diesen Stil für die aktuelle Datei übernehmen und nicht merken"*
-- *„Diesen Stil projektweit in die AGENTS.md aufnehmen und für diese Datei(en) anwenden"*
-- *„Nicht übernehmen"*
 
 ## GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!

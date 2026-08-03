@@ -1,13 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.EventArgs;
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.IO;
@@ -15,7 +12,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
-public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged, ILiveInstanceCache<ConnectedFormula> {
+public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedFormula>, IEditable, IReadableTextWithKey, IParseable, IJsonParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -34,7 +31,6 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     #region Constructors
 
     internal ConnectedFormula(string filename) : base(filename) {
-        LiveInstances[Filename] = this;
         Invalidate();
     }
 
@@ -57,12 +53,6 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen.
-    /// </summary>
-    public static ConcurrentDictionary<string, ConnectedFormula> LiveInstances { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public static string Type => "ConnectedFormula";
 
@@ -123,10 +113,33 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     #region Methods
 
     /// <summary>
-    /// Factory für <see cref="LiveInstanceCacheHelper.GetLiveInstance{T}" />.
-    /// Der Konstruktor trägt die neue Instanz selbst in <see cref="LiveInstances" /> ein.
+    /// Liefert einen stabilen Snapshot aller lebenden
+    /// ConnectedFormula-Instanzen. Überschreibt (per Method-Hiding) die geerbte
+    /// <see cref="LiveInstanceCache{T}.AllInstances"/> (T = BlockableFile), die
+    /// alle BlockableFile-Instanzen zurückgibt — hier wird auf den konkreten
+    /// Typ ConnectedFormula gefiltert und bereits disposed Instanzen
+    /// herausgefiltert (das geerbte Register wird nur asynchron bereinigt).
     /// </summary>
-    static ConnectedFormula ILiveInstanceCache<ConnectedFormula>.CreateInstance(string normalizedFileName) => new(normalizedFileName);
+    public new static List<ConnectedFormula> AllInstances() {
+        List<ConnectedFormula> result = [];
+        foreach (var bf in LiveInstances.Values) {
+            if (bf is ConnectedFormula { IsDisposed: false } cf) { result.Add(cf); }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
+    /// Erzeugt eine neue ConnectedFormula-Instanz für den angegebenen Dateipfad.
+    /// </summary>
+    public static ConnectedFormula Create(string key) => new(key);
+
+    /// <summary>
+    /// Holt eine bestehende oder erzeugt eine neue ConnectedFormula-Instanz für
+    /// den angegebenen Dateipfad. Race-Safe über das geerbte
+    /// <see cref="LiveInstanceCache{T}.GetOrCreate"/> (T = BlockableFile).
+    /// </summary>
+    public static ConnectedFormula? Get(string filename) => GetOrCreate<ConnectedFormula>(filename);
 
     public static void Invalidate_VisibleFor_AllUsed() {
         lock (_lock) {
@@ -144,8 +157,11 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
 
             List<string> tempResult = []; // Lokale Liste, um den Cache erst am Ende zu füllen
 
-            foreach (var thisCf in LiveInstances.Values) {
-                if (thisCf is not { IsDisposed: false }) { continue; }
+            foreach (var bf in LiveInstances.Values) {
+                // LiveInstances ist BlockableFile-typisch (geerbt über
+                // BlockableFile : LiveInstanceCache<BlockableFile>). Nur
+                // ConnectedFormula-Instanzen besitzen Pages.
+                if (bf is not ConnectedFormula { IsDisposed: false } thisCf) { continue; }
                 foreach (var icp in thisCf._pages) {
                     if (icp is { IsDisposed: false }) {
                         tempResult.AddRange(icp.VisibleFor_AllUsed());
@@ -159,25 +175,6 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     }
 
     // Das Schloss für die Threadsicherheit
-
-    private void RegisterPage(ItemCollectionPadItem page) {
-        page.Parent = this;
-        page.PropertyChangedExt += Pages_PropertyChangedExt;
-        page.PropertyChanged += Pages_PropertyChanged;
-    }
-
-    private void UnregisterPage(ItemCollectionPadItem page) {
-        page.PropertyChangedExt -= Pages_PropertyChangedExt;
-        page.PropertyChanged -= Pages_PropertyChanged;
-    }
-
-    private void ClearPages() {
-        foreach (var page in _pages) {
-            UnregisterPage(page);
-            page.Dispose();
-        }
-        _pages.Clear();
-    }
 
     public ItemCollectionPadItem AddPage(string headname) {
         // Ein Gitterkästchen in mm - konsistent zu ParseFinished.
@@ -216,10 +213,8 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
     public override void Dispose() {
         if (IsDisposed) { return; }
 
-        // Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
-        // (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
-        LiveInstances.TryRemove(new KeyValuePair<string, ConnectedFormula>(Filename, this));
-
+        // Austragen aus dem Live-Register übernimmt BlockableFile.Dispose
+        // (mit Race-Safety: nur wenn noch diese Instanz hinterlegt ist).
         Editing = null;
         PropertyChanged = null;
         PropertyChangedExt = null;
@@ -332,6 +327,7 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         IsParsed = true;
 
         try {
+
             #region Default-Head sicherstellen
 
             if (_pages.Count == 0) {
@@ -509,6 +505,14 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
     }
 
+    private void ClearPages() {
+        foreach (var page in _pages) {
+            UnregisterPage(page);
+            page.Dispose();
+        }
+        _pages.Clear();
+    }
+
     /// <summary>
     /// Ruft das Editing-Ereignis auf.
     /// </summary>
@@ -549,12 +553,10 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
         OnPropertyChangedExt(e.RelativePath, e.Partial);
     }
 
-    private void RepairRecivers() {
-        foreach (var page in _pages) {
-            if (page is { IsDisposed: false }) {
-                RepairReciver(page);
-            }
-        }
+    private void RegisterPage(ItemCollectionPadItem page) {
+        page.Parent = this;
+        page.PropertyChangedExt += Pages_PropertyChangedExt;
+        page.PropertyChanged += Pages_PropertyChanged;
     }
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
@@ -567,6 +569,19 @@ public sealed class ConnectedFormula : BlockableFile, IDisposableExtended, IEdit
                 itcf.ParentFormula = this;
             }
         }
+    }
+
+    private void RepairRecivers() {
+        foreach (var page in _pages) {
+            if (page is { IsDisposed: false }) {
+                RepairReciver(page);
+            }
+        }
+    }
+
+    private void UnregisterPage(ItemCollectionPadItem page) {
+        page.PropertyChangedExt -= Pages_PropertyChangedExt;
+        page.PropertyChanged -= Pages_PropertyChanged;
     }
 
     #endregion

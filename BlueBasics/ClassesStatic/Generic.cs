@@ -413,6 +413,17 @@ public static class Generic {
         }
     }
 
+    /// <summary>
+    /// Meldet ein zuvor über <see cref="RegisterCacheTrim" /> registriertes
+    /// Trim-Delegate wieder ab. Verhindert, dass weggeworfene Cache-Instanzen
+    /// über die Trim-Liste unbegrenzt am Leben gehalten werden.
+    /// </summary>
+    internal static void UnregisterCacheTrim(Action trimAction) {
+        lock (_trimActions) {
+            _ = _trimActions.Remove(trimAction);
+        }
+    }
+
     private static Dictionary<string, Type> BuildClassIdMap<T>() where T : class {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
         var targetType = typeof(T);

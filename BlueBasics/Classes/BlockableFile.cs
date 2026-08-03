@@ -12,7 +12,11 @@ namespace BlueBasics.Classes;
 /// <summary>
 /// Abstrakte Basisklasse für gecachte Dateien, die zusätzlich per
 /// <see cref="BlockFile"/> gegen parallele Bearbeitung durch andere Benutzer
-/// gesperrt werden können.
+/// gesperrt werden können. Erbt das Live-Instanz-Register von
+/// <see cref="LiveInstanceCache{T}"/> (als <see cref="LiveInstanceCache{T}"/>
+/// mit T = <see cref="BlockableFile"/>), sodass konkrete Ableitungen wie
+/// <c>ConnectedFormula</c> das Register indirekt über diese Basisklasse
+/// mitbekommen.
 /// </summary>
 /// <remarks>
 /// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading,
@@ -23,12 +27,11 @@ namespace BlueBasics.Classes;
 /// Dateien mit aktivem Schreibzugriff werden beim Polling übersprungen.
 /// <para>
 /// Das zentrale Lifecycle-Management (<see cref="SaveAll(bool, IEnumerable{BlockableFile})"/>
-/// und <see cref="DisposeAll(IEnumerable{BlockableFile})"/>) erhält die zu behandelnden
-/// Instanzen vom Aufrufer — die Ableitungen (z.B. ConnectedFormula) pflegen
-/// dafür eigene Live-Register.
+/// und <see cref="DisposeAll(IEnumerable{BlockableFile})"/>) greift direkt auf
+/// das geerbte <see cref="LiveInstanceCache{T}.LiveInstances"/>-Register zu.
 /// </para>
 /// </remarks>
-public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadableText {
+public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
 
@@ -37,12 +40,6 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
     private const int PollingIntervalMinutes = 5;
-
-    /// <summary>
-    /// Alle registrierten BlockableFile-Instanzen, geordnet nach normalisiertem Dateinamen.
-    /// Wird vom Polling-Timer durchlaufen.
-    /// </summary>
-    private static readonly ConcurrentDictionary<string, BlockableFile> _registeredFiles = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly object _timerLock = new();
 
@@ -102,6 +99,14 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     private volatile bool _hasWriteAccess;
 
     /// <summary>
+    /// Reentrancy-Guard für <see cref="RevokeWriteAccess"/>. Bei parallelen
+    /// Aufrufen (z. B. Form.Dispose parallel zu RevokeWriteAccessAll beim
+    /// Shutdown) wird nur der erste Aufruf aktiv; alle weiteren returnen
+    /// sofort. Verhindert ein doppeltes Save über OnReleasingWriteAccess.
+    /// </summary>
+    private int _revokingWriteAccess;
+
+    /// <summary>
     /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
     /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
     /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
@@ -123,17 +128,17 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
 
     /// <summary>
     /// Erstellt eine neue BlockableFile-Instanz für den angegebenen Dateipfad,
-    /// registriert sie im Polling-Register und startet bei Bedarf den statischen
-    /// Polling-Timer. Ableitungen pflegen ihre Live-Instanzen in eigenen Registern,
-    /// die dem Aufrufer von <see cref="SaveAll(bool, IEnumerable{BlockableFile})"/> bzw.
-    /// <see cref="DisposeAll(IEnumerable{BlockableFile})"/> übergeben werden.
+    /// registriert sie im geerbten <see cref="LiveInstanceCache{T}.LiveInstances"/>-Register
+    /// und startet bei Bedarf den statischen Polling-Timer. Das
+    /// <see cref="LiveInstanceCache{T}.Added"/>-Event wird nicht mehr aus dem
+    /// Konstruktor gefeuert — das übernimmt <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
     /// </summary>
     /// <param name="filename">Vollständiger Dateipfad.</param>
     protected BlockableFile(string filename) {
         Filename = string.IsNullOrEmpty(filename) ? string.Empty : filename.NormalizeFile();
 
         if (!string.IsNullOrEmpty(Filename)) {
-            _registeredFiles[Filename] = this;
+            LiveInstances[Filename] = this;
             EnsurePollingTimerStarted();
         }
     }
@@ -338,7 +343,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Disposed die angegebenen BlockableFile-Instanzen.
     /// </summary>
     /// <param name="files">Die zu verwerfenden BlockableFile-Instanzen (z. B. aus
-    /// <c>ConnectedFormula.LiveInstances</c>).</param>
+    /// <c>ConnectedFormula.AllInstances()</c>).</param>
     public static void DisposeAll(IEnumerable<BlockableFile> files) {
         foreach (var file in files) {
             try { file.Dispose(); } catch { }
@@ -371,7 +376,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Falls TRUE: Asynchrones Speichern anstoßen und WARTEN, bis alle fertig sind.
     /// </param>
     /// <param name="files">Die zu speichernden BlockableFile-Instanzen (z. B. aus
-    /// <c>ConnectedFormula.LiveInstances</c>).</param>
+    /// <c>ConnectedFormula.AllInstances()</c>).</param>
     public static void SaveAll(bool mustWait, IEnumerable<BlockableFile> files) {
         var tasks = new List<Task>();
         foreach (var file in files) {
@@ -419,7 +424,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
             _pollingTimer?.Dispose();
             _pollingTimer = null;
         }
-        _registeredFiles.Clear();
+        LiveInstances.Clear();
     }
 
     /// <summary>
@@ -459,7 +464,7 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
         // Cleanup, das passieren muss, während IsDisposed noch false ist
         // (RevokeWriteAccess kann über OnReleasingWriteAccess Save auslösen).
         if (!IsDisposed) {
-            _registeredFiles.TryRemove(Filename, out _);
+            LiveInstances.TryRemove(new KeyValuePair<string, BlockableFile>(Filename, this));
             if (_hasWriteAccess) { RevokeWriteAccess(); }
         }
 
@@ -620,15 +625,28 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// über <see cref="OnReleasingWriteAccess"/>, BEVOR die Blockdatei
     /// entfernt wird — sonst könnte ein anderer Benutzer zwischen Löschen
     /// der Sperre und Speichern die Datei laden und veraltete Daten vorfinden.
+    /// Reentrancy-safe über <see cref="_revokingWriteAccess"/>: Bei parallelen
+    /// Aufrufen (z. B. Dispose + expliziter Aufruf aus dem Form) läuft das
+    /// Save nur einmal, um duplizierte Schreibvorgänge zu vermeiden.
     /// </summary>
     public void RevokeWriteAccess() {
-        if (!_hasWriteAccess) { return; }
+        // Reentrancy-Guard: atomar sicherstellen, dass nur ein Thread das
+        // Revoke (inkl. Save) ausführt. Ein paralleler Aufrufer returnet
+        // sofort — der Gewinner gibt _hasWriteAccess=false und die Blockdatei
+        // frei, der andere hat anschließend nichts mehr zu tun.
+        if (Interlocked.CompareExchange(ref _revokingWriteAccess, 1, 0) != 0) { return; }
+        try {
+            // Double-Check innerhalb des Guards: ein vorheriger Gewinner
+            // könnte das Revoke bereits abgeschlossen haben.
+            if (!_hasWriteAccess) { return; }
 
-        OnReleasingWriteAccess();
-
-        _hasWriteAccess = false;
-        BlockFile.RevokeFor(Filename, MyId);
-        _writeAccessHolders.TryRemove(Filename, out _);
+            OnReleasingWriteAccess();
+            _hasWriteAccess = false;
+            BlockFile.RevokeFor(Filename, MyId);
+            _writeAccessHolders.TryRemove(Filename, out _);
+        } finally {
+            _revokingWriteAccess = 0;
+        }
     }
 
     /// <summary>
@@ -838,18 +856,29 @@ public abstract class BlockableFile : IDisposableExtended, IHasKeyName, IReadabl
     /// Invalidieren übersprungen, der Sperrstatus wird dennoch geprüft.
     /// </summary>
     private static void OnPollingTick(object? state) {
-        foreach (var kvp in _registeredFiles) {
+        foreach (var kvp in LiveInstances) {
             var file = kvp.Value;
 
             if (file.IsDisposed) {
-                _registeredFiles.TryRemove(kvp.Key, out _);
+                // Bedingtes Remove: nur diese disposed Instanz entfernen. Ein
+                // paralleles GetOrCreate könnte bereits eine frische Instanz
+                // eingetragen haben — deren Eintrag darf hier nicht gelöscht
+                // werden (sonst Datenverlust, siehe LiveInstanceCache).
+                LiveInstances.TryRemove(kvp);
                 continue;
             }
 
             // Sperrstatus für alle Dateien prüfen - auch für eigene
             // Schreibzugriffe -, damit eine Übernahme durch andere Benutzer
-            // erkannt wird.
-            file.CheckBlockStatus();
+            // erkannt wird. CheckBlockStatus macht File-I/O (Blockdatei)
+            // und invoket u. U. Handler — Exceptions hier dürfen nicht
+            // die gesamte Polling-Iteration abbrechen, sonst bleiben
+            // die restlichen Dateien in diesem Tick ungeprüft.
+            try {
+                file.CheckBlockStatus();
+            } catch {
+                continue;
+            }
 
             // Dateien mit eigenem Schreibzugriff nicht invalidieren:
             // ungespeicherte Änderungen würden sonst verworfen.

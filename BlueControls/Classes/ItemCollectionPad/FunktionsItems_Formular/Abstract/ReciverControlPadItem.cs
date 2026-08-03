@@ -73,6 +73,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         get => new(_getFilterFromKeys);
 
         set {
+            if (IsDisposed) { return; }
+
             // Dann die Collection leeren
             _getFilterFrom = null;
             _getFilterFromKeys.Clear();
@@ -113,6 +115,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public ReadOnlyCollection<string> VisibleFor {
         get;
         set {
+            if (IsDisposed) { return; }
             var tmp = Table.RepairUserGroups(value);
             if (!field.IsDifferentTo(tmp)) { return; }
 
@@ -128,6 +131,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         get;
 
         set {
+            if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -465,23 +469,25 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var c = Skin.IdColor(colorId);
         var c2 = c.Darken(0.4);
 
-        gr.TranslateTransform(p.X + xmod, p.Y - valueArrow);
+        var gs = gr.Save();
+        try {
+            gr.TranslateTransform(p.X + xmod, p.Y - valueArrow);
 
-        //Info: das ergibt zwei übernanderliegenede Ellipsen
-        //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-20,-10,40,20));
-        //gr.RotateTransform(90);
-        //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-10, -20, 20, 40));
+            //Info: das ergibt zwei übernanderliegenede Ellipsen
+            //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-20,-10,40,20));
+            //gr.RotateTransform(90);
+            //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-10, -20, 20, 40));
 
-        gr.RotateTransform(90);
+            gr.RotateTransform(90);
 
-        using var brush = new SolidBrush(c);
-        using var pen = new Pen(c2, 1.CanvasToControl(zoom));
+            using var brush = new SolidBrush(c);
+            using var pen = new Pen(c2, 1.CanvasToControl(zoom));
 
-        gr.FillPath(brush, pa);
-        gr.DrawPath(pen, pa);
-
-        gr.RotateTransform(-90);
-        gr.TranslateTransform(-p.X - xmod, -p.Y + valueArrow);
+            gr.FillPath(brush, pa);
+            gr.DrawPath(pen, pa);
+        } finally {
+            gr.Restore(gs);
+        }
 
         //var x = QuickImage.GenerateCode("Pfeil_Unten", (int)(10 * zoom), (int)(10 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, symbol);
 
@@ -583,11 +589,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) => CalculateColorIds();
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) => CalculateInputColorIds();
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            var cf = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(nameidorfile);
+            var cf = ConnectedFormula.Get(nameidorfile);
             return cf?.GetPage("Head");
         } else {
             if (Parent is ConnectedFormula cf) {

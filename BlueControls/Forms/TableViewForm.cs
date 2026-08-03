@@ -334,7 +334,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             stressTimer.Tick -= StressTestTimer_Tick;
             stressTimer.Dispose();
             _stressTestTimer = null;
-            Develop.AllowDuplicateTableLoad = false;
+            Table.AllowDuplicates = false;
         }
 
         base.OnFormClosing(e);
@@ -425,7 +425,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         #region Status-Meldung updaten?
 
         var maybeok = false;
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (thisTb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
@@ -435,7 +435,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         #endregion
 
-        var tb = Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
+        var tb = Table.Get(tablename);
         if (tb is { IsDisposed: false }) {
             if (btnLetzteDateien.Parent?.Parent?.Visible == true && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
@@ -475,7 +475,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     protected bool SwitchTabToTable(string tablename) {
         FormManager.SaveAllFiles();
         if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-            Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
+            Table.Get(tablename);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -642,7 +642,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         FormManager.SaveAllFiles();
-        Table.BeSureToBeUpToDate(Table.AllFiles);
+        Table.BeSureToBeUpToDate([.. Table.AllInstances()]);
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
@@ -653,7 +653,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (btnStresstest.Checked) {
             // Schalter aktivieren: doppeltes Laden der gleichen Tabelle wird
             // erlaubt, bis der Button wieder ausgeschaltet wird.
-            Develop.AllowDuplicateTableLoad = true;
+            Table.AllowDuplicates = true;
             TableChunk.EditLockSeconds = 30;
 
             _stressTestTimer ??= new System.Windows.Forms.Timer();
@@ -665,7 +665,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             _stressTestTimer.Start();
         } else {
             if (_stressTestTimer is { } t) { t.Stop(); }
-            Develop.AllowDuplicateTableLoad = false;
+            Table.AllowDuplicates = false;
             TableChunk.EditLockSeconds = 300;
         }
     }

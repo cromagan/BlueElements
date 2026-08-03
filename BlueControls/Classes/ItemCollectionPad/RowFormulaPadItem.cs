@@ -85,7 +85,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
             if (string.IsNullOrEmpty(_tableName)) {
                 _table = null;
             } else {
-                _table = Table.Get(_tableName, TableView.Table_NeedPassword);
+                _table = Table.Get(_tableName);
             }
 
             _table?.Disposed += _table_Disposed;

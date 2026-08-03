@@ -126,7 +126,7 @@ public class TableFile : Table {
         get {
             if (string.IsNullOrEmpty(Filename)) { return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc); }
 
-            var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
+            var chunk = Chunk.Get(Filename);
             if (chunk?.FileInfo is { Exists: true } fi) { return fi.LastWriteTimeUtc; }
 
             return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -185,10 +185,10 @@ public class TableFile : Table {
         // Develop-Stresstest: doppeltes Laden explizit erlaubt.
         // Der Schalter bleibt aktiv, bis der Stresstest-Button ihn ausschaltet
         // (wird nicht mehr nach jedem LoadFromFile zurückgesetzt).
-        if (Develop.AllowDuplicateTableLoad) { return true; }
+        if (AllowDuplicates) { return true; }
 
         lock (AllFilesLocker) {
-            foreach (var thisFile in AllFiles) {
+            foreach (var thisFile in LiveInstances.Values) {
                 if (thisFile is TableFile { IsDisposed: false } tbf) {
                     if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                         //tbf.Save(false);
@@ -319,14 +319,14 @@ public class TableFile : Table {
 
         if (InitialSavePending) { return string.Empty; }
 
-        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
+        var chunk = Chunk.Get(Filename);
         if (chunk is null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
         }
         return chunk.IsNowEditable();
     }
 
-    public virtual void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
+    public virtual void LoadFromFile(string fileNameToLoad, string freeze) {
         if (string.IsNullOrEmpty(fileNameToLoad)) { throw DebugError("Dateiname nicht angegeben!"); }
 
         fileNameToLoad = fileNameToLoad.NormalizeFile();
@@ -335,7 +335,7 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(Filename)) { throw DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
         var allowed = IsFileAllowedToLoad(fileNameToLoad);
-        // Develop-Stresstest: AllowDuplicateTableLoad wird NICHT mehr hier
+        // Develop-Stresstest: Table.AllowDuplicates wird NICHT mehr hier
         // zurückgesetzt. Der Öffnen-Vorgang einer Tabelle benötigt mehrere
         // Table.Get-Aufrufe (SwitchTabToTable + ShowTab); würde das Flag nach
         // dem ersten Load konsumiert, bekäme das zweite Form immer noch die
@@ -359,7 +359,6 @@ public class TableFile : Table {
             return;
         }
 
-        PasswordCallback = needPassword;
         Filename = fileNameToLoad;
         //ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
@@ -470,7 +469,7 @@ public class TableFile : Table {
             var result = SaveExtended(Filename, contentToWrite);
 
             if (result.IsSuccessful) {
-                LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename)?.Invalidate();
+                Chunk.Get(Filename)?.Invalidate();
             }
 
             return result;
@@ -532,7 +531,7 @@ public class TableFile : Table {
             return "Datei zu klein für Speicherung.";
         }
 
-        if (LiveInstanceCacheHelper.GetLiveInstance<Chunk>(tbf.Filename) is null) {
+        if (Chunk.Get(tbf.Filename) is null) {
             if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
             }
@@ -617,7 +616,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(Filename);
+        var chunk = Chunk.Get(Filename);
 
         if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");
@@ -681,7 +680,7 @@ public class TableFile : Table {
 
         List<Table> filtered = [];
         lock (AllFilesLocker) {
-            foreach (var thisTb in AllFiles) {
+            foreach (var thisTb in LiveInstances.Values) {
                 if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
 
                 // Tabelle wird aktuell noch geladen — kein Reload anstoßen,
@@ -720,7 +719,7 @@ public class TableFile : Table {
             var masters = 0;
             List<Table> snapshot;
             lock (AllFilesLocker) {
-                snapshot = [.. AllFiles];
+                snapshot = [.. LiveInstances.Values];
             }
 
             foreach (var thisTb in snapshot) {

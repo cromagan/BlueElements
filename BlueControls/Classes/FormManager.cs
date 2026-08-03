@@ -54,9 +54,9 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     /// an einem Ort zu bündeln.
     /// </summary>
     public static void SaveAllFiles() {
-        BlockableFile.SaveAll(false, ConnectedFormula.LiveInstances.Values);
+        BlockableFile.SaveAll(false, ConnectedFormula.AllInstances());
         Table.SaveAll();
-        BlockableFile.SaveAll(true, ConnectedFormula.LiveInstances.Values);
+        BlockableFile.SaveAll(true, ConnectedFormula.AllInstances());
     }
 
     public static void SaveEnd(Form? lastForm) {
@@ -71,7 +71,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         BlockableFile.RevokeWriteAccessAll();
         Develop.EndLog("SaveEnd: Nach BlockableFile.RevokeWriteAccessAll()");
 
-        List<Table> allTables = [.. Table.AllFiles];
+        List<Table> allTables = [.. Table.AllInstances()];
         Develop.EndLog($"SaveEnd: Freeze-Schleife über {allTables.Count} Tabelle(n)");
 
         var idx = 0;
@@ -93,7 +93,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         }
 
         Develop.EndLog("SaveEnd: Vor ConnectedFormula.DisposeAll()");
-        BlockableFile.DisposeAll(ConnectedFormula.LiveInstances.Values);
+        BlockableFile.DisposeAll(ConnectedFormula.AllInstances());
         Develop.EndLog("SaveEnd: Vor Chunk.DisposeAll()");
         Chunk.DisposeAll();
         Develop.EndLog("SaveEnd: Nach Chunk.DisposeAll()");

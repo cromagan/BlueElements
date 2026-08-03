@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -9,7 +8,7 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInstanceCache<Chunk> {
+public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
 
@@ -30,11 +29,16 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
 
     /// <summary>
     /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung
-    /// über <see cref="Get(string)"/>. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// über <see cref="Get"/>. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// Das Added-Event wird nicht mehr aus dem Konstruktor gefeuert — das übernimmt
+    /// <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
     /// </summary>
     public Chunk(string fullPath) {
         Filename = string.IsNullOrEmpty(fullPath) ? string.Empty : fullPath.NormalizeFile();
-        LiveInstances[Filename] = this;
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            LiveInstances[Filename] = this;
+        }
 
         var suffix = Filename.FileSuffix().ToLowerInvariant();
 
@@ -60,12 +64,6 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen.
-    /// </summary>
-    public static ConcurrentDictionary<string, Chunk> LiveInstances { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public FileInfo? FileInfo {
         get => field ??= GetFileInfo(Filename);
@@ -111,10 +109,10 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
     #region Methods
 
     /// <summary>
-    /// Factory für <see cref="LiveInstanceCacheHelper.GetLiveInstance{T}" />.
-    /// Der Konstruktor trägt die neue Instanz selbst in <see cref="LiveInstances" /> ein.
+    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
+    /// Erzeugt eine neue Chunk-Instanz für den angegebenen Dateipfad.
     /// </summary>
-    static Chunk ILiveInstanceCache<Chunk>.CreateInstance(string normalizedFileName) => new(normalizedFileName);
+    public static Chunk Create(string key) => new(key);
 
     /// <summary>
     /// Disposed alle lebenden Chunk-Instanzen. Wird beim Herunterfahren der Anwendung aufgerufen.
@@ -124,6 +122,12 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
             try { chunk.Dispose(); } catch { }
         }
     }
+
+    /// <summary>
+    /// Holt eine bestehende oder erzeugt eine neue Chunk-Instanz für den
+    /// angegebenen Dateipfad. Race-Safe über <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
+    /// </summary>
+    public static Chunk? Get(string fullPath) => GetOrCreate<Chunk>(fullPath);
 
     /// <summary>
     /// Prüft, ob der Content den erwarteten CheckPoint enthält.
@@ -145,7 +149,7 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
     public static bool IsChunkRecentlyUsed(string filename) {
-        var chunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(filename);
+        var chunk = Get(filename);
         if (chunk is null) { return false; }
         return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < SkipIfUnusedMinutes;
     }
@@ -295,20 +299,13 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
         return $"{folder}{tablename}\\";
     }
 
-    /// <summary>
-    /// Disposed die Instanz und trägt sie aus dem <see cref="LiveInstances"/>-Register aus.
-    /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
-    /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
-    /// </summary>
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        OnDisposed(); 
-        Disposed = null;
-
         LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
+
+        OnDisposed();
+        Disposed = null;
 
         Invalidate();
 
@@ -397,6 +394,13 @@ public class Chunk : IDisposableExtended, IHasKeyName, IReadableText, ILiveInsta
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
 
     public override string ToString() => KeyName;
+
+    /// <summary>
+    /// Disposed die Instanz und trägt sie aus dem <see cref="LiveInstances"/>-Register aus.
+    /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
+    /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
+    /// </summary>
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {

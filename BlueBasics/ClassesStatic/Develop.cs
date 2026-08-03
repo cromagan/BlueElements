@@ -23,7 +23,6 @@ public static class Develop {
     private static ErrorType? _isTraceLogging;
     private static string _lastDebugMessage = string.Empty;
     private static DateTime _lastDebugTime = DateTime.UtcNow;
-    private static TextWriterTraceListener? _traceListener;
 
     /// <summary>
     /// Statische Referenz auf den Shutdown-Timer. Ohne diese Wurzelreferenz würde der
@@ -31,6 +30,8 @@ public static class Develop {
     /// schwach referenziert wird – der 12-Stunden-Shutdown würde dann nicht mehr feuern.
     /// </summary>
     private static Timer? _shutdownTimer;
+
+    private static TextWriterTraceListener? _traceListener;
 
     #endregion
 
@@ -49,16 +50,6 @@ public static class Develop {
     #region Properties
 
     public static bool AllReadOnly { get; set; }
-
-    /// <summary>
-    /// Develop-Stresstest: Wenn TRUE, wird das doppelte Laden der gleichen Tabellen-Datei
-    /// im selben Prozess erlaubt (<see cref="BlueTable.Classes.TableFile.IsFileAllowedToLoad"/>
-    /// und <see cref="BlueTable.Classes.Table.Get(string, BlueBasics.Interfaces.NeedPassword)"/>).
-    /// Bleibt aktiv, bis der Stresstest-Button (btnStresstest) ihn ausschaltet — ein
-    /// automatisches Zurücksetzen nach LoadFromFile gibt es nicht mehr, da der Öffnen-
-    /// Vorgang einer Tabelle mehrere Table.Get-Aufrufe benötigt.
-    /// </summary>
-    public static bool AllowDuplicateTableLoad { get; set; }
 
     public static bool DiagFlag { get; set; }
 

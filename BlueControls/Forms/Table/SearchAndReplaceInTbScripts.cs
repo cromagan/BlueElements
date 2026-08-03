@@ -38,7 +38,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
 
         var count = 0;
 
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
                 foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
@@ -60,7 +60,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
 
         var count = 0;
 
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
                 foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
                     if (!string.IsNullOrEmpty(script.FailedReason)) {
@@ -81,7 +81,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
 
         var txt = new List<string>();
 
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb) {
                 foreach (var thiss in tb.EventScript) {
                     // Prüfen, ob der Suchtext im Skript vorkommt

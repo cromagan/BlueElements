@@ -559,7 +559,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
-    /// auf LiveInstanceCache.GetLiveInstance&lt;Chunk&gt;(Filename) zurückgreift, was für .tblh-Dateien
+    /// auf <c>Chunk.Get(Filename)</c> zurückgreift, was für .tblh-Dateien
     /// nicht funktioniert (Suffix wird nicht von Chunk unterstützt).
     /// </summary>
     public override string IsValueEditable(TableDataType type, string? chunkValue) {

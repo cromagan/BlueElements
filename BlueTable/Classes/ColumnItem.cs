@@ -708,7 +708,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Invalidate_LinkedTable(); // Events sicher abmelden
 
-            var newTable = Get(_linkedTableTableName, null);
+            var newTable = Get(_linkedTableTableName);
 
             if (newTable is not null) {
                 // Event-Registrierung vor dem Lock
@@ -2490,6 +2490,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string? ErrorReason_Relations(Table tb) {
         if (_relationType != RelationType.None) {
             if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
+            if (!l_tb.Unlocked) { return LinkedTableLocked; }
             if (tb == l_tb) { return CircularReference; }
             var c = l_tb.Column[_columnKeyOfLinkedTable];
             if (c is null) { return LinkedKeyColumnMissing; }

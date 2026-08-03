@@ -52,13 +52,13 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 field = null;
                 _tableOutputLoaded = true;
             } else {
-                field = Table.Get(_tableOutputName, TableView.Table_NeedPassword);
+                field = Table.Get(_tableOutputName);
 
                 // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
                 // (z. B. weil noch keine andere Tabelle geladen ist und der
                 // Name kein Dateipfad ist), versuche es mit dem HintPath.
                 if (field is null && !string.IsNullOrEmpty(_tableOutputHintPath)) {
-                    field = Table.Get(_tableOutputHintPath, TableView.Table_NeedPassword);
+                    field = Table.Get(_tableOutputHintPath);
                 }
 
                 // Nur als geladen markieren, wenn die Tabelle gefunden wurde.

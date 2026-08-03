@@ -50,6 +50,7 @@ public static class ColumnErrorConstants {
     public const string LinkedDataOnlyWithLinkedCells = "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten.";
     public const string LinkedKeyColumnMissing = "Die verknüpfte Schlüsselspalte existiert nicht.";
     public const string LinkedMustSaveContent = "Bei Spalten mit Verknüpfung zu anderen Tabellen der Inhalt gespeichert werden.";
+    public const string LinkedTableLocked = "Verknüpfte Tabelle ist passwortgeschützt.";
     public const string LinkedTableMissing = "Verknüpfte Tabelle fehlt oder existiert nicht.";
     public const string MaxLengthTooLarge = "Maximallänge zu groß!";
     public const string MultilineNotSupported = "Format unterstützt keine mehrzeiligen Texte.";

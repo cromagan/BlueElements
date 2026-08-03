@@ -52,6 +52,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     public bool BackColor => ColorBack.A > 0;
@@ -82,12 +88,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public bool StrikeOut { get; private set; }
 
     public bool Underline { get; private set; }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? Disposed;
 
     #endregion
 
@@ -198,15 +198,15 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        OnDisposed(); 
+        OnDisposed();
         Disposed = null;
         _font?.Dispose();
         _fontOl?.Dispose();
         _sampleTextSym?.Dispose();
+        _charSizeCache.Dispose();
+        _stringSizeCache.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -575,6 +575,8 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     private Brush GetMainBrush() => GetBrush(ColorMain);
 
     private Brush GetOutlineBrush() => GetBrush(ColorOutline);
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private bool SizeOk(float sizeToCheck) {
         // Windwows macht seltsamerweiße bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015

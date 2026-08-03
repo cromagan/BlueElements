@@ -332,6 +332,20 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         set {
             if (field == value) { return; }
 
+            // Passwort-Prüfung bei verschlüsselten Tabellen. Die Tabelle lädt
+            // immer ohne Passwort; erst bei der Anzeige wird das Passwort
+            // angefordert. Bei falschem/fehlendem Passwort wird der
+            // Tabellenwechsel verworfen — die alte Anzeige bleibt aktiv.
+            if (value is { IsDisposed: false, Unlocked: false } tbLocked) {
+                var pwd = Table_NeedPassword();
+                if (!string.IsNullOrEmpty(pwd) &&
+                    string.Equals(pwd, tbLocked.GlobalShowPass, StringComparison.Ordinal)) {
+                    tbLocked.Unlocked = true;
+                } else {
+                    return;
+                }
+            }
+
             CloseAllComponents();
 
             if (field is { IsDisposed: false } tb1) {
@@ -710,7 +724,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public static List<string> Permission_AllUsed(bool mitRowCreator) {
         var l = new List<string>();
 
-        foreach (var thisTb in AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (!thisTb.IsDisposed) {
                 l.AddRange(Permission_AllUsedInThisTable(thisTb, mitRowCreator));
             }
@@ -1061,15 +1075,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 if (thisItem is RowListItem { IsDisposed: false } rdli && rdli.Visible) {
                     da.RowBeginn();
                     foreach (var thisColumn in ca) {
-                        if (thisColumn.Column is not null) {
-                            var lcColumn = thisColumn.Column;
-                            var lCrow = rdli.Row;
-
-                            if (lcColumn is not null) {
-                                da.CellAdd(string.Join("<br>", lCrow.CellGetList(lcColumn)), thisColumn.Column.BackColor);
-                            } else {
-                                da.CellAdd(" ", thisColumn.Column.BackColor);
-                            }
+                        // thisColumn.Column ist bei virtuellen Spalten (Pin, Nummer, …) null.
+                        // Früher wurde im else-Zweig thisColumn.Column.BackColor gelesen —
+                        // das würde eine NRE auslösen, denn genau dann ist Column null.
+                        if (thisColumn.Column is { IsDisposed: false } col) {
+                            da.CellAdd(string.Join("<br>", rdli.Row.CellGetList(col)), col.BackColor);
                         }
                     }
 
@@ -1367,6 +1377,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     public void PinAdd(RowItem? row) {
         if (row is not { IsDisposed: false }) { return; }
+        if (PinnedRows.Contains(row)) { return; }
         PinnedRows.Add(row);
         Invalidate_AllViewItems(false);
         OnPinnedChanged();
@@ -1374,6 +1385,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     public void PinRemove(RowItem? row) {
         if (row is not { IsDisposed: false }) { return; }
+        if (!PinnedRows.Contains(row)) { return; }
         PinnedRows.Remove(row);
         Invalidate_AllViewItems(false);
         OnPinnedChanged();
@@ -1730,6 +1742,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 ViewSaving = null;
                 VisibleRowsChanged = null;
 
+                AutoFilter_Close();
+
                 FilterCombined.Dispose();
                 FilterFix.Dispose();
                 Filter.Dispose();
@@ -1870,7 +1884,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // Rahmen um die gesamte Tabelle zeichnen
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
 
-            if (Develop.AllowDuplicateTableLoad) {
+            if (Table.AllowDuplicates) {
                 CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, $"ID: {tb.MyId}", States.Standard);
             }
         } catch {
@@ -2275,8 +2289,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             try {
                 Invalidate_CurrentArrangement();
-                Invalidate_AllViewItems(false); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
-                                                //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             } finally {
                 _isinSizeChanged = false;
             }
@@ -2960,6 +2972,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var headX = columnviewitem.ControlColumnLeft(OffsetX);
         //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
+        // Altes AutoFilter explizit schließen, bevor ein neues erstellt wird.
+        // Ohne diesen Aufruf würde das alte _autoFilter samt seiner Event-
+        // Subscription leaked werden (AutoFilter_Close übernimmt Unsubscribe + Dispose).
+        AutoFilter_Close();
+
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(SheetStyle), columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
         _autoFilter.Show();
@@ -3006,7 +3023,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void BB_LostFocus(object sender, System.EventArgs e) {
-        if (FloatingForm.IsShowing(BTB) || FloatingForm.IsShowing(BCB)) { return; }
+        if (FloatingForm.IsShowing(BTB) || FloatingForm.IsShowing(BCB) || FloatingForm.IsShowing(BTS)) { return; }
 
         // Ist die Textbox noch sichtbar, wurde der Fokusverlust durch einen
         // Klick auf die Tabelle ausgelöst (nicht durch Enter/Tab/Esc — dort
@@ -3746,14 +3763,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             Invoke(new Action(CloseAllComponents));
             return;
         }
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        if (IsDisposed) { return; }
+
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
         TXTBox_Close(BTS);
-        FloatingForm.Close(this);
         AutoFilter_Close();
-        Forms.QuickInfo.Close();
         HideMiniToolbar();
+
+        if (Table is not { IsDisposed: false }) { return; }
+        FloatingForm.Close(this);
+        Forms.QuickInfo.Close();
     }
 
     private void CollapseThis(string[] t) {
@@ -4723,7 +4743,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         Invalidate_CurrentArrangement();
         Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
         FilterCombined.Invalidate_FilteredRows();
-        Invalidate_AllViewItems(false); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
         Invalidate_MaxBounds();
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
@@ -4786,6 +4805,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (PinnedRows.Contains(e.Row)) {
             PinnedRows.Remove(e.Row);
+            // Pin-Spalte ist von PinnedRows.Count abhängig. Ohne
+            // OnPinnedChanged bleibt die virtuelle Pin-Spalte sichtbar,
+            // bis ein anderes Invalidate_CurrentArrangement erfolgt.
+            OnPinnedChanged();
         }
         // Veraltete Block-Zustände der entfernten Zeile verwerfen, damit
         // keine "Geister-Zustände" im NumberStyle übrig bleiben.
@@ -4937,8 +4960,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void ToggleChapterExpanded(RowCaptionListItem rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
 
     private void TXTBox_Close(GenericControl? textbox) {
-        if (IsDisposed || textbox is null || Table is not { IsDisposed: false }) { return; }
-        if (!textbox.Visible) { return; }
+        if (IsDisposed || textbox is null || !textbox.Visible) { return; }
+
+        if (Table is not { IsDisposed: false }) {
+            textbox.Tag = null;
+            textbox.Visible = false;
+            return;
+        }
+
         if (textbox.Tag is not List<object?> { Count: >= 2 } tags) {
             textbox.Visible = false;
             return; // Ohne dem hier wird ganz am Anfang ein Ereignis ausgelöst

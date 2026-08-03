@@ -163,7 +163,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
         var colName = x.Find(kv => kv.Key.Equals("columnname", StringComparison.OrdinalIgnoreCase)).Value;
 
-        if (colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) { return ParseableItem.NewByTypeName<ColumnViewItem>(colName); }
+        if (colName is { Length: > 0 } && colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) { return ParseableItem.NewByTypeName<ColumnViewItem>(colName); }
 
         return new ColumnViewItem(table, x, toParse);
     }

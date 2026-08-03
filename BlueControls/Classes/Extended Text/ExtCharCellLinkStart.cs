@@ -113,7 +113,7 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
 
     internal string ResolveDisplayText() {
         try {
-            var tb = Table.Get(TableName, null);
+            var tb = Table.Get(TableName);
             if (tb is null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Table '{TableName}' not found]"; }
 
             var c = tb.Column[ColumnKey];
@@ -147,7 +147,7 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
         if (!string.IsNullOrEmpty(RowKey)) { return RowKey; }
         if (string.IsNullOrEmpty(CellValue)) { return string.Empty; }
         try {
-            var tb = Table.Get(TableName, null);
+            var tb = Table.Get(TableName);
             if (tb is not { IsDisposed: false }) { return string.Empty; }
             var c = tb.Column[ColumnKey];
             if (c is not { IsDisposed: false }) { return string.Empty; }

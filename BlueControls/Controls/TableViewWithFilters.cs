@@ -550,12 +550,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         _doingControls = true;
         _controlsCorrect = true;
 
-        RepositionControls();
-        CheckButtons();
-        DoFilterAndPinButtons();
-        DoScriptButtons();
-
-        _doingControls = false;
+        try {
+            RepositionControls();
+            CheckButtons();
+            DoFilterAndPinButtons();
+            DoScriptButtons();
+        } finally {
+            _doingControls = false;
+        }
 
         if (!_controlsCorrect) { Invalidate(); }
     }

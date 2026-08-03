@@ -11,7 +11,18 @@ public static class ColumnViewItemRenderingExtensions {
 
     #region Fields
 
+    /// <summary>
+    /// Hält zusätzliche Render-Daten pro <see cref="ColumnViewCollection" /> vor. Da es sich um eine
+    /// <see cref="ConditionalWeakTable{TKey, TValue}" /> handelt, werden die Einträge automatisch
+    /// freigegeben, wenn die zugehörige Collection garbage-collected wird.
+    /// </summary>
     private static readonly ConditionalWeakTable<ColumnViewCollection, CollectionRenderingData> _collectionRenderingData = [];
+
+    /// <summary>
+    /// Hält zusätzliche Render-Daten pro <see cref="ColumnViewItem" /> vor (z. B. Position, Breite,
+    /// gecachter Renderer). Da es sich um eine <see cref="ConditionalWeakTable{TKey, TValue}" />
+    /// handelt, werden die Einträge automatisch freigegeben, wenn das zugehörige Item garbage-collected wird.
+    /// </summary>
     private static readonly ConditionalWeakTable<ColumnViewItem, RenderingData> _renderingData = [];
 
     #endregion

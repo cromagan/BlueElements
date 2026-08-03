@@ -52,6 +52,11 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override bool Equals(object? obj) => Equals(obj as UniqueValueDefinition);
 
+    // GetHashCode MUSS zu Equals passen: Equals vergleicht KeyName mit
+    // OrdinalIgnoreCase, also muss der Hash auf der gleichen Normierung basieren.
+    // Sonst kaputte Objekte in HashSet/Dictionary (CS0659).
+    public override int GetHashCode() => KeyName.GetHashCode(StringComparison.OrdinalIgnoreCase);
+
     public string ErrorReason() {
         if (Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
         if (_internal.Count == 0) { return "Mindestens eine Spalte muss ausgewählt sein."; }
@@ -69,7 +74,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return tb.IsValueEditable(TableDataType.UniqueValues, string.Empty);
     }
 
-    public List<string> ParseableItems() {
+    public override List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("Columns", _internal, true);
         return result;

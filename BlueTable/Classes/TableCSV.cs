@@ -79,14 +79,14 @@ public class TableCSV : TableFile {
         return true;
     }
 
-    public override void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
+    public override void LoadFromFile(string fileNameToLoad, string freeze) {
         // .hbdb ist eine Begleitdatei – die zugehörige .csv laden
         if (fileNameToLoad.EndsWith(HbdbSuffix, StringComparison.OrdinalIgnoreCase)) {
             var csvFile = fileNameToLoad.FilePath() + fileNameToLoad.FileNameWithoutSuffix() + CsvSuffix;
             if (!FileExists(csvFile)) { return; }
             fileNameToLoad = csvFile;
         }
-        base.LoadFromFile(fileNameToLoad, needPassword, freeze);
+        base.LoadFromFile(fileNameToLoad, freeze);
     }
 
     public void SetSeparator(char separator) {
@@ -179,7 +179,7 @@ public class TableCSV : TableFile {
                 var headFile = HeadFile();
 
                 if (_headChunk is null) {
-                    _headChunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(headFile) ?? new Chunk(headFile);
+                    _headChunk = Chunk.Get(headFile) ?? new Chunk(headFile);
                 }
 
                 if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
@@ -225,7 +225,7 @@ public class TableCSV : TableFile {
     private void LoadHeadChunk() {
         var headFile = HeadFile();
 
-        _headChunk = LiveInstanceCacheHelper.GetLiveInstance<Chunk>(headFile);
+        _headChunk = Chunk.Get(headFile);
         if (_headChunk is null) { return; }
 
         _ = _headChunk.LoadContent();

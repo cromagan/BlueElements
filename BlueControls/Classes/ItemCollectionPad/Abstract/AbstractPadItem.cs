@@ -649,6 +649,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     protected override void Dispose(bool disposing) {
+        // base.Dispose FIRST: setzt _isDisposedFlag und verhindert doppelten Cleanup.
+        base.Dispose(disposing);
+
         if (disposing) {
             DoUpdateSideOptionMenu = null;
             ParentChanged = null;
@@ -661,12 +664,10 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             JointMiddle.Dispose();
             foreach (var p in MovablePoint) { p.Dispose(); }
             foreach (var p in JointPoints) { p.Dispose(); }
+
+            MovablePoint.RemoveAll();
+            JointPoints.Clear();
         }
-
-        MovablePoint.RemoveAll();
-        JointPoints.Clear();
-
-        base.Dispose(disposing);
     }
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting);

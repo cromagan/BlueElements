@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
-using System.Collections.Specialized;
 
 namespace BlueControls.Classes;
 
@@ -35,41 +34,20 @@ public static class Allgemein {
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
-        Table.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
-        //Controls.ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        Table.Added += Table_Added;
+
+        // Bereits geladene Tabellen nachträglich behandeln, falls sie vor
+        // StartGlobalService erzeugt wurden (Added würde sie sonst verpassen).
+        foreach (var tb in Table.AllInstances()) {
+            Table_Added(null, new LiveInstanceEventArgs<Table>(tb));
+        }
     }
 
-    private static void AllFiles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
-        if (e.NewItems is not null) {
-            foreach (var thisit in e.NewItems) {
-                if (thisit is Table tb) {
-                    tb.AdditionalRepair += TableView.Table_AdditionalRepair;
-                    tb.CanDoScript += TableView.Table_CanDoScript;
-                }
-            }
-        }
-
-        //if (e.OldItems is not null) {
-        //    foreach (var thisit in e.OldItems) {
-        //        if (thisit is Table tb) {
-        //            tb.AdditionalRepair += TableView.Table_AdditionalRepair;
-        //        }
-        //    }
-        //}
-
-        if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert(true);
-        }
+    private static void Table_Added(object? sender, LiveInstanceEventArgs<Table> e) {
+        var tb = e.Instance;
+        tb.AdditionalRepair += TableView.Table_AdditionalRepair;
+        tb.CanDoScript += TableView.Table_CanDoScript;
     }
 
     #endregion
-
-    //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
-    //    if (e.Handled) { return; }
-    //    e.Handled = true;
-    //    if (e?.Row?.Table is not Table tb) { return; }
-
-    //    var pad = new ItemCollectionPadItem(e.LayoutId, e.Row.Table, e.Row.Key);
-    //    pad.SaveAsBitmap(e.Filename);
-    //}
 }

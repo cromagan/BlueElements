@@ -114,7 +114,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             if (_pendingTableName is not null) {
                 var name = _pendingTableName;
                 _pendingTableName = null;
-                Table = Table.Get(name, null);
+                Table = Table.Get(name);
             }
             return field;
         }

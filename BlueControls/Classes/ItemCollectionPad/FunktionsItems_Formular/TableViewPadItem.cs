@@ -58,6 +58,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public GroupBoxStyle RahmenStil {
         get;
         set {
+            if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();

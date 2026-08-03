@@ -45,7 +45,7 @@ public class VariableTable : Variable {
     public Table? Table {
         get {
             if (_table is null && _pendingTableKey is { Length: > 0 } key) {
-                _table = Table.Get(key, null);
+                _table = Table.Get(key);
                 _pendingTableKey = null;
             }
             return _table;

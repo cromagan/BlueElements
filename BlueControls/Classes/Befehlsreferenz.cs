@@ -22,7 +22,7 @@ public partial class Befehlsreferenz : Form {
     private static void GetUses(Method thisc, int max) {
         if (thisc.UsesInDB.Count >= max) { return; }
 
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in Table.AllInstances()) {
             if (!thisTb.IsDisposed && thisTb is TableFile) {
                 if (thisTb.EventScript.ToString(false).IndexOfWord(thisc.KeyName, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) {
                     thisc.UsesInDB.AddIfNotExists("Tabelle: " + thisTb.Caption);

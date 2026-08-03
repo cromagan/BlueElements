@@ -23,11 +23,15 @@ internal class Method_Table : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
-        if (Table.Get(filn, null) is { IsDisposed: false } tb) {
-            return new DoItFeedback(new VariableTable(tb));
+        if (Table.Get(filn) is not { IsDisposed: false } tb) {
+            return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true);
         }
 
-        return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true);
+        if (!tb.Unlocked) {
+            return new DoItFeedback($"Tabelle '{filn}' ist passwortgeschützt und kann im Skript nicht verwendet werden.", true);
+        }
+
+        return new DoItFeedback(new VariableTable(tb));
     }
 
     #endregion

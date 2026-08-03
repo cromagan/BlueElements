@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Threading;
 
@@ -8,6 +9,8 @@ namespace BlueBasics.Classes;
 public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged, IDisposableExtended {
 
     #region Fields
+
+    private static readonly ConcurrentDictionary<Type, string> _classIdByType = new();
 
     private volatile int _isDisposedFlag;
 
@@ -29,7 +32,17 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     public string MyClassId {
         get {
-            if ((string?)GetType().GetProperty("ClassId")?.GetValue(null, null) is { } ci) {
+            var t = GetType();
+            if (_classIdByType.TryGetValue(t, out var cached)) { return cached; }
+
+            // Leere Strings sind keine gültige ClassId - sie würden die
+            // Typ-Registry korruptieren (GetTypeByClassId findet keinen Typ,
+            // NewByParsing schlägt lautlos fehl). Daher gegen null UND leer prüfen.
+            // BindingFlags.Static explizit: sonst findet GetProperty auch
+            // Instance-Properties und GetValue(null, null) wirft TargetException.
+            if ((string?)t.GetProperty("ClassId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
+                          ?.GetValue(null, null) is { Length: > 0 } ci) {
+                _classIdByType[t] = ci;
                 return ci;
             }
 
@@ -41,7 +54,21 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     #region Methods
 
-    public static T? NewByParsing<T>(string toParse, params object[] args) where T : ParseableItem {
+    /// <summary>
+    /// Erzeugt anhand des <c>type</c>- bzw. <c>classid</c>-Tags im übergebenen
+    /// String über die <c>ClassId</c>-Registry die passende Instanz und parst
+    /// anschließend das Objekt. Ein führendes codiertes <c>[I]</c> (und damit
+    /// der gesamte String) wird vorher via <c>FromNonCritical</c> dekodiert.
+    /// </summary>
+    /// <returns>
+    /// Eine neue Instanz oder <c>null</c>, wenn der String leer ist, keine
+    /// Tags enthält, der <c>type</c>/<c>classid</c>-Tag fehlt oder der Typ
+    /// nicht gefunden wurde. Ein fehlendes Tag ist also ein <b>stiller Fehler</b>
+    /// - der Aufrufer muss <c>null</c> explizit behandeln.
+    /// </returns>
+    public static T? NewByParsing<T>(string? toParse, params object[] args) where T : ParseableItem {
+        if (toParse is null) { return null; }
+
         var typeName = string.Empty;
 
         if (toParse.StartsWith("[I]", StringComparison.Ordinal)) { toParse = toParse.FromNonCritical(); }
@@ -69,6 +96,9 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// <c>type</c>- bzw. <c>classid</c>-Feldes im JSON-Objekt über die
     /// <c>ClassId</c>-Registry die passende Instanz und parst anschließend das Objekt.
     /// Gibt <c>null</c> zurück, wenn der Typ nicht ermittelt werden konnte.
+    /// Es werden sowohl <c>ParseJson</c> als auch abschließend
+    /// <c>ParseFinishedJson</c> aufgerufen - analog zum <see cref="NewByParsing{T}" />-Pendant,
+    /// das über die <c>Parse</c>-Erweiterung ebenfalls <c>ParseFinished</c> auslöst.
     /// </summary>
     public static T? NewByParsingJson<T>(JsonObject element, params object[] args) where T : ParseableItem, IJsonParseable {
         var typeName = string.Empty;
@@ -88,6 +118,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
         if (NewByTypeName<T>(typeName, args) is not { } ni) { return null; }
         ni.ParseJson(element);
+        ni.ParseFinishedJson(element);
         return ni;
     }
 

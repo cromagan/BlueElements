@@ -28,7 +28,7 @@ public sealed partial class UsesInfo : FormWithStatusBar {
         if (tblUndo.Table is { IsDisposed: false } tb) {
             tb.SuppressEvents();
             try {
-                foreach (var thisTb in Table.AllFiles) {
+                foreach (var thisTb in Table.AllInstances()) {
                     if (thisTb is TableFile) {
                         TableHeadEditor.AddUndosToTable(tblUndo, thisTb, 0.5f);
                     }

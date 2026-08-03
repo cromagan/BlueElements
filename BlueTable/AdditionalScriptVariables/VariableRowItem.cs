@@ -99,7 +99,7 @@ public class VariableRowItem : Variable {
             var tx = t.SplitBy(";");
             if (tx.Length != 3) { return true; }
 
-            if (Table.Get(tx[0], null) is not { IsDisposed: false } tb) { return true; }
+            if (Table.Get(tx[0]) is not { IsDisposed: false } tb) { return true; }
 
             tb.BeSureRowIsLoaded(tx[2]);
 

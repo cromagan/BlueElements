@@ -328,7 +328,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     break;
 
                 case Accessor<Table?> adb:
-                    var tb = Table.Get(Value, TableView.Table_NeedPassword);
+                    var tb = Table.Get(Value);
 
                     if (adb.Get() != tb) {
                         adb.Set(tb);

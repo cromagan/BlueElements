@@ -93,6 +93,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         get;
 
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             OnPropertyChanged();

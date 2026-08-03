@@ -3,7 +3,6 @@
 using BlueBasics.EventArgs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -128,6 +127,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         FormulaSet(null as ConnectedFormula, null);
         base.OnFormClosing(e);
+    }
+
+    /// <summary>
+    /// Setzt beim Schreibschutz alle Bearbeitungs-Controls (Komponenten hinzufügen,
+    /// Arbeitsbereich etc.) außer Kraft. Datei- und Ansichts-Aktionen bleiben aktiv.
+    /// </summary>
+    protected override void OnNotEditableReasonChanged() {
+        base.OnNotEditableReasonChanged();
+        UpdateEditingControlsEnabled();
     }
 
     protected override void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
@@ -282,7 +290,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            var newCf = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(SaveTab.FileName);
+            var newCf = ConnectedFormula.Get(SaveTab.FileName);
             if (newCf is null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
@@ -299,7 +307,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         const string path = @"D:\01_Data\test.json";
         if (!FileExists(path)) { return; }
 
-        var cf = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(path);
+        var cf = ConnectedFormula.Get(path);
         if (cf is null) { return; }
 
         var json = ReadAllText(path, Constants.Win1252);
@@ -412,6 +420,23 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         } catch { }
     }
 
+    /// <summary>
+    /// Reagiert auf <see cref="BlockableFile.BlockStatusChanged"/> (Polling-Thread):
+    /// Status auf dem UI-Thread neu auswerten und Lock ggf. übernehmen.
+    /// </summary>
+    private void Formula_BlockStatusChanged(object? sender, System.EventArgs e) {
+        if (IsHandleCreated) { BeginInvoke(new Action(OnBlockStatusChanged)); }
+    }
+
+    /// <summary>
+    /// Reagiert auf <see cref="BlockableFile.Invalidated"/> (Polling-Thread):
+    /// Im schreibgeschützten Modus die Datei neu anzeigen, damit Änderungen
+    /// anderer Benutzer sichtbar werden.
+    /// </summary>
+    private void Formula_Invalidated(object? sender, System.EventArgs e) {
+        if (IsHandleCreated) { BeginInvoke(new Action(OnInvalidated)); }
+    }
+
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula, notAllowedchilds);
 
@@ -424,7 +449,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = LiveInstanceCacheHelper.GetLiveInstance<ConnectedFormula>(filename);
+        var tmpFormula = ConnectedFormula.Get(filename);
         if (tmpFormula is null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);
@@ -442,102 +467,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         //    Formula.NotAllowedChilds = l.AsReadOnly();
         //}
-    }
-
-    private void UpdateFromFormula() {
-        if (Formula is not { IsDisposed: false }) {
-            Pad.Items = null;
-            NotEditableReason = string.Empty;
-            return;
-        }
-
-        ShowPage(null);
-
-        // ConnectedFormula ist eine BlockableFile: Schreibzugriff versuchen.
-        // Gelingt es nicht (Sperre durch einen anderen Benutzer), wird das
-        // Formular trotzdem geladen - nur schreibgeschützt.
-        NotEditableReason = Formula.AcquireWriteAccess();
-    }
-
-    /// <summary>
-    /// Zeigt die gewünschte Seite im Pad an. Ist <paramref name="preferredCaption"/>
-    /// leer oder nicht vorhanden, wird die Head-Seite gewählt.
-    /// </summary>
-    private void ShowPage(string? preferredCaption) {
-        if (Formula is { IsDisposed: false }) {
-            if (!string.IsNullOrEmpty(preferredCaption)) {
-                foreach (var icpi in Formula.Pages) {
-                    if (icpi is { IsDisposed: false } && icpi.Caption == preferredCaption) {
-                        Pad.Items = icpi;
-                        return;
-                    }
-                }
-            }
-
-            foreach (var icpi in Formula.Pages) {
-                if (icpi is { IsDisposed: false } && icpi.IsHead()) {
-                    Pad.Items = icpi;
-                    return;
-                }
-            }
-        }
-
-        Pad.Items = null;
-    }
-
-    /// <summary>
-    /// Setzt beim Schreibschutz alle Bearbeitungs-Controls (Komponenten hinzufügen,
-    /// Arbeitsbereich etc.) außer Kraft. Datei- und Ansichts-Aktionen bleiben aktiv.
-    /// </summary>
-    protected override void OnNotEditableReasonChanged() {
-        base.OnNotEditableReasonChanged();
-        UpdateEditingControlsEnabled();
-    }
-
-    private void UpdateEditingControlsEnabled() {
-        var editable = Formula is not null && string.IsNullOrEmpty(NotEditableReason);
-
-        grpFelder.Enabled = editable;
-        grpOptik.Enabled = editable;
-        groupBox1.Enabled = editable;
-        grpAllgemein.Enabled = editable;
-    }
-
-    /// <summary>
-    /// Reagiert auf <see cref="BlockableFile.BlockStatusChanged"/> (Polling-Thread):
-    /// Status auf dem UI-Thread neu auswerten und Lock ggf. übernehmen.
-    /// </summary>
-    private void Formula_BlockStatusChanged(object? sender, System.EventArgs e) {
-        if (IsHandleCreated) { BeginInvoke(new Action(OnBlockStatusChanged)); }
-    }
-
-    private void OnBlockStatusChanged() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
-        if (Formula is not { IsDisposed: false } cf) { return; }
-
-        // Sperrstatus neu ermitteln; ist die Datei frei, wird der Schreibzugriff
-        // hier übernommen (NotEditableReason wird leer).
-        NotEditableReason = cf.AcquireWriteAccess();
-    }
-
-    /// <summary>
-    /// Reagiert auf <see cref="BlockableFile.Invalidated"/> (Polling-Thread):
-    /// Im schreibgeschützten Modus die Datei neu anzeigen, damit Änderungen
-    /// anderer Benutzer sichtbar werden.
-    /// </summary>
-    private void Formula_Invalidated(object? sender, System.EventArgs e) {
-        if (IsHandleCreated) { BeginInvoke(new Action(OnInvalidated)); }
-    }
-
-    private void OnInvalidated() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
-        if (Formula is not { IsDisposed: false }) { return; }
-
-        // Nur im schreibgeschützten Modus neu laden. Im editierbaren Modus hält
-        // der Editor den Schreibzugriff und wird vom Polling nicht invalidiert.
-        if (string.IsNullOrEmpty(NotEditableReason)) { return; }
-
-        ShowPage(Pad?.Items?.Caption);
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
@@ -588,6 +517,76 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
                 break;
             }
         }
+    }
+
+    private void OnBlockStatusChanged() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Formula is not { IsDisposed: false } cf) { return; }
+
+        // Sperrstatus neu ermitteln; ist die Datei frei, wird der Schreibzugriff
+        // hier übernommen (NotEditableReason wird leer).
+        NotEditableReason = cf.AcquireWriteAccess();
+    }
+
+    private void OnInvalidated() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Formula is not { IsDisposed: false }) { return; }
+
+        // Nur im schreibgeschützten Modus neu laden. Im editierbaren Modus hält
+        // der Editor den Schreibzugriff und wird vom Polling nicht invalidiert.
+        if (string.IsNullOrEmpty(NotEditableReason)) { return; }
+
+        ShowPage(Pad?.Items?.Caption);
+    }
+
+    /// <summary>
+    /// Zeigt die gewünschte Seite im Pad an. Ist <paramref name="preferredCaption"/>
+    /// leer oder nicht vorhanden, wird die Head-Seite gewählt.
+    /// </summary>
+    private void ShowPage(string? preferredCaption) {
+        if (Formula is { IsDisposed: false }) {
+            if (!string.IsNullOrEmpty(preferredCaption)) {
+                foreach (var icpi in Formula.Pages) {
+                    if (icpi is { IsDisposed: false } && icpi.Caption == preferredCaption) {
+                        Pad.Items = icpi;
+                        return;
+                    }
+                }
+            }
+
+            foreach (var icpi in Formula.Pages) {
+                if (icpi is { IsDisposed: false } && icpi.IsHead()) {
+                    Pad.Items = icpi;
+                    return;
+                }
+            }
+        }
+
+        Pad.Items = null;
+    }
+
+    private void UpdateEditingControlsEnabled() {
+        var editable = Formula is not null && string.IsNullOrEmpty(NotEditableReason);
+
+        grpFelder.Enabled = editable;
+        grpOptik.Enabled = editable;
+        groupBox1.Enabled = editable;
+        grpAllgemein.Enabled = editable;
+    }
+
+    private void UpdateFromFormula() {
+        if (Formula is not { IsDisposed: false }) {
+            Pad.Items = null;
+            NotEditableReason = string.Empty;
+            return;
+        }
+
+        ShowPage(null);
+
+        // ConnectedFormula ist eine BlockableFile: Schreibzugriff versuchen.
+        // Gelingt es nicht (Sperre durch einen anderen Benutzer), wird das
+        // Formular trotzdem geladen - nur schreibgeschützt.
+        NotEditableReason = Formula.AcquireWriteAccess();
     }
 
     #endregion

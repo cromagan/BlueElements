@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -19,21 +20,11 @@ using static BlueScript.Classes.Script;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable {
+public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IEditable, IJsonParseable {
 
     #region Fields
 
     public const string TableVersion = "4.10";
-
-    public static readonly ObservableCollection<Table> AllFiles = [];
-
-    public static readonly object AllFilesLocker = new object();
-
-    // Race-Condition-Schutz für Table.Get: hält pro normalisiertem Tabellennamen
-    // ein eigenes Lock-Objekt vor, damit parallele Get-Aufrufe für dieselbe
-    // Tabelle serialisiert werden — die Datei wird nur einmal geladen und beide
-    // Aufrufer erhalten dieselbe Instanz. Verwaltet unter AllFilesLocker.
-    private static readonly Dictionary<string, object> _loadLocks = new();
 
     internal readonly object _undoLock = new();
 
@@ -146,12 +137,12 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
             _assetFolder = "Assets";
             _variableTmp = string.Empty;
 
-            // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
-            // Die Events registriert werden, um z.B: das Passwort abzufragen
-            // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
-            // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
-
-            AllFiles.Add(this);
+            // Muss vor dem Laden der Daten in LiveInstances eingetragen werden,
+            // weil interne Logik (Passwort-Logik, Filter für den Export etc.)
+            // die Tabelle über das Register finden muss. Das Added-Event wird
+            // nicht mehr aus dem Konstruktor gefeuert — das übernimmt
+            // GetOrCreate bzw. der direkte Erzeuger.
+            LiveInstances[KeyName] = this;
         }
     }
 
@@ -159,12 +150,6 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         MainChunkLoadDone = true;
         source?.CopyTo(this);
     }
-
-    #endregion
-
-    #region Delegates
-
-    public delegate string NeedPassword();
 
     #endregion
 
@@ -198,6 +183,10 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
     #region Properties
 
+    /// <summary>
+    /// Eigenes Register aller lebenden Table-Instanzen, geordnet nach
+    /// <see cref="KeyName" />. Schlüsselseitig Case-Insensitive.
+    /// </summary>
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -523,6 +512,14 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         }
     }
 
+    /// <summary>
+    /// Wenn <c>true</c>, darf die Tabelle im <c>TableView</c>-Control ohne
+    /// Passwortabfrage angezeigt werden. Default: <c>true</c>. Wird beim Laden
+    /// auf <c>false</c> gesetzt, wenn die Tabelle verschlüsselt ist und kein
+    /// Passwort eingegeben wurde. Die Abfrage erfolgt erst bei der Anzeige.
+    /// </summary>
+    public bool Unlocked { get; set; } = true;
+
     public VariableCollection Variables {
         get => [.. _variables];
         set {
@@ -560,7 +557,14 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
     protected string LoadedVersion { get; private set; }
 
-    protected NeedPassword? PasswordCallback { get; set; }
+    /// <summary>
+    /// Thread-static: zusätzliche Suchpfade, die von <see cref="Get(string)" /> befüllt
+    /// und von <see cref="CreateInstance" /> ausgewertet
+    /// werden. Ermöglicht die Übergabe des expliziten Pfads aus dem Aufrufer-
+    /// Kontext an die Factory ohne Interface-Parameter.
+    /// </summary>
+    [field: ThreadStatic]
+    private static List<string> AdditionalSearchPathsOnThisThread => field ??= [];
 
     [field: ThreadStatic]
     private static Stack<Table> LoadingOnThisThread => field ??= new Stack<Table>();
@@ -583,7 +587,7 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         // reicht es, das Verzeichnis einmal zu prüfen
         var allreadychecked = new List<Table>();
 
-        var allfiles = new List<Table>(AllFiles); // könnte sich ändern, deswegen Zwischenspeichern
+        var allfiles = new List<Table>(LiveInstances.Values); // könnte sich ändern, deswegen Zwischenspeichern
 
         foreach (var thisTb in allfiles) {
             var possibletables = thisTb.AllAvailableTables(allreadychecked);
@@ -607,10 +611,25 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         }
     }
 
+    /// <summary>
+    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
+    /// Sucht in den konfigurierten Suchpfaden (vom Aufrufer über <see cref="Get(string)" />,
+    /// plus die Pfade bereits geladener Tabellen) nach einer passenden Datei,
+    /// erzeugt über <see cref="Activator" /> die passende TableFile-Subtyp-Instanz
+    /// und lädt den Inhalt ohne Passwort-Abfrage. Der Konstruktor trägt die
+    /// Instanz selbst in <see cref="LiveInstanceCache{T}.LiveInstances" /> ein;
+    /// das <see cref="LiveInstanceCache{T}.Added" />-Event wird von
+    /// <see cref="LiveInstanceCache{T}.GetOrCreate" /> nach erfolgreicher
+    /// Konstruktion gefeuert. Wirft <see cref="FileNotFoundException" />, wenn
+    /// kein passendes File existiert — <see cref="Get(string)" /> fängt das
+    /// und gibt null zurück.
+    /// </summary>
+    public static Table Create(string key) => CreateInstance(key);
+
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
         lock (AllFilesLocker) {
-            snapshot = [.. AllFiles];
+            snapshot = [.. LiveInstances.Values];
         }
 
         foreach (var thisFile in snapshot) {
@@ -625,10 +644,11 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
             t = new Table(UniqueKeyValue());
         }
         t.InitDummyTable();
+        OnAdded(t);
         return t;
     }
 
-    public static Table? Get(string fileOrTableName, NeedPassword? needPassword) {
+    public static Table? Get(string fileOrTableName) {
         try {
             var file = fileOrTableName;
 
@@ -653,122 +673,21 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
                 }
             }
 
-            var folder = new List<string>();
+            // Suchpfade für CreateInstance übermitteln (thread-static).
+            // Reset + befüllen, damit nur die Pfade des aktuellen Aufrufs gelten.
+            AdditionalSearchPathsOnThisThread.Clear();
 
             if (file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                folder.AddIfNotExists(file.FilePath());
+                AdditionalSearchPathsOnThisThread.AddIfNotExists(file.FilePath());
                 file = file.FileNameWithoutSuffix();
             }
 
             file = FormatHolder_SystemName.MakeValid(file);
 
-            // Race-Condition-Schutz für parallele Get-Aufrufe: pro normiertem
-            // Tabellennamen ein eigenes Lock-Objekt unter AllFilesLocker ermitteln.
-            // Der Such-/Ladeblock läuft anschließend innerhalb dieses Locks, damit
-            // ein zweiter Aufrufer für dieselbe Tabelle die fertig geladene Instanz
-            // in AllFiles vorfindet, statt selbst noch einmal zu laden.
-            // Im Develop-Stresstest (AllowDuplicateTableLoad) bewusst deaktiviert.
-            object perNameLock;
-            lock (AllFilesLocker) {
-                if (!_loadLocks.TryGetValue(file, out var existing)) {
-                    existing = new object();
-                    _loadLocks[file] = existing;
-                }
-                perNameLock = existing;
-            }
-
-            if (Develop.AllowDuplicateTableLoad) {
-                return FindOrLoadTable();
-            }
-            lock (perNameLock) {
-                return FindOrLoadTable();
-            }
-
-            Table? FindOrLoadTable() {
-                #region Schauen, ob die Tabelle bereits geladen ist
-
-                Table? ok = null;
-                lock (AllFilesLocker) {
-                    foreach (var thisFile in AllFiles) {
-                        // folder VOR dem KeyName-Check befüllen: ist AllowDuplicateTableLoad
-                        // aktiv, wird ok unten nicht zurückgegeben und der Code benötigt
-                        // den folder, um die Datei neu zu laden.
-                        if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                            folder.AddIfNotExists(tbf.Filename.FilePath());
-                        }
-
-                        if (string.Equals(thisFile.KeyName, file, StringComparison.OrdinalIgnoreCase)) {
-                            ok = thisFile;
-                            break;
-                        }
-                    }
-                }
-
-                // Develop-Stresstest: ist AllowDuplicateTableLoad gesetzt, darf die
-                // bereits geladene Instanz NICHT zurückgegeben werden — es soll eine
-                // zweite, unabhängige Instanz mit eigener MyId erzeugt werden. Ohne
-                // diese Prüfung würde der KeyName-Treffer oben stets zuschlagen und
-                // IsFileAllowedToLoad/LoadFromFile (wo das Flag ebenfalls ausgewertet
-                // wird) nie erreicht. Das Flag bleibt aktiv, bis der Stresstest-Button
-                // es ausschaltet (mehrfache Table.Get-Aufrufe pro Öffnen-Vorgang).
-                if (ok is { } okt && !Develop.AllowDuplicateTableLoad) {
-                    if (!LoadingOnThisThread.Contains(okt)) {
-                        okt.WaitInitialDone();
-                    }
-                    return okt;
-                }
-
-                #endregion
-
-                var attemptedPaths = new List<string>();
-
-                foreach (var thisfolder in folder) {
-                    var f = thisfolder + file;
-
-                    foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
-                        var fs = f + suffix;
-
-                        if (!FileExists(fs)) {
-                            if (fs.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                                attemptedPaths.Add(fs);
-                            }
-
-                            continue;
-                        }
-
-                        if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-
-                        if (Activator.CreateInstance(type, file) is not TableFile tb) { return null; }
-
-                        LoadingOnThisThread.Push(tb);
-                        try {
-                            tb.LoadFromFile(fs, needPassword, string.Empty);
-                        } finally {
-                            LoadingOnThisThread.Pop();
-                        }
-
-                        return tb;
-                    }
-                }
-
-                //// Zweite Instanz: Recovery für alle Pfade, die nicht existierten
-                //foreach (var fne in attemptedPaths) {
-                //    // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
-                //    if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
-                //        if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
-                //            continue;
-                //        }
-                //    }
-
-                //    if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
-                //        // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
-                //        _recentRecoveryAttempts[fne] = DateTime.UtcNow;
-                //        return Get(fileOrTableName, needPassword);
-                //    }
-                //}
-
-                return null;
-            }
+            // Race-Safe über den Helper: Caching, Locking und AllowDuplicates
+            // werden dort behandelt. Create (bzw. CreateInstance) macht die
+            // Datei-Suche + Laden.
+            return GetOrCreate<Table>(file);
         } catch {
             Develop.AbortAppIfStackOverflow();
             // Rekursion im catch entfernt, um StackOverflow bei permanenten Fehlern zu vermeiden
@@ -954,7 +873,7 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
         List<Table> snapshot;
         lock (AllFilesLocker) {
-            snapshot = [.. AllFiles];
+            snapshot = [.. LiveInstances.Values];
         }
 
         Develop.EndLog($"Table.SaveAll: Start mit {snapshot.Count} Table(n)");
@@ -984,7 +903,7 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
                 var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Char_DateiSonderZeichen + " _.");
                 var ok = IsValidTableName(unique) &&
-                         !AllFiles.Any(thisfile => string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal));
+                         !LiveInstances.Values.Any(thisfile => string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal));
 
                 if (ok) { return unique; }
             } while (true);
@@ -1699,10 +1618,10 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
-                            CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
-                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1907,16 +1826,14 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
 
                     #endregion
 
-                    #region Bei verschlüsselten Tabellen das Passwort abfragen
+                    #region Bei verschlüsselten Tabellen Unlocked auf false setzen
 
+                    // Passwort wird entkoppelt: Die Tabelle lädt IMMER ohne Passwort.
+                    // Bei verschlüsselten Tabellen (GlobalShowPass gesetzt) wird
+                    // Unlocked = false gesetzt. Die Passwort-Abfrage erfolgt erst
+                    // bei der Anzeige im TableView.
                     if (command == TableDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
-                        var pwd = string.Empty;
-                        if (PasswordCallback is { } np) { pwd = np(); }
-
-                        if (pwd != value) {
-                            Freeze("Passwort falsch");
-                            break;
-                        }
+                        Unlocked = false;
                     }
 
                     #endregion
@@ -2413,6 +2330,8 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            LiveInstances.TryRemove(new KeyValuePair<string, Table>(KeyName, this));
+
             try {
                 OnDisposed();
                 UnregisterEvents();
@@ -2437,11 +2356,6 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
                 _dictionaryWords.Clear();
-
-                // Aus statischer Liste entfernen
-                lock (AllFilesLocker) {
-                    AllFiles.Remove(this);
-                }
             } catch (Exception ex) {
                 Develop.DebugError("Fehler beim Dispose: " + ex.Message);
             }
@@ -2782,6 +2696,51 @@ public class Table : IDisposableExtended, IHasKeyName, IEditable, IJsonParseable
     protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
         return IsGenericEditable(false);
+    }
+
+    private static Table CreateInstance(string key) {
+        // Suchpfade sammeln: explizit vom Aufrufer (thread-static) plus
+        // die Pfade bereits geladener Tabellen.
+        var folder = new List<string>(AdditionalSearchPathsOnThisThread);
+
+        foreach (var thisTb in LiveInstances.Values) {
+            if (thisTb is TableFile { IsDisposed: false } tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                folder.AddIfNotExists(tbf.Filename.FilePath());
+            }
+        }
+
+        foreach (var thisfolder in folder) {
+            var f = thisfolder + key;
+
+            foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
+                var fs = f + suffix;
+
+                if (!FileExists(fs)) { continue; }
+
+                if (!TableFile.IsFileAllowedToLoad(fs)) {
+                    // Datei wird bereits von einer anderen Instanz geladen:
+                    // Rekursion auf Get, um die bestehende Instanz zurückzugeben.
+                    var existingTb = Get(fs);
+                    if (existingTb is not null) { return existingTb; }
+                    continue;
+                }
+
+                if (Activator.CreateInstance(type, key) is not TableFile tb) {
+                    throw new InvalidOperationException($"Konnte keine Instanz erzeugen für {type.Name} mit Key '{key}'.");
+                }
+
+                LoadingOnThisThread.Push(tb);
+                try {
+                    tb.LoadFromFile(fs, string.Empty);
+                } finally {
+                    LoadingOnThisThread.Pop();
+                }
+
+                return tb;
+            }
+        }
+
+        throw new FileNotFoundException($"Tabelle '{key}' konnte in keinem Suchpfad gefunden werden.");
     }
 
     private static bool HasActiveThreadsExcept(string excludeThreadId) {

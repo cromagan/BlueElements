@@ -153,7 +153,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static void ExecuteValueChangedEvent() {
         List<Table> l;
         try {
-            l = Table.AllFiles.ToList(); // Explizites ToList() ist oft stabiler als der Spread-Operator bei Multithreading
+            l = Table.AllInstances().ToList(); // Explizites ToList() ist oft stabiler als der Spread-Operator bei Multithreading
             l = l.Where(x => x is not null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -237,7 +237,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     public static RowItem? NextRowToCeck() {
         try {
-            List<Table> allfiles = [.. Table.AllFiles];
+            List<Table> allfiles = [.. Table.AllInstances()];
 
             if (allfiles.Count == 0) { return null; }
 
@@ -312,7 +312,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     public static List<RowItem> RowListToCheck() {
         var r = new List<RowItem>();
-        List<Table> allfiles = [.. Table.AllFiles];
+        List<Table> allfiles = [.. Table.AllInstances()];
 
         foreach (var thisTb in allfiles) {
             if (thisTb is { IsDisposed: false } tb) {
@@ -334,7 +334,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
 
-            foreach (var thisfile in Table.AllFiles) {
+            foreach (var thisfile in Table.AllInstances()) {
                 var row = thisfile.Row[unique];
                 if (row is { IsDisposed: false }) { ok = false; break; }
             }
