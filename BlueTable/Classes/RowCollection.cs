@@ -46,6 +46,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler? Disposed;
 
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
+
     public event EventHandler<RowEventArgs>? RowAdded;
 
     public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
@@ -53,8 +55,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public event EventHandler<RowEventArgs>? RowRemoved;
 
     public event EventHandler<RowEventArgs>? RowRemoving;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -452,38 +452,39 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     public OperationResult GenerateAndAdd(FilterItem[] filter, string comment) {
-        Table? tb2 = null;
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabellen verworfen"); }
 
         foreach (var thisfi in filter) {
-            if (thisfi.Table is not { IsDisposed: false } tb1) { return OperationResult.Failed("Tabelle eines Filters nicht angegeben"); }
-            tb2 ??= tb1;
+            if (thisfi.Table is not { IsDisposed: false } fiTb || fiTb != tb) {
+                return OperationResult.Failed("Tabelle eines Filters stimmt nicht mit der aktuellen Tabelle überein.");
+            }
 
-            if (thisfi.Column?.Table is { IsDisposed: false } tb3 && tb3 != tb2) { return OperationResult.Failed("Tabellen der Spalten im Filter unterschiedlich"); }
+            if (thisfi.Column?.Table is { IsDisposed: false } colTb && colTb != tb) {
+                return OperationResult.Failed($"Spalte '{thisfi.Column.KeyName}' des Filters gehört zu einer anderen Tabelle.");
+            }
         }
 
-        if (tb2 is not { IsDisposed: false }) { return OperationResult.Failed("Tabellen verworfen"); }
-
-        var s = tb2.NextRowKey();
+        var s = tb.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return OperationResult.FailedRetryable("Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
 
         var chunkval = string.Empty;
-        foreach (var thisColum in tb2.Column) {
+        foreach (var thisColum in tb.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
-                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' fehlt.");
+                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
                     chunkval = inval;
-                    var loadResult = tb2.BeSureRowIsLoaded(inval);
+                    var loadResult = tb.BeSureRowIsLoaded(inval);
                     if (loadResult.IsFailed) {
-                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
+                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
                     }
                 }
             }
         }
 
-        var m = tb2.IsNowNewRowPossible(chunkval, false);
+        var m = tb.IsNowNewRowPossible(chunkval, false);
         if (!string.IsNullOrEmpty(m)) { return OperationResult.Failed($"In der Tabelle sind keine neuen Zeilen möglich: {m}"); }
 
         return GenerateAndAddInternal(s, filter, comment);
@@ -516,6 +517,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
+
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Rows", StringComparison.OrdinalIgnoreCase)) {
+            return GetByKey(key);
+        }
+        return null;
+    }
 
     public void InvalidateAllCheckData() {
         try {
@@ -572,6 +580,38 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         return foundrow;
+    }
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        JsonArray rows = [];
+        foreach (var row in _internal.Values) {
+            if (row is not { IsDisposed: false }) { continue; }
+            rows.Add(row.ParseableJson());
+        }
+        if (rows.Count > 0) { json["rows"] = rows; }
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonObject parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        // Zeilen werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
+        // Hier nur die Eigenschaften aktualisieren, falls Zeilen bereits existieren.
+        if (Table is not { IsDisposed: false }) { return; }
+        if (json["rows"] is not JsonArray rows) { return; }
+
+        foreach (var item in rows) {
+            if (item is not JsonObject jo) { continue; }
+            var key = jo.GetString("key", string.Empty);
+            if (key is not { Length: > 0 }) { continue; }
+            if (GetByKey(key) is { } r) { r.ParseJson(jo); }
+        }
     }
 
     public OperationResult Remove(FilterItem fi, string comment) {
@@ -763,13 +803,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            OnDisposed(); 
+            OnDisposed();
             Disposed = null;
             Table = null;
             Parallel.ForEach(_internal.Values, row => row.Dispose());
@@ -865,6 +903,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return new OperationResult(nRow);
     }
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
     private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.PropertyChangedExt += OnRowPropertyChangedExt;
@@ -874,14 +914,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowChecked(object? sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
-    private void OnRowRemoved(RowEventArgs e) {
-        if (Table is { IsEventsSuppressed: true }) { return; }
-        RowRemoved?.Invoke(this, e);
-    }
-
     private void OnRowPropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
         if (sender is not RowItem r) { return; }
         OnPropertyChangedExt($"Rows[{r.KeyName}].{e.RelativePath}", e.Partial);
+    }
+
+    private void OnRowRemoved(RowEventArgs e) {
+        if (Table is { IsEventsSuppressed: true }) { return; }
+        RowRemoved?.Invoke(this, e);
     }
 
     private void OnRowRemoving(RowEventArgs e) {
@@ -889,45 +929,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         e.Row.PropertyChangedExt -= OnRowPropertyChangedExt;
         if (Table is { IsEventsSuppressed: true }) { return; }
         RowRemoving?.Invoke(this, e);
-    }
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Rows", StringComparison.OrdinalIgnoreCase)) {
-            return GetByKey(key);
-        }
-        return null;
-    }
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        JsonArray rows = [];
-        foreach (var row in _internal.Values) {
-            if (row is not { IsDisposed: false }) { continue; }
-            rows.Add(row.ParseableJson());
-        }
-        if (rows.Count > 0) { json["rows"] = rows; }
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        // Zeilen werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
-        // Hier nur die Eigenschaften aktualisieren, falls Zeilen bereits existieren.
-        if (Table is not { IsDisposed: false }) { return; }
-        if (json["rows"] is not JsonArray rows) { return; }
-
-        foreach (var item in rows) {
-            if (item is not JsonObject jo) { continue; }
-            var key = jo.GetString("key", string.Empty);
-            if (key is not { Length: > 0 }) { continue; }
-            if (GetByKey(key) is { } r) { r.ParseJson(jo); }
-        }
     }
 
     #endregion

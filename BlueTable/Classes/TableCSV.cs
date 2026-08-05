@@ -79,6 +79,16 @@ public class TableCSV : TableFile {
         return true;
     }
 
+    /// <summary>
+    /// Stellt sicher, dass die System-Spalte SYS_ROWKEY existiert. Ohne diese
+    /// Spalte können Zeilen bei erneuten Laden nicht eindeutig zugeordnet werden.
+    /// </summary>
+    public override void RepairAfterParse() {
+        Column.GenerateAndAddSystem(SystemColumnKeys.RowKey);
+
+        base.RepairAfterParse();
+    }
+
     public override void LoadFromFile(string fileNameToLoad, string freeze) {
         // .hbdb ist eine Begleitdatei – die zugehörige .csv laden
         if (fileNameToLoad.EndsWith(HbdbSuffix, StringComparison.OrdinalIgnoreCase)) {
@@ -117,8 +127,7 @@ public class TableCSV : TableFile {
 
         // Head-Chunk VOR dem CSV-Content parsen, damit die Spalten-Metadaten
         // (insbesondere IsFirst -> Column.First) bereits gesetzt sind.
-        // ParseCSVContent benötigt Column.First für Row.GenerateAndAdd,
-        // sonst werden keine Zeilen angelegt.
+        // ParseCSVContent mapped die CSV-Spalten anhand der vorhandenen Columns.
         LoadHeadChunk();
         Column.GetSystems();
 
@@ -290,23 +299,57 @@ public class TableCSV : TableFile {
             }
         }
 
+        // Index der SYS_ROWKEY-Spalte ermitteln (falls vorhanden).
+        // Ist sie vorhanden, wird ihr Wert als RowKey verwendet.
+        var sysRowKeyIndex = -1;
+        if (Column.SysRowKey is { IsDisposed: false } srk) {
+            var idx = 0;
+            foreach (var col in Column) {
+                if (col == srk) {
+                    sysRowKeyIndex = idx;
+                    break;
+                }
+                idx++;
+            }
+        }
+
         for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
             var fields = new List<string>(CsvHelper.ParseCSVLine(lines[lineIndex], _separator));
             if (fields.Count == 0) { continue; }
 
-            var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
+            string rowKey;
+            if (sysRowKeyIndex >= 0 && sysRowKeyIndex < fields.Count && !string.IsNullOrEmpty(fields[sysRowKeyIndex])) {
+                rowKey = fields[sysRowKeyIndex];
+            } else {
+                rowKey = NextRowKey();
+            }
             parsedRowKeys.Add(rowKey);
 
-            var row = Row.GenerateAndAdd(rowKey, "CSV-Import");
+            // Während des Ladevorgangs ist MainChunkLoadDone noch false.
+            // Row.GenerateAndAdd / CellSet rufen ChangeData -> IsValueEditable
+            // -> IsGenericEditable(false) auf, das dann "Laden noch nicht
+            // abgeschlossen" zurückgibt. Deshalb derselbe Low-Level-Pfad wie
+            // in Table.Parse: ExecuteCommand + SetValueInternal mit
+            // Reason.NoUndo_NoInvalidate (= IgnoreFreeze).
+            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
 
-            if (row is null) { continue; }
+            if (Row.GetByKey(rowKey) is not { IsDisposed: false } row) {
+                Freeze("CSV-Ladefehler: Zeile konnte nicht erstellt werden.");
+                return false;
+            }
 
             var colIndex = 0;
             foreach (var col in Column) {
                 if (col.IsDisposed) { continue; }
 
                 if (colIndex < fields.Count) {
-                    row.CellSet(col, fields[colIndex], "CSV-Import");
+                    var error = SetValueInternal(TableDataType.UTF8Value_withoutSizeData, col, row,
+                        fields[colIndex], Generic.UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
+
+                    if (!string.IsNullOrEmpty(error)) {
+                        Freeze($"CSV-Ladefehler in Spalte '{col.KeyName}': {error}");
+                        return false;
+                    }
                 }
                 colIndex++;
             }
@@ -333,8 +376,7 @@ public class TableCSV : TableFile {
 
         // Head-Chunk VOR dem CSV-Content parsen, damit die Spalten-Metadaten
         // (insbesondere IsFirst -> Column.First) bereits gesetzt sind.
-        // ParseCSVContent benötigt Column.First für Row.GenerateAndAdd,
-        // sonst werden keine Zeilen angelegt.
+        // ParseCSVContent mapped die CSV-Spalten anhand der vorhandenen Columns.
         LoadHeadChunk();
 
         var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -349,10 +391,10 @@ public class TableCSV : TableFile {
         Column.RemoveObsoleteColumns(Column, parsedColumns, Reason.NoUndo_NoInvalidate);
 
         Column.GetSystems();
+        MainChunkLoadDone = true;
         RepairAfterParse();
 
         SaveRequired = false;
-        MainChunkLoadDone = true;
 
         OnLoaded(true, true);
 

@@ -979,8 +979,34 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is null || column is null ||
             CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
             AllViewItems is not { } avi || !avi.ContainsValue(row)) {
-            column = null;
-            row = null;
+            // Verwaiste Referenzen über die stabile RowItem-/ColumnItem-Identität
+            // migrieren. Ein Neuaufbau (RemoveRowItems in Cell_CellValueChanged,
+            // Invalidate_CurrentArrangement via Row_RowAdded) kann neue ViewItem-
+            // Instanzen erzeugt haben, sodass die übergebenen Parameter verwaist
+            // sind. Typisches Szenario: asynchrones Skript feuert Cell_CellValueChanged
+            // zwischen dem Lesen von CursorPosRow in Cursor_Move und dem Aufruf
+            // von CursorPos_Set. Ohne Migration würde die Position verworfen und
+            // die Tastatur-Navigation bricht ab.
+            var oldRli = row as RowListItem;
+            var colItem = column?.Column;
+            var rowItem = oldRli?.Row;
+            var chapter = oldRli?.AlignsToChapter;
+            var ca = CurrentArrangement;
+            var freshCol = colItem is { IsDisposed: false } && ca is { IsDisposed: false } ? ca[colItem] : null;
+            // RowItem + Kapitel-Caption nutzen, nicht _rowLookup — sonst wird
+            // bei mehrfacher Anzeige einer Row in verschiedenen Kapiteln das
+            // falsche RowListItem geliefert.
+            var freshRow = rowItem is { IsDisposed: false } ? GetRow(rowItem, chapter) : null;
+
+            if (freshCol is not null && freshRow is not null
+                && ca is { IsDisposed: false } && ca.Contains(freshCol)
+                && AllViewItems is { } avi2 && avi2.ContainsValue(freshRow)) {
+                column = freshCol;
+                row = freshRow;
+            } else {
+                column = null;
+                row = null;
+            }
         }
 
         var sameRow = CursorPosRow == row;
@@ -1437,7 +1463,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (view.GetJson("CursorPos") is not null) {
             tb.Cell.DataOfCellKey(view.GetString("CursorPos"), out var column, out var row);
-            CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
+            CursorPos_Set(CurrentArrangement?[column], GetRow(row, null), false);
         }
 
         if (view.GetJson("TempSort") is not null) {
@@ -1514,6 +1540,21 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
         var idx = _sortedViewItems.IndexOf(row);
+        // Asynchrone Skript-Abarbeitung (Cell_CellValueChanged → RemoveRowItems)
+        // kann zwischen dem Lesen von CursorPosRow in Cursor_Move und diesem
+        // Aufruf neue RowListItem-Instanzen erzeugt haben. Dann ist row
+        // verwaist und IndexOf liefert -1. Über RowItem-Identität UND Kapitel-
+        // Caption die aktuelle Instanz suchen (übernimmt auch das korrekte
+        // Kapitel, falls die Row in mehreren angezeigt wird). Ohne diesen
+        // Fallback würde View_NextRow null liefern, Cursor_Move gar nicht
+        // mehr weiterwandern und CursorPos_Set die Position verwerfen.
+        if (idx < 0) {
+            var fresh = GetRow(row.Row, row.AlignsToChapter);
+            if (fresh is not null) {
+                row = fresh;
+                idx = _sortedViewItems.IndexOf(row);
+            }
+        }
         return idx < 0 ? null : FindVisibleRowListItem(idx + 1, 1);
     }
 
@@ -1521,6 +1562,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
         var idx = _sortedViewItems.IndexOf(row);
+        // Siehe View_NextRow: verwaiste Instanz über RowItem-Identität +
+        // Kapitel-Caption auflösen.
+        if (idx < 0) {
+            var fresh = GetRow(row.Row, row.AlignsToChapter);
+            if (fresh is not null) {
+                row = fresh;
+                idx = _sortedViewItems.IndexOf(row);
+            }
+        }
         return idx < 0 ? null : FindVisibleRowListItem(idx - 1, -1);
     }
 
@@ -2732,7 +2782,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 }
             }
 
-            var rd = table.GetRow(newRow, false);
+            var rd = table.GetRow(newRow, null);
             table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
 
             return string.Empty;
@@ -3093,8 +3143,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
-        DoCursorPos();
-
         _rowsVisibleUnique = allrows;
         _sortedViewItems = sortedItems;
         _cachedRowViewItems = [.. sortedItems.OfType<RowListItem>()];
@@ -3102,6 +3150,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         foreach (var rli in _cachedRowViewItems) {
             _rowLookup.TryAdd(rli.Row, rli);
         }
+
+        // ERST nach _cachedRowViewItems/_rowLookup: DoCursorPos benötigt die
+        // aktuellen Collections, um verwaiste CursorPosRow-/CursorPosColumn-
+        // Referenzen auf die neuen Instanzen migrieren zu können.
+        DoCursorPos();
     }
 
     /// <summary>
@@ -3817,7 +3870,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, _, _) = GetContextData(e.HotItem);
-        var rli = GetRow(row, false);
+        var rli = GetRow(row, null);
         var cp = rli?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
         var vi = CurrentArrangement?[column];
         CopyToClipboard(column, row, true, PointToScreen(new Point(vi?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
@@ -3997,7 +4050,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         // Cursor auf die neue Zeile setzen. GetRow löst über _ = AllViewItems
         // den view-Aufbau aus, sodass die neue Zeile in _rowLookup liegt.
-        var newRowItem = GetRow(newRow, false);
+        var newRowItem = GetRow(newRow, null);
         if (View_ColumnFirst() is { } firstViewCol && newRowItem is not null) {
             CursorPos_Set(firstViewCol, newRowItem, true);
         }
@@ -4164,8 +4217,36 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void DoCursorPos() {
+        // Nach einem Neuaufbau (CalculateAllViewItems) können CursorPosRow/
+        // CursorPosColumn auf verwaiste Instanzen zeigen — z.B. wenn
+        // RemoveRowItems in Cell_CellValueChanged die alten RowListItems
+        // entfernt und CalculateAllViewItems_Rows neue Instanzen erzeugt hat,
+        // oder wenn Row_RowAdded → Invalidate_CurrentArrangement ein neues
+        // ColumnViewCollection mit neuen ColumnViewItems angelegt hat. Über die
+        // stabile RowItem-/ColumnItem-Identität die aktuellen Instanzen finden.
+        // Die Cursorposition (Zeile/Spalte) ändert sich dadurch nicht, daher
+        // werden keine Events ausgelöst. Ohne diese Pflege würde CursorPos_Set
+        // beim nächsten Validieren (in _Table_ViewChanged oder Cursor_Move) die
+        // Position verwerfen — die Tastatur-Navigation bricht ab.
+        if (CursorPosRow is { Row: { IsDisposed: false } cursorRow } oldRli) {
+            // Über RowItem-Identität UND Kapitel-Caption migrieren, nicht über
+            // _rowLookup (das nur das erste RowListItem pro Row speichert und
+            // bei mehrfacher Anzeige einer Row in verschiedenen Kapiteln das
+            // falsche liefern würde).
+            var freshRli = GetRow(cursorRow, oldRli.AlignsToChapter);
+            if (freshRli is not null && !ReferenceEquals(freshRli, oldRli)) {
+                CursorPosRow = freshRli;
+            }
+        }
+
+        if (CursorPosColumn is { Column: { IsDisposed: false } cursorCol } oldCvi
+            && CurrentArrangement is { IsDisposed: false } ca
+            && ca[cursorCol] is { } freshCvi && !ReferenceEquals(freshCvi, oldCvi)) {
+            CursorPosColumn = freshCvi;
+        }
+
         foreach (var rdli in _cachedRowViewItems) {
-            rdli.Column = CursorPosRow == rdli ? CursorPosColumn?.Column : null;
+            rdli.Column = ReferenceEquals(CursorPosRow, rdli) ? CursorPosColumn?.Column : null;
         }
     }
 
@@ -4629,14 +4710,28 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return (controlPos, null, string.Empty);
     }
 
-    private RowListItem? GetRow(RowItem? row, bool onlyIfVisible) {
-        if (row is null) { return null; }
-
-        if (onlyIfVisible && _mustDoAllViewItems) { return null; }
+    /// <summary>
+    /// Liefert das <see cref="RowListItem"/> für die übergebene Row.
+    /// Ist <paramref name="chapter"/> null, wird das erste gefundene
+    /// RowListItem der Row geliefert (über <c>_rowLookup</c>, das per
+    /// <c>TryAdd</c> das erste speichert) — ausreichend, wenn Kapitel
+    /// irrelevant ist. Ist <paramref name="chapter"/> gesetzt, wird die
+    /// exakte Kombination aus Row und Kapitel-Caption gesucht — wichtig,
+    /// wenn eine Row in mehreren Kapiteln angezeigt wird. Die Lookup mit
+    /// Kapitel erfolgt O(1) über <see cref="RowListItem.Identifier(RowItem, string)"/>,
+    /// der der Schlüssel in <c>_allViewItems</c> ist.
+    /// </summary>
+    private RowListItem? GetRow(RowItem? row, string? chapter) {
+        if (row is not { IsDisposed: false }) { return null; }
 
         _ = AllViewItems;
 
-        return _rowLookup.TryGetValue(row, out var rli) ? rli : null;
+        if (chapter is null) {
+            return _rowLookup.TryGetValue(row, out var firstRli) ? firstRli : null;
+        }
+
+        var id = RowListItem.Identifier(row, chapter);
+        return _allViewItems.TryGetValue(id, out var rb) && rb is RowListItem rli && !rli.IsDisposed ? rli : null;
     }
 
     private void Invalidate_AllViewItems(bool andclear) {
@@ -4794,7 +4889,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
-        if (GetRow(e.Row, true) is not null) {
+        // Nur bei aktuellen ViewItems ist die Abfrage, ob die Row überhaupt
+        // angezeigt wurde, aussagekräftig. Bei pending Invalidate würde
+        // GetRow sonst einen unnötigen Voll-Aufbau erzwingen.
+        if (_mustDoAllViewItems) { return; }
+        if (GetRow(e.Row, null) is not null) {
             Invalidate_AllViewItems(false);
         }
     }

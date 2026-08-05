@@ -662,7 +662,9 @@ public class TableFile : Table {
         [".csv"] = typeof(TableCSV),
         [".hbdb"] = typeof(TableCSV),
         [".mbdb"] = typeof(TableFragments),
-        [".tblh"] = typeof(TableChunk)
+        [".tblh"] = typeof(TableChunk),
+        [".tblj"] = typeof(TableJsonFile),
+        [".mtblj"] = typeof(TableJsonFragments)
     };
 
     private static void GenerateTableUpdateTimer() {
