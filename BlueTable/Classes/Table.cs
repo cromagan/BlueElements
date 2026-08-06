@@ -1618,10 +1618,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
-                                CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
-                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                            CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1903,9 +1903,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             json["variables"] = new VariableCollection(_variables.ToList(), false).ParseableJson();
         }
 
-        // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert
+        // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert.
+        // Rows werden in Speicher-Reihenfolge ausgegeben (SortDefinition bzw. KeyName),
+        // damit eine deterministische Datei entsteht - siehe Table.RowsInSaveOrder().
         if (Column is { IsDisposed: false, Count: > 0 }) { json["columns"] = Column.ParseableJson()["columns"]; }
-        if (Row is { IsDisposed: false, Count: > 0 }) { json["rows"] = Row.ParseableJson()["rows"]; }
+        if (Row is { IsDisposed: false, Count: > 0 }) {
+            JsonArray rowsJson = [];
+            foreach (var row in RowsInSaveOrder()) { rowsJson.Add(row.ParseableJson()); }
+            if (rowsJson.Count > 0) { json["rows"] = rowsJson; }
+        }
         if (Cell is { IsDisposed: false } && Cell.ParseableJson() is { Count: > 0 } cells) {
             foreach (var kvp in cells) { json[kvp.Key] = kvp.Value; }
         }
@@ -2141,6 +2147,23 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         OnLoaded(false, false);
         OnViewChanged();
         OnInvalidateView();
+    }
+
+    /// <summary>
+    /// Liefert die nicht-disposed Zeilen dieser Tabelle in der Reihenfolge,
+    /// in der sie gespeichert werden sollen. Ist eine <see cref="SortDefinition" />
+    /// vorhanden, wird diese angewendet. Andernfalls wird aufsteigend nach
+    /// <see cref="RowItem.KeyName" /> sortiert (OrdinalIgnoreCase).
+    /// </summary>
+    /// <returns>Eine neue, sortierte Liste aller nicht-disposed Zeilen.</returns>
+    public List<RowItem> RowsInSaveOrder() {
+        if (IsDisposed) { return []; }
+
+        var rows = Row.Where(r => !r.IsDisposed).ToList();
+
+        return SortDefinition is { } sd
+            ? sd.SortedRows(rows)
+            : [.. rows.OrderBy(r => r.KeyName, StringComparer.OrdinalIgnoreCase)];
     }
 
     /// <summary>

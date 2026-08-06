@@ -207,8 +207,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         targetPath = targetPath.NormalizeFile();
 
         var targetSuffix = targetPath.FileSuffix().ToLowerInvariant();
-        if (targetSuffix is not ("bdb" or "mbdb" or "csv" or "tblh")) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .csv, .tblh");
+        if (targetSuffix is not ("bdb" or "mbdb" or "csv" or "tblh" or "tblj" or "mtblj")) {
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .csv, .tblh, .tblj, .mtblj");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -221,7 +221,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
         }
 
-        var forbidden = new[] { "bdb", "mbdb", "csv", "hbdb", "tblh" };
+        var forbidden = new[] { "bdb", "mbdb", "csv", "hbdb", "tblh", "tblj", "mtblj" };
 
         foreach (var ext in forbidden) {
             if (string.Equals(ext, targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }
@@ -237,6 +237,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             "csv" => new TableCSV(targetPath, source),
             "mbdb" => new TableFragments(targetPath, source),
             "tblh" => new TableChunk(targetPath, source),
+            "tblj" => new TableJsonFile(targetPath, source),
+            "mtblj" => new TableJsonFragments(targetPath, source),
             _ => new TableFile(targetPath, source)
         };
 

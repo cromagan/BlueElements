@@ -28,12 +28,9 @@ public static class CsvHelper {
     public static string ExportCSV(Table table, char separator, bool firstLineIsHeader) {
         var sb = new StringBuilder();
 
-        var columns = new List<ColumnItem>();
-        foreach (var col in table.Column) {
-            if (!col.IsDisposed && col.SaveContent) {
-                columns.Add(col);
-            }
-        }
+        var columns = table.ColumnsInSaveOrder()
+            .Where(col => col.SaveContent)
+            .ToList();
 
         if (columns.Count == 0) { return string.Empty; }
 
@@ -42,9 +39,7 @@ public static class CsvHelper {
             sb.AppendJoin(separator, headerFields).AppendLine();
         }
 
-        foreach (var row in table.Row) {
-            if (row.IsDisposed) { continue; }
-
+        foreach (var row in table.RowsInSaveOrder()) {
             var escapedFields = EscapeCSVFields(columns.Select(row.CellGetString).ToList(), separator);
             sb.AppendJoin(separator, escapedFields).AppendLine();
         }

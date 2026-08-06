@@ -52,11 +52,6 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override bool Equals(object? obj) => Equals(obj as UniqueValueDefinition);
 
-    // GetHashCode MUSS zu Equals passen: Equals vergleicht KeyName mit
-    // OrdinalIgnoreCase, also muss der Hash auf der gleichen Normierung basieren.
-    // Sonst kaputte Objekte in HashSet/Dictionary (CS0659).
-    public override int GetHashCode() => KeyName.GetHashCode(StringComparison.OrdinalIgnoreCase);
-
     public string ErrorReason() {
         if (Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
         if (_internal.Count == 0) { return "Mindestens eine Spalte muss ausgewählt sein."; }
@@ -69,6 +64,11 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return string.Empty;
     }
 
+    // GetHashCode MUSS zu Equals passen: Equals vergleicht KeyName mit
+    // OrdinalIgnoreCase, also muss der Hash auf der gleichen Normierung basieren.
+    // Sonst kaputte Objekte in HashSet/Dictionary (CS0659).
+    public override int GetHashCode() => KeyName.GetHashCode(StringComparison.OrdinalIgnoreCase);
+
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen."; }
         return tb.IsValueEditable(TableDataType.UniqueValues, string.Empty);
@@ -80,10 +80,31 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return result;
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("type", "UniqueValueDefinition");
+        json.SetArrayIfNotEmpty("columns", _internal.Select(c => c.KeyName));
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
+    }
+
+    public void ParseFinishedJson(JsonObject parsed) {
+        SortColumnsBySaveOrder();
+        KeyName = RebuildKeyName();
+    }
+
+    public void ParseJson(JsonObject json) {
+        if (json["columns"] is JsonArray arr) {
+            _internal.Clear();
+            foreach (var item in arr) {
+                if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
+            }
+        }
     }
 
     public override bool ParseThis(string key, string value) {
@@ -110,18 +131,6 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public string ReadableText() => _internal.Count == 0 ? "(leer)" : string.Join(";", _internal.Select(x => x.Caption));
 
-    /// <summary>
-    /// Übernimmt alle Werte von <paramref name="other"/>. Wird beim Recycling in
-    /// <see cref="Table.SetValueInternal"/> (case UniqueValues) verwendet:
-    /// Existierende Instanzen behalten ihre Identität, nur die Spalten und der
-    /// KeyName werden aktualisiert.
-    /// </summary>
-    internal void UpdateFrom(UniqueValueDefinition other) {
-        _internal.Clear();
-        _internal.AddRange(other._internal);
-        KeyName = other.KeyName;
-    }
-
     public void Repair() {
         if (_internal.Count == 0) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
@@ -145,25 +154,16 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("type", "UniqueValueDefinition");
-        json.SetArrayIfNotEmpty("columns", _internal.Select(c => c.KeyName));
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) {
-        SortColumnsBySaveOrder();
-        KeyName = RebuildKeyName();
-    }
-
-    public void ParseJson(JsonObject json) {
-        if (json["columns"] is JsonArray arr) {
-            _internal.Clear();
-            foreach (var item in arr) {
-                if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
-            }
-        }
+    /// <summary>
+    /// Übernimmt alle Werte von <paramref name="other"/>. Wird beim Recycling in
+    /// <see cref="Table.SetValueInternal"/> (case UniqueValues) verwendet:
+    /// Existierende Instanzen behalten ihre Identität, nur die Spalten und der
+    /// KeyName werden aktualisiert.
+    /// </summary>
+    internal void UpdateFrom(UniqueValueDefinition other) {
+        _internal.Clear();
+        _internal.AddRange(other._internal);
+        KeyName = other.KeyName;
     }
 
     private string RebuildKeyName() => _internal.Count == 0
