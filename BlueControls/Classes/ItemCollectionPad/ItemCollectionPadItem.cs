@@ -1116,32 +1116,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return null;
     }
 
-    internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
-        foreach (var thisIt in _internal) {
-            if (thisIt != notOfMe) {
-                foreach (var thisPt in thisIt.JointPoints) {
-                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    internal List<PointM> GetJointPoints(string pointName, AbstractPadItem? notOfMe) {
-        var l = new List<PointM>();
-
-        foreach (var thisIt in _internal) {
-            if (thisIt != notOfMe) {
-                foreach (var thisPt in thisIt.JointPoints) {
-                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { l.Add(thisPt); }
-                }
-            }
-        }
-
-        return l;
-    }
-
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
     /// Zeilenselectionen werden dabei ignoriert.
@@ -1160,16 +1134,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     internal bool IsHead() => string.Equals(Caption, "Head", StringComparison.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
-    /// </summary>
-    /// <param name="names"></param>
-    internal void Items_DeleteJointPoints(List<string> names) {
-        foreach (var thisItem in _internal) {
-            thisItem.DeleteJointPoints(names);
-        }
-    }
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = _internal.IndexOf(bpi);

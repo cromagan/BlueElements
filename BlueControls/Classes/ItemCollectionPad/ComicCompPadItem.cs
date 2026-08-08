@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -43,6 +45,8 @@ public class ComicCompPadItem : AbstractPadItem {
         MovablePoint.Add(P2);
         _bitmap = null;
         CalculateJointMiddle(P1, P2);
+        JointPoints.CollectionChanged += JointPoints_CollectionChanged;
+        JointMiddle.Moved += JointMiddle_Moved;
         ImageChanged();
     }
 
@@ -61,6 +65,14 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override string Description => string.Empty;
+
+    /// <summary>
+    /// Diese Punkte sind Verbindungspunkte.
+    /// Sie können an sich verschoben werden, aber dessen CanvasPosition ist immer in Relation zum JointMiddle.
+    /// Deswegen verursacht ein Verschieben auch nur eine Relations-Änderung.
+    /// Zusätzlich werden diese Punkte auf Bewegungen getrackt und auch gespeichert.
+    /// </summary>
+    public ObservableCollection<PointM> JointPoints { get; } = [];
 
     /// <summary>
     /// Haupt Gelenkpunkt 1
@@ -83,9 +95,24 @@ public class ComicCompPadItem : AbstractPadItem {
 
     protected override int SaveOrder => 999;
 
+    private bool ShowJointPoints {
+        get {
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowJointPoints; }
+            return false;
+        }
+    }
+
     #endregion
 
     #region Methods
+
+    public void AddJointPointAbsolute(string name, float x, float y) {
+        var p = new PointM(name, x, y);
+        p.Distance = GetLength(JointMiddle, p);
+        p.Angle = GetAngle(JointMiddle, p) - GetAngle(P1, P2);
+        p.Parent = this;
+        JointPoints.Add(p);
+    }
 
     public override bool CanvasContains(PointF value, float zoom) {
         var ne = 6.ControlToCanvas(zoom) + 1;
@@ -97,12 +124,28 @@ public class ComicCompPadItem : AbstractPadItem {
         return false;
     }
 
+    public void DoJointPoint(PointM p) {
+        if (JointPoints.Contains(p)) {
+            p.Distance = GetLength(JointMiddle, p);
+            p.Angle = GetAngle(JointMiddle, p) - GetAngle(P1, P2);
+        }
+    }
+
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [
             new FlexiControlForProperty<int>(() => Width),
                 .. base.GetProperties(widthOfControl),
         ];
+        result.Add(new FlexiControlForDelegate(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
         return result;
+    }
+
+    public override IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "JointPoints", StringComparison.OrdinalIgnoreCase)) {
+            return JointPoints.GetByKey(key);
+        }
+
+        return base.GetSubItemByKey(containerName, key);
     }
 
     public Bitmap GetTransformedBitmap() { //USED: BZL
@@ -139,6 +182,25 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public override List<string> ParseableItems() => [];
 
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.SetArrayIfNotEmpty("jointpoints", JointPoints);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        base.ParseJson(json);
+
+        if (json["jointpoints"] is JsonArray jps) {
+            foreach (var item in jps) {
+                if (item is not JsonObject jo) { continue; }
+                var jp = new PointM(this, string.Empty, 0f, 0f);
+                jp.ParseJson(jo);
+                JointPoints.Add(jp);
+            }
+        }
+    }
+
     public override bool ParseThis(string key, string value) {
         Develop.DebugPrint_NichtImplementiert(true);
         return true;
@@ -149,7 +211,10 @@ public class ComicCompPadItem : AbstractPadItem {
             CalculateJointMiddle(P1, P2);
         }
 
-        base.PointMoved(sender, e);
+        if (sender is PointM p) {
+            if (e.ByMouse) { DoJointPoint(p); }
+            OnPropertyChanged("JointPoint");
+        }
     }
 
     public override string ReadableText() => "Bewegliches Element";
@@ -161,6 +226,13 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
+
+    public void Verbindungspunkt_hinzu() => AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
+
+    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
+        if (!JointPoints.Contains(myPoint)) { return; }
+        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
+    }
 
     protected override RectangleF CalculateCanvasUsedArea() {
         //var wp12 = AngleOfMiddleLine();
@@ -192,6 +264,16 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            JointPoints.CollectionChanged -= JointPoints_CollectionChanged;
+            JointMiddle.Moved -= JointMiddle_Moved;
+            foreach (var p in JointPoints) { p.Dispose(); }
+            JointPoints.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         var lOt = _ber_Lo.CanvasToControl(zoom, offsetX, offsetY);
         var rOt = _ber_Ro.CanvasToControl(zoom, offsetX, offsetY);
@@ -208,6 +290,10 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
             gr.DrawLine(ZoomPad.PenGray, P1.CanvasToControl(zoom, offsetX, offsetY), P2.CanvasToControl(zoom, offsetX, offsetY));
         }
+
+        if (!forPrinting && ShowJointPoints) {
+            DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.HandlePoint_Joint, States.Standard, true);
+        }
     }
 
     private void ImageChanged() {
@@ -221,6 +307,46 @@ public class ComicCompPadItem : AbstractPadItem {
             P2.Y = _bitmap.Height;
         }
         OnPropertyChanged();
+    }
+
+    private void JointMiddle_Moved(object? sender, MoveEventArgs e) {
+        if (JointPoints.Count == 0) { return; }
+
+        var angle = GetAngle(P1, P2);
+        foreach (var thispoint in JointPoints) {
+            thispoint.SetTo(JointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
+        }
+    }
+
+    private void JointPoint_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
+        if (sender is not PointM p) { return; }
+        OnPropertyChangedExt($"JointPoints[{p.KeyName}].{e.RelativePath}", e.Partial);
+    }
+
+    /// <summary>
+    /// Wird aufgerufen, wenn sich die Auflistung der Verbindungspunkte ändert.
+    /// Sorgt dafür, dass neue Punkte auf Bewegungen getrackt werden.
+    /// </summary>
+    private void JointPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
+        if (e.NewItems is not null) {
+            foreach (var thisit in e.NewItems) {
+                if (thisit is PointM p) {
+                    p.Moved += PointMoved;
+                    p.PropertyChangedExt += JointPoint_PropertyChangedExt;
+                }
+            }
+        }
+
+        if (e.OldItems is not null) {
+            foreach (var thisit in e.OldItems) {
+                if (thisit is PointM p) {
+                    p.Moved -= PointMoved;
+                    p.PropertyChangedExt -= JointPoint_PropertyChangedExt;
+                }
+            }
+        }
+
+        OnPropertyChanged("JointPoint");
     }
 
     #endregion

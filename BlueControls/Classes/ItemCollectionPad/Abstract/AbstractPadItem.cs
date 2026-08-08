@@ -5,7 +5,6 @@ using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
-using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
@@ -42,10 +41,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (string.IsNullOrEmpty(KeyName)) { KeyName = GetUniqueKey(); }
 
         JointMiddle = new PointM(nameof(JointMiddle), 0, 0);
-        JointMiddle.Moved += JointMiddle_Moved;
 
         MovablePoint.CollectionChanged += Point_CollectionChanged;
-        JointPoints.CollectionChanged += Point_CollectionChanged;
     }
 
     #endregion
@@ -110,14 +107,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
     /// </summary>
     public PointM JointMiddle { get; }
-
-    /// <summary>
-    /// Diese Punket sind Verbindungspunkte.
-    /// Sie können an sich verschoben werden, aber dessen CanvasPosition ist immer in Relation zum JointParentPoint.
-    /// Deswegen verursacht ein Verschoeben auch nur eine Relations-Änderung.
-    /// Zusätzlich werden diese Punkt auf Bewegungen getrackt und auch bei ToString gespeichert
-    /// </summary>
-    public ObservableCollection<PointM> JointPoints { get; } = [];
 
     public string KeyName {
         get;
@@ -188,13 +177,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public bool ShowJointPoints {
-        get {
-            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowJointPoints; }
-            return this is ItemCollectionPadItem { IsDisposed: false, ShowJointPoints: true }; // Wichtig, wegen NEW!
-        }
-    }
-
     public List<string> Tags { get; } = [];
     protected abstract int SaveOrder { get; }
 
@@ -221,18 +203,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         Parent = parent;
     }
 
-    public void AddJointPointAbsolute(string name, float x, float y) {
-        if (_jointReferenceFirst is null || _jointReferenceSecond is null) { return; }
-
-        var p = new PointM(name, x, y);
-        p.Distance = GetLength(JointMiddle, p);
-        p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
-        p.Parent = this;
-        JointPoints.Add(p);
-    }
-
     /// <summary>
-    /// Prüft, ob die angegebenen Koordinaten das Element berühren.
+    /// Prüft, ob die angegebenen Koordinaten das Element berührt.
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
     /// </summary>
     /// <remarks></remarks>
@@ -253,15 +225,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return 0;
     }
 
-    public void DoJointPoint(PointM p) {
-        if (_jointReferenceFirst is not null && _jointReferenceSecond is not null) {
-            if (JointPoints.Contains(p)) {
-                p.Distance = GetLength(JointMiddle, p);
-                p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
-            }
-        }
-    }
-
     public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (forPrinting && !Bei_Export_sichtbar && !ShowAlways || zoom < 0.00001) { return; }
 
@@ -274,10 +237,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
             if (!forPrinting) {
-                if (ShowJointPoints) {
-                    DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.HandlePoint_Joint, States.Standard, true);
-                }
-
                 if (zoom > 1) {
                     var bp = BorderDraw.GetPen(Color.Gray, zoom);
                     lock (bp) { gr.DrawRectangle(bp, positionControl); }
@@ -332,23 +291,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         ];
 
-        if (_jointReferenceFirst is not null && _jointReferenceSecond is not null) {
-            result.Add(new FlexiControlForDelegate(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
-
-            //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
-            //d
-        }
-
         return result;
     }
 
     public override IJsonParseable? GetSubItemByKey(string containerName, string key) {
         if (string.Equals(containerName, "Points", StringComparison.OrdinalIgnoreCase)) {
             return MovablePoint.GetByKey(key);
-        }
-
-        if (string.Equals(containerName, "JointPoints", StringComparison.OrdinalIgnoreCase)) {
-            return JointPoints.GetByKey(key);
         }
 
         return null;
@@ -386,9 +334,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         foreach (var thisPoint in MovablePoint) {
             result.ParseableAdd("Point", thisPoint as IStringable);
         }
-        foreach (var thisPoint in JointPoints) {
-            result.ParseableAdd("JointPoint", thisPoint as IStringable);
-        }
 
         result.ParseableAdd("Tags", Tags, false);
 
@@ -410,7 +355,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         json.Set("page", Page);
 
         json.SetArrayIfNotEmpty("points", MovablePoint);
-        json.SetArrayIfNotEmpty("jointpoints", JointPoints);
         json.SetArrayIfNotEmpty("tags", Tags);
 
         return json;
@@ -445,15 +389,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                         break;
                     }
                 }
-            }
-        }
-
-        if (json["jointpoints"] is JsonArray jps) {
-            foreach (var item in jps) {
-                if (item is not JsonObject jo) { continue; }
-                var jp = new PointM(this, string.Empty, 0f, 0f);
-                jp.ParseJson(jo);
-                JointPoints.Add(jp);
             }
         }
 
@@ -498,14 +433,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
                 return true;
 
-            case "jointpoint":
-                if (value.StartsWith("[I]", StringComparison.Ordinal)) { value = value.FromNonCritical(); }
-
-                var p = new PointM(this, value);
-                JointPoints.Add(p);
-
-                return true;
-
             case "removetoo": // TODO: Alt, löschen, 02.03.2020
                 //RemoveToo.AddRange(value.FromNonCritical().SplitAndCutByCr());
                 return true;
@@ -543,13 +470,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     //    ParseFinished(parsestring);
     //}
     public virtual void PointMoved(object? sender, MoveEventArgs e) {
-        if (sender is not PointM p) { return; }
+        if (sender is not PointM) { return; }
 
-        if (e.ByMouse) {
-            DoJointPoint(p);
-        }
-
-        OnPropertyChanged("JointPoint");
+        OnPropertyChanged("Point");
     }
 
     public abstract string ReadableText();
@@ -587,46 +510,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return bmp;
     }
 
-    public void Verbindungspunkt_hinzu() => AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
-
-    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
-        if (!JointPoints.Contains(myPoint)) { return; }
-        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
-    }
-
-    internal void ConnectJointPoint(AbstractPadItem itemToConnect, string pointnameInItem, string otherPointName, bool connectX, bool connectY) {
-        var myPoint = itemToConnect.JointPoints.GetByKey(pointnameInItem);
-        if (myPoint is null) { return; }
-
-        if (itemToConnect.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
-
-        var otherPoint = icpi.GetJointPoint(otherPointName, itemToConnect);
-        if (otherPoint is null) { return; }
-
-        if (connectX && connectY) {
-            Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
-        } else if (connectX) {
-            Move(otherPoint.X - myPoint.X, 0, false);
-        } else {
-            Move(0, otherPoint.Y - myPoint.Y, false);
-        }
-    }
-
-    /// <summary>
-    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
-    /// </summary>
-    /// <param name="names"></param>
-    internal void DeleteJointPoints(List<string> names) {
-        var j = new List<PointM>();
-        j.AddRange(JointPoints);
-
-        foreach (var thispoint in j) {
-            if (names.Count == 0 || names.Contains(thispoint.KeyName, StringComparer.OrdinalIgnoreCase)) {
-                JointPoints.Remove(thispoint);
-            }
-        }
-    }
-
     internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();
 
     protected abstract RectangleF CalculateCanvasUsedArea();
@@ -657,16 +540,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             ParentChanged = null;
             ParentChanging = null;
 
-            JointMiddle.Moved -= JointMiddle_Moved;
             MovablePoint.CollectionChanged -= Point_CollectionChanged;
-            JointPoints.CollectionChanged -= Point_CollectionChanged;
 
             JointMiddle.Dispose();
             foreach (var p in MovablePoint) { p.Dispose(); }
-            foreach (var p in JointPoints) { p.Dispose(); }
 
             MovablePoint.RemoveAll();
-            JointPoints.Clear();
         }
     }
 
@@ -684,18 +563,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _canvasUsedArea = default;
         base.OnPropertyChanged(propertyName);
-    }
-
-    private void JointMiddle_Moved(object? sender, MoveEventArgs e) {
-        if (_jointReferenceFirst is null || _jointReferenceSecond is null) { return; }
-
-        if (JointPoints.Count > 0) {
-            var angle = GetAngle(_jointReferenceFirst, _jointReferenceSecond);
-
-            foreach (var thispoint in JointPoints) {
-                thispoint.SetTo(JointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
-            }
-        }
     }
 
     private void Point_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
@@ -717,20 +584,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             }
         }
 
-        if (e.Action == NotifyCollectionChangedAction.Reset) {
-            foreach (var thisit in JointPoints) {
-                thisit.Moved -= PointMoved;
-                thisit.PropertyChangedExt -= SubPoint_PropertyChangedExt;
-            }
-        }
-
         OnPropertyChanged("JointPoint");
     }
 
     private void SubPoint_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
         if (sender is not PointM p) { return; }
-        var container = JointPoints.Contains(p) ? "JointPoints" : "Points";
-        OnPropertyChangedExt($"{container}[{p.KeyName}].{e.RelativePath}", e.Partial);
+        OnPropertyChangedExt($"Points[{p.KeyName}].{e.RelativePath}", e.Partial);
     }
 
     #endregion

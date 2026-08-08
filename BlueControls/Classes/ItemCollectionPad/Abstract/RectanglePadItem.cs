@@ -105,11 +105,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
     public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
         p ??= new PointM(JointMiddle);
 
-        foreach (var thisP in JointPoints) {
-            thisP.Mirror(p, vertical, horizontal);
-            DoJointPoint(thisP);
-        }
-
         Plo.Mirror(p, vertical, horizontal);
         Pru.Mirror(p, vertical, horizontal);
     }
@@ -153,10 +148,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
-        if (JointPoints.Contains(point)) {
-            base.PointMoved(sender, e);
-            return;
-        }
 
         var x = point.X;
         var y = point.Y;

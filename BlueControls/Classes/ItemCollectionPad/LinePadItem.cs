@@ -175,11 +175,6 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
 
-        if (JointPoints.Contains(point)) {
-            base.PointMoved(sender, e);
-            return;
-        }
-
         CalcTempPoints();
         CalculateJointMiddle(_point1, _point2);
         base.PointMoved(sender, e);

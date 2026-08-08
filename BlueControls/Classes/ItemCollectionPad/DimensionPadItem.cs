@@ -218,11 +218,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         _point1.Mirror(p, vertical, horizontal);
         _point2.Mirror(p, vertical, horizontal);
         _textPoint.Mirror(p, vertical, horizontal);
-
-        foreach (var thisP in JointPoints) {
-            thisP.Mirror(p, vertical, horizontal);
-            DoJointPoint(thisP);
-        }
     }
 
     public override List<string> ParseableItems() {
@@ -312,11 +307,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
 
     public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
-
-        if (JointPoints.Contains(point)) {
-            base.PointMoved(sender, e);
-            return;
-        }
 
         CalculateOtherPoints();
         base.PointMoved(sender, e);
