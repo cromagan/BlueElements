@@ -284,13 +284,11 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// </summary>
     /// <returns></returns>
     public virtual List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =
-        [
-            new FlexiControl("Allgemein:", widthOfControl, true),
-
-            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
-        ];
-
+        List<GenericControl> result = [];
+        if (Parent is not null) {
+            result.Add(new FlexiControl("Allgemein:", widthOfControl, true));
+            result.Add(new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar));
+        }
         return result;
     }
 

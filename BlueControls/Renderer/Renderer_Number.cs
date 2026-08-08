@@ -99,7 +99,7 @@ public class Renderer_Number : Renderer_Abstract {
         List<GenericControl> result =
         [   new FlexiControlForProperty<string>(() => Präfix),
             new FlexiControlForProperty<string>(() => Suffix,Renderer_TextOneLine.Suffixe(), true),
-            new FlexiControlForProperty<bool>(() => Tausender_Trennzeichen),
+            new FlexiControlForProperty<bool>(() => Tausender_Trennzeichen) { Suffix = "Stk." },
             new FlexiControlForProperty<int>(() => Nachkommastellen)
         ];
         return result;

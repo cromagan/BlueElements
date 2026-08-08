@@ -167,6 +167,8 @@ public partial class PadEditor : FormWithStatusBar {
         if (_currentItemsForSideMenu is { IsDisposed: false } icpi) {
             icpi.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
         }
+
+        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
     }
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;

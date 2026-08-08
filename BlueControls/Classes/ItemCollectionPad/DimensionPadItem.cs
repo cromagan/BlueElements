@@ -190,7 +190,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<float>(() => Länge_In_Mm),
+            new FlexiControlForProperty<float>(() => Länge_In_Mm) { Suffix = "mm" },
 
             new FlexiControlForProperty<string>(() => Text_Oben),
 

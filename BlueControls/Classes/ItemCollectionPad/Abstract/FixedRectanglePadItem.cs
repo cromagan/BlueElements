@@ -110,8 +110,8 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         List<GenericControl> result =
         [   .. base.GetProperties(widthOfControl),
             new FlexiControl(),
-            new FlexiControlForProperty<float>(() => Breite),
-            new FlexiControlForProperty<float>(() => Höhe),
+            new FlexiControlForProperty<float>(() => Breite) { Suffix = "mm" },
+            new FlexiControlForProperty<float>(() => Höhe) { Suffix = "mm" },
 
         ];
         return result;

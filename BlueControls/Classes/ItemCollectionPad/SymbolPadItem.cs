@@ -85,7 +85,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         List<GenericControl> result =
         [
             new FlexiControlForProperty<Contour>(() => Symbol, ItemsOf(typeof(Contour))),
-            new FlexiControlForProperty<float>(() => Randdicke),
+            new FlexiControlForProperty<float>(() => Randdicke ){ Suffix = "Pixel" },
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
             .. base.GetProperties(widthOfControl),

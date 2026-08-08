@@ -164,8 +164,8 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         result.Add(_button);
         result.Add(new FlexiControlForProperty<string>(() => Script, 3));
-        result.Add(new FlexiControlForProperty<int>(() => Sekunden));
-        result.Add(new FlexiControlForProperty<int>(() => MindestInaktivitaet));
+        result.Add(new FlexiControlForProperty<int>(() => Sekunden) { Suffix = "Sek." });
+        result.Add(new FlexiControlForProperty<int>(() => MindestInaktivitaet) { Suffix = "Sek." });
         result.Add(new FlexiControlForProperty<bool>(() => StandardAktiviert));
         result.Add(new FlexiControlForProperty<bool>(() => Deaktivierbar));
         result.Add(new FlexiControlForProperty<string>(() => Text));
