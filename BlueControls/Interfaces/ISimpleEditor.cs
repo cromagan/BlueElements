@@ -112,7 +112,7 @@ public static class SimpleEditorExtension {
 
         l.Height = Math.Clamp(contentHeight, 100, Math.Max(100, maxHeight));
 
-        return l;;
+        return l;
     }
 
     #endregion

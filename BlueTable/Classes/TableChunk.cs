@@ -309,11 +309,8 @@ public class TableChunk : TableFile {
         chunkId = chunkId.ToLowerInvariant();
 
         List<UndoItem> undoSnapshot;
-        //Develop.Diagnose("UNDO",$"GenerateUndoChunk WAIT: chunkId={chunkId} T{Environment.CurrentManagedThreadId}");
         lock (tb._undoLock) {
-            //Develop.Diagnose("UNDO",$"GenerateUndoChunk ENTER: chunkId={chunkId} Undo.Count={tb.Undo.Count} T{Environment.CurrentManagedThreadId}");
             undoSnapshot = [.. tb.Undo];
-            //Develop.Diagnose("UNDO",$"GenerateUndoChunk DONE: chunkId={chunkId} snapshot={undoSnapshot.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var sortedUndoItems = undoSnapshot

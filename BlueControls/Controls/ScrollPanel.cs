@@ -49,13 +49,26 @@ public class ScrollPanel : ZoomPad {
 
     #region Methods
 
-    public void BeginUpdate() => _freeze++;
+    public void BeginUpdate() {
+        if (_freeze == 0) {
+            SuspendLayout();
+        }
+        _freeze++;
+    }
 
     public void EndUpdate() {
         if (_freeze <= 0) { return; }
         _freeze--;
         if (_freeze > 0) { return; }
         _lastOffsetY = int.MinValue;
+
+        // Kinder positionieren, BEVOR Painting wieder aktiviert wird.
+        PositionChildren();
+        _lastOffsetX = OffsetX;
+        _lastOffsetY = OffsetY;
+
+        ResumeLayout(true);
+
         Invalidate_MaxBounds();
     }
 
@@ -89,8 +102,35 @@ public class ScrollPanel : ZoomPad {
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 
         if (OffsetX == _lastOffsetX && OffsetY == _lastOffsetY) { return; }
+
+        PositionChildren();
         _lastOffsetX = OffsetX;
         _lastOffsetY = OffsetY;
+        Invalidate_MaxBounds();
+    }
+
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+        if (_freeze > 0) { return; }
+        _lastOffsetY = int.MinValue;
+        Invalidate_MaxBounds();
+    }
+
+    protected override void OnControlRemoved(ControlEventArgs e) {
+        base.OnControlRemoved(e);
+        if (_freeze > 0) { return; }
+        _lastOffsetY = int.MinValue;
+        Invalidate_MaxBounds();
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        _lastOffsetY = int.MinValue;
+    }
+
+    private void PositionChildren() {
+        if (ChildLayout == ChildLayout.None) { return; }
+        if (Width < 10 || Height < 10) { return; }
 
         var children = new List<Control>();
         foreach (Control c in Controls) {
@@ -122,27 +162,6 @@ public class ScrollPanel : ZoomPad {
                 c.Top += OffsetY;
             }
         }
-
-        Invalidate_MaxBounds();
-    }
-
-    protected override void OnControlAdded(ControlEventArgs e) {
-        base.OnControlAdded(e);
-        if (_freeze > 0) { return; }
-        _lastOffsetY = int.MinValue;
-        Invalidate_MaxBounds();
-    }
-
-    protected override void OnControlRemoved(ControlEventArgs e) {
-        base.OnControlRemoved(e);
-        if (_freeze > 0) { return; }
-        _lastOffsetY = int.MinValue;
-        Invalidate_MaxBounds();
-    }
-
-    protected override void OnSizeChanged(System.EventArgs e) {
-        base.OnSizeChanged(e);
-        _lastOffsetY = int.MinValue;
     }
 
     #endregion

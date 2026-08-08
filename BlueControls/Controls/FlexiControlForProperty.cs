@@ -109,7 +109,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     Size = new Size(200, 16 + (24 * rowCount));
                     RaiseChangeDelay = 1;
                     TextInputAllowed = false;
-                    CreateSubControls();
                     break;
                 }
 
@@ -126,7 +125,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
                         RaiseChangeDelay = 1;
                         TextInputAllowed = false;
-                        CreateSubControls();
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
                         ImageCode = "Stift|16";
@@ -176,13 +174,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         }
                         RaiseChangeDelay = 1;
                         TextInputAllowed = false;
-                        CreateSubControls();
                     }
                     break;
                 }
         }
 
         #endregion
+
+        CreateSubControls();
 
         QuickInfo = _accessor.QuickInfo;
         _accessor.ValueChanged += _accessor_ValueChanged;
@@ -191,6 +190,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         GenFehlerText();
 
         CheckEnabledState();
+
     }
 
     #endregion

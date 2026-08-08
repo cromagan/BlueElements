@@ -706,17 +706,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
-
         result.AddRange(base.GetProperties(widthOfControl));
 
         if (Parent is null) {
-            //result.Add(new FlexiControl());
-            //result.Add(new FlexiControlForProperty<bool>(() => AutoZoomFit));
-            //result.Add(new FlexiControlForProperty<EditMode>(() => EditMode));
-
             result.Add(new FlexiControl());
             result.Add(new FlexiControl("Referenztabelle:", widthOfControl, true));
-            result.Add(new FlexiControlForProperty<Table?>(() => ReferenceTable, AllAvailableTables()));
+
+            var tables = AllAvailableTables();
+            result.Add(new FlexiControlForProperty<Table?>(() => ReferenceTable, tables));
+
             if (ReferenceTable is { IsDisposed: false } tb) {
                 result.Add(new FlexiControlForDelegate(tb));
             }

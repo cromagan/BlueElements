@@ -117,11 +117,8 @@ public class TableCSV : TableFile {
         var content = ReadAllText(Filename, Encoding.UTF8);
         _csvFileInfo = GetFileInfo(Filename);
 
-        //Develop.Diagnose("UNDO",$"CSV Load Clear WAIT: T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            //Develop.Diagnose("UNDO",$"CSV Load Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.Clear();
-            //Develop.Diagnose("UNDO",$"CSV Load Clear DONE: T{Environment.CurrentManagedThreadId}");
         }
         Row.RemoveNullOrEmpty();
 

@@ -94,6 +94,9 @@ public class FlexiControlForDelegate : FlexiControl {
         GenFehlerText();
 
         CheckEnabledState();
+
+        CreateSubControls();
+
     }
 
     #endregion

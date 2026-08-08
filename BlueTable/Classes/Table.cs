@@ -1768,9 +1768,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public bool Parse(byte[] data, bool isMain, HashSet<string>? parsedRowKeys) {
-        var caller = new System.Diagnostics.StackTrace(1, false);
-        var methods = string.Join(" <- ", caller.GetFrames()?.Skip(1).Take(8).Select(f => f.GetMethod()?.DeclaringType?.Name + "." + f.GetMethod()?.Name) ?? []);
-        Develop.Diagnose("VARS", $"Parse START: dataLen={data.Length} isMain={isMain} _variables.Count={_variables.Count} caller={methods} T{Environment.CurrentManagedThreadId}");
         var pointer = 0;
         var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -1864,7 +1861,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) { Freeze("Tabelleversions-Konflikt"); }
 
-        Develop.Diagnose("VARS", $"Parse ENDE: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
         return true;
     }
 
@@ -2318,11 +2314,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (type == TableDataType.SystemValue) { return; }
 
-        //Develop.Diagnose("UNDO",$"AddUndo WAIT: cmd={type} col={column} row={row?.KeyName} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            //Develop.Diagnose("UNDO",$"AddUndo ENTER: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
-            //Develop.Diagnose("UNDO",$"AddUndo DONE: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
     }
 
@@ -2368,11 +2361,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 Row.Dispose();
 
                 // Listen leeren
-                //Develop.Diagnose("UNDO",$"Dispose Clear WAIT: T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    //Develop.Diagnose("UNDO",$"Dispose Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Clear();
-                    //Develop.Diagnose("UNDO",$"Dispose Clear DONE: T{Environment.CurrentManagedThreadId}");
                 }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
