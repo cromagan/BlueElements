@@ -110,9 +110,20 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString1(), ImageCode.Rechtsbündig)
         ];
 
+        var textFlex = new FlexiControlForProperty<string>(() => Text, 5);
+
+        if (Parent is ItemCollectionPadItem { ReferenceTable: { IsDisposed: false } } icpi) {
+            var vars = icpi.GetExportVariables();
+            if (vars.Count > 0) {
+                textFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+                textFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+                textFlex.ListItems = [.. vars.Where(v => v.ToStringPossible).Select(v => ItemOf($"~{v.KeyName}~"))];
+            }
+        }
+
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<string>(() => Text, 5),
+            textFlex,
             new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht),
             new FlexiControlForProperty<float>(() => TextScale),
             new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true))

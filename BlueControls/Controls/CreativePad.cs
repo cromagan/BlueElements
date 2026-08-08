@@ -207,12 +207,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (DruckerDokument.DefaultPageSettings.Landscape) {
             _items.Breite = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Height, 100);
             _items.Höhe = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Width, 100);
-            _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
+            _items.RandinMm = new System.Windows.Forms.Padding((int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100)));
         } else {
             // Hochformat
             _items.Breite = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Width, 100);
             _items.Höhe = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Height, 100);
-            _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
+            _items.RandinMm = new System.Windows.Forms.Padding((int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100)), (int)Math.Round(PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100)));
         }
     }
 
@@ -275,7 +275,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     public void ShowPrinterPageSetup() {
         RepairPrinterData();
-        InputBoxEditor.Edit(DruckerDokument);
+        var data = PageSetupData.FromPrintDocument(DruckerDokument);
+        if (!InputBoxEditor.Edit(data)) { return; }
+        data.ApplyTo(DruckerDokument);
     }
 
     public void ShowPrintPreview() {
@@ -287,23 +289,24 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     public void ShowWorkingAreaSetup() {
         if (_items is null) { return; }
 
-        var oriD = new PrintDocument();
-        oriD.DefaultPageSettings.Landscape = false;
-        oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)MmToPixel(_items.Breite, 100), (int)MmToPixel(_items.Höhe, 100));
-        oriD.DefaultPageSettings.Margins.Top = (int)MmToPixel(_items.RandinMm.Top, 100);
-        oriD.DefaultPageSettings.Margins.Bottom = (int)MmToPixel(_items.RandinMm.Bottom, 100);
-        oriD.DefaultPageSettings.Margins.Left = (int)MmToPixel(_items.RandinMm.Left, 100);
-        oriD.DefaultPageSettings.Margins.Right = (int)MmToPixel(_items.RandinMm.Right, 100);
+        var oriD = new PageSetupData {
+            BreiteMm = _items.Breite,
+            HöheMm = _items.Höhe,
+            RandObenMm = _items.RandinMm.Top,
+            RandUntenMm = _items.RandinMm.Bottom,
+            RandLinksMm = _items.RandinMm.Left,
+            RandRechtsMm = _items.RandinMm.Right
+        };
 
-        if (!InputBoxEditor.Edit(oriD, true)) { return; }
+        if (!InputBoxEditor.Edit(oriD)) { return; }
 
-        _items.Breite = PixelToMm(oriD.DefaultPageSettings.PaperSize.Width, 100);
-        _items.Höhe = PixelToMm(oriD.DefaultPageSettings.PaperSize.Height, 100);
-
-        _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(oriD.DefaultPageSettings.Margins.Left, 100),
-                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Top, 100),
-                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Right, 100),
-                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Bottom, 100));
+        _items.Breite = oriD.BreiteMm;
+        _items.Höhe = oriD.HöheMm;
+        _items.RandinMm = new System.Windows.Forms.Padding(
+            (int)Math.Round(oriD.RandLinksMm),
+            (int)Math.Round(oriD.RandObenMm),
+            (int)Math.Round(oriD.RandRechtsMm),
+            (int)Math.Round(oriD.RandUntenMm));
 
         Invalidate_MaxBounds();
     }
@@ -809,18 +812,18 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         DruckerDokument.DocumentName = _items.Caption;
         var done = false;
         foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes) {
-            if (ps.Width == (int)MmToPixel(_items.Breite, 100) && ps.Height == (int)MmToPixel(_items.Höhe, 100)) {
+            if (ps.Width == (int)Math.Round(MmToPixel(_items.Breite, 100)) && ps.Height == (int)Math.Round(MmToPixel(_items.Höhe, 100))) {
                 done = true;
                 DruckerDokument.DefaultPageSettings.PaperSize = ps;
                 break;
             }
         }
         if (!done) {
-            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)MmToPixel(_items.Breite, 100), (int)MmToPixel(_items.Höhe, 100));
+            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)Math.Round(MmToPixel(_items.Breite, 100)), (int)Math.Round(MmToPixel(_items.Höhe, 100)));
         }
         DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
         DruckerDokument.OriginAtMargins = true;
-        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)MmToPixel(_items.RandinMm.Left, 100), (int)MmToPixel(_items.RandinMm.Right, 100), (int)MmToPixel(_items.RandinMm.Top, 100), (int)MmToPixel(_items.RandinMm.Bottom, 100));
+        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)Math.Round(MmToPixel(_items.RandinMm.Left, 100)), (int)Math.Round(MmToPixel(_items.RandinMm.Right, 100)), (int)Math.Round(MmToPixel(_items.RandinMm.Top, 100)), (int)Math.Round(MmToPixel(_items.RandinMm.Bottom, 100)));
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {

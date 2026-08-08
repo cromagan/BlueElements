@@ -123,24 +123,27 @@ public sealed class ColumnsHeadListItem : RowBackground {
         #endregion
 
         #region Virtuelle Spalten (Pin, Nummer, Hinzufügen)
+        // In Ansicht 0 ("Alle Spalten") werden keine virtuellen Spalten
+        // angeboten — sie sind dort nicht erlaubt (siehe ColumnViewCollection.Repair).
+        if (!tableView.IsAnsicht0(ca)) {
+            var virtualAdded = false;
 
-        var virtualAdded = false;
+            foreach (var (vKey, display, symbol) in new (string, string, ImageCode)[] {
+                ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel),
+                ("NUMBER", "Zeilennummer", ImageCode.Tabelle),
+                ("ADD", "Spalte zum Hinzufügen", ImageCode.PlusZeichen)
+            }) {
+                if (ca.Any(x => x.StorageKey == "VIR_" + vKey)) { continue; }
 
-        foreach (var (vKey, display, symbol) in new (string, string, ImageCode)[] {
-            ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel),
-            ("NUMBER", "Zeilennummer", ImageCode.Tabelle),
-            ("ADD", "Spalte zum Hinzufügen", ImageCode.PlusZeichen)
-        }) {
-            if (ca.Any(x => x.StorageKey == "VIR_" + vKey)) { continue; }
+                if (!virtualAdded) {
+                    items.Add(ItemOf("Virtuelle Spalten", "Virtuelle Spalten", true, "3"));
+                    virtualAdded = true;
+                }
 
-            if (!virtualAdded) {
-                items.Add(ItemOf("Virtuelle Spalten", "Virtuelle Spalten", true, "3"));
-                virtualAdded = true;
+                var virtualItem = ItemOf(display, "VIRADD:" + vKey, QuickImage.Get(symbol, 16));
+                virtualItem.UserDefCompareKey = "3_" + vKey;
+                items.Add(virtualItem);
             }
-
-            var virtualItem = ItemOf(display, "VIRADD:" + vKey, QuickImage.Get(symbol, 16));
-            virtualItem.UserDefCompareKey = "3_" + vKey;
-            items.Add(virtualItem);
         }
 
         #endregion

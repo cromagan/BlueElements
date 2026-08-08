@@ -90,12 +90,9 @@ public class TableFile : Table {
 
         Filename = filename.NormalizeFile();
         GenerateTableUpdateTimer();
-        if (source is not null) {
-            MainChunkLoadDone = true;
-            InitialSavePending = true;
-            SaveRequired = true;
-            source.CopyTo(this);
-        }
+        InitialSavePending = true;
+        SaveRequired = true;
+        source?.CopyTo(this);
     }
 
     #endregion
@@ -526,7 +523,11 @@ public class TableFile : Table {
 
         if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 
-        if (content.Count < 1200) {
+        // Die Mindestgrößen-Prüfung schützt vor korrupten Re-Saves (z.B. wenn
+        // durch einen Fehler kaum Daten generiert werden). Beim initialen Save
+        // einer neuen, leeren Tabelle ist der Inhalt legitim klein und darf
+        // nicht zum Freeze führen — sonst wäre die neue Tabelle sofort blockiert.
+        if (!tbf.InitialSavePending && content.Count < 1200) {
             tbf.Freeze("Datei zu klein für Speicherung");
             return "Datei zu klein für Speicherung.";
         }

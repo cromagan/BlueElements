@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -8,6 +9,12 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Forms;
 
 public partial class PadEditor : FormWithStatusBar {
+
+    #region Fields
+
+    private ItemCollectionPadItem? _currentItemsForSideMenu;
+
+    #endregion
 
     #region Constructors
 
@@ -55,6 +62,14 @@ public partial class PadEditor : FormWithStatusBar {
     /// </summary>
     protected virtual void OnNotEditableReasonChanged() { }
 
+    /// <summary>
+    /// Wenn true, werden bei nicht angewähltem Item die Eigenschaften des
+    /// Pads (ItemCollectionPadItem) in der Seitenleiste angezeigt — z.B. um
+    /// eine Referenztabelle auszuwählen. Der ConnectedFormulaEditor
+    /// überschreibt dies mit false.
+    /// </summary>
+    protected virtual bool ShowPadPropertiesWhenNoItemSelected => true;
+
     protected virtual void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
         Pad.LastClickedItem?.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
 
@@ -74,6 +89,8 @@ public partial class PadEditor : FormWithStatusBar {
             txbRasterFangen.Text = Pad.Items.GridSnap.ToString1_2();
             PadDesign.Text = Pad.Items.SheetStyle;
         }
+
+        SubscribeItemsForSideMenu();
     }
 
     private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
@@ -120,9 +137,37 @@ public partial class PadEditor : FormWithStatusBar {
         Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
-    private void LastClickedItem_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => Pad.LastClickedItem?.DoForm(tabElementEigenschaftenPanel);
+    private void LastClickedItem_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) {
+        if (Pad.LastClickedItem is { IsDisposed: false } item) {
+            item.DoForm(tabElementEigenschaftenPanel);
+            return;
+        }
+
+        if (ShowPadPropertiesWhenNoItemSelected) {
+            Pad.Items?.DoForm(tabElementEigenschaftenPanel);
+        } else {
+            ((ISimpleEditor?)null).DoForm(tabElementEigenschaftenPanel);
+        }
+    }
 
     private void Pad_ClickedItemChanging(object sender, System.EventArgs e) => Pad.LastClickedItem?.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
+
+    /// <summary>
+    /// Abonniert das DoUpdateSideOptionMenu-Event der aktuellen
+    /// ItemCollection, damit Änderungen (z.B. Referenztabelle) die
+    /// Seitenleiste aktualisieren, wenn kein Item angewählt ist.
+    /// </summary>
+    private void SubscribeItemsForSideMenu() {
+        if (_currentItemsForSideMenu is { IsDisposed: false } old && !ReferenceEquals(old, Pad.Items)) {
+            old.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
+        }
+
+        _currentItemsForSideMenu = Pad.Items;
+
+        if (_currentItemsForSideMenu is { IsDisposed: false } icpi) {
+            icpi.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
+        }
+    }
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 

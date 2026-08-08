@@ -222,7 +222,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     }
 
     private void _table_Disposed(object? sender, System.EventArgs e) {
-        if (_table != null) {
+        if (_table is not null) {
             _table.Disposed -= _table_Disposed;
             _table = null;
         }

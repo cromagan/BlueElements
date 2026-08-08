@@ -2,7 +2,7 @@
 
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
-using System.Drawing.Printing;
+using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
@@ -23,7 +23,7 @@ public partial class PageSetupDialog : EditorEasy {
 
     #region Properties
 
-    public override Type? EditorFor => typeof(PrintDocument);
+    public override Type? EditorFor => typeof(PageSetupData);
     public override EditorMode SupportedModes => EditorMode.EditItem;
 
     #endregion
@@ -57,79 +57,27 @@ public partial class PageSetupDialog : EditorEasy {
     }
 
     protected override bool SetValuesToFormula(object? toEdit) {
-        if (toEdit is not PrintDocument { } printDocument1) { return false; }
+        if (toEdit is not PageSetupData { } data) { return false; }
 
         _doing = true;
         Format.ItemClear();
-        foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
-            var nn = ps.Width + ";" + ps.Height;
+        foreach (var f in data.VerfügbareFormate) {
+            var nn = FormatKey(f.BreiteMm, f.HöheMm);
             if (Format[nn] is null) {
-                Format.ItemAdd(ItemOf(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName));
+                Format.ItemAdd(ItemOf(f.Name, nn, QuickImage.Get(ImageCode.Datei), true, f.Name));
             }
         }
         Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString()));
-        Hochformat.Checked = !printDocument1.DefaultPageSettings.Landscape;
+        Hochformat.Checked = !data.Querformat;
         Querformat.Checked = !Hochformat.Checked;
-        FillHöheBreite(printDocument1.DefaultPageSettings.PaperSize.Width, printDocument1.DefaultPageSettings.PaperSize.Height);
-        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString1_2();
-        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString1_2();
-        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString1_2();
-        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString1_2();
+        FillHöheBreite(data.BreiteMm, data.HöheMm);
+        Oben.Text = data.RandObenMm.ToString1_2();
+        Unten.Text = data.RandUntenMm.ToString1_2();
+        Links.Text = data.RandLinksMm.ToString1_2();
+        Rechts.Text = data.RandRechtsMm.ToString1_2();
         DrawSampleAndCheckButton();
         _doing = false;
         return true;
-    }
-
-    private static double Inch1000ToMm(double inch) {
-        switch (inch) {
-            case 8:
-                return 2.0F;
-
-            case 16:
-                return 4.0F;
-
-            case 20:
-                return 5.0F;
-
-            case 39:
-                return 10.0F;
-
-            case 79:
-                return 20.0F;
-
-            case 98:
-                return 25.0F;
-
-            case 394:
-                return 100.0F;
-
-            case 413:
-                return 105.0F;
-
-            case 432:
-                return 110.0F;
-
-            case 583:
-                return 148.0F;
-
-            case 591:
-                return 150.0F;
-
-            case 787:
-                return 200.0F;
-
-            case 827:
-                return 210.0F;
-
-            case 1169:
-                return 297.0F;
-
-            case 1654:
-                return 420.0F;
-
-            default:
-                return Math.Round(inch * 0.254, 1, MidpointRounding.AwayFromZero);
-        }
     }
 
     private void Abmasse_TextChanged(object sender, System.EventArgs e) {
@@ -173,52 +121,23 @@ public partial class PageSetupDialog : EditorEasy {
         }
     }
 
-    private void FillHöheBreite(double b, double h) {
-        var nn1 = b + ";" + h;
-        var nn2 = h + ";" + b;
+    private void FillHöheBreite(float bMm, float hMm) {
+        var nn1 = FormatKey(bMm, hMm);
+        var nn2 = FormatKey(hMm, bMm);
         if (Format[nn1] is not null) {
             Format.Text = nn1;
         } else if (Format[nn2] is not null) {
             Format.Text = nn2;
         } else {
             Format.Text = "neu";
-            b = b < 0 && !string.IsNullOrEmpty(Breite.Text) ? DoubleParse(Breite.Text) : Inch1000ToMm(b);
-            h = h < 0 && !string.IsNullOrEmpty(Höhe.Text) ? DoubleParse(Höhe.Text) : Inch1000ToMm(h);
         }
-        if (Format.Text != "neu") {
-            b = Inch1000ToMm(b);
-            h = Inch1000ToMm(h);
-            switch (Format.Text) {
-                case "827;1169":
-                    //A4
-                    h = 297;
-                    b = 210;
-                    break;
-
-                case "1169;1654":
-                    //A3
-                    h = 420;
-                    b = 297;
-                    break;
-
-                case "583;827":
-                    //A5
-                    h = 210;
-                    b = 148;
-                    break;
-
-                case "413;583":
-                    //A6
-                    h = 148;
-                    b = 105;
-                    break;
-            }
-        }
-        Breite.Text = b.ToString1_1();
-        Höhe.Text = h.ToString1_1();
+        Breite.Text = bMm.ToString1_1();
+        Höhe.Text = hMm.ToString1_1();
         Breite.Enabled = IsModeSupported() && Format.Text == "neu";
         Höhe.Enabled = IsModeSupported() && Format.Text == "neu";
     }
+
+    private static string FormatKey(float breiteMm, float höheMm) => $"{(int)Math.Round(breiteMm)};{(int)Math.Round(höheMm)}";
 
     private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_doing) { return; }
@@ -253,22 +172,24 @@ public partial class PageSetupDialog : EditorEasy {
     }
 
     private void WriteBackToData() {
-        if (((IIsEditor)this).OutputItem is not PrintDocument { } doc) { return; }
+        if (((IIsEditor)this).OutputItem is not PageSetupData { } data) { return; }
         if (!Breite.Text.IsNumeral()) { return; }
         if (!Höhe.Text.IsNumeral()) { return; }
         if (!Oben.Text.IsNumeral()) { return; }
         if (!Unten.Text.IsNumeral()) { return; }
         if (!Links.Text.IsNumeral()) { return; }
         if (!Rechts.Text.IsNumeral()) { return; }
-        var br = DoubleParse(Breite.Text);
-        var ho = DoubleParse(Höhe.Text);
+        var br = (float)DoubleParse(Breite.Text);
+        var ho = (float)DoubleParse(Höhe.Text);
         if (br < 5 || ho < 5) { return; }
-        doc.DefaultPageSettings.Landscape = Querformat.Checked;
-        doc.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(br / 0.254), (int)(ho / 0.254));
-        doc.DefaultPageSettings.Margins.Top = (int)(FloatParse(Oben.Text) / 0.254);
-        doc.DefaultPageSettings.Margins.Bottom = (int)(FloatParse(Unten.Text) / 0.254);
-        doc.DefaultPageSettings.Margins.Left = (int)(FloatParse(Links.Text) / 0.254);
-        doc.DefaultPageSettings.Margins.Right = (int)(FloatParse(Rechts.Text) / 0.254);
+
+        data.BreiteMm = br;
+        data.HöheMm = ho;
+        data.Querformat = Querformat.Checked;
+        data.RandObenMm = FloatParse(Oben.Text);
+        data.RandUntenMm = FloatParse(Unten.Text);
+        data.RandLinksMm = FloatParse(Links.Text);
+        data.RandRechtsMm = FloatParse(Rechts.Text);
     }
 
     #endregion

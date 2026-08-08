@@ -340,7 +340,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 foreach (var item in colsArr) {
                     if (item is not JsonObject jo) { continue; }
                     var colName = jo.GetString("columnname", string.Empty);
-                    if (colName is { Length: > 0 } && Table.Column[colName] is { } c) {
+                    if (colName is not { Length: > 0 }) { continue; }
+
+                    // Virtuelle persistente Spalte (VIR_…) über ihren Typnamen
+                    // rekonstruieren — analog zu ColumnViewItem.Create.
+                    if (colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) {
+                        if (ParseableItem.NewByTypeName<ColumnViewItem>(colName) is { } v) { Add(v); }
+                        continue;
+                    }
+
+                    if (Table.Column[colName] is { } c) {
                         var cvi = new ColumnViewItem(c);
                         cvi.ParseJson(jo);
                         Add(cvi);
@@ -557,6 +566,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         switch (number) {
             case 0:
                 if (string.IsNullOrEmpty(KeyName)) { KeyName = "Alle Spalten"; }
+                // Ansicht 0 zeigt ausschließlich alle echten Spalten.
+                // Virtuelle (persistente) Spalten — Pin, Nummer, Hinzufügen —
+                // sind hier nicht erlaubt und werden entfernt.
+                for (var z = _internal.Count - 1; z >= 0; z--) {
+                    if (_internal[z] is { StorageKey: not null } v) { Remove(v); }
+                }
                 ShowAllColumns();
                 break;
 

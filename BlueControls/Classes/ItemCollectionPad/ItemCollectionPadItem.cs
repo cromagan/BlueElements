@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 
@@ -25,6 +26,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private readonly object _itemLock = new();
 
     private RectangleF _cachedUsedAreaOfItems;
+    private string _referenceTableHintPath = string.Empty;
+    private bool _referenceTableLoaded;
+    private string _referenceTableName = string.Empty;
     private bool _usedAreaOfItemsDirty = true;
 
     #endregion
@@ -203,6 +207,50 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             OnPropertyChanged();
         }
     } = Padding.Empty;
+
+    /// <summary>
+    /// Optionale Tabelle, deren Export-Skript-Variablen als Vorschläge
+    /// (Suggestions) in den TextPadItem- und BitmapPadItem-Eigenschaften
+    /// angeboten werden. Wird nur in der obersten Collection ausgewertet.
+    /// </summary>
+    public Table? ReferenceTable {
+        get {
+            if (_referenceTableLoaded) { return field; }
+
+            if (string.IsNullOrEmpty(_referenceTableName)) {
+                field = null;
+                _referenceTableLoaded = true;
+            } else {
+                field = Table.Get(_referenceTableName);
+
+                // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
+                // (z. B. weil noch keine andere Tabelle geladen ist und der
+                // Name kein Dateipfad ist), versuche es mit dem HintPath.
+                if (field is null && !string.IsNullOrEmpty(_referenceTableHintPath)) {
+                    field = Table.Get(_referenceTableHintPath);
+                }
+
+                // Nur als geladen markieren, wenn die Tabelle gefunden wurde.
+                // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
+                // könnte zwischenzeitlich in den Cache geladen worden sein.
+                _referenceTableLoaded = field is not null;
+            }
+
+            return field;
+        }
+        set {
+            if (IsDisposed) { return; }
+            if (value == field && _referenceTableLoaded) { return; }
+
+            field = value;
+            _referenceTableName = value?.KeyName ?? string.Empty;
+            _referenceTableLoaded = true;
+
+            OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+            OnPropertyChangedExt("referencetable", _referenceTableName);
+        }
+    }
 
     public string SheetStyle {
         get => Parent is IStyleable ist ? ist.SheetStyle : field;
@@ -639,14 +687,41 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
+    /// <summary>
+    /// Liefert die gespeicherten Variablen des Export-Skripts der
+    /// <see cref="ReferenceTable"/> — ohne das Skript auszuführen.
+    /// Wird für die Suggestions in TextPadItem/BitmapPadItem verwendet.
+    /// </summary>
+    public List<Variable> GetExportVariables() {
+        if (ReferenceTable is not { IsDisposed: false } tb) { return []; }
+
+        foreach (var script in tb.EventScript.Get(ScriptEventTypes.export)) {
+            if (script.SavedVariables is { Count: > 0 } vars) {
+                return vars;
+            }
+        }
+
+        return [];
+    }
+
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =
-        [   .. base.GetProperties(widthOfControl),
-            new FlexiControl(),
-            new FlexiControlForProperty<float>(() => GridShow),
-            new FlexiControlForProperty<bool>(() => AutoZoomFit),
-            new FlexiControlForProperty<EditMode>(() => EditMode),
-        ];
+        List<GenericControl> result = [];
+
+        result.AddRange(base.GetProperties(widthOfControl));
+
+        if (Parent is null) {
+            //result.Add(new FlexiControl());
+            //result.Add(new FlexiControlForProperty<bool>(() => AutoZoomFit));
+            //result.Add(new FlexiControlForProperty<EditMode>(() => EditMode));
+
+            result.Add(new FlexiControl());
+            result.Add(new FlexiControl("Referenztabelle:", widthOfControl, true));
+            result.Add(new FlexiControlForProperty<Table?>(() => ReferenceTable, AllAvailableTables()));
+            if (ReferenceTable is { IsDisposed: false } tb) {
+                result.Add(new FlexiControlForDelegate(tb));
+            }
+        }
+
         return result;
     }
 
@@ -749,6 +824,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         result.ParseableAdd("GridShow", GridShow);
         result.ParseableAdd("GridSnap", GridSnap);
         result.ParseableAdd("EditMode", (int)EditMode);
+        result.ParseableAdd("ReferenceTable", _referenceTableName);
 
         return result;
     }
@@ -757,6 +833,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var json = base.ParseableJson();
 
         if (!HasItems) { return json; }
+
+        if (ReferenceTable is TableFile tf) {
+            _referenceTableHintPath = tf.Filename;
+        }
 
         json.Set("caption", Caption)
             .Set("sheetstyle", SheetStyle)
@@ -771,7 +851,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             .Set("editmode", (int)EditMode)
             .Set("printarea", RandinMm)
             .Set("width", Breite)
-            .Set("height", Höhe);
+            .Set("height", Höhe)
+            .Set("referencetable", _referenceTableName)
+            .Set("referencetablehintpath", _referenceTableHintPath);
 
         json.SetArrayIfNotEmpty("items", _internal.Where(it => it is not { IsDisposed: true }));
 
@@ -795,6 +877,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Höhe = json.GetFloat("height", Höhe);
 
         RandinMm = json.GetPadding("printarea", RandinMm);
+
+        _referenceTableName = json.GetString("referencetable", _referenceTableName);
+        _referenceTableHintPath = json.GetString("referencetablehintpath", _referenceTableHintPath);
+        _referenceTableLoaded = false;
 
         foreach (var created in json.GetList<AbstractPadItem>("items", false)) {
             Add(created);
@@ -844,6 +930,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             case "editmode":
                 EditMode = (EditMode)IntParse(value);
+                return true;
+
+            case "referencetable":
+                _referenceTableName = value.FromNonCritical();
+                _referenceTableLoaded = false;
+                return true;
+
+            case "referencetablehintpath":
+                _referenceTableHintPath = value.FromNonCritical();
                 return true;
 
             case "items":

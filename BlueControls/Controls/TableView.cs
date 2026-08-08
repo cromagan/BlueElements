@@ -196,14 +196,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
                 // On-demand virtuelle Spalten ein-/ausblenden:
-                // - Hinzufügen: NUR bei Admins — bei Ansichtbearbeitung
+                // - Hinzufügen: NUR bei Admins — in Ansicht 0 IMMER am Ende
+                //   (nur visuell, nicht persistent), sonst bei Ansichtbearbeitung
                 //   (oder wenn die Tabelle Spalten hat, aber keine im Arrangement liegt)
                 // - Pin: wenn mindestens eine Zeile angepinnt ist
                 // Persistente virtuelle Spalten (VIR_…) stehen bereits in der
                 // Collection und werden vom Reconcile nicht angerührt.
                 // Die Number-Spalte hat keinen on-demand-Trigger.
                 var needAdd = tb.IsAdministrator()
-                    && (Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
+                    && (IsAnsicht0(ca) || Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
                 var needPin = PinnedRows.Count > 0;
 
                 ca.ReconcileVirtualColumns(needPin, needAdd);
@@ -3096,12 +3097,21 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void CalculateAllViewItems(Dictionary<string, RowBackground> allItems) {
         if (IsDisposed || Table is not { IsDisposed: false } tb
             || allItems is null
-            || SortUsed() is not { } sortused
             || CurrentArrangement is not { } arrangement) {
             _rowsVisibleUnique = new([]);
             allItems?.Clear();
             return;
         }
+
+        // SortUsed() ist null, wenn die Tabelle weder eine SortDefinition noch
+        // eine SysRowSortIndex-Spalte besitzt — z. B. eine Tabelle ohne echte
+        // Spalten (nur virtuelle). Bisher führte das zum Early-Return oben,
+        // wobei allItems geleert wurde: AddFootElements lief nie, das
+        // TableEndListItem fehlte beim Zeichnen und die TableView zeigte
+        // "Fehler in der Zeilenberechung". Mit einer leeren Sortierung läuft
+        // die Pipeline vollständig durch (Head/Foot/Rows), sodass auch reine
+        // virtuelle Spalten normal gerendert werden.
+        var sortused = SortUsed() ?? new RowSortDefinition(tb, (ColumnItem?)null, false);
 
         if (arrangement.ControlColumnsWidth() <= 0 && arrangement.Count > 0) {
             arrangement.Invalidated = true;
@@ -3916,7 +3926,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, viewItem) = GetContextData(e.HotItem);
-        if (column is null) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { } ca) { return; }
 
@@ -3932,8 +3941,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var currentArr = tcvc.GetByKey(ca.KeyName);
         if (currentArr is null) { return; }
 
-        var virtualToRemove = currentArr.FirstOrDefault(x => x.StorageKey == viewItem?.StorageKey);
-        currentArr.Remove(virtualToRemove);
+        // Virtuelle Spalte (Pin, Nummer, Hinzufügen) hat kein ColumnItem
+        // und wird nur aus der aktuellen Ansicht ausgeblendet.
+        // Echte Spalten haben StorageKey is null und werden weiter unten
+        // behandelt — hier keinesfalls anfassen (sonst werden sie versehentlich entfernt).
+        if (column is null) {
+            if (viewItem?.StorageKey is { } sk && currentArr.FirstOrDefault(x => x.StorageKey == sk) is { } vItem) {
+                currentArr.Remove(vItem);
+                tb.ColumnArrangements = tcvc.AsReadOnly();
+            }
+            return;
+        }
 
         if (IsAnsicht0(ca)) {
             if (Forms.MessageBox.Show($"Spalte <b>{column.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return; }
@@ -4766,7 +4784,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Prüft, ob das angegebene Arrangement die Ansicht 0 ("Alle Spalten") ist.
     /// In Ansicht 0 darf die Reihenfolge nicht verändert werden.
     /// </summary>
-    private bool IsAnsicht0(ColumnViewCollection ca) {
+    internal bool IsAnsicht0(ColumnViewCollection ca) {
         if (Table is not { IsDisposed: false } tb) { return false; }
         if (tb.ColumnArrangements.Count <= 0) { return false; }
         return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);

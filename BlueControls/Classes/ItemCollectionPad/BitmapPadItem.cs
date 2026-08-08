@@ -135,6 +135,20 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString1(), QuickImage.Get("BildmodusEinpassen|32"))
         ];
 
+        var platzhalterFlex = new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2);
+
+        if (Parent is ItemCollectionPadItem { ReferenceTable: { IsDisposed: false } } icpi) {
+            var vars = icpi.GetExportVariables();
+            if (vars.Count > 0) {
+                var bitmapVars = vars.Where(v => v is VariableBitmap or VariableString).ToList();
+                if (bitmapVars.Count > 0) {
+                    platzhalterFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+                    platzhalterFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+                    platzhalterFlex.ListItems = [.. bitmapVars.Select(v => ItemOf($"~{v.KeyName}~"))];
+                }
+            }
+        }
+
         List<GenericControl> result =
         [
             new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
@@ -143,7 +157,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
             new FlexiControl(),
 
-            new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
+            platzhalterFlex,
 
             new FlexiControl(),
             new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms),

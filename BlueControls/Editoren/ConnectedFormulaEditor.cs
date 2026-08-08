@@ -143,6 +143,13 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         DoPages();
     }
 
+    /// <summary>
+    /// Im ConnectedFormulaEditor werden die Pad-Eigenschaften (insbesondere
+    /// die Referenztabelle) nicht in der Seitenleiste angeboten, da hier die
+    /// Formular-Logik über die ConnectedFormula läuft.
+    /// </summary>
+    protected override bool ShowPadPropertiesWhenNoItemSelected => false;
+
     private static void GenQuickInfo(Button b, ReciverControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
