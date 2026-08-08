@@ -32,17 +32,24 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
     public LinePadItem(string keyName, PadStyles format, Point point1, Point point2) : base(keyName) {
-        _point1 = new PointM(this, "Punkt 1", 0, 0);
-        _point2 = new PointM(this, "Punkt 2", 0, 0);
-        _point1.SetTo(point1, false);
-        _point2.SetTo(point2, false);
-        MovablePoint.Add(_point1);
-        MovablePoint.Add(_point2);
-        PointsForSuccessfullyMove.AddRange(MovablePoint);
-        CalculateJointMiddle(_point1, _point2);
-        Style = format;
-        _tempPoints = [];
-        Linien_Verhalten = ConnectorStyle.Direct;
+        // Suppress-Modus whrend der Konstruktion: Property-Setter (z. B. Style)
+        // lsen keine Change-Events aus. Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            _point1 = new PointM(this, "Punkt 1", 0, 0);
+            _point2 = new PointM(this, "Punkt 2", 0, 0);
+            _point1.SetTo(point1, false);
+            _point2.SetTo(point2, false);
+            MovablePoint.Add(_point1);
+            MovablePoint.Add(_point2);
+            PointsForSuccessfullyMove.AddRange(MovablePoint);
+            CalculateJointMiddle(_point1, _point2);
+            Style = format;
+            _tempPoints = [];
+            Linien_Verhalten = ConnectorStyle.Direct;
+        } finally {
+            EndInit();
+        }
     }
 
     #endregion

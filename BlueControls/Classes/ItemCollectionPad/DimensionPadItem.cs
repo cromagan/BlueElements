@@ -46,34 +46,42 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
     public DimensionPadItem(string keyName, PointM? point1, PointM? point2, float abstandinMm) : base(keyName) {
-        if (point1 is not null) { _point1.SetTo(point1.X, point1.Y, false); }
-        if (point2 is not null) { _point2.SetTo(point2.X, point2.Y, false); }
-        ComputeData();
+        // Suppress-Modus whrend der Konstruktion: Property-Setter (z. B. Style,
+        // Text_Oben, Nachkommastellen) lsen keine Change-Events aus.
+        // Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            if (point1 is not null) { _point1.SetTo(point1.X, point1.Y, false); }
+            if (point2 is not null) { _point2.SetTo(point2.X, point2.Y, false); }
+            ComputeData();
 
-        var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPadItem.Dpi), _winkel - 90f);
-        _textPoint.SetTo(_point1, _länge / 2, _winkel, false);
-        _textPoint.X += a.X;
-        _textPoint.Y += a.Y;
+            var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPadItem.Dpi), _winkel - 90f);
+            _textPoint.SetTo(_point1, _länge / 2, _winkel, false);
+            _textPoint.X += a.X;
+            _textPoint.Y += a.Y;
 
-        Text_Oben = string.Empty;
-        Text_Unten = string.Empty;
-        Nachkommastellen = 1;
+            Text_Oben = string.Empty;
+            Text_Unten = string.Empty;
+            Nachkommastellen = 1;
 
-        Style = PadStyles.Alternative;
-        _point1.Parent = this;
-        _point2.Parent = this;
-        _textPoint.Parent = this;
-        _schnittPunkt1.Parent = this;
-        _schnittPunkt2.Parent = this;
-        _bezugslinie1.Parent = this;
-        _bezugslinie2.Parent = this;
+            Style = PadStyles.Alternative;
+            _point1.Parent = this;
+            _point2.Parent = this;
+            _textPoint.Parent = this;
+            _schnittPunkt1.Parent = this;
+            _schnittPunkt2.Parent = this;
+            _bezugslinie1.Parent = this;
+            _bezugslinie2.Parent = this;
 
-        MovablePoint.Add(_point1);
-        MovablePoint.Add(_point2);
-        MovablePoint.Add(_textPoint);
-        PointsForSuccessfullyMove.AddRange(MovablePoint);
+            MovablePoint.Add(_point1);
+            MovablePoint.Add(_point2);
+            MovablePoint.Add(_textPoint);
+            PointsForSuccessfullyMove.AddRange(MovablePoint);
 
-        CalculateOtherPoints();
+            CalculateOtherPoints();
+        } finally {
+            EndInit();
+        }
     }
 
     public DimensionPadItem(PointF point1, PointF point2, float abstandInMm) : this(new PointM(point1), new PointM(point2), abstandInMm) { }

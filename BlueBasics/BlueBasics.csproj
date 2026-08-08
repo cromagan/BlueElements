@@ -55,12 +55,14 @@
 
   <ItemGroup>
     <None Remove="Ressourcen\Image\Icons\Aufklappen.png" />
+    <None Remove="Ressourcen\Image\Icons\Auge.png" />
     <None Remove="Ressourcen\Image\Icons\MinusZeichen2.png" />
     <None Remove="Ressourcen\Image\Icons\PlusZeichen2.png" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Aufklappen.png" />
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Auge.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusVerzerren.png" />

@@ -11,10 +11,17 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     #region Constructors
 
     public SymbolPadItem() : base(string.Empty) {
-        Symbol = Contour.Arrow;
-        Hintergrundfarbe = Color.White;
-        Randfarbe = Color.Black;
-        Randdicke = 1;
+        // Suppress-Modus whrend der Konstruktion: Property-Setter lsen keine
+        // Change-Events aus. Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            Symbol = Contour.Arrow;
+            Hintergrundfarbe = Color.White;
+            Randfarbe = Color.Black;
+            Randdicke = 1;
+        } finally {
+            EndInit();
+        }
     }
 
     #endregion

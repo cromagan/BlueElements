@@ -9,6 +9,7 @@ public enum ImageCode {
 
     Anwendung,
     Aufnahme,
+    Auge,
     AZ,
     Apfel,
     Aufklappen,

@@ -65,6 +65,13 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
                 // könnte zwischenzeitlich in den Cache geladen worden sein.
                 _tableOutputLoaded = field is not null;
+
+                // HintPath aus der gefundenen Tabelle aktualisieren, damit er
+                // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
+                // über den Namen (ohne HintPath) gefunden wurde.
+                if (field is TableFile tbf) {
+                    _tableOutputHintPath = tbf.Filename;
+                }
             }
 
             return field;
@@ -78,6 +85,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             field = value;
             _tableOutputName = value?.KeyName ?? string.Empty;
+            _tableOutputHintPath = (value as TableFile)?.Filename ?? string.Empty;
             _tableOutputLoaded = true;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
@@ -159,6 +167,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             result.ParseableAdd("OutputTable", tb.KeyName);
         } else {
             result.ParseableAdd("OutputTable", _tableOutputName);
+            result.ParseableAdd("OutputTableHintPath", _tableOutputHintPath);
         }
 
         //result.ParseableAdd("SentToChildIds", _childIds, false);
@@ -203,6 +212,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             case "outputtable":
                 _tableOutputName = value.FromNonCritical();
                 _tableOutputLoaded = false;
+                return true;
+
+            case "outputtablehintpath":
+                _tableOutputHintPath = value.FromNonCritical();
                 return true;
 
             case "senttochildids":

@@ -549,17 +549,31 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting);
 
-    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+    protected void OnDoUpdateSideOptionMenu() {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+        DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+    }
 
-    protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnParentChanged() {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+        ParentChanged?.Invoke(this, System.EventArgs.Empty);
+    }
 
-    protected virtual void OnParentChanging() => ParentChanging?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnParentChanging() {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+        ParentChanging?.Invoke(this, System.EventArgs.Empty);
+    }
 
     /// <summary>
-    /// Invalidiert CanvasUsedArea und löst das Ereignis Changed aus
+    /// Invalidiert CanvasUsedArea und löst das Ereignis Changed aus.
+    /// Die Cache-Invalidierung passiert UNABHNGIG vom Suppress-Modus (siehe
+    /// <see cref="ParseableItem.IsEventsSuppressed" />), damit nach einem Parse
+    /// kein veralteter Cache steht. Das eigentliche Event wird dagegen im
+    /// Suppress-Modus (z. B. whrend des Parsens) nicht gefeuert.
     /// </summary>
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _canvasUsedArea = default;
+        if (IsDisposed || IsEventsSuppressed) { return; }
         base.OnPropertyChanged(propertyName);
     }
 

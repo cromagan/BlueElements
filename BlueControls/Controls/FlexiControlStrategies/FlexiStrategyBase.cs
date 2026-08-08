@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
+public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISupportInitialize {
 
     #region Fields
 
@@ -280,11 +280,9 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     public abstract void CreateControl();
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        OnDisposed(); 
+        OnDisposed();
 
         UnsubscribeEvents();
 
@@ -344,6 +342,8 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
     protected abstract void SetValueToControlInternal(string value);
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

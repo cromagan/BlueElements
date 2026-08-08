@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.ComponentModel;
+
 namespace BlueBasics.Interfaces;
 
 public static class ParseableExtension {
@@ -14,14 +16,23 @@ public static class ParseableExtension {
     }
 
     public static bool Parse(this IParseable parsable, List<KeyValuePair<string, string>> allTags, string originalParse) {
-        foreach (var pair in allTags) {
-            var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
+        // ParseableItem: Suppress-Modus whrend des gesamten Parsens, damit
+        // Property-Setter der Subklassen keine Change-Events feuern (siehe
+        // ParseableItem.ISupportInitialize). Andere IParseable-Implementierungen
+        // profitieren nicht davon, werden aber auch nicht beeintrchtigt.
+        if (parsable is ISupportInitialize pi) { pi.BeginInit(); }
+        try {
+            foreach (var pair in allTags) {
+                var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
 
-            if (!i) {
-                Develop.DebugPrint("Kann nicht geparsed werden: " + pair.Key + " = " + pair.Value + Develop.ContextInfo(parsable));
+                if (!i) {
+                    Develop.DebugPrint("Kann nicht geparsed werden: " + pair.Key + " = " + pair.Value + Develop.ContextInfo(parsable));
+                }
             }
+            parsable.ParseFinished(originalParse);
+        } finally {
+            if (parsable is ISupportInitialize pi2) { pi2.EndInit(); }
         }
-        parsable.ParseFinished(originalParse);
         return true;
     }
 

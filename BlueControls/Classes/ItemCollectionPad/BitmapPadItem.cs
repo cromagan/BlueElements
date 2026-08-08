@@ -22,11 +22,18 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
-        _bitmap = bmp;
-        SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
-        Hintergrund_Weiß_Füllen = true;
-        Bild_Modus = SizeModes.EmptySpace;
-        Style = PadStyles.Undefined; // Kein Rahmen
+        // Suppress-Modus whrend der Konstruktion: Property-Setter lsen keine
+        // Change-Events aus. Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            _bitmap = bmp;
+            SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
+            Hintergrund_Weiß_Füllen = true;
+            Bild_Modus = SizeModes.EmptySpace;
+            Style = PadStyles.Undefined; // Kein Rahmen
+        } finally {
+            EndInit();
+        }
     }
 
     #endregion
@@ -137,15 +144,16 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         var platzhalterFlex = new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2);
 
-        if (Parent is ItemCollectionPadItem { ReferenceTable: { IsDisposed: false } } icpi) {
+        if (Parent is ItemCollectionPadItem icpi) {
             var vars = icpi.GetExportVariables();
-            if (vars.Count > 0) {
-                var bitmapVars = vars.Where(v => v is VariableBitmap or VariableString).ToList();
-                if (bitmapVars.Count > 0) {
-                    platzhalterFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
-                    platzhalterFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
-                    platzhalterFlex.ListItems = [.. bitmapVars.Select(v => ItemOf($"~{v.KeyName}~"))];
-                }
+            var bitmapVars = vars.Where(v => v is VariableBitmap or VariableString).ToList();
+
+            platzhalterFlex.QuickInfo = icpi.GetExportVariablesInfo(platzhalterFlex.QuickInfo, bitmapVars.Count);
+
+            if (bitmapVars.Count > 0) {
+                platzhalterFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+                platzhalterFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+                platzhalterFlex.ListItems = [.. bitmapVars.Select(v => ItemOf($"~{v.KeyName}~"))];
             }
         }
 

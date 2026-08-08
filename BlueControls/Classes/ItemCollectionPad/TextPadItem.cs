@@ -33,9 +33,17 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public TextPadItem() : this(string.Empty, string.Empty) { }
 
     public TextPadItem(string keyName, string visibleText) : base(keyName) {
-        _textReplaced = visibleText;
-        Text = visibleText;
-        Ausrichtung = Alignment.Top_Left;
+        // Suppress-Modus whrend der Konstruktion: Property-Setter (Text,
+        // Ausrichtung) lsen keine Change-Events aus.
+        // Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            _textReplaced = visibleText;
+            Text = visibleText;
+            Ausrichtung = Alignment.Top_Left;
+        } finally {
+            EndInit();
+        }
         InvalidateText();
     }
 
@@ -112,12 +120,16 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
         var textFlex = new FlexiControlForProperty<string>(() => Text, 5);
 
-        if (Parent is ItemCollectionPadItem { ReferenceTable: { IsDisposed: false } } icpi) {
+        if (Parent is ItemCollectionPadItem icpi) {
             var vars = icpi.GetExportVariables();
-            if (vars.Count > 0) {
+            var applicableVars = vars.Where(v => v.ToStringPossible).ToList();
+
+            textFlex.QuickInfo = icpi.GetExportVariablesInfo(textFlex.QuickInfo, applicableVars.Count);
+
+            if (applicableVars.Count > 0) {
                 textFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
                 textFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
-                textFlex.ListItems = [.. vars.Where(v => v.ToStringPossible).Select(v => ItemOf($"~{v.KeyName}~"))];
+                textFlex.ListItems = [.. applicableVars.Select(v => ItemOf($"~{v.KeyName}~"))];
             }
         }
 

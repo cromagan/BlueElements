@@ -6,13 +6,23 @@ using System.Threading;
 
 namespace BlueBasics.Classes;
 
-public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged, IDisposableExtended {
+public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged, IDisposableExtended, ISupportInitialize {
 
     #region Fields
 
     private static readonly ConcurrentDictionary<Type, string> _classIdByType = new();
 
     private volatile int _isDisposedFlag;
+
+    /// <summary>
+    /// Verschachtelungssicherer Zhler fr <see cref="BeginInit" /> / <see cref="EndInit" />.
+    /// Bei Werten &gt; 0 werden <see cref="OnPropertyChanged(string)" /> und
+    /// <see cref="OnPropertyChangedExt" /> unterdrckt - typischerweise whrend
+    /// des Parsens / Initialisierens, damit Property-Setter keine Change-Events
+    /// auf halb initialisierte Objekte feuern. Das <see cref="Disposed" />-Event
+    /// wird bewusst NIEMALS supprimiert (safety-relevant).
+    /// </summary>
+    private int _suspendCount;
 
     #endregion
 
@@ -29,6 +39,15 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     #region Properties
 
     public bool IsDisposed => _isDisposedFlag == 1;
+
+    /// <summary>
+    /// <c>true</c>, whrend sich das Objekt in einer Initialisierungs- oder
+    /// Parse-Phase befindet (zwischen <see cref="BeginInit" /> und
+    /// <see cref="EndInit" />). Consumer und Subklassen drfen darauf prfen,
+    /// um reaktive Logik zu verzgern. Change-Events werden in diesem Zustand
+    /// nicht gefeuert - mit Ausnahme des <see cref="Disposed" />-Events.
+    /// </summary>
+    public bool IsEventsSuppressed => _suspendCount > 0;
 
     public string MyClassId {
         get {
@@ -87,7 +106,14 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         }
 
         if (NewByTypeName<T>(typeName, args) is not { } ni) { return null; }
-        ni.Parse(toParse);
+        // Suppress-Modus whrend des Parsens: Property-Setter lsen keine
+        // Change-Events aus. Siehe ISupportInitialize-Doku in ParseableItem.
+        ni.BeginInit();
+        try {
+            ni.Parse(toParse);
+        } finally {
+            ni.EndInit();
+        }
         return ni;
     }
 
@@ -117,8 +143,13 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         if (string.IsNullOrEmpty(typeName)) { return null; }
 
         if (NewByTypeName<T>(typeName, args) is not { } ni) { return null; }
-        ni.ParseJson(element);
-        ni.ParseFinishedJson(element);
+        ni.BeginInit();
+        try {
+            ni.ParseJson(element);
+            ni.ParseFinishedJson(element);
+        } finally {
+            ni.EndInit();
+        }
         return ni;
     }
 
@@ -141,6 +172,19 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         return Activator.CreateInstance(type, args) as T;
     }
 
+    /// <summary>
+    /// Implementiert <see cref="ISupportInitialize" />. Erhht den
+    /// <see cref="_suspendCount" />-Zhler; alle nachfolgenden
+    /// <see cref="OnPropertyChanged(string)" />- und
+    /// <see cref="OnPropertyChangedExt" />-Aufrufe werden unterdrckt,
+    /// bis entsprechend oft <see cref="EndInit" /> aufgerufen wurde.
+    /// Verschachtelungssicher. Siehe auch <see cref="IsEventsSuppressed" />.
+    /// </summary>
+    public void BeginInit() {
+        if (IsDisposed) { return; }
+        _suspendCount++;
+    }
+
     public object Clone() {
         // GetType() liefert den konkreten Typ direkt - kein Umweg nötig über
         // NewByParsing, das sonst über ALLE ParseableItem-Typen iteriert und
@@ -149,13 +193,28 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         if (Activator.CreateInstance(GetType()) is not ParseableItem clone) {
             throw Develop.DebugError("Clonen fehlgeschlagen");
         }
-        clone.Parse(ParseableItems().FinishParseable());
+        clone.BeginInit();
+        try {
+            clone.Parse(ParseableItems().FinishParseable());
+        } finally {
+            clone.EndInit();
+        }
         return clone;
     }
 
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Implementiert <see cref="ISupportInitialize" />. Dekrementiert den
+    /// <see cref="_suspendCount" />-Zhler. Sobald der Zhler wieder 0
+    /// erreicht, feuern die On-Methoden wieder normal.
+    /// </summary>
+    public void EndInit() {
+        if (IsDisposed) { return; }
+        if (_suspendCount > 0) { _suspendCount--; }
     }
 
     /// <summary>
@@ -170,9 +229,11 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// <see cref="JsonParseableExtension.BuildPartialJson" />, nur der SourceKey
     /// wird hier individuell aufgebaut (ParseableItem ist formal nicht
     /// IJsonParseable, deshalb kein direkter Aufruf der Extension).
+    /// Whrend <see cref="IsEventsSuppressed" /> (z. B. beim Parsen) ist die
+    /// Methode eine No-Op.
     /// </summary>
     public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
         var key = (this as IHasKeyName)?.KeyName ?? MyClassId;
         var partial = JsonParseableExtension.BuildPartialJson(relativePath, value);
         PropertyChangedExt?.Invoke(this, new JsonPathChangedEventArgs(relativePath, partial, key));
@@ -201,7 +262,19 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         }
     }
 
-    protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    /// <summary>
+    /// Lst das <see cref="PropertyChanged" />-Event aus. Whrend
+    /// <see cref="IsEventsSuppressed" /> (z. B. beim Parsen / Initialisieren)
+    /// ist die Methode eine No-Op. Subklassen, die zustzliche Logik in
+    /// ihrem Override brauchen (z. B. Cache-Invalidierung), mssen dafr
+    /// SORGEN, dass diese zustzliche Logik UNABHNGIG vom Suppress-Modus
+    /// ausgefhrt wird - typischerweise indem sie vor dem
+    /// <c>base.OnPropertyChanged(...)</c>-Aufruf steht.
+    /// </summary>
+    protected virtual void OnPropertyChanged(string propertyName) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 

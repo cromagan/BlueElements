@@ -25,6 +25,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private readonly object _itemLock = new();
 
+    private List<Variable>? _cachedExportVariables;
+    private Table? _cachedExportVariablesTable;
     private RectangleF _cachedUsedAreaOfItems;
     private string _referenceTableHintPath = string.Empty;
     private bool _referenceTableLoaded;
@@ -36,9 +38,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     #region Constructors
 
     public ItemCollectionPadItem() : base(string.Empty) {
-        Breite = 10;
-        Höhe = 10;
-        Endless = false;
+        // Suppress-Modus whrend der Konstruktion: Property-Setter (Breite, Hhe,
+        // Endless) lsen keine Change-Events aus. Siehe ParseableItem.ISupportInitialize.
+        BeginInit();
+        try {
+            Breite = 10;
+            Höhe = 10;
+            Endless = false;
+        } finally {
+            EndInit();
+        }
 
         IsSaved = true;
     }
@@ -234,6 +243,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
                 // könnte zwischenzeitlich in den Cache geladen worden sein.
                 _referenceTableLoaded = field is not null;
+
+                // HintPath aus der gefundenen Tabelle aktualisieren, damit er
+                // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
+                // über den Namen (ohne HintPath) gefunden wurde.
+                if (field is TableFile tbf) {
+                    _referenceTableHintPath = tbf.Filename;
+                }
             }
 
             return field;
@@ -244,6 +260,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             field = value;
             _referenceTableName = value?.KeyName ?? string.Empty;
+            _referenceTableHintPath = (value as TableFile)?.Filename ?? string.Empty;
             _referenceTableLoaded = true;
 
             OnPropertyChanged();
@@ -688,20 +705,61 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
     /// <summary>
-    /// Liefert die gespeicherten Variablen des Export-Skripts der
-    /// <see cref="ReferenceTable"/> — ohne das Skript auszuführen.
-    /// Wird für die Suggestions in TextPadItem/BitmapPadItem verwendet.
+    /// Führt das Export-Skript der <see cref="ReferenceTable"/> aus und liefert
+    /// die dabei erzeugten Variablen. Das Ergebnis wird pro Tabelle gecacht:
+    /// Bei derselben Tabelle wird der Cache zurückgegeben, bei einer anderen
+    /// Tabelle (oder wenn keine gültige ReferenceTable gesetzt ist) wird neu
+    /// gerechnet. Wird für die Suggestions in TextPadItem/BitmapPadItem verwendet.
     /// </summary>
     public List<Variable> GetExportVariables() {
-        if (ReferenceTable is not { IsDisposed: false } tb) { return []; }
+        if (ReferenceTable is not { IsDisposed: false } tb) {
+            _cachedExportVariables = null;
+            _cachedExportVariablesTable = null;
+            return [];
+        }
 
-        foreach (var script in tb.EventScript.Get(ScriptEventTypes.export)) {
-            if (script.SavedVariables is { Count: > 0 } vars) {
-                return vars;
+        if (_cachedExportVariablesTable == tb && _cachedExportVariables is not null) {
+            return _cachedExportVariables;
+        }
+
+        var row = tb.Row.FirstOrDefault();
+        var feedback = tb.ExecuteScript(ScriptEventTypes.export, string.Empty, true, row, null, true, false, 0);
+
+        _cachedExportVariables = feedback.Variables is { Count: > 0 } vars ? vars.ToList() : [];
+        _cachedExportVariablesTable = tb;
+
+        return _cachedExportVariables;
+    }
+
+    /// <summary>
+    /// Liefert einen erklärenden Text, der den Status der Export-Variablen
+    /// beschreibt - woher die Werte kommen oder warum keine verfügbar sind.
+    /// Wird an die übergebene Basis-QuickInfo angehängt und für die
+    /// TextPadItem-/BitmapPadItem-Eingabefelder verwendet.
+    /// </summary>
+    /// <param name="baseQuickInfo">Die vorhandene QuickInfo (z. B. aus der Description des Properties).</param>
+    /// <param name="applicableVariableCount">Anzahl der für das jeweilige Steuerelement verwendbaren Variablen.</param>
+    public string GetExportVariablesInfo(string baseQuickInfo, int applicableVariableCount) {
+        string status;
+
+        if (ReferenceTable is not { IsDisposed: false } tb) {
+            status = "Keine Tabelle geladen.<br>Es können keine Variablen über das Kontextmenü eingefügt werden.";
+        } else if (applicableVariableCount > 0) {
+            status = $"Variablen der Tabelle <b>{tb.KeyName}</b> können über das Kontextmenü hinzugefügt werden.";
+        } else {
+            var exportScripts = tb.EventScript.Get(ScriptEventTypes.export);
+
+            if (exportScripts.Count == 0) {
+                status = $"Die Tabelle <b>{tb.KeyName}</b> hat kein Export-Skript.<br>Daher stehen keine Variablen zur Verfügung.";
+            } else {
+                var broken = exportScripts.FirstOrDefault(s => !s.IsOk());
+                status = broken is not null
+                    ? $"Das Export-Skript <b>{broken.KeyName}</b> der Tabelle <b>{tb.KeyName}</b> ist fehlerhaft und liefert keine Variablen."
+                    : $"Das Export-Skript der Tabelle <b>{tb.KeyName}</b> liefert keine verwendbaren Variablen.";
             }
         }
 
-        return [];
+        return string.IsNullOrEmpty(baseQuickInfo) ? status : baseQuickInfo + "<hr>" + status;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -717,6 +775,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             if (ReferenceTable is { IsDisposed: false } tb) {
                 result.Add(new FlexiControlForDelegate(tb));
+                result.Add(new FlexiControlForDelegate(OpenReferenceTablePreview, "Vorschau mit Zeilen", ImageCode.Auge));
             }
         }
 
@@ -799,6 +858,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Öffnet einen modalen Vorschau-Dialog, der alle Zeilen der
+    /// <see cref="ReferenceTable" /> auflistet und für jede Zeile eine
+    /// Live-Vorschau des Formulars inklusive der berechneten Variablen zeigt.
+    /// </summary>
+    public void OpenReferenceTablePreview() {
+        if (ReferenceTable is not { IsDisposed: false } tb) { return; }
+        using var f = new ReferenceTablePreviewForm(this, tb);
+        f.ShowDialog();
+    }
+
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
 
@@ -823,6 +893,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         result.ParseableAdd("GridSnap", GridSnap);
         result.ParseableAdd("EditMode", (int)EditMode);
         result.ParseableAdd("ReferenceTable", _referenceTableName);
+        result.ParseableAdd("ReferenceTableHintPath", _referenceTableHintPath);
 
         return result;
     }
@@ -1310,7 +1381,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
-        IsSaved = false;
+        // IsSaved = false nur, wenn nicht gerade geparsed/initialisiert wird.
+        // Whrend des Ladens gilt das Item als gespeichert (es kommt ja gerade
+        // aus dem Speicher). Cache-Invalidierung in base passiert weiterhin.
+        if (!IsEventsSuppressed) { IsSaved = false; }
         base.OnPropertyChanged(propertyName);
     }
 
