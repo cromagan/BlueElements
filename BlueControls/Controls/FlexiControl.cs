@@ -33,6 +33,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         EditType = EditTypeFormula.Line;
         Size = new Size(200, 8);
+        CreateSubControls();
     }
 
     /// <summary>
@@ -50,6 +51,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         CaptionPosition = CaptionPosition.ohne;
 
         Size = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, width);
+        CreateSubControls();
     }
 
     #endregion

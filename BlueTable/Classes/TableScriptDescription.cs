@@ -200,7 +200,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         return s;
     }
 
-    public override int CompareTo(object obj) {
+    public override int CompareTo(object? obj) {
         if (obj is TableScriptDescription v) {
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }

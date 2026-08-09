@@ -6,6 +6,7 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -171,6 +172,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     }
 
     [DefaultValue("")]
+    [AllowNull]
     public override string Text {
         get => _textBox.Text;
         set => _textBox.Text = value;

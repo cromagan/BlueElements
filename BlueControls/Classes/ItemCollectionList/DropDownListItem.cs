@@ -48,6 +48,9 @@ public class DropDownListItem : AbstractListItem {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            foreach (var item in DropDownItems) {
+                item.Dispose();
+            }
             DropDownItems.Clear();
         }
         base.Dispose(disposing);

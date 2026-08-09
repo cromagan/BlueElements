@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Interfaces;
 using System.Drawing.Printing;
 
 namespace BlueControls.Forms;
@@ -15,12 +14,12 @@ public sealed class PageSetupData : IEditable {
 
     #region Properties
 
-    public string CaptionForEditor => "Seite einrichten";
-
     /// <summary>
     /// Papierbreite in mm (kurze Seite bei Hochformat-Definition).
     /// </summary>
     public float BreiteMm { get; set; }
+
+    public string CaptionForEditor => "Seite einrichten";
 
     /// <summary>
     /// Papierhöhe in mm (lange Seite bei Hochformat-Definition).
@@ -29,13 +28,11 @@ public sealed class PageSetupData : IEditable {
 
     public bool Querformat { get; set; }
 
+    public float RandLinksMm { get; set; }
     public float RandObenMm { get; set; }
 
-    public float RandUntenMm { get; set; }
-
-    public float RandLinksMm { get; set; }
-
     public float RandRechtsMm { get; set; }
+    public float RandUntenMm { get; set; }
 
     /// <summary>
     /// Vom Drucker unterstützte Papierformate für die Auswahl im Dialog.
@@ -46,8 +43,6 @@ public sealed class PageSetupData : IEditable {
     #endregion
 
     #region Methods
-
-    public string IsNowEditable() => string.Empty;
 
     /// <summary>
     /// Erzeugt eine <see cref="PageSetupData"/> aus einem <see cref="PrintDocument"/>.
@@ -84,6 +79,8 @@ public sealed class PageSetupData : IEditable {
         doc.DefaultPageSettings.Margins.Left = MmToPixel(RandLinksMm);
         doc.DefaultPageSettings.Margins.Right = MmToPixel(RandRechtsMm);
     }
+
+    public string IsNowEditable() => string.Empty;
 
     private static int MmToPixel(float mm) => (int)Math.Round(mm / 0.254f);
 

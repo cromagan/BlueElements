@@ -10,7 +10,6 @@ using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
-using static BlueBasics.ClassesStatic.Geometry;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;

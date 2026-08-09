@@ -164,7 +164,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     public virtual List<string> Attributes() => [];
 
-    public virtual int CompareTo(object obj) {
+    public virtual int CompareTo(object? obj) {
         if (obj is ScriptDescription other) {
             return string.Compare(CompareKey, other.CompareKey, StringComparison.Ordinal);
         }

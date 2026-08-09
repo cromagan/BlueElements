@@ -127,7 +127,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         return instance.TryParseValue(txt, out result);
     }
 
-    public int CompareTo(object obj) {
+    public int CompareTo(object? obj) {
         if (obj is Variable v) {
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }

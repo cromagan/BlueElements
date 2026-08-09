@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace BlueControls.Forms;
 
 public partial class PictureView : FormWithStatusBar, IDisposableExtended {
@@ -55,6 +57,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     #region Properties
 
+    [AllowNull]
     public override sealed string Text {
         get => base.Text;
         set => base.Text = value;

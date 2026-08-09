@@ -2,7 +2,6 @@
 
 using System.ComponentModel;
 using System.Text;
-using System.Text.Json;
 
 namespace BlueTable.Classes;
 
@@ -28,6 +27,12 @@ public class TableJsonFile : TableFile {
     #region Properties
 
     /// <summary>
+    /// Ohne Chunk-System: Eine JSON-Datei gilt als "recently used", wenn sie
+    /// existiert - die feingranulare LastUsed-Logik der Chunk-Klasse entfällt.
+    /// </summary>
+    public override bool IsRecentlyUsed => !string.IsNullOrEmpty(Filename) && IO.FileExists(Filename);
+
+    /// <summary>
     /// Bei JSON-Tabellen gibt es kein Chunk-System. Die Aktualität wird direkt
     /// über die FileInfo der Hauptdatei ermittelt.
     /// </summary>
@@ -39,12 +44,6 @@ public class TableJsonFile : TableFile {
             return fi is { Exists: true } ? fi.LastWriteTimeUtc : new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         }
     }
-
-    /// <summary>
-    /// Ohne Chunk-System: Eine JSON-Datei gilt als "recently used", wenn sie
-    /// existiert - die feingranulare LastUsed-Logik der Chunk-Klasse entfällt.
-    /// </summary>
-    public override bool IsRecentlyUsed => !string.IsNullOrEmpty(Filename) && IO.FileExists(Filename);
 
     #endregion
 

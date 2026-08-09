@@ -2300,8 +2300,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     }
                 }
 
-                if (isRealColumn && _mouseOverRow?.Row is { IsDisposed: false } r) {
-                    OnCellClicked(new CellEventArgs(_mouseOverColumn.Column!, r));
+                if (_mouseOverColumn.Column is { IsDisposed: false } col && _mouseOverRow?.Row is { IsDisposed: false } r) {
+                    OnCellClicked(new CellEventArgs(col, r));
                     Invalidate();
 
                     // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder

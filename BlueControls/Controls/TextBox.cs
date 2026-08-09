@@ -7,6 +7,7 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Extended_Text.MarkRendering;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -189,6 +190,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     } = string.Empty;
 
+    [AllowNull]
     [DefaultValue("")]
     public override string Text {
         get {

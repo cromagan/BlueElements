@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Extended_Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
 
@@ -55,6 +56,7 @@ public partial class MessageBox : Form {
 
     #region Properties
 
+    [AllowNull]
     public override sealed string Text {
         get => base.Text;
         set => base.Text = value;

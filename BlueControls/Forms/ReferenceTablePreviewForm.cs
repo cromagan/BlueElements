@@ -1,14 +1,11 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;

@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls.ConnectedFormula;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -44,6 +45,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         }
     } = string.Empty;
 
+    [AllowNull]
     public override string Text {
         get => mainButton.Text;
         set => mainButton.Text = value;

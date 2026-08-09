@@ -288,7 +288,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         json.Set("quickinfo", QuickInfo);
         json.Set("columnheadermode", (int)ColumnHeaderMode);
         json.SetArrayIfNotEmpty("columns", _internal.Where(c => c.StorageKey is not null).Cast<IJsonStringable>());
-        json.SetArrayIfNotEmpty("columnkeys", _internal.Where(c => c.StorageKey is null && c.Column is not null).Select(c => c.Column!.KeyName));
+        json.SetArrayIfNotEmpty("columnkeys", _internal.Where(c => c.StorageKey is null).Select(c => c.Column).OfType<ColumnItem>().Select(c => c.KeyName));
         json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
         json.SetArrayIfNotEmpty("executeablescripts", Ausführbare_Skripte);
         json.SetArrayIfNotEmpty("columnsshowalwaysfilter", Filter_immer_Anzeigen);
@@ -371,7 +371,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                Add(ColumnViewItem.Create(Table, value.FromNonCritical()));
+                if (ColumnViewItem.Create(Table, value.FromNonCritical()) is { } cvi) { Add(cvi); }
                 return true;
 
             case "chaptercolumn":
