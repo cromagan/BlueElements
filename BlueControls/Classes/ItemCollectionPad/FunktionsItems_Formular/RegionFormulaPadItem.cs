@@ -23,6 +23,12 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #endregion
 
+    #region Fields
+
+    private string _parentFile = string.Empty;
+
+    #endregion
+
     #region Properties
 
     public static string ClassId => "FI-RegionFormula";
@@ -117,7 +123,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Parent", _parentFile);
         result.ParseableAdd("Child", Child);
         result.ParseableAdd("BorderStyle", RahmenStil);
         result.ParseableAdd("Detachable", Ausklappbar);
@@ -126,7 +132,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("parent", ParentFormula?.Filename ?? string.Empty);
+        json.Set("parent", _parentFile);
         json.Set("child", Child);
         json.Set("borderstyle", (int)RahmenStil);
         json.Set("detachable", Ausklappbar);
@@ -138,6 +144,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         try {
             var parent = json.GetString("parent");
             if (parent is { Length: > 0 }) {
+                _parentFile = parent;
                 ParentFormula = ConnectedFormula.Get(parent);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
             }
@@ -153,7 +160,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = ConnectedFormula.Get(value.FromNonCritical());
+                _parentFile = value.FromNonCritical();
+                ParentFormula = ConnectedFormula.Get(_parentFile);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 

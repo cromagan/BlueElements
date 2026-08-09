@@ -257,7 +257,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         json.Set("caption", Beschriftung);
         json.Set("image", Bild);
         json.Set("script", Script);
-        json.Set("quickinfo", ButtonQuickInfo);
+        json.Set("buttonquickinfo", ButtonQuickInfo);
         json.Set("enablewhenrows", (int)Drückbar_wenn);
         return json;
     }
@@ -268,7 +268,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
             Beschriftung = json.GetString("caption", Beschriftung);
             Bild = json.GetString("image", Bild);
             Script = json.GetString("script", Script);
-            ButtonQuickInfo = json.GetString("quickinfo", ButtonQuickInfo);
+            ButtonQuickInfo = json.GetString("buttonquickinfo", ButtonQuickInfo);
             Drückbar_wenn = json.GetEnum("enablewhenrows", Drückbar_wenn);
             base.ParseJson(json);
         } finally {

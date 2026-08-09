@@ -18,6 +18,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     private static readonly Brush HeadBrush = new SolidBrush(Color.FromArgb(255, 200, 200, 200));
     private readonly List<string> _childs = [];
+    private string _parentFile = string.Empty;
 
     #endregion
 
@@ -173,14 +174,14 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Parent", _parentFile);
         result.ParseableAdd("Childs", _childs, false);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("parent", ParentFormula?.Filename ?? string.Empty);
+        json.Set("parent", _parentFile);
         json.SetArrayIfNotEmpty("childs", _childs);
         return json;
     }
@@ -190,6 +191,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         try {
             var parent = json.GetString("parent");
             if (parent is { Length: > 0 }) {
+                _parentFile = parent;
                 ParentFormula = ConnectedFormula.Get(parent);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
             }
@@ -208,7 +210,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = ConnectedFormula.Get(value.FromNonCritical());
+                _parentFile = value.FromNonCritical();
+                ParentFormula = ConnectedFormula.Get(_parentFile);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 
