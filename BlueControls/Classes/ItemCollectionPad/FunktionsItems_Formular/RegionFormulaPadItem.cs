@@ -134,15 +134,20 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override void ParseJson(JsonObject json) {
-        var parent = json.GetString("parent");
-        if (parent is { Length: > 0 }) {
-            ParentFormula = ConnectedFormula.Get(parent);
-            ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
+        BeginInit();
+        try {
+            var parent = json.GetString("parent");
+            if (parent is { Length: > 0 }) {
+                ParentFormula = ConnectedFormula.Get(parent);
+                ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
+            }
+            Child = json.GetString("child", Child);
+            RahmenStil = json.GetEnum("borderstyle", RahmenStil);
+            Ausklappbar = json.GetBool("detachable", Ausklappbar);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
         }
-        Child = json.GetString("child", Child);
-        RahmenStil = json.GetEnum("borderstyle", RahmenStil);
-        Ausklappbar = json.GetBool("detachable", Ausklappbar);
-        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

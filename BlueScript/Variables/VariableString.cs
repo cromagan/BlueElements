@@ -85,8 +85,13 @@ public class VariableString : Variable {
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetString("value", _valueString));
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            SetValue(json.GetString("value", _valueString));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     protected override void SetValue(object? x) {

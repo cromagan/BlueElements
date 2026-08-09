@@ -70,8 +70,13 @@ public class VariableBool : Variable {
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetBool("value", _valuebool));
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            SetValue(json.GetBool("value", _valuebool));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     protected override void SetValue(object? x) {

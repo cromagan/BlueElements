@@ -122,12 +122,17 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     }
 
     public override void ParseJson(JsonObject json) {
-        Symbol = json.GetEnum("contour", Symbol);
-        Hintergrundfarbe = Color.FromArgb(json.GetInt("backcolor", Hintergrundfarbe.ToArgb()));
-        Randfarbe = Color.FromArgb(json.GetInt("bordercolor", Randfarbe.ToArgb()));
-        Randdicke = json.GetFloat("borderwidth", Randdicke);
-        Style = json.GetEnum("style", Style);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Symbol = json.GetEnum("contour", Symbol);
+            Hintergrundfarbe = Color.FromArgb(json.GetInt("backcolor", Hintergrundfarbe.ToArgb()));
+            Randfarbe = Color.FromArgb(json.GetInt("bordercolor", Randfarbe.ToArgb()));
+            Randdicke = json.GetFloat("borderwidth", Randdicke);
+            Style = json.GetEnum("style", Style);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

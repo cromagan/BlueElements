@@ -99,11 +99,16 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     }
 
     public void ParseJson(JsonObject json) {
-        if (json["columns"] is JsonArray arr) {
-            _internal.Clear();
-            foreach (var item in arr) {
-                if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
+        BeginInit();
+        try {
+            if (json["columns"] is JsonArray arr) {
+                _internal.Clear();
+                foreach (var item in arr) {
+                    if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
+                }
             }
+        } finally {
+            EndInit();
         }
     }
 

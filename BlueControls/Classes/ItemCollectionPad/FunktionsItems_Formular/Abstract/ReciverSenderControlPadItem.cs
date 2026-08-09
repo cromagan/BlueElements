@@ -107,13 +107,28 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     public override void AddedToCollection(ItemCollectionPadItem parent) {
         if (IsDisposed) { return; }
-        base.AddedToCollection(parent);
 
-        if (Parent is not null) {
-            OutputColorId = -1;
-            OutputColorId = GetFreeColorId();
+        // Befindet sich die umgebende Page im Parse-/Initialisierungs-Modus
+        // (IsEventsSuppressed), wird dieses Item gerade aus einem Speicherstand
+        // geladen. Die unten folgenden Initialisierungs-Aufrufe (OutputColorId,
+        // OnPropertyChanged) duerfen dann keine Versionserhoehung ausloesen -
+        // sonst wuerde das die Version bei jedem Roundtrip (altes Format <->
+        // JSON) kuenstlich hochzaehlen. Siehe IHasVersion.RaiseVersion.
+        // Im interaktiven Fall (Drag & Drop im Editor) ist die Page nicht
+        // suppressed und das Verhalten bleibt wie bisher.
+        var suppress = parent.IsEventsSuppressed;
+        if (suppress) { BeginInit(); }
+        try {
+            base.AddedToCollection(parent);
+
+            if (Parent is not null) {
+                OutputColorId = -1;
+                OutputColorId = GetFreeColorId();
+            }
+            OnPropertyChanged();
+        } finally {
+            if (suppress) { EndInit(); }
         }
-        OnPropertyChanged();
     }
 
     public override string ErrorReason() {
@@ -193,15 +208,20 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        var name = json.GetString("outputtable");
-        if (!string.IsNullOrEmpty(name)) {
-            _tableOutputName = name;
-            _tableOutputTried = false;
+        BeginInit();
+        try {
+            var name = json.GetString("outputtable");
+            if (!string.IsNullOrEmpty(name)) {
+                _tableOutputName = name;
+                _tableOutputTried = false;
+            }
+
+            _tableOutputHintPath = json.GetString("outputtablehintpath", _tableOutputHintPath);
+
+            base.ParseJson(json);
+        } finally {
+            EndInit();
         }
-
-        _tableOutputHintPath = json.GetString("outputtablehintpath", _tableOutputHintPath);
-
-        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

@@ -82,8 +82,13 @@ public class VariableDouble : Variable {
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetDouble("value", _double));
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            SetValue(json.GetDouble("value", _double));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     protected override void SetValue(object? x) {

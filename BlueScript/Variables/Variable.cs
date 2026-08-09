@@ -179,9 +179,14 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     /// Nicht vorhandene Keys werden übersprungen, sodass auch Partial-Updates funktionieren.
     /// </summary>
     public virtual void ParseJson(JsonObject json) {
-        KeyName = json.GetString("key", KeyName);
-        Comment = json.GetString("comment", Comment);
-        ReadOnly = json.GetBool("readonly", ReadOnly);
+        BeginInit();
+        try {
+            KeyName = json.GetString("key", KeyName);
+            Comment = json.GetString("comment", Comment);
+            ReadOnly = json.GetBool("readonly", ReadOnly);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

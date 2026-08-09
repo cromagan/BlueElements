@@ -264,14 +264,19 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     }
 
     public override void ParseJson(JsonObject json) {
-        Text_Oben = json.GetString("text1", Text_Oben);
-        Text_Unten = json.GetString("text2", Text_Unten);
-        Nachkommastellen = json.GetInt("decimal", Nachkommastellen);
-        Präfix = json.GetString("prefix", Präfix);
-        Suffix = json.GetString("suffix", Suffix);
-        TextScale = json.GetFloat("additionalscale", TextScale);
-        Style = json.GetEnum("style", Style);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Text_Oben = json.GetString("text1", Text_Oben);
+            Text_Unten = json.GetString("text2", Text_Unten);
+            Nachkommastellen = json.GetInt("decimal", Nachkommastellen);
+            Präfix = json.GetString("prefix", Präfix);
+            Suffix = json.GetString("suffix", Suffix);
+            TextScale = json.GetFloat("additionalscale", TextScale);
+            Style = json.GetEnum("style", Style);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

@@ -361,22 +361,27 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public override void ParseJson(JsonObject json) {
-        Version = json.GetInt("version", Version);
-        X_Position = json.GetEnum("xlock", X_Position);
+        BeginInit();
+        try {
+            Version = json.GetInt("version", Version);
+            X_Position = json.GetEnum("xlock", X_Position);
 
-        if (json["getfilterfromkeys"] is JsonArray gff) {
-            _getFilterFromKeys.Clear();
-            _getFilterFromKeys.AddRange(gff.ToStringList());
-            _getFilterFrom = null;
+            if (json["getfilterfromkeys"] is JsonArray gff) {
+                _getFilterFromKeys.Clear();
+                _getFilterFromKeys.AddRange(gff.ToStringList());
+                _getFilterFrom = null;
+            }
+
+            if (MustBeInDrawingArea && json["visiblefor"] is JsonArray vf) {
+                var l = vf.ToStringList();
+                if (l.Count == 0) { l.Add(Constants.Everybody); }
+                VisibleFor = Table.RepairUserGroups(l).AsReadOnly();
+            }
+
+            base.ParseJson(json);
+        } finally {
+            EndInit();
         }
-
-        if (MustBeInDrawingArea && json["visiblefor"] is JsonArray vf) {
-            var l = vf.ToStringList();
-            if (l.Count == 0) { l.Add(Constants.Everybody); }
-            VisibleFor = Table.RepairUserGroups(l).AsReadOnly();
-        }
-
-        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

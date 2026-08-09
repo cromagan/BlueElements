@@ -952,32 +952,41 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public override void ParseJson(JsonObject json) {
-        Caption = json.GetString("caption", Caption);
-        SheetStyle = json.GetString("sheetstyle", SheetStyle);
-        Endless = json.GetBool("endless", Endless);
-        AutoZoomFit = json.GetBool("autozoomfit", AutoZoomFit);
-        ShowAlways = json.GetBool("showalways", ShowAlways);
-        ShowJointPoints = json.GetBool("showjointpoints", ShowJointPoints);
+        // Waehrend des Parsens alle Change-Events unterdruecken. Die Werte
+        // kommen gerade aus dem Speicher - IsSaved darf nicht auf false
+        // gesetzt werden und RaiseVersion (via IHasVersion) darf die Version
+        // nicht hochzaehlen. Siehe ParseableItem.IsEventsSuppressed.
+        BeginInit();
+        try {
+            Caption = json.GetString("caption", Caption);
+            SheetStyle = json.GetString("sheetstyle", SheetStyle);
+            Endless = json.GetBool("endless", Endless);
+            AutoZoomFit = json.GetBool("autozoomfit", AutoZoomFit);
+            ShowAlways = json.GetBool("showalways", ShowAlways);
+            ShowJointPoints = json.GetBool("showjointpoints", ShowJointPoints);
 
-        BackColor = Color.FromArgb(json.GetInt("backcolor", BackColor.ToArgb()));
-        SnapMode = json.GetEnum("snapmode", SnapMode);
-        EditMode = json.GetEnum("editmode", EditMode);
-        GridShow = json.GetFloat("gridshow", GridShow);
-        GridSnap = json.GetFloat("gridsnap", GridSnap);
-        Breite = json.GetFloat("width", Breite);
-        Höhe = json.GetFloat("height", Höhe);
+            BackColor = Color.FromArgb(json.GetInt("backcolor", BackColor.ToArgb()));
+            SnapMode = json.GetEnum("snapmode", SnapMode);
+            EditMode = json.GetEnum("editmode", EditMode);
+            GridShow = json.GetFloat("gridshow", GridShow);
+            GridSnap = json.GetFloat("gridsnap", GridSnap);
+            Breite = json.GetFloat("width", Breite);
+            Höhe = json.GetFloat("height", Höhe);
 
-        RandinMm = json.GetPadding("printarea", RandinMm);
+            RandinMm = json.GetPadding("printarea", RandinMm);
 
-        _referenceTableName = json.GetString("referencetable", _referenceTableName);
-        _referenceTableHintPath = json.GetString("referencetablehintpath", _referenceTableHintPath);
-        _referenceTableTried = false;
+            _referenceTableName = json.GetString("referencetable", _referenceTableName);
+            _referenceTableHintPath = json.GetString("referencetablehintpath", _referenceTableHintPath);
+            _referenceTableTried = false;
 
-        foreach (var created in json.GetList<AbstractPadItem>("items", false)) {
-            Add(created);
+            foreach (var created in json.GetList<AbstractPadItem>("items", false)) {
+                Add(created);
+            }
+
+            base.ParseJson(json);
+        } finally {
+            EndInit();
         }
-
-        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {

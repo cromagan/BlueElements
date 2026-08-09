@@ -371,32 +371,37 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// auf. So bleibt die Leseschicht spiegelbildlich zu <see cref="ParseableJson" />.
     /// </summary>
     public virtual void ParseJson(JsonObject json) {
-        // "type": Klassenkennung, nur formal - der Dispatcher hat sie bereits
-        // zum Konstruieren der richtigen Klasse genutzt.
-        KeyName = json.GetString("key", KeyName);
-        Enabled = json.GetBool("enabled", Enabled);
-        Bei_Export_sichtbar = json.GetBool("print", Bei_Export_sichtbar);
-        QuickInfo = json.GetString("quickinfo", QuickInfo);
-        Page = json.GetString("page", Page);
+        BeginInit();
+        try {
+            // "type": Klassenkennung, nur formal - der Dispatcher hat sie bereits
+            // zum Konstruieren der richtigen Klasse genutzt.
+            KeyName = json.GetString("key", KeyName);
+            Enabled = json.GetBool("enabled", Enabled);
+            Bei_Export_sichtbar = json.GetBool("print", Bei_Export_sichtbar);
+            QuickInfo = json.GetString("quickinfo", QuickInfo);
+            Page = json.GetString("page", Page);
 
-        if (json["points"] is JsonArray pts) {
-            foreach (var item in pts) {
-                if (item is not JsonObject po) { continue; }
-                var name = po.GetString("key");
-                if (string.IsNullOrEmpty(name)) { continue; }
+            if (json["points"] is JsonArray pts) {
+                foreach (var item in pts) {
+                    if (item is not JsonObject po) { continue; }
+                    var name = po.GetString("key");
+                    if (string.IsNullOrEmpty(name)) { continue; }
 
-                foreach (var thisPoint in MovablePoint) {
-                    if (string.Equals(thisPoint.KeyName, name, StringComparison.Ordinal)) {
-                        thisPoint.ParseJson(po);
-                        break;
+                    foreach (var thisPoint in MovablePoint) {
+                        if (string.Equals(thisPoint.KeyName, name, StringComparison.Ordinal)) {
+                            thisPoint.ParseJson(po);
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        if (json["tags"] is JsonArray tags) {
-            Tags.Clear();
-            Tags.AddRange(tags.ToStringList());
+            if (json["tags"] is JsonArray tags) {
+                Tags.Clear();
+                Tags.AddRange(tags.ToStringList());
+            }
+        } finally {
+            EndInit();
         }
     }
 

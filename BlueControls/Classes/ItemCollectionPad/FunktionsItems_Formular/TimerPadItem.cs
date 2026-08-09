@@ -222,14 +222,19 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     }
 
     public override void ParseJson(JsonObject json) {
-        Version = json.GetInt("version", Version);
-        Script = json.GetString("script", Script);
-        Sekunden = json.GetInt("seconds", Sekunden);
-        MindestInaktivitaet = json.GetInt("minidle", MindestInaktivitaet);
-        StandardAktiviert = json.GetBool("active", StandardAktiviert);
-        Deaktivierbar = json.GetBool("disableable", Deaktivierbar);
-        Text = json.GetString("text", Text);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Version = json.GetInt("version", Version);
+            Script = json.GetString("script", Script);
+            Sekunden = json.GetInt("seconds", Sekunden);
+            MindestInaktivitaet = json.GetInt("minidle", MindestInaktivitaet);
+            StandardAktiviert = json.GetBool("active", StandardAktiviert);
+            Deaktivierbar = json.GetBool("disableable", Deaktivierbar);
+            Text = json.GetString("text", Text);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

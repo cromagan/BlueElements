@@ -156,10 +156,15 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public override void ParseJson(JsonObject json) {
-        Standard_Ansicht = json.GetString("defaultarrangement", Standard_Ansicht);
-        RahmenStil = json.GetEnum("borderstyle", RahmenStil);
-        Doppelklick_Skript = json.GetString("doubleclickscript", Doppelklick_Skript);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Standard_Ansicht = json.GetString("defaultarrangement", Standard_Ansicht);
+            RahmenStil = json.GetEnum("borderstyle", RahmenStil);
+            Doppelklick_Skript = json.GetString("doubleclickscript", Doppelklick_Skript);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

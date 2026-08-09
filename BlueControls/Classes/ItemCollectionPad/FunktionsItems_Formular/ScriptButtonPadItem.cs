@@ -263,12 +263,17 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     public override void ParseJson(JsonObject json) {
-        Beschriftung = json.GetString("caption", Beschriftung);
-        Bild = json.GetString("image", Bild);
-        Script = json.GetString("script", Script);
-        ButtonQuickInfo = json.GetString("quickinfo", ButtonQuickInfo);
-        Drückbar_wenn = json.GetEnum("enablewhenrows", Drückbar_wenn);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Beschriftung = json.GetString("caption", Beschriftung);
+            Bild = json.GetString("image", Bild);
+            Script = json.GetString("script", Script);
+            ButtonQuickInfo = json.GetString("quickinfo", ButtonQuickInfo);
+            Drückbar_wenn = json.GetEnum("enablewhenrows", Drückbar_wenn);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

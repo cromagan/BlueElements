@@ -224,14 +224,19 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     }
 
     public override void ParseJson(JsonObject json) {
-        Bild_Modus = json.GetEnum("modus", Bild_Modus);
-        Platzhalter_Für_Layout = json.GetString("placeholder", Platzhalter_Für_Layout);
-        PixelGenau = json.GetBool("pixelperfect", PixelGenau);
-        Hintergrund_Weiß_Füllen = json.GetBool("whiteback", Hintergrund_Weiß_Füllen);
-        _rawImageBase64 = json.GetString("image");
-        _bitmap = null;
-        Style = json.GetEnum("style", Style);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            Bild_Modus = json.GetEnum("modus", Bild_Modus);
+            Platzhalter_Für_Layout = json.GetString("placeholder", Platzhalter_Für_Layout);
+            PixelGenau = json.GetBool("pixelperfect", PixelGenau);
+            Hintergrund_Weiß_Füllen = json.GetBool("whiteback", Hintergrund_Weiß_Füllen);
+            _rawImageBase64 = json.GetString("image");
+            _bitmap = null;
+            Style = json.GetEnum("style", Style);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

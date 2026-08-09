@@ -193,15 +193,20 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            base.ParseJson(json);
 
-        if (json["jointpoints"] is JsonArray jps) {
-            foreach (var item in jps) {
-                if (item is not JsonObject jo) { continue; }
-                var jp = new PointM(this, string.Empty, 0f, 0f);
-                jp.ParseJson(jo);
-                JointPoints.Add(jp);
+            if (json["jointpoints"] is JsonArray jps) {
+                foreach (var item in jps) {
+                    if (item is not JsonObject jo) { continue; }
+                    var jp = new PointM(this, string.Empty, 0f, 0f);
+                    jp.ParseJson(jo);
+                    JointPoints.Add(jp);
+                }
             }
+        } finally {
+            EndInit();
         }
     }
 

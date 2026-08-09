@@ -100,8 +100,13 @@ public class VariableListString : Variable {
     }
 
     public override void ParseJson(JsonObject json) {
-        SetValue(json.GetStringList("value"));
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            SetValue(json.GetStringList("value"));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     protected override void SetValue(object? x) {

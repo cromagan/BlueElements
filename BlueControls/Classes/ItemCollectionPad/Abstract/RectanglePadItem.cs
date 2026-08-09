@@ -125,9 +125,14 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void ParseJson(JsonObject json) {
-        Drehwinkel = json.GetInt("rotation", Drehwinkel);
-        base.ParseJson(json);
-        CalculateSlavePoints();
+        BeginInit();
+        try {
+            Drehwinkel = json.GetInt("rotation", Drehwinkel);
+            base.ParseJson(json);
+            CalculateSlavePoints();
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

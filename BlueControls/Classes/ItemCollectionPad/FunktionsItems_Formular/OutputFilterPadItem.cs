@@ -178,12 +178,17 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override void ParseJson(JsonObject json) {
-        ColumnKey = json.GetString("columnkey", ColumnKey);
-        CaptionPosition = json.GetEnum("caption", CaptionPosition);
-        Standard_bei_keiner_Eingabe = json.GetEnum("defaultemptyfilter", Standard_bei_keiner_Eingabe);
-        Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
-        Einschnappen = json.GetBool("snapfilter", Einschnappen);
-        base.ParseJson(json);
+        BeginInit();
+        try {
+            ColumnKey = json.GetString("columnkey", ColumnKey);
+            CaptionPosition = json.GetEnum("caption", CaptionPosition);
+            Standard_bei_keiner_Eingabe = json.GetEnum("defaultemptyfilter", Standard_bei_keiner_Eingabe);
+            Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
+            Einschnappen = json.GetBool("snapfilter", Einschnappen);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
     }
 
     public override bool ParseThis(string key, string value) {

@@ -155,14 +155,19 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     }
 
     public override void ParseJson(JsonObject json) {
-        Layout_Dateiname = json.GetString("layoutfilename", Layout_Dateiname);
-        var name = json.GetString("table", string.Empty);
-        if (name is { Length: > 0 }) {
-            _tableName = name;
-            _tableLoaded = false;
+        BeginInit();
+        try {
+            Layout_Dateiname = json.GetString("layoutfilename", Layout_Dateiname);
+            var name = json.GetString("table", string.Empty);
+            if (name is { Length: > 0 }) {
+                _tableName = name;
+                _tableLoaded = false;
+            }
+            _rowKey = json.GetString("rowkey", _rowKey);
+            base.ParseJson(json);
+        } finally {
+            EndInit();
         }
-        _rowKey = json.GetString("rowkey", _rowKey);
-        base.ParseJson(json);
     }
 
     public override bool ParseThis(string key, string value) {
