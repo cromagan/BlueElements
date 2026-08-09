@@ -38,29 +38,33 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     #region Constructors
 
     protected FixedRectanglePadItem(string keyName) : base(keyName) {
-        _pLo = new PointM(this, "LO", 0, 0);
-        _pRo = new PointM(this, "RO", 0, 0);
-        _pRu = new PointM(this, "RU", 0, 0);
-        _pLu = new PointM(this, "LU", 0, 0);
-        _pl = new PointM(this, "L", 0, 0);
-        _pr = new PointM(this, "R", 0, 0);
-        _po = new PointM(this, "O", 0, 0);
-        _pu = new PointM(this, "U", 0, 0);
+        BeginInit();
 
-        _po.MoveXByMouse = false;
-        _pu.MoveXByMouse = false;
-        _pl.MoveYByMouse = false;
-        _pr.MoveYByMouse = false;
+        try {
+            _pLo = new PointM(this, "LO", 0, 0);
+            _pRo = new PointM(this, "RO", 0, 0);
+            _pRu = new PointM(this, "RU", 0, 0);
+            _pLu = new PointM(this, "LU", 0, 0);
+            _pl = new PointM(this, "L", 0, 0);
+            _pr = new PointM(this, "R", 0, 0);
+            _po = new PointM(this, "O", 0, 0);
+            _pu = new PointM(this, "U", 0, 0);
 
-        MovablePoint.Add(_pLo);
-        MovablePoint.Add(_pRo);
-        MovablePoint.Add(_pLu);
-        MovablePoint.Add(_pRu);
-        MovablePoint.Add(_pl);
-        MovablePoint.Add(_pr);
-        MovablePoint.Add(_pu);
-        MovablePoint.Add(_po);
-        PointsForSuccessfullyMove.Add(_pLo);
+            _po.MoveXByMouse = false;
+            _pu.MoveXByMouse = false;
+            _pl.MoveYByMouse = false;
+            _pr.MoveYByMouse = false;
+
+            MovablePoint.Add(_pLo);
+            MovablePoint.Add(_pRo);
+            MovablePoint.Add(_pLu);
+            MovablePoint.Add(_pRu);
+            MovablePoint.Add(_pl);
+            MovablePoint.Add(_pr);
+            MovablePoint.Add(_pu);
+            MovablePoint.Add(_po);
+            PointsForSuccessfullyMove.Add(_pLo);
+        } finally { EndInit(); }
     }
 
     #endregion

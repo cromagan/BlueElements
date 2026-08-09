@@ -31,9 +31,9 @@ public static class BackgroundFill {
         DeleteBackBrush = null;
     }
 
-    public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
+    public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), CreateBrush);
 
-    public static LinearGradientBrush GetGradient(BackgroundStyle style, Color c1, Color c2, Color c3, int w, int h, float mp) => _gradientCache.GetOrAdd(new GradientKey(style, c1.ToArgb(), c2.ToArgb(), c3.ToArgb(), w, h, (int)(mp * 1000)), static k => CreateGradient(k));
+    public static LinearGradientBrush GetGradient(BackgroundStyle style, Color c1, Color c2, Color c3, int w, int h, float mp) => _gradientCache.GetOrAdd(new GradientKey(style, c1.ToArgb(), c2.ToArgb(), c3.ToArgb(), w, h, (int)(mp * 1000)), CreateGradient);
 
     public static void Glossy(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var c3 = Color.FromArgb(180, backColor2);
@@ -135,6 +135,8 @@ public static class BackgroundFill {
             }
         }
     }
+
+    private static SolidBrush CreateBrush(int argb) => new(Color.FromArgb(argb));
 
     private static LinearGradientBrush CreateGradient(GradientKey k) {
         var rect = new Rectangle(0, 0, k.W, k.H);

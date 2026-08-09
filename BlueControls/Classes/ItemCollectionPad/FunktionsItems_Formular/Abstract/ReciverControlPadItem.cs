@@ -33,8 +33,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     #region Constructors
 
     protected ReciverControlPadItem(string keyName, ConnectedFormula? parentFormula) : base(keyName) {
-        ParentFormula = parentFormula;
-        SetCoordinates(new RectangleF(0, 0, 50, 30));
+        BeginInit();
+
+        try {
+            ParentFormula = parentFormula;
+            SetCoordinates(new RectangleF(0, 0, 50, 30));
+        } finally { EndInit(); }
     }
 
     #endregion

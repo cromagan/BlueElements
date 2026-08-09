@@ -182,12 +182,33 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         // Table.EventScript zurück und lädt _item auf die frische Backend-Instanz).
         OnExecuting(System.EventArgs.Empty);
 
-        var f = ExecuteScript(Script, testmode);
+        // Vorab-Prüfung: Variablen-Namen ermitteln und einfache Syntax-Prüfung.
+        // Syntax-Fehler verhindern die Ausführung. Protokoll-Nachrichten
+        // (z.B. nicht auflösbare Var-Werte) werden angezeigt, blockieren aber nicht.
+        var preCheck = ScriptPreCheck.Check(Script);
+        if (preCheck.HasSyntaxErrors) {
+            WriteCommandsToList();
+            var protocolPart = preCheck.Protocol.Count > 0
+                ? "\r\n\r\nZusätzliche Hinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
+                : string.Empty;
+            UpdateState($"Syntax-Fehler — Ausführung abgebrochen:\r\n{string.Join("\r\n", preCheck.SyntaxErrors)}{protocolPart}", null, false);
+            return;
+        }
+
+        if (ExecuteScript is not { } exec) {
+            UpdateState("Kein Skript-Executor gesetzt — Ausführung abgebrochen.", null, false);
+            return;
+        }
+
+        var f = exec(Script, testmode);
 
         WriteCommandsToList();
 
         if (f.Failed) {
-            UpdateState(f.ProtocolText, f.Variables?.ToList(), false);
+            var protocolPart = preCheck.Protocol.Count > 0
+                ? "\r\n\r\nZusätzliche Hinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
+                : string.Empty;
+            UpdateState(f.ProtocolText + protocolPart, f.Variables?.ToList(), false);
             return;
         }
 
@@ -196,7 +217,10 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             return;
         }
 
-        UpdateState("Erfolgreich geprüft.", f.Variables?.ToList(), false);
+        var protocolText = preCheck.Protocol.Count > 0
+            ? "\r\n\r\nHinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
+            : string.Empty;
+        UpdateState("Erfolgreich geprüft." + protocolText, f.Variables?.ToList(), false);
     }
 
     public void UpdateState(string txt, List<Variable>? variables, bool updateSpecialFields) {

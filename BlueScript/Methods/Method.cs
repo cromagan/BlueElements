@@ -80,6 +80,65 @@ public abstract class Method : IReadableTextWithKey {
     #region Methods
 
     /// <summary>
+    /// Prüft die Attribut-Anzahl eines Methodenaufrufs gegen die
+    /// Deklaration (<see cref="Args"/> und <see cref="LastArgMinCount"/>).
+    /// Gibt bei Fehler die Meldung zurück, sonst <c>null</c>.
+    /// Wird sowohl von <see cref="SplitAttributeToVars"/> als auch
+    /// vom <see cref="ScriptPreCheck"/> genutzt.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="attributes">Die bereits via <see cref="SplitAttributeToString"/>
+    /// gesplitteten Attribute oder <c>null</c>, wenn der Text leer war.</param>
+    /// <param name="argCount"></param>
+    /// <param name="lastArgMinCount"></param>
+    /// <remarks>
+    /// Die für die Fehlermeldung benötigte Syntax wird erst beim Auftreten
+    /// eines Fehlers über <see cref="AllMethods"/> anhand des Befehlsnamens ermittelt.
+    /// </remarks>
+    public static string? CheckArgumentCount(string command, List<string>? attributes, int argCount, LastArgMinCountType lastArgMinCount) {
+        string GetSyntax() => AllMethods.Instances.FirstOrDefault(m => m.Command.Equals(command, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
+
+        if (argCount == 0) {
+            return attributes is { Count: > 0 }
+                ? $"'{command}' erwartet keine Attribute."
+                : null;
+        }
+
+        if (attributes is not { Count: > 0 }) {
+            return $"Bei '{command}' wurden keine Attribute übergeben, erwartet wurden {argCount}. Beispiel: {GetSyntax()}";
+        }
+
+        if (attributes.Count < argCount && lastArgMinCount != LastArgMinCountType.Optional) {
+            return $"Zu wenige Attribute bei '{command}'. Beispiel: {GetSyntax()}";
+        }
+
+        if (attributes.Count < argCount - 1) {
+            return $"Zu wenige Attribute bei '{command}'. Beispiel: {GetSyntax()}";
+        }
+
+        if (lastArgMinCount == LastArgMinCountType.ExactlyOnce && attributes.Count > argCount) {
+            return $"Zu viele Attribute bei '{command}'. Beispiel: {GetSyntax()}";
+        }
+
+        if (lastArgMinCount == LastArgMinCountType.MinOnce && attributes.Count < argCount) {
+            return $"Zu wenige Attribute bei '{command}'. Beispiel: {GetSyntax()}";
+        }
+
+        if (lastArgMinCount == LastArgMinCountType.MinTwice && attributes.Count < argCount + 1) {
+            return $"Zu wenige Attribute bei '{command}'. Beispiel: {GetSyntax()}";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Convenience-Überladung: Splittet den Attribut-Text und nutzt die
+    /// Deklaration der übergebenen Methode.
+    /// </summary>
+    public static string? CheckArgumentCount(Method thisC, string attributText) =>
+        CheckArgumentCount(thisC.Command, SplitAttributeToString(attributText), thisC.Args.Count, thisC.LastArgMinCount);
+
+    /// <summary>
     /// Gibt den Text des Codeblocks zurück. Dabei werden die Zeilenumbrüche vor der { nicht entfernt, aber die Brackets {} selbst schon.
     /// Das muss berücksichtigt werden, um die Skript-Position richtig zu setzen!
     /// </summary>
@@ -320,23 +379,35 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData ld, ScriptProperties? scp) {
-        if (types.Count == 0) {
-            return string.IsNullOrEmpty(attributText)
-                ? new SplittedAttributesFeedback([])
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", true);
-        }
+    /// <summary>
+    /// Splittet den AttributText an Kommas auf Top-Level (Klammern werden respektiert).
+    /// </summary>
+    public static List<string>? SplitAttributeToString(string attributtext) {
+        if (string.IsNullOrEmpty(attributtext)) { return null; }
 
+        List<string> attributes = [];
+
+        var posc = 0;
+        do {
+            var (pos, _) = NextText(attributtext, posc, Comma, false, false, Brackets);
+            if (pos < 0) {
+                attributes.Add(attributtext[posc..].Trim(BracketRound));
+                break;
+            }
+            attributes.Add(attributtext[posc..pos].Trim(BracketRound));
+            posc = pos + 1;
+        } while (true);
+
+        return attributes;
+    }
+
+    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData ld, ScriptProperties? scp) {
         var attributes = SplitAttributeToString(attributText);
-        if (attributes is not { Count: not 0 }) {
-            var syntax = AllMethods.Instances.FirstOrDefault(m => m.Command.Equals(comand, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
-            return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Bei '{comand}' wurden keine Attribute übergeben, erwartet wurden {types.Count}. Beispiel: {syntax}", true);
-        }
-        if (attributes.Count < types.Count && lastArgMinCount != LastArgMinCountType.Optional) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
-        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount == LastArgMinCountType.ExactlyOnce && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu viele Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount == LastArgMinCountType.MinOnce && attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount == LastArgMinCountType.MinTwice && attributes.Count < types.Count + 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
+
+        var countError = CheckArgumentCount(comand, attributes, types.Count, lastArgMinCount);
+        if (countError is { Length: > 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, countError, true); }
+
+        if (types.Count == 0) { return new SplittedAttributesFeedback([]); }
 
         //  Variablen und Routinen ersetzen
         List<Variable> feedbackVariables = [];
@@ -704,28 +775,6 @@ public abstract class Method : IReadableTextWithKey {
         #endregion
 
         return null;
-    }
-
-    private static List<string>? SplitAttributeToString(string attributtext) {
-        if (string.IsNullOrEmpty(attributtext)) { return null; }
-        List<string> attributes = [];
-
-        #region Liste der Attribute splitten
-
-        var posc = 0;
-        do {
-            var (pos, _) = NextText(attributtext, posc, Comma, false, false, Brackets);
-            if (pos < 0) {
-                attributes.Add(attributtext[posc..].Trim(BracketRound));
-                break;
-            }
-            attributes.Add(attributtext[posc..pos].Trim(BracketRound));
-            posc = pos + 1;
-        } while (true);
-
-        #endregion
-
-        return attributes;
     }
 
     #endregion

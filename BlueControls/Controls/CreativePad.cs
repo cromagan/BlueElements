@@ -102,9 +102,18 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             _items = value;
 
             if (_items is { IsDisposed: false }) {
-                _items.ShowJointPoints = ShowJointPoint;
-                _items.ShowAlways = true;
-                _items.AutoZoomFit = false;
+                // Anzeige-Settings des Pads, die das Item selbst nicht als
+                // verändert markieren dürfen. Suppress verhindert IsSaved=false
+                // und PropertyChanged-Events; die spätere Neuzeichnung erfolgt
+                // explizit über Invalidate/ZoomFit unten.
+                _items.BeginInit();
+                try {
+                    _items.ShowJointPoints = ShowJointPoint;
+                    _items.ShowAlways = true;
+                    _items.AutoZoomFit = false;
+                } finally {
+                    _items.EndInit();
+                }
             }
 
             RegisterEvents();
@@ -161,7 +170,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             if (field == value) { return; }
             field = value;
             if (_items is { IsDisposed: false }) {
-                _items.ShowJointPoints = value;
+                _items.BeginInit();
+                try {
+                    _items.ShowJointPoints = value;
+                } finally {
+                    _items.EndInit();
+                }
             }
             OnDrawModeChanged();
             Unselect();

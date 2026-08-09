@@ -59,10 +59,6 @@ Der Editor von QuickImage muss überarbeitet werden und von EditorEasy abgeleite
 - Auf EditorEasy umstellen: ColumnEditor, TableScriptEditor, TableHeadEditor, ConnectedFormulaEditor, TableViewForm
 
 ##Aufgabe
-ReadableListItem benötigt einen Dispose Pattern, dass das Item freigegeben werden kann.
-AbstractListItem mit Dispose ausstatten und und in allen Ableitungen richtig implementieren
-
-##Aufgabe
 UpdateList in TableScriptEditor nutzt ein zweistufiges System.
 Mach ein neues Interface: ICategory
 EventScript soll das implementiern und UpdateList in Listboxen das automatisch berücksichtigen

@@ -123,7 +123,10 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     }
 
     public static bool TryParseValue<T>(string txt, out object? result) where T : Variable, new() {
-        var instance = _instanceCache.GetOrAdd(typeof(T), _ => new T());
+        if (!_instanceCache.TryGetValue(typeof(T), out var instance)) {
+            instance = new T();
+            _instanceCache.TryAdd(typeof(T), instance);
+        }
         return instance.TryParseValue(txt, out result);
     }
 

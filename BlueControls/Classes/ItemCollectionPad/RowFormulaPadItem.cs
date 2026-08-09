@@ -28,9 +28,13 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public RowFormulaPadItem(Table table, string rowkey, string layoutId) : this(string.Empty, table, rowkey, layoutId) { }
 
     public RowFormulaPadItem(string keyName, Table? table, string rowkey, string layoutFileName) : base(keyName) {
-        Table = table;
-        _rowKey = rowkey;
-        Layout_Dateiname = layoutFileName;
+        BeginInit();
+
+        try {
+            Table = table;
+            _rowKey = rowkey;
+            Layout_Dateiname = layoutFileName;
+        } finally { EndInit(); }
     }
 
     #endregion

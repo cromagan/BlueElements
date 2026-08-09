@@ -10,32 +10,36 @@ public abstract class RectanglePadItem : AbstractPadItem {
     #region Constructors
 
     protected RectanglePadItem(string keyName) : base(keyName) {
-        Plo = new PointM(this, "LO", 0, 0);
-        Pro = new PointM(this, "RO", 0, 0);
-        Pru = new PointM(this, "RU", 0, 0);
-        Plu = new PointM(this, "LU", 0, 0);
-        Pl = new PointM(this, "L", 0, 0);
-        Pr = new PointM(this, "R", 0, 0);
-        Po = new PointM(this, "O", 0, 0);
-        Pu = new PointM(this, "U", 0, 0);
+        BeginInit();
 
-        Po.MoveXByMouse = false;
-        Pu.MoveXByMouse = false;
-        Pl.MoveYByMouse = false;
-        Pr.MoveYByMouse = false;
+        try {
+            Plo = new PointM(this, "LO", 0, 0);
+            Pro = new PointM(this, "RO", 0, 0);
+            Pru = new PointM(this, "RU", 0, 0);
+            Plu = new PointM(this, "LU", 0, 0);
+            Pl = new PointM(this, "L", 0, 0);
+            Pr = new PointM(this, "R", 0, 0);
+            Po = new PointM(this, "O", 0, 0);
+            Pu = new PointM(this, "U", 0, 0);
 
-        MovablePoint.Add(Plo);
-        MovablePoint.Add(Pro);
-        MovablePoint.Add(Plu);
-        MovablePoint.Add(Pru);
-        MovablePoint.Add(Pl);
-        MovablePoint.Add(Pr);
-        MovablePoint.Add(Pu);
-        MovablePoint.Add(Po);
-        PointsForSuccessfullyMove.Add(Plo);
-        PointsForSuccessfullyMove.Add(Pru);
-        CalculateJointMiddle(Pl, Pr);
-        Drehwinkel = 0;
+            Po.MoveXByMouse = false;
+            Pu.MoveXByMouse = false;
+            Pl.MoveYByMouse = false;
+            Pr.MoveYByMouse = false;
+
+            MovablePoint.Add(Plo);
+            MovablePoint.Add(Pro);
+            MovablePoint.Add(Plu);
+            MovablePoint.Add(Pru);
+            MovablePoint.Add(Pl);
+            MovablePoint.Add(Pr);
+            MovablePoint.Add(Pu);
+            MovablePoint.Add(Po);
+            PointsForSuccessfullyMove.Add(Plo);
+            PointsForSuccessfullyMove.Add(Pru);
+            CalculateJointMiddle(Pl, Pr);
+            Drehwinkel = 0;
+        } finally { EndInit(); }
     }
 
     #endregion
@@ -101,13 +105,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height));
-
-    public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
-        p ??= new PointM(JointMiddle);
-
-        Plo.Mirror(p, vertical, horizontal);
-        Pru.Mirror(p, vertical, horizontal);
-    }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }

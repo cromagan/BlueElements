@@ -12,7 +12,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public EasyPicPadItem() : this(string.Empty, null) { }
 
-    public EasyPicPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30));
+    public EasyPicPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 

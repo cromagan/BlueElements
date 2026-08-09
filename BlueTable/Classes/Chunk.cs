@@ -300,16 +300,21 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     }
 
     public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
+        if (disposing) {
+            LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
 
-        OnDisposed();
-        Disposed = null;
+            OnDisposed();
+            Disposed = null;
 
-        Invalidate();
-
-        GC.SuppressFinalize(this);
+            Invalidate();
+        }
     }
 
     /// <summary>

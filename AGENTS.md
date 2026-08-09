@@ -79,7 +79,10 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 ## Leicht übersehbare Konventionen
 
 - **Bestehende Kommentare erhalten** — Kommentare nicht löschen, sondern bei Bedarf überarbeiten/aktualisieren.
-- **Kein redundanter Code** — vor dem Schreiben einer neuen Routine prüfen, ob eine bestehende genutzt oder leicht angepasst werden kann
+- **Kein redundanter Code** — vor dem Schreiben einer neuen Routine prüfen, ob eine bestehende genutzt oder leicht angepasst werden kann. Auch die Sichtbarkeit darf angepasst werden.
+- **Eine Datei pro Typ** — jede Klasse, Struktur, jedes Enum und jedes Interface kommt in eine eigene Datei (Dateiname = Typname).
+  Ausnahme: Ein Interface `IXxx` soll zusammen mit der zugehörigen statischen Erweiterungsklasse `IXxxExtension` (die es per `Extensions`-Muster erweitert) in derselben Datei stehen.
+- **Forms/UserControls brauchen eine Designer-Datei** — visuelle WinForms-Typen besitzen immer eine begleitende `.Designer.cs`-Datei (partial class), auch wenn sie leer ist.
 - **Alle `.cs`-Dateien müssen UTF-8 mit BOM sein.** Das Skript `Convert-Encoding.ps1` normalisiert Kodierung und Stil.
 - **Alle WinForms-Formulare müssen von `BlueControls.Forms.Form` erben**, nicht von `System.Windows.Forms.Form`. Das erzwingt `AutoScaleMode.None`.
 - **DPI-Awareness ist global deaktiviert.** Niemals `DpiMode`-Setter aufrufen. Das Manifest setzt `dpiAware=false`. `Skin.Scale` ist hart auf `1.0f` kodiert.
@@ -87,6 +90,7 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 - **Nullable Reference Types** sind aktiviert (`Nullable=enable`). Warnungen niemals mit `!` unterdrücken.
 - **Lambda Ausdrücke** - Lambda Ausdrücke wenn möglich vermeiden. Sind sie von Vorteil informiere den User vorab, ob er das so will
 - **Events** - nicht als Action oder Funct
+- **Events auslösen über `OnXxx`-Methoden** — niemals `MyEvent?.Invoke(this, e)` direkt aufrufen. Stattdessen eine geschützte `protected virtual void OnXxx(...)`-Methode definieren, die den Invoke kapselt (inkl. `IsDisposed`-Prüfung), und überall diese Methode aufrufen. So können abgeleitete Klassen das Verhalten überschreiben.
 
 ## Wichtige Hilfsklassen (BlueBasics)
 

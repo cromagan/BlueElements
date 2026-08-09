@@ -15,15 +15,23 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
+    private Table? _tableOutput;
     private string _tableOutputHintPath = string.Empty;
-    private bool _tableOutputLoaded;
     private string _tableOutputName = string.Empty;
+    private bool _tableOutputTried;
 
     #endregion
 
     #region Constructors
 
-    protected ReciverSenderControlPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? parentFormula, Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
+    protected ReciverSenderControlPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? parentFormula, Table? tableOutput) : base(keyName, parentFormula) {
+        BeginInit();
+
+        try {
+            Table.Added += Table_Added;
+            TableOutput = tableOutput;
+        } finally { EndInit(); }
+    }
 
     #endregion
 
@@ -46,35 +54,26 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         get {
             if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false }) { return TableInput; }
 
-            if (_tableOutputLoaded) { return field; }
+            if (_tableOutputTried) { return _tableOutput; }
 
-            if (string.IsNullOrEmpty(_tableOutputName)) {
-                field = null;
-                _tableOutputLoaded = true;
-            } else {
-                field = Table.Get(_tableOutputName);
+            _tableOutputTried = true;
+            _tableOutput = Table.Get(_tableOutputName);
 
-                // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
-                // (z. B. weil noch keine andere Tabelle geladen ist und der
-                // Name kein Dateipfad ist), versuche es mit dem HintPath.
-                if (field is null && !string.IsNullOrEmpty(_tableOutputHintPath)) {
-                    field = Table.Get(_tableOutputHintPath);
-                }
-
-                // Nur als geladen markieren, wenn die Tabelle gefunden wurde.
-                // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
-                // könnte zwischenzeitlich in den Cache geladen worden sein.
-                _tableOutputLoaded = field is not null;
-
-                // HintPath aus der gefundenen Tabelle aktualisieren, damit er
-                // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
-                // über den Namen (ohne HintPath) gefunden wurde.
-                if (field is TableFile tbf) {
-                    _tableOutputHintPath = tbf.Filename;
-                }
+            // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
+            // (z. B. weil noch keine andere Tabelle geladen ist und der
+            // Name kein Dateipfad ist), versuche es mit dem HintPath.
+            if (_tableOutput is null && _tableOutputHintPath is { Length: > 0 }) {
+                _tableOutput = Table.Get(_tableOutputHintPath);
             }
 
-            return field;
+            // HintPath aus der gefundenen Tabelle aktualisieren, damit er
+            // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
+            // über den Namen (ohne HintPath) gefunden wurde.
+            if (_tableOutput is TableFile tbf) {
+                _tableOutputHintPath = tbf.Filename;
+            }
+
+            return _tableOutput;
         }
         set {
             if (IsDisposed) { return; }
@@ -83,10 +82,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (value == TableOutput) { return; }
 
-            field = value;
+            _tableOutput = value;
             _tableOutputName = value?.KeyName ?? string.Empty;
             _tableOutputHintPath = (value as TableFile)?.Filename ?? string.Empty;
-            _tableOutputLoaded = true;
+            _tableOutputTried = true;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
             OnPropertyChangedExt("outputtable", _tableOutputName);
@@ -197,7 +196,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         var name = json.GetString("outputtable");
         if (!string.IsNullOrEmpty(name)) {
             _tableOutputName = name;
-            _tableOutputLoaded = false;
+            _tableOutputTried = false;
         }
 
         _tableOutputHintPath = json.GetString("outputtablehintpath", _tableOutputHintPath);
@@ -211,7 +210,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             case "outputdatabase":
             case "outputtable":
                 _tableOutputName = value.FromNonCritical();
-                _tableOutputLoaded = false;
+                _tableOutputTried = false;
                 return true;
 
             case "outputtablehintpath":
@@ -239,6 +238,39 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             if (!usedids.Contains(c)) { return c; }
         }
         return -1;
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+
+        if (disposing) {
+            Table.Added -= Table_Added;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Ereignisgesteuerter Retry: Wurde die Ausgangstabelle beim ersten
+    /// Zugriff nicht gefunden (z. B. weil sie noch nicht geladen war),
+    /// wird hier auf neu hinzugefügte Tabellen reagiert. Stimmt KeyName
+    /// oder Dateipfad überein, wird die Property invalidiert und beim
+    /// nächsten Zugriff neu geladen.
+    /// </summary>
+    private void Table_Added(object? sender, LiveInstanceEventArgs<Table> e) {
+        if (IsDisposed) { return; }
+        if (_tableOutputTried && _tableOutput is not null) { return; }
+        var tb = e.Instance;
+
+        var matches = string.Equals(tb.KeyName, _tableOutputName, StringComparison.OrdinalIgnoreCase);
+        if (!matches && tb is TableFile tbf) {
+            matches = string.Equals(tbf.Filename, _tableOutputHintPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!matches) { return; }
+
+        _tableOutputTried = false;
+        OnDoUpdateSideOptionMenu();
     }
 
     #endregion

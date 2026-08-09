@@ -37,12 +37,16 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     #region Constructors
 
     protected AbstractPadItem(string keyName) : base() {
-        KeyName = keyName;
-        if (string.IsNullOrEmpty(KeyName)) { KeyName = GetUniqueKey(); }
+        BeginInit();
 
-        JointMiddle = new PointM(nameof(JointMiddle), 0, 0);
+        try {
+            KeyName = keyName;
+            if (string.IsNullOrEmpty(KeyName)) { KeyName = GetUniqueKey(); }
 
-        MovablePoint.CollectionChanged += Point_CollectionChanged;
+            JointMiddle = new PointM(nameof(JointMiddle), 0, 0);
+
+            MovablePoint.CollectionChanged += Point_CollectionChanged;
+        } finally { EndInit(); }
     }
 
     #endregion

@@ -12,11 +12,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     private static readonly ConcurrentCache<string, BlueFont> _blueFontCache = new(StringComparer.OrdinalIgnoreCase, 100);
 
-    private static readonly ConcurrentCache<int, Brush> _brushCache = new(100);
-
     private static readonly ConcurrentCache<string, Font> _fontCache = new(StringComparer.OrdinalIgnoreCase, 1000);
-
-    private static readonly ConcurrentCache<(int color, float width), Pen> _penCache = new(100);
 
     private readonly ConcurrentCache<char, SizeF> _charSizeCache = new(1000);
 
@@ -126,14 +122,10 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         });
     }
 
-    public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
-
     public static Font GetFont(string fontName, float emSize, FontStyle style, GraphicsUnit unit, Func<Font> createFont) {
         var key = $"{fontName}_{emSize}_{style}_{unit}";
         return _fontCache.GetOrAdd(key, _ => createFont());
     }
-
-    public static Pen GetPen(Color color, float width) => _penCache.GetOrAdd((color.ToArgb(), width), key => new Pen(color, width));
 
     public static implicit operator Font(BlueFont font) => font._font;
 
@@ -237,13 +229,13 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             //    return;
             //}
             if (BackColor) {
-                gr.FillRectangle(GetBackColorBrush(), offsetX, offsetY, size.Width.CanvasToControl(zoom), size.Height.CanvasToControl(zoom));
+                gr.FillRectangle(BackgroundFill.GetBrush(ColorBack), offsetX, offsetY, size.Width.CanvasToControl(zoom), size.Height.CanvasToControl(zoom));
             }
         }
 
         // Outline
         if (Outline) {
-            var outlineBrush = GetOutlineBrush();
+            var outlineBrush = BackgroundFill.GetBrush(ColorOutline);
             const int outlineSize = 1;
             for (var px = -outlineSize; px <= outlineSize; px++) {
                 for (var py = -outlineSize; py <= outlineSize; py++) {
@@ -260,7 +252,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
         // Haupttext
 
-        DrawString(gr, text, font, GetMainBrush(), offsetX, offsetY);
+        DrawString(gr, text, font, BackgroundFill.GetBrush(ColorMain), offsetX, offsetY);
 
         // Linien
         if (Underline || StrikeOut) {
@@ -329,7 +321,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public string IsNowEditable() => string.Empty;
 
-    public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, _ => _fontOl.MeasureString(text));
+    public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, MeasureStringUncached);
 
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym is not null) { return _nameInStyleSym; }
@@ -486,7 +478,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public Pen Pen(float additionalScale) {
         var lineWidth = CalculateLineWidth(additionalScale);
-        return GetPen(ColorMain, lineWidth);
+        return BorderDraw.GetPen(ColorMain, lineWidth);
     }
 
     public string ReadableText() {
@@ -542,10 +534,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         return _symbolOfLineSym;
     }
 
-    internal SizeF CharSize(char c) => _charSizeCache.GetOrAdd(c, ch => {
-        if (ch <= 31) { return new SizeF(0, _zeilenabstand); }
-        return new SizeF(_fontOl.MeasureString($"|{c}|").Width - _widthOf2Points + 0.05f, _zeilenabstand);
-    });
+    internal SizeF CharSize(char c) => _charSizeCache.GetOrAdd(c, CalculateCharSize);
 
     internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);
 
@@ -570,11 +559,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         return result;
     }
 
-    private Brush GetBackColorBrush() => GetBrush(ColorBack);
+    private SizeF CalculateCharSize(char c) {
+        if (c <= 31) { return new SizeF(0, _zeilenabstand); }
+        return new SizeF(_fontOl.MeasureString($"|{c}|").Width - _widthOf2Points + 0.05f, _zeilenabstand);
+    }
 
-    private Brush GetMainBrush() => GetBrush(ColorMain);
-
-    private Brush GetOutlineBrush() => GetBrush(ColorOutline);
+    private SizeF MeasureStringUncached(string text) => _fontOl.MeasureString(text);
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 

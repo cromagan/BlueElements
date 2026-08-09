@@ -757,9 +757,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
+    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) {
+        if (IsDisposed) { return; }
+        ItemRemoved?.Invoke(this, e);
+    }
+
     protected virtual void OnExecuteComand() {
         if (IsDisposed) { return; }
         ExecuteComand?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected virtual void OnDropDownShowing() {
+        if (IsDisposed) { return; }
+        DropDownShowing?.Invoke(this, System.EventArgs.Empty);
     }
 
     protected virtual void OnNavigateToNext(NavigationDirection direction) {
@@ -940,11 +950,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Invalidate();
     }
 
-    private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+    private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
 
     private void Strategy_ExecuteComand(object? sender, System.EventArgs e) => OnExecuteComand();
 
-    private void Strategy_ItemRemoved(object? sender, AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+    private void Strategy_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 
     private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
 

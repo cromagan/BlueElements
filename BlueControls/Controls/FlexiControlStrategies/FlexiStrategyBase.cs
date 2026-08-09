@@ -281,23 +281,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
     public abstract void CreateControl();
 
     public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        OnDisposed();
-
-        UnsubscribeEvents();
-
-        DropDownShowing = null;
-        ExecuteComand = null;
-        ItemRemoved = null;
-        NavigateToNext = null;
-        ValueChanged = null;
-        Disposed = null;
-
-        if (Control is { IsDisposed: false } control) {
-            control.Visible = false;
-            control.Dispose();
-        }
-
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 
@@ -332,6 +316,28 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
     public virtual bool WasValueClicked() => false;
 
     protected abstract void ApplyStyle();
+
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            OnDisposed();
+
+            UnsubscribeEvents();
+
+            DropDownShowing = null;
+            ExecuteComand = null;
+            ItemRemoved = null;
+            NavigateToNext = null;
+            ValueChanged = null;
+            Disposed = null;
+
+            if (Control is { IsDisposed: false } control) {
+                control.Visible = false;
+                control.Dispose();
+            }
+        }
+    }
 
     protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 

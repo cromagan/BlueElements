@@ -12,8 +12,7 @@ public class Accessor<T> : IDisposableExtended {
 
     #region Fields
 
-    private readonly Func<T>? _getter;
-    private readonly Action<T>? _setter;
+    private readonly AccessorMemberEntry<T> _entry;
     private readonly object? _target;
     private volatile int _isDisposedFlag;
 
@@ -22,80 +21,23 @@ public class Accessor<T> : IDisposableExtended {
     #region Constructors
 
     /// <summary>
-    /// Konstruktor, der einen Lambda-Ausdruck annimmt, der auf eine Eigenschaft oder ein Feld zeigt.
+    /// Erzeugt einen Accessor aus einem Lambda-Ausdruck, der auf eine
+    /// Eigenschaft oder ein Feld zeigt. Aktuell werden nur einfache Ausdrücke
+    /// der Form <c>() => Property</c> unterstützt (Ziel = this).
     /// </summary>
-    /// <param name="expr"></param>
     public Accessor(Expression<Func<T>>? expr) {
-        // Versuche, den Körper des Ausdrucks in einen MemberExpression umzuwandeln.
-        // Das ist nötig, um auf die Details der Eigenschaft oder des Feldes zugreifen zu können.
         var memberExpression = (MemberExpression?)expr?.Body;
 
-        // Hole den Ausdruck, der das Objekt darstellt, zu dem das Mitglied gehört.
-        var instanceExpression = memberExpression?.Expression;
+        // Zielobjekt aus dem Instance-Ausdruck lösen. Bei () => this.Property
+        // ist die Instance eine ConstantExpression, die das Objekt direkt enthält.
+        _target = ResolveTarget(memberExpression?.Expression);
 
-        // Erstelle einen Parameterausdruck für den Wert, der gesetzt werden soll.
-        var parameter = Expression.Parameter(typeof(T));
+        var member = memberExpression?.Member;
+        _entry = member is null ? AccessorMemberEntry<T>.Unknown : AccessorMemberEntry<T>.Create(member);
 
-        // Variable, um benutzerdefinierte Attribute zu speichern, falls vorhanden.
-        IEnumerable<Attribute>? ca = null;
-
-        // Überprüfe, ob das Mitglied eine Eigenschaft ist und behandle es entsprechend.
-        if (memberExpression?.Member is PropertyInfo propertyInfo) {
-            // Hole die Set-Methode der Eigenschaft, falls vorhanden.
-            if (propertyInfo.GetSetMethod() is { } setm) {
-                // Erstelle einen Lambda-Ausdruck, der den Aufruf der Set-Methode darstellt, und kompiliere ihn zu einem Delegaten.
-                _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
-            }
-
-            // Hole die Get-Methode der Eigenschaft, falls vorhanden.
-            if (propertyInfo.GetGetMethod() is { } getm) {
-                // Erstelle einen Lambda-Ausdruck, der den Aufruf der Get-Methode darstellt, und kompiliere ihn zu einem Delegaten.
-                _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, getm)).Compile();
-            }
-
-            // Setze die Eigenschaften, die anzeigen, ob die Eigenschaft gelesen oder geschrieben werden kann.
-            CanWrite = propertyInfo.CanWrite;
-            CanRead = propertyInfo.CanRead;
-            Name = propertyInfo.Name;
-            //TypeFullname = propertyInfo.PropertyType.FullName; // Auskommentiert. Entkommentieren, wenn der vollständige Typname benötigt wird.
-
-            // Hole alle benutzerdefinierten Attribute, die für die Eigenschaft definiert sind.
-            ca = propertyInfo.GetCustomAttributes();
-        }
-        // Überprüfe, ob das Mitglied ein Feld ist und behandle es entsprechend.
-        else if (memberExpression?.Member is FieldInfo fieldInfo) {
-            // Erstelle einen Lambda-Ausdruck, der die Zuweisung zu einem Feld darstellt, und kompiliere ihn zu einem Delegaten.
-            _setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
-            // Erstelle einen Lambda-Ausdruck, der den Zugriff auf ein Feld darstellt, und kompiliere ihn zu einem Delegaten.
-            _getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
-
-            // Setze die Eigenschaften, die anzeigen, ob das Feld gelesen oder geschrieben werden kann.
-            CanWrite = !fieldInfo.IsInitOnly;
-            CanRead = true;
-            Name = fieldInfo.Name;
-            //TypeFullname = fieldInfo.FieldType.FullName; // Auskommentiert. Entkommentieren, wenn der vollständige Typname benötigt wird.
-
-            // Hole alle benutzerdefinierten Attribute, die für das Feld definiert sind.
-            ca = fieldInfo.GetCustomAttributes();
-        }
-
-        // Wenn benutzerdefinierte Attribute gefunden wurden, verarbeite sie.
-        if (ca is not null) {
-            foreach (var thisas in ca) {
-                // Überprüfe, ob das Attribut ein DescriptionAttribute ist und hole die Beschreibung.
-                if (thisas is DescriptionAttribute da) {
-                    QuickInfo = da.Description;
-                }
-            }
-        }
-
-        // Zielobjekt erfassen und INPC abonnieren
-        if (instanceExpression is not null) {
-            var targetLambda = Expression.Lambda<Func<object>>(Expression.Convert(instanceExpression, typeof(object)));
-            _target = targetLambda.Compile()();
-            if (_target is INotifyPropertyChanged inpc) {
-                inpc.PropertyChanged += OnTargetPropertyChanged;
-            }
+        // Auf Änderungen am Zielobjekt lauschen.
+        if (_target is INotifyPropertyChanged inpc) {
+            inpc.PropertyChanged += OnTargetPropertyChanged;
         }
     }
 
@@ -111,42 +53,57 @@ public class Accessor<T> : IDisposableExtended {
 
     #region Properties
 
-    public bool CanRead { get; }
-    public bool CanWrite { get; }
+    public bool CanRead => _entry.CanRead;
+    public bool CanWrite => _entry.CanWrite;
     public bool IsDisposed => _isDisposedFlag == 1;
-    public string Name { get; } = "[unbekannt]";
-    public string QuickInfo { get; } = string.Empty;
+    public string Name => _entry.Name;
+    public string QuickInfo => _entry.QuickInfo;
 
     #endregion
 
     #region Methods
 
     public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        OnDisposed();
-
-        if (_target is INotifyPropertyChanged inpc) {
-            inpc.PropertyChanged -= OnTargetPropertyChanged;
-        }
-
-        ValueChanged = null;
-        Disposed = null;
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 
     public T? Get() {
-        if (_getter is not null) { return _getter(); }
+        if (_entry.TryGet(_target, out var value)) { return value; }
         Develop.DebugPrint("Getter ist null!");
         return default;
     }
 
     public void Set(T value) {
-        if (_setter is not null) {
-            _setter(value);
-        } else {
+        if (!_entry.TrySet(_target, value)) {
             Develop.DebugPrint("Setter ist null!");
         }
+    }
+
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            OnDisposed();
+
+            if (_target is INotifyPropertyChanged inpc) {
+                inpc.PropertyChanged -= OnTargetPropertyChanged;
+            }
+
+            ValueChanged = null;
+            Disposed = null;
+        }
+    }
+
+    /// <summary>
+    /// Löst das Zielobjekt aus dem Instance-Ausdruck auf. Unterstützt werden
+    /// nur einfache Property-Ausdrücke (Konstante als Instance, also this).
+    /// </summary>
+    private static object? ResolveTarget(Expression? instanceExpression) {
+        if (instanceExpression is ConstantExpression ce) { return ce.Value; }
+        if (instanceExpression is null) { return null; }
+        Develop.DebugPrint("Nur einfache Property-Ausdrücke werden unterstützt.");
+        return null;
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);

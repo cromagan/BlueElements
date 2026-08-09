@@ -18,7 +18,6 @@ public static class Skin {
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
-    private static readonly ConcurrentCache<string, BlueFont> _fontCache = new(500);
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
     private static Dictionary<string, Dictionary<int, string>> _styleData = [];
@@ -144,14 +143,14 @@ public static class Skin {
 
             case GenericControl trb:
                 if (trb.BitmapOfControl() is not { } bmp) {
-                    gr.FillRectangle(BlueFont.GetBrush(control.Parent.BackColor), r);
+                    gr.FillRectangle(BackgroundFill.GetBrush(control.Parent.BackColor), r);
                     return;
                 }
                 gr.DrawImage(bmp, r, r with { X = control.Left + r.Left, Y = control.Top + r.Top }, GraphicsUnit.Pixel);
                 break;
 
             case Form frm:
-                gr.FillRectangle(BlueFont.GetBrush(frm.BackColor), r);
+                gr.FillRectangle(BackgroundFill.GetBrush(frm.BackColor), r);
                 break;
 
             case System.Windows.Forms.SplitContainer:
@@ -167,7 +166,7 @@ public static class Skin {
                 break;
 
             case System.Windows.Forms.TabPage:
-                gr.FillRectangle(BlueFont.GetBrush(control.Parent.BackColor), r);
+                gr.FillRectangle(BackgroundFill.GetBrush(control.Parent.BackColor), r);
                 break;
 
             case System.Windows.Forms.Panel:
@@ -175,7 +174,7 @@ public static class Skin {
                 break;
 
             default:
-                gr.FillRectangle(BlueFont.GetBrush(control.Parent.BackColor), r);
+                gr.FillRectangle(BackgroundFill.GetBrush(control.Parent.BackColor), r);
                 break;
         }
     }
@@ -318,14 +317,11 @@ public static class Skin {
     public static BlueFont GetBlueFont(string style, PadStyles format) {
         if (format == PadStyles.Undefined || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
-        var cacheKey = style + "|" + (int)format;
-        return _fontCache.GetOrAdd(cacheKey, _ => {
-            InitStyles();
-            if (_styleData.TryGetValue(style, out var formats) && formats.TryGetValue((int)format, out var fontString)) {
-                return BlueFont.Get(fontString);
-            }
-            return BlueFont.DefaultFont;
-        });
+        InitStyles();
+        if (_styleData.TryGetValue(style, out var formats) && formats.TryGetValue((int)format, out var fontString)) {
+            return BlueFont.Get(fontString);
+        }
+        return BlueFont.DefaultFont;
     }
 
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
@@ -453,16 +449,15 @@ public static class Skin {
             BackgroundFill.ClearAll();
             BorderDraw.ClearAll();
             GraphicsPaths.ClearAll();
-            _fontCache.Clear();
             LoadSkin("Win11");
         } catch (Exception ex) { Develop.DebugPrint("Fehler beim Laden des Win11-Skins", ex); }
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
 
-        PenLinieDünn = BlueFont.GetPen(Color_Border(Enums.Design.Table_Lines_Thin, States.Standard), 1);
-        PenLinieKräftig = BlueFont.GetPen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard), 1);
-        PenLinieDick = BlueFont.GetPen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard), 3);
+        PenLinieDünn = BorderDraw.GetPen(Color_Border(Enums.Design.Table_Lines_Thin, States.Standard), 1);
+        PenLinieKräftig = BorderDraw.GetPen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard), 1);
+        PenLinieDick = BorderDraw.GetPen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard), 3);
     }
 
     public static bool MustDrawTransparence(SkinDesign design, bool needTransparenz) {

@@ -15,6 +15,18 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     private Bitmap? _bitmap;
 
+    /// <summary>
+    /// Base64-kodiertes PNG des aktuellen Bildes. Wird beim Setzen der
+    /// <see cref="Bitmap" />-Property sofort erzeugt und beim Spiegeln
+    /// aktualisiert. Beim Parsen wird der Original-String unverändert
+    /// übernommen, damit ein PNG-Roundtrip (decode → encode) keine
+    /// anderen Bytes erzeugt — der GDI+-Encoder produziert nämlich nicht
+    /// zwingend identische IDAT-Bytes. Ist das Feld leer, gibt es kein Bild.
+    /// Das eigentliche <see cref="_bitmap" /> wird erst bei Bedarf im
+    /// <see cref="Bitmap" />-Getter dekodiert (Lazy Loading).
+    /// </summary>
+    private string _rawImageBase64 = string.Empty;
+
     #endregion
 
     #region Constructors
@@ -26,7 +38,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         // Change-Events aus. Siehe ParseableItem.ISupportInitialize.
         BeginInit();
         try {
-            _bitmap = bmp;
+            Bitmap = bmp;
             SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
             Hintergrund_Weiß_Füllen = true;
             Bild_Modus = SizeModes.EmptySpace;
@@ -52,9 +64,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     } = SizeModes.EmptySpace;
 
     public Bitmap? Bitmap {
-        get => _bitmap;
+        get {
+            if (_bitmap is null && _rawImageBase64 is { Length: > 0 } raw) {
+                _bitmap = Base64ToBitmap(raw);
+            }
+            return _bitmap;
+        }
         set {
             if (_bitmap == value) { return; }
+            _rawImageBase64 = value is null ? string.Empty : BitmapToBase64(value, ImageFormat.Png);
             _bitmap = value;
             OnPropertyChanged();
         }
@@ -180,24 +198,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         return result;
     }
 
-    public override void Mirror(PointM? p, bool vertical, bool horizontal) {
-        p ??= new PointM(JointMiddle);
-
-        base.Mirror(p, vertical, horizontal);
-
-        if (horizontal == vertical || _bitmap is null) { return; }
-
-        if (vertical) {
-            _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
-        }
-
-        if (horizontal) {
-            _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-        }
-
-        OnPropertyChanged();
-    }
-
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
@@ -206,7 +206,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
         result.ParseableAdd("PixelPerfect", PixelGenau);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
-        result.ParseableAdd("Image", Bitmap);
+        result.ParseableAdd("Image", _rawImageBase64);
         result.ParseableAdd("Style", Style);
 
         return result;
@@ -218,7 +218,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         json.Set("placeholder", Platzhalter_Für_Layout);
         json.Set("pixelperfect", PixelGenau);
         json.Set("whiteback", Hintergrund_Weiß_Füllen);
-        json.Set("image", _bitmap);
+        json.Set("image", _rawImageBase64);
         json.Set("style", (int)Style);
         return json;
     }
@@ -228,7 +228,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         Platzhalter_Für_Layout = json.GetString("placeholder", Platzhalter_Für_Layout);
         PixelGenau = json.GetBool("pixelperfect", PixelGenau);
         Hintergrund_Weiß_Füllen = json.GetBool("whiteback", Hintergrund_Weiß_Füllen);
-        _bitmap = json.GetBitmap("image", _bitmap);
+        _rawImageBase64 = json.GetString("image");
+        _bitmap = null;
         Style = json.GetEnum("style", Style);
         base.ParseJson(json);
     }
@@ -252,7 +253,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 return true;
 
             case "image":
-                _bitmap = Base64ToBitmap(value);
+                _rawImageBase64 = value.FromNonCritical();
+                _bitmap = null;
                 return true;
 
             case "placeholder":
@@ -314,6 +316,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
+            _rawImageBase64 = string.Empty;
             if (_bitmap is not null) {
                 _bitmap.Dispose();
                 _bitmap = null;

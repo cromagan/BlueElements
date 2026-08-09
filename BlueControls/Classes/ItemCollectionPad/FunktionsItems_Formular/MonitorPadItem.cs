@@ -12,7 +12,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public MonitorPadItem() : this(string.Empty, null) { }
 
-    public MonitorPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30));
+    public MonitorPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 

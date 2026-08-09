@@ -210,20 +210,6 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         return p;
     }
 
-    public override void Dispose() {
-        if (IsDisposed) { return; }
-
-        // Austragen aus dem Live-Register übernimmt BlockableFile.Dispose
-        // (mit Race-Safety: nur wenn noch diese Instanz hinterlegt ist).
-        Editing = null;
-        PropertyChanged = null;
-        PropertyChangedExt = null;
-
-        base.Dispose();
-
-        ClearPages();
-    }
-
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {
         if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
 
@@ -503,6 +489,24 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     protected override byte[]? BuildContent() {
         if (!IsParsed || IsDisposed) { return null; }
         return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+
+        if (disposing) {
+            // Austragen aus dem Live-Register übernimmt BlockableFile.Dispose(bool)
+            // (mit Race-Safety: nur wenn noch diese Instanz hinterlegt ist).
+            Editing = null;
+            PropertyChanged = null;
+            PropertyChangedExt = null;
+        }
+
+        base.Dispose(disposing);
+
+        if (disposing) {
+            ClearPages();
+        }
     }
 
     private void ClearPages() {

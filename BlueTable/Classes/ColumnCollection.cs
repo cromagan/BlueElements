@@ -478,10 +478,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (sender is ColumnItem c) {
             c.Disposed -= Column_Disposed;
             _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
-            ColumnDisposed?.Invoke(this, new ColumnEventArgs(c));
+            OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }
     }
+
+    private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 

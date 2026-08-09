@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 
 namespace BlueControls.Extended_Text.MarkRendering;
@@ -23,7 +24,7 @@ public sealed class MarkRenderer_Selection : MarkRenderer {
     #region Methods
 
     public override void Render(Graphics gr, float zoom, float startX, float startY, float endX, float endY, float height) {
-        gr.FillRectangle(BlueFont.GetBrush(Skin.Color_Back(Design.TextBox, States.Checked)), startX, startY, endX - startX, endY - startY);
+        gr.FillRectangle(BackgroundFill.GetBrush(Skin.Color_Back(Design.TextBox, States.Checked)), startX, startY, endX - startX, endY - startY);
     }
 
     #endregion

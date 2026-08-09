@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.BitmapExt_ImageFilters;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Drawing.Drawing2D;
 
@@ -16,7 +15,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     /// </summary>
     private static readonly object _picsLock = new object();
 
-    private static readonly ConcurrentDictionary<string, QuickImage> Pics = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentCache<string, QuickImage> Pics = new(StringComparer.OrdinalIgnoreCase, 1000);
     private readonly Bitmap _bitmap;
 
     #endregion

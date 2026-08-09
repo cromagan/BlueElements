@@ -84,11 +84,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Properties
 
-    /// <summary>
-    /// Liefert die aktuell im Dropdown enthaltenen Items in ihrer sichtbaren Reihenfolge.
-    /// </summary>
-    public ReadOnlyCollection<AbstractListItem> Items => lstbx.Items;
-
     /// <inheritdoc cref="Controls.ListBox.ItemPadding"/>
     public int ItemPadding {
         get => lstbx.ItemPadding;
@@ -98,6 +93,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             RecalcFormSize();
         }
     }
+
+    /// <summary>
+    /// Liefert die aktuell im Dropdown enthaltenen Items in ihrer sichtbaren Reihenfolge.
+    /// </summary>
+    public ReadOnlyCollection<AbstractListItem> Items => lstbx.Items;
 
     #endregion
 
@@ -199,11 +199,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
     }
 
-    private void ListBox1_AddClicked(object? sender, AddItemEventArgs e) => AddClicked?.Invoke(this, e);
+    private void ListBox1_AddClicked(object? sender, AddItemEventArgs e) => OnAddClicked(e);
 
     private void ListBox1_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) {
         RecalcFormSize();
-        ItemAddedByClick?.Invoke(this, e);
+        OnItemAddedByClick(e);
     }
 
     private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -227,11 +227,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         OnItemRemoved(e);
     }
 
-    private void ListBox1_UpDownClicked(object? sender, SwapEventArgs e) => UpDownClicked?.Invoke(this, e);
+    private void ListBox1_UpDownClicked(object? sender, SwapEventArgs e) => OnUpDownClicked(e);
+
+    private void OnAddClicked(AddItemEventArgs e) => AddClicked?.Invoke(this, e);
 
     private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
+    private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
+
     private void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+
+    private void OnUpDownClicked(SwapEventArgs e) => UpDownClicked?.Invoke(this, e);
 
     /// <summary>
     /// Berechnet die Größe des Fensters anhand der aktuellen Items neu.

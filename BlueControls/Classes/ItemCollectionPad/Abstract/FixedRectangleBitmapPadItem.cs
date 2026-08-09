@@ -12,7 +12,10 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Constructors
 
-    protected FixedRectangleBitmapPadItem(string keyName) : base(keyName) => RemovePic();
+    protected FixedRectangleBitmapPadItem(string keyName) : base(keyName) {
+        BeginInit();
+        try { RemovePic(); } finally { EndInit(); }
+    }
 
     #endregion
 

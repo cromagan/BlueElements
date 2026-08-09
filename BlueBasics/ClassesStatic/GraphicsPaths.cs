@@ -58,7 +58,7 @@ public static class GraphicsPaths {
 
     public static GraphicsPath? GetContour(Contour contour, int w, int h) {
         if (contour is Contour.None or Contour.Undefined || w < 1 || h < 1) { return null; }
-        return _contourCache.GetOrAdd((contour, w, h), static k => BuildPath(k.Item1, k.Item2, k.Item3));
+        return _contourCache.GetOrAdd((contour, w, h), BuildPath);
     }
 
     public static GraphicsPath Rechteck(Rectangle rect) {
@@ -98,9 +98,9 @@ public static class GraphicsPaths {
         return p;
     }
 
-    private static GraphicsPath BuildPath(Contour contour, int w, int h) {
-        var r = new Rectangle(0, 0, w, h);
-        return contour switch {
+    private static GraphicsPath BuildPath((Contour contour, int w, int h) key) {
+        var r = new Rectangle(0, 0, key.w, key.h);
+        return key.contour switch {
             Contour.RoundedRectThin => RoundRec(r, 2) ?? Rechteck(r),
             Contour.RoundedRect => RoundRec(r, 4) ?? Rechteck(r),
             Contour.Arrow => Arrow(r),

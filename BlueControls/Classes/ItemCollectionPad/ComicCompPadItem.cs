@@ -35,19 +35,23 @@ public class ComicCompPadItem : AbstractPadItem {
     public ComicCompPadItem() : this(string.Empty, null) { }
 
     public ComicCompPadItem(string keyName, Bitmap? bitmap) : base(keyName) {
-        _bitmap = bitmap;
-        _width = 100;
-        P1 = new PointM(this, "Punkt1", 0, 0);
-        P2 = new PointM(this, "Punkt2", 0, 0);
-        PointsForSuccessfullyMove.Add(P1);
-        PointsForSuccessfullyMove.Add(P2);
-        MovablePoint.Add(P1);
-        MovablePoint.Add(P2);
-        _bitmap = null;
-        CalculateJointMiddle(P1, P2);
-        JointPoints.CollectionChanged += JointPoints_CollectionChanged;
-        JointMiddle.Moved += JointMiddle_Moved;
-        ImageChanged();
+        BeginInit();
+
+        try {
+            _bitmap = bitmap;
+            _width = 100;
+            P1 = new PointM(this, "Punkt1", 0, 0);
+            P2 = new PointM(this, "Punkt2", 0, 0);
+            PointsForSuccessfullyMove.Add(P1);
+            PointsForSuccessfullyMove.Add(P2);
+            MovablePoint.Add(P1);
+            MovablePoint.Add(P2);
+            _bitmap = null;
+            CalculateJointMiddle(P1, P2);
+            JointPoints.CollectionChanged += JointPoints_CollectionChanged;
+            JointMiddle.Moved += JointMiddle_Moved;
+            ImageChanged();
+        } finally { EndInit(); }
     }
 
     #endregion

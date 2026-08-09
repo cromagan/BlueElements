@@ -12,7 +12,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     public FileExplorerPadItem() : this(string.Empty, null) { }
 
-    public FileExplorerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30));
+    public FileExplorerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 

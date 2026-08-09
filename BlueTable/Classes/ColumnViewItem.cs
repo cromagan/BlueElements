@@ -291,6 +291,18 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public override string ToString() => ParseableItems().FinishParseable();
 
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            OnDisposed();
+            Disposed = null;
+            PropertyChanged = null;
+            PropertyChangedExt = null;
+            Column = null;
+        }
+    }
+
     private void _column_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
@@ -298,18 +310,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
-    private void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        if (disposing) {
-            OnDisposed(); 
-            Disposed = null;
-            PropertyChanged = null;
-            PropertyChangedExt = null;
-            Column = null;
-        }
-    }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

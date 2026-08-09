@@ -152,28 +152,7 @@ public class PagePreviewListItem : AbstractListItem {
         }
 
         try {
-            var canvasUsedArea = Page.CanvasUsedArea.ToRect();
-            if (canvasUsedArea.Width <= 0 || canvasUsedArea.Height <= 0) {
-                _tmpBmp = QuickImage.Get(ImageCode.Warnung, 64);
-                return;
-            }
-
-            var maxSize = 300;
-            var internalZoom = Math.Min((float)maxSize / canvasUsedArea.Width, (float)maxSize / canvasUsedArea.Height);
-            internalZoom = Math.Min(1, internalZoom);
-
-            var bmpW = (int)(canvasUsedArea.Width * internalZoom);
-            var bmpH = (int)(canvasUsedArea.Height * internalZoom);
-            if (bmpW <= 0 || bmpH <= 0) {
-                _tmpBmp = QuickImage.Get(ImageCode.Warnung, 64);
-                return;
-            }
-
-            _tmpBmp = new Bitmap(bmpW, bmpH);
-            var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
-            var sliderX = -canvasUsedArea.Left * zoomv;
-            var sliderY = -canvasUsedArea.Top * zoomv;
-            Page.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY, false);
+            _tmpBmp = Page.GeneratePreviewBitmap(300) ?? QuickImage.Get(ImageCode.Warnung, 64);
         } catch {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 64);
         }

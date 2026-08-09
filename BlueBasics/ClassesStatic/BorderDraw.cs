@@ -42,11 +42,11 @@ public static class BorderDraw {
         }
     }
 
-    public static LinearGradientBrush GetBorderGradientBrush(Color c1, Color c2, int height) => _borderGradientCache.GetOrAdd(new BorderGradientKey(c1.ToArgb(), c2.ToArgb(), height), static k => new LinearGradientBrush(new Point(0, 0), new Point(0, k.H), Color.FromArgb(k.C1), Color.FromArgb(k.C2)) { GammaCorrection = true });
+    public static LinearGradientBrush GetBorderGradientBrush(Color c1, Color c2, int height) => _borderGradientCache.GetOrAdd(new BorderGradientKey(c1.ToArgb(), c2.ToArgb(), height), CreateBorderGradientBrush);
 
-    public static Pen GetDottedPen(Color color) => _dottedPenCache.GetOrAdd(color.ToArgb(), static argb => new Pen(Color.FromArgb(argb)) { DashStyle = DashStyle.Dot });
+    public static Pen GetDottedPen(Color color) => _dottedPenCache.GetOrAdd(color.ToArgb(), CreateDottedPen);
 
-    public static Pen GetPen(Color color, float width) => _penCache.GetOrAdd((color.ToArgb(), width), key => new Pen(color, width));
+    public static Pen GetPen(Color color, float width) => _penCache.GetOrAdd((color.ToArgb(), width), CreatePen);
 
     public static void Solid1Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
         var pen = GetPen(borderColor1, 1);
@@ -125,6 +125,12 @@ public static class BorderDraw {
             }
         }
     }
+
+    private static LinearGradientBrush CreateBorderGradientBrush(BorderGradientKey k) => new(new Point(0, 0), new Point(0, k.H), Color.FromArgb(k.C1), Color.FromArgb(k.C2)) { GammaCorrection = true };
+
+    private static Pen CreateDottedPen(int argb) => new(Color.FromArgb(argb)) { DashStyle = DashStyle.Dot };
+
+    private static Pen CreatePen((int argb, float width) key) => new(Color.FromArgb(key.argb), key.width);
 
     #endregion
 

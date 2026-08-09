@@ -28,9 +28,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private List<Variable>? _cachedExportVariables;
     private Table? _cachedExportVariablesTable;
     private RectangleF _cachedUsedAreaOfItems;
+    private Table? _referenceTable;
     private string _referenceTableHintPath = string.Empty;
-    private bool _referenceTableLoaded;
     private string _referenceTableName = string.Empty;
+    private bool _referenceTableTried;
     private bool _usedAreaOfItemsDirty = true;
 
     #endregion
@@ -40,6 +41,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ItemCollectionPadItem() : base(string.Empty) {
         // Suppress-Modus whrend der Konstruktion: Property-Setter (Breite, Hhe,
         // Endless) lsen keine Change-Events aus. Siehe ParseableItem.ISupportInitialize.
+        Table.Added += ReferenceTable_Added;
+
         BeginInit();
         try {
             Breite = 10;
@@ -224,44 +227,34 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// </summary>
     public Table? ReferenceTable {
         get {
-            if (_referenceTableLoaded) { return field; }
+            if (_referenceTableTried) { return _referenceTable; }
+            _referenceTableTried = true;
+            _referenceTable = Table.Get(_referenceTableName);
 
-            if (string.IsNullOrEmpty(_referenceTableName)) {
-                field = null;
-                _referenceTableLoaded = true;
-            } else {
-                field = Table.Get(_referenceTableName);
-
-                // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
-                // (z. B. weil noch keine andere Tabelle geladen ist und der
-                // Name kein Dateipfad ist), versuche es mit dem HintPath.
-                if (field is null && !string.IsNullOrEmpty(_referenceTableHintPath)) {
-                    field = Table.Get(_referenceTableHintPath);
-                }
-
-                // Nur als geladen markieren, wenn die Tabelle gefunden wurde.
-                // Sonst beim nächsten Aufruf erneut versuchen - die Tabelle
-                // könnte zwischenzeitlich in den Cache geladen worden sein.
-                _referenceTableLoaded = field is not null;
-
-                // HintPath aus der gefundenen Tabelle aktualisieren, damit er
-                // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
-                // über den Namen (ohne HintPath) gefunden wurde.
-                if (field is TableFile tbf) {
-                    _referenceTableHintPath = tbf.Filename;
-                }
+            // Fallback: Wenn die Tabelle namentlich nicht gefunden wurde
+            // (z. B. weil noch keine andere Tabelle geladen ist und der
+            // Name kein Dateipfad ist), versuche es mit dem HintPath.
+            if (_referenceTable is null && _referenceTableHintPath is { Length: > 0 }) {
+                _referenceTable = Table.Get(_referenceTableHintPath);
             }
 
-            return field;
+            // HintPath aus der gefundenen Tabelle aktualisieren, damit er
+            // beim nächsten Speichern aktuell ist — auch wenn die Tabelle
+            // über den Namen (ohne HintPath) gefunden wurde.
+            if (_referenceTable is TableFile tbf) {
+                _referenceTableHintPath = tbf.Filename;
+            }
+
+            return _referenceTable;
         }
         set {
             if (IsDisposed) { return; }
-            if (value == field && _referenceTableLoaded) { return; }
+            if (value == _referenceTable && _referenceTableTried) { return; }
 
-            field = value;
+            _referenceTable = value;
             _referenceTableName = value?.KeyName ?? string.Empty;
             _referenceTableHintPath = (value as TableFile)?.Filename ?? string.Empty;
-            _referenceTableLoaded = true;
+            _referenceTableTried = true;
 
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
@@ -283,6 +276,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     } = string.Empty;
 
+    [DefaultValue(true)]
     public new bool ShowAlways {
         get;
         set {
@@ -290,9 +284,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             field = value;
             OnPropertyChanged();
         }
-    }
+    } = true;
 
-    public new bool ShowJointPoints {
+    public bool ShowJointPoints {
         get;
         set {
             if (field == value) { return; }
@@ -657,7 +651,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
         item.AddedToCollection(this);
 
-        IsSaved = false;
+        if (!IsEventsSuppressed) { IsSaved = false; }
         OnItemAdded();
 
         item.PropertyChanged += Item_PropertyChanged;
@@ -698,6 +692,34 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (i2 is not null) {
             Swap(_internal.IndexOf(bpi), _internal.IndexOf(i2));
         }
+    }
+
+    /// <summary>
+    /// Erstellt ein Vorschaubitmap der Seite, das die Items (UsedAreaOfItems)
+    /// vollständig und randlos ausfüllt. Im Gegensatz zu <see cref="DrawExplicit"/>
+    /// wird AutoZoomFit ignoriert, damit die Vorschau nicht vom Seiteneffekt des
+    /// CreativePad (der AutoZoomFit auf false setzt) abhängt.
+    /// </summary>
+    public Bitmap? GeneratePreviewBitmap(int maxSize) {
+        var usedArea = UsedAreaOfItems();
+        if (usedArea.Width <= 0 || usedArea.Height <= 0) { return null; }
+
+        var zoom = Math.Min((float)maxSize / usedArea.Width, (float)maxSize / usedArea.Height);
+        zoom = Math.Min(1, zoom);
+
+        var bmpW = (int)Math.Round(usedArea.Width * zoom);
+        var bmpH = (int)Math.Round(usedArea.Height * zoom);
+        if (bmpW <= 0 || bmpH <= 0) { return null; }
+
+        var bmp = new Bitmap(bmpW, bmpH);
+        using var gr = Graphics.FromImage(bmp);
+
+        var offsetX = -usedArea.Left * zoom;
+        var offsetY = -usedArea.Top * zoom;
+        var visibleArea = new Rectangle(0, 0, bmpW, bmpH);
+
+        DrawItems(gr, visibleArea, visibleArea, zoom, offsetX, offsetY, false, false);
+        return bmp;
     }
 
     public IEnumerator<AbstractPadItem> GetEnumerator() => ((IEnumerable<AbstractPadItem>)_internal).GetEnumerator();
@@ -949,7 +971,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         _referenceTableName = json.GetString("referencetable", _referenceTableName);
         _referenceTableHintPath = json.GetString("referencetablehintpath", _referenceTableHintPath);
-        _referenceTableLoaded = false;
+        _referenceTableTried = false;
 
         foreach (var created in json.GetList<AbstractPadItem>("items", false)) {
             Add(created);
@@ -1003,7 +1025,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             case "referencetable":
                 _referenceTableName = value.FromNonCritical();
-                _referenceTableLoaded = false;
+                _referenceTableTried = false;
                 return true;
 
             case "referencetablehintpath":
@@ -1281,6 +1303,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         base.Dispose(disposing);
 
         if (disposing) {
+            Table.Added -= ReferenceTable_Added;
+
             foreach (var thisIt in _internal) {
                 thisIt.PropertyChanged -= Item_PropertyChanged;
                 thisIt.PropertyChangedExt -= Child_PropertyChangedExt;
@@ -1297,72 +1321,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        gr.PixelOffsetMode = PixelOffsetMode.None;
-
-        var d = !Endless ? CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false) : visibleAreaControl;
-        var ds = !Endless ? positionControl : visibleAreaControl;
-
-        if (BackColor.A > 0) {
-            var bb = BackgroundFill.GetBrush(BackColor);
-            lock (bb) { gr.FillRectangle(bb, d); }
-        }
-
-        #region Grid
-
-        if (GridShow > 0.1) {
-            var tmpgrid = GridShow;
-
-            while (MmToPixel(tmpgrid, Dpi).CanvasToControl(zoom) < 5) { tmpgrid *= 2; }
-
-            var p = GridPen;
-            float ex = 0;
-
-            var po = new PointM(0, 0).CanvasToControl(zoom, offsetX, offsetY);
-            float dxp, dyp, dxm, dym;
-
-            lock (p) {
-                do {
-                    var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(zoom);
-
-                    dxp = po.X + mo;
-                    dxm = po.X - mo;
-                    dyp = po.Y + mo;
-                    dym = po.Y - mo;
-
-                    if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
-                    if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
-
-                    if (ex > 0) {
-                        // erste Linie nicht doppelt zeichnen
-                        if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
-                        if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
-                    }
-
-                    ex++;
-                } while (!(dxm < ds.Left &&
-                        dym < ds.Top &&
-                        dxp > ds.Right &&
-                        dyp > ds.Bottom));
-            }
-        }
-
-        #endregion
-
-        #region Items selbst
-
-        var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, zoom, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
-
-        List<AbstractPadItem> snapshot;
-        lock (_itemLock) {
-            snapshot = [.. _internal];
-        }
-
-        foreach (var thisItem in snapshot) {
-            gr.PixelOffsetMode = PixelOffsetMode.None;
-            thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY, forPrinting);
-        }
-
-        #endregion
+        DrawItems(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting, AutoZoomFit);
     }
 
     protected override void OnParentChanged() {
@@ -1416,6 +1375,75 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return true;
     }
 
+    private void DrawItems(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting, bool autoZoomFit) {
+        gr.PixelOffsetMode = PixelOffsetMode.None;
+
+        var d = !Endless ? CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false) : visibleAreaControl;
+        var ds = !Endless ? positionControl : visibleAreaControl;
+
+        if (BackColor.A > 0) {
+            var bb = BackgroundFill.GetBrush(BackColor);
+            lock (bb) { gr.FillRectangle(bb, d); }
+        }
+
+        #region Grid
+
+        if (GridShow > 0.1) {
+            var tmpgrid = GridShow;
+
+            while (MmToPixel(tmpgrid, Dpi).CanvasToControl(zoom) < 5) { tmpgrid *= 2; }
+
+            var p = GridPen;
+            float ex = 0;
+
+            var po = new PointM(0, 0).CanvasToControl(zoom, offsetX, offsetY);
+            float dxp, dyp, dxm, dym;
+
+            lock (p) {
+                do {
+                    var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(zoom);
+
+                    dxp = po.X + mo;
+                    dxm = po.X - mo;
+                    dyp = po.Y + mo;
+                    dym = po.Y - mo;
+
+                    if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
+                    if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
+
+                    if (ex > 0) {
+                        // erste Linie nicht doppelt zeichnen
+                        if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
+                        if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
+                    }
+
+                    ex++;
+                } while (!(dxm < ds.Left &&
+                        dym < ds.Top &&
+                        dxp > ds.Right &&
+                        dyp > ds.Bottom));
+            }
+        }
+
+        #endregion
+
+        #region Items selbst
+
+        var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, zoom, offsetX, offsetY, autoZoomFit, UsedAreaOfItems());
+
+        List<AbstractPadItem> snapshot;
+        lock (_itemLock) {
+            snapshot = [.. _internal];
+        }
+
+        foreach (var thisItem in snapshot) {
+            gr.PixelOffsetMode = PixelOffsetMode.None;
+            thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY, forPrinting);
+        }
+
+        #endregion
+    }
+
     private void Icpi_StyleChanged(object? sender, System.EventArgs e) {
         if (sender is IStyleable ist) {
             SheetStyle = ist.SheetStyle;
@@ -1428,16 +1456,19 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     private void OnItemAdded() {
-        if (IsDisposed) { return; }
+        // Cache-Invalidierung UNABHNGIG vom Suppress-Modus (wie bei
+        // AbstractPadItem.OnPropertyChanged), damit nach einem Parse kein
+        // veralteter Cache steht. Events erst auerhalb des Suppress-Modus.
         _usedAreaOfItemsDirty = true;
+        if (IsDisposed || IsEventsSuppressed) { return; }
         OnPropertyChanged("Items");
         ItemAdded?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void OnItemRemoved() {
-        ItemRemoved?.Invoke(this, System.EventArgs.Empty);
-        if (IsDisposed) { return; }
         _usedAreaOfItemsDirty = true;
+        if (IsDisposed || IsEventsSuppressed) { return; }
+        ItemRemoved?.Invoke(this, System.EventArgs.Empty);
         OnPropertyChanged("Items");
     }
 
@@ -1473,6 +1504,29 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Ereignisgesteuerter Retry: Wurde die ReferenzTabelle beim ersten
+    /// Zugriff nicht gefunden (z. B. weil sie noch nicht geladen war),
+    /// wird hier auf neu hinzugefügte Tabellen reagiert. Stimmt KeyName
+    /// oder Dateipfad überein, wird die Property invalidiert und beim
+    /// nächsten Zugriff neu geladen.
+    /// </summary>
+    private void ReferenceTable_Added(object? sender, LiveInstanceEventArgs<Table> e) {
+        if (IsDisposed) { return; }
+        if (_referenceTableTried && _referenceTable is not null) { return; }
+        var tb = e.Instance;
+
+        var matches = string.Equals(tb.KeyName, _referenceTableName, StringComparison.OrdinalIgnoreCase);
+        if (!matches && tb is TableFile tbf) {
+            matches = string.Equals(tbf.Filename, _referenceTableHintPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!matches) { return; }
+
+        _referenceTableTried = false;
+        OnDoUpdateSideOptionMenu();
     }
 
     private void UnRegisterEvents() {
