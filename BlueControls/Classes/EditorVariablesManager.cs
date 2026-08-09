@@ -118,10 +118,10 @@ public static class EditorVariablesManager {
             foreach (var kvp in _sets) {
                 JsonArray arr = [];
                 foreach (var set in kvp.Value) {
-                    var setObj = new JsonObject()
-                        .Set("name", set.KeyName)
-                        .Set("data", set.JsonData?.DeepClone())
-                        .Set("modified", set.Modified.ToString("o"));
+                    JsonObject setObj = new();
+                    setObj.Set("name", set.KeyName);
+                    setObj.Set("data", set.JsonData?.DeepClone());
+                    setObj.Set("modified", set.Modified.ToString("o"));
                     arr.Add(setObj);
                 }
                 setsObj.Add(kvp.Key, arr);
@@ -132,9 +132,9 @@ public static class EditorVariablesManager {
                 settingsObj.Add(kvp.Key, kvp.Value);
             }
 
-            var json = new JsonObject()
-                .Set("sets", setsObj)
-                .Set("settings", settingsObj);
+            JsonObject json = new();
+            json.Set("sets", setsObj);
+            json.Set("settings", settingsObj);
 
             _ = IO.WriteAllBytes(_filename, Encoding.UTF8.GetBytes(json.ToJsonString()));
         } catch (Exception ex) { Develop.DebugPrint("Fehler beim Speichern der Editor-Variablen", ex); }

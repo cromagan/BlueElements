@@ -226,12 +226,12 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     }
 
     public JsonObject ParseableJson() {
-        var json = new JsonObject()
-            .Set("key", KeyName)
-            .Set("x", _x)
-            .Set("y", _y)
-            .Set("distance", _distance)
-            .Set("angle", _angle);
+        JsonObject json = new();
+        json.Set("key", KeyName);
+        json.Set("x", _x);
+        json.Set("y", _y);
+        json.Set("distance", _distance);
+        json.Set("angle", _angle);
 
         return json;
     }

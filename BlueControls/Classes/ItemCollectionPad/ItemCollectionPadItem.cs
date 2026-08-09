@@ -929,22 +929,22 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             _referenceTableHintPath = tf.Filename;
         }
 
-        json.Set("caption", Caption)
-            .Set("sheetstyle", SheetStyle)
-            .Set("backcolor", BackColor.ToArgb())
-            .Set("endless", Endless)
-            .Set("autozoomfit", AutoZoomFit)
-            .Set("showalways", ShowAlways)
-            .Set("showjointpoints", ShowJointPoints)
-            .Set("snapmode", (int)SnapMode)
-            .Set("gridshow", GridShow)
-            .Set("gridsnap", GridSnap)
-            .Set("editmode", (int)EditMode)
-            .Set("printarea", RandinMm)
-            .Set("width", Breite)
-            .Set("height", Höhe)
-            .Set("referencetable", _referenceTableName)
-            .Set("referencetablehintpath", _referenceTableHintPath);
+        json.Set("caption", Caption);
+        json.Set("sheetstyle", SheetStyle);
+        json.Set("backcolor", BackColor.ToArgb());
+        json.Set("endless", Endless);
+        json.Set("autozoomfit", AutoZoomFit);
+        json.Set("showalways", ShowAlways);
+        json.Set("showjointpoints", ShowJointPoints);
+        json.Set("snapmode", (int)SnapMode);
+        json.Set("gridshow", GridShow);
+        json.Set("gridsnap", GridSnap);
+        json.Set("editmode", (int)EditMode);
+        json.Set("printarea", RandinMm);
+        json.Set("width", Breite);
+        json.Set("height", Höhe);
+        json.Set("referencetable", _referenceTableName);
+        json.Set("referencetablehintpath", _referenceTableHintPath);
 
         json.SetArrayIfNotEmpty("items", _internal.Where(it => it is not { IsDisposed: true }));
 

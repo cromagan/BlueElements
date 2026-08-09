@@ -289,11 +289,11 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// </list>
     /// </summary>
     public JsonObject ParseableJson() {
-        var json = new JsonObject()
-            .Set("type", Type)
-            .Set("version", Version)
-            .Set("createdate", CreateDate)
-            .Set("creator", Creator);
+        JsonObject json = new();
+        json.Set("type", Type);
+        json.Set("version", Version);
+        json.Set("createdate", CreateDate);
+        json.Set("creator", Creator);
 
         json.SetArrayIfNotEmpty("notallowedchilds", _notAllowedChilds);
 

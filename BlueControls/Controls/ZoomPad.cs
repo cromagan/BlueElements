@@ -266,10 +266,13 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }, null, 0, 16);
     }
 
-    public virtual JsonObject ViewToJson() => new JsonObject()
-            .Set("Zoom", Zoom)
-            .Set("SliderX", (int)SliderX.Value)
-            .Set("SliderY", (int)SliderY.Value);
+    public virtual JsonObject ViewToJson() {
+        JsonObject json = new();
+        json.Set("Zoom", Zoom);
+        json.Set("SliderX", (int)SliderX.Value);
+        json.Set("SliderY", (int)SliderY.Value);
+        return json;
+    }
 
     public void ZoomFit() {
         if (IsDisposed) { return; }

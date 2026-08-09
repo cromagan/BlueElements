@@ -107,9 +107,10 @@ public static class CellNoteHelper {
 
         JsonObject obj = new();
         foreach (var (keyName, symbol, text) in entries) {
-            obj[keyName] = new JsonObject()
-                .Set(KeySymbol, symbol.ToString())
-                .Set(KeyText, text);
+            JsonObject entry = new();
+            entry.Set(KeySymbol, symbol.ToString());
+            entry.Set(KeyText, text);
+            obj.Set(keyName, entry);
         }
         return obj.ToJsonString();
     }

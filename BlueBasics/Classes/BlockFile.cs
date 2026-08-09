@@ -115,15 +115,14 @@ public sealed class BlockFile {
     }
 
     private static void WriteBlockFile(string blkName, string myId) {
-        var json = new JsonObject()
-            .Set("user", UserName)
-            .Set("timeutc", DateTime.UtcNow)
-            .Set("machinename", Environment.MachineName)
-            .Set("app", Develop.AppExe())
-            .Set("id", myId)
-            .ToJsonString();
+        JsonObject json = new();
+        json.Set("user", UserName);
+        json.Set("timeutc", DateTime.UtcNow);
+        json.Set("machinename", Environment.MachineName);
+        json.Set("app", Develop.AppExe());
+        json.Set("id", myId);
 
-        WriteAllBytes(blkName, Encoding.UTF8.GetBytes(json));
+        WriteAllBytes(blkName, Encoding.UTF8.GetBytes(json.ToJsonString()));
     }
 
     /// <summary>

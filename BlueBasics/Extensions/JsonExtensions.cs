@@ -152,9 +152,8 @@ public static partial class Extensions {
 
     public static bool IsObject(this JsonElement json) => json.ValueKind == JsonValueKind.Object;
 
-    public static JsonObject Set(this JsonObject json, string key, JsonNode? value) {
+    public static void Set(this JsonObject json, string key, JsonNode? value) {
         json[key] = value;
-        return json;
     }
 
     /// <summary>
@@ -162,34 +161,33 @@ public static partial class Extensions {
     /// Base64-kodiertes PNG. Bei <c>null</c> wird der Key nicht gesetzt, sodass
     /// das Ziel-JSON unverändert bleibt (kein <c>null</c>-Eintrag).
     /// </summary>
-    public static JsonObject Set(this JsonObject json, string key, Bitmap? bmp) {
-        if (bmp is null) { return json; }
+    public static void Set(this JsonObject json, string key, Bitmap? bmp) {
+        if (bmp is null) { return; }
         json[key] = BitmapToBase64(bmp, ImageFormat.Png);
-        return json;
     }
 
     /// <summary>
     /// Serialisiert ein <see cref="System.Windows.Forms.Padding" /> unter <paramref name="key" /> als
     /// verschachteltes Objekt mit den Feldern <c>left</c>, <c>top</c>, <c>right</c>, <c>bottom</c>.
     /// </summary>
-    public static JsonObject Set(this JsonObject json, string key, System.Windows.Forms.Padding padding) {
-        json[key] = new JsonObject()
-            .Set("left", padding.Left)
-            .Set("top", padding.Top)
-            .Set("right", padding.Right)
-            .Set("bottom", padding.Bottom);
-        return json;
+    public static void Set(this JsonObject json, string key, System.Windows.Forms.Padding padding) {
+        JsonObject jo = new();
+        jo.Set("left", padding.Left);
+        jo.Set("top", padding.Top);
+        jo.Set("right", padding.Right);
+        jo.Set("bottom", padding.Bottom);
+        json.Set(key, jo);
     }
 
     /// <summary>
     /// Serialisiert ein <see cref="SizeF" /> unter <paramref name="key" /> als
     /// verschachteltes Objekt mit den Feldern <c>width</c> und <c>height</c>.
     /// </summary>
-    public static JsonObject Set(this JsonObject json, string key, SizeF size) {
-        json[key] = new JsonObject()
-            .Set("width", size.Width)
-            .Set("height", size.Height);
-        return json;
+    public static void Set(this JsonObject json, string key, SizeF size) {
+        JsonObject jo = new();
+        jo.Set("width", size.Width);
+        jo.Set("height", size.Height);
+        json.Set(key, jo);
     }
 
     /// <summary>

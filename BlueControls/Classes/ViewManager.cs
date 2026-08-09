@@ -165,10 +165,10 @@ public static class ViewManager {
             foreach (var kvp in _views) {
                 JsonArray arr = [];
                 foreach (var view in kvp.Value) {
-                    var viewObj = new JsonObject()
-                        .Set("name", view.KeyName)
-                        .Set("data", view.JsonData?.DeepClone())
-                        .Set("modified", view.Modified.ToString("o"));
+                    JsonObject viewObj = new();
+                    viewObj.Set("name", view.KeyName);
+                    viewObj.Set("data", view.JsonData?.DeepClone());
+                    viewObj.Set("modified", view.Modified.ToString("o"));
                     arr.Add(viewObj);
                 }
                 viewsObj.Add(kvp.Key, arr);
@@ -179,9 +179,9 @@ public static class ViewManager {
                 settingsObj.Add(kvp.Key, kvp.Value);
             }
 
-            var json = new JsonObject()
-                .Set("views", viewsObj)
-                .Set("settings", settingsObj);
+            JsonObject json = new();
+            json.Set("views", viewsObj);
+            json.Set("settings", settingsObj);
 
             _ = IO.WriteAllBytes(_filename, Encoding.UTF8.GetBytes(json.ToJsonString()));
         } catch (Exception ex) { Develop.DebugPrint("Fehler beim Speichern der View-Konfiguration", ex); }
