@@ -168,7 +168,7 @@ public static class ViewManager {
                     JsonObject viewObj = new();
                     viewObj.Set("name", view.KeyName);
                     viewObj.Set("data", view.JsonData?.DeepClone());
-                    viewObj.Set("modified", view.Modified.ToString("o"));
+                    viewObj.Set("modified", view.Modified);
                     arr.Add(viewObj);
                 }
                 viewsObj.Add(kvp.Key, arr);

@@ -4,6 +4,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
@@ -138,7 +139,18 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
-        WriteAllText(_lastFileName, t, Constants.Win1252, false);
+        SaveLayoutToDisk(_lastFileName, t);
+    }
+
+    /// <summary>
+    /// Schreibt den Layout-Inhalt auf die Festplatte und invalidiert den
+    /// zugehörigen <see cref="ConnectedFormula" />-Cache-Eintrag. Ohne
+    /// Invalidierung würde ein sofortiges Wiederöffnen des Editors die
+    /// veralteten gecachten Bytes liefern (Stale-Cache-Bug).
+    /// </summary>
+    private static void SaveLayoutToDisk(string fileName, string content) {
+        WriteAllText(fileName, content, Constants.Win1252, false);
+        ConnectedFormula.Get(fileName)?.Invalidate();
     }
 
     private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
@@ -160,7 +172,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad?.Items is null) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
-        WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
+        SaveLayoutToDisk(SaveTab.FileName, t);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         _lastFileName = SaveTab.FileName;
     }

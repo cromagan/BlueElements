@@ -530,7 +530,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                 // Umbruchbreite in Canvas-Koordinaten angeben. Da der Text später mit
                 // Zoom gezeichnet wird, muss die Control-Breite durch Zoom geteilt werden,
                 // damit der Umbruch bei jedem Zoom-Faktor exakt in die sichtbare Breite passt.
-                _eTxt.TextDimensions = new Size((int)((effectWidth - (Skin.PaddingSmal * 2)) / Zoom), -1);
+                //
+                // Bewusst auf Basis der vollen Size.Width — nicht der Slider-bereinigten
+                // effectWidth: Bei sehr schmalen TextBoxen flackert der Scrollbalken sonst
+                // (Slider erscheint → Breite schrumpft → Umbruchbreite ≤ 0 → Text fällt auf
+                // eine Zeile zusammen → Slider verschwindet → Breite kehrt zurück → von vorn).
+                // Size.Width ist unabhängig von der Slider-Sichtbarkeit, die Höhenmessung
+                // — und damit die Slider-Entscheidung — bleibt stabil. Text hinter dem
+                // Slider wird über AreaControl (effectWidth) abgeschnitten.
+                _eTxt.TextDimensions = new Size(Math.Max(1, (int)((Size.Width - (Skin.PaddingSmal * 2)) / Zoom)), -1);
                 _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, controlArea.Height);
                 break;
 

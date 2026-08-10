@@ -628,9 +628,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn is not { IsDisposed: false }) { continue; }
                 var val = CellGetStringCore(thisColumn);
-                if (!string.IsNullOrEmpty(val)) { cells[thisColumn.KeyName] = val; }
+                if (!string.IsNullOrEmpty(val)) { cells.Set(thisColumn.KeyName, val); }
             }
-            if (cells.Count > 0) { json["cells"] = cells; }
+            if (cells.Count > 0) { json.Set("cells", cells); }
         }
         return json;
     }
@@ -1185,7 +1185,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 });
 
             if (hasViolation) {
-                return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
+                var valuePairs = uvd.KeyColumns.Select((c, i) => $"{c.Caption}='{thisRowValues[i]}'");
+                return $"Unique-Wert-Verletzung in Tabelle '{tb.Caption}': Die Kombination aus {string.Join(", ", valuePairs)} muss einzigartig sein.";
             }
         }
 

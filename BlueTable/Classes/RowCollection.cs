@@ -594,7 +594,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (row is not { IsDisposed: false }) { continue; }
             rows.Add(row.ParseableJson());
         }
-        if (rows.Count > 0) { json["rows"] = rows; }
+        if (rows.Count > 0) { json.Set("rows", rows); }
         return json;
     }
 

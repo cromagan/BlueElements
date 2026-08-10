@@ -127,6 +127,10 @@ public sealed partial class ExportDialog : IHasTable {
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
                 var it = new ItemCollectionPadItem(layoutFileName);
+                // Alle Items werden aus derselben Layout-Datei erzeugt und erben
+                // beim Parsen denselben KeyName. Ohne eindeutige ID würde das zweite
+                // Add mit "Name bereits vorhanden" abgelehnt werden.
+                it.GetNewIdsForEverything();
 
                 //if (it._internal is not null) {
                 it.ReplaceVariables(rowsForExport[startNr]);

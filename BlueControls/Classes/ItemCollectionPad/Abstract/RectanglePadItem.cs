@@ -196,6 +196,13 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
         CalculateSlavePoints();
         base.PointMoved(sender, e);
+
+        // Breite/Höhe sind abgeleitete Properties (basierend auf den
+        // MovablePoints). Damit gebundene Controls - z.B. in der Sidebar des
+        // CreativePads - die neuen Werte via PropertyChanged übernehmen,
+        // müssen sie hier explizit als geändert gemeldet werden.
+        OnPropertyChanged(nameof(Breite));
+        OnPropertyChanged(nameof(Höhe));
     }
 
     public void SetCoordinates(RectangleF r) {

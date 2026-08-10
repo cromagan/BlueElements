@@ -10,6 +10,7 @@ using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
+using static BlueBasics.ClassesStatic.Geometry;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -516,14 +517,14 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is not AbstractPadItem bpi) { continue; }
                     var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
-                    //// JointPoints haben Vorrang, danach MovablePoint prüfen
-                    //var jointPoints = bpi is ComicCompPadItem ccpi ? ccpi.JointPoints : [];
-                    //var hit = jointPoints.Concat(bpi.MovablePoint)
-                    //                          .FirstOrDefault(p => GetLength(e.ControlPoint, p.CanvasToControl(ez, ex, ey)) < 5f);
-                    //if (hit is not null) {
-                    //    SelectItem(hit, false);
-                    //    return;
-                    //}
+                    // MovablePoint prüfen
+                    var jointPoints = bpi is ComicCompPadItem ccpi ? ccpi.JointPoints : [];
+                    var hit = jointPoints.Concat(bpi.MovablePoint)
+                                              .FirstOrDefault(p => GetLength(e.ControlPoint, p.CanvasToControl(ez, ex, ey)) < 5f);
+                    if (hit is not null) {
+                        SelectItem(hit, false);
+                        return;
+                    }
                 }
             }
 

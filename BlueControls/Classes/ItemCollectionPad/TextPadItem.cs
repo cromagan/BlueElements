@@ -100,6 +100,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             value = Math.Clamp(value, 0.01f, 20);
             if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
             field = value;
+            InvalidateText();
             OnPropertyChanged();
         }
     } = 3.07f;

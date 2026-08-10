@@ -284,7 +284,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             _fontOl.Unit,
             () => SizeOk(emSize)
                 ? new Font(FontName, emSize, _fontOl.Style, _fontOl.Unit)
-                : new Font("Arial", emSize, _fontOl.Style, _fontOl.Unit)
+                : new Font("Arial", 7, _fontOl.Style, _fontOl.Unit)
         );
     }
 

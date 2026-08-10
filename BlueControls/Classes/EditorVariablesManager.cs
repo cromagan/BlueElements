@@ -121,7 +121,7 @@ public static class EditorVariablesManager {
                     JsonObject setObj = new();
                     setObj.Set("name", set.KeyName);
                     setObj.Set("data", set.JsonData?.DeepClone());
-                    setObj.Set("modified", set.Modified.ToString("o"));
+                    setObj.Set("modified", set.Modified);
                     arr.Add(setObj);
                 }
                 setsObj.Add(kvp.Key, arr);

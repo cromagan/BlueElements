@@ -307,7 +307,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
             cellJson.Set("value", kvp.Value.Value);
             cells.Add(cellJson);
         }
-        if (cells.Count > 0) { json["cells"] = cells; }
+        if (cells.Count > 0) { json.Set("cells", cells); }
         return json;
     }
 

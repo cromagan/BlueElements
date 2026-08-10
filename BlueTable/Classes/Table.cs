@@ -1886,30 +1886,30 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow);
         json.SetArrayIfNotEmpty("tableadmin", _tableAdmin);
 
-        if (SortDefinition is { } sd) { json["sortdefinition"] = sd.ParseableJson(); }
+        if (SortDefinition is { } sd) { json.Set("sortdefinition", sd.ParseableJson()); }
         json.SetArrayIfNotEmpty("uniquevalues", _uniqueValues);
         json.SetArrayIfNotEmpty("eventscript", _eventScript);
         json.SetArrayIfNotEmpty("columnarrangements", _columnArrangements.Where(c => !c.IsDisposed));
 
-        json["eventscriptversion"] = _eventScriptVersion.ToString("o");
-        json.Set("poweredittime", _powerEditTime.ToString("o"));
-        json.Set("lastchange", LastChange.ToString("o"));
+        json.Set("eventscriptversion", _eventScriptVersion);
+        json.Set("poweredittime", _powerEditTime);
+        json.Set("lastchange", LastChange);
 
         if (_variables is { Count: > 0 }) {
-            json["variables"] = new VariableCollection(_variables.ToList(), false).ParseableJson();
+            json.Set("variables", new VariableCollection(_variables.ToList(), false).ParseableJson());
         }
 
         // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert.
         // Rows werden in Speicher-Reihenfolge ausgegeben (SortDefinition bzw. KeyName),
         // damit eine deterministische Datei entsteht - siehe Table.RowsInSaveOrder().
-        if (Column is { IsDisposed: false, Count: > 0 }) { json["columns"] = Column.ParseableJson()["columns"]; }
+        if (Column is { IsDisposed: false, Count: > 0 }) { json.Set("columns", Column.ParseableJson()["columns"]?.DeepClone()); }
         if (Row is { IsDisposed: false, Count: > 0 }) {
             JsonArray rowsJson = [];
             foreach (var row in RowsInSaveOrder()) { rowsJson.Add(row.ParseableJson()); }
-            if (rowsJson.Count > 0) { json["rows"] = rowsJson; }
+            if (rowsJson.Count > 0) { json.Set("rows", rowsJson); }
         }
         if (Cell is { IsDisposed: false } && Cell.ParseableJson() is { Count: > 0 } cells) {
-            foreach (var kvp in cells) { json[kvp.Key] = kvp.Value; }
+            foreach (var kvp in cells) { json.Set(kvp.Key, kvp.Value?.DeepClone()); }
         }
 
         return json;
@@ -1998,17 +1998,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         #region Struktur-Sub-Bäume (Columns, Rows, Cells)
 
-        if (json["columns"] is JsonArray cols) {
-            foreach (var item in cols) {
-                if (item is JsonObject jo) { Column?.ParseJson(new JsonObject { ["columns"] = jo }); }
-            }
-        }
+        if (json["columns"] is JsonArray) { Column?.ParseJson(json); }
 
-        if (json["rows"] is JsonArray rows) {
-            foreach (var item in rows) {
-                if (item is JsonObject jo) { Row?.ParseJson(new JsonObject { ["rows"] = jo }); }
-            }
-        }
+        if (json["rows"] is JsonArray) { Row?.ParseJson(json); }
 
         Cell?.ParseJson(json);
 

@@ -192,7 +192,7 @@ public class UndoItem : IParseable, IJsonParseable {
         var json = new JsonObject();
         json.Set("table", TableName);
         json.Set("command", (int)Command);
-        json.Set("datetimeutc", DateTimeUtc.ToString("o"));
+        json.Set("datetimeutc", DateTimeUtc);
         json.Set("user", User);
         json.Set("colname", ColName);
         json.Set("rowkey", RowKey);

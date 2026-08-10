@@ -214,5 +214,4 @@ Prüfe die OnLoaded Logik von Tabellen.
 TableFragments wirft ein "First=false" (BeSureUptoDate) vor dem ersten echten Laden.
 Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 
-## Aufgabe
-Initialwert-Fehler: Spalte KOMMISSION: Unique-Wert-Verletzung: Die Kombination aus Beleg, Pos., Kommission muss einzigartig sein.
+

@@ -55,6 +55,17 @@ public class TableJsonFile : TableFile {
     /// (<see cref="TableFile.InitialSavePending" />) oder bei fehlender Datei
     /// wird kein Ladeversuch unternommen.
     /// </summary>
+    /// <remarks>
+    /// Die Collection-Implementierungen von <c>ParseJson</c>
+    /// (<see cref="ColumnCollection.ParseJson(JsonObject)" /> bzw.
+    /// <see cref="RowCollection.ParseJson(JsonObject)" />) legen bewusst KEINE
+    /// neuen Spalten oder Zeilen an — sie sind für Partial-Updates gedacht und
+    /// aktualisieren nur bereits existierende Elemente. Beim Laden einer
+    /// kompletten Datei müssen die Strukturen deshalb zuerst explizit erzeugt
+    /// werden (analog zum binären <see cref="TableFile.LoadMainData" />, der
+    /// Spalten/Zeilen über ExecuteCommand anlegt). Erst danach darf
+    /// <c>ParseJson</c> die Eigenschaften, Zellwerte und Sub-Bäume übernehmen.
+    /// </remarks>
     protected override bool LoadMainData() {
         if (InitialSavePending) { return true; }
 
@@ -68,7 +79,50 @@ public class TableJsonFile : TableFile {
             }
 
             using var doc = JsonDocument.Parse(json);
-            this.ParseJson(doc.RootElement);
+
+            // JsonObject aufbauen (Keys auf Kleinschreibung normalisiert),
+            // damit es sowohl zur Struktur-Anlage als auch anschließend zum
+            // Setzen aller Eigenschaften über ParseJson genutzt werden kann.
+            JsonObject root = new();
+            foreach (var pair in doc.RootElement.EnumerateObject()) {
+                root[pair.Name.ToLowerInvariant()] = pair.Value.ToJsonNode();
+            }
+
+            // Reihenfolge: Erst Spalten anlegen, damit Zeilen deren Zellwerte
+            // referenzieren können. Systemspalten werden beim ersten Add durch
+            // GetSystems() automatisch erzeugt und beim späteren ParseJson
+            // aktualisiert.
+            if (root["columns"] is JsonArray cols) {
+                foreach (var item in cols) {
+                    if (item is not JsonObject jo) { continue; }
+                    if (jo.GetString("key", string.Empty) is not { Length: > 0 } key) { continue; }
+                    if (Column[key] is { IsDisposed: false }) { continue; }
+                    var error = Column.ExecuteCommand(TableDataType.Command_AddColumnByName, key, Reason.NoUndo_NoInvalidate);
+                    if (!string.IsNullOrEmpty(error)) {
+                        Freeze("JSON-Ladefehler (Spalte): " + error);
+                        return false;
+                    }
+                }
+            }
+
+            if (root["rows"] is JsonArray rows) {
+                foreach (var item in rows) {
+                    if (item is not JsonObject jo) { continue; }
+                    if (jo.GetString("key", string.Empty) is not { Length: > 0 } key) { continue; }
+                    if (Row.GetByKey(key) is { IsDisposed: false }) { continue; }
+                    var result = Row.ExecuteCommand(TableDataType.Command_AddRow, key, Reason.NoUndo_NoInvalidate, null, null);
+                    if (result.IsFailed) {
+                        Freeze("JSON-Ladefehler (Zeile): " + result.FailedReason);
+                        return false;
+                    }
+                }
+            }
+
+            // Jetzt, da alle Spalten und Zeilen existieren, dürfen ParseJson die
+            // Eigenschaften, Zellwerte und Sub-Bäume (Cells, SortDefinition,
+            // UniqueValues, EventScript, ...) übernehmen.
+            this.ParseJson(root);
+            this.ParseFinishedJson(root);
         } catch (Exception ex) {
             Freeze("JSON-Ladefehler: " + ex.Message);
             return false;

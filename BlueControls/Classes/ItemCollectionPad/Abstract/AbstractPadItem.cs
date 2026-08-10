@@ -517,7 +517,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return bmp;
     }
 
-    internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();
+    internal virtual void GetNewIdsForEverything() => KeyName = GetUniqueKey();
 
     protected abstract RectangleF CalculateCanvasUsedArea();
 

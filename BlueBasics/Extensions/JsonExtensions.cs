@@ -54,7 +54,7 @@ public static partial class Extensions {
     public static T GetEnum<T>(this JsonObject json, string key, T defaultValue) where T : struct, Enum {
         switch (json[key]) {
             case JsonValue v when v.TryGetValue(out int i):
-                return (T)(object)i;
+                return (T)Enum.ToObject(typeof(T), i);
 
             case JsonValue v when v.TryGetValue(out string? s) && Enum.TryParse<T>(s, out var result):
                 return result;
@@ -164,6 +164,17 @@ public static partial class Extensions {
     public static void Set(this JsonObject json, string key, Bitmap? bmp) {
         if (bmp is null) { return; }
         json[key] = BitmapToBase64(bmp, ImageFormat.Png);
+    }
+
+    /// <summary>
+    /// Serialisiert ein <see cref="DateTime" /> unter <paramref name="key" /> als
+    /// ISO-8601-Roundtrip-Format (<c>"o"</c>), sodass der Wert verlustfrei
+    /// zurückgelesen werden kann - kompatibel zu den Get-Routen, die
+    /// <see cref="JsonNode.GetValue{T}" /> bzw.
+    /// <see cref="Converter.DateTimeParse(string)" /> verwenden.
+    /// </summary>
+    public static void Set(this JsonObject json, string key, DateTime value) {
+        json[key] = value.ToString("o", CultureInfo.InvariantCulture);
     }
 
     /// <summary>
