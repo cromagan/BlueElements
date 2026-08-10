@@ -369,6 +369,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     protected virtual void DrawBackground(Graphics gr, Rectangle drawArea) {
+        if (ShowInPrintMode) {
+            gr.FillRectangle(Brushes.White, drawArea);
+            return;
+        }
         using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, drawArea);
     }
