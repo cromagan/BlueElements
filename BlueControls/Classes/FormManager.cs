@@ -78,7 +78,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         foreach (var thisTable in allTables) {
             idx++;
             try {
-                if (lastForm is Forms.FormWithStatusBar fws && !string.IsNullOrEmpty(thisTable.Caption)) {
+                if (lastForm is FormWithStatusBar fws && !string.IsNullOrEmpty(thisTable.Caption)) {
                     fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
                 }
             } catch { }

@@ -510,7 +510,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
 
         // StringBuilder ist bei vielen Manipulationen deutlich schneller als String-Konkatenation
-        var sb = new System.Text.StringBuilder(tXt.Length + 10); // Puffer für neue Zeichen einplanen
+        var sb = new StringBuilder(tXt.Length + 10); // Puffer für neue Zeichen einplanen
 
         for (var i = 0; i < tXt.Length; i++) {
             var currentChar = tXt[i];

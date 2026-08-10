@@ -212,7 +212,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) => NextControl(e.Direction);
+    private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => NextControl(e.Direction);
 
     private void F_ValueChanged(object sender, System.EventArgs e) {
         if (IsDisposed || f is null) { return; }

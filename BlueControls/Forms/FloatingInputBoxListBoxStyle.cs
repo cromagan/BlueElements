@@ -119,7 +119,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     /// <summary>
     /// Zeigt eine Mini-Toolbar an der übergebenen Bildschirm-Position.
-    /// Wird von <see cref="Interfaces.IMiniToolbar.MiniToolbarShow"/> verwendet.
+    /// Wird von <see cref="IMiniToolbar.MiniToolbarShow"/> verwendet.
     /// </summary>
     public static FloatingInputBoxListBoxStyle ShowAtPosition(List<AbstractListItem> items, Point screenPosition, Control? connectedControl, object? hotItem) => new(items, CheckBehavior.NoSelection, null, screenPosition.X, screenPosition.Y, -1, connectedControl,
             false, ListBoxAppearance.MiniToolbar, Design.Item_MiniToolbar, false, false, AddType.None, false, false, null, hotItem);

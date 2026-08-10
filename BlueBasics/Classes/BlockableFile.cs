@@ -1001,7 +1001,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Schreibt den Content auf die Festplatte und aktualisiert danach die
     /// Instanz-Zustände (Hashes, FileInfo) sowie löst <see cref="OnSaved"/> aus.
-    /// Für <see cref="ExtendedSave"/> = true wird <see cref="IO.SaveExtended"/>
+    /// Für <see cref="ExtendedSave"/> = true wird <see cref="SaveExtended"/>
     /// (Backup-Rotation, atomares Ersetzen) genutzt, sonst ein direkter Schreibvorgang.
     /// </summary>
     private OperationResult SaveToDisk(byte[] contentToWrite, string savedContentHash) {

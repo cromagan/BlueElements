@@ -49,7 +49,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new BlueControls.Controls.TabControl {
+        var con = new Controls.TabControl {
             Name = this.DefaultItemToControlName(parent?.Page?.UniqueId)
         };
         // Die Input-Settings werden direkt auf das erzeugte
@@ -58,7 +58,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return con;
     }
 
-    public void CreateTabs(BlueControls.Controls.TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
+    public void CreateTabs(Controls.TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -283,8 +283,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
-    private BlueControls.Controls.ListBox Childs() {
-        var childs = new BlueControls.Controls.ListBox {
+    private Controls.ListBox Childs() {
+        var childs = new Controls.ListBox {
             AddAllowed = AddType.Suggestions,
             RemoveAllowed = true,
             MoveAllowed = true,
@@ -314,7 +314,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     private void Childs_Disposed(object? sender, System.EventArgs e) {
-        if (sender is BlueControls.Controls.ListBox childs) {
+        if (sender is Controls.ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
             childs.ParentChanged -= Childs_ParentChanged;
@@ -323,7 +323,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     private void Childs_ItemCheckedChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (sender is not BlueControls.Controls.ListBox lb) { return; }
+        if (sender is not Controls.ListBox lb) { return; }
 
         _childs.Clear();
 
@@ -346,7 +346,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     private void Childs_ParentChanged(object? sender, System.EventArgs e) {
-        if (sender is BlueControls.Controls.ListBox { Parent: null } childs) {
+        if (sender is Controls.ListBox { Parent: null } childs) {
             childs.Dispose();
         }
     }

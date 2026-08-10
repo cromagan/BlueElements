@@ -31,7 +31,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         gr.DrawImage(picPreview, ctrlRect.X, ctrlRect.Y, ctrlRect.Width, (float)ctrlRect.Height);
     }
 
-    private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
+    private void btnAlleFarbenSchwarz_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -44,7 +44,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnAusdünnen_Click(object sender, System.EventArgs e) {
+    private void btnAusdünnen_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -56,9 +56,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnGamma_Click(object sender, System.EventArgs e) => DoPic();
+    private void btnGamma_Click(object sender, EventArgs e) => DoPic();
 
-    private void btnGraustufen_Click(object sender, System.EventArgs e) {
+    private void btnGraustufen_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -71,11 +71,11 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnHelligkeit_Click(object sender, System.EventArgs e) => DoPic();
+    private void btnHelligkeit_Click(object sender, EventArgs e) => DoPic();
 
-    private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) => DoPic();
+    private void btnKontrastErhoehen_Click(object sender, EventArgs e) => DoPic();
 
-    private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
+    private void btnPixelHinzu_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -106,17 +106,17 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void sldGamma_ValueChanged(object sender, System.EventArgs e) {
+    private void sldGamma_ValueChanged(object sender, EventArgs e) {
         capGamma.Text = sldGamma.Value.ToString1_2();
         OnDoInvalidate();
     }
 
-    private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e) {
+    private void sldHelligkeit_ValueChanged(object sender, EventArgs e) {
         capHelligkeit.Text = sldHelligkeit.Value.ToString1_2();
         OnDoInvalidate();
     }
 
-    private void sldKontrast_ValueChanged(object sender, System.EventArgs e) {
+    private void sldKontrast_ValueChanged(object sender, EventArgs e) {
         capKontrast.Text = sldKontrast.Value.ToString1_2();
         OnDoInvalidate();
     }

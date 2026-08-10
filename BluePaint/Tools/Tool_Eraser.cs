@@ -92,9 +92,9 @@ public partial class Tool_Eraser : GenericTool {
         }
     }
 
-    private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
+    private void DrawBox_CheckedChanged(object sender, EventArgs e) => OnDoInvalidate();
 
-    private void sldSize_ValueChanged(object sender, System.EventArgs e) {
+    private void sldSize_ValueChanged(object sender, EventArgs e) {
         _brushSize = (int)Math.Round(sldSize.Value, MidpointRounding.AwayFromZero);
         capSize.Text = _brushSize.ToString1();
         OnDoInvalidate();

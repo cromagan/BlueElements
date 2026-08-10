@@ -26,7 +26,7 @@ public static class Develop {
 
     /// <summary>
     /// Statische Referenz auf den Shutdown-Timer. Ohne diese Wurzelreferenz würde der
-    /// <see cref="System.Threading.Timer"/> vom GC eingesammelt werden, da er intern nur
+    /// <see cref="Timer"/> vom GC eingesammelt werden, da er intern nur
     /// schwach referenziert wird – der 12-Stunden-Shutdown würde dann nicht mehr feuern.
     /// </summary>
     private static Timer? _shutdownTimer;
@@ -66,7 +66,7 @@ public static class Develop {
 
     /// <summary>
     /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in <see cref="StartService"/>.
-    /// Bleibt unveraendert (insb. mit Tausendertrennzeichen "."), waehrend <see cref="System.Globalization.CultureInfo.CurrentCulture"/>
+    /// Bleibt unveraendert (insb. mit Tausendertrennzeichen "."), waehrend <see cref="CultureInfo.CurrentCulture"/>
     /// nach dem Override ein leeres <see cref="NumberFormatInfo.NumberGroupSeparator"/> hat.
     /// </summary>
     public static CultureInfo OriginCultureInfo { get; private set; } = new CultureInfo("de-DE");

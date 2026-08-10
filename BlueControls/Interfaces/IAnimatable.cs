@@ -5,7 +5,7 @@ using BlueControls.Classes;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Vertrag für Objekte (Forms wie <see cref="Forms.FloatingForm" /> bzw. künftig
+/// Vertrag für Objekte (Forms wie <see cref="FloatingForm" /> bzw. künftig
 /// auch Controls), die von der <see cref="Animator" />-Engine animiert werden.
 /// Der Animations-Thread ruft pro Frame <see cref="Animate" /> auf und wendet das
 /// gelieferte <see cref="AnimationFrame" /> via Win32 an. Sobald

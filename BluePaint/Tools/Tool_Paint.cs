@@ -44,7 +44,7 @@ public partial class Tool_Paint {
         }
     }
 
-    private void sldSize_ValueChanged(object sender, System.EventArgs e) {
+    private void sldSize_ValueChanged(object sender, EventArgs e) {
         _brushSize = (int)Math.Round(sldSize.Value, MidpointRounding.AwayFromZero);
         capSize.Text = _brushSize.ToString1();
         OnDoInvalidate();

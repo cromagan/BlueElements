@@ -12,7 +12,7 @@ namespace BlueBasics.Classes;
 /// <para>
 /// Beim Entfernen oder Leeren von Einträgen werden Werte, die <see cref="IDisposable" />
 /// implementieren, automatisch verworfen. Jede Instanz registriert sich zusätzlich bei
-/// <see cref="Generic.RegisterCacheTrim" />, sodass globaler Memory-Druck zum
+/// <see cref="RegisterCacheTrim" />, sodass globaler Memory-Druck zum
 /// automatischen Verkleinern des Caches führt.
 /// </para>
 /// </summary>
@@ -21,11 +21,11 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     #region Fields
 
     /// <summary>
-    /// Trim-Delegate, das bei <see cref="Generic.RegisterCacheTrim" /> angemeldet
+    /// Trim-Delegate, das bei <see cref="RegisterCacheTrim" /> angemeldet
     /// wurde. In einem Feld gehalten, damit <see cref="Dispose" /> die exakt
     /// gleiche Instanz wieder abmelden kann (Method-Group-Erzeugung liefert
     /// sonst jedes Mal ein neues Delegate). Zeigt auf <see cref="TrimToMax" />,
-    /// damit <see cref="Generic.TrimAllCaches" /> niemals eine
+    /// damit <see cref="TrimAllCaches" /> niemals eine
     /// <see cref="ObjectDisposedException" /> auslöst, wenn ein Cache während
     /// des Trimmens freigegeben wird.
     /// </summary>
@@ -272,7 +272,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     /// <see cref="_trimAction" />-Delegate aus aufgerufen und muss daher auch
     /// während eines konkurrierenden <see cref="Dispose" /> sicher bleiben —
     /// eine <see cref="ObjectDisposedException" /> würde sonst die Iteration in
-    /// <see cref="Generic.TrimAllCaches" /> abbrechen und alle anderen Caches
+    /// <see cref="TrimAllCaches" /> abbrechen und alle anderen Caches
     /// ungetrimmt lassen. Doppel-Dispose ist ausgeschlossen, weil
     /// <see cref="ConcurrentDictionary{TKey, TValue}.TryRemove(TKey, out TValue)" /> atomar ist.
     /// </summary>
@@ -295,7 +295,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     }
 
     /// <summary>
-    /// Trim-Einstiegspunkt für <see cref="Generic.TrimAllCaches" />. Ruft
+    /// Trim-Einstiegspunkt für <see cref="TrimAllCaches" />. Ruft
     /// <see cref="TrimCore" /> mit der konfigurierten <see cref="_maxCacheSize" />
     /// auf. Bewusst ohne <see cref="ThrowIfDisposed" /> — siehe Dokumentation
     /// von <see cref="TrimCore" />.
@@ -305,7 +305,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     /// <summary>
     /// Gibt den Cache frei: Alle Einträge werden entfernt, disposable Werte
     /// werden verworfen und das Trim-Delegate wird bei
-    /// <see cref="Generic.UnregisterCacheTrim" /> abgemeldet. Mehrfaches Aufrufen
+    /// <see cref="UnregisterCacheTrim" /> abgemeldet. Mehrfaches Aufrufen
     /// ist sicher und hat ab dem zweiten Mal keinen Effekt.
     /// </summary>
     public void Dispose() {

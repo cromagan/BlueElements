@@ -79,7 +79,7 @@ public static class MiniToolbarExtension {
     /// </para>
     /// <para>
     /// Zum Ausblenden der Toolbar (z. B. bei Mausbewegung oder Tastatur-Navigation)
-    /// <see cref="MiniToolbarExtension.HideMiniToolbar"/> verwenden. Das schließt
+    /// <see cref="HideMiniToolbar"/> verwenden. Das schließt
     /// nur das Fenster, merkt sich aber das letzte HotItem — so führt ein erneuter
     /// Klick auf dieselbe Zelle nicht zu einem erneuten Einblenden.
     /// </para>

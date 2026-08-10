@@ -10,7 +10,7 @@ namespace BlueBasics.Interfaces;
 /// eingebettet - kein String-Encoding via ToNonCritical/FromNonCritical mehr nötig.
 /// </summary>
 /// <remarks>
-/// Gewollt ist <see cref="JsonObject" /> und nicht <see cref="System.Text.Json.JsonElement" />,
+/// Gewollt ist <see cref="JsonObject" /> und nicht <see cref="JsonElement" />,
 /// weil <see cref="JsonObject" /> mutable ist: Subklassen können das Ergebnis von
 /// <c>base.ParseableJson()</c> direkt erweitern, und Einbetten als Sub-Objekt funktioniert ohne
 /// Konvertierung, da <see cref="JsonObject" /> selbst ein <see cref="JsonNode" /> ist.

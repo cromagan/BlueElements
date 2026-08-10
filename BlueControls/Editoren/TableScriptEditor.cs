@@ -16,19 +16,19 @@ namespace BlueControls.BlueTableDialogs;
 /// <summary>
 /// Editor für genau ein Tabellen-Skript (<see cref="TableScriptDescription"/>).
 /// Erbt die Skript-Bearbeitung von <see cref="ScriptEditor"/> und wird zusammen mit einem
-/// <see cref="Editoren.EditorForIEnumerable"/> im <see cref="TableScriptEditorForm"/> gehostet.
+/// <see cref="EditorForIEnumerable"/> im <see cref="TableScriptEditorForm"/> gehostet.
 /// <para />
 /// Der Editor ist ein reines Anzeige-Tool: er hält das aktuell gewählte
 /// <see cref="TableScriptDescription"/> in seiner Oberfläche. Sobald der Nutzer eine
 /// Eingabe tätigt, feuert er <see cref="INotifyPropertyChanged.PropertyChanged"/>
-/// (jeweils für <c>OutputItem</c>). Das <see cref="Editoren.EditorForIEnumerable"/>
+/// (jeweils für <c>OutputItem</c>). Das <see cref="EditorForIEnumerable"/>
 /// holt sich daraufhin über <see cref="IIsEditor.OutputItem"/> eine frische, vom
 /// Editor aus der aktuellen Oberfläche erzeugte Instanz (EditCopy-Modus), ersetzt
 /// das Element in seiner Arbeitskopie und benachrichtigt das hostende
 /// <see cref="TableScriptEditorForm"/>. Das Form schreibt die Collection ans Backend
 /// zurück — so entstehen saubere Undo-Einträge (old≠new). Die anzuzeigenden Elemente
 /// liefert die Backend-Collection <see cref="Table.EventScript"/> direkt als
-/// <see cref="Editoren.EditorForIEnumerable.InputItem"/>.
+/// <see cref="EditorForIEnumerable.InputItem"/>.
 /// Die Tabellen-Verwaltung (Lebenszyklus, Schreibrechte) übernimmt das hostende Form.
 /// </summary>
 public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
@@ -199,7 +199,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
     /// <summary>
     /// Erzeugt aus dem aktuellen UI-Zustand eine neue <see cref="TableScriptDescription"/>.
-    /// Wird vom <see cref="Editoren.EditorForIEnumerable"/> über
+    /// Wird vom <see cref="EditorForIEnumerable"/> über
     /// <see cref="IIsEditor.OutputItem"/> abgefragt, sobald der Editor
     /// <c>OutputItem</c>-Änderung signalisiert. Nicht editierte Backend-Werte
     /// (AdminInfo, AverageRunTime, Table) werden vom geladenen <see cref="_item"/>

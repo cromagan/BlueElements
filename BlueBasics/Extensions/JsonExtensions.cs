@@ -218,8 +218,8 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Konvertiert ein <see cref="JsonElement" /> (z. B. aus <see cref="System.Text.Json.JsonDocument" />
-    /// oder <see cref="System.Text.Json.JsonElement.Clone" />) in einen <see cref="JsonNode" />,
+    /// Konvertiert ein <see cref="JsonElement" /> (z. B. aus <see cref="JsonDocument" />
+    /// oder <see cref="JsonElement.Clone" />) in einen <see cref="JsonNode" />,
     /// sodass es direkt in ein übergeordnetes <see cref="JsonObject" /> / <see cref="JsonArray" />
     /// eingebettet werden kann.
     /// Ein <see cref="JsonValueKind.Undefined" />- oder <see cref="JsonValueKind.Null" />-Element

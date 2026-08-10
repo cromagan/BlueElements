@@ -129,7 +129,7 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
             }
 
             return r.CellGetString(c);
-        } catch (System.Exception ex) {
+        } catch (Exception ex) {
             return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Error: {ex.Message}]";
         }
     }

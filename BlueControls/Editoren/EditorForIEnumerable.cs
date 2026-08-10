@@ -32,7 +32,7 @@ namespace BlueControls.Editoren;
 /// </list>
 /// <para />
 /// Das Hinzufügen neuer Elemente wird nicht durch den Editor erzeugt,
-/// sondern über <see cref="Controls.ListBox.AddClicked"/> an das Form durchgereicht.
+/// sondern über <see cref="ListBox.AddClicked"/> an das Form durchgereicht.
 /// Das Form erzeugt lediglich das neue Element und übergibt es über
 /// <see cref="Add"/> an diesen Editor; dieser übernimmt es dann automatisch in
 /// seine Arbeitskopie (<see cref="OutputItem"/>), aktualisiert die Anzeige und selektiert es. Das Entfernen übernimmt diese
@@ -172,7 +172,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// <summary>
     /// Fügt der Arbeitskopie (<see cref="OutputItem"/>) ein neues Element hinzu,
     /// aktualisiert die Anzeige und selektiert das Element. Typischerweise aus
-    /// dem <see cref="Controls.ListBox.AddClicked"/>-Handler des hostenden
+    /// dem <see cref="ListBox.AddClicked"/>-Handler des hostenden
     /// Forms aufzurufen — der <paramref name="newItem"/> wird dabei als
     /// <c>sender</c> übergeben (das ist die Instanz dieses Editors).
     /// </summary>

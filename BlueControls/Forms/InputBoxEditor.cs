@@ -11,7 +11,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     #region Fields
 
     private static readonly ConcurrentCache<Type, Type?> _editorCache = new(200);
-    private static readonly System.Collections.Generic.HashSet<Type> _processedEditors = new();
+    private static readonly HashSet<Type> _processedEditors = new();
     private readonly bool _allowInvalid;
     private Caption? _capError;
     private System.Threading.Timer? _errorCheckTimer;
@@ -154,10 +154,12 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
                     }
                     mb = frm;
                     break;
+
                 case EditorEasy ea:
                     ea.Mode = ea.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
                     mb = new InputBoxEditor(ea, supportsCancel, allowInvalid);
                     break;
+
                 case ISimpleEditor se:
                     if (se is IIsEditor seEditor) {
                         seEditor.Mode = seEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
@@ -174,6 +176,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             case IIsEditor ie:
                 ie.InputItem = toEdit;
                 break;
+
             case InputBoxEditor ibe:
                 foreach (var c in ibe.Controls) {
                     if (c is IIsEditor ie2) {

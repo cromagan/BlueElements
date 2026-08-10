@@ -53,7 +53,7 @@ public partial class Tool_DummyGenerator {
         OnOverridePic(newPic, true);
     }
 
-    private void Erstellen_Click(object sender, System.EventArgs e) {
+    private void Erstellen_Click(object sender, EventArgs e) {
         CreateDummy();
         OnZoomFit();
     }

@@ -23,7 +23,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
         DoCapInfo();
     }
 
-    private void btnDoResize_Click(object sender, System.EventArgs? e) {
+    private void btnDoResize_Click(object sender, EventArgs? e) {
         var p = OnNeedCurrentPic();
         if (p is null) { return; }
         if (!DoubleTryParse(flxProzent.Value, out var pr)) { return; }
@@ -58,7 +58,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
         capInfo.Text = "Zielgröße: " + (int)(p.Width * pr) + " x " + (int)(p.Height * pr) + " Pixel";
     }
 
-    private void flxProzent_ValueChanged(object sender, System.EventArgs e) => DoCapInfo();
+    private void flxProzent_ValueChanged(object sender, EventArgs e) => DoCapInfo();
 
     #endregion
 }

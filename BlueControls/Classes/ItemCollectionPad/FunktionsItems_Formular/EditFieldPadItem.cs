@@ -29,7 +29,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     [DefaultValue(false)]
-    [System.ComponentModel.Description("Wenn aktiv, springt der Fokus automatisch zum nächsten Steuerelement, wenn am Ende des Textes die Rechts-Taste gedrückt wird.")]
+    [Description("Wenn aktiv, springt der Fokus automatisch zum nächsten Steuerelement, wenn am Ende des Textes die Rechts-Taste gedrückt wird.")]
     public bool AutoNext {
         get;
         set {
@@ -55,7 +55,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     [DefaultValue(true)]
-    [System.ComponentModel.Description("Richtet die Eingabefelder aller Steuerelemente auf gleicher horizontaler Ebene automatisch an der breitesten Beschriftung aus.")]
+    [Description("Richtet die Eingabefelder aller Steuerelemente auf gleicher horizontaler Ebene automatisch an der breitesten Beschriftung aus.")]
     public bool AutoX {
         get;
         set {

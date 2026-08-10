@@ -91,16 +91,16 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         OnOverridePic(bmp, true);
     }
 
-    private void btnAusrichten_Click(object sender, System.EventArgs e) {
+    private void btnAusrichten_Click(object sender, EventArgs e) {
         if (OnNeedCurrentPic() is null) { return; }
         _ausricht = true;
         OnDoInvalidate();
         Notification.Show("Auf dem Bild eine Linie entlang der Kante ziehen,<br>die waagerecht oder senkrecht ausgerichtet werden soll.", ImageCode.Information);
     }
 
-    private void btnDrehenL_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.Rotate270FlipNone);
+    private void btnDrehenL_Click(object sender, EventArgs e) => DoThis(RotateFlipType.Rotate270FlipNone);
 
-    private void btnDrehenR_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.Rotate90FlipNone);
+    private void btnDrehenR_Click(object sender, EventArgs e) => DoThis(RotateFlipType.Rotate90FlipNone);
 
     private void DoThis(RotateFlipType b) {
         _ausricht = false;
@@ -119,9 +119,9 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         OnZoomFit();
     }
 
-    private void SpiegelnH_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipY);
+    private void SpiegelnH_Click(object sender, EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipY);
 
-    private void SpiegelnV_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipX);
+    private void SpiegelnV_Click(object sender, EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipX);
 
     #endregion
 }

@@ -141,9 +141,9 @@ public class TableChunk : TableFile {
     /// TableChunk verwaltet seine eigenen Chunk-Zugriffszeiten über
     /// <c>_lastUsed</c> und nicht über Chunk-LiveInstances.
     /// Die Tabelle gilt als "recently used", wenn mindestens ein Chunk
-    /// in den letzten <see cref="Chunk.SkipIfUnusedMinutes"/> verwendet wurde.
+    /// in den letzten <see cref="SkipIfUnusedMinutes"/> verwendet wurde.
     /// Ohne diese Überschreibung würde der periodische TableUpdater die Tabelle
-    /// immer überspringen, da <see cref="Chunk.IsChunkRecentlyUsed"/> für
+    /// immer überspringen, da <see cref="IsChunkRecentlyUsed"/> für
     /// .tblh-Dateien niemals eine Chunk-LiveInstance findet.
     /// </summary>
     public override bool IsRecentlyUsed {
@@ -1217,7 +1217,7 @@ public class TableChunk : TableFile {
     /// Datei im Ordner existiert und lädt diese ggf. neu.
     /// Entdeckt außerdem neue Row-Chunk-Ordner, die andere Benutzer seit dem
     /// letzten Refresh angelegt haben (z.B. Zeilen in einem neuen Chunk-Wert).
-    /// Chunks, die länger als <see cref="Chunk.SkipIfUnusedMinutes"/> nicht verwendet wurden,
+    /// Chunks, die länger als <see cref="SkipIfUnusedMinutes"/> nicht verwendet wurden,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).
     /// </summary>

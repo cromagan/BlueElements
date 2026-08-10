@@ -112,11 +112,11 @@ public partial class MainWindow : FormWithStatusBar {
         return false;
     }
 
-    private void Bruchlinie_Click(object sender, System.EventArgs e) => SetTool(new Tool_Bruchlinie());
+    private void Bruchlinie_Click(object sender, EventArgs e) => SetTool(new Tool_Bruchlinie());
 
-    private void btn100_Click(object sender, System.EventArgs e) => P.Zoom = 1f;
+    private void btn100_Click(object sender, EventArgs e) => P.Zoom = 1f;
 
-    private void btnCopy_Click(object sender, System.EventArgs e) {
+    private void btnCopy_Click(object sender, EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
         if (P.Bmp is { } pic && pic.IsValid()) {
             System.Windows.Forms.Clipboard.SetImage(pic);
@@ -128,7 +128,7 @@ public partial class MainWindow : FormWithStatusBar {
         MessageBox.Show("Kein Bild vorhanden.");
     }
 
-    private void btnEinfügen_Click(object sender, System.EventArgs e) {
+    private void btnEinfügen_Click(object sender, EventArgs e) {
         if (!IsSaved()) { return; }
         if (!System.Windows.Forms.Clipboard.ContainsImage()) {
             QuickNote.Show(NoteSymbols.Warning, "Kein Bild vorhanden");
@@ -140,27 +140,27 @@ public partial class MainWindow : FormWithStatusBar {
         P.ZoomFit();
     }
 
-    private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize());
+    private void btnGrößeÄndern_Click(object sender, EventArgs e) => SetTool(new Tool_Resize());
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (!IsSaved()) { return; }
         LoadFromDisk(e.Item.KeyName);
     }
 
-    private void btnNeu_Click(object sender, System.EventArgs e) {
+    private void btnNeu_Click(object sender, EventArgs e) {
         if (!IsSaved()) { return; }
         SetPic(new Bitmap(100, 100), true);
         _filename = "*";
     }
 
-    private void btnOeffnen_Click(object sender, System.EventArgs e) {
+    private void btnOeffnen_Click(object sender, EventArgs e) {
         if (!IsSaved()) { return; }
         LoadTab.ShowDialog();
     }
 
-    private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
+    private void btnSave_Click(object sender, EventArgs e) => Speichern();
 
-    private void btnSaveAs_Click(object sender, System.EventArgs e) {
+    private void btnSaveAs_Click(object sender, EventArgs e) {
         SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
@@ -172,13 +172,13 @@ public partial class MainWindow : FormWithStatusBar {
         Speichern();
     }
 
-    private void btnZoomFit_Click(object sender, System.EventArgs e) => P.ZoomFit();
+    private void btnZoomFit_Click(object sender, EventArgs e) => P.ZoomFit();
 
-    private void Clipping_Click(object sender, System.EventArgs e) => SetTool(new Tool_Clipping());
+    private void Clipping_Click(object sender, EventArgs e) => SetTool(new Tool_Clipping());
 
-    private void CurrentTool_DoInvalidate(object? sender, System.EventArgs e) => P.Invalidate();
+    private void CurrentTool_DoInvalidate(object? sender, EventArgs e) => P.Invalidate();
 
-    private void CurrentTool_ForceUndoSaving(object? sender, System.EventArgs e) {
+    private void CurrentTool_ForceUndoSaving(object? sender, EventArgs e) {
         _isSaved = false;
         if (_picUndo is not null) {
             _picUndo.Dispose();
@@ -198,7 +198,7 @@ public partial class MainWindow : FormWithStatusBar {
         btnRückgänig.Enabled = true;
     }
 
-    private void CurrentTool_HideMainWindow(object? sender, System.EventArgs e) => Hide();
+    private void CurrentTool_HideMainWindow(object? sender, EventArgs e) => Hide();
 
     private void CurrentTool_NeedCurrentPic(object? sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
@@ -220,11 +220,11 @@ public partial class MainWindow : FormWithStatusBar {
         P.Invalidate();
     }
 
-    private void CurrentTool_ShowMainWindow(object? sender, System.EventArgs e) => Show();
+    private void CurrentTool_ShowMainWindow(object? sender, EventArgs e) => Show();
 
-    private void CurrentTool_ZoomFit(object? sender, System.EventArgs e) => P.ZoomFit();
+    private void CurrentTool_ZoomFit(object? sender, EventArgs e) => P.ZoomFit();
 
-    private void Dummy_Click(object sender, System.EventArgs e) => SetTool(new Tool_DummyGenerator());
+    private void Dummy_Click(object sender, EventArgs e) => SetTool(new Tool_DummyGenerator());
 
     private bool IsSaved() {
         while (true) {
@@ -251,7 +251,7 @@ public partial class MainWindow : FormWithStatusBar {
         }
     }
 
-    private void Kontrast_Click(object sender, System.EventArgs e) => SetTool(new Tool_Kontrast());
+    private void Kontrast_Click(object sender, EventArgs e) => SetTool(new Tool_Kontrast());
 
     private void LoadFromDisk(string filename) {
         if (!IsSaved()) { return; }
@@ -266,7 +266,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFromDisk(LoadTab.FileName);
 
-    private void OK_Click(object sender, System.EventArgs e) {
+    private void OK_Click(object sender, EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
         Close();
     }
@@ -287,11 +287,11 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void P_ImageMouseUp(object sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) => _currentTool?.MouseUp(e, P.Bmp);
 
-    private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = string.Empty;
+    private void P_MouseLeave(object sender, EventArgs e) => InfoText.Text = string.Empty;
 
-    private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser());
+    private void Radiergummi_Click(object sender, EventArgs e) => SetTool(new Tool_Eraser());
 
-    private void Rückg_Click(object sender, System.EventArgs e) {
+    private void Rückg_Click(object sender, EventArgs e) {
         if (_picUndo is null) { return; }
         btnRückgänig.Enabled = false;
         _isSaved = false;
@@ -308,7 +308,7 @@ public partial class MainWindow : FormWithStatusBar {
         _currentTool?.PictureChangedByMainWindow();
     }
 
-    private void Screenshot_Click(object sender, System.EventArgs e) => SetTool(new Tool_Screenshot());
+    private void Screenshot_Click(object sender, EventArgs e) => SetTool(new Tool_Screenshot());
 
     private void Speichern() {
         SetTool(null); // um OnToolChangeAuszulösen
@@ -346,9 +346,9 @@ public partial class MainWindow : FormWithStatusBar {
         }
     }
 
-    private void Spiegeln_Click(object sender, System.EventArgs e) => SetTool(new Tool_Spiegeln());
+    private void Spiegeln_Click(object sender, EventArgs e) => SetTool(new Tool_Spiegeln());
 
-    private void Zeichnen_Click(object sender, System.EventArgs e) => SetTool(new Tool_Paint());
+    private void Zeichnen_Click(object sender, EventArgs e) => SetTool(new Tool_Paint());
 
     #endregion
 }

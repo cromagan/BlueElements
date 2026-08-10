@@ -58,7 +58,7 @@ public partial class Tool_Clipping {
         ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
-    private void btnAutoZ_Click(object sender, System.EventArgs? e) {
+    private void btnAutoZ_Click(object sender, EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
@@ -102,7 +102,7 @@ public partial class Tool_Clipping {
         }
     }
 
-    private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
+    private void ValueChangedByClicking(object sender, EventArgs e) => OnDoInvalidate();
 
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
@@ -110,7 +110,7 @@ public partial class Tool_Clipping {
         ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
-    private void ZuschnittOK_Click(object sender, System.EventArgs? e) {
+    private void ZuschnittOK_Click(object sender, EventArgs? e) {
         var pic = OnNeedCurrentPic();
         var bmp2 = CropStatic(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
         OnOverridePic(bmp2, true);

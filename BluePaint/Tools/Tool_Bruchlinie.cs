@@ -19,7 +19,7 @@ public partial class Tool_Bruchlinie {
 
     #region Methods
 
-    private void Bruch_Click(object sender, System.EventArgs e) {
+    private void Bruch_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
         var xRi = Convert.ToInt32(pic.Width / 10.0);

@@ -158,7 +158,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// die statische <c>ClassId</c>-Property des Zieltyps; <typeparamref name="T" />
     /// muss daher nur ein Referenztyp mit einer solchen Property sein (ein
     /// Bezug zu <see cref="ParseableItem" /> ist nicht erforderlich).
-    /// Die Typsuche ist über <see cref="Generic.GetTypeByClassId{T}" /> gecacht,
+    /// Die Typsuche ist über <see cref="GetTypeByClassId{T}" /> gecacht,
     /// sodass der Reflection-Zugriff auf <c>ClassId</c> nur einmal pro Target-Typ
     /// und Assembly-Generation erfolgt.
     /// </summary>

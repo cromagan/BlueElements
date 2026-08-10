@@ -124,7 +124,7 @@ public static class Generic {
             using var response = request.GetResponse();
             using var remoteStream = response.GetResponseStream();
             if (remoteStream is null) { return null; }
-            var ms = new System.IO.MemoryStream();
+            var ms = new MemoryStream();
             remoteStream.CopyTo(ms);
             ms.Position = 0;
             return Image.FromStream(ms);
@@ -161,7 +161,7 @@ public static class Generic {
         return dict;
     }
 
-    public static System.IO.Stream? GetEmmbedResource(Assembly? assembly, string name) {
+    public static Stream? GetEmmbedResource(Assembly? assembly, string name) {
         if (assembly is null) { return null; }
         if (string.IsNullOrEmpty(name)) { return null; }
 

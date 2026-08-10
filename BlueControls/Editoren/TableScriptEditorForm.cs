@@ -16,7 +16,7 @@ namespace BlueControls.BlueTableDialogs;
 /// Wird systemweit eindeutig pro Tabelle geöffnet
 /// (<see cref="IUniqueWindowExtension.ShowOrCreate{T}"/>).
 /// </summary>
-public sealed partial class TableScriptEditorForm : BlueControls.Forms.Form, IUniqueWindow {
+public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
 
     #region Fields
 

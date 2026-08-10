@@ -27,7 +27,7 @@ public partial class Tool_Screenshot {
         OnShowMainWindow();
     }
 
-    private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
+    private void NeuerScreenshot_Click(object sender, EventArgs e) {
         DoScreenShot();
         OnZoomFit();
     }

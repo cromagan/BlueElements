@@ -11,9 +11,9 @@ namespace BlueControls.Forms;
 /// Editor für eine einzelne <see cref="UniqueValueDefinition"/> (EditCopy). Die
 /// anzuzeigenden Elemente liefert die Backend-Collection
 /// <see cref="Table.UniqueValues"/> direkt als
-/// <see cref="Editoren.EditorForIEnumerable.InputItem"/>. Neue Definitionen
+/// <see cref="EditorForIEnumerable.InputItem"/>. Neue Definitionen
 /// erzeugt das hostende Form über das AddClicked-Event des
-/// <see cref="Editoren.EditorForIEnumerable"/>.
+/// <see cref="EditorForIEnumerable"/>.
 /// </summary>
 public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotifyPropertyChanged {
 

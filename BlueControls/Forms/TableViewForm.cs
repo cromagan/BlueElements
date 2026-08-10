@@ -1035,9 +1035,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CheckButtons(true);
     }
 
-    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.JsonEventArgs e) => OnViewLoading(sender, e);
+    private void Table_ViewLoading(object? sender, JsonEventArgs e) => OnViewLoading(sender, e);
 
-    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.JsonEventArgs e) {
+    private void Table_ViewSaving(object? sender, JsonEventArgs e) {
         if (IsDisposed) { return; }
 
         if (InvokeRequired) {

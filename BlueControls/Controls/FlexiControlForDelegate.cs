@@ -16,7 +16,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
     public FlexiControlForDelegate() : this(null, string.Empty, BlueBasics.Enums.ImageCode.Kreuz) { }
 
-    public FlexiControlForDelegate(DoThis? doThis, string text, BlueBasics.Enums.ImageCode image) : base() {
+    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() {
         Init(doThis, text, QuickImage.Get(image, 22));
     }
 

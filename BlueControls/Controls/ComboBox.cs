@@ -134,7 +134,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    /// <inheritdoc cref="Controls.ListBox.ItemPadding"/>
+    /// <inheritdoc cref="ListBox.ItemPadding"/>
     [DefaultValue(0)]
     public int ItemPadding { get; set; }
 

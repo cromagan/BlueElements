@@ -347,7 +347,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (Visible && Enabled) { RestartMarker(); }
     }
 
-    private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) {
+    private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) {
         if (AutoNext) { NextControl(e.Direction); }
     }
 

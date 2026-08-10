@@ -46,7 +46,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     private int _animExpandedY;
 
     private volatile bool _isAnimating;
-    private System.Windows.Forms.Control? _hookedParent;
+    private Control? _hookedParent;
 
     #endregion
 

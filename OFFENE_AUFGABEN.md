@@ -209,4 +209,8 @@ dauert ewig lange. Ich denke, das liegt an NewByTypeName.
 Kann man das irgendwie cachen? Also NewByTypeName global mit AssemblyAwareCache?
 Ich hab schon ein bisschen optimiert.
 
+## Aufgabe
+Prüfe die OnLoaded Logik von Tabellen.
+TableFragments wirft ein "First=false" (BeSureUptoDate) vor dem ersten echten Laden.
+Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 
