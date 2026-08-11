@@ -43,20 +43,22 @@ public static class InputFormatExtensions {
         t.TextFormatingAllowed = source.TextFormatingAllowed;
     }
 
-    public static bool IsFormat(this List<string> list, IInputFormat formatToCheck, bool valueRequired) => list.Exists(thisstring => !thisstring.IsFormat(formatToCheck, valueRequired));
-
-    public static bool IsFormat(this string txt, IInputFormat formatToCheck, bool valueRequired) {
-        if (!valueRequired && string.IsNullOrEmpty(txt)) { return true; }
-        return txt.IsFormat(formatToCheck);
-    }
+    public static bool IsFormat(this List<string> list, IInputFormat formatToCheck, bool valueRequired) => list.TrueForAll(thisstring => thisstring.IsFormat(formatToCheck, valueRequired, false));
 
     /// <summary>
     /// Prüft den Text, ob er mit dem geforderten Format (z.B. FormatHolder_Filepath.Instance) übereinstimmt
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="formatToCheck">z.B. FormatHolder_Filepath.Instance</param>
+    /// <param name="splitallowed"></param>
     /// <returns></returns>
-    public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
+    public static bool IsFormat(this string txt, IInputFormat formatToCheck, bool valueRequired, bool splitallowed) {
+        if (!valueRequired && string.IsNullOrEmpty(txt)) { return true; }
+
+        if (splitallowed && formatToCheck.MultiLine && txt.Contains('\r')) {
+            return txt.SplitByCr().ToList().IsFormat(formatToCheck, false);
+        }
+
         if (txt.Length > formatToCheck.MaxTextLength) { return false; }
 
         if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !txt.ContainsOnlyChars(formatToCheck.AllowedChars)) {

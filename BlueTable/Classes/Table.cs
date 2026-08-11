@@ -658,7 +658,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 var fn = string.Empty;
 
                 foreach (var thist in t) {
-                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
                         fn = thist;
                     }
                     if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
@@ -677,7 +677,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             // Reset + befüllen, damit nur die Pfade des aktuellen Aufrufs gelten.
             AdditionalSearchPathsOnThisThread.Clear();
 
-            if (file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+            if (file.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
                 AdditionalSearchPathsOnThisThread.AddIfNotExists(file.FilePath());
                 file = file.FileNameWithoutSuffix();
             }
@@ -751,7 +751,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (t.StartsWith("DATABASE", StringComparison.Ordinal)) { return false; }
         if (t.StartsWith("TABLE", StringComparison.Ordinal)) { return false; }
 
-        if (!tablename.IsFormat(FormatHolder_SystemName.Instance)) { return false; }
+        if (!tablename.IsFormat(FormatHolder_SystemName.Instance, true, false)) { return false; }
 
         if (t == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -1018,7 +1018,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (!string.IsNullOrEmpty(_assetFolder)) {
             var t = _assetFolder.NormalizePath();
-            if (t.IsFormat(FormatHolder_Filepath.Instance)) {
+            if (t.IsFormat(FormatHolder_Filepath.Instance, true, false)) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -1034,7 +1034,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
 
             t = t.NormalizePath();
-            if (t.IsFormat(FormatHolder_Filepath.Instance)) {
+            if (t.IsFormat(FormatHolder_Filepath.Instance, true, false)) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -2709,7 +2709,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         var folder = new List<string>(AdditionalSearchPathsOnThisThread);
 
         foreach (var thisTb in LiveInstances.Values) {
-            if (thisTb is TableFile { IsDisposed: false } tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+            if (thisTb is TableFile { IsDisposed: false } tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
                 folder.AddIfNotExists(tbf.Filename.FilePath());
             }
         }

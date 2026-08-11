@@ -1726,6 +1726,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         Invalidate();
     }
 
+    /// <summary>
+    /// Prüft, ob das angegebene Arrangement die Ansicht 0 ("Alle Spalten") ist.
+    /// In Ansicht 0 darf die Reihenfolge nicht verändert werden.
+    /// </summary>
+    internal bool IsAnsicht0(ColumnViewCollection ca) {
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (tb.ColumnArrangements.Count <= 0) { return false; }
+        return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);
+    }
+
     internal void RowCleanUp() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         var l = new RowCleanUp(this);
@@ -2735,7 +2745,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         #region Format prüfen
 
         if (formatWarnung) {
-            if (!newValue.IsFormat(contentHolderCellColumn, contentHolderCellColumn.ValueRequired)) {
+            if (!newValue.IsFormat(contentHolderCellColumn, contentHolderCellColumn.ValueRequired, contentHolderCellColumn.MultiLine)) {
                 if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
                     return "Abbruch, da das erwartete Format nicht eingehalten wurde.";
                 }
@@ -4778,16 +4788,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
         Invalidate_MaxBounds();
         Invalidate();
-    }
-
-    /// <summary>
-    /// Prüft, ob das angegebene Arrangement die Ansicht 0 ("Alle Spalten") ist.
-    /// In Ansicht 0 darf die Reihenfolge nicht verändert werden.
-    /// </summary>
-    internal bool IsAnsicht0(ColumnViewCollection ca) {
-        if (Table is not { IsDisposed: false } tb) { return false; }
-        if (tb.ColumnArrangements.Count <= 0) { return false; }
-        return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

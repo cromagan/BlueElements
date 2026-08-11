@@ -72,7 +72,7 @@ public static class IO {
 
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
 
         lock (_fileOperationLock) {
             if (_canWriteCache.TryGetValue(directory, out var cacheEntry) &&
@@ -951,7 +951,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         if (TryDirectoryExists(affectingFiles).Value is true) { return OperationResult.Success; }
 
@@ -1034,7 +1034,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directoryx) { return OperationResult.FailedInternalError; }
 
         var directory = directoryx.NormalizePath();
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         try {
             return new(Directory.Exists(directory));
@@ -1081,7 +1081,7 @@ public static class IO {
     private static OperationResult TryFileExists(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             return new(File.Exists(filename));
@@ -1233,7 +1233,7 @@ public static class IO {
     private static OperationResult TryReadAllBytes(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             // Prüfen ob Datei existiert

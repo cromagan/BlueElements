@@ -34,7 +34,7 @@ internal class Method_SaveImage : Method {
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
+        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         var opr = CanWriteInDirectory(filn.FilePath());
         if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true); }

@@ -56,7 +56,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
-        if (layoutFileName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        if (layoutFileName.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
             if (!IO.DirectoryExists(layoutFileName.FilePath())) {
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
@@ -680,20 +680,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public bool Contains(AbstractPadItem item) => _internal.Contains(item);
 
-    /// <inheritdoc />
-    /// <remarks>
-    /// Rekursive Überschreibung: Vergibt nicht nur für dieses Collection-Item,
-    /// sondern auch für alle Kinder (und deren Kinder ...) neue eindeutige IDs.
-    /// Sonst würden z. B. beim Duplizieren oder beim Erzeugen mehrerer Layouts
-    /// aus derselben Vorlage Items mit identischem KeyName entstehen.
-    /// </remarks>
-    internal override void GetNewIdsForEverything() {
-        base.GetNewIdsForEverything();
-        foreach (var child in new List<AbstractPadItem>(_internal)) {
-            child.GetNewIdsForEverything();
-        }
-    }
-
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 is not null) {
@@ -1228,6 +1214,20 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
         return null;
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Rekursive Überschreibung: Vergibt nicht nur für dieses Collection-Item,
+    /// sondern auch für alle Kinder (und deren Kinder ...) neue eindeutige IDs.
+    /// Sonst würden z. B. beim Duplizieren oder beim Erzeugen mehrerer Layouts
+    /// aus derselben Vorlage Items mit identischem KeyName entstehen.
+    /// </remarks>
+    internal override void GetNewIdsForEverything() {
+        base.GetNewIdsForEverything();
+        foreach (var child in new List<AbstractPadItem>(_internal)) {
+            child.GetNewIdsForEverything();
+        }
     }
 
     /// <summary>

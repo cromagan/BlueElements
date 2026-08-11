@@ -1355,6 +1355,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return result;
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         Invalidate_LinkedTable();
@@ -1394,6 +1396,132 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_value_for_Chunk != ChunkType.None) { return false; }
         if (_relationType == RelationType.DropDownValues) { return false; }
         return true;
+    }
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("key", _keyName);
+        json.Set("caption", _caption);
+        json.Set("captiongroup1", _captionGroup1);
+        json.Set("captiongroup2", _captionGroup2);
+        json.Set("captiongroup3", _captionGroup3);
+        json.Set("captionbitmapcode", _captionBitmapCode);
+        json.Set("quickinfo", _quickInfo);
+        json.Set("admininfo", _adminInfo);
+        json.Set("columnsysteminfo", _columnSystemInfo);
+        json.Set("columntags", _columnTags);
+        json.Set("defaultrenderer", _defaultRenderer);
+        json.Set("renderersettings", _rendererSettings);
+        json.Set("regexcheck", _regexCheck);
+        json.Set("allowedchars", _allowedChars);
+        json.Set("autofilterjoker", _autoFilterJoker);
+        json.Set("columnkeyoflinkedtable", _columnKeyOfLinkedTable);
+        json.Set("linkedtabletablename", _linkedTableTableName);
+        json.Set("linestyleleft", (int)_lineStyleLeft);
+        json.Set("linestyleright", (int)_lineStyleRight);
+        json.Set("align", (int)_align);
+        json.Set("backgroundstyle", (int)_backgroundStyle);
+        json.Set("sorttype", (int)_sortType);
+        json.Set("scripttype", (int)_scriptType);
+        json.Set("additionalformatcheck", (int)_additionalFormatCheck);
+        json.Set("filteroptions", (int)_filterOptions);
+        json.Set("relationtype", (int)_relationType);
+        json.Set("value_for_chunk", (int)_value_for_Chunk);
+        json.Set("doopticaltranslation", (int)_doOpticalTranslation);
+        json.Set("forecolor", _foreColor.ToArgb());
+        json.Set("backcolor", _backColor.ToArgb());
+        json.Set("multiline", _multiLine);
+        json.Set("isfirst", _isFirst);
+        json.Set("iskeycolumn", _isKeyColumn);
+        json.Set("relationship_to_first", _relationship_to_First);
+        json.Set("ignoreatrowfilter", _ignoreAtRowFilter);
+        json.Set("editablewithdropdown", _editableWithDropdown);
+        json.Set("editablewithtextinput", _editableWithTextInput);
+        json.Set("editalloweddespitelock", _editAllowedDespiteLock);
+        json.Set("valuerequired", _valueRequired);
+        json.Set("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
+        json.Set("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
+        json.Set("aftereditround", _afterEditRound);
+        json.Set("aftereditautocorrect", _afterEditAutoCorrect);
+        json.Set("aftereditdoucase", _afterEditDoUCase);
+        json.Set("aftereditautoremovechar", _afterEditAutoRemoveChar);
+        json.Set("textformatingallowed", _textFormatingAllowed);
+        json.Set("savecontent", _saveContent);
+        json.Set("spellcheckingenabled", _spellCheckingEnabled);
+        json.Set("fixedcolumnwidth", _fixedColumnWidth);
+        json.Set("maxtextlength", _maxTextLength);
+        json.Set("maxcelllength", _maxCellLength);
+        json.SetArrayIfNotEmpty("aftereditautoreplace", _afterEditAutoReplace);
+        json.SetArrayIfNotEmpty("dropdownitems", _dropDownItems);
+        json.SetArrayIfNotEmpty("linkedcellfilter", _linkedCellFilter);
+        json.SetArrayIfNotEmpty("permissiongroupschangecell", _permissionGroupsChangeCell);
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonObject parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { _keyName = s.ToUpperInvariant(); }
+        _caption = json.GetString("caption", _caption);
+        _captionGroup1 = json.GetString("captiongroup1", _captionGroup1);
+        _captionGroup2 = json.GetString("captiongroup2", _captionGroup2);
+        _captionGroup3 = json.GetString("captiongroup3", _captionGroup3);
+        _captionBitmapCode = json.GetString("captionbitmapcode", _captionBitmapCode);
+        _quickInfo = json.GetString("quickinfo", _quickInfo);
+        _adminInfo = json.GetString("admininfo", _adminInfo);
+        _columnSystemInfo = json.GetString("columnsysteminfo", _columnSystemInfo);
+        _columnTags = json.GetString("columntags", _columnTags);
+        _defaultRenderer = json.GetString("defaultrenderer", _defaultRenderer);
+        _rendererSettings = json.GetString("renderersettings", _rendererSettings);
+        _regexCheck = json.GetString("regexcheck", _regexCheck);
+        _allowedChars = json.GetString("allowedchars", _allowedChars);
+        _autoFilterJoker = json.GetString("autofilterjoker", _autoFilterJoker);
+        _columnKeyOfLinkedTable = json.GetString("columnkeyoflinkedtable", _columnKeyOfLinkedTable);
+        _linkedTableTableName = json.GetString("linkedtabletablename", _linkedTableTableName);
+        _lineStyleLeft = json.GetEnum("linestyleleft", _lineStyleLeft);
+        _lineStyleRight = json.GetEnum("linestyleright", _lineStyleRight);
+        _align = json.GetEnum("align", _align);
+        _backgroundStyle = json.GetEnum("backgroundstyle", _backgroundStyle);
+        _sortType = json.GetEnum("sorttype", _sortType);
+        _scriptType = json.GetEnum("scripttype", _scriptType);
+        _additionalFormatCheck = json.GetEnum("additionalformatcheck", _additionalFormatCheck);
+        _filterOptions = json.GetEnum("filteroptions", _filterOptions);
+        _relationType = json.GetEnum("relationtype", _relationType);
+        _value_for_Chunk = json.GetEnum("value_for_chunk", _value_for_Chunk);
+        _doOpticalTranslation = json.GetEnum("doopticaltranslation", _doOpticalTranslation);
+        if (json.GetInt("forecolor", -1) is { } fc && fc >= 0) { _foreColor = Color.FromArgb(fc); }
+        if (json.GetInt("backcolor", -1) is { } bc && bc >= 0) { _backColor = Color.FromArgb(bc); }
+        _multiLine = json.GetBool("multiline", _multiLine);
+        _isFirst = json.GetBool("isfirst", _isFirst);
+        _isKeyColumn = json.GetBool("iskeycolumn", _isKeyColumn);
+        _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
+        _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
+        _editableWithDropdown = json.GetBool("editablewithdropdown", _editableWithDropdown);
+        _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
+        _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
+        _valueRequired = json.GetBool("valuerequired", _valueRequired);
+        _showValuesOfOtherCellsInDropdown = json.GetBool("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
+        _afterEditQuickSortRemoveDouble = json.GetBool("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
+        _afterEditRound = json.GetInt("aftereditround", _afterEditRound);
+        _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
+        _afterEditDoUCase = json.GetBool("aftereditdoucase", _afterEditDoUCase);
+        _afterEditAutoRemoveChar = json.GetString("aftereditautoremovechar", _afterEditAutoRemoveChar);
+        _textFormatingAllowed = json.GetBool("textformatingallowed", _textFormatingAllowed);
+        _saveContent = json.GetBool("savecontent", _saveContent);
+        _spellCheckingEnabled = json.GetBool("spellcheckingenabled", _spellCheckingEnabled);
+        _fixedColumnWidth = json.GetInt("fixedcolumnwidth", _fixedColumnWidth);
+        _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
+        _maxCellLength = json.GetInt("maxcelllength", _maxCellLength);
+
+        if (json["aftereditautoreplace"] is JsonArray aer) { _afterEditAutoReplace.Clear(); _afterEditAutoReplace.AddRange(aer.ToStringList()); }
+        if (json["dropdownitems"] is JsonArray ddi) { _dropDownItems.Clear(); _dropDownItems.AddRange(ddi.ToStringList()); }
+        if (json["linkedcellfilter"] is JsonArray lcf) { _linkedCellFilter.Clear(); _linkedCellFilter.AddRange(lcf.ToStringList()); }
+        if (json["permissiongroupschangecell"] is JsonArray pgcc) { _permissionGroupsChangeCell.Clear(); _permissionGroupsChangeCell.AddRange(pgcc.ToStringList()); }
     }
 
     public string ReadableText() {
@@ -2250,7 +2378,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.ColumnKeyOfLinkedTable:
 
-                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder_Long.Instance) ? string.Empty : value;
+                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder_Long.Instance, true, false) ? string.Empty : value;
 
                 break;
 
@@ -2351,7 +2479,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            OnDisposed(); 
+            OnDisposed();
             Disposed = null;
             PropertyChanged = null;
             PropertyChangedExt = null;
@@ -2607,134 +2735,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("key", _keyName);
-        json.Set("caption", _caption);
-        json.Set("captiongroup1", _captionGroup1);
-        json.Set("captiongroup2", _captionGroup2);
-        json.Set("captiongroup3", _captionGroup3);
-        json.Set("captionbitmapcode", _captionBitmapCode);
-        json.Set("quickinfo", _quickInfo);
-        json.Set("admininfo", _adminInfo);
-        json.Set("columnsysteminfo", _columnSystemInfo);
-        json.Set("columntags", _columnTags);
-        json.Set("defaultrenderer", _defaultRenderer);
-        json.Set("renderersettings", _rendererSettings);
-        json.Set("regexcheck", _regexCheck);
-        json.Set("allowedchars", _allowedChars);
-        json.Set("autofilterjoker", _autoFilterJoker);
-        json.Set("columnkeyoflinkedtable", _columnKeyOfLinkedTable);
-        json.Set("linkedtabletablename", _linkedTableTableName);
-        json.Set("linestyleleft", (int)_lineStyleLeft);
-        json.Set("linestyleright", (int)_lineStyleRight);
-        json.Set("align", (int)_align);
-        json.Set("backgroundstyle", (int)_backgroundStyle);
-        json.Set("sorttype", (int)_sortType);
-        json.Set("scripttype", (int)_scriptType);
-        json.Set("additionalformatcheck", (int)_additionalFormatCheck);
-        json.Set("filteroptions", (int)_filterOptions);
-        json.Set("relationtype", (int)_relationType);
-        json.Set("value_for_chunk", (int)_value_for_Chunk);
-        json.Set("doopticaltranslation", (int)_doOpticalTranslation);
-        json.Set("forecolor", _foreColor.ToArgb());
-        json.Set("backcolor", _backColor.ToArgb());
-        json.Set("multiline", _multiLine);
-        json.Set("isfirst", _isFirst);
-        json.Set("iskeycolumn", _isKeyColumn);
-        json.Set("relationship_to_first", _relationship_to_First);
-        json.Set("ignoreatrowfilter", _ignoreAtRowFilter);
-        json.Set("editablewithdropdown", _editableWithDropdown);
-        json.Set("editablewithtextinput", _editableWithTextInput);
-        json.Set("editalloweddespitelock", _editAllowedDespiteLock);
-        json.Set("valuerequired", _valueRequired);
-        json.Set("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
-        json.Set("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
-        json.Set("aftereditround", _afterEditRound);
-        json.Set("aftereditautocorrect", _afterEditAutoCorrect);
-        json.Set("aftereditdoucase", _afterEditDoUCase);
-        json.Set("aftereditautoremovechar", _afterEditAutoRemoveChar);
-        json.Set("textformatingallowed", _textFormatingAllowed);
-        json.Set("savecontent", _saveContent);
-        json.Set("spellcheckingenabled", _spellCheckingEnabled);
-        json.Set("fixedcolumnwidth", _fixedColumnWidth);
-        json.Set("maxtextlength", _maxTextLength);
-        json.Set("maxcelllength", _maxCellLength);
-        json.SetArrayIfNotEmpty("aftereditautoreplace", _afterEditAutoReplace);
-        json.SetArrayIfNotEmpty("dropdownitems", _dropDownItems);
-        json.SetArrayIfNotEmpty("linkedcellfilter", _linkedCellFilter);
-        json.SetArrayIfNotEmpty("permissiongroupschangecell", _permissionGroupsChangeCell);
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { _keyName = s.ToUpperInvariant(); }
-        _caption = json.GetString("caption", _caption);
-        _captionGroup1 = json.GetString("captiongroup1", _captionGroup1);
-        _captionGroup2 = json.GetString("captiongroup2", _captionGroup2);
-        _captionGroup3 = json.GetString("captiongroup3", _captionGroup3);
-        _captionBitmapCode = json.GetString("captionbitmapcode", _captionBitmapCode);
-        _quickInfo = json.GetString("quickinfo", _quickInfo);
-        _adminInfo = json.GetString("admininfo", _adminInfo);
-        _columnSystemInfo = json.GetString("columnsysteminfo", _columnSystemInfo);
-        _columnTags = json.GetString("columntags", _columnTags);
-        _defaultRenderer = json.GetString("defaultrenderer", _defaultRenderer);
-        _rendererSettings = json.GetString("renderersettings", _rendererSettings);
-        _regexCheck = json.GetString("regexcheck", _regexCheck);
-        _allowedChars = json.GetString("allowedchars", _allowedChars);
-        _autoFilterJoker = json.GetString("autofilterjoker", _autoFilterJoker);
-        _columnKeyOfLinkedTable = json.GetString("columnkeyoflinkedtable", _columnKeyOfLinkedTable);
-        _linkedTableTableName = json.GetString("linkedtabletablename", _linkedTableTableName);
-        _lineStyleLeft = json.GetEnum("linestyleleft", _lineStyleLeft);
-        _lineStyleRight = json.GetEnum("linestyleright", _lineStyleRight);
-        _align = json.GetEnum("align", _align);
-        _backgroundStyle = json.GetEnum("backgroundstyle", _backgroundStyle);
-        _sortType = json.GetEnum("sorttype", _sortType);
-        _scriptType = json.GetEnum("scripttype", _scriptType);
-        _additionalFormatCheck = json.GetEnum("additionalformatcheck", _additionalFormatCheck);
-        _filterOptions = json.GetEnum("filteroptions", _filterOptions);
-        _relationType = json.GetEnum("relationtype", _relationType);
-        _value_for_Chunk = json.GetEnum("value_for_chunk", _value_for_Chunk);
-        _doOpticalTranslation = json.GetEnum("doopticaltranslation", _doOpticalTranslation);
-        if (json.GetInt("forecolor", -1) is { } fc && fc >= 0) { _foreColor = Color.FromArgb(fc); }
-        if (json.GetInt("backcolor", -1) is { } bc && bc >= 0) { _backColor = Color.FromArgb(bc); }
-        _multiLine = json.GetBool("multiline", _multiLine);
-        _isFirst = json.GetBool("isfirst", _isFirst);
-        _isKeyColumn = json.GetBool("iskeycolumn", _isKeyColumn);
-        _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
-        _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
-        _editableWithDropdown = json.GetBool("editablewithdropdown", _editableWithDropdown);
-        _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
-        _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
-        _valueRequired = json.GetBool("valuerequired", _valueRequired);
-        _showValuesOfOtherCellsInDropdown = json.GetBool("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
-        _afterEditQuickSortRemoveDouble = json.GetBool("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
-        _afterEditRound = json.GetInt("aftereditround", _afterEditRound);
-        _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
-        _afterEditDoUCase = json.GetBool("aftereditdoucase", _afterEditDoUCase);
-        _afterEditAutoRemoveChar = json.GetString("aftereditautoremovechar", _afterEditAutoRemoveChar);
-        _textFormatingAllowed = json.GetBool("textformatingallowed", _textFormatingAllowed);
-        _saveContent = json.GetBool("savecontent", _saveContent);
-        _spellCheckingEnabled = json.GetBool("spellcheckingenabled", _spellCheckingEnabled);
-        _fixedColumnWidth = json.GetInt("fixedcolumnwidth", _fixedColumnWidth);
-        _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
-        _maxCellLength = json.GetInt("maxcelllength", _maxCellLength);
-
-        if (json["aftereditautoreplace"] is JsonArray aer) { _afterEditAutoReplace.Clear(); _afterEditAutoReplace.AddRange(aer.ToStringList()); }
-        if (json["dropdownitems"] is JsonArray ddi) { _dropDownItems.Clear(); _dropDownItems.AddRange(ddi.ToStringList()); }
-        if (json["linkedcellfilter"] is JsonArray lcf) { _linkedCellFilter.Clear(); _linkedCellFilter.AddRange(lcf.ToStringList()); }
-        if (json["permissiongroupschangecell"] is JsonArray pgcc) { _permissionGroupsChangeCell.Clear(); _permissionGroupsChangeCell.AddRange(pgcc.ToStringList()); }
-    }
 
     #endregion
 

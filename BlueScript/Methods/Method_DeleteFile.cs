@@ -32,7 +32,7 @@ internal class Method_DeleteFile : Method {
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
         foreach (var filn in files) {
-            if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+            if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
                 return new DoItFeedback("Dateinamen-Fehler!", true);
             }
 

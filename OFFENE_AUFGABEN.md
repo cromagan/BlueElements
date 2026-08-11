@@ -214,4 +214,47 @@ Prüfe die OnLoaded Logik von Tabellen.
 TableFragments wirft ein "First=false" (BeSureUptoDate) vor dem ersten echten Laden.
 Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 
+## Aufgabe
+Ändere ich ein Skript, weil es fehlerhaft war, wird in TableViewForm die Aufgabenbox nicht aktualisiert
+
+## Aufgabe
+Entferne ich den Fehler im EventScriptEditor, wird das ListItem nicht aktualisiert
+
+## Aufgabe
+IsFormat soll anstelle von bool einen STRING zurückgeben, WAS der GRund ist.
+UserEdited in Tablview soll diese Info anzeigen.
+IInputFormat muss erweitert werden mit MinTextLength und die überladungen mit von IsFormat mit valueRequired entfernt werden.
+ColumnItem muss ebenfalls _valueRequired durch MinTextLength ersetzt werden. Als neues Feld, _valueRequired wird gelesen und bei True MinTextLength gesetzt.  Aber nur noch MinTextLength gespeichert.
+Genau so muss IInputFormat sowas wie vorbiddenChars bekommen, dass dann _afterEditAutoRemoveChar ersetzt.
+IsFormat muss dass dann prüfen, aber ColiumnItem nimmt es trotzdem her zum löschen. Wichtig: \r usw. muss ebenfalls funktionieren. 
+
+Dann alle Formate anpassen.
+
+
+## Aufgabe
+Mache aus dem hier: 
+IsFormat(FormatHolder_FilepathAndName.Instance, 
+IsFormat(FormatHolder_Filepath.Instance
+Schnelle neue Metjoden in IO. Sowas wie: IsValidFilePath und IsValidFilepathAndName
+
+## Aufgabe
+Prüfe alle LINQ, ob Exists RICHTIG ist und ob evtl.TrueForAll oder FalseForAll benutzt werden sollte.
+
+## Aufgabe
+Verändere ich den Wert, der für eine Verlinkte Zelle zuständig ist, ändert sich der Verlinkte wert nicht.
+Aufgefallen, wenn die Zeile des neuen Wertes nicht existiert.
+
+## Aufgabe
+Mache einen neuen Renderer für ZELLEN.
+Texte normal darstellen.
+AUSSER die Zeile beginnt mit "CaptionStartSequence"
+Beginnt eine der Mehrzeilingen Einträgge mit der Sequenz, wird es als Überschrift dargestellt
+
+Dann baue noch einen replace ein, der eine Sequenze entfernt und wie Tab behandelt. Evtl. kann das mit extText gelöst werden.
+
+## Aufgabe
+EventScript, werden die TableHead-Variablen richtig zurückgeschrieben?
+
+
+
 

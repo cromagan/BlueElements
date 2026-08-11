@@ -99,7 +99,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         r.CellSet("Table", db.Caption, string.Empty);
 
-        if (work.Container.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        if (work.Container.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
             r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
         }
 

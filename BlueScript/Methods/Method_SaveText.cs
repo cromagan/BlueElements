@@ -25,7 +25,7 @@ internal class Method_SaveText : Method {
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
+        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         var pf = filn.PathParent();
         var opr = CanWriteInDirectory(pf);

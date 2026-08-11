@@ -187,7 +187,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
     public void AddTabPage(string tablename) {
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -294,7 +294,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     protected static void ChangeTableInTab(string tablename, TabPage? tabpage, JsonObject? settings) {
         if (tabpage is null) { return; }
 
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -476,7 +476,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         FormManager.SaveAllFiles();
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
             Table.Get(tablename);
             tablename = tablename.FileNameWithoutSuffix();
         }
