@@ -55,8 +55,8 @@ public class FlexiControlForDelegate : FlexiControl {
         base.OnControlAdded(e);
     }
 
-    protected override void OnExecuteComand() {
-        base.OnExecuteComand();
+    protected override void OnExecuteCommand () {
+        base.OnExecuteCommand ();
         _doThis?.Invoke();
     }
 

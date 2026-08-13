@@ -36,8 +36,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private bool _afterEditAutoCorrect;
 
-    private string _afterEditAutoRemoveChar;
-
     private bool _afterEditDoUCase;
 
     private bool _afterEditQuickSortRemoveDouble;
@@ -81,6 +79,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _editAllowedDespiteLock;
     private FilterOptions _filterOptions;
     private int _fixedColumnWidth;
+    private string _forbiddenChars;
     private Color _foreColor;
     private bool _ignoreAtRowFilter;
     private volatile int _isDisposedFlag;
@@ -98,6 +97,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string _linkedTableTableName;
     private int _maxCellLength;
     private int _maxTextLength;
+    private int _minTextLength;
     private bool _multiLine;
     private string _quickInfo;
     private string _regexCheck = string.Empty;
@@ -111,7 +111,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _spellCheckingEnabled;
     private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
-    private bool _valueRequired;
 
     #endregion
 
@@ -165,6 +164,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _defaultRenderer = string.Empty;
         _rendererSettings = string.Empty;
         _maxTextLength = 4000;
+        _minTextLength = 0;
         _maxCellLength = 4000;
         //ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
@@ -174,7 +174,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //_AutoFilterErweitertErlaubt = true;
         _ignoreAtRowFilter = false;
         _editableWithDropdown = false;
-        _valueRequired = false;
         _editableWithTextInput = false;
         _showValuesOfOtherCellsInDropdown = false;
         _afterEditQuickSortRemoveDouble = false;
@@ -185,7 +184,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _textFormatingAllowed = false;
         _additionalFormatCheck = AdditionalCheck.None;
         _scriptType = ScriptType.undefiniert;
-        _afterEditAutoRemoveChar = string.Empty;
+        _forbiddenChars = string.Empty;
         _autoFilterJoker = string.Empty;
         _saveContent = true;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
@@ -255,17 +254,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditAutoCorrect == value) { return; }
 
             Table?.ChangeData(TableDataType.AutoCorrectAfterEdit, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus());
-            OnPropertyChanged();
-        }
-    }
-
-    public string AfterEditAutoRemoveChar {
-        get => _afterEditAutoRemoveChar;
-        set {
-            if (IsDisposed) { return; }
-            if (_afterEditAutoRemoveChar == value) { return; }
-
-            Table?.ChangeData(TableDataType.AfterEditAutoRemoveChar, this, _afterEditAutoRemoveChar, value);
             OnPropertyChanged();
         }
     }
@@ -401,6 +389,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         get => _captionGroup1;
         set {
             if (IsDisposed) { return; }
+            value = value.RemoveChars("\r\n").Trim();
             if (_captionGroup1 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup1, this, _captionGroup1, value);
@@ -412,6 +401,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         get => _captionGroup2;
         set {
             if (IsDisposed) { return; }
+            value = value.RemoveChars("\r\n").Trim();
             if (_captionGroup2 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup2, this, _captionGroup2, value);
@@ -423,6 +413,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         get => _captionGroup3;
         set {
             if (IsDisposed) { return; }
+            value = value.RemoveChars("\r\n").Trim();
             if (_captionGroup3 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup3, this, _captionGroup3, value);
@@ -563,6 +554,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    public string ForbiddenChars {
+        get => _forbiddenChars;
+        set {
+            if (IsDisposed) { return; }
+            if (_forbiddenChars == value) { return; }
+
+            Table?.ChangeData(TableDataType.ForbiddenChars, this, _forbiddenChars, value);
+            OnPropertyChanged();
+        }
+    }
+
     public Color ForeColor {
         get => _foreColor;
         set {
@@ -580,7 +582,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditAutoCorrect) { return true; }
             if (_afterEditAutoReplace.Count > 0) { return true; }
             if (_afterEditDoUCase) { return true; }
-            if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { return true; }
+            if (_forbiddenChars is { Length: > 0 }) { return true; }
             if (_afterEditRound > -1) { return true; }
             if (_textFormatingAllowed) { return true; }
 
@@ -751,6 +753,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_maxTextLength == value) { return; }
             Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString1(), value.ToString1());
+            OnPropertyChanged();
+        }
+    }
+
+    public int MinTextLength {
+        get => _minTextLength;
+        set {
+            if (IsDisposed) { return; }
+            if (_minTextLength == value) { return; }
+
+            Table?.ChangeData(TableDataType.MinTextLength, this, _minTextLength.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -968,17 +981,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public bool ValueRequired {
-        get => _valueRequired;
-        set {
-            if (IsDisposed) { return; }
-            if (_valueRequired == value) { return; }
-
-            Table?.ChangeData(TableDataType.ValueRequired, this, _valueRequired.ToPlusMinus(), value.ToPlusMinus());
-            OnPropertyChanged();
-        }
-    }
-
     #endregion
 
     #region Methods
@@ -1097,7 +1099,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
 
-        if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { value = value.RemoveChars(_afterEditAutoRemoveChar); }
+        if (_forbiddenChars is { Length: > 0 }) { value = value.RemoveChars(_forbiddenChars); }
 
         if (_textFormatingAllowed) { value = value.CreateHtmlCodes(); }
 
@@ -1300,7 +1302,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (SortType is SortierTyp.Datum_Uhrzeit) { return "01.01.1900 00:00:00"; }
 
-        if (!ValueRequired) { return string.Empty; }
+        if (_minTextLength < 1) { return string.Empty; }
 
         return "-";
     }
@@ -1443,13 +1445,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("editablewithdropdown", _editableWithDropdown);
         json.Set("editablewithtextinput", _editableWithTextInput);
         json.Set("editalloweddespitelock", _editAllowedDespiteLock);
-        json.Set("valuerequired", _valueRequired);
+        json.Set("mintextlength", _minTextLength);
         json.Set("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
         json.Set("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
         json.Set("aftereditround", _afterEditRound);
         json.Set("aftereditautocorrect", _afterEditAutoCorrect);
         json.Set("aftereditdoucase", _afterEditDoUCase);
-        json.Set("aftereditautoremovechar", _afterEditAutoRemoveChar);
+        json.Set("forbiddenchars", _forbiddenChars);
         json.Set("textformatingallowed", _textFormatingAllowed);
         json.Set("savecontent", _saveContent);
         json.Set("spellcheckingenabled", _spellCheckingEnabled);
@@ -1468,9 +1470,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public void ParseJson(JsonObject json) {
         if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { _keyName = s.ToUpperInvariant(); }
         _caption = json.GetString("caption", _caption);
-        _captionGroup1 = json.GetString("captiongroup1", _captionGroup1);
-        _captionGroup2 = json.GetString("captiongroup2", _captionGroup2);
-        _captionGroup3 = json.GetString("captiongroup3", _captionGroup3);
+        _captionGroup1 = json.GetString("captiongroup1", _captionGroup1).RemoveChars("\r\n").Trim();
+        _captionGroup2 = json.GetString("captiongroup2", _captionGroup2).RemoveChars("\r\n").Trim();
+        _captionGroup3 = json.GetString("captiongroup3", _captionGroup3).RemoveChars("\r\n").Trim();
         _captionBitmapCode = json.GetString("captionbitmapcode", _captionBitmapCode);
         _quickInfo = json.GetString("quickinfo", _quickInfo);
         _adminInfo = json.GetString("admininfo", _adminInfo);
@@ -1479,7 +1481,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _defaultRenderer = json.GetString("defaultrenderer", _defaultRenderer);
         _rendererSettings = json.GetString("renderersettings", _rendererSettings);
         _regexCheck = json.GetString("regexcheck", _regexCheck);
-        _allowedChars = json.GetString("allowedchars", _allowedChars);
+        _allowedChars = json.GetString("allowedchars", _allowedChars).DistinctCharsSorted();
         _autoFilterJoker = json.GetString("autofilterjoker", _autoFilterJoker);
         _columnKeyOfLinkedTable = json.GetString("columnkeyoflinkedtable", _columnKeyOfLinkedTable);
         _linkedTableTableName = json.GetString("linkedtabletablename", _linkedTableTableName);
@@ -1494,8 +1496,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _relationType = json.GetEnum("relationtype", _relationType);
         _value_for_Chunk = json.GetEnum("value_for_chunk", _value_for_Chunk);
         _doOpticalTranslation = json.GetEnum("doopticaltranslation", _doOpticalTranslation);
-        if (json.GetInt("forecolor", -1) is { } fc && fc >= 0) { _foreColor = Color.FromArgb(fc); }
-        if (json.GetInt("backcolor", -1) is { } bc && bc >= 0) { _backColor = Color.FromArgb(bc); }
+        _foreColor = json.GetColor("forecolor", _foreColor);
+        _backColor = json.GetColor("backcolor", _backColor);
         _multiLine = json.GetBool("multiline", _multiLine);
         _isFirst = json.GetBool("isfirst", _isFirst);
         _isKeyColumn = json.GetBool("iskeycolumn", _isKeyColumn);
@@ -1504,13 +1506,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _editableWithDropdown = json.GetBool("editablewithdropdown", _editableWithDropdown);
         _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
         _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
-        _valueRequired = json.GetBool("valuerequired", _valueRequired);
+        _minTextLength = json.GetInt("mintextlength", 0);
+
         _showValuesOfOtherCellsInDropdown = json.GetBool("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
         _afterEditQuickSortRemoveDouble = json.GetBool("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
         _afterEditRound = json.GetInt("aftereditround", _afterEditRound);
         _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
         _afterEditDoUCase = json.GetBool("aftereditdoucase", _afterEditDoUCase);
-        _afterEditAutoRemoveChar = json.GetString("aftereditautoremovechar", _afterEditAutoRemoveChar);
+        _forbiddenChars = json.GetString("forbiddenchars", string.Empty).DistinctCharsSorted();
         _textFormatingAllowed = json.GetBool("textformatingallowed", _textFormatingAllowed);
         _saveContent = json.GetBool("savecontent", _saveContent);
         _spellCheckingEnabled = json.GetBool("spellcheckingenabled", _spellCheckingEnabled);
@@ -1518,10 +1521,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
         _maxCellLength = json.GetInt("maxcelllength", _maxCellLength);
 
-        if (json["aftereditautoreplace"] is JsonArray aer) { _afterEditAutoReplace.Clear(); _afterEditAutoReplace.AddRange(aer.ToStringList()); }
-        if (json["dropdownitems"] is JsonArray ddi) { _dropDownItems.Clear(); _dropDownItems.AddRange(ddi.ToStringList()); }
-        if (json["linkedcellfilter"] is JsonArray lcf) { _linkedCellFilter.Clear(); _linkedCellFilter.AddRange(lcf.ToStringList()); }
-        if (json["permissiongroupschangecell"] is JsonArray pgcc) { _permissionGroupsChangeCell.Clear(); _permissionGroupsChangeCell.AddRange(pgcc.ToStringList()); }
+        _afterEditAutoReplace.Clear();
+        _afterEditAutoReplace.AddRange(json.GetListString("aftereditautoreplace", null));
+        _dropDownItems.Clear();
+        _dropDownItems.AddRange(json.GetListString("dropdownitems", null));
+        _linkedCellFilter.Clear();
+        _linkedCellFilter.AddRange(json.GetListString("linkedcellfilter", null));
+        _permissionGroupsChangeCell.Clear();
+        _permissionGroupsChangeCell.AddRange(json.GetListString("permissiongroupschangecell", null));
     }
 
     public string ReadableText() {
@@ -1643,15 +1650,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (MaxCellLength < MaxTextLength) { MaxCellLength = MaxTextLength; }
 
-        PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
-
-        _valueRequired = false;
-
-        if (_scriptType is ScriptType.Bool or ScriptType.Numeral) {
-            _valueRequired = true;
+        // Bei einzeiligen Spalten Zeilenumbrüche automatisch verbieten
+        if (!_multiLine) {
+            _forbiddenChars = (_forbiddenChars + "\r\n").DistinctCharsSorted();
         }
 
-        if (_isFirst) { _valueRequired = true; }
+        PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
+
+        _minTextLength = 0;
+
+        if (_scriptType is ScriptType.Bool or ScriptType.Numeral) {
+            _minTextLength = 1;
+        }
+
+        if (_isFirst) { _minTextLength = 1; }
 
         ResetSystemToDefault(false);
         CheckIfIAmAKeyColumn();
@@ -1675,7 +1687,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         switch (_keyName) {
             case SystemColumnKeys.Creator:
-                _valueRequired = true;
+                _minTextLength = 1;
                 _isFirst = false;
                 _maxTextLength = 20;
                 _maxCellLength = 20;
@@ -1692,7 +1704,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Changer:
-                _valueRequired = true;
+                _minTextLength = 1;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1716,22 +1728,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case SystemColumnKeys.Chapter_Obsolete:
                 KeyName = "CHAPTER";
-                _valueRequired = false;
-
-                //_multiLine = true;
-
-                //if (setOpticalToo) {
-                //    Caption = "Kapitel";
-                //    ForeColor = Color.FromArgb(0, 0, 0);
-                //    BackColor = Color.FromArgb(255, 255, 150);
-                //    LineStyleLeft = ColumnLineStyle.Dick;
-                //}
                 break;
 
             case SystemColumnKeys.DateCreated:
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                _valueRequired = true;
+                _minTextLength = 19;
 
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
@@ -1746,7 +1748,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.RowKey:
-                _valueRequired = true;
+                _minTextLength = 5;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _editableWithTextInput = false;
@@ -1773,7 +1775,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                _valueRequired = false;
+                _minTextLength = 0;
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {
@@ -1791,7 +1793,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 KeyName = "ROWCOLOROLD";
                 Caption = "LÖSCHEN";
                 AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
-                _valueRequired = false;
                 break;
 
             case SystemColumnKeys.DateChanged:
@@ -1802,7 +1803,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                _valueRequired = true;
+                _minTextLength = 19;
 
                 this.GetStyleFrom(FormatHolder_DateTimeWithMilliSeconds.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
@@ -1822,7 +1823,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Correct:
-                _valueRequired = true;
+                _minTextLength = 1;
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -1857,7 +1858,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.CellNote:
-                _valueRequired = false;
+                _minTextLength = 0;
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -1883,7 +1884,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Locked:
-                _valueRequired = true;
+                _minTextLength = 1;
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -1916,7 +1917,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.RowSortIndex:
-                _valueRequired = true;
+                _minTextLength = 1;
                 _isFirst = false;
                 _isKeyColumn = false;
                 _relationship_to_First = false;
@@ -2195,15 +2196,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.CaptionGroup1:
-                _captionGroup1 = value;
+                _captionGroup1 = value.RemoveChars("\r\n").Trim();
                 break;
 
             case TableDataType.CaptionGroup2:
-                _captionGroup2 = value;
+                _captionGroup2 = value.RemoveChars("\r\n").Trim();
                 break;
 
             case TableDataType.CaptionGroup3:
-                _captionGroup3 = value;
+                _captionGroup3 = value.RemoveChars("\r\n").Trim();
                 break;
 
             case TableDataType.MultiLine:
@@ -2254,7 +2255,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.AllowedChars:
-                _allowedChars = value;
+                _allowedChars = value.DistinctCharsSorted();
                 break;
 
             case TableDataType.MaxTextLength:
@@ -2295,7 +2296,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.ValueRequired:
-                _valueRequired = value.FromPlusMinus();
+                // Migration: altes bool → MinTextLength
+                _minTextLength = value.FromPlusMinus() ? 1 : 0;
+                break;
+
+            case TableDataType.MinTextLength:
+                _minTextLength = IntParse(value);
                 break;
 
             case TableDataType.ShowValuesOfOtherCellsInDropdown:
@@ -2326,8 +2332,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _afterEditAutoCorrect = value.FromPlusMinus();
                 break;
 
-            case TableDataType.AfterEditAutoRemoveChar:
-                _afterEditAutoRemoveChar = value;
+            case TableDataType.ForbiddenChars:
+                _forbiddenChars = value.DistinctCharsSorted();
                 break;
 
             case TableDataType.ColumnAdminInfo:
@@ -2378,7 +2384,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.ColumnKeyOfLinkedTable:
 
-                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder_Long.Instance, true, false) ? string.Empty : value;
+                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder_Long.Instance, false) is { Length: > 0 } ? value : string.Empty;
 
                 break;
 
@@ -2533,7 +2539,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
-        if (!_valueRequired && !EmptyPossible()) { return EmptyNotAllowed; }
+        if (_minTextLength < 1 && !EmptyPossible()) { return EmptyNotAllowed; }
         return null;
     }
 
@@ -2557,6 +2563,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_maxCellLength < 1) { return CellSizeTooSmall; }
         if (_maxCellLength > 4000) { return CellSizeTooLarge; }
         if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
+        if (_minTextLength > _maxTextLength) { return MinLengthGreaterThanMax; }
 
         if (tb.Column is { IsDisposed: false } col && col.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return ColumnKeyDuplicate;
@@ -2572,8 +2579,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_multiLine) {
             if (!MultilinePossible()) { return MultilineNotSupported; }
             if (_afterEditRound != -1) { return RoundOnlySingleLine; }
+            if (_forbiddenChars.Contains('\r')) { return MultilineButCrForbidden; }
         } else {
             if (_afterEditQuickSortRemoveDouble) { return SortOnlyMultiline; }
+            if (!_forbiddenChars.Contains('\r') || !_forbiddenChars.Contains('\n')) { return SingleLineNeedsCrLfForbidden; }
         }
 
         return null;
@@ -2607,7 +2616,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (uv.Any(uvd => uvd.KeyColumns.Contains(this))) { return LinkedColumnInUniqueDefinition; }
         }
 
-        if (!_valueRequired) {
+        if (_allowedChars is { Length: > 0 } && _forbiddenChars is { Length: > 0 } && _allowedChars.Intersect(_forbiddenChars).Any()) {
+            return AllowedAndForbiddenOverlap;
+        }
+
+        if (_minTextLength < 1) {
             if (_scriptType is ScriptType.Bool or ScriptType.Numeral) { return ValueRequiredMissingScript; }
             if (_isFirst) { return ValueRequiredMissingFirst; }
         }

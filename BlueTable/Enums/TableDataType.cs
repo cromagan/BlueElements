@@ -213,6 +213,8 @@ public enum TableDataType : byte {
     IgnoreAtRowFilter = 146,
 
     //co_EditType = 147,
+    MinTextLength = 147,
+
     //co_SpaltenGröße = 148
     //co_ÜberschriftAnordnung = 149
     //co_ÜberschriftErsatz = 150
@@ -269,7 +271,7 @@ public enum TableDataType : byte {
     SortType = 188,
 
     //co_ZellenZusammenfassen = 189,
-    AfterEditAutoRemoveChar = 190,
+    ForbiddenChars = 190,
 
     //SaveContent = 191,
     //co_AutoFilter_Dauerfilter = 192,

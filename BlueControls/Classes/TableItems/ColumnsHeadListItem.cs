@@ -123,6 +123,7 @@ public sealed class ColumnsHeadListItem : RowBackground {
         #endregion
 
         #region Virtuelle Spalten (Pin, Nummer, Hinzufügen)
+
         // In Ansicht 0 ("Alle Spalten") werden keine virtuellen Spalten
         // angeboten — sie sind dort nicht erlaubt (siehe ColumnViewCollection.Repair).
         if (!tableView.IsAnsicht0(ca)) {
@@ -263,6 +264,37 @@ public sealed class ColumnsHeadListItem : RowBackground {
         return false;
     }
 
+    /// <summary>
+    /// Übernimmt die gesamte Doppelklick-Logik für den Spaltenkopf: prüft
+    /// Spalten- und Tabellen-Zustand sowie Admin-Berechtigung und startet
+    /// die Caption-Editierung über <see cref="TableView.BeginEdit" />.
+    /// </summary>
+    public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi) { return false; }
+        if (cvi.Column is not { IsDisposed: false } col) { return false; }
+        if (Arrangement?.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return false; }
+
+        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+        var colX = cvi.ControlColumnLeft(tableView.OffsetX);
+        var colW = cvi.ControlColumnWidth();
+
+        tableView.BeginEdit(
+            EditTypeTable.Textfeld,
+            new Point(colX, headPos.Y),
+            new Size(colW, headPos.Height),
+            col.Caption.Replace("\r", "\r\n"),
+            v => ApplyCaption(tableView, cvi, v),
+            ColumnFormatHolder_TextMultiline.Instance,
+            null, null, null,
+            string.Empty,
+            true,
+            headPos.Height,
+            null,
+            null,
+            tableView.Zoom);
+        return true;
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
@@ -277,27 +309,6 @@ public sealed class ColumnsHeadListItem : RowBackground {
         }
 
         return RowListItem.QuickInfoText(col, string.Empty);
-    }
-
-    internal void EditCaption(ColumnViewItem viewItem, TableView tableView) {
-        if (viewItem.Column is not { IsDisposed: false } col) { return; }
-        if (tableView.Table is not { IsDisposed: false }) { return; }
-
-        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
-        var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
-        var colW = viewItem.ControlColumnWidth();
-
-        var bt = tableView.BTB;
-        bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
-        bt.MultiLine = true;
-        bt.Text = col.Caption.Replace("\r", "\r\n");
-        bt.Location = new Point(colX, headPos.Y);
-        bt.Size = new Size(colW, headPos.Height);
-        bt.Tag = (List<object?>)[viewItem, this, "CaptionEdit"];
-        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-        bt.Visible = true;
-        bt.BringToFront();
-        bt.Focus();
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
@@ -383,6 +394,30 @@ public sealed class ColumnsHeadListItem : RowBackground {
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
         tableView.BeginInvoke(new Action(() => tableView.BeginSmoothScrollToColumn(int.MinValue, tableView.OffsetY)));
+    }
+
+    /// <summary>
+    /// Übernimmt die neue Spalten-Überschrift. Wenn Caption und KeyName
+    /// bisher identisch waren, wird der KeyName aus der neuen Caption
+    /// abgeleitet (sofern das ein gültiger Schlüssel ist). Commit-Callback
+    /// aus <see cref="HandleDoubleClick" />, der an
+    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// </summary>
+    private void ApplyCaption(TableView tableView, ColumnViewItem? column, string value) {
+        if (column?.Column is not { IsDisposed: false } col) { return; }
+
+        var newCaption = value.Replace("\r\n", "\r").Trim();
+        if (!string.IsNullOrEmpty(newCaption)) {
+            var namesMatch = col.Caption.Equals(col.KeyName, StringComparison.OrdinalIgnoreCase);
+            col.Caption = newCaption;
+            if (namesMatch) {
+                var newKey = newCaption.ReduceToChars(AllowedCharsVariableName).ToUpperInvariant();
+                if (!string.IsNullOrEmpty(newKey) && ColumnItem.IsValidColumnKey(newKey)) {
+                    col.KeyName = newKey;
+                }
+            }
+        }
+        tableView.Invalidate_CurrentArrangement();
     }
 
     #endregion

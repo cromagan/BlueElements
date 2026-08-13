@@ -16,6 +16,7 @@ public class FormatHolder_TextWithFormat : FormatHolder {
         SpellCheckingEnabled = true;
         MultiLine = true;
         MaxTextLength = 4000;
+        MinTextLength = 0;
         QuickInfo = "Text, der Kursiv, Fett, etc. unterstüzt";
     }
 

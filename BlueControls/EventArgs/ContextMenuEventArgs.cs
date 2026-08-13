@@ -8,7 +8,7 @@ public class ContextMenuEventArgs : AbstractListItemEventArgs {
 
     #region Constructors
 
-    public ContextMenuEventArgs(AbstractListItem clickedComand, object? hotItem) : base(clickedComand) => HotItem = hotItem;
+    public ContextMenuEventArgs(AbstractListItem clickedCommand, object? hotItem) : base(clickedCommand) => HotItem = hotItem;
 
     #endregion
 

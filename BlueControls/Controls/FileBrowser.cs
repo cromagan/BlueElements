@@ -571,7 +571,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var dir = Directory;
 
-        if (!dir.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return; }
+        if (!dir.IsValidFilePath()) { return; }
 
         if (!Visible) { return; }
 
@@ -604,7 +604,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (!DirectoryExists(dir)) {
             if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
-                 dir.IsFormat(FormatHolder_Filepath.Instance, true, false)) {
+                 dir.IsValidFilePath()) {
                 CreateDirectory(dir);
             } else {
                 return;

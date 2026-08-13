@@ -14,5 +14,6 @@ public enum EditTypeFormula {
     als_Überschrift_anzeigen = 23,
     Listbox = 26,
     Line = 1000,
-    Button = 1001
+    Button = 1001,
+    CSV_Table = 1002
 }

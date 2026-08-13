@@ -248,9 +248,13 @@ Aufgefallen, wenn die Zeile des neuen Wertes nicht existiert.
 Mache einen neuen Renderer für ZELLEN.
 Texte normal darstellen.
 AUSSER die Zeile beginnt mit "CaptionStartSequence"
-Beginnt eine der Mehrzeilingen Einträgge mit der Sequenz, wird es als Überschrift dargestellt
+Beginnt eine der Mehrzeilingen Einträge mit der Sequenz, wird es als Überschrift dargestellt
 
 Dann baue noch einen replace ein, der eine Sequenze entfernt und wie Tab behandelt. Evtl. kann das mit extText gelöst werden.
+
+## Aufgabe
+IInputFormat um eine `TextCase`-Eigenschaft ergänzen (None/Upper/Lower/Title), die die Groß-/Kleinschreibung bei der Eingabe erzwingt.
+Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiControl`) müssen dies bei der Eingabe und beim `AfterEdit` berücksichtigen.
 
 ## Aufgabe
 EventScript, werden die TableHead-Variablen richtig zurückgeschrieben?

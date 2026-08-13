@@ -83,6 +83,7 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.Appearance = ListBoxAppearance.Listbox_Boxes;
         _control.CustomContextMenuItems = CustomContextMenuItems;
         _control.QuickInfo = QuickInfo;
+        _control.Zoom = Zoom;
     }
 
     protected override void SetValueToControlInternal(string value) {

@@ -215,8 +215,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnControlAdded(e);
     }
 
-    protected override void OnExecuteComand() {
-        base.OnExecuteComand();
+    protected override void OnExecuteCommand () {
+        base.OnExecuteCommand ();
         if (_accessor is not null) {
             object? x = _accessor.Get();
 

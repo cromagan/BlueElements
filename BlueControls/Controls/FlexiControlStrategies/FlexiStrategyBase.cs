@@ -23,11 +23,19 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
 
     public event EventHandler? DropDownShowing;
 
-    public event EventHandler? ExecuteComand;
+    public event EventHandler? EnterKey;
+
+    public event EventHandler? EscKey;
+
+    public event EventHandler? ExecuteCommand;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
 
+    public event EventHandler? LostFocus;
+
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
+    public event EventHandler? TabKey;
 
     public event EventHandler<TextEventArgs>? ValueChanged;
 
@@ -109,6 +117,15 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
         }
     }
 
+    public string ForbiddenChars {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    } = string.Empty;
+
     public string ImageCode {
         get;
         set {
@@ -130,6 +147,15 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
     }
 
     public int MaxTextLength {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    }
+
+    public int MinTextLength {
         get;
         set {
             if (field == value) { return; }
@@ -210,6 +236,19 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
         }
     }
 
+    /// <summary>
+    /// Generischer Strategie-Parameter, der pro Strategy unterschiedlich verwendet wird.
+    /// Bei der CSV-Table-Strategy z. B. die Spaltennamen, getrennt mit ";".
+    /// </summary>
+    public string StrategyParameter {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    } = string.Empty;
+
     public string Suffix {
         get;
         set {
@@ -227,6 +266,16 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
             if (!_initializing) { ApplyStyle(); }
         }
     } = SuggestionPosition.Bottom;
+
+    /// <summary>
+    /// Gibt an, ob diese Strategie eine Auswahlliste (Vorschläge) handhaben kann.
+    /// Ist <c>true</c>, ermittelt die <see cref="TableView" /> beim Start des
+    /// Edits die Items zur content-Spalte/-Zeile und weist sie
+    /// <see cref="ListItems" /> zu — einheitlich, unabhängig vom konkreten
+    /// Strategie-Typ. Hat der Aufrufer bereits Items übergeben, werden diese
+    /// übernommen. Default <c>false</c>.
+    /// </summary>
+    public virtual bool SupportsSuggestions => false;
 
     public bool TextFormatingAllowed {
         get;
@@ -255,6 +304,16 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
         }
     }
 
+    [DefaultValue(1f)]
+    public float Zoom {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    } = 1f;
+
     #endregion
 
     #region Methods
@@ -272,6 +331,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
             EditTypeFormula.Line => new FlexiStrategyLine(),
             EditTypeFormula.als_Überschrift_anzeigen => new FlexiStrategyGroupBox(),
             EditTypeFormula.nur_als_Text_anzeigen => new FlexiStrategyCaption(),
+            EditTypeFormula.CSV_Table => new FlexiStrategyCsvTable(),
             _ => null
         };
     }
@@ -326,9 +386,13 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
             UnsubscribeEvents();
 
             DropDownShowing = null;
-            ExecuteComand = null;
+            EnterKey = null;
+            EscKey = null;
+            ExecuteCommand = null;
             ItemRemoved = null;
+            LostFocus = null;
             NavigateToNext = null;
+            TabKey = null;
             ValueChanged = null;
             Disposed = null;
 
@@ -341,11 +405,19 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
 
     protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 
-    protected void OnExecuteComand() => ExecuteComand?.Invoke(this, System.EventArgs.Empty);
+    protected void OnEnterKey() => EnterKey?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnEscKey() => EscKey?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnExecuteCommand() => ExecuteCommand?.Invoke(this, System.EventArgs.Empty);
 
     protected void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
+    protected void OnLostFocus() => LostFocus?.Invoke(this, System.EventArgs.Empty);
+
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+
+    protected void OnTabKey() => TabKey?.Invoke(this, System.EventArgs.Empty);
 
     protected abstract void SetValueToControlInternal(string value);
 

@@ -17,6 +17,8 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
 
     public override System.Windows.Forms.Control? Control => _control;
 
+    public override bool SupportsSuggestions => true;
+
     #endregion
 
     #region Methods
@@ -36,6 +38,10 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.NavigateToNext += _navigateHandler;
         _control?.ItemRemoved += ComboBox_ItemRemoved;
         _control?.DropDownShowing += ComboBox_DropDownShowing;
+        _control?.EnterKey += Control_EnterKey;
+        _control?.EscKey += Control_EscKey;
+        _control?.TabKey += Control_TabKey;
+        _control?.LostFocus += Control_LostFocus;
     }
 
     public override void UnsubscribeEvents() {
@@ -43,6 +49,10 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         if (_navigateHandler is not null && _control is not null) { _control.NavigateToNext -= _navigateHandler; }
         _control?.ItemRemoved -= ComboBox_ItemRemoved;
         _control?.DropDownShowing -= ComboBox_DropDownShowing;
+        _control?.EnterKey -= Control_EnterKey;
+        _control?.EscKey -= Control_EscKey;
+        _control?.TabKey -= Control_TabKey;
+        _control?.LostFocus -= Control_LostFocus;
     }
 
     public override bool WasValueClicked() => _control?.WasThisValueClicked() ?? false;
@@ -68,6 +78,14 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
     private void ComboBox_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
 
     private void ComboBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
+
+    private void Control_EnterKey(object? sender, System.EventArgs e) => OnEnterKey();
+
+    private void Control_EscKey(object? sender, System.EventArgs e) => OnEscKey();
+
+    private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
     private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
 

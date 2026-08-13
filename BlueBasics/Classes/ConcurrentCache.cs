@@ -16,20 +16,9 @@ namespace BlueBasics.Classes;
 /// automatischen Verkleinern des Caches führt.
 /// </para>
 /// </summary>
-public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : notnull {
+public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TKey : notnull {
 
     #region Fields
-
-    /// <summary>
-    /// Trim-Delegate, das bei <see cref="RegisterCacheTrim" /> angemeldet
-    /// wurde. In einem Feld gehalten, damit <see cref="Dispose" /> die exakt
-    /// gleiche Instanz wieder abmelden kann (Method-Group-Erzeugung liefert
-    /// sonst jedes Mal ein neues Delegate). Zeigt auf <see cref="TrimToMax" />,
-    /// damit <see cref="TrimAllCaches" /> niemals eine
-    /// <see cref="ObjectDisposedException" /> auslöst, wenn ein Cache während
-    /// des Trimmens freigegeben wird.
-    /// </summary>
-    private readonly Action _trimAction;
 
     /// <summary>
     /// Interne, thread-sichere Datenstruktur zur Aufnahme der Cache-Einträge.
@@ -41,6 +30,17 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     /// Wird zur Laufzeit nicht verändert.
     /// </summary>
     private readonly int _maxCacheSize;
+
+    /// <summary>
+    /// Trim-Delegate, das bei <see cref="RegisterCacheTrim" /> angemeldet
+    /// wurde. In einem Feld gehalten, damit <see cref="Dispose" /> die exakt
+    /// gleiche Instanz wieder abmelden kann (Method-Group-Erzeugung liefert
+    /// sonst jedes Mal ein neues Delegate). Zeigt auf <see cref="TrimToMax" />,
+    /// damit <see cref="TrimAllCaches" /> niemals eine
+    /// <see cref="ObjectDisposedException" /> auslöst, wenn ein Cache während
+    /// des Trimmens freigegeben wird.
+    /// </summary>
+    private readonly Action _trimAction;
 
     private int _isDisposedFlag;
 
@@ -74,6 +74,12 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    #endregion
+
     #region Properties
 
     /// <summary>Aktuelle Anzahl der Einträge im Cache.</summary>
@@ -83,6 +89,14 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
             return _dict.Count;
         }
     }
+
+    /// <summary>
+    /// Gibt an, ob der Cache bereits über <see cref="Dispose" /> freigegeben wurde.
+    /// Erlaubt sichere Lesezugriffe aus Consumern, die ihr eigenes Lifetime-Ende
+    /// nicht synchron kontrollieren können — typischerweise <c>null</c>-Rückgaben
+    /// in Such-Properties statt <see cref="ObjectDisposedException" />.
+    /// </summary>
+    public bool IsDisposed => _isDisposedFlag != 0;
 
     /// <summary>Sammlung aller aktuell im Cache enthaltenen Schlüssel.</summary>
     public ICollection<TKey> Keys {
@@ -170,6 +184,20 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     }
 
     /// <summary>
+    /// Gibt den Cache frei: Alle Einträge werden entfernt, disposable Werte
+    /// werden verworfen und das Trim-Delegate wird bei
+    /// <see cref="UnregisterCacheTrim" /> abgemeldet. Mehrfaches Aufrufen
+    /// ist sicher und hat ab dem zweiten Mal keinen Effekt.
+    /// </summary>
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        Generic.UnregisterCacheTrim(_trimAction);
+        ClearCore();
+        OnDisposed();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     /// Liefert den Wert zu <paramref name="key" />. Ist kein Eintrag vorhanden,
     /// wird er über <paramref name="factory" /> erzeugt und gespeichert.
     /// <para>
@@ -248,16 +276,6 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     }
 
     /// <summary>
-    /// Wirft eine <see cref="ObjectDisposedException" />, wenn die Instanz bereits
-    /// über <see cref="Dispose" /> freigegeben wurde. Schutz vor
-    /// Use-After-Dispose — insbesondere vor dem stillen Hinzufügen von Einträgen,
-    /// die nie wieder disposet würden (Memory-Leak).
-    /// </summary>
-    private void ThrowIfDisposed() {
-        ObjectDisposedException.ThrowIf(_isDisposedFlag != 0, this);
-    }
-
-    /// <summary>
     /// Internes Clear ohne Dispose-Prüfung. Darf auch aus <see cref="Dispose" />
     /// heraus aufgerufen werden, nachdem das Dispose-Flag bereits gesetzt wurde.
     /// </summary>
@@ -265,6 +283,18 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
         foreach (var kvp in _dict.ToArray()) {
             if (_dict.TryRemove(kvp.Key, out var value) && value is IDisposable d) { d.Dispose(); }
         }
+    }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Wirft eine <see cref="ObjectDisposedException" />, wenn die Instanz bereits
+    /// über <see cref="Dispose" /> freigegeben wurde. Schutz vor
+    /// Use-After-Dispose — insbesondere vor dem stillen Hinzufügen von Einträgen,
+    /// die nie wieder disposet würden (Memory-Leak).
+    /// </summary>
+    private void ThrowIfDisposed() {
+        ObjectDisposedException.ThrowIf(_isDisposedFlag != 0, this);
     }
 
     /// <summary>
@@ -301,19 +331,6 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposable where TKey : not
     /// von <see cref="TrimCore" />.
     /// </summary>
     private void TrimToMax() => TrimCore(_maxCacheSize);
-
-    /// <summary>
-    /// Gibt den Cache frei: Alle Einträge werden entfernt, disposable Werte
-    /// werden verworfen und das Trim-Delegate wird bei
-    /// <see cref="UnregisterCacheTrim" /> abgemeldet. Mehrfaches Aufrufen
-    /// ist sicher und hat ab dem zweiten Mal keinen Effekt.
-    /// </summary>
-    public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        Generic.UnregisterCacheTrim(_trimAction);
-        ClearCore();
-        GC.SuppressFinalize(this);
-    }
 
     #endregion
 }

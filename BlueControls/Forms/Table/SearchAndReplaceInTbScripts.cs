@@ -37,11 +37,13 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         _isWorking = true;
 
         var count = 0;
+        var suchText = txbAlt.Text.DecodeControlChars();
+        var ersetzText = txbNeu.Text.DecodeControlChars();
 
         foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
                 foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
-                    var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
+                    var newScriptContent = script.Script.Replace(suchText, ersetzText);
                     if (newScriptContent != script.Script) {
                         count++;
                         Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: Math.Min(20, script.StoppedTimeCount));
@@ -80,12 +82,13 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         _isWorking = true;
 
         var txt = new List<string>();
+        var suchText = txbAlt.Text.DecodeControlChars();
 
         foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb) {
                 foreach (var thiss in tb.EventScript) {
                     // Prüfen, ob der Suchtext im Skript vorkommt
-                    if (thiss.Script.Contains(txbAlt.Text)) {
+                    if (thiss.Script.Contains(suchText)) {
                         // Tabellename -> Skriptname zur Liste hinzufügen
                         txt.Add(string.Empty);
                         txt.Add(string.Empty);
@@ -95,7 +98,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
                         // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
                         var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
                         foreach (var line in lines) {
-                            if (line.Contains(txbAlt.Text)) {
+                            if (line.Contains(suchText)) {
                                 txt.Add(line.Trim());
                             }
                         }

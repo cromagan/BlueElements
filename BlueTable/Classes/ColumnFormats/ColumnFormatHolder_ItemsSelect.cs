@@ -19,7 +19,6 @@ public class ColumnFormatHolder_ItemsSelect : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Übersetzen;
         AfterEditQuickSortRemoveDouble = true;
         ScriptType = ScriptType.String;
-        ValueRequired = true;
         EditableWithDropdown = true;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

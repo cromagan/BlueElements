@@ -14,6 +14,8 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
 
     public override System.Windows.Forms.Control? Control => _control;
 
+    public override bool SupportsSuggestions => true;
+
     #endregion
 
     #region Methods
@@ -24,10 +26,18 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
 
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_TextBoxSuggestions;
+        _control?.EnterKey += Control_EnterKey;
+        _control?.EscKey += Control_EscKey;
+        _control?.TabKey += Control_TabKey;
+        _control?.LostFocus += Control_LostFocus;
     }
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBoxSuggestions;
+        _control?.EnterKey -= Control_EnterKey;
+        _control?.EscKey -= Control_EscKey;
+        _control?.TabKey -= Control_TabKey;
+        _control?.LostFocus -= Control_LostFocus;
     }
 
     protected override void ApplyStyle() {
@@ -43,6 +53,7 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         _control.QuickInfo = QuickInfo;
+        _control.Zoom = Zoom;
 
         if (ListItems is { Count: > 0 } items) {
             _control.Suggestions = new System.Collections.ObjectModel.ReadOnlyCollection<string>([.. items.Select(i => i.KeyName)]);
@@ -54,6 +65,14 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
     protected override void SetValueToControlInternal(string value) {
         if (_control is { } c) { c.Text = value; }
     }
+
+    private void Control_EnterKey(object? sender, System.EventArgs e) => OnEnterKey();
+
+    private void Control_EscKey(object? sender, System.EventArgs e) => OnEscKey();
+
+    private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
     private void ValueChanged_TextBoxSuggestions(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
 

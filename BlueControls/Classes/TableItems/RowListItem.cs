@@ -242,6 +242,17 @@ public sealed class RowListItem : RowBackground {
         return false;
     }
 
+    /// <summary>
+    /// Startet die Inline-Editierung der angeklickten Zelle. Die gesamte
+    /// Logik (Editability, LinkedCell-Auflösung, EditType, Position) liegt in
+    /// der Basisklasse <see cref="RowBackground.BeginCellEdit" />.
+    /// </summary>
+    public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
+        if (mouseOverColumn is null) { return false; }
+        if (Row is not { IsDisposed: false }) { return false; }
+        return BeginCellEdit(tableView, mouseOverColumn, this, Row, true, Row.ChunkValue);
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return 18; }
 

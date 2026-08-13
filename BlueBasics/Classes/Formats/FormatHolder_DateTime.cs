@@ -16,6 +16,8 @@ public class FormatHolder_DateTime : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 19;
+        MinTextLength = 19;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Deutsches Datum und Uhrzeit. Beispiel: 31.12.2000 12:34:00";
     }
 

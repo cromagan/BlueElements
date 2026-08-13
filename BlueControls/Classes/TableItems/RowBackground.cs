@@ -310,6 +310,198 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
     public virtual bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) => false;
 
+    /// <summary>
+    /// Wird bei einem Doppelklick auf die Zeile aufgerufen. Die konkrete
+    /// Zeilen-Implementierung übernimmt alle Prüfungen (Berechtigung,
+    /// Spaltenzustand etc.) und fordert — wenn nötig — die <paramref name="tableView"/>
+    /// auf, die eigentliche Editier-UI zu starten. Rückgabe <c>true</c>, wenn
+    /// der Doppelklick verarbeitet wurde und die TableView keine weitere
+    /// Standard-Aktion mehr ausführen soll.
+    /// </summary>
+    public virtual bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) => false;
+
+    /// <summary>
+    /// Gemeinsame Logik für den Start einer Zell-Editierung direkt über
+    /// <see cref="TableView.BeginEdit" />. Wird von <see cref="RowListItem" />
+    /// (mit echter Row) und <see cref="NewRowListItem" /> (mit <c>null</c>)
+    /// aus ihrem <see cref="HandleDoubleClick" /> aufgerufen.
+    /// Übernimmt Editability-Prüfung, LinkedCell-Auflösung, Bestimmung des
+    /// Edit-Typs, Positions-/Größen-Berechnung und startet das Edit über
+    /// <see cref="TableView.BeginEdit" />. Die Auswahllisten-Ermittlung für
+    /// Strategien mit NeedsSuggestions übernimmt die <see cref="TableView" />
+    /// dort einheitlich.
+    /// </summary>
+    /// <param name="row">Die Row, in der editiert wird — <c>null</c> für
+    /// "neue Zeile".</param>
+    /// <param name="rowContainer">Das sichtbare Item (RowListItem oder
+    /// NewRowListItem), das für die Positionsberechnung herangezogen wird.</param>
+    /// <returns><c>true</c>, wenn ein Edit gestartet wurde (oder die Zelle
+    /// bewusst nicht editierbar ist, der Klick also verarbeitet wurde).</returns>
+    protected internal bool BeginCellEdit(TableView tableView, ColumnViewItem? viewItem, RowBackground rowContainer, RowItem? row, bool preferDropDown, string? chunkValue) {
+        var notEditableReason = tableView.IsCellEditable(viewItem, rowContainer as RowListItem, chunkValue, true);
+        if (notEditableReason is { Length: > 0 } f) {
+            TableView.NotEditableInfo(f);
+            return true;
+        }
+
+        if (viewItem?.Column is not { IsDisposed: false } originalColumn) {
+            TableView.NotEditableInfo("Keine Spalte angeklickt.");
+            return true;
+        }
+
+        // LinkedCell-Auflösung nur bei echter Row und Relations-Spalte.
+        // Position, Style und Commit basieren weiterhin auf der Original-Spalte;
+        // nur der EditType und das Dropdown werden über die Ziel-Spalte bestimmt.
+        var contentHolderCellColumn = originalColumn;
+        var contentHolderCellRow = row;
+        if (contentHolderCellRow is { IsDisposed: false } cr && originalColumn.RelationType == RelationType.CellValues) {
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cr.LinkedCellData(contentHolderCellColumn, true, true);
+        }
+
+        if (contentHolderCellColumn is not { IsDisposed: false }) {
+            TableView.NotEditableInfo("Keine Spalte angeklickt.");
+            return true;
+        }
+
+        var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, preferDropDown);
+        if (dia == EditTypeTable.None && (contentHolderCellColumn.Table?.PowerEdit ?? false)) {
+            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, false, true);
+        }
+
+        switch (dia) {
+            case EditTypeTable.None:
+                return true;
+
+            case EditTypeTable.DragDrop:
+                TableView.NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
+                return true;
+
+            case EditTypeTable.Dropdown_Single:
+                // Dropdown benötigt ein echtes RowListItem als Container.
+                if (rowContainer is not RowListItem rli) { return true; }
+
+                // Bei LinkedCell-Spalten (column != originalColumn) kann für
+                // eine neue Zeile kein Dropdown erstellt werden.
+                if (contentHolderCellColumn != originalColumn && contentHolderCellRow is null) {
+                    TableView.NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
+                    return true;
+                }
+
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+
+                // Aktuell ausgewählte Werte der Zelle als Startwert für das
+                // Dropdown. Die Auswahlliste ermittelt TableView über
+                // NeedsSuggestions einheitlich in BeginEdit.
+                var ddValue = contentHolderCellRow is { IsDisposed: false } cr2
+                    ? string.Join('\r', cr2.CellGetList(contentHolderCellColumn))
+                    : string.Empty;
+
+                // Position / Größe der Zelle berechnen, damit die
+                // FlexiStrategyDropDownListBox an der richtigen Stelle
+                // erscheint. Die tatsächliche Größe (größer als die Zelle)
+                // wird in TableView.BeginEdit berechnet.
+                var ddZoom = tableView.Zoom;
+                var ddOffsetX = tableView.OffsetX;
+                var ddOffsetY = tableView.OffsetY;
+                var ddControlPos = rowContainer.ControlPosition(ddZoom, ddOffsetX, ddOffsetY);
+                var ddIndentOffset = IndentWidth.CanvasToControl(ddZoom) * rowContainer.Indent;
+                var ddLocation = new Point(viewItem.ControlColumnLeft(ddOffsetX) + ddIndentOffset, ddControlPos.Y);
+                var ddSize = new Size(viewItem.ControlColumnWidth(), ddControlPos.Height);
+
+                tableView.BeginEdit(
+                    EditTypeTable.Dropdown_Single,
+                    ddLocation,
+                    ddSize,
+                    ddValue,
+                    _ => { },
+                    null,
+                    originalColumn,
+                    contentHolderCellColumn,
+                    contentHolderCellRow,
+                    string.Empty,
+                    false,
+                    0,
+                    null,
+                    new CellExtEventArgs(viewItem, rli),
+                    tableView.Zoom);
+                return true;
+
+            case EditTypeTable.Textfeld:
+            case EditTypeTable.Textfeld_mit_Auswahlknopf:
+            case EditTypeTable.Textfeld_mit_Vorschlägen:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                break;
+
+            default:
+                Develop.DebugPrint(dia);
+                TableView.NotEditableInfo("Unbekannte Bearbeitungs-Methode");
+                return true;
+        }
+
+        // Position / Size — entspricht der früheren GetEditBounds + ConfigureAndActivateCellEdit-Logik.
+        var zoom = tableView.Zoom;
+        var offsetX = tableView.OffsetX;
+        var offsetY = tableView.OffsetY;
+
+        var controlPos = rowContainer.ControlPosition(zoom, offsetX, offsetY);
+        var cellText = row?.CellGetString(originalColumn) ?? string.Empty;
+
+        // Spalte erlaubt Mehrzeiler, wird aber einzeilig angezeigt ->
+        // Edit-Feld vergrößern, damit mehrzeilig getippt werden kann.
+        if (originalColumn.MultiLine && controlPos.Height <= 30) {
+            var lineCount = Math.Clamp(cellText.CountChar('\r') + 1, 3, 6);
+            controlPos.Height = controlPos.Height * lineCount;
+        }
+
+        var indentOffset = IndentWidth.CanvasToControl(zoom) * rowContainer.Indent;
+        var addWith = dia == EditTypeTable.Textfeld_mit_Auswahlknopf ? 20 : 0;
+        var totalWidth = viewItem.ControlColumnWidth() + addWith;
+        var location = new Point(viewItem.ControlColumnLeft(offsetX) + indentOffset, controlPos.Y);
+        var size = new Size(totalWidth, controlPos.Height);
+
+        // Für ComboBox / Suggestions die Items vorab besorgen und ggf.
+        // auf eine einfache TextBox zurückfallen.
+        List<AbstractListItem>? items = null;
+        var effectiveType = dia;
+        var renderer = viewItem.GetRenderer(rowContainer.SheetStyle);
+
+        if (dia == EditTypeTable.Textfeld_mit_Auswahlknopf) {
+            items = AbstractListItemExtension.ItemsOf(originalColumn, contentHolderCellRow, 1000, renderer);
+            if (items.Count == 0) { effectiveType = EditTypeTable.Textfeld; }
+        } else if (dia == EditTypeTable.Textfeld_mit_Vorschlägen) {
+            items = AbstractListItemExtension.ItemsOf(originalColumn, null, 1000, renderer);
+            if (items.Count is 0 or > 30) { effectiveType = EditTypeTable.Textfeld; }
+        }
+
+        tableView.BeginEdit(
+            effectiveType,
+            location,
+            size,
+            cellText,
+            v => ApplyCellValue(tableView, viewItem, rowContainer as RowListItem, v),
+            null,
+            originalColumn,
+            null,
+            null,
+            originalColumn.QuickInfo,
+            false,
+            controlPos.Height,
+            items,
+            null,
+            tableView.Zoom);
+        return true;
+    }
+
+    /// <summary>
+    /// Schreibt den übergebenen Wert als neuen Zellinhalt — inkl. Formatprüfung
+    /// und Rückmeldung bei Fehler (über <see cref="TableView.UserEdited" />).
+    /// Commit-Callback aus <see cref="BeginCellEdit" />, der an
+    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// </summary>
+    private void ApplyCellValue(TableView tableView, ColumnViewItem? column, RowListItem? row, string value) {
+        TableView.NotEditableInfo(TableView.UserEdited(tableView, value, column, row, true));
+    }
+
     public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => true;

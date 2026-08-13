@@ -72,7 +72,7 @@ public static class IO {
 
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
+        if (!directory.IsValidFilePath()) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
 
         lock (_fileOperationLock) {
             if (_canWriteCache.TryGetValue(directory, out var cacheEntry) &&
@@ -251,33 +251,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                                    ? FileFormat.Unknown
-                                    : filename.FileSuffix().ToUpperInvariant() switch {
-                                        "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                                        "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                                        "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                                        "CSV" => FileFormat.CSV,
-                                        "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                                        "MSG" or "EML" => FileFormat.EMail,
-                                        "PDF" => FileFormat.Pdf,
-                                        "HTM" or "HTML" => FileFormat.HTML,
-                                        "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                                        "ICO" => FileFormat.Icon,
-                                        "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                                        "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                                        "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                                        "CHM" => FileFormat.HelpFile,
-                                        "XML" => FileFormat.XMLFile,
-                                        "VCF" => FileFormat.Visitenkarte,
-                                        "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                                        "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                                        "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
-                                        "TBLC" => FileFormat.TableChunk,
-                                        "LNK" or "URL" => FileFormat.Link,
-                                        "BCR" => FileFormat.BlueCreativeFile,
-                                        "BCS" => FileFormat.BlueCreativeSymbol,
-                                        _ => FileFormat.Unknown
-                                    };
+                                        ? FileFormat.Unknown
+                                        : filename.FileSuffix().ToUpperInvariant() switch {
+                                            "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                                            "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                                            "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                                            "CSV" => FileFormat.CSV,
+                                            "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                                            "MSG" or "EML" => FileFormat.EMail,
+                                            "PDF" => FileFormat.Pdf,
+                                            "HTM" or "HTML" => FileFormat.HTML,
+                                            "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                                            "ICO" => FileFormat.Icon,
+                                            "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                                            "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                                            "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                                            "CHM" => FileFormat.HelpFile,
+                                            "XML" => FileFormat.XMLFile,
+                                            "VCF" => FileFormat.Visitenkarte,
+                                            "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                                            "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                                            "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
+                                            "TBLC" => FileFormat.TableChunk,
+                                            "LNK" or "URL" => FileFormat.Link,
+                                            "BCR" => FileFormat.BlueCreativeFile,
+                                            "BCS" => FileFormat.BlueCreativeSymbol,
+                                            _ => FileFormat.Unknown
+                                        };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -308,12 +308,26 @@ public static class IO {
     public static FileInfo? GetFileInfo(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileInfo, [filename], abortIfFailed, time).Value as FileInfo;
 
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                                        => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
+                                            => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
 
     public static string[] GetFiles(string directory)
-                                 => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
+                                     => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
 
     public static DateTime? GetFolderWriteTimeUtc(string directory) => ProcessFile(TryGetFolderWriteTimeUtc, [directory], false, 5).Value as DateTime?;
+
+    /// <summary>
+    /// Prüft, ob der übergebene Text ein gültiger Verzeichnispfad ist
+    /// (ohne Dateiname). Ersetzt IsFormat(FormatHolder_Filepath.Instance, ...).
+    /// </summary>
+    public static bool IsValidFilePath(this string directory) =>
+        directory.IsFormat(FormatHolder_Filepath.Instance, false) is { Length: 0 };
+
+    /// <summary>
+    /// Prüft, ob der übergebene Text ein gültiger Dateiname inkl. Pfad ist.
+    /// Ersetzt IsFormat(FormatHolder_FilepathAndName.Instance, ...).
+    /// </summary>
+    public static bool IsValidFilepathAndName(this string filename) =>
+        filename.IsFormat(FormatHolder_FilepathAndName.Instance, false) is { Length: 0 };
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
@@ -951,7 +965,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsValidFilePath()) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         if (TryDirectoryExists(affectingFiles).Value is true) { return OperationResult.Success; }
 
@@ -1034,7 +1048,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directoryx) { return OperationResult.FailedInternalError; }
 
         var directory = directoryx.NormalizePath();
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsValidFilePath()) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         try {
             return new(Directory.Exists(directory));
@@ -1081,7 +1095,7 @@ public static class IO {
     private static OperationResult TryFileExists(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsValidFilepathAndName()) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             return new(File.Exists(filename));
@@ -1233,7 +1247,7 @@ public static class IO {
     private static OperationResult TryReadAllBytes(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsValidFilepathAndName()) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             // Prüfen ob Datei existiert

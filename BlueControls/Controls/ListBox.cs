@@ -168,6 +168,12 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         set => lstBox.Translate = value;
     }
 
+    [DefaultValue(1f)]
+    public float Zoom {
+        get => lstBox.Zoom;
+        set => lstBox.Zoom = value;
+    }
+
     #endregion
 
     #region Indexers

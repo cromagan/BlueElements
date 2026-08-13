@@ -16,6 +16,8 @@ public class FormatHolder_Long : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = long.MinValue.ToString1().Length;
+        MinTextLength = 1;
+        ForbiddenChars = "\r\n";
     }
 
     #endregion

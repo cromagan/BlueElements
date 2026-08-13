@@ -16,6 +16,8 @@ public class FormatHolder_DateTimeWithMilliSeconds : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 23;
+        MinTextLength = 23;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Deutsches Datum und Uhrzeit mit Millisecunden. Beispiel: 31.12.2000 12:34:00.123";
     }
 

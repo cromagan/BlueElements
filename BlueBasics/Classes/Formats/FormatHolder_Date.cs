@@ -16,6 +16,8 @@ public class FormatHolder_Date : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 10;
+        MinTextLength = 10;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Deutsches Datum. Beispiel: 31.12.2000";
     }
 

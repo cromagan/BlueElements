@@ -8,9 +8,9 @@ internal class Method_MatchColumnFormat : Method_TableGeneric {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "matchcolumnformat";
-    public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
+    public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Gibt bei Erfolg einen leeren Text zurück, andernfalls eine lesbare Begründung.";
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string Syntax => "MatchColumnFormat(Value, Column)";
 
     #endregion
@@ -28,7 +28,7 @@ internal class Method_MatchColumnFormat : Method_TableGeneric {
         }
         if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
 
-        return tocheck.IsFormat(column, column.ValueRequired) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        return new DoItFeedback(tocheck.IsFormat(column));
     }
 
     #endregion

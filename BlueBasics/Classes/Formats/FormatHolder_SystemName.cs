@@ -20,6 +20,8 @@ public class FormatHolder_SystemName : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 128;
+        MinTextLength = 2;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Werte, wie für eine System-Variabel. Beispiel: WERT_12";
     }
 

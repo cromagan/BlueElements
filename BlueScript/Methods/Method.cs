@@ -401,10 +401,10 @@ public abstract class Method : IReadableTextWithKey {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData ld, ScriptProperties? scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(string command, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData ld, ScriptProperties? scp) {
         var attributes = SplitAttributeToString(attributText);
 
-        var countError = CheckArgumentCount(comand, attributes, types.Count, lastArgMinCount);
+        var countError = CheckArgumentCount(command, attributes, types.Count, lastArgMinCount);
         if (countError is { Length: > 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, countError, true); }
 
         if (types.Count == 0) { return new SplittedAttributesFeedback([]); }
@@ -442,11 +442,11 @@ public abstract class Method : IReadableTextWithKey {
                     foreach (var thisC in AllMethods.Instances) {
                         var f = thisC.CanDo(attributes[n], 0, false, ld);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
-                            if (comand.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
+                            if (command.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
                                 return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
                             }
 
-                            return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{comand}' kann in diesen Skript nicht verwendet werden.", true);
+                            return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{command}' kann in diesen Skript nicht verwendet werden.", true);
                         }
                     }
                 }
@@ -464,10 +464,10 @@ public abstract class Method : IReadableTextWithKey {
 
             if (!ok) {
                 if (v is VariableUnknown ukn) {
-                    return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' konnte das Attribut '{n + 1}' nicht aufgelöst werden: {ukn.Value}", true);
+                    return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{command}' konnte das Attribut '{n + 1}' nicht aufgelöst werden: {ukn.Value}", true);
                 }
 
-                return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{string.Join("' oder '", exceptetType)}', sondern {v.MyClassId}", true);
+                return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{command}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{string.Join("' oder '", exceptetType)}', sondern {v.MyClassId}", true);
             }
 
             feedbackVariables.Add(v);

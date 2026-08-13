@@ -22,7 +22,6 @@ namespace BlueControls.BlueTableDialogs {
     internal sealed partial class ColumnEditor : Form {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            var resources = new ComponentResourceManager(typeof(ColumnEditor));
             ColorDia = new ColorDialog();
             tabAnzeige = new TabPage();
             cbxBackground = new ComboBox();
@@ -65,7 +64,6 @@ namespace BlueControls.BlueTableDialogs {
             btnOtherValuesToo = new Button();
             txbAuswaehlbareWerte = new TextBox();
             capImmerWerte = new Caption();
-            btnRequired = new Button();
             btnIgnoreLock = new Button();
             lbxCellEditor = new ListBox();
             btnEditableStandard = new Button();
@@ -130,6 +128,8 @@ namespace BlueControls.BlueTableDialogs {
             btnMaxTextLength = new Button();
             txbMaxTextLength = new TextBox();
             capMaxTextLength = new Caption();
+            txbMinTextLength = new TextBox();
+            capMinTextLength = new Caption();
             tabSpaltenVerlinkung = new TabPage();
             cbxRelationType = new ComboBox();
             capOtherTable = new Caption();
@@ -570,16 +570,6 @@ namespace BlueControls.BlueTableDialogs {
             capImmerWerte.Name = "capImmerWerte";
             capImmerWerte.Size = new Size(440, 24);
             capImmerWerte.Text = "<b><u>Immer auswählbare Werte:";
-            // 
-            // btnRequired
-            // 
-            btnRequired.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnRequired.Location = new Point(8, 152);
-            btnRequired.Name = "btnRequired";
-            btnRequired.QuickInfo = resources.GetString("btnRequired.QuickInfo");
-            btnRequired.Size = new Size(328, 16);
-            btnRequired.TabIndex = 6;
-            btnRequired.Text = "Wert erforderlich <i> ('0' zählt als Wert!)";
             // 
             // btnIgnoreLock
             // 
@@ -1139,7 +1129,6 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(grpStyles);
             tabDatenFormat.Controls.Add(capInfos);
             tabDatenFormat.Controls.Add(btnSystemInfo);
-            tabDatenFormat.Controls.Add(btnRequired);
             tabDatenFormat.Controls.Add(chkRelation);
             tabDatenFormat.Controls.Add(chkIsKeyColumn);
             tabDatenFormat.Controls.Add(chkSaveContent);
@@ -1147,6 +1136,8 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(btnMaxTextLength);
             tabDatenFormat.Controls.Add(txbMaxTextLength);
             tabDatenFormat.Controls.Add(capMaxTextLength);
+            tabDatenFormat.Controls.Add(txbMinTextLength);
+            tabDatenFormat.Controls.Add(capMinTextLength);
             tabDatenFormat.Controls.Add(txbAllowedChars);
             tabDatenFormat.Controls.Add(cbxSort);
             tabDatenFormat.Controls.Add(capSortiermaske);
@@ -1259,6 +1250,27 @@ namespace BlueControls.BlueTableDialogs {
             capMaxTextLength.Size = new Size(136, 24);
             capMaxTextLength.Text = "Maximale Text-Länge:";
             // 
+            // txbMinTextLength
+            // 
+            txbMinTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
+            txbMinTextLength.AllowedChars = "0123456789";
+            txbMinTextLength.Cursor = Cursors.IBeam;
+            txbMinTextLength.Location = new Point(560, 328);
+            txbMinTextLength.MaxTextLength = 255;
+            txbMinTextLength.Name = "txbMinTextLength";
+            txbMinTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
+            txbMinTextLength.Size = new Size(96, 24);
+            txbMinTextLength.TabIndex = 45;
+            // 
+            // capMinTextLength
+            // 
+            capMinTextLength.CausesValidation = false;
+            capMinTextLength.Location = new Point(560, 304);
+            capMinTextLength.Name = "capMinTextLength";
+            capMinTextLength.QuickInfo = "Mindestanzahl Zeichen, die in der Zelle stehen müssen.\r\n0 bedeutet: kein Pflichtfeld.\r\nLeer bedeutet, kein String; Zahlenwerte wie z.B. 0 zählen als befüllt.";
+            capMinTextLength.Size = new Size(112, 24);
+            capMinTextLength.Text = "Min. Text-Länge:";
+            // 
             // tabSpaltenVerlinkung
             // 
             tabSpaltenVerlinkung.BackColor = Color.FromArgb(255, 255, 255);
@@ -1298,6 +1310,7 @@ namespace BlueControls.BlueTableDialogs {
             tblFilterliste.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tblFilterliste.Ansichtbearbeitung = false;
             tblFilterliste.Location = new Point(8, 112);
+            tblFilterliste.MiniToolbarEnabled = false;
             tblFilterliste.Name = "tblFilterliste";
             tblFilterliste.PowerEdit = false;
             tblFilterliste.Size = new Size(1073, 472);
@@ -1423,7 +1436,8 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnEditableDropdown;
         private Button btnEditableStandard;
         private TextBox txbAuswaehlbareWerte;
-        private Button btnRequired;
+        private TextBox txbMinTextLength;
+        private Caption capMinTextLength;
         private Caption capUserGroupEdit;
         private Caption capTags;
         private ComboBox cbxRandRechts;

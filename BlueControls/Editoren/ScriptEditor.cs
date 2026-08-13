@@ -246,7 +246,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     /// </summary>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            CloseComandList();
+            CloseCommandList();
 
             components?.Dispose();
         }
@@ -332,7 +332,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
-    private static void CloseComandList() {
+    private static void CloseCommandList() {
         if (_befehlsReferenz is { Visible: true }) {
             _befehlsReferenz.Close();
             _befehlsReferenz.Dispose();
@@ -357,7 +357,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
-        CloseComandList();
+        CloseCommandList();
 
         _befehlsReferenz = new Befehlsreferenz();
         _befehlsReferenz.Show();
@@ -366,6 +366,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         LastFailedReason = string.Empty;
         LastVariables = null;
+        OnPropertyChanged("FailedReason");
         btnAnzeigen_Click(null, System.EventArgs.Empty);
     }
 
@@ -465,7 +466,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
         foreach (var thisc in Method.AllMethods.Instances) {
-            if (thisc is IComandBuilder ic) {
+            if (thisc is ICommandBuilder ic) {
                 if (e.Item.KeyName == ic.KeyName) {
                     var c = ic.GetCode((BlueControls.Forms.Form?)FindForm());
 
@@ -494,8 +495,8 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             _assistantDone = true;
 
             foreach (var thisc in Method.AllMethods.Instances) {
-                if (thisc is IComandBuilder ic) {
-                    var t = new TextListItem(ic.ComandDescription(), ic.KeyName, ic.ComandImage(), false, true, string.Empty, string.Empty);
+                if (thisc is ICommandBuilder ic) {
+                    var t = new TextListItem(ic.CommandDescription(), ic.KeyName, ic.CommandImage(), false, true, string.Empty, string.Empty);
 
                     lstAssistant.ItemAdd(t);
                 }

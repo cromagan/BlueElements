@@ -4,7 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Color : FormatHolder {
 
+    #region Fields
+
     public static readonly string Keyname = "Color";
+
+    #endregion
 
     #region Constructors
 
@@ -16,6 +20,8 @@ public class FormatHolder_Color : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 9;
+        MinTextLength = 7;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Farbcode im Hex-Format. Beispiel: #aa0000";
     }
 

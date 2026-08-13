@@ -42,7 +42,7 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
 
     protected override void SetValueToControlInternal(string value) { }
 
-    private void CommandButton_Click(object? sender, System.EventArgs e) => OnExecuteComand();
+    private void CommandButton_Click(object? sender, System.EventArgs e) => OnExecuteCommand ();
 
     #endregion
 }

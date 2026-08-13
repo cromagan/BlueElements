@@ -17,6 +17,8 @@ public class FormatHolder_Filepath : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 512;
+        MinTextLength = 3;
+        ForbiddenChars = "\r\n";
     }
 
     #endregion

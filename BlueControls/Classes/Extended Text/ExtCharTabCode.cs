@@ -34,7 +34,10 @@ internal class ExtCharTabCode : ExtChar {
 
     public override string PlainText() => "\t";
 
-    protected override SizeF CalculateSizeCanvas() => new SizeF(150 - (PosCanvas.X % 150), 0);
+    protected override SizeF CalculateSizeCanvas() {
+        var h = Font is null ? 16f : Font.CharHeight;
+        return new SizeF(150 - (PosCanvas.X % 150), h);
+    }
 
     #endregion
 }

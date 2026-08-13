@@ -74,6 +74,109 @@ public sealed class RowCaptionListItem : RowBackground {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
+    /// <summary>
+    /// Übernimmt die gesamte Doppelklick-Logik für ein Kapitel: prüft
+    /// <see cref="CanEditChapter" /> und stellt sicher, dass der Klick nicht
+    /// auf dem Pfeil-Button (Ein-/Ausklappen) lag. Startet anschließend die
+    /// Kapitel-Editierung über <see cref="TableView.BeginEdit" />. Die Ermittlung
+    /// der zum Block gehörenden Zeilen erfolgt über
+    /// <see cref="TableView.GetChapterBlockRows" /> in der TableView, da sie
+    /// auf deren sortierter Item-Liste basiert.
+    /// </summary>
+    public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
+        if (!CanEditChapter) { return false; }
+        if (IsArrowButtonHit(tableView.MouseDownData?.ControlX ?? 0, tableView.MouseDownData?.ControlY ?? 0,
+                             tableView.Zoom, tableView.OffsetX, tableView.OffsetY)) { return false; }
+
+        var blockRows = tableView.GetChapterBlockRows(this);
+        if (blockRows is null) { return false; }
+
+        var capPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+
+        tableView.BeginEdit(
+            EditTypeTable.Textfeld,
+            new Point(0, capPos.Y),
+            new Size(tableView.Width, capPos.Height),
+            ChapterText.ChapterPathLastName(),
+            v => ApplyChapter(tableView, blockRows, v),
+            ColumnFormatHolder_TextOneLine.Instance,
+            null, null, null,
+            string.Empty,
+            false,
+            capPos.Height,
+            null,
+            null,
+            tableView.Zoom);
+        return true;
+    }
+
+    /// <summary>
+    /// Übernimmt das Umbenennen oder Löschen dieses Kapitels. Es werden nur
+    /// die Zeilen des übergebenen Blocks aktualisiert (lokal, nicht global
+    /// über alle Zeilen mit gleichem Namen). Unterpfade werden rekursiv
+    /// mitgeführt, sodass die Hierarchie erhalten bleibt. Commit-Callback
+    /// aus <see cref="HandleDoubleClick" />, der an
+    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// </summary>
+    private void ApplyChapter(TableView tableView, List<RowItem> blockRows, string value) {
+        if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return; }
+        if (Arrangement.Table is not { IsDisposed: false }) { return; }
+
+        var oldChapter = ChapterText;
+        var parentPath = oldChapter.ChapterPathParent();
+
+        // newChapter: nur das letzte Segment ersetzen (Parent bleibt erhalten).
+        // Einheitliche Behandlung — unabhängig vom NumberStyle.
+        var newLastName = value.Replace("\r\n", "\r").ChapterPathNormalize();
+        var newChapter = string.IsNullOrEmpty(parentPath)
+            ? newLastName
+            : parentPath + Kapiteltrenner + newLastName;
+
+        if (!string.IsNullOrEmpty(newLastName) && newChapter != oldChapter) {
+            // Kapitel umbenennen. Auch Unterpfade aktualisieren, damit
+            // die Hierarchie erhalten bleibt (z. B. "A\B" → "A\C" ändert
+            // auch "A\B\D" zu "A\C\D").
+            foreach (var tableRow in blockRows) {
+                if (tableRow is not { IsDisposed: false }) { continue; }
+                var values = tableRow.CellGetList(capCol);
+                var changed = false;
+                for (var i = 0; i < values.Count; i++) {
+                    var valueNorm = values[i].ChapterPathNormalize();
+                    if (valueNorm == oldChapter) {
+                        values[i] = newChapter;
+                        changed = true;
+                    } else if (valueNorm.StartsWith(oldChapter + Kapiteltrenner, StringComparison.Ordinal)) {
+                        // Suffix hinter dem Prefix unverändert übernehmen.
+                        values[i] = newChapter + valueNorm[oldChapter.Length..];
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    tableRow.CellSet(capCol, values, "Kapitel umbenannt: " + oldChapter + " → " + newChapter);
+                }
+            }
+        } else if (string.IsNullOrEmpty(newLastName)) {
+            // Kapitel löschen: passenden Wert aus den Zellen entfernen,
+            // sodass die Zeilen ohne Kapitel auf der obersten Ebene erscheinen.
+            foreach (var tableRow in blockRows) {
+                if (tableRow is not { IsDisposed: false }) { continue; }
+                var values = tableRow.CellGetList(capCol);
+                var changed = false;
+                for (var i = 0; i < values.Count; i++) {
+                    if (values[i].ChapterPathNormalize() == oldChapter) {
+                        values[i] = string.Empty;
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    tableRow.CellSet(capCol, values, "Kapitel entfernt: " + oldChapter);
+                }
+            }
+        }
+        tableView.Invalidate_AllViewItems(true);
+    }
+
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         var displayText = ChapterText.ChapterPathLastName();
         if (CanEditChapter) {
@@ -99,32 +202,6 @@ public sealed class RowCaptionListItem : RowBackground {
         // Button ist horizontal festgepinnt — offsetX abziehen, damit die
         // Hit-Test-Position mit der gezeichneten (ungescrollten) Position übereinstimmt.
         return new Rectangle(controlPos.X - (int)offsetX + indentOffset + p2, buttonY, size, size);
-    }
-
-    internal void EditChapter(TableView tableView) {
-        if (Arrangement?.ColumnForChapter is not { IsDisposed: false }) { return; }
-        if (tableView.Table is not { IsDisposed: false }) { return; }
-
-        // Die Zeilen des zusammenhängenden Blocks erfassen, damit beim
-        // Umbenennen nur dieser Block — und nicht alle Zeilen mit dem
-        // gleichen Kapitel-Namen in der gesamten Tabelle — geändert wird.
-        var blockRows = tableView.GetChapterBlockRows(this);
-
-        var capPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
-
-        var bt = tableView.BTB;
-        bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
-        bt.MultiLine = false;
-        // Nur das letzte Pfad-Segment bearbeiten (analog zum Windows Explorer).
-        // Die Hierarchie wird über den Parent-Pfad beibehalten.
-        bt.Text = ChapterText.ChapterPathLastName();
-        bt.Location = new Point(0, capPos.Y);
-        bt.Size = new Size(tableView.Width, capPos.Height);
-        bt.Tag = (List<object?>)[null, this, "ChapterEdit", blockRows];
-        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-        bt.Visible = true;
-        bt.BringToFront();
-        bt.Focus();
     }
 
     /// <summary>

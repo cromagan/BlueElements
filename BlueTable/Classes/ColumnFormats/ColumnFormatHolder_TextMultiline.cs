@@ -13,7 +13,6 @@ public class ColumnFormatHolder_TextMultiline : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ValueRequired = false;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

@@ -23,7 +23,7 @@ internal class Method_DeleteDirectory : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder_Filepath.Instance, true, false)) { return new DoItFeedback("Dateinamen-Fehler!", true); }
+        if (!filn.IsValidFilePath()) { return new DoItFeedback("Dateinamen-Fehler!", true); }
 
         if (!IO.DirectoryExists(filn)) {
             return DoItFeedback.Wahr();

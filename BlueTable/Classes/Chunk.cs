@@ -242,7 +242,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.AfterEditRound, c.AfterEditRound.ToString1(), name);
         SaveToByteList(bytes, TableDataType.MaxCellLength, c.MaxCellLength.ToString1(), name);
         SaveToByteList(bytes, TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString1(), name);
-        SaveToByteList(bytes, TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
+        SaveToByteList(bytes, TableDataType.ForbiddenChars, c.ForbiddenChars, name);
         SaveToByteList(bytes, TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.FilterOptions, ((int)c.FilterOptions).ToString1(), name);
         SaveToByteList(bytes, TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
@@ -263,7 +263,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.LinkedCellFilter, string.Join('\r', c.LinkedCellFilter), name);
         SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, string.Join('\r', c.AfterEditAutoReplace), name);
         SaveToByteList(bytes, TableDataType.RegexCheck, c.RegexCheck, name);
-        SaveToByteList(bytes, TableDataType.ValueRequired, c.ValueRequired.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.MinTextLength, c.MinTextLength.ToString1(), name);
         SaveToByteList(bytes, TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(bytes, TableDataType.ColumnAdminInfo, c.AdminInfo, name);

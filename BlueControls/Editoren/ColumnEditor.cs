@@ -431,7 +431,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnZeilenFilterIgnorieren.Checked = c.IgnoreAtRowFilter;
         btnEditableStandard.Checked = c.EditableWithTextInput;
         btnEditableDropdown.Checked = c.EditableWithDropdown;
-        btnRequired.Checked = c.ValueRequired;
+        txbMinTextLength.Text = c.MinTextLength.ToString1();
         btnAutoEditAutoSort.Checked = c.AfterEditQuickSortRemoveDouble;
         txbRunden.Text = c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty;
         txbFixedColumnWidth.Text = c.FixedColumnWidth > 0 ? c.FixedColumnWidth.ToString1() : string.Empty;
@@ -450,7 +450,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbRegex.Text = c.RegexCheck;
         txbTags.Text = string.Join('\r', c.ColumnTags);
         lbxCellEditor.Check(c.PermissionGroupsChangeCell, true);
-        txbAllowedChars.Text = c.AllowedChars;
+        txbAllowedChars.Text = c.AllowedChars.EncodeControlChars();
         txbMaxTextLength.Text = c.MaxTextLength.ToString1();
         txbMaxCellLength.Text = c.MaxCellLength.ToString1();
         btnOtherValuesToo.Checked = c.ShowValuesOfOtherCellsInDropdown;
@@ -458,7 +458,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbAdminInfo.Text = c.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbQuickinfo.Text = c.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxLinkedTable.Text = c.LinkedTableTableName;
-        txbAutoRemove.Text = c.AfterEditAutoRemoveChar;
+        txbAutoRemove.Text = c.ForbiddenChars.EncodeControlChars();
         cbxLinkedTable_TextChanged(cbxLinkedTable, System.EventArgs.Empty);
         capInfos.Text = ColumnUsage(c);
     }
@@ -527,10 +527,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.RegexCheck = txbRegex.Text;
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.EditableWithDropdown = btnEditableDropdown.Checked;
-        c.ValueRequired = btnRequired.Checked;
+        c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
-        c.AllowedChars = txbAllowedChars.Text;
+        c.AllowedChars = txbAllowedChars.Text.DecodeControlChars();
         c.MaxTextLength = IntParse(txbMaxTextLength.Text);
         c.MaxCellLength = IntParse(txbMaxCellLength.Text);
         c.LinkedTableTableName = cbxLinkedTable.Text;
@@ -543,7 +543,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.DefaultRenderer = cbxRenderer.Text;
         c.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
         c.SortType = (SortierTyp)IntParse(cbxSort.Text);
-        c.AfterEditAutoRemoveChar = txbAutoRemove.Text;
+        c.ForbiddenChars = txbAutoRemove.Text.DecodeControlChars();
 
         if (c.RelationType == RelationType.None) {
             c.LinkedTableTableName = string.Empty;
@@ -596,6 +596,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
         }
 
+        if (fehler == MinLengthGreaterThanMax) {
+            solutions.Add(CreateSolution("Minimallänge auf 0 setzen", () => txbMinTextLength.Text = "0", txbMinTextLength));
+            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
+        }
+
         //if (fehler == CaptionMissing) {
         //    solutions.Add(CreateSolution("Beschriftung eingeben", () => txbCaption.Text = Column?.Caption ?? string.Empty, txbCaption));
         //}
@@ -642,6 +647,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => chkRelation.Checked = false, chkRelation));
         }
 
+        if (fehler == SingleLineNeedsCrLfForbidden) {
+            solutions.Add(CreateSolution("Zeilenumbrüche zu verbotenen Zeichen hinzufügen", () => txbAutoRemove.Text += "\\r\\n", txbAutoRemove));
+            solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => chkMultiline.Checked = true, chkMultiline));
+        }
+
+        if (fehler == MultilineButCrForbidden) {
+            solutions.Add(CreateSolution("\\r aus verbotenen Zeichen entfernen", () => txbAutoRemove.Text = txbAutoRemove.Text.DecodeControlChars().Replace("\r", string.Empty).EncodeControlChars(), txbAutoRemove));
+            solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
+        }
+
         if (fehler == FixedWidthRequired) {
             solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => txbFixedColumnWidth.Text = "100", txbFixedColumnWidth));
         }
@@ -675,7 +690,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => btnEditableDropdown.Checked = true, btnEditableDropdown));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
-                btnRequired.Checked = false;
+                txbMinTextLength.Text = "0";
                 txbAuswaehlbareWerte.Text = string.Empty;
             }, txbAuswaehlbareWerte));
             if (fehler == DropdownNotSelectedItems) {
@@ -709,7 +724,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler is ValueRequiredMissingFirst
                    or ValueRequiredMissingScript) {
-            solutions.Add(CreateSolution("Wert erforderlich aktivieren", () => btnRequired.Checked = true, btnRequired));
+            solutions.Add(CreateSolution("Wert erforderlich aktivieren (mind. 1 Zeichen)", () => txbMinTextLength.Text = "1", txbMinTextLength));
         }
 
         if (fehler == ValueRequiredMissingScript) {
@@ -717,7 +732,18 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == EmptyNotAllowed) {
-            solutions.Add(CreateSolution("'Wert erforderlich' deaktivieren", () => btnRequired.Checked = false, btnRequired));
+            solutions.Add(CreateSolution("'Wert erforderlich' deaktivieren (0 Zeichen)", () => txbMinTextLength.Text = "0", txbMinTextLength));
+        }
+
+        if (fehler == AllowedAndForbiddenOverlap) {
+            solutions.Add(CreateSolution("Konfliktzeichen aus Erlaubt entfernen", () => {
+                var conflict = string.Concat(txbAllowedChars.Text.Intersect(txbAutoRemove.Text));
+                if (conflict is { Length: > 0 }) { txbAllowedChars.Text = txbAllowedChars.Text.RemoveChars(conflict); }
+            }, txbAllowedChars));
+            solutions.Add(CreateSolution("Konfliktzeichen aus Verboten entfernen", () => {
+                var conflict = string.Concat(txbAllowedChars.Text.Intersect(txbAutoRemove.Text));
+                if (conflict is { Length: > 0 }) { txbAutoRemove.Text = txbAutoRemove.Text.RemoveChars(conflict); }
+            }, txbAutoRemove));
         }
 
         return solutions;
@@ -761,7 +787,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
-            b.ValueRequired = true;
+            b.MinTextLength = 1;
             b.EditableWithDropdown = true;
 
             var dd = b.DropDownItems.Clone();

@@ -18,6 +18,8 @@ public class FormatHolder_EMail : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 320;
+        MinTextLength = 5;
+        ForbiddenChars = "\r\n";
     }
 
     #endregion

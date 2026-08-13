@@ -8,6 +8,7 @@ public static class ColumnErrorConstants {
 
     public const string AddOtherCellsNotAllowed = "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt.";
     public const string AdministratorNotAllowed = "'#Administrator' bei den Bearbeitern entfernen.";
+    public const string AllowedAndForbiddenOverlap = "Erlaubte und verbotene Zeichen enthalten Gemeinsamkeiten!";
     public const string CaptionMissing = "Spalten Beschriftung fehlt.";
     public const string CellLinkError = "Zell-Verlinkung fehlerhaft";
     public const string CellSizeTooLarge = "Zellengröße zu groß!";
@@ -53,6 +54,8 @@ public static class ColumnErrorConstants {
     public const string LinkedTableLocked = "Verknüpfte Tabelle ist passwortgeschützt.";
     public const string LinkedTableMissing = "Verknüpfte Tabelle fehlt oder existiert nicht.";
     public const string MaxLengthTooLarge = "Maximallänge zu groß!";
+    public const string MinLengthGreaterThanMax = "Die Minimallänge ist größer als die Maximallänge!";
+    public const string MultilineButCrForbidden = "Mehrzeilige Spalten dürfen \\r (Wagenrücklauf) nicht verbieten!";
     public const string MultilineNotSupported = "Format unterstützt keine mehrzeiligen Texte.";
     public const string MustIgnoreRowFilter = "Spalten ohne Inhaltsspeicherung müssen bei Zeilenfiltern ignoriert werden.";
     public const string NoAutoFilterRemoveJoker = "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen";
@@ -67,6 +70,7 @@ public static class ColumnErrorConstants {
     public const string RoundMaxFiveDecimals = "Beim Runden maximal 5 Nachkommastellen möglich";
     public const string RoundOnlySingleLine = "Runden nur bei einzeiligen Texten möglich";
     public const string ScriptTypeUndefined = "Der Typ im Skript ist nicht definiert.";
+    public const string SingleLineNeedsCrLfForbidden = "Bei einzeiligen Spalten müssen Zeilenumbrüche (\\r\\n) verboten sein.";
     public const string SortOnlyMultiline = "Sortierung kann nur bei mehrzeiligen Feldern erfolgen.";
     public const string SpellCheckNotPossible = "Rechtschreibprüfung bei diesem Format nicht möglich.";
     public const string TableDisposed = "Tabelle verworfen";

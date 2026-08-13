@@ -12,7 +12,6 @@ public class ColumnFormatHolder_FloatOnlyPositive : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Zahl;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.Numeral;
-        ValueRequired = true;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

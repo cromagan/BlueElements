@@ -4,7 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Bit : FormatHolder {
 
+    #region Fields
+
     public static readonly string Keyname = "Bit";
+
+    #endregion
 
     #region Constructors
 
@@ -16,6 +20,8 @@ public class FormatHolder_Bit : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 1;
+        MinTextLength = 1;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Ja/Nein Werte";
     }
 

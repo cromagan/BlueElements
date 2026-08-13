@@ -8,7 +8,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_CheckBitmap : Method, IComandBuilder {
+internal class Method_CheckBitmap : Method, ICommandBuilder {
 
     #region Properties
 
@@ -27,9 +27,9 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
     #region Methods
 
-    public string ComandDescription() => "Prüfe, ob auf dem Bildchirm etwas Bestimmtes zu sehen ist.";
+    public string CommandDescription() => "Prüfe, ob auf dem Bildchirm etwas Bestimmtes zu sehen ist.";
 
-    public QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
+    public QuickImage CommandImage() => QuickImage.Get(ImageCode.Bild, 16);
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(); }

@@ -25,6 +25,18 @@ public static class CsvHelper {
     public static List<string> EscapeCSVFields(List<string> fields, char separator) =>
         fields.Select(field => EscapeCSVField(field, separator)).ToList();
 
+    /// <summary>
+    /// Serialisiert die Tabelle zu einem CSV-String. Spalten- und Zeilenauswahl
+    /// erfolgen einheitlich über <see cref="Table.ColumnsInSaveOrder" /> bzw.
+    /// <see cref="Table.RowsInSaveOrder" />; Spalten mit
+    /// <see cref="ColumnItem.SaveContent" /> == false werden ausgelassen.
+    /// Felder werden escapet (in Anführungszeichen gesetzt, wenn sie Separator,
+    /// ", \r oder \n enthalten), sodass der Round-Trip mit
+    /// <see cref="ParseCSVLine" /> verlustfrei ist.
+    /// Zeilentrenner ist Environment.NewLine.
+    /// </summary>
+    /// <param name="firstLineIsHeader">Wenn true, wird als erste Zeile ein Header
+    /// mit den KeyName-Werten der Spalten geschrieben.</param>
     public static string ExportCSV(Table table, char separator, bool firstLineIsHeader) {
         var sb = new StringBuilder();
 

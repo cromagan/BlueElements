@@ -99,6 +99,16 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     } = string.Empty;
 
+    [DefaultValue("")]
+    public string ForbiddenChars {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            GenerateEtxt(false);
+        }
+    } = string.Empty;
+
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
@@ -134,6 +144,16 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             GenerateEtxt(false);
         }
     } = 4000;
+
+    [DefaultValue(0)]
+    public int MinTextLength {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            GenerateEtxt(false);
+        }
+    }
 
     /// <summary>
     /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt

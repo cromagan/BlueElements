@@ -79,6 +79,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.AllowedChars = value;
     }
 
+    public string ForbiddenChars {
+        get => _textBox.ForbiddenChars;
+        set => _textBox.ForbiddenChars = value;
+    }
+
     public bool ContextMenuDefault {
         get => _textBox.ContextMenuDefault;
         set => _textBox.ContextMenuDefault = value;
@@ -98,6 +103,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     public int MaxTextLength {
         get => _textBox.MaxTextLength;
         set => _textBox.MaxTextLength = value;
+    }
+
+    public int MinTextLength {
+        get => _textBox.MinTextLength;
+        set => _textBox.MinTextLength = value;
     }
 
     public bool MultiLine {

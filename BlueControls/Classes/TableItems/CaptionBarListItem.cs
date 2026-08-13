@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.TableItems;
 
@@ -111,6 +112,83 @@ public sealed class CaptionBarListItem : RowBackground {
         }
     }
 
+    /// <summary>
+    /// Übernimmt die gesamte Doppelklick-Logik für die Caption-Bar:
+    /// prüft Ansichtbearbeitung und Admin-Berechtigung, wählt die
+    /// Anker-Spalte (geklickt oder Fallback erstes Arrangement-Element),
+    /// sammelt Suggestions aus allen Ebenen und startet die Editierung
+    /// der Gruppen-Überschrift über <see cref="TableView.BeginEdit" />.
+    /// </summary>
+    public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
+        if (!(Arrangement?.Ansichtbearbeitung ?? false)) { return false; }
+        if (Arrangement?.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return false; }
+        if (Arrangement is not { IsDisposed: false } arrangement) { return false; }
+
+        var anchor = mouseOverColumn is { IsDisposed: false } cvi && cvi.Column is { IsDisposed: false }
+            ? cvi
+            : arrangement.FirstOrDefault(x => x is { IsDisposed: false } && x.Column is { IsDisposed: false });
+        if (anchor is not { IsDisposed: false } || anchor.Column is not { IsDisposed: false } col) { return false; }
+
+        // Suggestions aus allen Ebenen der Arrangement-Spalten sammeln.
+        List<string> suggestions = [];
+        foreach (var thisC in arrangement) {
+            if (thisC.Column is not { IsDisposed: false } c) { continue; }
+            for (var z = 0; z < 3; z++) {
+                if (c.CaptionGroup(z) is { Length: > 0 } g) { suggestions.AddIfNotExists(g); }
+            }
+        }
+
+        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+        var colX = anchor.ControlColumnLeft(tableView.OffsetX);
+        var colW = anchor.ControlColumnWidth();
+
+        tableView.BeginEdit(
+            EditTypeTable.Textfeld_mit_Vorschlägen,
+            new Point(colX, headPos.Y),
+            new Size(colW, headPos.Height),
+            col.CaptionGroup(Caption).Replace("\r", "\r\n"),
+            v => ApplyCaptionGroup(tableView, anchor, v),
+            ColumnFormatHolder_TextMultiline.Instance,
+            null, null, null,
+            string.Empty,
+            true,
+            headPos.Height,
+            ItemsOf(suggestions),
+            null,
+            tableView.Zoom);
+        return true;
+    }
+
+    /// <summary>
+    /// Übernimmt die neue Überschrift der Caption-Gruppe (Ebene
+    /// <see cref="Caption" />). Commit-Callback aus
+    /// <see cref="HandleDoubleClick" />, der an
+    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// </summary>
+    private void ApplyCaptionGroup(TableView tableView, ColumnViewItem? column, string value) {
+        if (column?.Column is not { IsDisposed: false } col) { return; }
+
+        var newGroup = value.Replace("\r\n", "\r").Trim();
+        switch (Caption) {
+            case 0:
+                col.CaptionGroup1 = newGroup;
+                break;
+
+            case 1:
+                col.CaptionGroup2 = newGroup;
+                break;
+
+            case 2:
+                col.CaptionGroup3 = newGroup;
+                break;
+
+            default:
+                Develop.DebugPrint("Ungültiger CaptionIndex: " + Caption);
+                break;
+        }
+        tableView.Invalidate_CurrentArrangement();
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
@@ -121,40 +199,6 @@ public sealed class CaptionBarListItem : RowBackground {
                 : $"Überschrift Ebene {Caption + 1}: {group}\rDoppelklick zum Bearbeiten";
         }
         return string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
-    }
-
-    internal void EditCaptionGroup(ColumnViewItem viewItem, TableView tableView) {
-        if (viewItem.Column is not { IsDisposed: false } col) { return; }
-        if (tableView.Table is not { IsDisposed: false }) { return; }
-        if (Arrangement is null) { return; }
-
-        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
-        var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
-        var colW = viewItem.ControlColumnWidth();
-
-        // Alle Überschriften-Texte aller Ebenen sammeln (für die Dropdown-Auswahl).
-        // Auch die Werte der anderen Ebenen werden angeboten.
-        List<string> suggestions = [];
-        foreach (var thisC in Arrangement) {
-            if (thisC.Column is not { IsDisposed: false } c) { continue; }
-            for (var z = 0; z < 3; z++) {
-                if (c.CaptionGroup(z) is { Length: > 0 } g) { suggestions.AddIfNotExists(g); }
-            }
-        }
-
-        var bt = tableView.BTS;
-        bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
-        bt.MultiLine = true;
-        bt.Suggestions = suggestions.AsReadOnly();
-        bt.Text = col.CaptionGroup(Caption).Replace("\r", "\r\n");
-        bt.TextboxSize = new Size(colW, headPos.Height);
-        bt.Location = new Point(colX, headPos.Y);
-        bt.Size = new Size(colW, bt.GetEstimatedHeight(colW, headPos.Height));
-        bt.Tag = (List<object?>)[viewItem, this, "CaptionGroupEdit", Caption];
-        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-        bt.Visible = true;
-        bt.BringToFront();
-        bt.Focus();
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);

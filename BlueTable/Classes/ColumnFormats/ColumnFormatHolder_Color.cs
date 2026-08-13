@@ -12,7 +12,6 @@ public class ColumnFormatHolder_Color : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ValueRequired = true;
         EditableWithDropdown = true;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

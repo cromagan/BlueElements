@@ -99,7 +99,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         r.CellSet("Table", db.Caption, string.Empty);
 
-        if (work.Container.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+        if (work.Container.IsValidFilepathAndName()) {
             r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
         }
 
@@ -560,7 +560,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         #region Variablen
 
-        // Identisch in TableHeadEditor und TableScriptEditor
+        // Arbeitskopie (OutputItem) ins Backend übernehmen. Früher geschah das
+        // bei jeder Änderung über das ItemsModified-Event — jetzt zentral beim
+        // Schließen. TableScriptEditor besitzt keinen Variablen-Editor und
+        // schreibt Table.Variables nicht zurück.
         if (((IIsEditor)variableEditor).OutputItem is VariableCollection vl) {
             Table.Variables = vl;
         }

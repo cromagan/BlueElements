@@ -16,50 +16,8 @@ namespace BlueControls.Controls {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.BCB = new ComboBox();
-            this.BTB = new TextBox();
-            this.BTS = new TextBoxSuggestions();
             this.btnEdit = new Button();
             this.SuspendLayout();
-            // 
-            // BCB
-            // 
-            this.BCB.Cursor = Cursors.IBeam;
-            this.BCB.Location = new Point(48, 120);
-            this.BCB.Name = "BCB";
-            this.BCB.Size = new Size(128, 32);
-            this.BCB.TabIndex = 8;
-            this.BCB.Visible = false;
-            this.BCB.EnterKey += new EventHandler(this.BB_EnterKey);
-            this.BCB.EscKey += new EventHandler(this.BB_EscKey);
-            this.BCB.TabKey += new EventHandler(this.BB_TabKey);
-            this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
-            // 
-            // BTB
-            // 
-            this.BTB.Cursor = Cursors.IBeam;
-            this.BTB.Location = new Point(48, 88);
-            this.BTB.Name = "BTB";
-            this.BTB.Size = new Size(128, 32);
-            this.BTB.TabIndex = 7;
-            this.BTB.Visible = false;
-            this.BTB.EnterKey += new EventHandler(this.BB_EnterKey);
-            this.BTB.EscKey += new EventHandler(this.BB_EscKey);
-            this.BTB.TabKey += new EventHandler(this.BB_TabKey);
-            this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
-            // 
-            // BTS
-            // 
-            this.BTS.Cursor = Cursors.IBeam;
-            this.BTS.Location = new Point(48, 56);
-            this.BTS.Name = "BTS";
-            this.BTS.Size = new Size(128, 64);
-            this.BTS.TabIndex = 9;
-            this.BTS.Visible = false;
-            this.BTS.EnterKey += new EventHandler(this.BB_EnterKey);
-            this.BTS.EscKey += new EventHandler(this.BB_EscKey);
-            this.BTS.TabKey += new EventHandler(this.BB_TabKey);
-            this.BTS.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // btnEdit
             // 
@@ -75,18 +33,12 @@ namespace BlueControls.Controls {
             // TableView
             // 
             this.Controls.Add(this.btnEdit);
-            this.Controls.Add(this.BCB);
-            this.Controls.Add(this.BTS);
-            this.Controls.Add(this.BTB);
             this.Name = "TableView";
             this.Size = new Size(599, 388);
             this.AutoCenter = false;
             this.ResumeLayout(false);
 
         }
-        private ComboBox BCB;
-        internal TextBox BTB;
-        internal TextBoxSuggestions BTS;
         private Button btnEdit;
     }
 }

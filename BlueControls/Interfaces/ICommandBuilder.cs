@@ -2,13 +2,13 @@
 
 namespace BlueControls.Interfaces;
 
-public interface IComandBuilder : IHasKeyName {
+public interface ICommandBuilder : IHasKeyName {
 
     #region Methods
 
-    string ComandDescription();
+    string CommandDescription();
 
-    QuickImage ComandImage();
+    QuickImage CommandImage();
 
     string GetCode(Form? form);
 

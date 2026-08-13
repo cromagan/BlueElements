@@ -17,6 +17,8 @@ public class FormatHolder_PhoneNumber : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 15;
+        MinTextLength = 3;
+        ForbiddenChars = "\r\n";
         QuickInfo = "Internationales Telefon-Format. Beispiel: +49 123 456";
     }
 

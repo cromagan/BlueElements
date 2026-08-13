@@ -89,11 +89,19 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
         _control?.TextChanged += ValueChanged_TextBox;
         _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
         _control?.NavigateToNext += _navigateHandler;
+        _control?.EnterKey += Control_EnterKey;
+        _control?.EscKey += Control_EscKey;
+        _control?.TabKey += Control_TabKey;
+        _control?.LostFocus += Control_LostFocus;
     }
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBox;
         _control?.NavigateToNext -= _navigateHandler;
+        _control?.EnterKey -= Control_EnterKey;
+        _control?.EscKey -= Control_EscKey;
+        _control?.TabKey -= Control_TabKey;
+        _control?.LostFocus -= Control_LostFocus;
     }
 
     protected override void ApplyStyle() {
@@ -106,6 +114,7 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         _control?.QuickInfo = QuickInfo;
+        _control?.Zoom = Zoom;
     }
 
     protected override void SetValueToControlInternal(string value) => _control?.Text = value;
@@ -114,6 +123,14 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
         if (_control is not { IsDisposed: false }) { return; }
         OnValueChanged(_control.Text);
     }
+
+    private void Control_EnterKey(object? sender, System.EventArgs e) => OnEnterKey();
+
+    private void Control_EscKey(object? sender, System.EventArgs e) => OnEscKey();
+
+    private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
+
+    private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
     #endregion
 }

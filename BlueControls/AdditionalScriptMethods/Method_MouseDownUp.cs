@@ -7,7 +7,7 @@ using BlueScript.Variables;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_MouseDownUp : Method, IComandBuilder {
+internal class Method_MouseDownUp : Method, ICommandBuilder {
 
     #region Properties
 
@@ -24,9 +24,9 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
     #region Methods
 
-    public string ComandDescription() => "Klicke mit der Maus.";
+    public string CommandDescription() => "Klicke mit der Maus.";
 
-    public QuickImage ComandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
+    public QuickImage CommandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var xdown = attvar.ValueIntGet(0);

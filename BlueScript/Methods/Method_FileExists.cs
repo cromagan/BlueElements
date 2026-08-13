@@ -21,7 +21,7 @@ internal class Method_FileExists : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var filn = attvar.ValueStringGet(0);
 
-        return !filn.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)
+        return !filn.IsValidFilepathAndName()
             ? new DoItFeedback("Dateinamen-Fehler!", true)
             : new DoItFeedback(IO.FileExists(filn));
     }

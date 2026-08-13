@@ -658,7 +658,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 var fn = string.Empty;
 
                 foreach (var thist in t) {
-                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+                    if (string.IsNullOrEmpty(fn) && thist.IsValidFilepathAndName()) {
                         fn = thist;
                     }
                     if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
@@ -677,7 +677,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             // Reset + befüllen, damit nur die Pfade des aktuellen Aufrufs gelten.
             AdditionalSearchPathsOnThisThread.Clear();
 
-            if (file.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+            if (file.IsValidFilepathAndName()) {
                 AdditionalSearchPathsOnThisThread.AddIfNotExists(file.FilePath());
                 file = file.FileNameWithoutSuffix();
             }
@@ -751,7 +751,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (t.StartsWith("DATABASE", StringComparison.Ordinal)) { return false; }
         if (t.StartsWith("TABLE", StringComparison.Ordinal)) { return false; }
 
-        if (!tablename.IsFormat(FormatHolder_SystemName.Instance, true, false)) { return false; }
+        if (tablename.IsFormat(FormatHolder_SystemName.Instance, false) is { Length: > 0 }) { return false; }
 
         if (t == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -1018,7 +1018,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (!string.IsNullOrEmpty(_assetFolder)) {
             var t = _assetFolder.NormalizePath();
-            if (t.IsFormat(FormatHolder_Filepath.Instance, true, false)) {
+            if (t.IsValidFilePath()) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -1034,7 +1034,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
 
             t = t.NormalizePath();
-            if (t.IsFormat(FormatHolder_Filepath.Instance, true, false)) {
+            if (t.IsValidFilePath()) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -1328,16 +1328,31 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         Column.GenerateAndAddSystem(SystemColumnKeys.RowSortIndex);
         RepairAfterParse();
 
+        RenumberRows(r, "Benutzerdefinierte Sortierung aktiviert");
+
+        ConvertChapterColumnsToSingleLine();
+    }
+
+    /// <summary>
+    /// Nummeriert die übergebenen Zeilen in der übergebenen Reihenfolge fortlaufend
+    /// (1, 2, 3, ...) und schreibt die Werte in die Systemspalte für die
+    /// benutzerdefinierte Sortierung (<see cref="ColumnCollection.SysRowSortIndex"/>).
+    /// Dispose-Zustände werden übersprungen. Ist keine Sortierspalte aktiv, ist die
+    /// Methode eine No-Op. Event-Suppression muss der Aufrufer übernehmen — bei
+    /// vielen Zeilen löst jedes <see cref="RowItem.CellSet"/> synchron teure
+    /// Layout-Aktualisierungen aus.
+    /// </summary>
+    public void RenumberRows(IEnumerable<RowItem> rowsInOrder, string reason) {
+        if (IsDisposed) { return; }
         if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
 
         var nr = 1;
-        foreach (var thisRow in r) {
-            if (thisRow.IsDisposed) { continue; }
-            thisRow.CellSet(sortCol, nr, "Benutzerdefinierte Sortierung aktiviert");
-            nr++;
+        foreach (var thisRow in rowsInOrder) {
+            if (thisRow is { IsDisposed: false }) {
+                thisRow.CellSet(sortCol, nr, reason);
+                nr++;
+            }
         }
-
-        ConvertChapterColumnsToSingleLine();
     }
 
     public void EnableScript() {
@@ -2266,9 +2281,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (column.Relationship_to_First) { rowItem.RepairRelationText(column, previewsValue); }
 
         if (column.Am_A_Key_For.Count > 0) {
-            foreach (var thisColumn in Column) {
-                if (thisColumn.RelationType == RelationType.CellValues) {
-                    rowItem.LinkedCellData(thisColumn, true, false);
+            foreach (var linkedColumnName in column.Am_A_Key_For) {
+                if (Column[linkedColumnName] is { IsDisposed: false } thisColumn) {
+                    rowItem.LinkedCellData(thisColumn, true, true);
                 }
             }
         }
@@ -2581,10 +2596,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             case TableDataType.EventScript: {
                     var parsed = value.SplitAndCutByCr().Select(t => new TableScriptDescription(this, t)).ToList();
 
-                    if (!IsOnlyStatisticsUpdate(_eventScript, parsed)) {
-                        Row.InvalidateAllCheckData();
-                        OnScriptChanged();
-                    }
+                    // IsOnlyStatisticsUpdate muss gegen den ALTEN Stand von _eventScript
+                    // gebildet werden, deshalb vor der Aktualisierung auswerten.
+                    var isOnlyStatisticsUpdate = IsOnlyStatisticsUpdate(_eventScript, parsed);
 
                     var existingByKey = new Dictionary<string, TableScriptDescription>(StringComparer.OrdinalIgnoreCase);
                     foreach (var s in _eventScript) { existingByKey.TryAdd(s.KeyName, s); }
@@ -2600,6 +2614,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                     _hasValueChangedScript = null;
                     _mayAffectUser = null;
                     _changesRowColor = null;
+
+                    // OnScriptChanged() ERST nach der Aktualisierung von _eventScript feuern:
+                    // Subscriber (z. B. TableViewForm.UpdateScripts) lesen tb.EventScript und
+                    // werten CheckScriptError/ErrorReason aus. Mit dem alten Stand wuerde die
+                    // Aufgabenbox nicht den korrigierten Fehlerstatus anzeigen.
+                    if (!isOnlyStatisticsUpdate) {
+                        Row.InvalidateAllCheckData();
+                        OnScriptChanged();
+                    }
+
                     break;
                 }
 
@@ -2709,7 +2733,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         var folder = new List<string>(AdditionalSearchPathsOnThisThread);
 
         foreach (var thisTb in LiveInstances.Values) {
-            if (thisTb is TableFile { IsDisposed: false } tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+            if (thisTb is TableFile { IsDisposed: false } tbf && tbf.Filename.IsValidFilepathAndName()) {
                 folder.AddIfNotExists(tbf.Filename.FilePath());
             }
         }

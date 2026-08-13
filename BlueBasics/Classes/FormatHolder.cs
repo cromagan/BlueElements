@@ -24,8 +24,10 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
+    public string ForbiddenChars { get; set; } = string.Empty;
     public string KeyName { get; protected set; }
     public int MaxTextLength { get; set; }
+    public int MinTextLength { get; set; }
     public bool MultiLine { get; set; }
     public string QuickInfo { get; set; } = string.Empty;
     public string RegexCheck { get; set; } = string.Empty;

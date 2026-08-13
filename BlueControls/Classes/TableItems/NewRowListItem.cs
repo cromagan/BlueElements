@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+
 namespace BlueControls.Classes.TableItems;
 
 /// <summary>
@@ -81,6 +83,24 @@ public sealed class NewRowListItem : RowBackground {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+
+    /// <summary>
+    /// Startet die Inline-Editierung für das Anlegen einer neuen Zeile.
+    /// Ist die ChunkValue-Spalte die erste Spalte, wird der ChunkValue null
+    /// übergeben (neue Zeile wird später erzeugt); sonst der aktuelle
+    /// FilterChunkValue, damit die neue Zeile im aktuellen Chunk landet.
+    /// Die eigentliche Edit-Logik liegt in
+    /// <see cref="RowBackground.BeginCellEdit" />.
+    /// </summary>
+    public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
+        if (mouseOverColumn is null) { return false; }
+        if (Arrangement?.Table is not { IsDisposed: false } tb) { return false; }
+
+        var chunkValue = tb.Column.ChunkValueColumn == tb.Column.First
+            ? null
+            : FilterCombined?.ChunkVal;
+        return BeginCellEdit(tableView, mouseOverColumn, this, null, true, chunkValue);
+    }
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { IsDisposed: false }) { return string.Empty; }

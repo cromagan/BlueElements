@@ -187,7 +187,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
     public void AddTabPage(string tablename) {
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+        if (tablename.IsValidFilepathAndName()) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -294,7 +294,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     protected static void ChangeTableInTab(string tablename, TabPage? tabpage, JsonObject? settings) {
         if (tabpage is null) { return; }
 
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+        if (tablename.IsValidFilepathAndName()) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -476,7 +476,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         FormManager.SaveAllFiles();
-        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance, true, false)) {
+        if (tablename.IsValidFilepathAndName()) {
             Table.Get(tablename);
             tablename = tablename.FileNameWithoutSuffix();
         }
@@ -702,7 +702,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
-            => TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, null, null, null, TableView.RowsVisibleUnique());
+            => TableView.ExecuteContextMenuCommand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, null, null, null, TableView.RowsVisibleUnique());
 
     private void cbxColumnArr_AddClicked(object? sender, AddItemEventArgs e) {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
@@ -841,7 +841,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// Click-Handler für das Aufgaben-Item "Komplette Datenüberprüfung".
     /// </summary>
     private void ContextMenu_DataValidation(object? sender, ContextMenuEventArgs e)
-        => TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DataValidation, null, null, null, null, TableView.RowsVisibleUnique());
+        => TableView.ExecuteContextMenuCommand(BlueControls.Controls.TableView.ContextMenu_DataValidation, null, null, null, null, TableView.RowsVisibleUnique());
 
     /// <summary>
     /// Click-Handler für Aufgaben-Items, die eine bestimmte Spalte betreffen
@@ -852,7 +852,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (TableView.Table is not { IsDisposed: false } tb) { return; }
         if (tb.Column[e.Item.KeyName] is not { IsDisposed: false } column) { return; }
 
-        TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, column, null, column, null, null);
+        TableView.ExecuteContextMenuCommand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, column, null, column, null, null);
     }
 
     /// <summary>
@@ -863,7 +863,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (TableView.Table is not { IsDisposed: false } tb) { return; }
         if (tb.EventScript.FirstOrDefault(s => s.KeyName == e.Item.KeyName) is not { } script) { return; }
 
-        TableView.ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, null, null, null, TableView.RowsVisibleUnique());
+        TableView.ExecuteContextMenuCommand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, null, null, null, TableView.RowsVisibleUnique());
     }
 
     private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) {

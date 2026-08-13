@@ -142,3 +142,6 @@ Verschwende nicht zu viel Zeit, oft geht es schneller mit Diagnose-Aufrufen.
 Kein Console.Writeline und auch ein Develop.DebugPrint
 Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden sollen.
 
+## Sonstiges
+Erinnere mich im September daran, MinTextLength = 147 zu entfernen und 147 zu den obsoleten Werten hinzuzufügen.
+

@@ -17,6 +17,8 @@ public class FormatHolder_FloatOnlyPositive : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 255;
+        MinTextLength = 1;
+        ForbiddenChars = "\r\n";
     }
 
     #endregion

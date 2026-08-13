@@ -6,6 +6,7 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
+using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Renderer;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
@@ -58,6 +59,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     private readonly HashSet<string> _collapsedBlockFirstRowKeys = [];
 
+    /// <summary>
+    /// Cache der Inline-Edit-Strategien, schlüsselweise nach
+    /// <see cref="EditTypeTable" />. Jede Strategie wird beim ersten Gebrauch
+    /// lazy erzeugt und für alle weiteren Edits wiederverwendet, damit das
+    /// teure Control (inkl. Item-Listen-Setup) nicht jedes Mal neu aufgebaut
+    /// werden muss. Der Cache ist <see cref="IDisposable" /> und wird beim
+    /// Freigeben der TableView disposet — dabei werden auch alle enthaltenen
+    /// Strategien (und damit ihre Controls) freigegeben.
+    /// </summary>
+    private readonly ConcurrentCache<EditTypeTable, FlexiStrategyBase> _editStrategyCache = new(16);
+
     private readonly object _lockUserAction = new();
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
@@ -73,6 +85,24 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private object? _dragItem;
 
     private Point _dragMouseDown;
+
+    /// <summary>
+    /// Zell-Kontext des aktiven Dropdown-Edits. Wird beim Öffnen der
+    /// <see cref="FlexiStrategyDropDownListBox" /> gesetzt und im
+    /// <see cref="Edit_ValueChanged" />-Event-Handler benötigt,
+    /// um die Toggle-/Commit-Logik auszuführen.
+    /// </summary>
+    private CellExtEventArgs? _dropdownCellInfo;
+
+    /// <summary>
+    /// Commit-Callback des gerade aktiven Inline-Edits. Wird beim Starten
+    /// eines Edits gesetzt und beim Schließen (<see cref="Edit_Close"/>)
+    /// mit dem neuen Text aufgerufen; danach wieder auf <c>null</c>.
+    /// Am Ende wird immer nur ein String an eine
+    /// konkrete Ziel-Stelle (Zelle, Caption, Kapitel, …) geschrieben,
+    /// und genau diese Setter-Referenz hält dieses Feld bereit.
+    /// </summary>
+    private Action<string>? _editCommit;
 
     private bool _isDragging;
     private bool _isinDoubleClick;
@@ -274,7 +304,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool MiniToolbarEnabled { get; set; } = false;
 
     [Browsable(false)]
@@ -430,6 +460,28 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     protected override bool ShowSliderX => true;
 
     protected override int SmallChangeY => 10;
+
+    /// <summary>
+    /// Liefert die aktuell aktive Inline-Edit-Strategie, falls vorhanden.
+    /// "Aktiv" bedeutet: Ihr Control ist sichtbar und nicht disposet. Da zu
+    /// jedem Zeitpunkt höchstens eine Strategie aktiv ist, reicht eine lineare
+    /// Suche über den <see cref="_editStrategyCache" />. Ersetzt das frühere
+    /// <c>_editStrategy</c>-Feld — die Aktiv-Markierung wird jetzt rein aus dem
+    /// Sichtbarkeitszustand des Controls abgeleitet.
+    /// </summary>
+    private FlexiStrategyBase? ActiveEditStrategy {
+        get {
+            if (_editStrategyCache.IsDisposed) { return null; }
+            foreach (var strategy in _editStrategyCache.Values) {
+                if (strategy.Control is System.Windows.Forms.Control c
+                    && c.Visible
+                    && !c.IsDisposed) {
+                    return strategy;
+                }
+            }
+            return null;
+        }
+    }
 
     private Dictionary<string, RowBackground>? AllViewItems {
         get {
@@ -1630,6 +1682,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return result;
     }
 
+    internal static void NotEditableInfo(string reason) {
+        if (string.IsNullOrEmpty(reason)) { return; }
+        Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+        QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
+    }
+
     internal static void RepairColumnArrangements(Table tb) {
         if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
@@ -1641,6 +1699,227 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
+    }
+
+    internal static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, bool formatWarnung) {
+        if (cellInThisTableColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
+
+        #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
+
+        var contentHolderCellRow = cellInThisTableRow?.Row;
+        if (contentHolderCellRow is { IsDisposed: false } cellRow && contentHolderCellColumn.RelationType == RelationType.CellValues) {
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
+            if (contentHolderCellColumn is null || contentHolderCellRow is null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
+        }
+
+        #endregion
+
+        #region Format prüfen
+
+        if (formatWarnung) {
+            var formatReason = newValue.IsFormat(contentHolderCellColumn, contentHolderCellColumn.MultiLine);
+            if (formatReason is { Length: > 0 }) {
+                if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format:<br><b>" + formatReason + "</b><br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
+                    return "Abbruch, da das erwartete Format nicht eingehalten wurde: " + formatReason;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Info über Abwandlungen
+
+        var tmpnewValue = contentHolderCellColumn.AutoCorrect(newValue, false);
+
+        if (tmpnewValue != newValue.Replace("\r\n", "\r")) {
+            QuickNote.Show(NoteSymbols.Pencil, "Eingabe automatisch korrigiert");
+        }
+        newValue = tmpnewValue;
+
+        #endregion
+
+        #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Tabelle)
+
+        if (cellInThisTableRow is null) {
+            if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
+            if (cellInThisTableColumn.Column?.Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+            if (table.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
+
+            using var filterColNewRow = new FilterCollection(table.Table, "Edit-Filter");
+            filterColNewRow.AddIfNotExists(table.FilterCombined);
+            filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
+
+            var newChunkVal = filterColNewRow.ChunkVal;
+            var fe = table.IsCellEditable(cellInThisTableColumn, null, newChunkVal, true);
+            if (string.IsNullOrWhiteSpace(fe)) {
+                fe = Table.IsCellEditable(cellInThisTableColumn?.Column, null, newChunkVal, false);
+            }
+            if (!string.IsNullOrEmpty(fe)) { return fe; }
+
+            var nr = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
+
+            if (nr.IsFailed || nr.Value is not RowItem newRow) { return nr.FailedReason; }
+
+            if (!table.FilterCombined.Rows.Contains(newRow)) {
+                if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
+                    table.PinAdd(newRow);
+                }
+            }
+
+            var rd = table.GetRow(newRow, null);
+            table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
+
+            return string.Empty;
+        }
+
+        #endregion
+
+        if (contentHolderCellRow is not null) {
+            var oldval = contentHolderCellRow.CellGetString(contentHolderCellColumn);
+
+            if (newValue == oldval) { return string.Empty; }
+
+            var newChunkVal = cellInThisTableRow.Row.ChunkValue;
+
+            if (cellInThisTableColumn.Column == cellInThisTableColumn.Column.Table?.Column.ChunkValueColumn) {
+                newChunkVal = newValue;
+            }
+
+            var check1 = table.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
+            if (string.IsNullOrWhiteSpace(check1)) {
+                check1 = Table.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, false);
+            }
+            if (!string.IsNullOrEmpty(check1)) { return check1; }
+
+            var cellResult = contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
+            if (!string.IsNullOrEmpty(cellResult)) { return cellResult; }
+
+            if (contentHolderCellColumn.SaveContent) {
+                contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");
+            } else {
+                // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
+                contentHolderCellRow.InvalidateCheckData();
+                contentHolderCellRow.CheckRow();
+            }
+
+            if (cellInThisTableColumn is { } citc && table.Table == citc.Column?.Table) { table.CursorPos_Set(citc, cellInThisTableRow, false); }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Universeller Einstieg für alle Inline-Edits. Die Aufrufer (üblicherweise
+    /// die <see cref="RowBackground" />-Subklassen via <c>HandleDoubleClick</c>
+    /// bzw. <c>HandleKeyPress</c>) übergeben Position, Edit-Typ und Commit-
+    /// Logik direkt. TableView kümmert sich nur noch um Strategy-Auswahl,
+    /// Konfiguration und Aktivierung des Controls — nicht mehr um die
+    /// Herkunft des Werts.
+    /// Strategien mit <see cref="FlexiStrategyBase.SupportsSuggestions" /> erhalten
+    /// hier einheitlich ihre Auswahlliste, sofern der Aufrufer keine vorbelegt.
+    /// </summary>
+    internal void BeginEdit(
+        EditTypeTable editType,
+        Point location,
+        Size size,
+        string value,
+        Action<string> commit,
+        ColumnFormatHolder? styleTemplate,
+        ColumnItem? styleColumn,
+        ColumnItem? contentColumn,
+        RowItem? contentRow,
+        string quickInfo,
+        bool multiLine,
+        int parentHeight,
+        List<AbstractListItem>? listItems,
+        CellExtEventArgs? cellInfo,
+        float zoom) {
+        if (IsDisposed) { return; }
+
+        HideAllEditControls();
+
+        var strategy = GetOrCreateEditStrategy(editType);
+        if (strategy.Control is not System.Windows.Forms.Control c) { return; }
+
+        // Auswahllisten (Vorschläge) einheitlich für alle Strategien mit
+        // NeedsSuggestions ermitteln — sofern der Aufrufer keine eigenen
+        // Items übergibt. Die content-Spalte hat Vorrang vor der Style-Spalte
+        // (LinkedCell-Auflösung), der Renderer wird aus dem CellView geholt.
+        var items = listItems;
+        if (strategy.SupportsSuggestions && items is not { Count: > 0 }) {
+            items = CollectEditItems(contentColumn, styleColumn, contentRow, cellInfo);
+        }
+
+        // Dropdown-Sonderfall: Ohne Items ist kein Dropdown möglich. Wenn die
+        // Spalte Text erlaubt, auf Textfeld zurückfallen, sonst abbrechen.
+        // Die "Erweiterte Eingabe" wird bei Text-Erlaubnis als zusätzlicher
+        // Eintrag angeboten (Auswertung in DropDownMenu_ItemClicked).
+        if (editType == EditTypeTable.Dropdown_Single) {
+            if (contentColumn is not { IsDisposed: false } contentHolderCellColumn) { return; }
+
+            if (items is not { Count: > 0 }) {
+                if (contentHolderCellColumn.EditableWithTextInput) {
+                    BeginEdit(EditTypeTable.Textfeld, location, size, value, commit, styleTemplate, styleColumn, contentColumn, contentRow, quickInfo, multiLine, parentHeight, listItems, cellInfo, zoom);
+
+                    return;
+                } else {
+                    NotEditableInfo("Keine Items zum Auswählen vorhanden.");
+                }
+                return;
+            }
+
+            if (contentHolderCellColumn.EditableWithTextInput) {
+                items.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
+                items.Add(SeparatorWith(FirstSortChar + "2"));
+            }
+        }
+
+        strategy.BeginInit();
+        if (styleTemplate is { } template) {
+            strategy.GetStyleFrom(template);
+        } else if (styleColumn is { IsDisposed: false } col) {
+            strategy.GetStyleFrom(col);
+        }
+        strategy.Zoom = zoom;
+        strategy.QuickInfo = quickInfo;
+        strategy.MultiLine = multiLine;
+        strategy.ParentHeight = parentHeight;
+        if (items is { Count: > 0 }) { strategy.ListItems = items; }
+
+        // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
+        if (editType == EditTypeTable.Dropdown_Single) {
+            strategy.CheckBehavior = CheckBehavior.MultiSelection;
+            strategy.AutoSort = true;
+        }
+
+        strategy.EndInit();
+
+        // Größenberechnung: TextBoxSuggestions schätzt die Höhe anhand der
+        // Vorschläge, das Dropdown wird so groß wie die Items es verlangen.
+        if (strategy.Control is TextBoxSuggestions tbs) {
+            tbs.TextboxSize = size;
+            size = new Size(size.Width, tbs.GetEstimatedHeight(size.Width, size.Height));
+        } else if (strategy is FlexiStrategyDropDownListBox ddStrategy) {
+            size = ddStrategy.CalculateRequiredSize(size.Width, size.Height);
+        }
+
+        c.Location = location;
+        c.Size = size;
+        strategy.SetValueToControl(value);
+
+        // Commit-Setup: Dropdown committet pro Item-Klick über ValueChanged
+        // (siehe DropDownStrategy_ValueChanged) und braucht _editCommit nicht;
+        // alle anderen Strategien committen über den übergebenen Callback.
+        if (editType == EditTypeTable.Dropdown_Single) {
+            _dropdownCellInfo = cellInfo;
+            _editCommit = null;
+        } else {
+            _editCommit = commit;
+        }
+
+        c.Visible = true;
+        c.BringToFront();
+        c.Focus();
     }
 
     internal void BeginSmoothScrollToColumn(int targetX, int targetY) {
@@ -1718,6 +1997,34 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         return found ? rows : null;
+    }
+
+    internal void Invalidate_AllViewItems(bool andclear) {
+        _mustDoAllViewItems = true;
+        _sortedViewItems = [];
+        _cachedRowViewItems = [];
+        _rowLookup.Clear();
+        if (andclear) {
+            _allViewItems.Clear();
+        } else {
+            try {
+                var keysToRemove = new List<string>();
+                foreach (var kvp in _allViewItems) {
+                    if (kvp.Value is RowListItem rli && rli.Row.IsDisposed) {
+                        keysToRemove.Add(kvp.Key);
+                    } else if (kvp.Value is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
+                        keysToRemove.Add(kvp.Key);
+                    }
+                }
+                foreach (var key in keysToRemove) {
+                    _allViewItems.Remove(key);
+                }
+            } catch {
+                _allViewItems.Clear(); // Tja, geht wohl nicht anders.
+            }
+        }
+        Invalidate_MaxBounds();
+        Invalidate();
     }
 
     internal void Invalidate_CurrentArrangement() {
@@ -1808,6 +2115,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 FilterCombined.Dispose();
                 FilterFix.Dispose();
                 Filter.Dispose();
+
+                HideAllEditControls();
+                _editCommit = null;
+                _editStrategyCache.Dispose();
 
                 Table = null; // Wichtig um Events zu lösen
             }
@@ -1967,7 +2278,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         lock (_lockUserAction) {
             if (_isinDoubleClick) { return; }
@@ -1985,25 +2296,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     return;
                 }
 
-                if (_mouseOverRow is RowListItem rli) {
-                    Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);
-                } else if (_mouseOverRow is NewRowListItem nrli) {
-                    if (tb.Column.ChunkValueColumn == tb.Column.First) {
-                        Cell_Edit(_mouseOverColumn, nrli, true, null);
-                    } else {
-                        Cell_Edit(_mouseOverColumn, nrli, true, FilterCombined.ChunkVal);
-                    }
-                } else if (_mouseOverRow is ColumnsHeadListItem chli && _mouseOverColumn is { IsDisposed: false } cvi && cvi.Column is { IsDisposed: false }) {
-                    if (IsAdministrator()) { chli.EditCaption(cvi, this); }
-                } else if (Ansichtbearbeitung && _mouseOverRow is CaptionBarListItem cbli && IsAdministrator()) {
-                    var anchor = _mouseOverColumn is { IsDisposed: false } anchorCvi ? anchorCvi : CurrentArrangement?.FirstOrDefault();
-                    if (anchor is { IsDisposed: false } && anchor.Column is { IsDisposed: false }) {
-                        cbli.EditCaptionGroup(anchor, this);
-                    }
-                } else if (_mouseOverRow is RowCaptionListItem rcli && rcli.CanEditChapter
-                           && !rcli.IsArrowButtonHit(MouseDownData?.ControlX ?? 0, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY)) {
-                    rcli.EditChapter(this);
-                }
+                _mouseOverRow?.HandleDoubleClick(_mouseOverColumn, this);
             } finally {
                 _isinDoubleClick = false;
             }
@@ -2378,7 +2671,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     protected override void WndProc(ref Message m) {
         const int WM_MOUSEWHEEL = 0x020A;
-        if (m.Msg == WM_MOUSEWHEEL && (BTB.Visible || BCB.Visible || BTS.Visible)) {
+        if (m.Msg == WM_MOUSEWHEEL && ActiveEditStrategy is not null) {
             return;
         }
         base.WndProc(ref m);
@@ -2488,6 +2781,20 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         CellNoteHelper.RemoveNote(column, row);
         tableView?.Invalidate();
     }
+
+    /// <summary>
+    /// Factory für den <see cref="_editStrategyCache" />: erzeugt zur
+    /// übergebenen <paramref name="editType" /> die passende neue Strategie.
+    /// Aufruf erfolgt ausschließlich über <see cref="ConcurrentCache{TKey, TValue}.GetOrAdd" />,
+    /// sodass jede Strategie pro TableView höchstens einmal angelegt wird.
+    /// </summary>
+    private static FlexiStrategyBase CreateEditStrategy(EditTypeTable editType) => editType switch {
+        EditTypeTable.Textfeld => new FlexiStrategyTextBox(),
+        EditTypeTable.Textfeld_mit_Auswahlknopf => new FlexiStrategyComboBox(),
+        EditTypeTable.Textfeld_mit_Vorschlägen => new FlexiStrategyTextBoxSuggestions(),
+        EditTypeTable.Dropdown_Single => new FlexiStrategyDropDownListBox(),
+        _ => throw new ArgumentOutOfRangeException(nameof(editType), editType, "Nicht unterstützter Edit-Typ für Inline-Edit.")
+    };
 
     private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
         var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
@@ -2714,12 +3021,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
-    private static void NotEditableInfo(string reason) {
-        if (string.IsNullOrEmpty(reason)) { return; }
-        Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
-        QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
-    }
-
     /// <summary>
     /// Liefert entweder eine Einzelelement-Liste (wenn <paramref name="row"/> gesetzt)
     /// oder eine Kopie aller <paramref name="rows"/>. Typischer Aufruf in
@@ -2728,112 +3029,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
         => row is not null ? [row] : [.. rows];
-
-    private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, bool formatWarnung) {
-        if (cellInThisTableColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
-
-        #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
-
-        var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow is { IsDisposed: false } cellRow && contentHolderCellColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
-            if (contentHolderCellColumn is null || contentHolderCellRow is null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
-        }
-
-        #endregion
-
-        #region Format prüfen
-
-        if (formatWarnung) {
-            if (!newValue.IsFormat(contentHolderCellColumn, contentHolderCellColumn.ValueRequired, contentHolderCellColumn.MultiLine)) {
-                if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
-                    return "Abbruch, da das erwartete Format nicht eingehalten wurde.";
-                }
-            }
-        }
-
-        #endregion
-
-        #region Info über Abwandlungen
-
-        var tmpnewValue = contentHolderCellColumn.AutoCorrect(newValue, false);
-
-        if (tmpnewValue != newValue.Replace("\r\n", "\r")) {
-            QuickNote.Show(NoteSymbols.Pencil, "Eingabe automatisch korrigiert");
-        }
-        newValue = tmpnewValue;
-
-        #endregion
-
-        #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Tabelle)
-
-        if (cellInThisTableRow is null) {
-            if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
-            if (cellInThisTableColumn.Column?.Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-            if (table.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
-
-            using var filterColNewRow = new FilterCollection(table.Table, "Edit-Filter");
-            filterColNewRow.AddIfNotExists(table.FilterCombined);
-            filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
-
-            var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.IsCellEditable(cellInThisTableColumn, null, newChunkVal, true);
-            if (string.IsNullOrWhiteSpace(fe)) {
-                fe = Table.IsCellEditable(cellInThisTableColumn?.Column, null, newChunkVal, false);
-            }
-            if (!string.IsNullOrEmpty(fe)) { return fe; }
-
-            var nr = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
-
-            if (nr.IsFailed || nr.Value is not RowItem newRow) { return nr.FailedReason; }
-
-            if (!table.FilterCombined.Rows.Contains(newRow)) {
-                if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
-                    table.PinAdd(newRow);
-                }
-            }
-
-            var rd = table.GetRow(newRow, null);
-            table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
-
-            return string.Empty;
-        }
-
-        #endregion
-
-        if (contentHolderCellRow is not null) {
-            var oldval = contentHolderCellRow.CellGetString(contentHolderCellColumn);
-
-            if (newValue == oldval) { return string.Empty; }
-
-            var newChunkVal = cellInThisTableRow.Row.ChunkValue;
-
-            if (cellInThisTableColumn.Column == cellInThisTableColumn.Column.Table?.Column.ChunkValueColumn) {
-                newChunkVal = newValue;
-            }
-
-            var check1 = table.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
-            if (string.IsNullOrWhiteSpace(check1)) {
-                check1 = Table.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, false);
-            }
-            if (!string.IsNullOrEmpty(check1)) { return check1; }
-
-            var cellResult = contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
-            if (!string.IsNullOrEmpty(cellResult)) { return cellResult; }
-
-            if (contentHolderCellColumn.SaveContent) {
-                contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");
-            } else {
-                // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
-                contentHolderCellRow.InvalidateCheckData();
-                contentHolderCellRow.CheckRow();
-            }
-
-            if (cellInThisTableColumn is { } citc && table.Table == citc.Column?.Table) { table.CursorPos_Set(citc, cellInThisTableRow, false); }
-        }
-
-        return string.Empty;
-    }
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Table = null;
 
@@ -3066,38 +3261,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             OffsetY -= 20;
         }
     }
-
-    private void BB_EnterKey(object sender, System.EventArgs e) {
-        if (sender is TextBox tb && tb.MultiLine) { return; }
-        if (sender is TextBoxSuggestions tbs && tbs.MultiLine) { return; }
-        CloseAllComponents();
-    }
-
-    private void BB_EscKey(object sender, System.EventArgs e) {
-        BTB.Tag = null;
-        BTB.Visible = false;
-        BCB.Tag = null;
-        BCB.Visible = false;
-        BTS.Tag = null;
-        BTS.Visible = false;
-        CloseAllComponents();
-    }
-
-    private void BB_LostFocus(object sender, System.EventArgs e) {
-        if (FloatingForm.IsShowing(BTB) || FloatingForm.IsShowing(BCB) || FloatingForm.IsShowing(BTS)) { return; }
-
-        // Ist die Textbox noch sichtbar, wurde der Fokusverlust durch einen
-        // Klick auf die Tabelle ausgelöst (nicht durch Enter/Tab/Esc — dort
-        // wird Visible vorher auf false gesetzt). Den folgenden MouseDown
-        // konsumieren, damit der Cursor nicht springt.
-        if (sender is Control c && c.Visible) {
-            _consumeNextMouseDown = true;
-        }
-
-        CloseAllComponents();
-    }
-
-    private void BB_TabKey(object sender, System.EventArgs e) => CloseAllComponents();
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
@@ -3631,199 +3794,24 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         Invalidate();
     }
 
+    /// <summary>
+    /// Dünner Dispatcher für Tastatur-/Kontextmenü-gesteuerte Zell-Edits
+    /// (z. B. F2-Taste, "#Erweitert"-Fallback aus dem Dropdown-Menü).
+    /// Die eigentliche Logik liegt in
+    /// <see cref="RowBackground.BeginCellEdit" /> und wird pro Item-Typ
+    /// aufgerufen. Doppelklicks laufen direkt über
+    /// <see cref="RowBackground.HandleDoubleClick" />, ohne diesen Dispatcher.
+    /// </summary>
     private void Cell_Edit(ColumnViewItem? viewItem, RowBackground? rowItem, bool preverDropDown, string? chunkval) {
-        var f = IsCellEditable(viewItem, rowItem as RowListItem, chunkval, true);
-        if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
-
-        if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
-            NotEditableInfo("Keine Spalte angeklickt.");
-            return;
-        }
-
-        var contentHolderCellRow = (rowItem as RowListItem)?.Row;
-
-        if (contentHolderCellRow is { IsDisposed: false } cellRow && viewItem.Column.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
-        }
-
-        if (contentHolderCellColumn is not { IsDisposed: false }) {
-            NotEditableInfo("Keine Spalte angeklickt.");
-            return;
-        }
-
-        var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, preverDropDown);
-
-        if (dia == EditTypeTable.None && (contentHolderCellColumn.Table?.PowerEdit ?? false)) {
-            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, false, true);
-        }
-
-        switch (dia) {
-            case EditTypeTable.Textfeld:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(viewItem, rowItem, BTB, 0);
+        switch (rowItem) {
+            case RowListItem rli:
+                rli.BeginCellEdit(this, viewItem, rli, rli.Row, preverDropDown, chunkval);
                 break;
 
-            case EditTypeTable.Textfeld_mit_Auswahlknopf:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(viewItem, rowItem, BCB, 20);
-                break;
-
-            case EditTypeTable.Dropdown_Single:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_Dropdown(viewItem, rowItem, contentHolderCellColumn, contentHolderCellRow);
-                break;
-
-            case EditTypeTable.Textfeld_mit_Vorschlägen:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, 0);
-                break;
-
-            case EditTypeTable.None:
-                break;
-
-            case EditTypeTable.DragDrop:
-                NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
-                break;
-
-            default:
-                Develop.DebugPrint(dia);
-                NotEditableInfo("Unbekannte Bearbeitungs-Methode");
+            case NewRowListItem nrli:
+                nrli.BeginCellEdit(this, viewItem, nrli, null, preverDropDown, chunkval);
                 break;
         }
-    }
-
-    private void Cell_Edit_Dropdown(ColumnViewItem viewItem, RowBackground? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
-        if (viewItem.Column != contentHolderCellColumn) {
-            if (contentHolderCellRow is null) {
-                NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-                return;
-            }
-            if (cellInThisTableRow is null) {
-                NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-                return;
-            }
-        }
-
-        if (cellInThisTableRow is not RowListItem rli) { return; }
-
-        var t = new List<AbstractListItem>();
-
-        var r = viewItem.GetRenderer(SheetStyle);
-        var cell = new CellExtEventArgs(viewItem, cellInThisTableRow as RowListItem);
-
-        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
-        if (t.Count == 0) {
-            // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
-                NotEditableInfo("Keine Items zum Auswählen vorhanden.");
-            }
-            return;
-        }
-
-        if (contentHolderCellColumn.EditableWithTextInput) {
-            if (t.Count == 0 && string.IsNullOrWhiteSpace(rli.Row.CellGetString(viewItem.Column))) {
-                // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
-                Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal);
-                return;
-            }
-            var erw = ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
-
-            t.Add(erw);
-            t.Add(SeparatorWith(FirstSortChar + "2"));
-        }
-
-        List<string> toc = [];
-
-        if (contentHolderCellRow is not null) {
-            toc.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
-        }
-
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.MultiSelection, toc, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
-        dropDownMenu.ItemClicked += (sender, e) => DropDownMenu_ItemClicked(e, cell);
-        Develop.Debugprint_BackgroundThread();
-    }
-
-    private bool Cell_Edit_TextBox(ColumnViewItem viewItem, RowBackground? cellInThisTableRow, TextBox box, int addWith) {
-        if (IsDisposed || viewItem.Column is null) { return false; }
-
-        //if (contentHolderCellColumn != viewItem.Column) {
-        //    if (contentHolderCellRow is null) {
-        //        NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-        //        return false;
-        //    }
-        //    if (cellInThisTableRow is null) {
-        //        NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-        //        return false;
-        //    }
-        //}
-
-        box.GetStyleFrom(viewItem.Column);
-        box.QuickInfo = viewItem.Column.QuickInfo;
-        box.Zoom = Zoom;
-
-        var (controlPos, contentHolderCellRow, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
-
-        // Indent wie beim Zeichnen (RowBackground.DrawExplicit) zur X-Position
-        // addieren, damit die Textbox exakt über der gezeichneten Zelle liegt.
-        var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * (cellInThisTableRow?.Indent ?? 0);
-
-        box.Location = new Point(viewItem.ControlColumnLeft(OffsetX) + indentOffset, controlPos.Y);
-        box.Size = new Size(viewItem.ControlColumnWidth() + addWith, controlPos.Height);
-        box.Text = cellText;
-        box.Tag = (List<object?>)[viewItem, cellInThisTableRow];
-
-        if (box is ComboBox cbox) {
-            cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(viewItem.Column, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle)));
-            if (cbox.ItemCount == 0) {
-                return Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
-            }
-        }
-
-        box.Verhalten = controlPos.Height > 20
-            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-
-        box.Visible = true;
-        box.BringToFront();
-        box.Focus();
-        return true;
-    }
-
-    private void Cell_Edit_TextboxWithSuggestions(ColumnViewItem viewItem, RowBackground? cellInThisTableRow, int addWith) {
-        if (IsDisposed || viewItem.Column is null) { return; }
-
-        var items = ItemsOf(viewItem.Column, null, 1000, viewItem.GetRenderer(SheetStyle));
-
-        if (items.Count is 0 or > 30) {
-            Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
-            return;
-        }
-
-        BTS.GetStyleFrom(viewItem.Column);
-        BTS.QuickInfo = viewItem.Column.QuickInfo;
-        BTS.Suggestions = items.Select(s => s.KeyName).ToList().AsReadOnly();
-        BTS.Zoom = Zoom;
-
-        var (controlPos, _, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
-        var totalWidth = viewItem.ControlColumnWidth() + addWith;
-
-        // Indent wie beim Zeichnen (RowBackground.DrawExplicit) zur X-Position
-        // addieren, damit die Textbox exakt über der gezeichneten Zelle liegt.
-        var indentOffset = RowBackground.IndentWidth.CanvasToControl(Zoom) * (cellInThisTableRow?.Indent ?? 0);
-
-        BTS.TextboxSize = new Size(totalWidth, controlPos.Height);
-        BTS.Location = new Point(viewItem.ControlColumnLeft(OffsetX) + indentOffset, controlPos.Y);
-        BTS.Size = new Size(totalWidth, BTS.GetEstimatedHeight(totalWidth, controlPos.Height));
-        BTS.Text = cellText;
-        BTS.Verhalten = controlPos.Height > 20
-            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-
-        BTS.Tag = (List<object?>)[viewItem, cellInThisTableRow];
-        BTS.Visible = true;
-        BTS.BringToFront();
-        BTS.Focus();
     }
 
     private (ColumnViewItem?, RowBackground?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) {
@@ -3838,9 +3826,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
         if (IsDisposed) { return; }
 
-        TXTBox_Close(BTB);
-        TXTBox_Close(BCB);
-        TXTBox_Close(BTS);
+        Edit_Close();
         AutoFilter_Close();
         HideMiniToolbar();
 
@@ -3864,6 +3850,24 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         if (did) { Invalidate_AllViewItems(false); }
+    }
+
+    /// <summary>
+    /// Ermittelt die Auswahlliste (Vorschläge) für eine Strategie mit
+    /// <see cref="FlexiStrategyBase.SupportsSuggestions" />. Die content-Spalte
+    /// hat Vorrang vor der Style-Spalte (LinkedCell-Auflösung). Der Renderer
+    /// wird aus dem CellView von <paramref name="cellInfo" /> geholt, falls
+    /// vorhanden — sonst direkt aus der Spalte erzeugt.
+    /// </summary>
+    private List<AbstractListItem> CollectEditItems(ColumnItem? contentColumn, ColumnItem? styleColumn, RowItem? contentRow, CellExtEventArgs? cellInfo) {
+        var column = contentColumn ?? styleColumn;
+        if (column is not { IsDisposed: false } col) { return []; }
+
+        var renderer = cellInfo?.ColumnView is { IsDisposed: false } cv
+            ? cv.GetRenderer(SheetStyle)
+            : RendererOf(col, SheetStyle);
+
+        return AbstractListItemExtension.ItemsOf(col, contentRow, 1000, renderer);
     }
 
     private void Column_ItemRemoving(object? sender, ColumnEventArgs e) {
@@ -4374,13 +4378,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
 
             // Alle Zeilen neu nummerieren
-            var nr = 1;
-            foreach (var thisRow in sortedRows) {
-                if (thisRow is { IsDisposed: false }) {
-                    thisRow.CellSet(sortCol, nr, "Drag/Drop Sortierung");
-                    nr++;
-                }
-            }
+            tb.RenumberRows(sortedRows, "Drag/Drop Sortierung");
         } finally {
             tb.ResumeEvents();
         }
@@ -4487,17 +4485,18 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Berechent die Y-CanvasPosition auf dem aktuellen Controll
+    /// Toggle-/Commit-Logik für einen Klick auf ein Dropdown-Item. Wird
+    /// aus <see cref="Edit_ValueChanged" /> aufgerufen, nachdem
+    /// die Inline-ListBox bereits geschlossen wurde.
+    /// Behandelt MultiLine-Spalten (Mehrfachauswahl mit Toggle), SingleLine-
+    /// Spalten (Wert setzen bzw. bei erneutem Klick leeren), die
+    /// "Erweiterte Eingabe" (Fallback auf TextBox) sowie neue Zeilen.
     /// </summary>
-    /// <returns></returns>
-    private void DropDownMenu_ItemClicked(AbstractListItemEventArgs e, CellExtEventArgs ck) {
-        FloatingForm.Close(this);
-
+    private void DropDownMenu_ItemClicked(string toAdd, CellExtEventArgs ck) {
         if (CurrentArrangement is not { IsDisposed: false }) { return; }
 
         if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
 
-        var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
             Cell_Edit(ck.ColumnView, ck.RowData, false, ck.RowData?.Row.ChunkValue ?? FilterCombined.ChunkVal);
@@ -4513,7 +4512,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             var li = r.CellGetList(c);
             if (li.Contains(toAdd, StringComparer.OrdinalIgnoreCase)) {
                 // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
-                if (li.Count > 1 || !c.ValueRequired) {
+                if (li.Count > 1 || c.MinTextLength < 1) {
                     toRemove = toAdd;
                     toAdd = string.Empty;
                 }
@@ -4522,7 +4521,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
             NotEditableInfo(UserEdited(this, string.Join('\r', li), ck.ColumnView, ck.RowData, false));
         } else {
-            if (!c.ValueRequired) {
+            if (c.MinTextLength < 1) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {
                     NotEditableInfo(UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false));
                     return;
@@ -4530,6 +4529,86 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
             NotEditableInfo(UserEdited(this, toAdd, ck.ColumnView, ck.RowData, false));
         }
+    }
+
+    /// <summary>
+    /// Schließt das aktuelle Edit und committet den Wert über den
+    /// zugehörigen <see cref="_editCommit" />-Callback. Hat kein Edit aktiv,
+    /// ist die Tabelle disposed oder der Callback fehlt, wird nur
+    /// <see cref="EndEdit" /> aufgerufen. Entspricht der alten
+    /// <c>TXTBox_Close</c>-Logik ohne die Tags-Auswertung.
+    /// </summary>
+    private void Edit_Close() {
+        if (IsDisposed || ActiveEditStrategy is not { } strategy) { return; }
+
+        if (Table is not { IsDisposed: false } || _editCommit is not { } commit) {
+            EndEdit();
+            return;
+        }
+
+        var value = (strategy.Control as System.Windows.Forms.Control)?.Text ?? string.Empty;
+        EndEdit();
+        commit(value);
+        Focus();
+    }
+
+    private void Edit_EnterKey(object? sender, System.EventArgs e) {
+        if (sender is FlexiStrategyBase { MultiLine: true }) { return; }
+        CloseAllComponents();
+    }
+
+    private void Edit_EscKey(object? sender, System.EventArgs e) {
+        // Esc bricht den Edit ab: Commit-Referenz verwerfen, dann alles
+        // schließen. _editCommit muss vor EndEdit null werden, damit das
+        // nachfolgende Edit_Close in CloseAllComponents keinen Commit
+        // mehr auslöst.
+        _editCommit = null;
+        EndEdit();
+        CloseAllComponents();
+    }
+
+    private void Edit_LostFocus(object? sender, System.EventArgs e) {
+        if (ActiveEditStrategy?.Control is { } activeControl) {
+            if (FloatingForm.IsShowing(activeControl)) { return; }
+
+            // Ist das Edit-Control noch sichtbar, wurde der Fokusverlust durch
+            // einen Klick auf die Tabelle ausgelöst (nicht durch Enter/Tab/Esc —
+            // dort wird Visible vorher über EndEdit auf false gesetzt). Den
+            // folgenden MouseDown konsumieren, damit der Cursor nicht springt.
+            if (activeControl.Visible) {
+                _consumeNextMouseDown = true;
+            }
+        }
+
+        CloseAllComponents();
+    }
+
+    private void Edit_TabKey(object? sender, System.EventArgs e) => CloseAllComponents();
+
+    /// <summary>
+    /// Event-Handler für das <see cref="FlexiStrategyBase.ValueChanged" />-Event
+    /// der aktiven Edit-Strategie. Hat nur während eines Dropdown-Edits eine
+    /// Wirkung (sonst ist <see cref="_dropdownCellInfo" /> null und der Handler
+    /// bricht ab). Verbirgt das Inline-Control und reicht die Toggle-/Commit-
+    /// Logik an <see cref="DropDownMenu_ItemClicked" /> weiter.
+    /// </summary>
+    private void Edit_ValueChanged(object? sender, TextEventArgs e) {
+        if (_dropdownCellInfo is not { } cell) { return; }
+        EndEdit();
+        Focus();
+        DropDownMenu_ItemClicked(e.Text, cell);
+    }
+
+    /// <summary>
+    /// Beendet das aktuelle Edit ohne Commit. Macht das Control unsichtbar
+    /// und löscht den Commit-Callback. Welche Strategie aktiv war, wird
+    /// beim nächsten Aufruf von <see cref="ActiveEditStrategy" /> neu
+    /// ermittelt — ein separater Merker wird nicht gepflegt.
+    /// </summary>
+    private void EndEdit() {
+        HideAllEditControls();
+        _editCommit = null;
+        _dropdownCellInfo = null;
     }
 
     /// <summary>
@@ -4715,27 +4794,34 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Berechnet Position, ggf. Inhalt-Zeile und Zelltext für ein Edit-Control.
+    /// Holt eine gecachte Strategie für den übergebenen Edit-Typ oder erzeugt
+    /// sie beim ersten Aufruf (lazy über den <see cref="_editStrategyCache" />).
+    /// Das zugehörige Control wird einmalig erzeugt, zur
+    /// <see cref="Control.Controls" />-Collection der TableView hinzugefügt
+    /// und mit den TableView-spezifischen Event-Handlern verdrahtet. Die
+    /// Event-Weiterleitung (Enter-/Esc-/Tab-Key, LostFocus, ValueChanged)
+    /// übernimmt die Strategie selbst — die TableView abonniert nur noch
+    /// die Strategie-Events und muss nicht mehr auf konkrete Control-Typen
+    /// (TextBox, ListBox usw.) casten.
     /// </summary>
-    private (Rectangle controlPos, RowItem? contentRow, string cellText) GetEditBounds(ColumnViewItem viewItem, RowBackground? cellInThisTableRow) {
-        if (cellInThisTableRow is null) { return (Rectangle.Empty, null, string.Empty); }
+    private FlexiStrategyBase GetOrCreateEditStrategy(EditTypeTable editType) {
+        var strategy = _editStrategyCache.GetOrAdd(editType, CreateEditStrategy);
 
-        var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
-
-        if (cellInThisTableRow is RowListItem rli) {
-            var cellText = rli.Row.CellGetString(viewItem.Column);
-
-            // Spalte erlaubt Mehrzeiler, wird aber einzeilig angezeigt ->
-            // Edit-Feld vergrößern, damit mehrzeilig getippt werden kann.
-            if (viewItem.Column is { IsDisposed: false, MultiLine: true } && controlPos.Height <= 30) {
-                var lineCount = Math.Clamp(cellText.CountChar('\r') + 1, 3, 6);
-                controlPos.Height = controlPos.Height * lineCount;
+        if (strategy.Control is null) {
+            strategy.CreateControl();
+            if (strategy.Control is System.Windows.Forms.Control c) {
+                c.Visible = false;
+                Controls.Add(c);
             }
 
-            return (controlPos, rli.Row, cellText);
+            strategy.EnterKey += Edit_EnterKey;
+            strategy.EscKey += Edit_EscKey;
+            strategy.TabKey += Edit_TabKey;
+            strategy.LostFocus += Edit_LostFocus;
+            strategy.ValueChanged += Edit_ValueChanged;
         }
 
-        return (controlPos, null, string.Empty);
+        return strategy;
     }
 
     /// <summary>
@@ -4762,32 +4848,26 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return _allViewItems.TryGetValue(id, out var rb) && rb is RowListItem rli && !rli.IsDisposed ? rli : null;
     }
 
-    private void Invalidate_AllViewItems(bool andclear) {
-        _mustDoAllViewItems = true;
-        _sortedViewItems = [];
-        _cachedRowViewItems = [];
-        _rowLookup.Clear();
-        if (andclear) {
-            _allViewItems.Clear();
-        } else {
-            try {
-                var keysToRemove = new List<string>();
-                foreach (var kvp in _allViewItems) {
-                    if (kvp.Value is RowListItem rli && rli.Row.IsDisposed) {
-                        keysToRemove.Add(kvp.Key);
-                    } else if (kvp.Value is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
-                        keysToRemove.Add(kvp.Key);
-                    }
-                }
-                foreach (var key in keysToRemove) {
-                    _allViewItems.Remove(key);
-                }
-            } catch {
-                _allViewItems.Clear(); // Tja, geht wohl nicht anders.
+    /// <summary>
+    /// Macht alle Inline-Edit-Controls unsichtbar. Da zu jedem Zeitpunkt
+    /// höchstens ein Edit aktiv ist, ist die Iteration effektiv ein No-Op,
+    /// wenn gerade kein Edit läuft. Sicher gegen bereits freigegebenen Cache.
+    /// </summary>
+    private void HideAllEditControls() {
+        if (_editStrategyCache.IsDisposed) { return; }
+        // Sobald alle Edit-Controls verborgen werden, ist auch der
+        // Dropdown-Kontext hinfällig. Wird u. a. aus BeginEdit aufgerufen,
+        // bevor ein neues Edit startet — da ValueChanged jetzt einheitlich
+        // an allen Strategien hängt, darf _dropdownCellInfo hier nicht
+        // stehen bleiben.
+        _dropdownCellInfo = null;
+        foreach (var strategy in _editStrategyCache.Values) {
+            if (strategy.Control is System.Windows.Forms.Control c
+                && !c.IsDisposed
+                && c.Visible) {
+                c.Visible = false;
             }
         }
-        Invalidate_MaxBounds();
-        Invalidate();
     }
 
     /// <summary>
@@ -5075,134 +5155,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Zustandsverwaltung im NumberStyle.
     /// </summary>
     private void ToggleChapterExpanded(RowCaptionListItem rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
-
-    private void TXTBox_Close(GenericControl? textbox) {
-        if (IsDisposed || textbox is null || !textbox.Visible) { return; }
-
-        if (Table is not { IsDisposed: false }) {
-            textbox.Tag = null;
-            textbox.Visible = false;
-            return;
-        }
-
-        if (textbox.Tag is not List<object?> { Count: >= 2 } tags) {
-            textbox.Visible = false;
-            return; // Ohne dem hier wird ganz am Anfang ein Ereignis ausgelöst
-        }
-        var w = textbox.Text;
-
-        ColumnViewItem? column = null;
-        RowListItem? row = null;
-
-        if (tags[0] is ColumnViewItem c) { column = c; }
-        if (tags[1] is RowListItem r) { row = r; }
-
-        var isCaptionEdit = tags.Count >= 3 && tags[2] is string s && s == "CaptionEdit";
-        var isCaptionGroupEdit = tags.Count >= 3 && tags[2] is string s2 && s2 == "CaptionGroupEdit";
-        var isChapterEdit = tags.Count >= 3 && tags[2] is string s3 && s3 == "ChapterEdit";
-
-        textbox.Tag = null;
-        textbox.Visible = false;
-
-        if (isCaptionEdit && column?.Column is { IsDisposed: false } col) {
-            var newCaption = w.Replace("\r\n", "\r").Trim();
-            if (!string.IsNullOrEmpty(newCaption)) {
-                var namesMatch = col.Caption.Equals(col.KeyName, StringComparison.OrdinalIgnoreCase);
-                col.Caption = newCaption;
-                if (namesMatch) {
-                    var newKey = newCaption.ReduceToChars(AllowedCharsVariableName).ToUpperInvariant();
-                    if (!string.IsNullOrEmpty(newKey) && ColumnItem.IsValidColumnKey(newKey)) {
-                        col.KeyName = newKey;
-                    }
-                }
-            }
-            Invalidate_CurrentArrangement();
-        } else if (isCaptionGroupEdit && column?.Column is { IsDisposed: false } col2 && tags.Count >= 4 && tags[3] is int captionIndex) {
-            var newGroup = w.Replace("\r\n", "\r").Trim();
-            switch (captionIndex) {
-                case 0:
-                    col2.CaptionGroup1 = newGroup;
-                    break;
-
-                case 1:
-                    col2.CaptionGroup2 = newGroup;
-                    break;
-
-                case 2:
-                    col2.CaptionGroup3 = newGroup;
-                    break;
-            }
-            Invalidate_CurrentArrangement();
-        } else if (isChapterEdit && tags[1] is RowCaptionListItem rcli
-            && rcli.Arrangement?.ColumnForChapter is { IsDisposed: false } capCol
-            && rcli.Arrangement.Table is { IsDisposed: false } tbChapter) {
-            var oldChapter = rcli.ChapterText;
-            var parentPath = oldChapter.ChapterPathParent();
-
-            // newChapter: nur das letzte Segment ersetzen (Parent bleibt erhalten).
-            // Einheitliche Behandlung — unabhängig vom NumberStyle.
-            var newLastName = w.Replace("\r\n", "\r").ChapterPathNormalize();
-            var newChapter = string.IsNullOrEmpty(parentPath)
-                ? newLastName
-                : parentPath + RowCaptionListItem.Kapiteltrenner + newLastName;
-
-            // Nur der zusammenhängende Block unter dem geklickten Header
-            // (tags[3]). Ist der Block nicht ermittelt worden (z. B. weil
-            // die Ansicht inzwischen neu aufgebaut wurde), auf alle Zeilen
-            // zurückgreifen.
-            var blockRows = tags.Count >= 4 && tags[3] is List<RowItem> br
-                ? br
-                : [.. tbChapter.Row.Where(r => r is { IsDisposed: false })];
-
-            if (!string.IsNullOrEmpty(newLastName) && newChapter != oldChapter) {
-                // Kapitel umbenennen. Auch Unterpfade aktualisieren, damit
-                // die Hierarchie erhalten bleibt (z. B. "A\B" → "A\C" ändert
-                // auch "A\B\D" zu "A\C\D").
-                foreach (var tableRow in blockRows) {
-                    if (tableRow is not { IsDisposed: false }) { continue; }
-                    var values = tableRow.CellGetList(capCol);
-                    var changed = false;
-                    for (var i = 0; i < values.Count; i++) {
-                        var valueNorm = values[i].ChapterPathNormalize();
-                        if (valueNorm == oldChapter) {
-                            values[i] = newChapter;
-                            changed = true;
-                        } else if (valueNorm.StartsWith(oldChapter + RowCaptionListItem.Kapiteltrenner, StringComparison.Ordinal)) {
-                            // Suffix hinter dem Prefix unverändert übernehmen.
-                            values[i] = newChapter + valueNorm[oldChapter.Length..];
-                            changed = true;
-                        }
-                    }
-
-                    if (changed) {
-                        tableRow.CellSet(capCol, values, "Kapitel umbenannt: " + oldChapter + " → " + newChapter);
-                    }
-                }
-            } else if (string.IsNullOrEmpty(newLastName)) {
-                // Kapitel löschen: passenden Wert aus den Zellen entfernen,
-                // sodass die Zeilen ohne Kapitel auf der obersten Ebene erscheinen.
-                foreach (var tableRow in blockRows) {
-                    if (tableRow is not { IsDisposed: false }) { continue; }
-                    var values = tableRow.CellGetList(capCol);
-                    var changed = false;
-                    for (var i = 0; i < values.Count; i++) {
-                        if (values[i].ChapterPathNormalize() == oldChapter) {
-                            values[i] = string.Empty;
-                            changed = true;
-                        }
-                    }
-                    if (changed) {
-                        tableRow.CellSet(capCol, values, "Kapitel entfernt: " + oldChapter);
-                    }
-                }
-            }
-            Invalidate_AllViewItems(true);
-        } else {
-            NotEditableInfo(UserEdited(this, w, column, row, true));
-        }
-
-        Focus();
-    }
 
     /// <summary>
     /// Aktualisiert das Kapitel der verschobenen Zeile, wenn sie in einen

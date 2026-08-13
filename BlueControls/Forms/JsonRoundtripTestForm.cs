@@ -44,7 +44,7 @@ public sealed partial class JsonRoundtripTestForm : Form {
     private static string BytesToPrintable(byte[] bytes) {
         try {
             var s = Win1252.GetString(bytes);
-            return s.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t");
+            return s.EncodeControlChars();
         } catch {
             return "<binär nicht darstellbar>";
         }

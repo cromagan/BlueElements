@@ -16,6 +16,7 @@ public class FormatHolder_Text : FormatHolder {
         SpellCheckingEnabled = true;
         MultiLine = false;
         MaxTextLength = 4000;
+        MinTextLength = 0;
     }
 
     #endregion

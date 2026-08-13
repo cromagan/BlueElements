@@ -17,6 +17,8 @@ public class FormatHolder_Url : FormatHolder {
         SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 2048;
+        MinTextLength = 4;
+        ForbiddenChars = "\r\n";
     }
 
     #endregion

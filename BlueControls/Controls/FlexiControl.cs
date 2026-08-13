@@ -61,7 +61,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DefaultValue(AdditionalCheck.None)]
     public event EventHandler? DropDownShowing;
 
-    public event EventHandler? ExecuteComand;
+    public event EventHandler? ExecuteCommand;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
 
@@ -298,6 +298,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public new bool Enabled => !DesignMode && string.IsNullOrEmpty(DisabledReason);
 
     [DefaultValue("")]
+    public string ForbiddenChars {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.ForbiddenChars = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.ForbiddenChars = value;
+        }
+    } = string.Empty;
+
+    [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -367,6 +383,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.MaxTextLength = value;
         }
     } = 4000;
+
+    [DefaultValue(0)]
+    public int MinTextLength {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.MinTextLength = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.MinTextLength = value;
+        }
+    }
 
     [DefaultValue(false)]
     [Browsable(false)]
@@ -487,6 +519,29 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.SpellCheckingEnabled = value;
         }
     }
+
+    /// <summary>
+    /// Generischer Strategie-Parameter, der pro Strategy unterschiedlich verwendet wird.
+    /// Siehe <see cref="FlexiControlStrategies.FlexiStrategyBase.StrategyParameter"/>.
+    /// </summary>
+    [DefaultValue("")]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string StrategyParameter {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.StrategyParameter = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.StrategyParameter = value;
+        }
+    } = string.Empty;
 
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
@@ -662,14 +717,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
             _strategy.AddAllowed = AddAllowed;
             _strategy.AllowedChars = AllowedChars;
+            _strategy.ForbiddenChars = ForbiddenChars;
             _strategy.AutoSort = AutoSort;
             _strategy.CheckBehavior = CheckBehavior;
             _strategy.MaxTextLength = MaxTextLength;
+            _strategy.MinTextLength = MinTextLength;
             _strategy.MultiLine = MultiLine;
             _strategy.MoveAllowed = MoveAllowed;
             _strategy.RegexCheck = RegexCheck;
             _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
             _strategy.TextFormatingAllowed = TextFormatingAllowed;
+            _strategy.StrategyParameter = StrategyParameter;
             _strategy.CustomVocabulary = CustomVocabulary;
             _strategy.Suffix = Suffix;
             _strategy.SuggestionPosition = SuggestionPosition;
@@ -697,7 +755,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             _strategy.ValueChanged += Strategy_ValueChanged;
             _strategy.NavigateToNext += Strategy_NavigateToNext;
-            _strategy.ExecuteComand += Strategy_ExecuteComand;
+            _strategy.ExecuteCommand += Strategy_ExecuteCommand;
             _strategy.DropDownShowing += Strategy_DropDownShowing;
             _strategy.ItemRemoved += Strategy_ItemRemoved;
         } catch {
@@ -757,19 +815,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) {
-        if (IsDisposed) { return; }
-        ItemRemoved?.Invoke(this, e);
-    }
-
-    protected virtual void OnExecuteComand() {
-        if (IsDisposed) { return; }
-        ExecuteComand?.Invoke(this, System.EventArgs.Empty);
-    }
-
     protected virtual void OnDropDownShowing() {
         if (IsDisposed) { return; }
         DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected virtual void OnExecuteCommand() {
+        if (IsDisposed) { return; }
+        ExecuteCommand?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) {
+        if (IsDisposed) { return; }
+        ItemRemoved?.Invoke(this, e);
     }
 
     protected virtual void OnNavigateToNext(NavigationDirection direction) {
@@ -952,7 +1010,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
 
-    private void Strategy_ExecuteComand(object? sender, System.EventArgs e) => OnExecuteComand();
+    private void Strategy_ExecuteCommand(object? sender, System.EventArgs e) => OnExecuteCommand();
 
     private void Strategy_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 

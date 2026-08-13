@@ -28,8 +28,6 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     // IInputFormat — delegiert an Format (Setter sind No-Op, ColumnFormatHolder wird nur als Quelle verwendet)
     public AdditionalCheck AdditionalFormatCheck { get => _format.AdditionalFormatCheck; set { } }
 
-    public string AfterEditAutoRemoveChar { get; set; } = string.Empty;
-
     public bool AfterEditDoUCase { get; set; }
 
     public bool AfterEditQuickSortRemoveDouble { get; set; }
@@ -49,10 +47,13 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     public bool EditableWithDropdown { get; set; }
     public bool EditableWithTextInput { get; set; }
 
+    public string ForbiddenChars { get => _format.ForbiddenChars; set { } }
+
     // IHasKeyName
     public string KeyName { get; protected set; }
 
     public int MaxTextLength { get => _format.MaxTextLength; set { } }
+    public int MinTextLength { get => _format.MinTextLength; set { } }
     public bool MultiLine { get; set; }
 
     // IReadableTextWithKey
@@ -65,7 +66,6 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     public SortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get => _format.SpellCheckingEnabled; set { } }
     public bool TextFormatingAllowed { get => _format.TextFormatingAllowed; set { } }
-    public bool ValueRequired { get; set; }
 
     #endregion
 

@@ -228,6 +228,15 @@ public static partial class Extensions {
         return bytePointer > 0 ? Encoding.UTF8.GetString(byteArray, 0, bytePointer) : string.Empty;
     }
 
+    /// <summary>
+    /// Löst Escape-Sequenzen (z.B. die Zeichenfolge Backslash-r) in die
+    /// tatsächlichen Steuerzeichen auf. Unterstützt: \r, \n, \t, \0.
+    /// </summary>
+    public static string DecodeControlChars(this string s) {
+        if (string.IsNullOrEmpty(s) || !s.Contains('\\')) { return s; }
+        return s.Replace("\\r", "\r").Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\0", "\0");
+    }
+
     public static string? Decrypt(this string cipherText, string key) {
         key += "!äQsWERadf§$%öü,";
         var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
@@ -251,6 +260,15 @@ public static partial class Extensions {
             using var streamReader = new System.IO.StreamReader(cryptoStream);
             return streamReader.ReadToEnd();
         } catch { return null; }
+    }
+
+    /// <summary>
+    /// Inverse zu <see cref="DecodeControlChars"/>: Wandelt tatsächliche
+    /// Steuerzeichen (\r, \n, \t, \0) in ihre Escape-Sequenz-Darstellung um.
+    /// </summary>
+    public static string EncodeControlChars(this string s) {
+        if (string.IsNullOrEmpty(s)) { return s; }
+        return s.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\0", "\\0");
     }
 
     public static string? Encrypt(this string plainText, string key) {
@@ -818,6 +836,15 @@ public static partial class Extensions {
         }
 
         return result.ToString();
+    }
+
+    /// <summary>
+    /// Entfernt alle doppelten Zeichen (zeichenweise, nicht nur aufeinanderfolgende)
+    /// und sortiert die verbleibenden nach OrdinalIgnoreCase.
+    /// </summary>
+    public static string DistinctCharsSorted(this string input) {
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
+        return string.Concat(input.Distinct().OrderBy(c => c.ToString(), StringComparer.OrdinalIgnoreCase));
     }
 
     /// <summary>

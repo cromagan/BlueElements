@@ -247,9 +247,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     /// Führt ein Kontextmenü-Kommando über die interne TableView aus,
     /// ohne die TableView-Instanz nach außen zu geben.
     /// </summary>
-    public void ExecuteContextMenuComand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
+    public void ExecuteContextMenuCommand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
         var hotItem = TableView.ContextMenuItemGenerate(TableInternal, viewItem, column, row, visibleRows);
-        ((IContextMenu)TableInternal).ExecuteContextMenuComand(click, additional, hotItem);
+        ((IContextMenu)TableInternal).ExecuteContextMenuCommand(click, additional, hotItem);
     }
 
     public void ResetView() => TableInternal.ResetView();
@@ -430,7 +430,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, null, null, null, RowsVisibleUnique());
+        ExecuteContextMenuCommand(TableView.ContextMenu_ExecuteScript, script, null, null, null, RowsVisibleUnique());
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

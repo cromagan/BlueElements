@@ -172,8 +172,8 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         _isWorking = true;
 
         // Escape-Sequenzen in den Eingabefeldern auflösen
-        var suchText = txbAlt.Text.Replace("\\r", "\r").Replace("\\t", "\t");
-        var ersetzText = txbNeu.Text.Replace("\\r", "\r").Replace("\\t", "\t");
+        var suchText = txbAlt.Text.DecodeControlChars();
+        var ersetzText = txbNeu.Text.DecodeControlChars();
 
         if (IsDisposed || _tableView?.Table is not { IsDisposed: false } tb) {
             _isWorking = false;

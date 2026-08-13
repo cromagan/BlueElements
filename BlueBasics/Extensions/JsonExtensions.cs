@@ -26,6 +26,18 @@ public static partial class Extensions {
         return defaultValue;
     }
 
+    /// <summary>
+    /// Liest einen ARGB-Farbwert (als int) unter <paramref name="key" /> und
+    /// konvertiert ihn in ein <see cref="Color" />. Negative Werte gelten als
+    /// "nicht gesetzt" (Sentinel). Fehlt der Key, ist er keine Zahl oder ist der
+    /// Wert negativ, wird <paramref name="defaultValue" /> geliefert - so bleiben
+    /// Partial-Updates möglich, ohne bestehende Farben zu überschreiben.
+    /// </summary>
+    public static Color GetColor(this JsonObject json, string key, Color defaultValue) {
+        if (json[key] is JsonValue v && v.TryGetValue(out int i) && i >= 0) { return Color.FromArgb(i); }
+        return defaultValue;
+    }
+
     public static double GetDouble(this JsonObject json, string key, double defaultValue = 0d) {
         if (json[key] is JsonValue v && v.TryGetValue(out double d)) { return d; }
         return defaultValue;
@@ -108,6 +120,15 @@ public static partial class Extensions {
         }
         return result;
     }
+
+    /// <summary>
+    /// Liest ein JSON-Array von Strings unter dem angegebenen Key und gibt es als
+    /// Liste zurück. Fehlt der Key oder ist er kein Array, wird
+    /// <paramref name="defaultValue" /> geliefert.
+    /// Null-Elemente innerhalb des Arrays werden als leerer String interpretiert.
+    /// </summary>
+    public static List<string> GetListString(this JsonObject json, string key, List<string>? defaultValue) =>
+        json[key] is JsonArray arr ? arr.ToStringList() : defaultValue ?? [];
 
     /// <summary>
     /// Liest ein vom <see cref="Set" /> geschriebenes verschachteltes Objekt
