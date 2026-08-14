@@ -9,11 +9,11 @@ public class DoItWithEndedPosFeedback : DoItFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) => Position = endpos;
+    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) => Position = endpos;
 
     /// <summary>
     /// Konstruiert das Feedback aus einem bestehenden <see cref="DoItFeedback"/>
-    /// (typischerweise das Ergebnis von <c>Method.DoIt</c>).
+    /// (typischerweise das Ergebnis von <c>ScriptCommand.DoIt</c>).
     /// Dabei werden auch <see cref="Line"/> und alle anderen Eigenschaften übernommen,
     /// sodass z.B. die Zeilennummer aus einem verschachtelten Skript-Block
     /// (if/foreach/do) beim Weiterreichen an den äußeren Parser erhalten bleibt.

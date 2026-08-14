@@ -1,10 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using System.Collections.ObjectModel;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -124,8 +122,8 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
 
         var filterColumns = ItemsOf(tb.Column);
 
-        var scriptAll = new List<AbstractListItem>();
-        var scriptRow = new List<AbstractListItem>();
+        var scriptAll = new List<ListItem>();
+        var scriptRow = new List<ListItem>();
 
         foreach (var thisScript in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
             scriptAll.Add(ItemOf(thisScript));

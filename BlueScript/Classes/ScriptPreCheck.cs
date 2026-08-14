@@ -23,18 +23,18 @@ public static class ScriptPreCheck {
     /// <summary>
     /// Prüft den übergebenen Skript-Text mit allen registrierten Methoden.
     /// </summary>
-    public static ScriptPreCheckResult Check(string scriptText) => Check(scriptText, Method.AllMethods.Instances);
+    public static ScriptPreCheckResult Check(string scriptText) => Check(scriptText, ScriptCommand.AllMethods.Instances);
 
     /// <summary>
     /// Prüft den übergebenen Skript-Text mit den übergebenen Methoden.
     /// </summary>
-    public static ScriptPreCheckResult Check(string scriptText, IEnumerable<Method> availableMethods) {
+    public static ScriptPreCheckResult Check(string scriptText, IEnumerable<ScriptCommand> availableMethods) {
         var result = new ScriptPreCheckResult();
 
-        var methodList = availableMethods as IList<Method> ?? availableMethods.ToList();
+        var methodList = availableMethods as IList<ScriptCommand> ?? availableMethods.ToList();
 
-        var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
-        var emptyStartMethods = new List<Method>();
+        var lookup = new Dictionary<string, List<ScriptCommand>>(StringComparer.OrdinalIgnoreCase);
+        var emptyStartMethods = new List<ScriptCommand>();
         foreach (var m in methodList) {
             if (!lookup.TryGetValue(m.Command, out var list)) {
                 list = [];
@@ -57,7 +57,7 @@ public static class ScriptPreCheck {
         return result;
     }
 
-    private static void CheckInternal(string text, Dictionary<string, List<Method>> lookup, List<Method> emptyStartMethods, ScriptPreCheckResult result, string context, int lineOffset) {
+    private static void CheckInternal(string text, Dictionary<string, List<ScriptCommand>> lookup, List<ScriptCommand> emptyStartMethods, ScriptPreCheckResult result, string context, int lineOffset) {
         var pos = 0;
 
         while (pos < text.Length) {
@@ -143,7 +143,7 @@ public static class ScriptPreCheck {
             // ausgeschlossen, da diese keine Variablen sein können.
             if (!matched && idEnd > pos && idEnd < text.Length && text[idEnd] == '=') {
                 if (!lookup.ContainsKey(text[pos..idEnd])) {
-                    var f = Method.GetEnd(text, idEnd, 1, ";");
+                    var f = ScriptCommand.GetEnd(text, idEnd, 1, ";");
                     if (!f.Failed) {
                         newPos = f.ContinuePosition;
                         matched = true;
@@ -190,19 +190,19 @@ public static class ScriptPreCheck {
         return attributText[..eqPos];
     }
 
-    private static void ProcessMatchedMethod(Method thisC, CanDoFeedback f, ScriptPreCheckResult result, Dictionary<string, List<Method>> lookup, List<Method> emptyStartMethods, string context, int line) {
+    private static void ProcessMatchedMethod(ScriptCommand thisC, CanDoFeedback f, ScriptPreCheckResult result, Dictionary<string, List<ScriptCommand>> lookup, List<ScriptCommand> emptyStartScriptCommand, string context, int line) {
         // var-Deklaration: Variablennamen sammeln — KEINE Attribut-Prüfung,
         // da var VariablenBerechnung nutzt, nicht SplitAttributeToVars.
-        if (thisC.Command.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
+        if (thisC.Command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
             var varName = ExtractVarName(f.AttributText);
-            if (varName is { Length: > 0 } && Variable.IsValidName(varName)) {
+            if (varName is { Length: > 0 } && ScriptVariable.IsValidName(varName)) {
                 result.VariableNames.Add(varName);
             } else {
                 result.Protocol.Add($"[{context}, Zeile: {line}] Var-Deklaration konnte nicht aufgelöst werden: {f.AttributText}");
             }
         } else {
             // Alle anderen Methoden: Attribut-Anzahl prüfen.
-            var countError = Method.CheckArgumentCount(thisC, f.AttributText);
+            var countError = ScriptCommand.CheckArgumentCount(thisC, f.AttributText);
             if (countError is { Length: > 0 }) {
                 result.SyntaxErrors.Add($"[{context}, Zeile: {line}] {countError}");
                 return;
@@ -222,7 +222,7 @@ public static class ScriptPreCheck {
         if (!string.IsNullOrEmpty(f.CodeBlockAfterText)) {
             var blockText = f.CodeBlockAfterText;
             var blockLineOffset = line + blockText.CountChar('¶', blockText.IndexOf('{'));
-            CheckInternal(blockText, lookup, emptyStartMethods, result, context + "/" + thisC.Command, blockLineOffset);
+            CheckInternal(blockText, lookup, emptyStartScriptCommand, result, context + "/" + thisC.Command, blockLineOffset);
         }
     }
 
@@ -232,7 +232,7 @@ public static class ScriptPreCheck {
     /// String-Literale werden dabei übersprungen. Verschachtelte Aufrufe
     /// wie <c>ToUpper(Calculate("1+1",0))</c> werden vollständig erfasst.
     /// </summary>
-    private static void ScanExpressionForMethodCalls(string text, Dictionary<string, List<Method>> lookup, ScriptPreCheckResult result, string context, int line) {
+    private static void ScanExpressionForMethodCalls(string text, Dictionary<string, List<ScriptCommand>> lookup, ScriptPreCheckResult result, string context, int line) {
         var pos = 0;
         var inString = false;
 
@@ -268,10 +268,10 @@ public static class ScriptPreCheck {
                     if (m.StartSequence != "(") { continue; }
 
                     // Matching ")" finden und Argumente extrahieren
-                    var f = Method.GetEnd(text, idEnd, 1, ")");
+                    var f = ScriptCommand.GetEnd(text, idEnd, 1, ")");
                     if (f.Failed) { break; }
 
-                    var countError = Method.CheckArgumentCount(m, f.NormalizedText);
+                    var countError = ScriptCommand.CheckArgumentCount(m, f.NormalizedText);
                     if (countError is { Length: > 0 }) {
                         result.SyntaxErrors.Add($"[{context}, Zeile: {line}] {countError}");
                         return;

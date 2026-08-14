@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Renderer;
+using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 
 namespace BlueControls.Forms;
@@ -9,7 +10,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
 
     #region Fields
 
-    private ColumnItem? _choose;
+    private readonly ColumnItem? _choose;
     private RowItem? _selectedRow;
 
     #endregion
@@ -22,16 +23,16 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
 
         if (tb is null) { return; }
 
-        _choose = tb.Column.GenerateAndAdd("btn_waehlen", "Wählen", ColumnFormatHolderTextOneLine.Instance);
+        _choose = tb.Column.GenerateAndAdd("btn_waehlen", "Wählen", TextOneLineColumnFormat.Instance);
 
         if (_choose is { IsDisposed: false }) {
-            var btn = new Renderer_Button {
+            var btn = new ButtonRenderer {
                 Text_anzeigen = false,
                 Bild_anzeigen = true,
                 CheckStatus_anzeigen = false
             };
             _choose.FixedColumnWidth = 32;
-            _choose.DefaultRenderer = Renderer_Button.ClassId;
+            _choose.DefaultRenderer = ButtonRenderer.ClassId;
             _choose.RendererSettings = btn.ParseableItems().FinishParseable();
         }
 

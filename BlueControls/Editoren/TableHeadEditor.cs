@@ -4,7 +4,8 @@ using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
-using BlueScript.Variables;
+using BlueScript.ScriptVariables;
+using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
@@ -181,33 +182,33 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
         var tb = Table.Get();
-        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolderTextOneLine.Instance);
-        if (tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolderTextOneLine.Instance) is { } f) {
+        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormats.TextOneLine.Instance);
+        if (tb.Column.GenerateAndAdd("ID", "ID", TextOneLineColumnFormat.Instance) is { } f) {
             f.IsFirst = true;
         }
-        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolderLongOnlyPositive.Instance);
-        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolderTextOneLine.Instance);
-        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolderDateTime.Instance);
-        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolderImageCode.Instance);
-        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Table", "Tabelle", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", LongOnlyPositiveColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", TextOneLineColumnFormat.Instance);
+        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", DateTimeColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Aenderer", "Änderer", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Aenderung", "Änderung", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", TextOneLineColumnFormat.Instance);
         tb.Column.DisableAllEditing();
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
-                thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
+                thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
             }
         }
 
         if (az is { IsDisposed: false }) {
-            var o = new Renderer_DateTime {
+            var o = new Renderer.DateTimeRenderer {
                 UTCToLocal = true,
                 ShowSymbol = true
             };
@@ -216,7 +217,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         if (tb.Column["Symbol"] is { IsDisposed: false } c) {
-            var o = new Renderer_ImageAndText {
+            var o = new ImageAndTextRenderer {
                 Text_anzeigen = false,
                 Bild_anzeigen = true
             };
@@ -308,7 +309,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
                 var plainText = column.TextFormatingAllowed ? cellText.HtmlToPlain() : cellText;
 
-                foreach (Match match in Constants.WordPatternRegex().Matches(plainText)) {
+                foreach (Match match in WordPatternRegex().Matches(plainText)) {
                     if (match.Length > 1 && !SpellDictionary.ContainsWord(match.Value)) {
                         words.Add(match.Value);
                     }
@@ -333,7 +334,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
         if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
         _writeAccessLost = true;
-        Forms.Notification.Show("Tabellen-Einstellungen werden geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
+        Notification.Show("Tabellen-Einstellungen werden geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 
@@ -524,7 +525,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.TableAdmin = new(lbxTableAdmin.Checked);
 
         var tmp = PermissionGroups_NewRow.Checked.ToList();
-        tmp.Remove(Constants.Administrator);
+        tmp.Remove(Administrator);
         Table.PermissionGroupsNewRow = new(tmp);
 
         if (Table.Column.SysRowSortIndex is not { IsDisposed: false }) {

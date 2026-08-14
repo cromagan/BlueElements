@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Controls.FlexiControlStrategies;
+using BlueControls.ControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
@@ -21,7 +19,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Caption? _captionObject;
 
     private Caption? _infoCaption;
-    private FlexiStrategyBase? _strategy;
+    private ControlStrategie? _strategy;
 
     #endregion
 
@@ -63,7 +61,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public event EventHandler? ExecuteCommand;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
+    public event EventHandler<ListItemEventArgs>? ItemRemoved;
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
@@ -217,7 +215,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get;
         set {
             if (field == value) { return; }
@@ -354,7 +352,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<AbstractListItem>? ListItems {
+    public List<ListItem>? ListItems {
         get;
         set {
             if (field == value) { return; }
@@ -522,7 +520,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     /// <summary>
     /// Generischer Strategie-Parameter, der pro Strategy unterschiedlich verwendet wird.
-    /// Siehe <see cref="FlexiControlStrategies.FlexiStrategyBase.StrategyParameter"/>.
+    /// Siehe <see cref="ControlStrategie.StrategyParameter"/>.
     /// </summary>
     [DefaultValue("")]
     [Browsable(false)]
@@ -702,7 +700,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 return;
             }
 
-            _strategy = FlexiStrategyBase.GetStrategy(EditType);
+            _strategy = ControlStrategie.GetStrategy(EditType);
             if (_strategy is null) {
                 Allinitialized = true;
                 return;
@@ -825,7 +823,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ExecuteCommand?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) {
+    protected virtual void OnItemRemoved(ListItemEventArgs e) {
         if (IsDisposed) { return; }
         ItemRemoved?.Invoke(this, e);
     }
@@ -851,9 +849,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ValueChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private void _InfoCaption_Click(object? sender, System.EventArgs e) {
-        _strategy?.HandleCaptionClick();
-    }
+    private void _InfoCaption_Click(object? sender, System.EventArgs e) => _strategy?.HandleCaptionClick();
 
     private void Control_Create_Caption() {
         if (CaptionPosition == CaptionPosition.ohne) { return; }
@@ -1012,7 +1008,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Strategy_ExecuteCommand(object? sender, System.EventArgs e) => OnExecuteCommand();
 
-    private void Strategy_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
+    private void Strategy_ItemRemoved(object? sender, ListItemEventArgs e) => OnItemRemoved(e);
 
     private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
 

@@ -1,19 +1,16 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
-using BlueScript.Variables;
+using BlueScript.ScriptVariables;
 using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -79,7 +76,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     public override Type? EditorFor => typeof(ScriptDescription);
 
@@ -93,7 +90,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     public string LastFailedReason { get; set; } = string.Empty;
 
-    public List<Variable>? LastVariables { get; set; }
+    public List<ScriptVariable>? LastVariables { get; set; }
 
     /// <summary>
     /// Der Skript-Editor öffnet maximiert als normales Fenster, da Skripte
@@ -146,8 +143,8 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         LastVariables = null;
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
-        List<AbstractListItem> contextMenu = [];
+    public List<ListItem>? GetContextMenuItems(object? hotItem) {
+        List<ListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true));
         }
@@ -223,7 +220,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         UpdateState("Erfolgreich geprüft." + protocolText, f.Variables?.ToList(), false);
     }
 
-    public void UpdateState(string txt, List<Variable>? variables, bool updateSpecialFields) {
+    public void UpdateState(string txt, List<ScriptVariable>? variables, bool updateSpecialFields) {
         txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
         grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
@@ -257,7 +254,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         var vc = new VariableCollection();
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                vc.Add(new VariableString(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
+                vc.Add(new StringScriptVariable(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
             }
         }
         return vc;
@@ -340,7 +337,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
-    private static JsonObject? DummyJson(List<Variable>? variables) {
+    private static JsonObject? DummyJson(List<ScriptVariable>? variables) {
         if (variables is null) { return null; }
 
         var j = new JsonObject();
@@ -382,7 +379,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         var storageKey = VariablesStorageKey;
         var savedSets = EditorVariablesManager.GetSets(storageKey);
 
-        var items = new List<AbstractListItem>();
+        var items = new List<ListItem>();
 
         if (savedSets.Count > 0) {
             items.Add(ItemOf("Gespeicherte Variablen-Sets:", true));
@@ -408,7 +405,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     private void Contextmenu_CopyVariableContent(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not string content) { return; }
-        if (Generic.CopytoClipboard(content)) {
+        if (CopytoClipboard(content)) {
             QuickNote.Show(NoteSymbols.Ok, "Kopiert");
         } else {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
@@ -464,11 +461,11 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         grpInjectVariables.ResumeLayout();
     }
 
-    private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        foreach (var thisc in Method.AllMethods.Instances) {
+    private void lstAssistant_ItemClicked(object sender, ListItemEventArgs e) {
+        foreach (var thisc in ScriptCommand.AllMethods.Instances) {
             if (thisc is ICommandBuilder ic) {
                 if (e.Item.KeyName == ic.KeyName) {
-                    var c = ic.GetCode((BlueControls.Forms.Form?)FindForm());
+                    var c = ic.GetCode((Forms.Form?)FindForm());
 
                     if (!string.IsNullOrEmpty(c)) {
                         Script = Script + "\r\n" + c + "\r\n";
@@ -494,7 +491,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         if (e.TabPage == tabAssistent && !_assistantDone) {
             _assistantDone = true;
 
-            foreach (var thisc in Method.AllMethods.Instances) {
+            foreach (var thisc in ScriptCommand.AllMethods.Instances) {
                 if (thisc is ICommandBuilder ic) {
                     var t = new TextListItem(ic.CommandDescription(), ic.KeyName, ic.CommandImage(), false, true, string.Empty, string.Empty);
 
@@ -534,7 +531,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
-            foreach (var thisc in Method.AllMethods.Instances) {
+            foreach (var thisc in ScriptCommand.AllMethods.Instances) {
                 if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
@@ -577,14 +574,14 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     private void VariablesManager_SaveSet(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
 
-        var name = InputBox.Show("Variablen speichern unter:", string.Empty, FormatHolderSystemName.Instance);
+        var name = InputBox.Show("Variablen speichern unter:", string.Empty, BlueBasics.Classes.Formats.SystemNameFormat.Instance);
         if (string.IsNullOrEmpty(name)) { return; }
 
         SaveCurrentVariableSet(name);
         QuickNote.Show(NoteSymbols.Ok, "Gespeichert");
     }
 
-    private void VariablesManagerDropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+    private void VariablesManagerDropDown_ItemRemoved(object? sender, ListItemEventArgs e) {
         if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
         if (e.Item.RemoveLocked) { return; }
         if (e.Item is not TextListItem tli) { return; }
@@ -601,7 +598,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = [];
-            foreach (var thisc in Method.AllMethods.Instances) {
+            foreach (var thisc in ScriptCommand.AllMethods.Instances) {
                 items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
                 items.Add(new AutocompleteItem(thisc.Command));
                 if (!string.IsNullOrEmpty(thisc.Returns)) {

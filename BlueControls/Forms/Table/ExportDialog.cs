@@ -1,8 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
@@ -10,7 +7,6 @@ using System.Collections.Specialized;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.Forms;
@@ -99,11 +95,11 @@ public sealed partial class ExportDialog : IHasTable {
         if (pad.Items is null) { return -1; }
 
         pad.Items.Clear();
-        Generic.CollectGarbage();
+        CollectGarbage();
 
         if (rowsForExport is not { Count: > 0 }) { return -1; }
 
-        var tmp = new ItemCollectionPadItem(layoutFileName);
+        var tmp = new CollectionPadItem(layoutFileName);
         tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (scx.Failed) { return -1; }
@@ -116,7 +112,7 @@ public sealed partial class ExportDialog : IHasTable {
         tmp.Dispose();
 
         var druckB = pad.Items.CanvasUsedArea;
-        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPadItem.Dpi), MidpointRounding.AwayFromZero);
+        var abstand = (float)Math.Round(MmToPixel(abstandMm, CollectionPadItem.Dpi), MidpointRounding.AwayFromZero);
 
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
@@ -126,7 +122,7 @@ public sealed partial class ExportDialog : IHasTable {
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
-                var it = new ItemCollectionPadItem(layoutFileName);
+                var it = new CollectionPadItem(layoutFileName);
                 // Alle Items werden aus derselben Layout-Datei erzeugt und erben
                 // beim Parsen denselben KeyName. Ohne eindeutige ID würde das zweite
                 // Add mit "Name bereits vorhanden" abgelehnt werden.
@@ -249,7 +245,7 @@ public sealed partial class ExportDialog : IHasTable {
             padVorschau.Items?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Items = new ItemCollectionPadItem(cbxLayoutWahl.Text);
+            padVorschau.Items = new CollectionPadItem(cbxLayoutWahl.Text);
             padVorschau.Items.ResetVariables();
             padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
@@ -273,7 +269,7 @@ public sealed partial class ExportDialog : IHasTable {
             ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
             : "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
 
-    private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
+    private void Exported_ItemClicked(object sender, ListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }

@@ -43,8 +43,8 @@ namespace BlueControls.Forms
             this.lstbx.TabIndex = 0;
             this.lstbx.TabStop = false;
             this.lstbx.Text = "lstbx";
-            this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemClicked);
-            this.lstbx.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemRemoved);
+            this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.ListBox1_ItemClicked);
+            this.lstbx.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.ListBox1_ItemRemoved);
             // 
             // FloatingInputBoxListBoxStyle
             // 

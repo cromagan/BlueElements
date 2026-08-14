@@ -241,7 +241,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (allfiles.Count == 0) { return null; }
 
-            if (Constants.GlobalRnd.Next(10) == 1) {
+            if (GlobalRnd.Next(10) == 1) {
                 allfiles.Shuffle();
             } else {
                 try {
@@ -301,7 +301,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return OperationResult.SuccessFalse;
         }
 
-        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment);
+        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, UserName, DateTime.UtcNow, comment);
 
         return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
     }
@@ -331,7 +331,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             x += 1;
             if (x > 99999) { Develop.DebugError("Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Char_DateiSonderZeichen + ".");
             var ok = true;
 
             foreach (var thisfile in Table.AllInstances()) {
@@ -614,10 +614,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    public OperationResult Remove(FilterItem fi, string comment) {
+    public OperationResult Remove(FilterItem fi, string comment) =>
         //TODO: unbenutzt
-        return Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
-    }
+        Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
 
     public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -750,7 +749,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
-                Generic.Pause(0.001, false);
+                Pause(0.001, false);
             }
             return OperationResult.SuccessTrue;
         }
@@ -851,7 +850,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
         }
 
-        var u = Generic.UserName;
+        var u = UserName;
         var d = DateTime.UtcNow;
 
         // Fehlerbehandlung für Zeilen-Erstellung

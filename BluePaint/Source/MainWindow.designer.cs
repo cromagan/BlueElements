@@ -185,7 +185,7 @@ namespace BluePaint
             this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteDateien.TabIndex = 1;
             this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
             // 
             // btnOeffnen
             // 

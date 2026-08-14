@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.BitmapExt_ImageFilters;
+using BlueBasics.ImageFilters;
 using System.Drawing.Drawing2D;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -60,13 +60,13 @@ public static partial class Extensions {
     public static Bitmap? CropStatic(Bitmap? sourceBmp, int left, int right, int top, int bottom) {
         if (sourceBmp is null || left == 0 && right == 0 && top == 0 && bottom == 0) { return sourceBmp; }
 
-        Generic.CollectGarbage();
+        CollectGarbage();
         var w = Math.Max(sourceBmp.Width - left + right, 1);
         var h = Math.Max(sourceBmp.Height - top + bottom, 1);
         var bmp = new Bitmap(w, h);
         using var gr = Graphics.FromImage(bmp);
         gr.DrawImageUnscaled(sourceBmp, -left, -top);
-        Generic.CollectGarbage();
+        CollectGarbage();
         return bmp;
     }
 
@@ -158,7 +158,7 @@ public static partial class Extensions {
     public static Bitmap? GetEmmbedBitmap(Assembly assembly, string name) {
         if (name.Contains('|')) { return null; }
         if (name.Contains('[')) { return null; }
-        using var d = Generic.GetEmmbedResource(assembly, name);
+        using var d = GetEmmbedResource(assembly, name);
         if (d is null) { return null; }
 
         switch (name.FileType()) {
@@ -298,12 +298,12 @@ public static partial class Extensions {
 
     public static Bitmap? ReplaceColor(this Bitmap sourceBmp, Color toReplace, Color replacement) {
         var bmp = sourceBmp.CloneFromBitmap();
-        bmp.ApplyFilter((ImageFilter_ColorChange.Instance, (toReplace, replacement)));
+        bmp.ApplyFilter((ColorChangeImageFilter.Instance, (toReplace, replacement)));
         return bmp;
     }
 
     public static Bitmap Resize(this Bitmap sourceBmp, int maxwidth, int maxheight, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
-        if (collectGarbage) { Generic.CollectGarbage(); }
+        if (collectGarbage) { CollectGarbage(); }
         if (maxwidth < 1) { maxwidth = 1; }
         if (maxheight < 1) { maxheight = 1; }
 
@@ -379,7 +379,7 @@ public static partial class Extensions {
         } catch { /* Bitmap-Resize fehlgeschlagen, Fallback wird versucht */ }
 
         try {
-            if (!collectGarbage) { Generic.CollectGarbage(); }
+            if (!collectGarbage) { CollectGarbage(); }
 
             if (sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
                 return (Bitmap)sourceBmp.GetThumbnailImage(calcwidth, calcheight, null, IntPtr.Zero);
@@ -440,7 +440,7 @@ public static partial class Extensions {
         } catch {
             try {
                 l.Clear();
-                Generic.CollectGarbage();
+                CollectGarbage();
                 if (Image_FromFile(fileName) is Bitmap x) {
                     l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 }
@@ -454,7 +454,7 @@ public static partial class Extensions {
                 }
             } catch (Exception ex) {
                 l.Clear();
-                Generic.CollectGarbage();
+                CollectGarbage();
                 var bmp = new Bitmap(200, 200);
                 using var gr2 = Graphics.FromImage(bmp);
                 gr2.Clear(Color.White);

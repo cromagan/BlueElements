@@ -1,0 +1,69 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueScript.Classes;
+
+namespace BlueScript.ScriptCommands;
+
+public class LinkifyScriptCommand : TableGenericScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
+    public override string Command => "linkify";
+
+    public override string Description => "Ersetzt Wörter im eingehenden Text durch Links.\r\nDie Funktion durchsucht eine andere Tabelle nach einer Spalte mit identischen Textinhalten. Wird ein vollständiger Zelleninhalt gefunden, wird dieser im Text durch einen Link zur entsprechenden Zeile ersetzt. Optional kann die zu durchsuchende Spalte explizit angegeben werden. Der verlinkte Text bleibt dabei textlich identisch – er wird lediglich verlinkt.";
+
+    public override bool MustUseReturnValue => true;
+
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
+
+    #endregion
+
+    #region Methods
+
+    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string term, bool tillEnde) {
+        if (!tillEnde) {
+            return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">";
+        }
+
+        return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";
+    }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        // Parameter 1: Eingehender Text
+        var inputText = attvar.ValueStringGet(0);
+
+        // Parameter 2: Zieltabelle
+        if (attvar.Attributes[1] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) {
+            return new DoItFeedback("Tabelle nicht vorhanden", true);
+        }
+
+        // Parameter 3: Zu durchsuchende Spalte
+        var searchColumn = tb.Column[attvar.ValueStringGet(2)];
+        if (searchColumn is null) {
+            return new DoItFeedback($"Such-Spalte '{attvar.ValueStringGet(2)}' nicht gefunden", true);
+        }
+
+        // Parameter 4: Spalte für Link-Text (optional, sonst = SearchColumn)
+        var linkColumn = tb.Column[attvar.ValueStringGet(3)];
+        if (linkColumn is null) {
+            return new DoItFeedback($"Link-Spalte '{attvar.ValueStringGet(3)}' nicht gefunden", true);
+        }
+
+        // Alle eindeutigen Werte nach Länge sortiert (längste zuerst)
+        var searchData = searchColumn.GetCellContentsSortedByLength();
+        var resultText = inputText;
+
+        foreach (var (term, row) in searchData) {
+            if (!resultText.Contains(term)) { continue; }
+
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, term, true);
+            resultText = resultText.Replace(term, link);
+        }
+
+        return new(resultText);
+    }
+
+    #endregion
+}

@@ -1,10 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -12,7 +9,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     #region Fields
 
-    private ItemCollectionPadItem? _currentItemsForSideMenu;
+    private CollectionPadItem? _currentItemsForSideMenu;
 
     #endregion
 
@@ -64,7 +61,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     /// <summary>
     /// Wenn true, werden bei nicht angewähltem Item die Eigenschaften des
-    /// Pads (ItemCollectionPadItem) in der Seitenleiste angezeigt — z.B. um
+    /// Pads (ItemCollection) in der Seitenleiste angezeigt — z.B. um
     /// eine Referenztabelle auszuwählen. Der ConnectedFormulaEditor
     /// überschreibt dies mit false.
     /// </summary>
@@ -178,7 +175,7 @@ public partial class PadEditor : FormWithStatusBar {
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
 
-    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void PadDesign_ItemClicked(object sender, ListItemEventArgs e) {
         if (Pad?.Items is not null && Skin.HasStyles) {
             Pad.Items.SheetStyle = e.Item.KeyName;
         }

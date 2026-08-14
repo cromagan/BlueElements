@@ -88,9 +88,7 @@ public static class CsvHelper {
         return sb.ToString();
     }
 
-    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) {
-        return ImportCsv(table, importText, zeileZuordnen, splitChar.Length > 0 ? splitChar[0] : ';', eliminateMultipleSplitter, eliminateSplitterAtStart);
-    }
+    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) => ImportCsv(table, importText, zeileZuordnen, splitChar.Length > 0 ? splitChar[0] : ';', eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public static string ImportCsv(Table table, string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) {
         var f = table.IsGenericEditable(false);
@@ -140,7 +138,7 @@ public static class CsvHelper {
                 Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, leerer Spaltenname.", 0);
                 return "Abbruch,<br>leerer Spaltenname.";
             }
-            zeil[0][spaltNo] = FormatHolderSystemName.MakeValid(zeil[0][spaltNo]);
+            zeil[0][spaltNo] = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(zeil[0][spaltNo]);
 
             var col = table.Column[zeil[0][spaltNo]];
             if (col is null) {

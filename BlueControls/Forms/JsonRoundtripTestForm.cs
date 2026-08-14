@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls.ConnectedFormula;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -17,10 +15,9 @@ public sealed partial class JsonRoundtripTestForm : Form {
 
     #region Constructors
 
-    public JsonRoundtripTestForm() {
+    public JsonRoundtripTestForm() =>
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
-    }
 
     #endregion
 
@@ -201,9 +198,9 @@ public sealed partial class JsonRoundtripTestForm : Form {
                     json = cf.ParseableJson();
                 }
             } else {
-                // BCR: wird über den ItemCollectionPadItem-Konstruktor geladen,
+                // BCR: wird über den ItemCollection-Konstruktor geladen,
                 // der intern ConnectedFormula.Get + ParseableItems.Parse nutzt.
-                var layout = new ItemCollectionPadItem(origCopy);
+                var layout = new CollectionPadItem(origCopy);
                 using (layout) {
                     Append("Anzahl Items: " + layout.Count());
                     json = layout.ParseableJson();
@@ -262,7 +259,7 @@ public sealed partial class JsonRoundtripTestForm : Form {
                     oldFormatStr = cf2.ParseableItems().FinishParseable();
                 }
             } else {
-                var layout2 = new ItemCollectionPadItem();
+                var layout2 = new CollectionPadItem();
                 using (layout2) {
                     layout2.ParseJson(doc.RootElement); // Extension: ParseJson + ParseFinishedJson
                     oldFormatStr = layout2.ParseableItems().FinishParseable();

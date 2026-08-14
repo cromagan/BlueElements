@@ -6,7 +6,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
+    public ScriptProperties(string scriptname, IEnumerable<ScriptCommand> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -17,19 +17,19 @@ public class ScriptProperties {
         MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
+    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<ScriptCommand> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
 
     #endregion
 
     #region Properties
 
     public object? AdditionalInfo { get; }
-    public IEnumerable<Method> AllowedMethods { get; }
+    public IEnumerable<ScriptCommand> AllowedMethods { get; }
     public string Chain { get; } = string.Empty;
 
     public string MainInfo { get; } = string.Empty;
 
-    public Dictionary<string, List<Method>> MethodLookup => field ??= BuildMethodLookup();
+    public Dictionary<string, List<ScriptCommand>> MethodLookup => field ??= BuildScriptCommandLookup();
 
     public List<string> MethodsWithReturnSearch => field ??= BuildMethodsWithReturnSearch();
 
@@ -47,18 +47,6 @@ public class ScriptProperties {
 
     #region Methods
 
-    private Dictionary<string, List<Method>> BuildMethodLookup() {
-        var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
-        foreach (var m in AllowedMethods) {
-            if (!lookup.TryGetValue(m.Command, out var list)) {
-                list = [];
-                lookup[m.Command] = list;
-            }
-            list.Add(m);
-        }
-        return lookup;
-    }
-
     private List<string> BuildMethodsWithReturnSearch() {
         List<string> list = [];
         foreach (var m in AllowedMethods) {
@@ -67,6 +55,18 @@ public class ScriptProperties {
             }
         }
         return list;
+    }
+
+    private Dictionary<string, List<ScriptCommand>> BuildScriptCommandLookup() {
+        var lookup = new Dictionary<string, List<ScriptCommand>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var m in AllowedMethods) {
+            if (!lookup.TryGetValue(m.Command, out var list)) {
+                list = [];
+                lookup[m.Command] = list;
+            }
+            list.Add(m);
+        }
+        return lookup;
     }
 
     #endregion

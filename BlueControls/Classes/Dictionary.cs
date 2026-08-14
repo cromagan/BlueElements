@@ -29,7 +29,7 @@ internal static class Dictionary {
         if (!DictionaryRunning(false) || _dictWords is null) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
-        if (Constants.Char_Numerals.Contains(word[0])) { return true; } // z.B. 00 oder 1b oder 2L
+        if (Char_Numerals.Contains(word[0])) { return true; } // z.B. 00 oder 1b oder 2L
 
         if (_dictWords.TryGetValue(word, out var stored)) {
             // Klein geschriebene Wörter müssen exakt im Wörterbuch stehen
@@ -60,7 +60,7 @@ internal static class Dictionary {
 
         if (_dictWords is not null) {
             foreach (var w in _dictWords.Values) {
-                var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
+                var di = LevenshteinDistance(wordLow, w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
                     l.Add(di.ToString5() + w);
                 }
@@ -69,7 +69,7 @@ internal static class Dictionary {
 
         if (additionalWords is not null) {
             foreach (var w in additionalWords) {
-                var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
+                var di = LevenshteinDistance(wordLow, w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
                     l.Add(di.ToString5() + w);
                 }
@@ -94,7 +94,7 @@ internal static class Dictionary {
                 return;
             }
 
-            using var stream = Generic.GetEmmbedResource(assembly, "Deutsch.bin");
+            using var stream = GetEmmbedResource(assembly, "Deutsch.bin");
             if (stream is null) {
                 _initFailed = true;
                 return;

@@ -1,0 +1,71 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using System.Text.RegularExpressions;
+
+namespace BlueScript.ScriptCommands;
+
+
+internal class ReplaceListScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
+    public override string Command => "replacelist";
+    public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
+    public override string Syntax => "ReplaceListScriptCommand(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(); }
+
+        var tmpList = attvar.ValueListStringGet(0);
+
+        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true); }
+        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true); }
+
+        var ct = 0;
+        bool again;
+        do {
+            ct++;
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceListScriptCommand.", true); }
+            again = false;
+            for (var z = 0; z < tmpList.Count; z++) {
+                if (attvar.ValueBoolGet(2)) {
+                    // Teilersetzungen
+                    var orignal = tmpList[z];
+
+                    if (attvar.ValueBoolGet(1)) {
+                        // Case Sensitive
+                        tmpList[z] = tmpList[z].Replace(attvar.ValueStringGet(3), attvar.ValueStringGet(4));
+                    } else {
+                        // Not Case Sesitive
+                        tmpList[z] = tmpList[z].Replace(attvar.ValueStringGet(3), attvar.ValueStringGet(4), RegexOptions.IgnoreCase);
+                    }
+                    again = tmpList[z] != orignal;
+                } else {
+                    // nur Komplett-Ersetzungen
+                    if (attvar.ValueBoolGet(1)) {
+                        // Case Sensitive
+                        if (tmpList[z] == attvar.ValueStringGet(3)) {
+                            tmpList[z] = attvar.ValueStringGet(4);
+                            again = true;
+                        }
+                    } else {
+                        // Not Case Sesitive
+                        if (string.Equals(tmpList[z], attvar.ValueStringGet(3), StringComparison.OrdinalIgnoreCase)) {
+                            tmpList[z] = attvar.ValueStringGet(4);
+                            again = true;
+                        }
+                    }
+                }
+            }
+        } while (again);
+
+        return attvar.ValueListStringSet(0, tmpList) ?? DoItFeedback.Null();
+    }
+
+    #endregion
+}

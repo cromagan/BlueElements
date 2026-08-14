@@ -4,7 +4,6 @@ using BlueTable.EventArgs;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -468,7 +467,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem?.IsOk() == true) {
-                result.ParseableAdd("Filter", (IStringable)thisFilterItem);
+                result.ParseableAdd("Filter", thisFilterItem);
             }
         }
         return result;
@@ -499,13 +498,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return sb.ToString().TrimEnd('\r', '\n');
     }
 
-    public void Remove(ColumnItem? column) {
-        RemoveRange(_internal.Where(thisFilter => thisFilter.Column == column));
-    }
+    public void Remove(ColumnItem? column) => RemoveRange(_internal.Where(thisFilter => thisFilter.Column == column));
 
-    public void Remove(FilterType filterType) {
-        RemoveRange(_internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)));
-    }
+    public void Remove(FilterType filterType) => RemoveRange(_internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)));
 
     public void Remove(FilterItem filter) {
         if (IsDisposed) { return; }
@@ -641,7 +636,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 return QuickImage.Get(ImageCode.Trichter, 16);
 
             default:
-                return QuickImage.Get(ImageCode.Trichter, 16, Color.Red, Color.Transparent);
+                return QuickImage.Get(ImageCode.Trichter, 16, System.Drawing.Color.Red, System.Drawing.Color.Transparent);
         }
     }
 
@@ -722,7 +717,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (disposing) {
             lock (_internal) {
-                OnDisposed(); 
+                OnDisposed();
 
                 Disposed = null;
                 PropertyChanged = null;

@@ -1,0 +1,111 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueScript.ScriptVariables;
+
+public class BoolScriptVariable : ScriptVariable {
+
+    #region Fields
+
+    private bool _valuebool;
+
+    #endregion
+
+    #region Constructors
+
+    public BoolScriptVariable(string name, bool value, bool ronly, string comment) : base(name, ronly, comment) => _valuebool = value;
+
+    public BoolScriptVariable(string name) : this(name, false, true, string.Empty) { }
+
+    public BoolScriptVariable() : this(string.Empty, false, true, string.Empty) { }
+
+    public BoolScriptVariable(bool value) : this(DummyName(), value, true, string.Empty) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "bol";
+    public static string ShortName_Plain => "bol";
+    public static string ShortName_Variable => "*bol";
+    public override int CheckOrder => 0;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => false;
+    public override string ReadableText => _valuebool.ToString();
+
+    public override bool ToStringPossible => true;
+
+    public bool ValueBool {
+        get => _valuebool;
+        set {
+            if (ReadOnly) { return; }
+            _valuebool = value; // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+            OnPropertyChangedExt("value", _valuebool);
+        }
+    }
+
+    public override string ValueForCell {
+        get => _valuebool.ToPlusMinus();
+        set => ValueBool = value.FromPlusMinus();
+    }
+
+    public override string ValueForReplace => _valuebool ? "true" : "false";
+
+    #endregion
+
+    #region Methods
+
+    public override void DisposeContent() { }
+
+    public override string GetValueFrom(ScriptVariable variable) {
+        if (variable is not BoolScriptVariable v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueBool = v.ValueBool;
+        return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("value", _valuebool);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        BeginInit();
+        try {
+            SetValue(json.GetBool("value", _valuebool));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
+    }
+
+    protected override void SetValue(object? x) {
+        if (x is bool val) {
+            _valuebool = val;
+        } else {
+            Develop.DebugError("Variablenfehler!");
+        }
+    }
+
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+
+        switch (txt.ToLowerInvariant()) {
+            case "true":
+            case "+":
+            case "wahr":
+                result = true;
+                return true;
+
+            case "false":
+            case "-":
+            case "falsch":
+                result = false;
+                return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+}

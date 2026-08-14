@@ -1,15 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.Renderer;
-using System.Globalization;
+using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Classes.ColumnErrorConstants;
 
 namespace BlueControls.BlueTableDialogs;
@@ -19,7 +18,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     #region Fields
 
     private readonly TableView? _table;
-    private Renderer_Abstract? _renderer;
+    private Renderer.Renderer? _renderer;
     private bool _writeAccessLost;
 
     #endregion
@@ -43,13 +42,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        foreach (var thisr in Renderer_Abstract.AllRenderers.Instances) {
+        foreach (var thisr in Renderer.Renderer.AllRenderers.Instances) {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
         }
 
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
-        foreach (var thisItem in ColumnFormatHolder.AllFormats.Instances) {
+        foreach (var thisItem in BlueTable.Classes.ColumnFormat.AllFormats.Instances) {
             var bli = new BitmapListItem(thisItem.SymbolForReadableText() is { } s ? (Bitmap)s : null, thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
                 QuickInfo = thisItem.QuickInfo
@@ -220,7 +219,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
         if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
         _writeAccessLost = true;
-        Forms.Notification.Show("Spalten-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
+        Notification.Show("Spalten-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 
@@ -359,7 +358,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         _renderer?.DoUpdateSideOptionMenu -= _renderer_DoUpdateSideOptionMenu;
 
         if (InputItem is ColumnItem c && !string.IsNullOrEmpty(cbxRenderer.Text)) {
-            _renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
+            _renderer = ParseableItem.NewByTypeName<Renderer.Renderer>(cbxRenderer.Text);
             _renderer?.Parse(c.RendererSettings);
         } else {
             _renderer = null;
@@ -403,7 +402,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbName.Text = c.KeyName;
         txbName.Enabled = !c.KeyName.StartsWith("SYS_", StringComparison.Ordinal);
 
-        txbName.AllowedChars = Constants.AllowedCharsVariableName;
+        txbName.AllowedChars = AllowedCharsVariableName;
         txbCaption.Text = c.Caption;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, c.BackColor).KeyName;
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, c.ForeColor).KeyName;
@@ -573,8 +572,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         return item;
     }
 
-    private List<AbstractListItem> GenerateSolutions(string fehler) {
-        var solutions = new List<AbstractListItem>();
+    private List<ListItem> GenerateSolutions(string fehler) {
+        var solutions = new List<ListItem>();
 
         //if (fehler == ColumnKeyInvalid) {
         //    solutions.Add(CreateSolution("Anderen Spaltennamen (Schlüssel) eingeben", () => txbName.Text = (InputItem as ColumnItem)?.KeyName ?? string.Empty, txbName));
@@ -614,8 +613,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == RendererMissing) {
-            solutions.Add(CreateSolution("Einzeiligen-Renderer setzen", () => cbxRenderer.Text = Renderer_TextOneLine.ClassId, cbxRenderer));
-            solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => cbxRenderer.Text = Renderer_ImageAndText.ClassId, cbxRenderer));
+            solutions.Add(CreateSolution("Einzeiligen-Renderer setzen", () => cbxRenderer.Text = TextOneLineRenderer.ClassId, cbxRenderer));
+            solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => cbxRenderer.Text = ImageAndTextRenderer.ClassId, cbxRenderer));
         }
 
         if (fehler is LinkedTableMissing
@@ -768,21 +767,21 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (tblFilterliste.Table is null) {
             var tb = Table.Get();
-            //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolderTextOneLine.Instance);
+            //tb.Column.GenerateAndAdd("count", "count", ColumnFormat.IntegerPositive);
+            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", TextOneLineColumnFormat.Instance);
             if (spn is not { IsDisposed: false }) { return; }
             spn.IsFirst = true;
-            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolderBit.Instance);
+            var vis = tb.Column.GenerateAndAdd("visible", "visible", BitColumnFormat.Instance);
             if (vis is not { IsDisposed: false }) { return; }
-            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolderSystemname.Instance);
+            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", SystemnameColumnFormat.Instance);
             if (sp is not { IsDisposed: false }) { return; }
 
-            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolderImageCode.Instance);
+            var info = tb.Column.GenerateAndAdd("info", "Info", ImageAndTextColumnFormat.Instance);
             if (info is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolderTextOneLine.Instance);
+            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", TextOneLineColumnFormat.Instance);
             if (b is not { IsDisposed: false }) { return; }
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
@@ -802,9 +801,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             b.DropDownItems = dd.AsReadOnly();
 
-            b.DefaultRenderer = Renderer_ImageAndText.ClassId;
+            b.DefaultRenderer = ImageAndTextRenderer.ClassId;
 
-            var s = new Renderer_ImageAndText {
+            var s = new ImageAndTextRenderer {
                 Text_ersetzen = string.Join('\r', or)
             };
             b.RendererSettings = s.ReadableText();
@@ -879,8 +878,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
-    private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        var chf = ColumnFormatHolder.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
+    private void lstStyles_ItemClicked(object sender, EventArgs.ListItemEventArgs e) {
+        var chf = BlueTable.Classes.ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
         if (chf is null) { return; }
 
         if (!AllOk()) { return; }

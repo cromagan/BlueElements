@@ -6,7 +6,7 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, LogData ld, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
+    public ScriptEndedFeedback(VariableCollection variables, LogData ld, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
         Variables = variables;
         GiveItAnotherTry = false;
         Routine = ld.Subname;

@@ -1,10 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueTable.Editoren;
 
@@ -78,14 +76,14 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         return (lstFilterItems.CheckedItems[0] as ReadableListItem)?.Item as FilterItem;
     }
 
-    private void lstFilterItems_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstFilterItems_ItemClicked(object sender, ListItemEventArgs e) {
         WriteCurrentFilterBack();
 
         filterItemEditor.Mode = EditorMode.EditCopy;
         filterItemEditor.InputItem = GetSelectedFilter();
     }
 
-    private void lstFilterItems_RemoveClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstFilterItems_RemoveClicked(object sender, ListItemEventArgs e) {
         if (InputItem is not FilterCollection fc) { return; }
 
         if (lstFilterItems[e.Item.KeyName] is not ReadableListItem rli) { return; }

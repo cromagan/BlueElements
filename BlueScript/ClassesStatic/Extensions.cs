@@ -22,11 +22,21 @@ public static class Extensions {
         var sb = new System.Text.StringBuilder(txt.Length);
         foreach (var c in txt) {
             switch (c) {
-                case '\\': sb.Append(ReplacerForBackSlash); break;
-                case '"': sb.Append(ReplacerForQuotes); break;
-                case '\r': sb.Append(ReplacerForR); break;
-                case '\n': sb.Append(ReplacerForN); break;
-                default: sb.Append(c); break;
+                case '\\':
+                    sb.Append(ReplacerForBackSlash);
+                    break;
+                case '"':
+                    sb.Append(ReplacerForQuotes);
+                    break;
+                case '\r':
+                    sb.Append(ReplacerForR);
+                    break;
+                case '\n':
+                    sb.Append(ReplacerForN);
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
             }
         }
         return sb.ToString();

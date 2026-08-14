@@ -2,7 +2,6 @@
 
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -27,7 +26,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         //Table = table;
 
         if (Table is { IsDisposed: false } tb) {
-            //var lst =  List<AbstractListItem>();
+            //var lst =  List<ListItem>();
             lstColumns.ItemAddRange(ItemsOf(tb.Column));
             //cbxColDateiname.Item = lst;
         }
@@ -191,7 +190,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         }
     }
 
-    private void lstColumns_ItemClicked(object sender, AbstractListItemEventArgs e) => CheckButtons();
+    private void lstColumns_ItemClicked(object sender, ListItemEventArgs e) => CheckButtons();
 
     #endregion
 }

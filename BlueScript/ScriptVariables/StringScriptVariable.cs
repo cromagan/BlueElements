@@ -1,0 +1,119 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueScript.ClassesStatic;
+
+namespace BlueScript.ScriptVariables;
+
+public class StringScriptVariable : ScriptVariable {
+
+    #region Fields
+
+    private string _valueString;
+
+    #endregion
+
+    #region Constructors
+
+    public StringScriptVariable(string name, string value, bool ronly, string comment) : base(name, ronly, comment) => _valueString = value.RestoreCriticalVariableChars();
+
+    public StringScriptVariable(string name) : this(name, string.Empty, true, string.Empty) { }
+
+    public StringScriptVariable() : this(string.Empty, string.Empty, true, string.Empty) { }
+
+    public StringScriptVariable(string name, string value) : this(name, value, true, string.Empty) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "str";
+    public static string ShortName_Plain => "str";
+    public static string ShortName_Variable => "*str";
+    public override int CheckOrder => 2;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
+
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
+    /// </summary>
+    public override string ReadableText => _valueString;
+
+    public override bool ToStringPossible => true;
+
+    public override string ValueForCell {
+        get => _valueString;
+        set => ValueString = value;
+    }
+
+    /// <summary>
+    /// Der Wert mit " Anfang/Ende und entfernten kritischen Zeichen.
+    /// </summary>
+    public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
+
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
+    /// </summary>
+    public string ValueString {
+        get => _valueString;
+        set {
+            if (ReadOnly) {
+                Develop.DebugPrint_ReadOnly(); // Wichtig für TableVariables
+                return;
+            }
+            _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+            OnPropertyChangedExt("value", _valueString);
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    public override void DisposeContent() { }
+
+    public override string GetValueFrom(ScriptVariable variable) {
+        if (variable is not StringScriptVariable v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueString = v.ValueString;
+        return string.Empty;
+    }
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+        json.Set("value", _valueString);
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        BeginInit();
+        try {
+            SetValue(json.GetString("value", _valueString));
+            base.ParseJson(json);
+        } finally {
+            EndInit();
+        }
+    }
+
+    protected override void SetValue(object? x) {
+        if (x is string val) {
+            _valueString = val.RestoreCriticalVariableChars();
+        } else {
+            Develop.DebugError("Variablenfehler!");
+        }
+    }
+
+    protected override bool TryParseValue(string txt, out object? result) {
+        if (txt.Length > 1 && txt.StartsWith('"') && txt.EndsWith('"')) {
+            var tmp = txt[1..^1]; // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+            tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+            if (tmp.Contains('"')) { result = null; return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+
+            result = tmp;
+            return true;
+        }
+        result = null;
+        return false;
+    }
+
+    #endregion
+}

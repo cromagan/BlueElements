@@ -99,7 +99,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpBenutzergruppen
             // 
             grpBenutzergruppen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            grpBenutzergruppen.BackColor = Color.FromArgb(255, 255, 255);
+            grpBenutzergruppen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpBenutzergruppen.CausesValidation = false;
             grpBenutzergruppen.Controls.Add(btnDummyAdmin);
             grpBenutzergruppen.Controls.Add(PermissionGroups_NewRow);
@@ -180,7 +180,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpKennwort
             // 
             grpKennwort.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            grpKennwort.BackColor = Color.FromArgb(255, 255, 255);
+            grpKennwort.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpKennwort.CausesValidation = false;
             grpKennwort.Controls.Add(capKennwort);
             grpKennwort.Controls.Add(txbKennwort);
@@ -283,7 +283,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAllgemein
             // 
-            tabAllgemein.BackColor = Color.FromArgb(255, 255, 255);
+            tabAllgemein.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabAllgemein.Controls.Add(btnLoadAll);
             tabAllgemein.Controls.Add(btnMasterMe);
             tabAllgemein.Controls.Add(btnUnMaster);
@@ -458,7 +458,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabRechte
             // 
-            tabRechte.BackColor = Color.FromArgb(255, 255, 255);
+            tabRechte.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabRechte.Controls.Add(grpKennwort);
             tabRechte.Controls.Add(grpBenutzergruppen);
             tabRechte.Location = new Point(4, 25);
@@ -470,7 +470,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSortierung
             // 
-            tabSortierung.BackColor = Color.FromArgb(255, 255, 255);
+            tabSortierung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabSortierung.Controls.Add(rowSortDefinitionEditor);
             tabSortierung.Controls.Add(capCustomSortInfo);
             tabSortierung.Controls.Add(btnCustomSortEnable);
@@ -521,7 +521,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabUniqueValues
             // 
-            tabUniqueValues.BackColor = Color.FromArgb(255, 255, 255);
+            tabUniqueValues.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabUniqueValues.Controls.Add(capUniqueInfo);
             tabUniqueValues.Controls.Add(uniqueValueDefinitionEditor);
             tabUniqueValues.Controls.Add(lstUniqueValues);
@@ -562,7 +562,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabVariablen
             // 
-            tabVariablen.BackColor = Color.FromArgb(255, 255, 255);
+            tabVariablen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabVariablen.Controls.Add(variableEditor);
             tabVariablen.Location = new Point(4, 25);
             tabVariablen.Name = "tabVariablen";
@@ -582,7 +582,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabDictionary
             // 
-            tabDictionary.BackColor = Color.FromArgb(255, 255, 255);
+            tabDictionary.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabDictionary.Controls.Add(btnExtractWords);
             tabDictionary.Controls.Add(txbDictionary);
             tabDictionary.Controls.Add(capDictionary);
@@ -624,7 +624,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabUndo
             // 
-            tabUndo.BackColor = Color.FromArgb(255, 255, 255);
+            tabUndo.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabUndo.Controls.Add(tblUndo);
             tabUndo.Location = new Point(4, 25);
             tabUndo.Name = "tabUndo";

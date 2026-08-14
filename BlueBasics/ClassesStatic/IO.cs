@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 
+
 namespace BlueBasics.ClassesStatic;
 
 public static class IO {
@@ -317,17 +318,17 @@ public static class IO {
 
     /// <summary>
     /// Prüft, ob der übergebene Text ein gültiger Verzeichnispfad ist
-    /// (ohne Dateiname). Ersetzt IsFormat(FormatHolderFilepath.Instance, ...).
+    /// (ohne Dateiname). Ersetzt IsFormat(Filepath.Instance, ...).
     /// </summary>
     public static bool IsValidFilePath(this string directory) =>
-        directory.IsFormat(FormatHolderFilepath.Instance, false) is { Length: 0 };
+        directory.IsFormat(Classes.Formats.FilepathFormat.Instance, false) is { Length: 0 };
 
     /// <summary>
     /// Prüft, ob der übergebene Text ein gültiger Dateiname inkl. Pfad ist.
-    /// Ersetzt IsFormat(FormatHolderFilepathAndName.Instance, ...).
+    /// Ersetzt IsFormat(FilepathAndName.Instance, ...).
     /// </summary>
     public static bool IsValidFilepathAndName(this string filename) =>
-        filename.IsFormat(FormatHolderFilepathAndName.Instance, false) is { Length: 0 };
+        filename.IsFormat(Classes.Formats.FilepathAndNameFormat.Instance, false) is { Length: 0 };
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
@@ -758,7 +759,7 @@ public static class IO {
         var z = -1;
         directory = directory.NormalizePath();
         TryCreateDirectory([directory]);
-        preferedfilename = preferedfilename.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
+        preferedfilename = preferedfilename.ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
         if (preferedfilename.Length > 80) { preferedfilename = preferedfilename[..80]; }
 

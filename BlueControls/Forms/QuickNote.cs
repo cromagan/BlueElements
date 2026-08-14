@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -48,7 +47,7 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
         // Position so setzen, dass die komplette QuickNote innerhalb des
         // sichtbaren Bildschirmbereichs liegt - weder außerhalb startend noch
         // über den Rand hinausragend.
-        Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(x, y)), x, y);
+        Position_SetWindowIntoScreen(PointOnScreenNr(new Point(x, y)), x, y);
         _startX = Left;
         _startTop = Top;
 

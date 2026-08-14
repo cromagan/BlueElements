@@ -21,13 +21,13 @@ public static class Allgemein {
 
             // Wenn mehr als 20% des Systemspeichers oder mehr als 1GB für diese Instanz verwendet wird
             if (availableMemoryGB > Math.Min(totalSystemMemoryGB * 0.2, 8)) {
-                Generic.TrimAllCaches();
-                Generic.CollectGarbage();
+                TrimAllCaches();
+                CollectGarbage();
             }
         } catch {
             // Fallback, wenn Speicherabfrage fehlschlägt
-            Generic.TrimAllCaches();
-            Generic.CollectGarbage();
+            TrimAllCaches();
+            CollectGarbage();
         }
     }
 

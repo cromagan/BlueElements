@@ -28,7 +28,7 @@ public class Script {
         //            if (!string.IsNullOrEmpty(comment)) { comment = comment + "\r\n"; }
         //            comment = comment + "Konstante aus " + thism.KeyName.ToUpper();
 
-        //            Variables.Add(new VariableString(varname, thisValue, true, comment));
+        //            Variables.Add(new String(varname, thisValue, true, comment));
         //        }
         //    }
         //}
@@ -68,7 +68,7 @@ public class Script {
             // Ansonsten werden bei Try / If / For diese gelöscht
             vars.RemoveWithComment("Attribut");
             for (var z = 0; z < args.Count; z++) {
-                vars.Add(new VariableString("Attribut" + z, args[z], true, "Attribut"));
+                vars.Add(new StringScriptVariable("Attribut" + z, args[z], true, "Attribut"));
             }
         }
 
@@ -76,7 +76,7 @@ public class Script {
             var nam = "Attribut" + z;
 
             if (vars.GetByKey(nam) is null) {
-                vars.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
+                vars.Add(new StringScriptVariable("Attribut" + z, string.Empty, true, "Attribut"));
             }
         }
     }
@@ -159,12 +159,12 @@ public class Script {
         if (!expectedvariablefeedback && idEnd > pos && idEnd + 1 < scriptText.Length && scriptText[idEnd] == '=') {
             var varnam = scriptText[pos..idEnd];
             if (varCol.GetByKey(varnam) is { } thisV) {
-                var f = Method.GetEnd(scriptText, idEnd, 1, ";");
+                var f = ScriptCommand.GetEnd(scriptText, idEnd, 1, ";");
                 if (f.Failed) {
                     return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true);
                 }
 
-                var scx = Method.VariablenBerechnung(varCol, ld, scp, varnam + "=" + f.NormalizedText + ";", false);
+                var scx = ScriptCommand.VariablenBerechnung(varCol, ld, scp, varnam + "=" + f.NormalizedText + ";", false);
                 return new DoItWithEndedPosFeedback(scx, f.ContinuePosition);
             }
         }
@@ -194,7 +194,7 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
-        if (idEnd > pos && Method.AllMethodByCommand.TryGetValue(scriptText[pos..idEnd], out var allCandidates)) {
+        if (idEnd > pos && ScriptCommand.AllMethodByCommand.TryGetValue(scriptText[pos..idEnd], out var allCandidates)) {
             foreach (var thisC in allCandidates) {
                 var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
                 if (string.IsNullOrEmpty(f.FailedReason)) {
@@ -219,7 +219,7 @@ public class Script {
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, AbortReason? abort) {
         var ifFound = scp.AllowedMethods.Any(thisC => string.Equals(thisC.Command, "if", StringComparison.Ordinal));
-        var stringFound = varCol.Any(thisV => thisV is VariableString);
+        var stringFound = varCol.Any(thisV => thisV is StringScriptVariable);
 
         if (!ifFound || !stringFound) {
             return new ScriptEndedFeedback("Interner Fehler: Programm nicht korrekt gestartet, bitte neu starten!", false, false, scp.ScriptName);

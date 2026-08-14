@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 
@@ -329,7 +328,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     }
 
     private void CheckErrorState(object? state) {
-        if (_errorCheckTimer is null || Disposing || IsDisposed || Generic.Ending) { return; }
+        if (_errorCheckTimer is null || Disposing || IsDisposed || Ending) { return; }
 
         try {
             BeginInvoke(new Action(UpdateButtons));

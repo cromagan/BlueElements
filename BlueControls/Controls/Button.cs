@@ -1,9 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Extended_Text;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Drawing.Design;
@@ -89,7 +86,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     [Category("Darstellung")]
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
@@ -110,7 +107,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     #region Methods
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
+    public List<ListItem>? GetContextMenuItems(object? hotItem) => null;
 
     internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);
@@ -322,7 +319,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void ClickFirerer_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
 
         if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing && ContainsMouse) {
             _clickFired = false;

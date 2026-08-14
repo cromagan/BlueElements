@@ -1,15 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.BlueTableDialogs;
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Editoren;
-using BlueScript.Variables;
-using BlueTable.AdditionalScriptVariables;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
+using BlueScript.ScriptVariables;
 
 namespace BlueControls.Controls;
 
@@ -24,7 +20,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     private bool _generated;
     private bool _generating;
     private RowItem? _lastRow;
-    private System.Threading.Timer? _updater;
+    private readonly System.Threading.Timer? _updater;
 
     #endregion
 
@@ -32,7 +28,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public ConnectedFormulaView() : this(string.Empty, null) { }
 
-    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
+    public ConnectedFormulaView(string mode, CollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
         IsSelectable = false;
 
@@ -65,7 +61,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         get;
         set {
             field = value;
-            btnEdit.Visible = Generic.IsAdministrator() && !string.IsNullOrEmpty(field);
+            btnEdit.Visible = IsAdministrator() && !string.IsNullOrEmpty(field);
             btnEdit.BringToFront();
         }
     } = string.Empty;
@@ -89,7 +85,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    public ItemCollectionPadItem? Page {
+    public CollectionPadItem? Page {
         get;
         set {
             if (value == field) { return; }
@@ -185,7 +181,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 y2 = Skin.Padding;
             }
 
-            var l = ItemCollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
+            var l = CollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
 
             var posLookup = new Dictionary<IAutosizable, RectangleF>(l.Count);
             foreach (var (item, pos) in l) { posLookup[item] = pos; }
@@ -198,7 +194,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                     if (SearchOrGenerate(thisitco, Mode) is { } con) {
                         unused.Remove(con);
 
-                        con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
+                        con.Visible = thisit is not ReciverPadItem cspi || cspi.IsVisibleForMe(Mode, true);
 
                         if (thisit is IAutosizable autoItem && posLookup.TryGetValue(autoItem, out var newpos)) {
                             con.Left = (int)newpos.Left + x1;
@@ -240,11 +236,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    public Variable? GetFieldVariable() {
+    public ScriptVariable? GetFieldVariable() {
         var fn = FieldName;
 
         if (!string.IsNullOrEmpty(fn)) {
-            return new VariableRowItem(fn, _lastRow, true, "Die Eingangszeile des Formulares");
+            return new RowScriptVariable(fn, _lastRow, true, "Die Eingangszeile des Formulares");
         }
 
         return null;
@@ -328,7 +324,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         base.SetToRow(row);
     }
 
-    public void SetValueFromVariable(Variable v) { }
+    public void SetValueFromVariable(ScriptVariable v) { }
 
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 
@@ -507,7 +503,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (!Generic.IsAdministrator()) {
+        if (!IsAdministrator()) {
             btnEdit.Visible = false;
             return;
         }
@@ -523,7 +519,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
-        if (Generic.IsAdministrator()) {
+        if (IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
 
             if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
@@ -548,7 +544,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         Parents.Exists(p => !p.IsDisposed && !p.FilterOutput.IsDisposed && p.FilterOutput.Table == table);
 
     private void Updater_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
         _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         if (!_generated) { Invalidate(); }
     }

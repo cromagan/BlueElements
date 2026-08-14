@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using System.Reflection;
 
 namespace BlueControls.Forms;
@@ -15,7 +13,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
 
         //var types = Generic.GetTypesOfType<IIsStandalone>();
 
-        var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
+        var methods = GetMethodWithAttribute<StandaloneInfo>();
 
         foreach (var thisType in methods) {
             var name = thisType.Name;
@@ -46,7 +44,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
                 UserDefCompareKey = sort.ToString10() + "1" + name
             };
 
-            //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToString10() + "1" + name) {
+            //var p = new TextAndIcon(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToString10() + "1" + name) {
             //    Tag = thisType
             //};
             Forms.ItemAdd(bli);
@@ -68,9 +66,9 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
         BringToFront();
     }
 
-    private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+    private void Forms_ItemClicked(object sender, EventArgs.ListItemEventArgs e) {
         if (e.Item is BitmapListItem bli) {
-            var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().FirstOrDefault(m =>
+            var methodInfo = GetMethodWithAttribute<StandaloneInfo>().FirstOrDefault(m =>
                 (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? string.Empty) + "." + m.Name == bli.KeyName);
             if (methodInfo is { } mi) {
                 var result = mi.Invoke(null, null);

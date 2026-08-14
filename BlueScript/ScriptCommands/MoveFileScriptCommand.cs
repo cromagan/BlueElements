@@ -1,0 +1,44 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using static BlueBasics.ClassesStatic.IO;
+
+namespace BlueScript.ScriptCommands;
+
+internal class MoveFileScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "movefile";
+    public override string Description => "Verschiebt eine Datei.";
+
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
+
+    public override string Returns => BoolScriptVariable.ShortName_Plain;
+
+    public override string Syntax => "MoveFileScriptCommand(SourceCompleteName, DestinationCompleteName)";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        var sop = attvar.ValueStringGet(0);
+        var dep = attvar.ValueStringGet(1);
+
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht:" + dep.FilePath(), true); }
+        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", true); }
+
+        if (FileExists(dep)) { return DoItFeedback.Falsch(); }
+
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
+
+        if (!MoveFile(sop, dep, false)) {
+            return DoItFeedback.Falsch();
+        }
+
+        return DoItFeedback.Wahr();
+    }
+
+    #endregion
+}

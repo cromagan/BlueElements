@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -17,9 +16,7 @@ public class ScrollPanel : ZoomPad {
 
     #region Constructors
 
-    public ScrollPanel() {
-        AutoCenter = false;
-    }
+    public ScrollPanel() => AutoCenter = false;
 
     #endregion
 

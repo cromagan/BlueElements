@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueScript.Variables;
+using BlueScript.ScriptVariables;
 
 namespace BlueControls.Interfaces;
 
@@ -11,7 +11,7 @@ public interface ICanHaveVariables {
 
     #region Methods
 
-    bool ReplaceVariable(Variable variable);
+    bool ReplaceVariable(ScriptVariable variable);
 
     bool ResetVariables();
 

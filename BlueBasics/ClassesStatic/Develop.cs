@@ -404,9 +404,7 @@ public static class Develop {
         }
     }
 
-    public static bool IsAllreadyRunning() {
-        return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
-    }
+    public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
     public static bool IsHostRunning() => Debugger.IsAttached;
 
@@ -491,7 +489,7 @@ public static class Develop {
 
     private static void CloseAfter12Hours() {
         try {
-            if (Generic.Ending) { return; }
+            if (Ending) { return; }
             if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours <= 12) { return; }
             if (IsHostRunning()) { return; }
 

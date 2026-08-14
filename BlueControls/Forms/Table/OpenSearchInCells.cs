@@ -1,8 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.TableItems;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.TableElements;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 using Form = BlueControls.Forms.Form;
@@ -14,18 +14,16 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
     #region Fields
 
     private ColumnViewItem? _col;
-    private RowListItem? _row;
+    private RowTableElement? _row;
     private TableView? _tableView;
 
     #endregion
 
     #region Constructors
 
-    public OpenSearchInCells() {
+    public OpenSearchInCells() =>
         // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-    }
+        InitializeComponent();// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
     #endregion
 

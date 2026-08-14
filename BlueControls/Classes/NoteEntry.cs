@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 
 namespace BlueControls.Classes;
@@ -66,7 +65,7 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
     };
 
     public List<GenericControl> GetProperties(int widthOfControl) {
-        var levels = new List<AbstractListItem> {
+        var levels = new List<ListItem> {
             new TextListItem("Neutral", ((int)NoteSymbols.Pencil).ToString1(), QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Ok", ((int)NoteSymbols.Ok).ToString1(), QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Warnung", ((int)NoteSymbols.Warning).ToString1(), QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
@@ -85,9 +84,7 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
 
     public QuickImage? SymbolForReadableText(int size) => QuickImage.Get(ImageCodeFor(Symbol), size);
 
-    private void OnPropertyChanged(string propertyName) {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

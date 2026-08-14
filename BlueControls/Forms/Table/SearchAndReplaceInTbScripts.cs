@@ -112,7 +112,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
     }
 
     private void Checkbuttons() {
-        var canDo = Generic.IsAdministrator();
+        var canDo = IsAdministrator();
         if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
         btnErsetzen.Enabled = canDo;
         btnSuche.Enabled = canDo;

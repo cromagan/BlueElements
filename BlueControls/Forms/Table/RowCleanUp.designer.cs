@@ -96,7 +96,7 @@ namespace BlueControls.BlueTableDialogs
             // 
             // grpVerhalten
             // 
-            grpVerhalten.BackColor = Color.FromArgb(240, 240, 240);
+            grpVerhalten.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
             grpVerhalten.Controls.Add(optLöschen);
             grpVerhalten.Controls.Add(optFülle);
             grpVerhalten.Location = new Point(288, 56);

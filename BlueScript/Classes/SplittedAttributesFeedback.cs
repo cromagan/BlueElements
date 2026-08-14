@@ -1,14 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Drawing;
-
 namespace BlueScript.Classes;
 
 public readonly struct SplittedAttributesFeedback {
 
     #region Constructors
 
-    public SplittedAttributesFeedback(List<Variable> atts) => Attributes = atts;
+    public SplittedAttributesFeedback(List<ScriptVariable> atts) => Attributes = atts;
 
     public SplittedAttributesFeedback(ScriptIssueType type, string failedReason, bool needsScriptFix) {
         Attributes = [];
@@ -21,7 +19,7 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Properties
 
-    public List<Variable> Attributes { get; } = [];
+    public List<ScriptVariable> Attributes { get; } = [];
     public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
 
     public string FailedReason { get; } = string.Empty;
@@ -56,22 +54,22 @@ public readonly struct SplittedAttributesFeedback {
         return Attributes[varno] is not { ReadOnly: false };
     }
 
-    public Bitmap? ValueBitmapGet(int varno) {
+    public System.Drawing.Bitmap? ValueBitmapGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return null; }
 
-        return Attributes[varno] is VariableBitmap vs ? vs.ValueBitmap : null;
+        return Attributes[varno] is BitmapScriptVariable vs ? vs.ValueBitmap : null;
     }
 
     public bool ValueBoolGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return false; }
 
-        return Attributes[varno] is VariableBool { ValueBool: true };
+        return Attributes[varno] is BoolScriptVariable { ValueBool: true };
     }
 
     public DateTime? ValueDateGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return null; }
 
-        if (Attributes[varno] is VariableString vs) {
+        if (Attributes[varno] is StringScriptVariable vs) {
             if (DateTimeTryParse(vs.ValueString, out var d)) { return d; }
         }
         return null;
@@ -80,19 +78,19 @@ public readonly struct SplittedAttributesFeedback {
     public int ValueIntGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        return Attributes[varno] is VariableDouble vs ? vs.ValueInt : 0;
+        return Attributes[varno] is DoubleScriptVariable vs ? vs.ValueInt : 0;
     }
 
     public List<string> ValueListStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return []; }
 
-        return Attributes[varno] is VariableListString vs ? vs.ValueList : [];
+        return Attributes[varno] is ListOfStringsScriptVariable vs ? vs.ValueList : [];
     }
 
     public DoItFeedback? ValueListStringSet(int varno, List<string> value) {
         if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(varno); }
 
-        if (Attributes[varno] is VariableListString vs) {
+        if (Attributes[varno] is ListOfStringsScriptVariable vs) {
             vs.ValueList = value;
             return null;
         }
@@ -102,19 +100,19 @@ public readonly struct SplittedAttributesFeedback {
     public double ValueNumGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        return Attributes[varno] is VariableDouble vs ? vs.ValueNum : 0;
+        return Attributes[varno] is DoubleScriptVariable vs ? vs.ValueNum : 0;
     }
 
     public string ValueStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        return Attributes[varno] is VariableString vs ? vs.ValueString : string.Empty;
+        return Attributes[varno] is StringScriptVariable vs ? vs.ValueString : string.Empty;
     }
 
     internal DoItFeedback? ValueBoolSet(int varno, bool value) {
         if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(varno); }
 
-        if (Attributes[varno] is VariableBool vs) {
+        if (Attributes[varno] is BoolScriptVariable vs) {
             vs.ValueBool = value;
             return null;
         }
@@ -124,7 +122,7 @@ public readonly struct SplittedAttributesFeedback {
     internal DoItFeedback? ValueNumSet(int varno, double value) {
         if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(varno); }
 
-        if (Attributes[varno] is VariableDouble vs) {
+        if (Attributes[varno] is DoubleScriptVariable vs) {
             vs.ValueNum = value;
             return null;
         }
@@ -134,7 +132,7 @@ public readonly struct SplittedAttributesFeedback {
     internal DoItFeedback? ValueStringSet(int varno, string value) {
         if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(varno); }
 
-        if (Attributes[varno] is VariableString vs) {
+        if (Attributes[varno] is StringScriptVariable vs) {
             vs.ValueString = value;
             return null;
         }

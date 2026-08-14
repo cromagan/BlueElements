@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Renderer;
-
 namespace BlueControls.Classes;
 
 /// <summary>
@@ -19,7 +17,7 @@ public sealed class RenderingData {
 
     public int? ControlColumnWidth { get; set; }
 
-    public Renderer_Abstract? Renderer { get; set; }
+    public Renderer.Renderer? Renderer { get; set; }
 
     #endregion
 }

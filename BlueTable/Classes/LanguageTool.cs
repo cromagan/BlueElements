@@ -124,9 +124,7 @@ public static class LanguageTool {
     /// <summary>
     /// Hilfsmethode zur String-Formatierung, um doppelten Code zu vermeiden.
     /// </summary>
-    private static string FormatResult(string pattern, object?[] args) {
-        return args.Length == 0 ? pattern : string.Format(CultureInfo.InvariantCulture, pattern, args);
-    }
+    private static string FormatResult(string pattern, object?[] args) => args.Length == 0 ? pattern : string.Format(CultureInfo.InvariantCulture, pattern, args);
 
     #endregion
 }

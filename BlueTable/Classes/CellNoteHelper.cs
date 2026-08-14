@@ -124,11 +124,16 @@ public static class CellNoteHelper {
         if (Enum.TryParse<NoteSymbols>(value, true, out var result)) { return result; }
 
         switch (value) {
-            case "Kritisch": return NoteSymbols.Critical;
-            case "Warnung": return NoteSymbols.Warning;
-            case "Häkchen": return NoteSymbols.Ok;
-            case "Stift": return NoteSymbols.Pencil;
-            default: return NoteSymbols.Pencil;
+            case "Kritisch":
+                return NoteSymbols.Critical;
+            case "Warnung":
+                return NoteSymbols.Warning;
+            case "Häkchen":
+                return NoteSymbols.Ok;
+            case "Stift":
+                return NoteSymbols.Pencil;
+            default:
+                return NoteSymbols.Pencil;
         }
     }
 

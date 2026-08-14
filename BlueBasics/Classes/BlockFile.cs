@@ -27,7 +27,7 @@ public sealed class BlockFile {
 
     #region Constructors
 
-    private BlockFile(string id) { _myId = id; }
+    private BlockFile(string id) => _myId = id;
 
     #endregion
 

@@ -1,0 +1,33 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using System.Globalization;
+
+namespace BlueScript.ScriptCommands;
+
+
+internal class DateTimeNowUTCScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "datetimeutcnow";
+    public override List<string> Constants => [.. DateTimeFormats];
+    public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. dd.MM.yyyy HH:mm:ss.fff) zurück. ";
+    public override bool MustUseReturnValue => true;
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Syntax => "DateTimeUTCNow(format)";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        try {
+            return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
+        } catch {
+            return new DoItFeedback("Der Umwandlungs-StringScriptCommand '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true);
+        }
+    }
+
+    #endregion
+}

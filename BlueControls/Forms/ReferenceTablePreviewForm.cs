@@ -1,12 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
-using BlueScript.Variables;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueScript.ScriptVariables;
 
 namespace BlueControls.Forms;
 
@@ -20,7 +17,7 @@ public sealed partial class ReferenceTablePreviewForm : Form {
 
     #region Fields
 
-    private readonly ItemCollectionPadItem _original;
+    private readonly CollectionPadItem _original;
     private readonly Table _referenceTable;
 
     #endregion
@@ -31,7 +28,7 @@ public sealed partial class ReferenceTablePreviewForm : Form {
     /// Erzeugt einen neuen Vorschau-Dialog für die übergebene Collection
     /// und deren Referenztabelle.
     /// </summary>
-    public ReferenceTablePreviewForm(ItemCollectionPadItem original, Table referenceTable) : base() {
+    public ReferenceTablePreviewForm(CollectionPadItem original, Table referenceTable) : base() {
         InitializeComponent();
 
         _original = original;
@@ -54,12 +51,12 @@ public sealed partial class ReferenceTablePreviewForm : Form {
     /// Erzeugt einen Klon der Original-Collection über JSON-Serialisierung,
     /// damit das Original durch Variablen-Ersetzung nicht verändert wird.
     /// </summary>
-    private static ItemCollectionPadItem? CloneCollection(ItemCollectionPadItem original) {
+    private static CollectionPadItem? CloneCollection(CollectionPadItem original) {
         var json = original.ParseableJson();
-        return ParseableItem.NewByParsingJson<ItemCollectionPadItem>(json);
+        return ParseableItem.NewByParsingJson<CollectionPadItem>(json);
     }
 
-    private void LstRows_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void LstRows_ItemClicked(object sender, ListItemEventArgs e) {
         if (_referenceTable is not { IsDisposed: false } tb) { return; }
         if (tb.Row.GetByKey(e.Item.KeyName) is not { IsDisposed: false } row) { return; }
 
@@ -71,7 +68,7 @@ public sealed partial class ReferenceTablePreviewForm : Form {
 
         if (_referenceTable is not { IsDisposed: false } tb) { return; }
 
-        List<AbstractListItem> items = [];
+        List<ListItem> items = [];
         foreach (var thisRow in tb.Row) {
             if (thisRow is not { IsDisposed: false }) { continue; }
             items.Add(ItemOf(thisRow.CellFirstString(), thisRow.KeyName, ImageCode.Zeile));
@@ -102,11 +99,11 @@ public sealed partial class ReferenceTablePreviewForm : Form {
         VariableCollection vc;
 
         if (feedback.Failed) {
-            vc = [new VariableString("Fehler", feedback.ProtocolText, true, "Fehler beim Ausführen des Export-Skripts")];
+            vc = [new StringScriptVariable("Fehler", feedback.ProtocolText, true, "Fehler beim Ausführen des Export-Skripts")];
         } else if (feedback.Variables is { Count: > 0 } vars) {
             vc = new VariableCollection(vars.ToList(), false);
         } else {
-            vc = [new VariableString("Hinweis", "Keine Variablen berechnet.", true, "Export-Skript lieferte keine Variablen")];
+            vc = [new StringScriptVariable("Hinweis", "Keine Variablen berechnet.", true, "Export-Skript lieferte keine Variablen")];
         }
 
         varEditor.InputItem = vc;

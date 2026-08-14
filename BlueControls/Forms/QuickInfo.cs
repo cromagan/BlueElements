@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -19,8 +18,8 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
     private static string _shownTxt = string.Empty;
     private readonly (Rectangle Bounds, Rectangle WorkingArea)[] _screens;
 
-    private int _cachedHeight;
-    private int _cachedWidth;
+    private readonly int _cachedHeight;
+    private readonly int _cachedWidth;
     private volatile bool _externallyClosing;
 
     private volatile bool _wasAutoClose;

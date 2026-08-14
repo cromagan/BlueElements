@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueControls.DrawingHelpers;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
@@ -49,7 +48,7 @@ public sealed partial class ScreenShot : Form {
                 gr.CopyFromScreen(r.X, r.Y, 0, 0, bmp.Size);
                 return bmp;
             } catch {
-                Generic.CollectGarbage();
+                CollectGarbage();
             }
         } while (true);
     }
@@ -61,7 +60,7 @@ public sealed partial class ScreenShot : Form {
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(Form? frm) {
-        using var x = new ScreenShot("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, [DrawingHelper_DrawRectangle.Instance, DrawingHelper_Magnifier.Instance]);
+        using var x = new ScreenShot("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, [RectangleDrawingHelper.Instance, MagnifierDrawingHelper.Instance]);
         return x.Start(frm);
     }
 

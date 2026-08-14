@@ -1,20 +1,18 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-
 namespace BlueControls.Forms;
 
 public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     #region Fields
 
-    private AbstractListItem? _giveBack;
+    private ListItem? _giveBack;
 
     #endregion
 
     #region Constructors
 
-    private ItemSelect(List<AbstractListItem> items) : base(true, true) {
+    private ItemSelect(List<ListItem> items) : base(true, true) {
         InitializeComponent();
 
         List.ItemClear();
@@ -29,10 +27,10 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     public static RowItem? Show(List<RowItem> rows, string layoutId) {
         try {
-            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<AbstractListItem>().ToList();
+            var items = rows.Select(thisRow => new RowLayoutListItem(thisRow, layoutId)).Cast<ListItem>().ToList();
 
             var x = Show(items);
-            return (x as RowFormulaListItem)?.Row;
+            return (x as RowLayoutListItem)?.Row;
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Generieren des _internal: " + layoutId, ex);
             return null;
@@ -40,7 +38,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
     }
 
     public static string Show(List<string> files) {
-        var items = new List<AbstractListItem>();
+        var items = new List<ListItem>();
 
         foreach (var thisString in files) {
             if (thisString.FileType() == FileFormat.Image) {
@@ -51,7 +49,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         return x?.KeyName ?? string.Empty;
     }
 
-    public static AbstractListItem? Show(List<AbstractListItem>? items) {
+    public static ListItem? Show(List<ListItem>? items) {
         if (items is not { Count: not 0 }) { return null; }
 
         var x = new ItemSelect(items);

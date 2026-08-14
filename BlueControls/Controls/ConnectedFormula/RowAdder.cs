@@ -1,17 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Variables;
-using BlueTable.AdditionalScriptVariables;
+using BlueScript.ScriptVariables;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -79,24 +74,24 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         VariableCollection vars =
         [
-            new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
-            new VariableString("User", Generic.UserName, true,
+            new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
+            new StringScriptVariable("User", UserName, true,
                 "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
 
-            new VariableString("Usergroup", Generic.UserGroup, true,
+            new StringScriptVariable("Usergroup", UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
-            //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
-            new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
-            new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
-            new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
+            //vars.Add(new ListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
+            new StringScriptVariable("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
+            new StringScriptVariable("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+            new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
         if (isMenuGeneration) {
-            vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
-            vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+            vars.Add(new ListOfStringsScriptVariable("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+            vars.Add(new ListOfStringsScriptVariable("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
-        var m = Method.GetMethods(MethodType.Sub); // Ja, Sub/Longtime... andere Tabellen müssen geladen werden.
+        var m = ScriptCommand.GetMethods(ScriptCommandType.Sub); // Ja, Sub/Longtime... andere Tabellen müssen geladen werden.
 
         var scp = new ScriptProperties("Row-Adder", m, produktivPhase, [], rowIn, "Row-Adder", "Row-Adder");
 
@@ -164,7 +159,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             i++;
         }
         var result = sb.ToString().Trim('\\');
-        return result.RemoveChars(Constants.Char_PfadSonderZeichen);
+        return result.RemoveChars(Char_PfadSonderZeichen);
     }
 
     public void Fehler(string txt, ImageCode symbol) {
@@ -424,7 +419,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         Invalidate();
     }
 
-    private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemClicked(object? sender, ListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (e.Item is ReadableListItem { Item: AdderItem ai }) {
@@ -436,7 +431,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         Invalidate();
     }
 
-    private void F_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+    private void F_ItemClicked(object? sender, ListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
         if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {

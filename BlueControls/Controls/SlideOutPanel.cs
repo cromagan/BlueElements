@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 
@@ -54,7 +53,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
 
     public SlideOutPanel() {
         DoubleBuffered = true;
-        SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
+        SetStyle(ControlStyles.Selectable, false);
         _animProgress = 0;
     }
 

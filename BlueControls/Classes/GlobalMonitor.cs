@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueControls.Renderer;
+using BlueTable.ColumnFormats;
 using System.Threading;
 
 namespace BlueControls;
@@ -33,25 +33,25 @@ public partial class GlobalMonitor : Form {
     public static void GenerateLogTable(Controls.TableViewWithFilters tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
         var tb = Table.Get();
-        var tbID = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolderTextOneLine.Instance);
+        var tbID = tb.Column.GenerateAndAdd("ID", "ID", TextOneLineColumnFormat.Instance);
         tbID?.IsFirst = true;
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolderImageCode.Instance);
-        var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolderDateTime.Instance);
-        tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolderLong.Instance);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
+        var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", DateTimeColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("category", "Kategorie", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Message", "Message", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Indent", "Stufe", LongColumnFormat.Instance);
 
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.EditableWithTextInput = false;
                 thisColumn.EditableWithDropdown = false;
-                thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
+                thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
             }
         }
 
         if (tb.Column["Symbol"] is { IsDisposed: false } c) {
-            var o = new Renderer_ImageAndText {
+            var o = new ImageAndTextRenderer {
                 Text_anzeigen = false,
                 Bild_anzeigen = true
             };
@@ -130,7 +130,7 @@ public partial class GlobalMonitor : Form {
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        //var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
+        //var e = $"[{System.DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
 
         //lstLog.ItemAdd(ItemOf(e, _n.ToString7()));
 

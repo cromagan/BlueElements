@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueControls.Controls;
+using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
@@ -79,15 +79,15 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
     private static void GenerateTable(TableViewWithFilters tableView) {
         var tb = Table.Get();
 
-        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", ColumnFormatHolderLongOnlyPositive.Instance);
+        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", LongOnlyPositiveColumnFormat.Instance);
         if (cNr is { IsDisposed: false }) { cNr.IsFirst = true; }
 
-        tb.Column.GenerateAndAdd("Position", "Position", ColumnFormatHolderLongOnlyPositive.Instance);
-        tb.Column.GenerateAndAdd("Routine", "Routine", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("DataType", "DataType", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolderTextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Wert", "Wert", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Position", "Position", LongOnlyPositiveColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Routine", "Routine", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("DataType", "DataType", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
 
         tb.Column.DisableAllEditing();
 

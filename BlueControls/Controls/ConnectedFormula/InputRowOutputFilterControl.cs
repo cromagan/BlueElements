@@ -1,12 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
@@ -33,7 +30,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
     #region Properties
 
     public bool ContextMenuDefault { get; set; } = true;
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     public string ErrorText { get; set; } = string.Empty;
 
@@ -41,8 +38,8 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
     #region Methods
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
-        var items = new List<AbstractListItem>();
+    public List<ListItem>? GetContextMenuItems(object? hotItem) {
+        var items = new List<ListItem>();
 
         var filterText = hotItem as string ?? string.Empty;
 
@@ -193,7 +190,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
         if (string.IsNullOrEmpty(filterText)) {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
-        } else if (Generic.CopytoClipboard(filterText)) {
+        } else if (CopytoClipboard(filterText)) {
             QuickNote.Show(NoteSymbols.Ok, "Kopiert");
         } else {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");

@@ -26,7 +26,7 @@ namespace BlueControls.Controls{
             this.f.Size = new System.Drawing.Size(150, 150);
             this.f.TabIndex = 0;
             this.f.DropDownShowing += new EventHandler(this.Cbx_DropDownShowing);
-            this.f.ItemRemoved += new System.EventHandler<AbstractListItemEventArgs>(this.Cbx_ItemRemoved);
+            this.f.ItemRemoved += new System.EventHandler<ListItemEventArgs>(this.Cbx_ItemRemoved);
             this.f.ExecuteCommand += new EventHandler(this.F_ExecuteCommand );
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
             this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);            

@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.BitmapExt_ImageFilters;
+using BlueBasics.ImageFilters;
 using System.Collections.ObjectModel;
 using System.Drawing.Drawing2D;
 
@@ -347,35 +347,35 @@ public sealed class QuickImage : IReadableText, IEditable {
         var filters = new List<(ImageFilter filter, object? parameter)>();
 
         if (!string.IsNullOrEmpty(Zweitsymbol)) {
-            filters.Add((ImageFilter_Zweitsymbol.Instance, Zweitsymbol));
+            filters.Add((ZweitsymbolImageFilter.Instance, Zweitsymbol));
         }
 
         if (ChangeGreenTo.HasValue) {
-            filters.Add((ImageFilter_ColorChange.Instance, (Color.FromArgb(0, 255, 0), ChangeGreenTo.Value)));
+            filters.Add((ColorChangeImageFilter.Instance, (Color.FromArgb(0, 255, 0), ChangeGreenTo.Value)));
         }
         if (Färbung is { } cf && cf.A > 0) {
-            filters.Add((ImageFilter_Färbung.Instance, cf));
+            filters.Add((FärbungImageFilter.Instance, cf));
         }
         if (Sättigung != 100) {
-            filters.Add((ImageFilter_Sättigung.Instance, Sättigung / 100f));
+            filters.Add((SättigungImageFilter.Instance, Sättigung / 100f));
         }
         if (Helligkeit != 100) {
-            filters.Add((ImageFilter_Brightness.Instance, Helligkeit / 100f));
+            filters.Add((BrightnessImageFilter.Instance, Helligkeit / 100f));
         }
         if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
-            filters.Add((ImageFilter_Durchgestrichen.Instance, null));
+            filters.Add((DurchgestrichenImageFilter.Instance, null));
         }
         if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
-            filters.Add((ImageFilter_WindowsXPDisabled.Instance, null));
+            filters.Add((WindowsXPDisabledImageFilter.Instance, null));
         }
         if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) {
-            filters.Add((ImageFilter_Grayscale.Instance, null));
+            filters.Add((GrayscaleImageFilter.Instance, null));
         }
         if (Transparenz is > 0 and < 100) {
-            filters.Add((ImageFilter_Transparenz.Instance, Transparenz));
+            filters.Add((TransparenzImageFilter.Instance, Transparenz));
         }
         if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
-            filters.Add((ImageFilter_WindowsMEDisabled.Instance, bmpOri));
+            filters.Add((WindowsMEDisabledImageFilter.Instance, bmpOri));
         }
 
         var bmp = bmpOri.CloneFromBitmap();

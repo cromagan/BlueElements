@@ -100,9 +100,7 @@ public static class Animator {
     /// Standardmäßig wird das Fenster als Layered-Window markiert, damit
     /// <see cref="AnimationFrame.Opacity" /> greift (Top-Level-Fenster).
     /// </summary>
-    public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) {
-        Start(hwnd, compute, onFinished, true);
-    }
+    public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) => Start(hwnd, compute, onFinished, true);
 
     /// <summary>
     /// Startet eine Animation für das Fenster <paramref name="hwnd" />.
@@ -193,9 +191,7 @@ public static class Animator {
     [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
     private static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
 
-    private static int GetWindowLongCompat(IntPtr hWnd, int nIndex) {
-        return IntPtr.Size == 4 ? GetWindowLong32(hWnd, nIndex) : GetWindowLongPtr64(hWnd, nIndex).ToInt32();
-    }
+    private static int GetWindowLongCompat(IntPtr hWnd, int nIndex) => IntPtr.Size == 4 ? GetWindowLong32(hWnd, nIndex) : GetWindowLongPtr64(hWnd, nIndex).ToInt32();
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
     private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
@@ -213,7 +209,7 @@ public static class Animator {
     private static extern bool IsWindowVisible(IntPtr hWnd);
 
     private static void Run() {
-        while (!Generic.Ending) {
+        while (!Ending) {
             var cycleStart = DateTime.UtcNow;
 
             List<Entry> snapshot;

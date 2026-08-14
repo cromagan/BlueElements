@@ -1,0 +1,96 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueControls.ListItems;
+
+public class TextListItem : ListItem {
+
+    #region Constructors
+
+    public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string quickInfo, string userDefCompareKey) : base(keyName, enabled) {
+        IsCaption = isCaption;
+        Text = readableText;
+        Symbol = symbol;
+        UserDefCompareKey = userDefCompareKey;
+        if (string.IsNullOrEmpty(quickInfo)) {
+            QuickInfo = Text.CreateHtmlCodes();
+        } else {
+            QuickInfo = quickInfo;
+        }
+    }
+
+    #endregion
+
+    #region Properties
+
+    public bool IsCaption {
+        get;
+        protected set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public QuickImage? Symbol {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Text {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        if (style == ListBoxAppearance.MiniToolbar) { return columnWidth; }
+        return UntrimmedCanvasSize(itemdesign).Height;
+    }
+
+    public override bool IsClickable() => !IsCaption && base.IsClickable();
+
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        var tmpd = TempDesign(itemdesign);
+        if (drawBorderAndBack) {
+            Skin.Draw_Back(gr, tmpd, state, positionControl.ToRect(), null, false);
+        }
+        var align = itemdesign == Design.Item_MiniToolbar ? Alignment.Horizontal_Vertical_Center : Alignment.VerticalCenter_Left;
+        Skin.Draw_FormatedText(gr, Text, Symbol, align, positionControl.ToRect(), tmpd, state, null, false, translate);
+        if (drawBorderAndBack) {
+            Skin.Draw_Border(gr, tmpd, state, positionControl.ToRect());
+        }
+    }
+
+    protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
+
+    private Design TempDesign(Design itemdesign) {
+        if (IsCaption) {
+            switch (itemdesign) {
+                case Design.Item_ContextMenu:
+                    return Design.Item_ContextMenu_Caption;
+
+                case Design.Item_DropdownMenu:
+                case Design.Item_ListBox:
+                    return Design.Item_ListBox_Caption;
+            }
+        }
+        return itemdesign;
+    }
+
+    #endregion
+}

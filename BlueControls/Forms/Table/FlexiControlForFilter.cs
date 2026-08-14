@@ -1,15 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.BlueTableDialogs;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
-using BlueScript.Variables;
+using BlueControls.TableElements;
+using BlueScript.ScriptVariables;
 using System.Diagnostics;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -19,7 +16,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Fields
 
     private const int MaxRecentFilterEntries = 20;
-    private readonly Renderer_Abstract _renderer;
+    private readonly Renderer.Renderer _renderer;
 
     #endregion
 
@@ -31,7 +28,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Size = new Size(204, 24);
         FilterSingleColumn = filterColumn;
         f.ShowInfoWhenDisabled = true;
-        _renderer = TableView.RendererOf(filterColumn, Constants.Win11);
+        _renderer = TableView.RendererOf(filterColumn, Win11);
         Standard_bei_keiner_Eingabe = emptyInputBehavior;
         Filterart_Bei_Texteingabe = defaultTextInputFilter;
         DefaultCaptionPosition = defaultCaptionPosition;
@@ -85,7 +82,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Methods
 
-    public Variable? GetFieldVariable() {
+    public ScriptVariable? GetFieldVariable() {
         if (FilterSingleColumn is { } c) {
             var fn = FieldName;
 
@@ -102,7 +99,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         HandleChangesNow();
     }
 
-    public void SetValueFromVariable(Variable v) => Value = v.ValueForCell;
+    public void SetValueFromVariable(ScriptVariable v) => Value = v.ValueForCell;
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -150,7 +147,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             this.LoadSettingsFromDisk(false);
             var nr = 0;
             var f2 = FilterHash();
-            var recentItems = new List<AbstractListItem>();
+            var recentItems = new List<ListItem>();
 
             for (var z = Settings.Count - 1; z >= 0 && nr < MaxRecentFilterEntries; z--) {
                 var x = Settings[z].SplitAndCutBy("|");
@@ -185,9 +182,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void Cbx_ItemRemoved(object? sender, AbstractListItemEventArgs e) => this.SettingsRemoveValue($"{FilterHash()}|{e.Item.KeyName}");
+    private void Cbx_ItemRemoved(object? sender, ListItemEventArgs e) => this.SettingsRemoveValue($"{FilterHash()}|{e.Item.KeyName}");
 
-    private void F_ExecuteCommand (object? sender, System.EventArgs e) {
+    private void F_ExecuteCommand(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle is null) {
@@ -260,7 +257,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         #region QuickInfo erstellen
 
-        var qi = RowListItem.QuickInfoText(FilterSingleColumn, string.Empty);
+        var qi = RowTableElement.QuickInfoText(FilterSingleColumn, string.Empty);
 
         if (filterSingle is not null) {
             if (string.IsNullOrEmpty(qi)) {

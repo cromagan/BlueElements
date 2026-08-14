@@ -1,14 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.EventArgs;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
@@ -22,7 +18,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     private readonly List<string> _notAllowedChilds = [];
 
-    private readonly List<ItemCollectionPadItem> _pages = [];
+    private readonly List<CollectionPadItem> _pages = [];
 
     private bool _finishingParse;
 
@@ -30,9 +26,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     #region Constructors
 
-    internal ConnectedFormula(string filename) : base(filename) {
-        Invalidate();
-    }
+    internal ConnectedFormula(string filename) : base(filename) => Invalidate();
 
     #endregion
 
@@ -97,10 +91,10 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         }
     }
 
-    public IReadOnlyList<ItemCollectionPadItem> Pages {
+    public IReadOnlyList<CollectionPadItem> Pages {
         get {
             if (!IsParsed) {
-                this.Parse(Constants.Win1252.GetString(Content));
+                this.Parse(Win1252.GetString(Content));
             }
             return _pages.AsReadOnly();
         }
@@ -176,11 +170,11 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     // Das Schloss für die Threadsicherheit
 
-    public ItemCollectionPadItem AddPage(string headname) {
+    public CollectionPadItem AddPage(string headname) {
         // Ein Gitterkästchen in mm - konsistent zu ParseFinished.
-        var gridMm = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+        var gridMm = PixelToMm(AutosizableExtension.GridSize, CollectionPadItem.Dpi);
 
-        var p = new ItemCollectionPadItem {
+        var p = new CollectionPadItem {
             Caption = headname,
             Breite = 100 * gridMm,
             Höhe = 100 * gridMm,
@@ -210,8 +204,8 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         return p;
     }
 
-    public ItemCollectionPadItem? GetPage(string keyOrCaption) {
-        if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
+    public CollectionPadItem? GetPage(string keyOrCaption) {
+        if (!IsParsed) { this.Parse(Win1252.GetString(Content)); }
 
         foreach (var icp in _pages) {
             if (icp is not { IsDisposed: false }) { continue; }
@@ -324,7 +318,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
             #region Pro Page: RowEntryItem sicherstellen, GridShow/GridSnap setzen
 
-            var gridMm = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+            var gridMm = PixelToMm(AutosizableExtension.GridSize, CollectionPadItem.Dpi);
 
             foreach (var icpi in _pages) {
                 if (icpi is not { IsDisposed: false }) { continue; }
@@ -373,7 +367,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         if (json["pages"] is JsonArray pa) {
             foreach (var pageJson in pa) {
                 if (pageJson is not JsonObject po) { continue; }
-                var page = new ItemCollectionPadItem();
+                var page = new CollectionPadItem();
                 page.ParseJson(po);
                 page.ParseFinishedJson(po);
                 RegisterPage(page);
@@ -408,15 +402,15 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
             case "page":
             case "paditemdata":
-                var container = new ItemCollectionPadItem();
+                var container = new CollectionPadItem();
                 container.Parse(value.FromNonCritical());
 
                 // Altes Container-Format: direkte Kinder sind ausschließlich
-                // ItemCollectionPadItem → als einzelne Pages übernehmen.
+                // ItemCollection → als einzelne Pages übernehmen.
                 // Sonst den Container selbst als eine Page behandeln.
-                if (container.Any() && container.All(it => it is ItemCollectionPadItem)) {
+                if (container.Any() && container.All(it => it is CollectionPadItem)) {
                     foreach (var child in container.ToList()) {
-                        if (child is ItemCollectionPadItem { IsDisposed: false } page) {
+                        if (child is CollectionPadItem { IsDisposed: false } page) {
                             container.Remove(child);
                             RegisterPage(page);
                             _pages.Add(page);
@@ -450,8 +444,8 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// <summary>
     /// Gibt alle bekannten Fomulare zurück - außer die in notAllowedChilds
     /// </summary>
-    internal List<AbstractListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
-        List<AbstractListItem> list = [];
+    internal List<ListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
+        List<ListItem> list = [];
 
         if (FileExists(Filename)) {
             foreach (var thisf in GetFiles(Filename.FilePath(), "*.cfo", System.IO.SearchOption.TopDirectoryOnly)) {
@@ -488,7 +482,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     protected override byte[]? BuildContent() {
         if (!IsParsed || IsDisposed) { return null; }
-        return Constants.Win1252.GetBytes(ParseableItems().FinishParseable());
+        return Win1252.GetBytes(ParseableItems().FinishParseable());
     }
 
     protected override void Dispose(bool disposing) {
@@ -557,19 +551,19 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         OnPropertyChangedExt(e.RelativePath, e.Partial);
     }
 
-    private void RegisterPage(ItemCollectionPadItem page) {
+    private void RegisterPage(CollectionPadItem page) {
         page.Parent = this;
         page.PropertyChangedExt += Pages_PropertyChangedExt;
         page.PropertyChanged += Pages_PropertyChanged;
     }
 
-    private void RepairReciver(ItemCollectionPadItem icpi) {
+    private void RepairReciver(CollectionPadItem icpi) {
         foreach (var thisIt in icpi) {
-            if (thisIt is ItemCollectionPadItem { IsDisposed: false } icp2) {
+            if (thisIt is CollectionPadItem { IsDisposed: false } icp2) {
                 RepairReciver(icp2);
             }
 
-            if (thisIt is ReciverControlPadItem itcf) {
+            if (thisIt is ReciverPadItem itcf) {
                 itcf.ParentFormula = this;
             }
         }
@@ -583,7 +577,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         }
     }
 
-    private void UnregisterPage(ItemCollectionPadItem page) {
+    private void UnregisterPage(CollectionPadItem page) {
         page.PropertyChangedExt -= Pages_PropertyChangedExt;
         page.PropertyChanged -= Pages_PropertyChanged;
     }

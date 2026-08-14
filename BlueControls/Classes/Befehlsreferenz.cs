@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls;
 
@@ -19,7 +17,7 @@ public partial class Befehlsreferenz : Form {
 
     #region Methods
 
-    private static void GetUses(Method thisc, int max) {
+    private static void GetUses(ScriptCommand thisc, int max) {
         if (thisc.UsesInDB.Count >= max) { return; }
 
         foreach (var thisTb in Table.AllInstances()) {
@@ -34,9 +32,9 @@ public partial class Befehlsreferenz : Form {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-    private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstCommands_ItemClicked(object sender, ListItemEventArgs e) {
         var co = string.Empty;
-        if (e.Item is ReadableListItem { Item: Method thisc }) {
+        if (e.Item is ReadableListItem { Item: ScriptCommand thisc }) {
             GetUses(thisc, 5);
 
             co += thisc.HintText();
@@ -52,7 +50,7 @@ public partial class Befehlsreferenz : Form {
     private void WriteCommandsToList() {
         lstCommands.ItemClear();
 
-        foreach (var thisc in Method.AllMethods.Instances) {
+        foreach (var thisc in ScriptCommand.AllMethods.Instances) {
             lstCommands.ItemAdd(ItemOf(thisc));
         }
     }

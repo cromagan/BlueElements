@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;
@@ -39,7 +38,7 @@ public interface IMiniToolbar {
     /// <summary>
     /// Diese Routine wird aufgerufen, um die internen Mini-Toolbar-Einträge zu erstellen.
     /// </summary>
-    List<AbstractListItem>? GetMiniToolbarItems(object? hotItem);
+    List<ListItem>? GetMiniToolbarItems(object? hotItem);
 
     #endregion
 }
@@ -61,9 +60,7 @@ public static class MiniToolbarExtension {
     /// die Toolbar nicht noch einmal an (gewünschtes „Ausgeschaltet-bleiben“
     /// bei wiederholten Klicks auf dieselbe Zelle).
     /// </summary>
-    public static void HideMiniToolbar() {
-        FloatingForm.Close(Design.Form_MiniToolbar);
-    }
+    public static void HideMiniToolbar() => FloatingForm.Close(Design.Form_MiniToolbar);
 
     /// <summary>
     /// Zeigt die Mini-Toolbar an der übergebenen Bildschirm-Position an.
@@ -91,7 +88,7 @@ public static class MiniToolbarExtension {
             return;
         }
 
-        var thisMiniToolbar = new List<AbstractListItem>();
+        var thisMiniToolbar = new List<ListItem>();
 
         if (parent.GetMiniToolbarItems(hotItem) is { } mti && mti.Count > 0) {
             thisMiniToolbar.AddRange(mti);

@@ -47,7 +47,7 @@ public sealed partial class JsonRoundtripTestForm {
         //
         // txbProtocol
         //
-        txbProtocol.BackColor = Color.White;
+        txbProtocol.BackColor = System.Drawing.Color.White;
         txbProtocol.Cursor = Cursors.IBeam;
         txbProtocol.Dock = DockStyle.Fill;
         txbProtocol.Location = new Point(0, 32);

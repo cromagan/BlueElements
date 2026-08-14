@@ -1,10 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
+using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.EventArgs;
 
 namespace BlueControls.Interfaces;
 
@@ -33,7 +31,7 @@ public interface IContextMenu {
     /// <summary>
     /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden, unabhängig von ContextMenuDefault
     /// </summary>
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
     /// Größe der Icons im Kontextmenü.
@@ -48,7 +46,7 @@ public interface IContextMenu {
         FloatingForm.Close(Design.Form_ContextMenu);
         //FloatingForm.Close(this);
 
-        var thisContextMenu = new List<AbstractListItem>();
+        var thisContextMenu = new List<ListItem>();
 
         if (ContextMenuDefault && GetContextMenuItems(hotItem) is { } cmi && cmi.Count > 0) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
@@ -78,7 +76,7 @@ public interface IContextMenu {
     /// Die benutzerdefinierten Einträge (CustomMenuItems) wurden bereits vorher eingefügt.
     /// Zugriff auf hotItem erfolgt über die Property ContextMenuHotItem.
     /// </summary>
-    List<AbstractListItem>? GetContextMenuItems(object? hotItem);
+    List<ListItem>? GetContextMenuItems(object? hotItem);
 
     #endregion
 }

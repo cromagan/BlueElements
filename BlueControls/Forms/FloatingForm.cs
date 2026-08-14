@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Windows.Forms;
 using WndMsg = BlueControls.Enums.WndProc;
 
@@ -108,7 +107,7 @@ public partial class FloatingForm : Form {
     }
 
     public void Position_LocateToMouse() {
-        var screenNr = Generic.PointOnScreenNr(Cursor.Position);
+        var screenNr = PointOnScreenNr(Cursor.Position);
         CheckMaxSize(screenNr);
         var ypos = Cursor.Position.Y + 15;
         var xpos = Cursor.Position.X + 15;
@@ -122,7 +121,7 @@ public partial class FloatingForm : Form {
     }
 
     public void Position_LocateToPosition(Point bestPosition) {
-        var screenNr = Generic.PointOnScreenNr(bestPosition);
+        var screenNr = PointOnScreenNr(bestPosition);
         CheckMaxSize(screenNr);
         Position_SetWindowIntoScreen(screenNr, bestPosition.X, bestPosition.Y);
     }

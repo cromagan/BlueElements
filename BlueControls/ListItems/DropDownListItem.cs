@@ -1,0 +1,87 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Controls;
+
+namespace BlueControls.ListItems;
+
+public class DropDownListItem : ListItem {
+
+    #region Constructors
+
+    public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) => UserDefCompareKey = userDefCompareKey;
+
+    #endregion
+
+    #region Properties
+
+    public List<ListItem> DropDownItems { get; } = [];
+
+    #endregion
+
+    #region Methods
+
+    public override bool FilterMatch(string filterText) => false;
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        var he = 16;
+
+        foreach (var item in DropDownItems) {
+            var s = item.HeightInControl(style, columnWidth, itemdesign);
+
+            he = Math.Max(he, s);
+        }
+        return he;
+    }
+
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
+        var wi = 16 * 3;
+        var he = 16;
+
+        foreach (var item in DropDownItems) {
+            var s = item.UntrimmedCanvasSize(itemdesign);
+
+            wi = Math.Max(wi, s.Width);
+            he = Math.Max(he, s.Height);
+        }
+        return new Size(wi, he);
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            foreach (var item in DropDownItems) {
+                item.Dispose();
+            }
+            DropDownItems.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        //var tmpd = TempDesign(design);
+        if (drawBorderAndBack) {
+            Skin.Draw_Back(gr, Design.ComboBox_TextBox, state, positionControl.ToRect(), null, false);
+        }
+
+        //Selected?.Draw(gr, positionControl.ControlX, positionControl.Y, design, design, vState, false, string.Empty, translate, Design.Undefined);
+
+        //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionControl, null, false, translate);
+        if (drawBorderAndBack) {
+            Skin.Draw_Border(gr, Design.ComboBox_TextBox, state, positionControl.ToRect());
+            var but = new Rectangle((int)positionControl.Right - 16, (int)positionControl.Top, 16, 16);
+
+            var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
+
+            Button.DrawButton(null, gr, Design.Button_ComboBox, state, qi, Alignment.Horizontal_Vertical_Center, false, null, string.Empty, but, false);
+
+            //Skin.Draw_Back(gr, Design.Button_ComboBox, vState, but, null, false);
+            //Skin.Draw_Border(gr, Design.Button_ComboBox, vState, but);
+        }
+    }
+
+    protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
+
+    #endregion
+}

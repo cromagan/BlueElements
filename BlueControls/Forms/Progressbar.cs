@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-
 namespace BlueControls.Forms;
 
 public partial class Progressbar : FloatingForm {
@@ -89,9 +87,7 @@ public partial class Progressbar : FloatingForm {
         UpdateInternal(CalculateText(_baseText, current, _count));
     }
 
-    private void btnAction_Click(object sender, System.EventArgs e) {
-        IsCancelRequested = true;
-    }
+    private void btnAction_Click(object sender, System.EventArgs e) => IsCancelRequested = true;
 
     private string CalculateText(string baseText, int current, int count) {
         if (current < _eProgressbarLastCurrent) {

@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using System.Threading;
 
 namespace BlueControls.Controls;
@@ -11,7 +9,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     #region Fields
 
     private int _last;
-    private Timer? _main;
+    private readonly Timer? _main;
     private string _value0 = string.Empty;
     private string _value1 = string.Empty;
     private string _value2 = string.Empty;
@@ -94,7 +92,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     }
 
     private void Main_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
 
         if (!_wasok || !IsActive) { return; }
 

@@ -1,20 +1,18 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-
 namespace BlueControls.EventArgs;
 
-public class AbstractListItemEventArgs : System.EventArgs {
+public class ListItemEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public AbstractListItemEventArgs(AbstractListItem item) => Item = item;
+    public ListItemEventArgs(ListItem item) => Item = item;
 
     #endregion
 
     #region Properties
 
-    public AbstractListItem Item { get; }
+    public ListItem Item { get; }
 
     #endregion
 }

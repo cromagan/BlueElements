@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
@@ -46,7 +46,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Methods
 
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverSenderControlPadItem source, string mode) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverSenderPadItem source, string mode) {
         FilterOutput.Table = source.TableOutput;
         base.DoDefaultSettings(parentFormula, source, mode);
     }

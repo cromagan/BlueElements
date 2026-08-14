@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -27,7 +26,7 @@ public partial class FormWithStatusBar : Form {
     private static bool _staticHandlerRegistered;
 
     private DateTime _lastMessage = DateTime.UtcNow;
-    private System.Threading.Timer? _timMessageClearer;
+    private readonly System.Threading.Timer? _timMessageClearer;
 
     #endregion
 
@@ -213,7 +212,7 @@ public partial class FormWithStatusBar : Form {
     private void btnNeuerModus_Click(object sender, System.EventArgs e) => FormManager.OpenLastMenu();
 
     private void TimMessageClearer_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) {
+        if (Ending || IsDisposed || Disposing) {
             _timMessageClearer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }

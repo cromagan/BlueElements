@@ -1,0 +1,70 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueBasics.Enums;
+
+namespace BlueScript.ScriptCommands;
+
+internal class ForEachScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], ListStringVar];
+    public override string Command => "foreach";
+    public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer aktuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchem Eintrag der Zeiger sich gerade befindet.";
+    public override bool GetCodeBlockAfter => true;
+    public override string Syntax => "ForEach(NeueVariable, List) { }";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
+
+        var l = attvar.ValueListStringGet(1);
+
+        var varnam = "value";
+
+        if (attvar.Attributes[0] is UnknownScriptVariable vkn) { varnam = vkn.Value; }
+
+        if (!ScriptVariable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true); }
+
+        var vari = varCol.GetByKey(varnam);
+        if (vari is not null) {
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true);
+        }
+
+        ScriptEndedFeedback? scx = null;
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, BreakScriptCommand.Method], scp.Stufe + 1, scp.Chain);
+
+        for (var index = 0; index < l.Count; index++) {
+            var addme = new List<ScriptVariable>() {
+                new ScriptVariables.StringScriptVariable(varnam, l[index], true, "Iterations-Variable"),
+                new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
+            };
+
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach");
+            if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
+
+            Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
+        }
+
+        if (scx is null) {
+            return new DoItFeedback();
+        }
+
+        scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return scx;
+    }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
+    }
+
+    #endregion
+}

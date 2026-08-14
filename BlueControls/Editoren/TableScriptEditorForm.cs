@@ -1,11 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -183,15 +181,14 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
         if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }
 
-    private void Table_Loaded(object? sender, FirstEventArgs e) {
+    private void Table_Loaded(object? sender, FirstEventArgs e) =>
         // Bei externen Aktualisierungen (Server-Sync, Undo/Redo) werden alle
         // TableScriptDescription-Objekte neu erstellt. Quelle neu setzen.
         lstEventScripts.InputItem = _table?.EventScript;
-    }
 
     private void Table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
         if (e.IsEditable || IsDisposed) { return; }
-        Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
+        Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }
 

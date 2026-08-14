@@ -1,12 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.TableItems;
+using BlueControls.TableElements;
 
 namespace BlueControls;
 
 /// <content>
 /// Chapter-Pfad-Hilfsroutinen für Tabellen (Chapter-Spalten). Als
-/// Trennzeichen wird ausschließlich <see cref="RowCaptionListItem.Kapiteltrenner"/>
+/// Trennzeichen wird ausschließlich <see cref="RowCaptionTableElement.Kapiteltrenner"/>
 /// ('\') verwendet.
 /// </content>
 public static partial class Extensions {
@@ -22,7 +22,7 @@ public static partial class Extensions {
 
         var count = 0;
         foreach (var c in path) {
-            if (c == RowCaptionListItem.Kapiteltrenner) { count++; }
+            if (c == RowCaptionTableElement.Kapiteltrenner) { count++; }
         }
         return count;
     }
@@ -35,10 +35,10 @@ public static partial class Extensions {
         var result = new List<string>();
         if (string.IsNullOrWhiteSpace(path)) { return result; }
 
-        var segments = path.Split([RowCaptionListItem.Kapiteltrenner], StringSplitOptions.RemoveEmptyEntries);
+        var segments = path.Split([RowCaptionTableElement.Kapiteltrenner], StringSplitOptions.RemoveEmptyEntries);
         var current = string.Empty;
         foreach (var s in segments) {
-            current = string.IsNullOrEmpty(current) ? s : current + RowCaptionListItem.Kapiteltrenner + s;
+            current = string.IsNullOrEmpty(current) ? s : current + RowCaptionTableElement.Kapiteltrenner + s;
             result.Add(current);
         }
         return result;
@@ -50,7 +50,7 @@ public static partial class Extensions {
     public static string ChapterPathLastName(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
 
-        var pos = path.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
+        var pos = path.LastIndexOf(RowCaptionTableElement.Kapiteltrenner);
         return pos < 0 ? path : path[(pos + 1)..];
     }
 
@@ -60,13 +60,13 @@ public static partial class Extensions {
     /// </summary>
     public static string ChapterPathNormalize(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
-        return path.Trim(RowCaptionListItem.Kapiteltrenner).Trim();
+        return path.Trim(RowCaptionTableElement.Kapiteltrenner).Trim();
     }
 
     /// <summary>
     /// Erzeugt eine sortierfähige Repräsentation des Kapitel-Pfads, bei der
     /// die Hierarchie-Reihenfolge korrekt abgebildet wird. Der
-    /// <see cref="RowCaptionListItem.Kapiteltrenner"/> ('\') wird durch
+    /// <see cref="RowCaptionTableElement.Kapiteltrenner"/> ('\') wird durch
     /// '/' (ASCII 47) ersetzt — ein Zeichen, das zwischen
     /// <see cref="FirstSortChar"/> ('+', 43) und '0' (48) liegt.
     /// Dadurch sortieren Kind-Kapitel direkt nach ihrem Eltern-Kapitel und
@@ -74,7 +74,7 @@ public static partial class Extensions {
     /// </summary>
     public static string ChapterPathSortKey(this string path) {
         if (string.IsNullOrEmpty(path)) { return string.Empty; }
-        return path.ChapterPathNormalize().ToUpperInvariant().Replace(RowCaptionListItem.Kapiteltrenner, '/');
+        return path.ChapterPathNormalize().ToUpperInvariant().Replace(RowCaptionTableElement.Kapiteltrenner, '/');
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public static partial class Extensions {
         var normalized = path.ChapterPathNormalize();
         if (string.IsNullOrEmpty(normalized)) { return string.Empty; }
 
-        var pos = normalized.LastIndexOf(RowCaptionListItem.Kapiteltrenner);
+        var pos = normalized.LastIndexOf(RowCaptionTableElement.Kapiteltrenner);
         return pos <= 0 ? string.Empty : normalized[..pos];
     }
 

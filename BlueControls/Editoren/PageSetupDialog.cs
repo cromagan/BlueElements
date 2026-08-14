@@ -2,7 +2,6 @@
 
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -66,7 +65,7 @@ public partial class PageSetupDialog : EditorEasy {
                 Format.ItemAdd(ItemOf(f.Name, nn, QuickImage.Get(ImageCode.Datei), true, f.Name));
             }
         }
-        Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString()));
+        Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, FirstSortChar.ToString()));
         Hochformat.Checked = !data.Querformat;
         Querformat.Checked = !Hochformat.Checked;
         FillHöheBreite(data.BreiteMm, data.HöheMm);
@@ -102,7 +101,7 @@ public partial class PageSetupDialog : EditorEasy {
             ho = DoubleParse(Höhe.Text);
             if (ho < 5) { makeP = false; }
         }
-        if (Querformat.Checked) { Generic.Swap(ref br, ref ho); }
+        if (Querformat.Checked) { Swap(ref br, ref ho); }
         if (makeP) {
             var z = Math.Min(Sample.Width / br, Sample.Height / ho);
             var l = (float)(FloatParse(Links.Text) * z);
@@ -138,7 +137,7 @@ public partial class PageSetupDialog : EditorEasy {
 
     private static string FormatKey(float breiteMm, float höheMm) => $"{(int)Math.Round(breiteMm)};{(int)Math.Round(höheMm)}";
 
-    private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void Format_ItemClicked(object sender, ListItemEventArgs e) {
         if (_doing) { return; }
         _doing = true;
         if (Format.Text.Contains(';')) {
@@ -155,7 +154,7 @@ public partial class PageSetupDialog : EditorEasy {
 
     private void HochQuer_CheckedChanged(object sender, System.EventArgs e) {
         if (_doing) { return; }
-        if (!((BlueControls.Controls.Button)sender).Checked) { return; }
+        if (!((Controls.Button)sender).Checked) { return; }
         _doing = true;
         DrawSampleAndCheckButton();
         WriteBackToData();

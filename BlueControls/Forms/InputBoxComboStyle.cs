@@ -1,8 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-
 namespace BlueControls.Forms;
 
 public partial class InputBoxComboStyle : DialogWithOkAndCancel {
@@ -15,9 +12,9 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxComboStyle() : this(string.Empty, string.Empty, FormatHolderText.Instance, null, false) { }
+    private InputBoxComboStyle() : this(string.Empty, string.Empty, BlueBasics.Classes.Formats.TextFormat.Instance, null, false) { }
 
-    private InputBoxComboStyle(string txt, string vorschlagsText, IInputFormat textformat, List<AbstractListItem>? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
+    private InputBoxComboStyle(string txt, string vorschlagsText, IInputFormat textformat, List<ListItem>? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
         InitializeComponent();
         cbxText.Text = vorschlagsText;
         cbxText.ItemAddRange(suggestOriginal);
@@ -33,10 +30,10 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     #region Methods
 
-    public static string Show(string txt, IInputFormat textformat, List<AbstractListItem>? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, textformat, suggest, texteingabeErlaubt);
+    public static string Show(string txt, IInputFormat textformat, List<ListItem>? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, textformat, suggest, texteingabeErlaubt);
 
     public static string Show(string txt, IInputFormat textformat, List<string> suggest, bool texteingabeErlaubt) {
-        var suggestItems = new List<AbstractListItem>();
+        var suggestItems = new List<ListItem>();
         suggestItems.AddRange(ItemsOf(suggest));
         //Suggest.Sort();
         return Show(txt, string.Empty, textformat, suggestItems, texteingabeErlaubt);
@@ -56,7 +53,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     /// <param name="texteingabeErlaubt"></param>
     /// <returns></returns>
 
-    private static string Show(string txt, string vorschlagsText, IInputFormat textformat, List<AbstractListItem>? suggest, bool texteingabeErlaubt) {
+    private static string Show(string txt, string vorschlagsText, IInputFormat textformat, List<ListItem>? suggest, bool texteingabeErlaubt) {
         var MB = new InputBoxComboStyle(txt, vorschlagsText, textformat, suggest, texteingabeErlaubt);
         MB.ShowDialog();
         return MB._giveBack;

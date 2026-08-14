@@ -1,9 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -11,9 +8,9 @@ public partial class FontEditor : EditorEasy {
 
     #region Fields
 
-    private static List<AbstractListItem>? _fnList;
+    private static List<ListItem>? _fnList;
 
-    private static List<AbstractListItem>? _fsList;
+    private static List<ListItem>? _fsList;
 
     #endregion
 

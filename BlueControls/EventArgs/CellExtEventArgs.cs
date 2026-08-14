@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.TableItems;
+using BlueControls.TableElements;
 
 namespace BlueControls.EventArgs;
 
@@ -8,7 +8,7 @@ public class CellExtEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public CellExtEventArgs(ColumnViewItem? column, RowListItem? row) {
+    public CellExtEventArgs(ColumnViewItem? column, RowTableElement? row) {
         ColumnView = column;
         RowData = row;
     }
@@ -18,7 +18,7 @@ public class CellExtEventArgs : System.EventArgs {
     #region Properties
 
     public ColumnViewItem? ColumnView { get; }
-    public RowListItem? RowData { get; }
+    public RowTableElement? RowData { get; }
 
     #endregion
 }

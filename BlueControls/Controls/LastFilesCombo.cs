@@ -1,11 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Text;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
+using System.Text;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -22,7 +20,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         SetLastFilesStyle();
         RemoveAllowed = true;
 
-        CustomContextMenuItems = new List<AbstractListItem> {
+        CustomContextMenuItems = new List<ListItem> {
             ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), ContextMenu_OpenPath, true, string.Empty)
         }.AsReadOnly();
     }
@@ -105,7 +103,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         GenerateMenu();
     }
 
-    protected override void OnItemClicked(AbstractListItemEventArgs e) {
+    protected override void OnItemClicked(ListItemEventArgs e) {
         base.OnItemClicked(e);
         if (e.Item?.KeyName is not { } keyName) { return; }
 
@@ -121,7 +119,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         Text = string.Empty;
     }
 
-    protected override void OnItemRemoved(AbstractListItemEventArgs e) {
+    protected override void OnItemRemoved(ListItemEventArgs e) {
         base.OnItemRemoved(e);
         if (e.Item?.KeyName is null) { return; }
 
@@ -130,7 +128,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     }
 
     private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is AbstractListItem ali) {
+        if (e.HotItem is ListItem ali) {
             ExecuteFile(ali.KeyName.FilePath());
         }
     }

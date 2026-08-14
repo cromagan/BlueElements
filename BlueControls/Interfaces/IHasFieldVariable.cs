@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueScript.Variables;
+using BlueScript.ScriptVariables;
 
 namespace BlueControls.Interfaces;
 
@@ -17,9 +17,9 @@ public interface IHasFieldVariable {
 
     #region Methods
 
-    Variable? GetFieldVariable();
+    ScriptVariable? GetFieldVariable();
 
-    void SetValueFromVariable(Variable v);
+    void SetValueFromVariable(ScriptVariable v);
 
     #endregion
 }

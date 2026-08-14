@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
@@ -9,7 +8,6 @@ using BlueScript.EventArgs;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -98,7 +96,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// <see cref="TableChunk.GetChunkId"/> einen Chunk-<b>Wert</b> erwarten
     /// und diesen erneut hashen würden.
     /// </summary>
-    public static List<AbstractListItem> BuildChunkDropdownItems(Table? table) {
+    public static List<ListItem> BuildChunkDropdownItems(Table? table) {
         if (table is not TableChunk { IsDisposed: false } tc) { return []; }
 
         if (tc.Row.Count < 5) {
@@ -112,7 +110,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             .OrderBy(c => c)
             .ToList();
 
-        var chunkItems = new List<AbstractListItem>();
+        var chunkItems = new List<ListItem>();
         foreach (var c in chunkValues) {
             chunkItems.Add(ItemOf(c, c));
         }
@@ -124,7 +122,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// Erzeugt eine Liste von Zeilen für das Dropdown-Menü, gefiltert nach dem Chunk-Wert.
     /// Bei einer <see cref="TableChunk"/> werden nur die Zeilen des angegebenen Chunks geladen.
     /// </summary>
-    public static List<AbstractListItem> BuildRowDropdownItems(Table? table, string chunkValue) {
+    public static List<ListItem> BuildRowDropdownItems(Table? table, string chunkValue) {
         if (table is not { IsDisposed: false }) { return []; }
 
         IEnumerable<RowItem> rows = table.Row.Where(r => r is { IsDisposed: false });
@@ -143,7 +141,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             uni = nichteinzigartig.Count == 0;
         }
 
-        var items = new List<AbstractListItem>();
+        var items = new List<ListItem>();
         foreach (var r in rowList) {
             var caption = r.ReadableText();
 
@@ -160,7 +158,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// <summary>
     /// Zeigt ein Dropdown-Menü neben dem übergebenen Control an.
     /// </summary>
-    public static FloatingInputBoxListBoxStyle? ShowScriptEditorDropDown(Control anchorControl, List<AbstractListItem> items, string currentValue) {
+    public static FloatingInputBoxListBoxStyle? ShowScriptEditorDropDown(Control anchorControl, List<ListItem> items, string currentValue) {
         if (items.Count == 0) { return null; }
 
         items.Add(ItemOf("... und weitere", true));
@@ -520,12 +518,12 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         return f;
     }
 
-    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstPermissionExecute_ItemClicked(object sender, ListItemEventArgs e) {
         if (_item is null) { return; }
         OnPropertyChanged("Permission");
     }
 
-    private void ScriptEditorDropDown_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+    private void ScriptEditorDropDown_ItemClicked(object? sender, ListItemEventArgs e) {
         if (_dropDownTarget is { IsDisposed: false } tbx && e.Item is { } item) {
             tbx.Text = item.KeyName;
         }

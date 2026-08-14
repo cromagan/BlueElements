@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Drawing;
-
 namespace BlueScript.Classes;
 
 /// <summary>
@@ -16,7 +14,7 @@ public class DoItFeedback {
     /// (<see cref="ScriptEndedFeedback" />, <see cref="DoItWithEndedPosFeedback" />)
     /// genutzt.
     /// </summary>
-    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) {
+    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) {
         BreakFired = breakFired;
         ReturnFired = returnFired;
 
@@ -30,23 +28,23 @@ public class DoItFeedback {
 
     public DoItFeedback() { }
 
-    public DoItFeedback(Variable variable) => ReturnValue = variable;
+    public DoItFeedback(ScriptVariable variable) => ReturnValue = variable;
 
     public DoItFeedback(string failedReason, bool needsScriptFix) : this(needsScriptFix, false, false, failedReason, null) { }
 
-    public DoItFeedback(string valueString) : this(new VariableString(Variable.DummyName(), valueString)) { }
+    public DoItFeedback(string valueString) : this(new StringScriptVariable(ScriptVariable.DummyName(), valueString)) { }
 
-    public DoItFeedback(List<string>? list) : this(new VariableListString(list)) { }
+    public DoItFeedback(List<string>? list) : this(new ListOfStringsScriptVariable(list)) { }
 
-    public DoItFeedback(Bitmap? bmp) : this(new VariableBitmap(bmp)) { }
+    public DoItFeedback(System.Drawing.Bitmap? bmp) : this(new BitmapScriptVariable(bmp)) { }
 
-    public DoItFeedback(bool value) : this(new VariableBool(value)) { }
+    public DoItFeedback(bool value) : this(new BoolScriptVariable(value)) { }
 
-    public DoItFeedback(double value) : this(new VariableDouble(value)) { }
+    public DoItFeedback(double value) : this(new DoubleScriptVariable(value)) { }
 
-    public DoItFeedback(float value) : this(new VariableDouble(value)) { }
+    public DoItFeedback(float value) : this(new DoubleScriptVariable(value)) { }
 
-    public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) { }
+    public DoItFeedback(IEnumerable<string> list) : this(new ListOfStringsScriptVariable(list)) { }
 
     #endregion
 
@@ -67,7 +65,7 @@ public class DoItFeedback {
     public virtual int Line => 0;
 
     public bool ReturnFired { get; private set; }
-    public Variable? ReturnValue { get; private set; }
+    public ScriptVariable? ReturnValue { get; private set; }
 
     #endregion
 

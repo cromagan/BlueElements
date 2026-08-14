@@ -16,9 +16,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
     public FlexiControlForDelegate() : this(null, string.Empty, BlueBasics.Enums.ImageCode.Kreuz) { }
 
-    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() {
-        Init(doThis, text, QuickImage.Get(image, 22));
-    }
+    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() => Init(doThis, text, QuickImage.Get(image, 22));
 
     /// <summary>
     /// Öffnet den Dialog zum DIREKTEN Bearbeiten.
@@ -55,8 +53,8 @@ public class FlexiControlForDelegate : FlexiControl {
         base.OnControlAdded(e);
     }
 
-    protected override void OnExecuteCommand () {
-        base.OnExecuteCommand ();
+    protected override void OnExecuteCommand() {
+        base.OnExecuteCommand();
         _doThis?.Invoke();
     }
 

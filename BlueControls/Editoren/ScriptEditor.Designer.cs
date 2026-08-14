@@ -95,7 +95,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabScriptEditor
             // 
-            tabScriptEditor.BackColor = Color.White;
+            tabScriptEditor.BackColor = System.Drawing.Color.White;
             tabScriptEditor.Controls.Add(splitContainer1);
             tabScriptEditor.Location = new Point(4, 25);
             tabScriptEditor.Name = "tabScriptEditor";
@@ -160,7 +160,7 @@ namespace BlueControls.BlueTableDialogs {
             txtSkript.CharHeight = 14;
             txtSkript.CharWidth = 8;
             txtSkript.Cursor = Cursors.IBeam;
-            txtSkript.DisabledColor = Color.FromArgb(100, 180, 180, 180);
+            txtSkript.DisabledColor = System.Drawing.Color.FromArgb(100, 180, 180, 180);
             txtSkript.Font = new Font("Courier New", 9.75F);
             txtSkript.Hotkeys = resources.GetString("txtSkript.Hotkeys");
             txtSkript.IsReplaceMode = false;
@@ -172,7 +172,7 @@ namespace BlueControls.BlueTableDialogs {
             txtSkript.Paddings = new Padding(0);
             txtSkript.RightBracket = ')';
             txtSkript.RightBracket2 = '}';
-            txtSkript.SelectionColor = Color.FromArgb(60, 0, 0, 255);
+            txtSkript.SelectionColor = System.Drawing.Color.FromArgb(60, 0, 0, 255);
             txtSkript.ServiceColors = (FastColoredTextBoxNS.ServiceColors)resources.GetObject("txtSkript.ServiceColors");
             txtSkript.Size = new Size(754, 183);
             txtSkript.TabIndex = 2;
@@ -239,7 +239,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAssistent
             // 
-            tabAssistent.BackColor = Color.White;
+            tabAssistent.BackColor = System.Drawing.Color.White;
             tabAssistent.Controls.Add(lstAssistant);
             tabAssistent.Location = new Point(4, 25);
             tabAssistent.Name = "tabAssistent";
@@ -261,7 +261,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabStart
             // 
-            tabStart.BackColor = Color.White;
+            tabStart.BackColor = System.Drawing.Color.White;
             tabStart.Controls.Add(btnAusführen);
             tabStart.Controls.Add(btnBefehlsUebersicht);
             tabStart.Controls.Add(btnSaveLoad);
@@ -275,7 +275,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpInjectVariables
             // 
-            grpInjectVariables.BackColor = Color.White;
+            grpInjectVariables.BackColor = System.Drawing.Color.White;
             grpInjectVariables.Controls.Add(btnVariables);
             grpInjectVariables.Dock = DockStyle.Top;
             grpInjectVariables.GroupBoxStyle = GroupBoxStyle.RoundRect;

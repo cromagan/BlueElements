@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueScript.Classes;
 using System.Collections.ObjectModel;
-using System.Drawing;
 
 namespace BlueTable.Classes;
 
@@ -31,15 +31,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
-
-    #endregion
-
     #region Constructors
 
-    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, List<Variable>? savedVariables, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason, savedVariables) {
+    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, List<ScriptVariable>? savedVariables, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason, savedVariables) {
         Table = table;
         EventTypes = eventTypes;
         NeedRow = needRow;
@@ -57,6 +51,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
     public TableScriptDescription(Table? table, string toParse) : this(table) => this.Parse(toParse);
 
     public TableScriptDescription(Table? table) : this(table, string.Empty, string.Empty) { }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -90,7 +90,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         get {
             if (_mayAffectUser is { } b) { return b; }
 
-            if (AllowedMethodsMaxLevel(true) == MethodType.Standard) {
+            if (AllowedMethodsMaxLevel(true) == ScriptCommandType.Standard) {
                 _mayAffectUser = false;
                 return false;
             }
@@ -101,8 +101,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
             if (AverageRunTime > 5000) { a = true; }
 
             if (!a) {
-                foreach (var thisc in Method.AllMethods.Instances) {
-                    if (thisc.MethodLevel >= MethodType.ManipulatesUser) {
+                foreach (var thisc in ScriptCommand.AllMethods.Instances) {
+                    if (thisc.ScriptCommandLevel >= ScriptCommandType.ManipulatesUser) {
                         if (Script?.IndexOfWord(thisc.Command, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) { a = true; break; }
                     }
                 }
@@ -166,13 +166,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
 
     #region Methods
 
-    /// <summary>
-    /// Rundet eine Laufzeit auf 500 ms, um Fragment-Schreibvorgänge zu reduzieren.
-    /// Die Statistik dient nur der Anzeige (Sekunden) und MayAffectUser (&gt; 5000 ms),
-    /// daher ist eine Auflösung von 500 ms mehr als ausreichend.
-    /// </summary>
-    internal static long RoundRunTime(long milliseconds) => ((milliseconds + 250) / 500) * 500;
-
     public static bool MustBeReadonly(ScriptEventTypes type) {
         if (type.HasFlag(ScriptEventTypes.prepare_formula)) { return true; }
         if (type.HasFlag(ScriptEventTypes.export)) { return true; }
@@ -181,16 +174,16 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         return false;
     }
 
-    public MethodType AllowedMethodsMaxLevel(bool extended) {
-        if (EventTypes == ScriptEventTypes.Ohne_Auslöser) { return MethodType.GUI; }
+    public ScriptCommandType AllowedMethodsMaxLevel(bool extended) {
+        if (EventTypes == ScriptEventTypes.Ohne_Auslöser) { return ScriptCommandType.GUI; }
 
-        if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return MethodType.Standard; }
+        if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return ScriptCommandType.Standard; }
 
-        if (EventTypes == ScriptEventTypes.value_changed && extended) { return MethodType.ManipulatesUser; }
+        if (EventTypes == ScriptEventTypes.value_changed && extended) { return ScriptCommandType.ManipulatesUser; }
 
         //if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
 
-        return MethodType.Sub;
+        return ScriptCommandType.Sub;
     }
 
     public override List<string> Attributes() {
@@ -309,6 +302,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         return base.ErrorReason();
     }
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
     public override List<string> ParseableItems() {
         try {
             if (IsDisposed) { return []; }
@@ -325,9 +325,49 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         }
     }
 
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.Set("key", KeyName);
+        json.Set("script", Script);
+        json.Set("image", Image);
+        json.Set("quickinfo", QuickInfo);
+        json.Set("admininfo", AdminInfo);
+        json.Set("failedreason", FailedReason);
+        json.Set("events", (int)EventTypes);
+        json.Set("needrow", NeedRow);
+        json.Set("valuesreadonly", ValuesReadOnly);
+        json.Set("stoppedtimecount", StoppedTimeCount);
+        json.Set("averageruntime", AverageRunTime);
+        json.SetArrayIfNotEmpty("usergroups", UserGroups);
+        return json;
+    }
+
     public override void ParseFinished(string parsed) {
         if (MustBeReadonly(EventTypes)) {
             ValuesReadOnly = true;
+        }
+    }
+
+    public void ParseFinishedJson(JsonObject parsed) {
+        if (MustBeReadonly(EventTypes)) {
+            ValuesReadOnly = true;
+        }
+    }
+
+    public void ParseJson(JsonObject json) {
+        if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { KeyName = s; }
+        Script = json.GetString("script", Script);
+        Image = json.GetString("image", Image);
+        QuickInfo = json.GetString("quickinfo", QuickInfo);
+        AdminInfo = json.GetString("admininfo", AdminInfo);
+        FailedReason = json.GetString("failedreason", FailedReason);
+        EventTypes = json.GetEnum("events", EventTypes);
+        NeedRow = json.GetBool("needrow", NeedRow);
+        ValuesReadOnly = json.GetBool("valuesreadonly", ValuesReadOnly);
+        StoppedTimeCount = json.GetInt("stoppedtimecount", StoppedTimeCount);
+        AverageRunTime = json.GetInt("averageruntime", (int)AverageRunTime);
+        if (json["usergroups"] is JsonArray arr) {
+            UserGroups = arr.ToStringList().AsReadOnly();
         }
     }
 
@@ -371,7 +411,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         if (base.SymbolForReadableText() is { } i) { return i; }
 
         var symb = ImageCode.Formel;
-        var c = Color.Transparent;
+        var c = System.Drawing.Color.Transparent;
 
         var h = 100;
 
@@ -389,8 +429,15 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
-        return QuickImage.Get(symb, 16, c, Color.Transparent, h);
+        return QuickImage.Get(symb, 16, c, System.Drawing.Color.Transparent, h);
     }
+
+    /// <summary>
+    /// Rundet eine Laufzeit auf 500 ms, um Fragment-Schreibvorgänge zu reduzieren.
+    /// Die Statistik dient nur der Anzeige (Sekunden) und MayAffectUser (&gt; 5000 ms),
+    /// daher ist eine Auflösung von 500 ms mehr als ausreichend.
+    /// </summary>
+    internal static long RoundRunTime(long milliseconds) => ((milliseconds + 250) / 500) * 500;
 
     /// <summary>
     /// Übernimmt alle Werte von <paramref name="other"/> (Basis + Skript-spezifisch).
@@ -421,53 +468,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
     }
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("key", KeyName);
-        json.Set("script", Script);
-        json.Set("image", Image);
-        json.Set("quickinfo", QuickInfo);
-        json.Set("admininfo", AdminInfo);
-        json.Set("failedreason", FailedReason);
-        json.Set("events", (int)EventTypes);
-        json.Set("needrow", NeedRow);
-        json.Set("valuesreadonly", ValuesReadOnly);
-        json.Set("stoppedtimecount", StoppedTimeCount);
-        json.Set("averageruntime", AverageRunTime);
-        json.SetArrayIfNotEmpty("usergroups", UserGroups);
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) {
-        if (MustBeReadonly(EventTypes)) {
-            ValuesReadOnly = true;
-        }
-    }
-
-    public void ParseJson(JsonObject json) {
-        if (json["key"] is JsonValue v && v.TryGetValue(out string? s)) { KeyName = s; }
-        Script = json.GetString("script", Script);
-        Image = json.GetString("image", Image);
-        QuickInfo = json.GetString("quickinfo", QuickInfo);
-        AdminInfo = json.GetString("admininfo", AdminInfo);
-        FailedReason = json.GetString("failedreason", FailedReason);
-        EventTypes = json.GetEnum("events", EventTypes);
-        NeedRow = json.GetBool("needrow", NeedRow);
-        ValuesReadOnly = json.GetBool("valuesreadonly", ValuesReadOnly);
-        StoppedTimeCount = json.GetInt("stoppedtimecount", StoppedTimeCount);
-        AverageRunTime = json.GetInt("averageruntime", (int)AverageRunTime);
-        if (json["usergroups"] is JsonArray arr) {
-            UserGroups = arr.ToStringList().AsReadOnly();
-        }
-    }
 
     #endregion
 }

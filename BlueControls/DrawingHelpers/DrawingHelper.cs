@@ -6,36 +6,35 @@ namespace BlueControls.DrawingHelpers;
 
 public abstract class DrawingHelper : IHasKeyName {
 
-	#region Fields
+    #region Fields
 
-	protected static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
-	protected static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+    public static readonly AssemblyAwareCache<DrawingHelper> AllHelpers = new();
+    protected static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+    protected static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
 
-	public static readonly AssemblyAwareCache<DrawingHelper> AllHelpers = new();
+    #endregion
 
-	#endregion
+    #region Constructors
 
-	#region Constructors
+    protected DrawingHelper() { }
 
-	protected DrawingHelper() { }
+    #endregion
 
-	#endregion
+    #region Properties
 
-	#region Properties
+    /// <summary>
+    /// Wenn true, wird der Helper erst nach dem Zurücksetzen des Clips
+    /// sowie nach Overlay und InfoText gezeichnet (z.B. Lupe).
+    /// </summary>
+    public virtual bool DrawsAfterOverlay => false;
 
-	public abstract string KeyName { get; }
+    public abstract string KeyName { get; }
 
-	/// <summary>
-	/// Wenn true, wird der Helper erst nach dem Zurücksetzen des Clips
-	/// sowie nach Overlay und InfoText gezeichnet (z.B. Lupe).
-	/// </summary>
-	public virtual bool DrawsAfterOverlay => false;
+    #endregion
 
-	#endregion
+    #region Methods
 
-	#region Methods
+    public abstract void Draw(Graphics gr, PositionEventArgs canvasCoords, float zoom, int offsetX, int offsetY, Bitmap? bmp, CanvasMouseEventArgs? mouseDownData, CanvasMouseEventArgs? currentMouseData, Rectangle availableControlPaintArea);
 
-	public abstract void Draw(Graphics gr, PositionEventArgs canvasCoords, float zoom, int offsetX, int offsetY, Bitmap? bmp, CanvasMouseEventArgs? mouseDownData, CanvasMouseEventArgs? currentMouseData, Rectangle availableControlPaintArea);
-
-	#endregion
+    #endregion
 }

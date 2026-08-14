@@ -174,7 +174,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Primitive Methode. Ersetzt nur Umlaute und \r
-    /// Besser: Siehe Method_StringAsciiToHTML
+    /// Besser: Siehe StringAsciiToHTML
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>

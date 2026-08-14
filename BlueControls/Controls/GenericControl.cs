@@ -3,7 +3,6 @@
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
-using BlueControls.Classes;
 
 namespace BlueControls.Controls;
 

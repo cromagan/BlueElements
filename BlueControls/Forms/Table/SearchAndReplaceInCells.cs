@@ -19,11 +19,9 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
 
     #region Constructors
 
-    public SearchAndReplaceInCells() {
+    public SearchAndReplaceInCells() =>
         // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-    }
+        InitializeComponent();// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
     #endregion
 

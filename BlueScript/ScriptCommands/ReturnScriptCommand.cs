@@ -1,0 +1,25 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueScript.ScriptCommands;
+
+
+internal class ReturnScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "return";
+    public override string Description => "Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.";
+    public override string StartSequence => string.Empty;
+
+    public override string Syntax => "ReturnScriptCommand \"ReturnValue\";";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) =>
+        new(false, false, true, string.Empty, attvar.Attributes[0]);
+
+    #endregion
+}

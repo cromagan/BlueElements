@@ -1,9 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using System.Reflection;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes;
 
@@ -20,7 +18,7 @@ public static class Skin {
     internal static Pen PenLinieKräftig = Pens.Red;
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
-    private static Dictionary<string, Dictionary<int, string>> _styleData = [];
+    private static readonly Dictionary<string, Dictionary<int, string>> _styleData = [];
     private static bool _stylesLoaded;
 
     #endregion
@@ -324,8 +322,8 @@ public static class Skin {
         return BlueFont.DefaultFont;
     }
 
-    public static List<AbstractListItem> GetFonts(string sheetStyle) {
-        List<AbstractListItem> rahms =
+    public static List<ListItem> GetFonts(string sheetStyle) {
+        List<ListItem> rahms =
         [
             ItemOf("Haupt-Überschrift", ((int)PadStyles.Title).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Title).SymbolForReadableText()),
@@ -345,8 +343,8 @@ public static class Skin {
         return rahms;
     }
 
-    public static List<AbstractListItem> GetRahmenArt(string sheetStyle, bool mitOhne) {
-        var rahms = new List<AbstractListItem>();
+    public static List<ListItem> GetRahmenArt(string sheetStyle, bool mitOhne) {
+        var rahms = new List<ListItem>();
         if (mitOhne) {
             rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefined).ToString1(), ImageCode.Kreuz));
         }

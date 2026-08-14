@@ -1,10 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System.Collections;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
 
@@ -238,7 +236,7 @@ public partial class EditorForIEnumerable : ListBox {
         RefreshEditor();
     }
 
-    protected override void OnItemClicked(AbstractListItemEventArgs e) {
+    protected override void OnItemClicked(ListItemEventArgs e) {
         base.OnItemClicked(e);
 
         var newSel = (e.Item as ReadableListItem)?.Item;
@@ -260,7 +258,7 @@ public partial class EditorForIEnumerable : ListBox {
         PushSelectionToEditor();
     }
 
-    protected override void OnRemoveClicked(AbstractListItemEventArgs e) {
+    protected override void OnRemoveClicked(ListItemEventArgs e) {
         base.OnRemoveClicked(e);
         if (IsDisposed || Disposing) { return; }
         if (e.Item is not ReadableListItem rli || rli.Item is not { } item) { return; }
@@ -282,7 +280,7 @@ public partial class EditorForIEnumerable : ListBox {
         }
     }
 
-    private static AbstractListItem CreateListItem(object item) {
+    private static ListItem CreateListItem(object item) {
         if (item is IReadableText rt) {
             var key = item is IHasKeyName hkn && !string.IsNullOrEmpty(hkn.KeyName)
                 ? hkn.KeyName
@@ -326,7 +324,7 @@ public partial class EditorForIEnumerable : ListBox {
 
         // Anzeige aktualisieren, damit die Master-Liste die neue Instanz
         // reflektiert (z.B. geänderte Spaltennamen). Ohne diesen Aufbau bliebe
-        // das angezeigte ReadableListItem bei der alten Instanz — Klicks darauf
+        // das angezeigte Readable bei der alten Instanz — Klicks darauf
         // würden SelectedItem auf eine nicht mehr in OutputItem enthaltene
         // Referenz setzen und nachfolgende DemandEditorOutput-Aufrufe wären
         // wirkungslos (Änderungen gingen beim Schließen verloren). Der Editor

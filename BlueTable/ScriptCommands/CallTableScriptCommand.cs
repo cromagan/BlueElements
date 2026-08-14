@@ -1,0 +1,58 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueScript.Classes;
+using System.Diagnostics;
+
+namespace BlueScript.ScriptCommands;
+
+public class CallTableScriptCommand : TableGenericScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal];
+    public override string Command => "calltable";
+
+    public override string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
+            "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.\r\n" +
+        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
+
+    public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
+    public override string Syntax => "CallTableScriptCommand(Table, Scriptname, Attribut0, ...);";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (attvar.Attributes[0] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
+        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl CallScriptCommand benutzen!", true); }
+
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
+
+        var stackTrace = new StackTrace();
+        if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true); }
+
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
+
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is StringScriptVariable vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, 0);
+        scx.ConsumeBreakAndReturn();
+        if (scx.NeedsScriptFix) {
+            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", true);
+        }
+        return scx;
+    }
+
+    #endregion
+}

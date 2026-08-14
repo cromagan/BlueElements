@@ -46,7 +46,7 @@ namespace BlueControls {
             this.lstCommands.Name = "lstCommands";
             this.lstCommands.Size = new System.Drawing.Size(288, 384);
             this.lstCommands.TabIndex = 3;
-            this.lstCommands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstCommands_ItemClicked);
+            this.lstCommands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.lstCommands_ItemClicked);
             // 
             // txbComms
             // 

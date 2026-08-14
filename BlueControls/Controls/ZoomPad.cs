@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
@@ -277,7 +275,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     public void ZoomFit() {
         if (IsDisposed) { return; }
         var controlBounds = AvailableControlPaintArea;
-        _zoomFit = ItemCollectionPadItem.ZoomFitValue(CanvasMaxBounds, controlBounds.Size);
+        _zoomFit = CollectionPadItem.ZoomFitValue(CanvasMaxBounds, controlBounds.Size);
         Zoom = _zoomFit;
         Fitting = true;
     }
@@ -486,8 +484,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         var tmpCanvasMaxBounds = CanvasMaxBounds;
 
-        var freiraumNoSliders = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
-        var freiraumBoth = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
+        var freiraumNoSliders = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
+        var freiraumBoth = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
 
         var oldSliderYVisible = SliderY.Visible;
         var oldSliderXVisible = SliderX.Visible;
@@ -507,7 +505,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
 
         var controlArea = AvailableControlPaintArea;
-        var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
+        var freiraumControl = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
         if (SliderX.Visible || AllowScrollWithoutSliderX) {
             // Struktur analog zu SliderY (unten): Maximum ist die "große" Distanz,

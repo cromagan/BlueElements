@@ -44,9 +44,7 @@ public class CellItem : IJsonParseable {
 
     public void ParseFinishedJson(JsonObject parsed) { }
 
-    public void ParseJson(JsonObject json) {
-        Value = json.GetString("value", Value);
-    }
+    public void ParseJson(JsonObject json) => Value = json.GetString("value", Value);
 
     #endregion
 }

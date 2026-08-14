@@ -140,7 +140,7 @@ namespace BlueControls.BlueTableDialogs
             // 
             this.grpSuche.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                     | AnchorStyles.Right)));
-            this.grpSuche.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpSuche.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSuche.CausesValidation = false;
             this.grpSuche.Controls.Add(this.optInhaltEgal);
             this.grpSuche.Controls.Add(this.optSucheNach);
@@ -168,7 +168,7 @@ namespace BlueControls.BlueTableDialogs
             // 
             this.grpErsetzen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                        | AnchorStyles.Right)));
-            this.grpErsetzen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpErsetzen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpErsetzen.CausesValidation = false;
             this.grpErsetzen.Controls.Add(this.optFügeHinzu);
             this.grpErsetzen.Controls.Add(this.optErsetzeKomplett);
@@ -206,7 +206,7 @@ namespace BlueControls.BlueTableDialogs
             // 
             this.grpOptionen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom) 
                                                        | AnchorStyles.Left)));
-            this.grpOptionen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpOptionen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpOptionen.CausesValidation = false;
             this.grpOptionen.Controls.Add(this.chkAbgeschlosseZellen);
             this.grpOptionen.Controls.Add(this.chkNurinAktuellerSpalte);
@@ -233,7 +233,7 @@ namespace BlueControls.BlueTableDialogs
             this.grpSonderzeichen.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
                                                              | AnchorStyles.Left) 
                                                             | AnchorStyles.Right)));
-            this.grpSonderzeichen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpSonderzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSonderzeichen.CausesValidation = false;
             this.grpSonderzeichen.Controls.Add(this.capSonderzeichen);
             this.grpSonderzeichen.Location = new Point(344, 200);

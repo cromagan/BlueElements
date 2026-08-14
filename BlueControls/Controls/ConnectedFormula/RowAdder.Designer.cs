@@ -45,7 +45,7 @@ partial class RowAdder {
             this.f.Name = "f";
             this.f.Size = new Size(381, 419);
             this.f.TabIndex = 0;
-            this.f.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.F_ItemClicked);
+            this.f.ItemClicked += new EventHandler<ListItemEventArgs>(this.F_ItemClicked);
             // 
             // RowAdder
             // 

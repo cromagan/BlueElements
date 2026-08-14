@@ -132,7 +132,7 @@ public class AssemblyAwareCache<T> {
     /// </summary>
     public IReadOnlyCollection<Type> Types {
         get {
-            _ = Generic.AllTypes;
+            _ = AllTypes;
 
             var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
             if (_types is not null && _assemblyCount == currentCount) { return _types.Values; }
@@ -142,7 +142,7 @@ public class AssemblyAwareCache<T> {
                 if (_types is not null && _assemblyCount == currentCount) { return _types.Values; }
 
                 var targetType = typeof(T);
-                var allTypes = Generic.AllTypes;
+                var allTypes = AllTypes;
 
                 // Generic.AllTypes liefert während seines eigenen Aufbaus eine leere
                 // Liste zurück (siehe Generic.AllTypes: `_allTypesLoading`). Würden wir

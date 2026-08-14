@@ -20,9 +20,7 @@ public sealed class AddColumnItem : ColumnViewItem {
 
     #region Constructors
 
-    public AddColumnItem() : base((Table?)null) {
-        IsExpanded = true;
-    }
+    public AddColumnItem() : base((Table?)null) => IsExpanded = true;
 
     #endregion
 
@@ -37,7 +35,7 @@ public sealed class AddColumnItem : ColumnViewItem {
 
     public override string RendererSettings => "{ClassId=\"Bool\", SymbolTrue=CheckBox_Checked, SymbolFalse=CheckBox}";
 
-    public override string? StorageKey => AddColumnItem.ClassId;
+    public override string? StorageKey => ClassId;
 
     #endregion
 

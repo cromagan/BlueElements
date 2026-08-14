@@ -28,7 +28,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     public ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty, null) { }
 
-    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, List<Variable>? savedVariables) {
+    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, List<ScriptVariable>? savedVariables) {
         if (string.IsNullOrEmpty(name)) {
             name = "New script";
         }
@@ -125,7 +125,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         }
     }
 
-    public List<Variable>? SavedVariables {
+    public List<ScriptVariable>? SavedVariables {
         get;
         set {
             if (field?.SortByKeyName().ToString(true) == value?.SortByKeyName().ToString(true)) { return; }
@@ -157,7 +157,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     #region Methods
 
     public static bool IsValidName(string name) {
-        if (name.IsFormat(FormatHolderText.Instance, false) is { Length: > 0 }) { return false; }
+        if (name.IsFormat(BlueBasics.Classes.Formats.TextFormat.Instance, false) is { Length: > 0 }) { return false; }
         if (string.Equals(name, "New script", StringComparison.OrdinalIgnoreCase)) { return false; }
         return true;
     }

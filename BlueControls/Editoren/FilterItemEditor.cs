@@ -1,9 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueTable.Interfaces;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueTable.Editoren;
 
@@ -120,13 +118,9 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
         return true;
     }
 
-    private void TxtSearchValue_TextChanged(object? sender, System.EventArgs e) {
-        UpdateLogicVisibility();
-    }
+    private void TxtSearchValue_TextChanged(object? sender, System.EventArgs e) => UpdateLogicVisibility();
 
-    private void UpdateLogicVisibility() {
-        cmbLogic.Visible = txtSearchValue.Text.Contains("\r\n");
-    }
+    private void UpdateLogicVisibility() => cmbLogic.Visible = txtSearchValue.Text.Contains("\r\n");
 
     #endregion
 }

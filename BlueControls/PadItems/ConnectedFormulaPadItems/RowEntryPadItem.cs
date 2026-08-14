@@ -1,0 +1,98 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
+using BlueScript.ScriptVariables;
+
+namespace BlueControls.PadItems.FunktionsItems_Formular;
+
+/// <summary>
+/// Dieses Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.
+/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
+/// Unsichtbares Element, wird nicht angezeigt.
+/// </summary>
+public class RowEntryPadItem : ReciverSenderPadItem, IReadableText, IHasFieldVariable {
+
+    #region Constructors
+
+    public RowEntryPadItem() : this(string.Empty, null, null) { }
+
+    public RowEntryPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "FI-RowEntryElement";
+
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None;
+
+    public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
+
+    public string FieldName => "Field_EntryRow";
+
+    public new List<int> InputColorId => [OutputColorId];
+
+    public override bool InputMustBeOneRow => false;
+
+    public override bool MustBeInDrawingArea => false;
+
+    public override bool TableInputMustMatchOutputTable => true;
+
+    protected override int SaveOrder => 1;
+
+    #endregion
+
+    #region Methods
+
+    public ScriptVariable? GetFieldVariable() {
+        var fn = FieldName;
+
+        if (!string.IsNullOrEmpty(fn) && TableOutput?.Row?.First() is { } r) {
+            return new RowScriptVariable(fn, r, true, "Die Eingangszeile des Formulares");
+        }
+
+        return null;
+    }
+
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        return result;
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "style":
+            case "id": // TODO: 29.03.2023
+                //Id = IntParse(value);
+                return true;
+        }
+        return base.ParseThis(key, value);
+    }
+
+    public override string ReadableText() {
+        const string txt = "Eingangs-Zeile: ";
+
+        return txt + TableOutput?.Caption;
+    }
+
+    public void SetValueFromVariable(ScriptVariable v) { }
+
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
+        // Die Eigangszeile ist immer vom übergeordenetem Formular und wird einfach weitergegeben.
+        // Deswegen ist InputColorID nur Fake
+
+        if (!forPrinting) {
+            DrawArrowOutput(gr, positionControl, zoom, forPrinting, OutputColorId);
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
+        }
+
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
+
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
+    }
+
+    #endregion
+}

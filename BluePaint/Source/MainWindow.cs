@@ -11,7 +11,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     #region Fields
 
-    private GenericTool? _currentTool;
+    private Tool? _currentTool;
 
     private string _filename = string.Empty;
 
@@ -49,7 +49,7 @@ public partial class MainWindow : FormWithStatusBar {
         _filename = string.Empty;
     }
 
-    public void SetTool(GenericTool? newTool) {
+    public void SetTool(Tool? newTool) {
         if (AreSame(newTool, _currentTool)) {
             MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
             return;
@@ -112,7 +112,7 @@ public partial class MainWindow : FormWithStatusBar {
         return false;
     }
 
-    private void Bruchlinie_Click(object sender, EventArgs e) => SetTool(new Tool_Bruchlinie());
+    private void Bruchlinie_Click(object sender, EventArgs e) => SetTool(new FaultLineTool());
 
     private void btn100_Click(object sender, EventArgs e) => P.Zoom = 1f;
 
@@ -140,9 +140,9 @@ public partial class MainWindow : FormWithStatusBar {
         P.ZoomFit();
     }
 
-    private void btnGrößeÄndern_Click(object sender, EventArgs e) => SetTool(new Tool_Resize());
+    private void btnGrößeÄndern_Click(object sender, EventArgs e) => SetTool(new ResizeTool());
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, ListItemEventArgs e) {
         if (!IsSaved()) { return; }
         LoadFromDisk(e.Item.KeyName);
     }
@@ -174,7 +174,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void btnZoomFit_Click(object sender, EventArgs e) => P.ZoomFit();
 
-    private void Clipping_Click(object sender, EventArgs e) => SetTool(new Tool_Clipping());
+    private void Clipping_Click(object sender, EventArgs e) => SetTool(new ClipTool());
 
     private void CurrentTool_DoInvalidate(object? sender, EventArgs e) => P.Invalidate();
 
@@ -224,7 +224,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void CurrentTool_ZoomFit(object? sender, EventArgs e) => P.ZoomFit();
 
-    private void Dummy_Click(object sender, EventArgs e) => SetTool(new Tool_DummyGenerator());
+    private void Dummy_Click(object sender, EventArgs e) => SetTool(new DummyGeneratorTool());
 
     private bool IsSaved() {
         while (true) {
@@ -251,7 +251,7 @@ public partial class MainWindow : FormWithStatusBar {
         }
     }
 
-    private void Kontrast_Click(object sender, EventArgs e) => SetTool(new Tool_Kontrast());
+    private void Kontrast_Click(object sender, EventArgs e) => SetTool(new ContrastTool());
 
     private void LoadFromDisk(string filename) {
         if (!IsSaved()) { return; }
@@ -289,7 +289,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void P_MouseLeave(object sender, EventArgs e) => InfoText.Text = string.Empty;
 
-    private void Radiergummi_Click(object sender, EventArgs e) => SetTool(new Tool_Eraser());
+    private void Radiergummi_Click(object sender, EventArgs e) => SetTool(new EraserTool());
 
     private void Rückg_Click(object sender, EventArgs e) {
         if (_picUndo is null) { return; }
@@ -297,7 +297,7 @@ public partial class MainWindow : FormWithStatusBar {
         _isSaved = false;
         var bmp = P.Bmp;
         if (bmp is null) { return; }
-        Generic.Swap(ref bmp, ref _picUndo);
+        Swap(ref bmp, ref _picUndo);
         P.Bmp = bmp;
         if (P.Bmp.Width != _picUndo.Width || P.Bmp.Height != _picUndo.Height) {
             P.ZoomFit();
@@ -308,7 +308,7 @@ public partial class MainWindow : FormWithStatusBar {
         _currentTool?.PictureChangedByMainWindow();
     }
 
-    private void Screenshot_Click(object sender, EventArgs e) => SetTool(new Tool_Screenshot());
+    private void Screenshot_Click(object sender, EventArgs e) => SetTool(new ScreenshotTool());
 
     private void Speichern() {
         SetTool(null); // um OnToolChangeAuszulösen
@@ -346,9 +346,9 @@ public partial class MainWindow : FormWithStatusBar {
         }
     }
 
-    private void Spiegeln_Click(object sender, EventArgs e) => SetTool(new Tool_Spiegeln());
+    private void Spiegeln_Click(object sender, EventArgs e) => SetTool(new MirrorTool());
 
-    private void Zeichnen_Click(object sender, EventArgs e) => SetTool(new Tool_Paint());
+    private void Zeichnen_Click(object sender, EventArgs e) => SetTool(new PenTool());
 
     #endregion
 }

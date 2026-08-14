@@ -2,7 +2,6 @@
 
 using BlueTable.EventArgs;
 using System.ComponentModel;
-using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -19,10 +18,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     #region Constructors
 
-    public ColumnViewItem(ColumnItem column) : this(column.Table) {
-        Column = column;
-        //Renderer = string.Empty;
-    }
+    public ColumnViewItem(ColumnItem column) : this(column.Table) => Column = column;//Renderer = string.Empty;
 
     public ColumnViewItem(Table? table, List<KeyValuePair<string, string>> allTags, string originalParse) : this(table) => this.Parse(allTags, originalParse);
 
@@ -58,7 +54,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
-    public Color BackColor_ColumnCell => Column?.BackColor ?? Color.White;
+    public System.Drawing.Color BackColor_ColumnCell => Column?.BackColor ?? System.Drawing.Color.White;
 
     public virtual string Caption => Column?.Caption ?? "[Spalte]";
 

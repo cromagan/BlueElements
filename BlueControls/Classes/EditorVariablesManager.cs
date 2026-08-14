@@ -8,7 +8,7 @@ public static class EditorVariablesManager {
 
     #region Fields
 
-    private static readonly string _filename = $"%appdocumentpath%\\{Generic.UserName}_EditorVariables.json".NormalizeFile();
+    private static readonly string _filename = $"%appdocumentpath%\\{UserName}_EditorVariables.json".NormalizeFile();
     private static readonly object _lock = new();
     private static readonly Dictionary<string, List<JsonEntry>> _sets = [];
     private static readonly Dictionary<string, bool> _settings = [];

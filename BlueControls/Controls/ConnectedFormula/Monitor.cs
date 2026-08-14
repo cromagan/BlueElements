@@ -3,7 +3,6 @@
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using System.Globalization;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -92,7 +91,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        lstDone.ItemAdd(ItemOf(message, Generic.GetUniqueKey(), symbol, false, _n.ToString7()));
+        lstDone.ItemAdd(ItemOf(message, GetUniqueKey(), symbol, false, _n.ToString7()));
 
         lstDone.Refresh();
         //capInfo.Text = message;

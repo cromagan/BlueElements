@@ -126,9 +126,7 @@ public static partial class Extensions {
     /// <summary>
     /// Fügt nur die Key-Namen in die Liste hinzu, getrennt mit |
     /// </summary>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
-        ParseableAdd(col, tagname, value?.ToListOfString(), ignoreEmpty);
-    }
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) => ParseableAdd(col, tagname, value?.ToListOfString(), ignoreEmpty);
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IStringable> value) {
         foreach (var thisi in value) {
@@ -261,7 +259,7 @@ public static partial class Extensions {
 
     public static void Shuffle<T>(this IList<T> list) {
         for (var i1 = 0; i1 < list.Count; i1++) {
-            var i2 = Constants.GlobalRnd.Next(i1, list.Count);
+            var i2 = GlobalRnd.Next(i1, list.Count);
             if (i1 != i2) {
                 var v1 = list[i1];
                 var v2 = list[i2];

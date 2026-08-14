@@ -1,9 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Classes.ItemCollectionPad.Abstract;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.PadItems.Abstract;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueTable.EventArgs;
 
 namespace BlueControls.Controls.ConnectedFormula;
@@ -43,7 +41,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public AbstractPadItem? GeneratedFrom { get; set; }
+    public PadItem? GeneratedFrom { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -148,10 +146,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="parentFormula"></param>
     /// <param name="source"></param>
     /// <param name="mode"></param>
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverControlPadItem source, string mode) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverPadItem source, string mode) {
         Name = source.DefaultItemToControlName(parentFormula?.Page?.UniqueId);
         Mode = mode;
-        if (source is AbstractPadItem ali) { GeneratedFrom = ali; }
+        if (source is PadItem ali) { GeneratedFrom = ali; }
 
         if (this is IHasSettings ihs) {
             ihs.SettingsManualFilename = $"%appdocumentpath%\\{source.KeyName}.ini".NormalizeFile();
@@ -159,7 +157,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (parentFormula is null) { return; }
 
-        if (source.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+        if (source.Parent is CollectionPadItem { IsDisposed: false } icpi) {
             foreach (var thisKey in source.Parents) {
                 var it = icpi[thisKey];
 

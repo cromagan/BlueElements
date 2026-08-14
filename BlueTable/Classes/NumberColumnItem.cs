@@ -31,7 +31,7 @@ public sealed class NumberColumnItem : ColumnViewItem {
 
     public override string RendererSettings => "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding={-4, -2}}";
 
-    public override string? StorageKey => NumberColumnItem.ClassId;
+    public override string? StorageKey => ClassId;
 
     #endregion
 

@@ -1,10 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueControls.Controls;
 
@@ -27,7 +26,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, list, false) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list) : this(expr, list, false) { }
 
     /// <summary>
     /// Anzeige als Dropdown-Feld
@@ -35,7 +34,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="expr"></param>
     /// <param name="list"></param>
     /// <param name="texteditAllowed"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, true) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, true) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige, mit der angegeben Anzahl an Zeilen.
@@ -65,7 +64,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<ListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -139,7 +138,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         if (rowCount >= 2) {
                             CaptionPosition = CaptionPosition.Über_dem_Feld;
                             Size = new Size(200, 16 + (24 * rowCount));
-                            this.GetStyleFrom(FormatHolderText.Instance);
+                            this.GetStyleFrom(Formats.TextFormat.Instance);
                             MultiLine = true;
                         } else {
                             CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
@@ -147,28 +146,28 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             MultiLine = false;
                             switch (_accessor) {
                                 case Accessor<string>:
-                                    this.GetStyleFrom(FormatHolderText.Instance);
+                                    this.GetStyleFrom(Formats.TextFormat.Instance);
                                     break;
 
                                 case Accessor<long>:
                                 case Accessor<int>:
-                                    this.GetStyleFrom(FormatHolderLong.Instance);
+                                    this.GetStyleFrom(Formats.LongFormat.Instance);
                                     break;
 
                                 case Accessor<float>:
-                                    this.GetStyleFrom(FormatHolderFloat.Instance);
+                                    this.GetStyleFrom(Formats.FloatFormat.Instance);
                                     break;
 
                                 case Accessor<double>:
-                                    this.GetStyleFrom(FormatHolderFloat.Instance);
+                                    this.GetStyleFrom(Formats.FloatFormat.Instance);
                                     break;
 
                                 case Accessor<Color>:
-                                    this.GetStyleFrom(FormatHolderText.Instance);
+                                    this.GetStyleFrom(Formats.TextFormat.Instance);
                                     break;
 
                                 default:
-                                    this.GetStyleFrom(FormatHolderText.Instance);
+                                    this.GetStyleFrom(Formats.TextFormat.Instance);
                                     break;
                             }
                         }
@@ -215,8 +214,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnControlAdded(e);
     }
 
-    protected override void OnExecuteCommand () {
-        base.OnExecuteCommand ();
+    protected override void OnExecuteCommand() {
+        base.OnExecuteCommand();
         if (_accessor is not null) {
             object? x = _accessor.Get();
 

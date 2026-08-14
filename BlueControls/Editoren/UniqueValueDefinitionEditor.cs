@@ -1,9 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueTable.Interfaces;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -44,9 +42,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotif
 
     #region Methods
 
-    public override void Clear() {
-        lbxKeyColumns.ItemClear();
-    }
+    public override void Clear() => lbxKeyColumns.ItemClear();
 
     public override object? CreateNewItem() {
         if (Table is not { IsDisposed: false } tb) { return null; }
@@ -82,9 +78,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotif
         OnPropertyChanged("Columns");
     }
 
-    private void OnPropertyChanged(string propertyName) {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

@@ -6,7 +6,7 @@ namespace BlueTable.Classes;
 /// Virtuelle Spalte zum Anpinnen einzelner Zeilen. Hat kein eigenes
 /// <see cref="ColumnItem" /> und kann vom Benutzer frei innerhalb der
 /// Anordnung verschoben werden. Standardmäßig erscheint sie am Anfang.
-/// Jede Zeile zeigt ein Pin-Symbol (Renderer_Bool), dessen Zustand
+/// Jede Zeile zeigt ein Pin-Symbol (Bool), dessen Zustand
 /// (angepinnt/nicht angepinnt) über die TableView gesteuert wird.
 /// Erscheint entweder dauerhaft (als <see cref="StorageKey"/> VIR_PIN
 /// in der Collection gespeichert) oder on-demand, sobald mindestens
@@ -30,7 +30,7 @@ public sealed class PinColumnItem : ColumnViewItem {
 
     public override string? Renderer => "Bool";
     public override string RendererSettings => "{ClassId=\"Bool\", SymbolTrue=Checkbox_Checked, SymbolFalse=Checkbox}";
-    public override string? StorageKey => PinColumnItem.ClassId;
+    public override string? StorageKey => ClassId;
 
     #endregion
 

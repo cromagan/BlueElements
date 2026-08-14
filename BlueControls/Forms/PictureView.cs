@@ -31,7 +31,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
         if (mitScreenResize) {
             if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
-                var opScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+                var opScNr = PointOnScreenNr(System.Windows.Forms.Cursor.Position);
                 Width = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
                 Height = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
                 Left = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));

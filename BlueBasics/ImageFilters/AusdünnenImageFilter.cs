@@ -1,0 +1,58 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueBasics.ImageFilters;
+
+public class AusdünnenImageFilter : ImageFilter {
+
+    #region Properties
+
+    public static AusdünnenImageFilter Instance { get; } = new();
+
+    #endregion
+
+    #region Methods
+
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
+        if (Parameter is not int staerke) { return; }
+        if (bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || staerke <= 0) { return; }
+
+        for (var x = 0; x < bitmapData.Width - 1; x++) {
+            for (var y = 0; y < bitmapData.Height - 1; y++) {
+                if (!IsWhite(x, y)) {
+                    for (var wi = staerke; wi > 0; wi--) {
+                        var ma1 = (int)Math.Floor((float)wi / 2);
+                        var ma2 = wi - ma1;
+                        // X
+                        if (IsWhite(x - ma1 - 1, y) && IsWhite(x + ma2 + 1, y)) {
+                            var allblack = true;
+                            for (var ch = -ma1; ch <= ma2; ch++) {
+                                if (IsWhite(x + ch, y)) { allblack = false; break; }
+                            }
+                            if (allblack) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
+                                    if (ch != 0) { bitmapData.SetPixelArgb(bits, x + ch, y, 255, 255, 255, 255); }
+                                }
+                            }
+                        }
+                        // Y
+                        if (IsWhite(x, y - ma1 - 1) && IsWhite(x, y + ma2 + 1)) {
+                            var allblack = true;
+                            for (var ch = -ma1; ch <= ma2; ch++) {
+                                if (IsWhite(x, y + ch)) { allblack = false; break; }
+                            }
+                            if (allblack) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
+                                    if (ch != 0) { bitmapData.SetPixelArgb(bits, x, y + ch, 255, 255, 255, 255); }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        bool IsWhite(int x, int y) => bitmapData.IsNearWhiteAt(bits, x, y, 0.9);
+    }
+
+    #endregion
+}

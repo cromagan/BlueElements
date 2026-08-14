@@ -33,7 +33,7 @@ namespace BlueControls.Controls
             // 
             this.EditPanelFrame.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                           | AnchorStyles.Right)));
-            this.EditPanelFrame.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.EditPanelFrame.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.EditPanelFrame.CausesValidation = false;
             this.EditPanelFrame.Controls.Add(this.btnLoad);
             this.EditPanelFrame.Controls.Add(this.btnScreenshot);

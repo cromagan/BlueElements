@@ -1,9 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Extended_Text;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
@@ -39,7 +36,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt
@@ -75,7 +72,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         return eText.LastSize();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
+    public List<ListItem>? GetContextMenuItems(object? hotItem) => null;
 
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);

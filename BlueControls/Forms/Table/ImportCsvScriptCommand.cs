@@ -1,0 +1,98 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueTable.Interfaces;
+
+namespace BlueControls.BlueTableDialogs;
+
+public sealed partial class ImportCsvScriptCommand : FormWithStatusBar, IHasTable {
+
+    #region Fields
+
+    private readonly string _originalImportText;
+
+    #endregion
+
+    #region Constructors
+
+    public ImportCsvScriptCommand(Table? table, string importtext) : base() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
+        var ein = _originalImportText.SplitAndCutByCr().ToList();
+        capEinträge.Text = $"{ein.Count - 1} zum Importieren bereit.";
+        Table = table;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public Table? Table {
+        get;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == field) { return; }
+
+            field?.Disposed -= _table_Disposed;
+            field = value;
+
+            field?.Disposed += _table_Disposed;
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    protected override void OnClosing(CancelEventArgs e) {
+        Table = null;
+        base.OnClosing(e);
+    }
+
+    private void _table_Disposed(object? sender, System.EventArgs e) {
+        Table = null;
+        Close();
+    }
+
+    private void Cancel_Click(object sender, System.EventArgs e) => Close();
+
+    private void Fertig_Click(object sender, System.EventArgs e) {
+        var tr = string.Empty;
+        if (optTabStopp.Checked) {
+            tr = "\t";
+        } else if (optSemikolon.Checked) {
+            tr = ";";
+        } else if (optKomma.Checked) {
+            tr = ",";
+        } else if (optLeerzeichen.Checked) {
+            tr = " ";
+        } else if (optAndere.Checked) {
+            tr = txtAndere.Text;
+        }
+        if (string.IsNullOrEmpty(tr)) {
+            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", txtAndere);
+            return;
+        }
+        var m = "Tabellen-Fehler";
+
+        if (Table is { IsDisposed: false } tb) {
+            // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
+            // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.
+            // SuppressEvents bündelt sie, ResumeEvents macht am Ende einen Aufbau.
+            tb.SuppressEvents();
+            try {
+                m = tb.ImportCsv(_originalImportText, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
+            } finally {
+                tb.ResumeEvents();
+            }
+        }
+
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show(m, ImageCode.Information, "OK");
+        }
+        Close();
+    }
+
+    #endregion
+}

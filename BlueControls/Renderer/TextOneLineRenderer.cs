@@ -1,0 +1,129 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Controls;
+
+namespace BlueControls.Renderer;
+
+public class TextOneLineRenderer : Renderer {
+
+    #region Fields
+
+    private string _präfix = string.Empty;
+
+    private string _suffix = string.Empty;
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "TextOneLine";
+
+    public override string Description => "Schnelle Darstellung eines einzeiligen Textes.";
+
+    public string Präfix {
+        get => _präfix;
+        set {
+            if (_präfix == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            _präfix = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Suffix {
+        get => _suffix;
+        set {
+            if (_suffix == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            _suffix = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    public static List<ListItem> Suffixe() => [
+            ItemOf("µm", ImageCode.Lineal),
+            ItemOf("mm", ImageCode.Lineal),
+            ItemOf("cm", ImageCode.Lineal),
+            ItemOf("dm", ImageCode.Lineal),
+            ItemOf("m", ImageCode.Lineal),
+            ItemOf("km", ImageCode.Lineal),
+            ItemOf("mm²", ImageCode.GrößeÄndern),
+            ItemOf("m²", ImageCode.GrößeÄndern),
+            ItemOf("µg", ImageCode.Gewicht),
+            ItemOf("mg", ImageCode.Gewicht),
+            ItemOf("g", ImageCode.Gewicht),
+            ItemOf("kg", ImageCode.Gewicht),
+            ItemOf("t", ImageCode.Gewicht),
+            ItemOf("h", ImageCode.Uhr),
+            ItemOf("min", ImageCode.Uhr),
+            ItemOf("St.", ImageCode.Eins)
+];
+
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
+        if (string.IsNullOrEmpty(content)) { return; }
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+
+        Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
+    }
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result =
+        [   new FlexiControlForProperty<string>(() => Präfix),
+            new FlexiControlForProperty<string>(() => Suffix,Suffixe(), true)
+        ];
+        return result;
+    }
+
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Prefix", _präfix);
+
+        result.ParseableAdd("Suffix", _suffix);
+
+        return result;
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "prefix":
+                _präfix = value.FromNonCritical();
+                return true;
+
+            case "suffix":
+                _suffix = value.FromNonCritical();
+                return true;
+        }
+        return base.ParseThis(key, value);
+    }
+
+    public override string ReadableText() => "Einzeiliger Text";
+
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
+
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
+        return GetFont().FormatedText_NeededSize(replacedText, null, 16);
+    }
+
+    /// <summary>
+    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="style"></param>
+    /// <param name="doOpticalTranslation"></param>
+    /// <returns></returns>
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
+        content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, doOpticalTranslation, null);
+
+        if (content.IndexOf('\r') == -1) { return content; }
+
+        return content.Replace("\r\n", "; ").Replace("\r", "; ");
+    }
+
+    #endregion
+}

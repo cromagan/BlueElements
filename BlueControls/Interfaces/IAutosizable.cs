@@ -24,7 +24,7 @@ public static class AutosizableExtension {
 
     #region Fields
 
-    public const float GridSize = 8; // PixelToMm(4f, ItemCollectionPadItem.Dpi);
+    public const float GridSize = 8; // PixelToMm(4f, ItemCollection.Dpi);
 
     public const float MinHeigthCapAndBox = 48;
     public const float MinHeigthCaption = 16;

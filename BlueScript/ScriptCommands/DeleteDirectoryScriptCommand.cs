@@ -1,0 +1,40 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueScript.ScriptCommands;
+
+internal class DeleteDirectoryScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "deletedirectory";
+    public override string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
+
+    public override string Returns => BoolScriptVariable.ShortName_Variable;
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
+    public override string Syntax => "DeleteDirectory(Dir)";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        var filn = attvar.ValueStringGet(0);
+
+        if (!filn.IsValidFilePath()) { return new DoItFeedback("Dateinamen-Fehler!", true); }
+
+        if (!IO.DirectoryExists(filn)) {
+            return DoItFeedback.Wahr();
+        }
+
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
+
+        try {
+            return new DoItFeedback(IO.DeleteDir(filn, false));
+        } catch {
+            return new DoItFeedback("Fehler beim Löschen: " + filn, true);
+        }
+    }
+
+    #endregion
+}

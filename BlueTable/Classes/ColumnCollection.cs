@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Formats;
 using BlueTable.EventArgs;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -221,7 +222,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd('/'));
                 var name = string.Empty;
-                foreach (var thisFormat in FormatHolder.AllFormats.Instances) {
+                foreach (var thisFormat in Format.AllFormats.Instances) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.KeyName; }
                 }
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");
@@ -320,7 +321,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
-                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment));
+                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment));
 
     public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -449,7 +450,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnAdded(new ColumnEventArgs(column)); }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
-                Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
+                Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
             return string.Empty;
@@ -491,7 +492,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            OnDisposed(); 
+            OnDisposed();
             Disposed = null;
             ColumnAdded = null;
             ColumnDisposed = null;
@@ -511,7 +512,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     private string Freename(string preferedName) {
-        preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
+        preferedName = preferedName.ReduceToChars(AllowedCharsVariableName);
         if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }
 
         if (this[preferedName] is null) { return preferedName; }

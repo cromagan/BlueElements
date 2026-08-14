@@ -3,6 +3,7 @@
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.PadItems;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -42,13 +43,13 @@ namespace BlueControls.BlueTableDialogs
             this.txbEingabe.TabIndex = 2;
             this.txbEingabe.EnterKey += new EventHandler(this.TXTBox_Enter);
             // 
-            // Line
+            // LinePadItem
             // 
             this.Line.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                 | AnchorStyles.Right)));
             this.Line.CausesValidation = false;
             this.Line.Location = new Point(8, 132);
-            this.Line.Name = "Line";
+            this.Line.Name = "LinePadItem";
             this.Line.Size = new Size(152, 2);
             this.Line.Text = "BlueLine1";
             // 
@@ -64,7 +65,7 @@ namespace BlueControls.BlueTableDialogs
             this.lsbFilterItems.Name = "lsbFilterItems";
             this.lsbFilterItems.Size = new Size(150, 12);
             this.lsbFilterItems.TabIndex = 5;
-            this.lsbFilterItems.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.FiltItems_ItemClicked);
+            this.lsbFilterItems.ItemClicked += new EventHandler<ListItemEventArgs>(this.FiltItems_ItemClicked);
             // 
             // lsbStandardFilter
             // 
@@ -77,7 +78,7 @@ namespace BlueControls.BlueTableDialogs
             this.lsbStandardFilter.Size = new Size(150, 72);
             this.lsbStandardFilter.TabIndex = 1;
             this.lsbStandardFilter.Text = "Standard";
-            this.lsbStandardFilter.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.sFilter_ItemClicked);
+            this.lsbStandardFilter.ItemClicked += new EventHandler<ListItemEventArgs>(this.sFilter_ItemClicked);
             // 
             // capWas
             // 

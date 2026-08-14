@@ -63,5 +63,8 @@
     <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
     <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
     <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
+    <Using Include="BlueControls.ListItems" />
+    <Using Include="BlueControls.ListItems.ListItemExtension" Static="true" />
+    <Using Include="BlueControls.PadItems" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,77 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueControls.Chars;
+
+public class AsciiChar : Char {
+
+    #region Fields
+
+    private readonly char _char;
+    private int _charInt;
+    private string _charString = string.Empty;
+    private string _htmlText = string.Empty;
+    private bool _isLineBreak;
+    private bool _isPossibleLineBreak;
+    private bool _isSpace;
+    private bool _isWordSeparator;
+
+    #endregion
+
+    #region Constructors
+
+    public AsciiChar() { }
+
+    internal AsciiChar(ExtText parent, List<string> overrideTags, char charcode) : base(parent, overrideTags) {
+        _char = charcode;
+        InitValues();
+    }
+
+    internal AsciiChar(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
+        _char = charcode;
+        InitValues();
+    }
+
+    #endregion
+
+    #region Methods
+
+    public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
+        if (_charInt < 20) { return; }
+        try {
+            Font?.DrawString(gr, _charString, zoom, controlPos.X, controlPos.Y);
+        } catch { }
+    }
+
+    public override string HtmlText() => _htmlText;
+
+    public override bool IsLineBreak() => _isLineBreak;
+
+    public override bool IsPossibleLineBreak() => _isPossibleLineBreak;
+
+    public override bool IsSpace() => _isSpace;
+
+    public override bool IsWordSeparator() => _isWordSeparator;
+
+    public override string PlainText() => _charString;
+
+    internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
+        if (_charInt < 20) { return; }
+        try {
+            font.DrawString(gr, _charString, zoom, controlPos.X, controlPos.Y);
+        } catch { }
+    }
+
+    protected override SizeF CalculateSizeCanvas() => Font is null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
+
+    private void InitValues() {
+        _charInt = _char;
+        _charString = _char.ToString();
+        _htmlText = _charString.CreateHtmlCodes();
+        _isLineBreak = _charInt is 11 or 13;
+        _isPossibleLineBreak = PossibleLineBreaks.Contains(_char);
+        _isSpace = _charInt is 32 or 0 or 9;
+        _isWordSeparator = WordSeparators.Contains(_char);
+    }
+
+    #endregion
+}

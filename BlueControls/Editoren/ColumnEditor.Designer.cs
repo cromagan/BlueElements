@@ -162,7 +162,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAnzeige
             // 
-            tabAnzeige.BackColor = Color.FromArgb(255, 255, 255);
+            tabAnzeige.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabAnzeige.Controls.Add(cbxBackground);
             tabAnzeige.Controls.Add(capHintergrund);
             tabAnzeige.Controls.Add(cbxRenderer);
@@ -512,7 +512,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabBearbeitung
             // 
-            tabBearbeitung.BackColor = Color.FromArgb(255, 255, 255);
+            tabBearbeitung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabBearbeitung.Controls.Add(grpAuswahlmenuOptionen);
             tabBearbeitung.Controls.Add(btnIgnoreLock);
             tabBearbeitung.Controls.Add(lbxCellEditor);
@@ -529,7 +529,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpAuswahlmenuOptionen
             // 
             grpAuswahlmenuOptionen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            grpAuswahlmenuOptionen.BackColor = Color.FromArgb(255, 255, 255);
+            grpAuswahlmenuOptionen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpAuswahlmenuOptionen.CausesValidation = false;
             grpAuswahlmenuOptionen.Controls.Add(btnOtherValuesToo);
             grpAuswahlmenuOptionen.Controls.Add(txbAuswaehlbareWerte);
@@ -627,7 +627,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAutoKorrektur
             // 
-            tabAutoKorrektur.BackColor = Color.FromArgb(255, 255, 255);
+            tabAutoKorrektur.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabAutoKorrektur.Controls.Add(btnCalculateMaxCellLength);
             tabAutoKorrektur.Controls.Add(txbAutoReplace);
             tabAutoKorrektur.Controls.Add(capAutoReplace);
@@ -761,7 +761,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabFilter
             // 
-            tabFilter.BackColor = Color.FromArgb(255, 255, 255);
+            tabFilter.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabFilter.Controls.Add(chkFilterOnlyOr);
             tabFilter.Controls.Add(chkFilterOnlyAND);
             tabFilter.Controls.Add(capJokerValue);
@@ -850,7 +850,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabQuickInfo
             // 
-            tabQuickInfo.BackColor = Color.FromArgb(255, 255, 255);
+            tabQuickInfo.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabQuickInfo.Controls.Add(txbAdminInfo);
             tabQuickInfo.Controls.Add(txbQuickinfo);
             tabQuickInfo.Controls.Add(capAdminInfo);
@@ -918,7 +918,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSonstiges
             // 
-            tabSonstiges.BackColor = Color.FromArgb(255, 255, 255);
+            tabSonstiges.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabSonstiges.Controls.Add(txbTags);
             tabSonstiges.Controls.Add(capTags);
             tabSonstiges.Location = new Point(4, 25);
@@ -1022,7 +1022,7 @@ namespace BlueControls.BlueTableDialogs {
             // BlueFrame1
             // 
             BlueFrame1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            BlueFrame1.BackColor = Color.FromArgb(240, 240, 240);
+            BlueFrame1.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
             BlueFrame1.CausesValidation = false;
             BlueFrame1.Controls.Add(capInfo);
             BlueFrame1.Controls.Add(capInternalName);
@@ -1125,7 +1125,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabDatenFormat
             // 
-            tabDatenFormat.BackColor = Color.FromArgb(255, 255, 255);
+            tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabDatenFormat.Controls.Add(grpStyles);
             tabDatenFormat.Controls.Add(capInfos);
             tabDatenFormat.Controls.Add(btnSystemInfo);
@@ -1161,7 +1161,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpStyles
             // 
             grpStyles.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            grpStyles.BackColor = Color.FromArgb(255, 255, 255);
+            grpStyles.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpStyles.Controls.Add(lstStyles);
             grpStyles.Location = new Point(8, 360);
             grpStyles.Name = "grpStyles";
@@ -1273,7 +1273,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSpaltenVerlinkung
             // 
-            tabSpaltenVerlinkung.BackColor = Color.FromArgb(255, 255, 255);
+            tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabSpaltenVerlinkung.Controls.Add(cbxRelationType);
             tabSpaltenVerlinkung.Controls.Add(capOtherTable);
             tabSpaltenVerlinkung.Controls.Add(tblFilterliste);

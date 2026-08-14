@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-
 namespace BlueControls.Interfaces;
 
 /// <summary>
@@ -23,7 +21,7 @@ public static class StyleableOneExtension {
 
     #region Methods
 
-    public static BlueFont GetFont(this IStyleableOne o, float additionalScale) => Math.Abs(1 - additionalScale) < Constants.DefaultTolerance ? GetFont(o) : GetFont(o).Scale(additionalScale);
+    public static BlueFont GetFont(this IStyleableOne o, float additionalScale) => Math.Abs(1 - additionalScale) < DefaultTolerance ? GetFont(o) : GetFont(o).Scale(additionalScale);
 
     public static BlueFont GetFont(this IStyleableOne o) {
         o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Style);

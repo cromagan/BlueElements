@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 
 namespace BlueControls.Controls;
@@ -52,7 +51,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         if (didChange) { OnItemCheckedChanged(); }
     }
 
-    internal void SuggestionsAdd(List<AbstractListItem>? item) {
+    internal void SuggestionsAdd(List<ListItem>? item) {
         if (item is null) { return; }
 
         foreach (var thisi in item) {
@@ -112,14 +111,14 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-    private void Main_ItemAddedByClick(object sender, AbstractListItemEventArgs e) {
+    private void Main_ItemAddedByClick(object sender, ListItemEventArgs e) {
         MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
         OnItemCheckedChanged();
     }
 
-    private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
+    private void Main_ItemClicked(object sender, ListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 
-    private void Suggest_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
+    private void Suggest_ItemClicked(object sender, ListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 
     private void txbFilter_TextChanged(object sender, System.EventArgs e) {
         Main.FilterText = txbFilter.Text;

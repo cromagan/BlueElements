@@ -1,10 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Drawing.Design;
@@ -17,7 +14,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Fields
 
-    private readonly List<AbstractListItem> _items = [];
+    private readonly List<ListItem> _items = [];
 
     private bool _btnDropDownIsIn;
 
@@ -59,11 +56,11 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public event EventHandler? DropDownShowing;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
+    public event EventHandler<ListItemEventArgs>? ItemAddedByClick;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
+    public event EventHandler<ListItemEventArgs>? ItemClicked;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
+    public event EventHandler<ListItemEventArgs>? ItemRemoved;
 
     public event EventHandler? UpDownClicked;
 
@@ -155,7 +152,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Indexers
 
-    public AbstractListItem? this[string @internal] {
+    public ListItem? this[string @internal] {
         get {
             try {
                 return _items.GetByKey(@internal);
@@ -166,7 +163,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public AbstractListItem? this[int no] {
+    public ListItem? this[int no] {
         get {
             try {
                 return no < 0 || no >= _items.Count ? null : _items[no];
@@ -181,7 +178,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Methods
 
-    public void ItemAdd(AbstractListItem item) {
+    public void ItemAdd(ListItem item) {
         _items.Add(item);
         Invalidate();
     }
@@ -220,7 +217,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         _btnDropDownIsIn = false;
     }
 
-    internal void ItemAddRange(List<AbstractListItem>? items) {
+    internal void ItemAddRange(List<ListItem>? items) {
         if (items is null) { return; }
 
         foreach (var thisIt in items) {
@@ -229,9 +226,9 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    internal ReadOnlyCollection<AbstractListItem> Items() => _items.AsReadOnly();
+    internal ReadOnlyCollection<ListItem> Items() => _items.AsReadOnly();
 
-    internal void Remove(AbstractListItem thisit) {
+    internal void Remove(ListItem thisit) {
         if (!_items.Contains(thisit)) { return; }
         _items.Remove(thisit);
         Invalidate();
@@ -342,11 +339,11 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
+    protected virtual void OnItemAddedByClick(ListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    protected virtual void OnItemClicked(ListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+    protected virtual void OnItemRemoved(ListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     protected override void OnLostFocus(System.EventArgs e) {
         Invalidate();
@@ -400,9 +397,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    protected override void OnTextChanged(System.EventArgs e) {
-        base.OnTextChanged(e);
-    }
+    protected override void OnTextChanged(System.EventArgs e) => base.OnTextChanged(e);
 
     protected virtual void OnUpDownClicked() => UpDownClicked?.Invoke(this, System.EventArgs.Empty);
 
@@ -439,22 +434,22 @@ public partial class ComboBox : TextBox, ITranslateable {
         Focus();
     }
 
-    private void DropDownMenu_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemAddedByClick(object? sender, ListItemEventArgs e) {
         if (e.Item is { } ali) { _items.Add(ali); }
         OnItemAddedByClick(e);
     }
 
-    private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemClicked(object? sender, ListItemEventArgs e) {
         if (e.Item is { } bli) {
             _lastClickedText = bli.KeyName;
             Text = bli.KeyName;
-            OnItemClicked(new AbstractListItemEventArgs(bli));
+            OnItemClicked(new ListItemEventArgs(bli));
         }
         FloatingForm.Close(this);
         Focus();
     }
 
-    private void DropDownMenu_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemRemoved(object? sender, ListItemEventArgs e) {
         if (e.Item is { } bli) {
             Remove(bli);
             OnItemRemoved(e);

@@ -114,7 +114,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabKopfdaten
             // 
-            tabKopfdaten.BackColor = Color.FromArgb(255, 255, 255);
+            tabKopfdaten.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabKopfdaten.Controls.Add(capLaufzeit);
             tabKopfdaten.Controls.Add(capFehler);
             tabKopfdaten.Controls.Add(txbQuickInfo);
@@ -191,7 +191,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpRechte
             // 
-            grpRechte.BackColor = Color.FromArgb(255, 255, 255);
+            grpRechte.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpRechte.Controls.Add(lstPermissionExecute);
             grpRechte.Location = new Point(472, 80);
             grpRechte.Name = "grpRechte";
@@ -216,7 +216,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpEigenschaften
             // 
-            grpEigenschaften.BackColor = Color.FromArgb(255, 255, 255);
+            grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpEigenschaften.Controls.Add(chkReadOnly);
             grpEigenschaften.Controls.Add(chkZeile);
             grpEigenschaften.Location = new Point(8, 64);
@@ -250,7 +250,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpAuslöser
             // 
-            grpAuslöser.BackColor = Color.FromArgb(255, 255, 255);
+            grpAuslöser.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpAuslöser.Controls.Add(chkAuslöser_deletingRow);
             grpAuslöser.Controls.Add(chkAuslöser_export);
             grpAuslöser.Controls.Add(chkAuslöser_newrow);
@@ -349,7 +349,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpRow
             // 
-            grpRow.BackColor = Color.FromArgb(255, 255, 255);
+            grpRow.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             grpRow.Controls.Add(txbChunk);
             grpRow.Controls.Add(btnChunkDropDown);
             grpRow.Controls.Add(capChunk);

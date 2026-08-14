@@ -1,0 +1,27 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueScript.ScriptCommands;
+
+
+internal class IntScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [FloatVal];
+
+    public override string Command => "int";
+
+    public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
+
+    public override bool MustUseReturnValue => true;
+    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Syntax => "Int(Number)";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) => new(attvar.ValueIntGet(0));
+
+    #endregion
+}

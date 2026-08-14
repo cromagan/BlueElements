@@ -152,7 +152,7 @@ namespace BlueControls.Forms {
             // 
             // tabFile
             // 
-            tabFile.BackColor = Color.FromArgb(244, 245, 246);
+            tabFile.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabFile.Controls.Add(grpOrdner);
             tabFile.Controls.Add(grpDatei);
             tabFile.Location = new Point(4, 25);
@@ -164,7 +164,7 @@ namespace BlueControls.Forms {
             // 
             // grpOrdner
             // 
-            grpOrdner.BackColor = Color.FromArgb(244, 245, 246);
+            grpOrdner.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpOrdner.CausesValidation = false;
             grpOrdner.Controls.Add(btnTabellenSpeicherort);
             grpOrdner.Controls.Add(btnTemporärenSpeicherortÖffnen);
@@ -203,7 +203,7 @@ namespace BlueControls.Forms {
             // 
             // grpDatei
             // 
-            grpDatei.BackColor = Color.FromArgb(244, 245, 246);
+            grpDatei.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpDatei.CausesValidation = false;
             grpDatei.Controls.Add(btnLetzteDateien);
             grpDatei.Controls.Add(btnOeffnen);
@@ -268,7 +268,7 @@ namespace BlueControls.Forms {
             // 
             // tabAllgemein
             // 
-            tabAllgemein.BackColor = Color.FromArgb(244, 245, 246);
+            tabAllgemein.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabAllgemein.Controls.Add(grpAufgaben);
             tabAllgemein.Controls.Add(grpAnsicht);
             tabAllgemein.Controls.Add(grpHilfen);
@@ -280,7 +280,7 @@ namespace BlueControls.Forms {
             // 
             // grpAufgaben
             // 
-            grpAufgaben.BackColor = Color.FromArgb(244, 245, 246);
+            grpAufgaben.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAufgaben.CausesValidation = false;
             grpAufgaben.Controls.Add(lstAufgaben);
             grpAufgaben.Dock = DockStyle.Left;
@@ -305,7 +305,7 @@ namespace BlueControls.Forms {
             // 
             // grpAnsicht
             // 
-            grpAnsicht.BackColor = Color.FromArgb(244, 245, 246);
+            grpAnsicht.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAnsicht.CausesValidation = false;
             grpAnsicht.Controls.Add(btnAnsichtZoom);
             grpAnsicht.Controls.Add(capSpaltenanordnung);
@@ -369,7 +369,7 @@ namespace BlueControls.Forms {
             // 
             // grpHilfen
             // 
-            grpHilfen.BackColor = Color.FromArgb(244, 245, 246);
+            grpHilfen.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpHilfen.CausesValidation = false;
             grpHilfen.Controls.Add(btnEinstellungen);
             grpHilfen.Controls.Add(btnSuchFenster);
@@ -407,7 +407,7 @@ namespace BlueControls.Forms {
             // 
             // tabAdmin
             // 
-            tabAdmin.BackColor = Color.FromArgb(244, 245, 246);
+            tabAdmin.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabAdmin.Controls.Add(grpAdminZeilen);
             tabAdmin.Controls.Add(grpAdminAllgemein);
             tabAdmin.Controls.Add(grpAdminBearbeiten);
@@ -419,7 +419,7 @@ namespace BlueControls.Forms {
             // 
             // grpAdminZeilen
             // 
-            grpAdminZeilen.BackColor = Color.FromArgb(244, 245, 246);
+            grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAdminZeilen.CausesValidation = false;
             grpAdminZeilen.Controls.Add(btnAufräumen);
             grpAdminZeilen.Controls.Add(btnSuchenUndErsetzen);
@@ -470,7 +470,7 @@ namespace BlueControls.Forms {
             // 
             // grpAdminAllgemein
             // 
-            grpAdminAllgemein.BackColor = Color.FromArgb(244, 245, 246);
+            grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAdminAllgemein.CausesValidation = false;
             grpAdminAllgemein.Controls.Add(btnMonitoring);
             grpAdminAllgemein.Controls.Add(btnUserInfo);
@@ -573,7 +573,7 @@ namespace BlueControls.Forms {
             // 
             // grpAdminBearbeiten
             // 
-            grpAdminBearbeiten.BackColor = Color.FromArgb(244, 245, 246);
+            grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAdminBearbeiten.CausesValidation = false;
             grpAdminBearbeiten.Controls.Add(btnSuchInScript);
             grpAdminBearbeiten.Controls.Add(btnSkripteBearbeiten);
@@ -646,7 +646,7 @@ namespace BlueControls.Forms {
             // 
             // tabExport
             // 
-            tabExport.BackColor = Color.FromArgb(244, 245, 246);
+            tabExport.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabExport.Controls.Add(grpExport);
             tabExport.Controls.Add(grpImport);
             tabExport.Location = new Point(4, 25);
@@ -657,7 +657,7 @@ namespace BlueControls.Forms {
             // 
             // grpExport
             // 
-            grpExport.BackColor = Color.FromArgb(244, 245, 246);
+            grpExport.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpExport.CausesValidation = false;
             grpExport.Controls.Add(btnDrucken);
             grpExport.Controls.Add(btnHTMLExport);
@@ -709,7 +709,7 @@ namespace BlueControls.Forms {
             // 
             // grpImport
             // 
-            grpImport.BackColor = Color.FromArgb(244, 245, 246);
+            grpImport.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpImport.CausesValidation = false;
             grpImport.Controls.Add(btnClipboardImport);
             grpImport.Dock = DockStyle.Left;
@@ -808,7 +808,7 @@ namespace BlueControls.Forms {
             // 
             // tabFormula
             // 
-            tabFormula.BackColor = Color.FromArgb(255, 255, 255);
+            tabFormula.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
             tabFormula.Controls.Add(CFO);
             tabFormula.Location = new Point(4, 25);
             tabFormula.Name = "tabFormula";

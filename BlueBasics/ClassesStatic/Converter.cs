@@ -43,7 +43,7 @@ public static class Converter {
 
         if (input.StartsWith('#')) { input = input[1..]; }
 
-        if (!(input.Length is 6 or 8 && input.ContainsOnlyChars(Constants.Char_Numerals + "abcdef"))) { return false; }
+        if (!(input.Length is 6 or 8 && input.ContainsOnlyChars(Char_Numerals + "abcdef"))) { return false; }
 
         try {
             switch (input.Length) {
@@ -97,7 +97,7 @@ public static class Converter {
         s = s.TrimEnd(" Uhr");
 
         // Versuche, das Datum und die Uhrzeit mit den definierten Formaten zu parsen.
-        return DateTime.TryParseExact(s.Trim(), Constants.DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+        return DateTime.TryParseExact(s.Trim(), DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public static class Converter {
 
     private static Bitmap? Bitmap_ChangePixelFormat(Image? oldBmp) {
         if (oldBmp is null) { return null; }
-        Generic.CollectGarbage();
+        CollectGarbage();
         return new Bitmap(oldBmp);
         // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
     }

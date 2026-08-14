@@ -1,16 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
+using BlueControls.TableElements;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -123,13 +120,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
+    public RowTableElement? CursorPosRow => TableInternal.CursorPosRow;
 
     [Browsable(false)]
     [DefaultValue(null)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get => TableInternal.CustomContextMenuItems;
         set => TableInternal.CustomContextMenuItems = value;
     }
@@ -187,9 +184,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.PowerEdit = value;
     }
 
-    public List<RowListItem> RowViewItems => TableInternal.RowViewItems;
+    public List<RowTableElement> RowViewItems => TableInternal.RowViewItems;
 
-    [DefaultValue(Constants.Win11)]
+    [DefaultValue(Win11)]
     public string SheetStyle {
         get => TableInternal.SheetStyle;
         set => TableInternal.SheetStyle = value;
@@ -239,7 +236,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         return ViewManager.GetViews(tableKey);
     }
 
-    public (ColumnViewItem?, RowBackground?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
+    public (ColumnViewItem?, TableElement?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
 
     public void CollapesAll() => TableInternal.CollapesAll();
 
@@ -254,7 +251,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void ResetView() => TableInternal.ResetView();
 
-    public void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
+    public void CursorPos_Set(ColumnViewItem? columnViewItem, RowTableElement? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
 
     public void DeleteView(string viewName) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
@@ -275,7 +272,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
 
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
+    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
 
     public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
 
@@ -311,7 +308,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
-    public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
+    public RowTableElement? View_RowFirst() => TableInternal.View_RowFirst();
 
     public JsonObject ViewToJson() => TableInternal.ViewToJson();
 
@@ -459,7 +456,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var savedViews = GetViews(tableKey);
         var autoLoad = ViewManager.GetAutoLoadLastView(tableKey);
 
-        var items = new List<AbstractListItem>();
+        var items = new List<ListItem>();
 
         var c = 0;
 
@@ -788,7 +785,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         _scriptButtonsCorrect = true;
     }
 
-    private void DropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+    private void DropDown_ItemRemoved(object? sender, ListItemEventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
         if (e.Item.RemoveLocked) { return; }
         if (e.Item is not TextListItem tli) { return; }
@@ -1107,7 +1104,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
 
-        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolderSystemName.Instance);
+        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, BlueBasics.Classes.Formats.SystemNameFormat.Instance);
         if (string.IsNullOrEmpty(name)) { return; }
 
         SaveCurrentView(name);

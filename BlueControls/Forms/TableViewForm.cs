@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.BlueTableDialogs;
-using BlueControls.Classes;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
@@ -11,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -215,8 +213,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         var targetDir = targetPath.FilePath();
 
         // Tabellennamen müssen gültige Systemnamen sein, damit KeyName und Dateiname konsistent bleiben.
-        // FormatHolderSystemName.MakeValid darf den Namen nicht verändern.
-        var validBase = FormatHolderSystemName.MakeValid(targetBase);
+        // BlueBasics.Classes.Formats.SystemNameFormat.MakeValid darf den Namen nicht verändern.
+        var validBase = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(targetBase);
         if (!string.Equals(targetBase, validBase, StringComparison.OrdinalIgnoreCase) || !Table.IsValidTableName(validBase)) {
             return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
         }
@@ -510,9 +508,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void Ansicht_ExpandAll(object? sender, ContextMenuEventArgs e) => TableView.ExpandAll();
 
-    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) {
-        TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
-    }
+    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) => TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
 
     private void Ansicht_ZoomFit(object? sender, ContextMenuEventArgs e) => TableView.Zoom = 1f;
 
@@ -520,9 +516,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void Ansicht_ZoomOut(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(false);
 
-    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
-        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
-    }
+    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) => TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
 
     private void btnAnsichtZoom_DropDownShowing(object? sender, System.EventArgs e) {
         btnAnsichtZoom.ItemClear();
@@ -586,7 +580,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         OpenLayoutEditor(tb, string.Empty);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
+    private void btnLetzteDateien_ItemClicked(object sender, ListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
@@ -730,9 +724,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         BeginInvoke(new Action(() => ActivateNewArrangement(e.Text)));
     }
 
-    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
+    private void cbxColumnArr_ItemClicked(object sender, ListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
 
-    private void cbxColumnArr_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+    private void cbxColumnArr_ItemRemoved(object? sender, ListItemEventArgs e) {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
         if (e.Item.RemoveLocked) { return; }
         var tcvc = ColumnViewCollection.ParseAll(tb);
@@ -866,9 +860,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         TableView.ExecuteContextMenuCommand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, null, null, null, TableView.RowsVisibleUnique());
     }
 
-    private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) {
-        _zellenClickInsClipboard = !_zellenClickInsClipboard;
-    }
+    private void Einstellungen_ToggleClipboard(object? sender, ContextMenuEventArgs e) => _zellenClickInsClipboard = !_zellenClickInsClipboard;
 
     private void ExportCSV_Click(object? sender, ContextMenuEventArgs e) {
         FormManager.SaveAllFiles();

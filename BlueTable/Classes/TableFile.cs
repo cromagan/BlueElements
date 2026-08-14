@@ -79,12 +79,12 @@ public class TableFile : Table {
 
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
-    public TableFile(string filename, Table? source) : base(FormatHolderSystemName.MakeValid(filename), null) {
+    public TableFile(string filename, Table? source) : base(BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(filename), null) {
         // Developer-Safeguard: Der Dateiname muss bereits ein gültiger Systemname sein.
         // Die Validierung beim Aufrufer (z.B. CreateTable) muss sicherstellen,
         // dass MakeValid den Basisnamen nicht verändert.
         var baseName = filename.FileNameWithoutSuffix();
-        if (!string.Equals(baseName, FormatHolderSystemName.MakeValid(baseName), StringComparison.OrdinalIgnoreCase)) {
+        if (!string.Equals(baseName, BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(baseName), StringComparison.OrdinalIgnoreCase)) {
             throw DebugError($"Dateiname '{baseName}' ist kein gültiger Systemname für eine Tabelle.");
         }
 
@@ -389,7 +389,7 @@ public class TableFile : Table {
             // MUSS MainChunkLoadDone trotzdem gesetzt werden — sonst hängen alle
             // WaitInitialDone-Aufrufe anderer Threads bis zum 120-s-Timeout.
             // Freeze markiert die Tabelle als unbrauchbar, IsFreezed löst WaitInitialDone zusätzlich aus.
-            Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {KeyName} fehlgeschlagen: {ex.Message}", 0);
             Freeze("Laden der Tabelle fehlgeschlagen: " + ex.Message);
             MainChunkLoadDone = true;
         } finally {
@@ -401,7 +401,7 @@ public class TableFile : Table {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(KeyName, FormatHolderSystemName.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(KeyName, BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
                 DebugPrint("Tabellenname stimmt nicht: " + Filename);
             }
         }
@@ -456,7 +456,7 @@ public class TableFile : Table {
                 return OperationResult.Failed("Kein gültiger EOF-Marker");
             }
 
-            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {KeyName}", 0);
+            Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {KeyName}", 0);
 
             var contentToWrite = content.ZipIt() ?? [];
             if (contentToWrite.Length == 0) {
@@ -489,14 +489,14 @@ public class TableFile : Table {
     }
 
     public void UnMasterMe() {
-        Develop.EndLog($"UnMasterMe '{KeyName}': START");
+        EndLog($"UnMasterMe '{KeyName}': START");
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
             if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
                 TemporaryTableMasterUser = "Unset: " + UserName;
                 TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
             }
         }
-        Develop.EndLog($"UnMasterMe '{KeyName}': ENDE");
+        EndLog($"UnMasterMe '{KeyName}': ENDE");
     }
 
     protected static string SaveFullFile(TableFile tbf) {

@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls.ConnectedFormula;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
@@ -123,7 +122,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         #endregion
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, true, null, row, tb, FilterInput, fieldSources);
+        var t = ScriptButton.ExecuteScript(Script, Mode, true, null, row, tb, FilterInput, fieldSources);
 
         var errorreason = string.Empty;
 

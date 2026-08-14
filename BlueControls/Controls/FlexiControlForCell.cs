@@ -1,17 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
+using BlueControls.TableElements;
 using BlueTable.EventArgs;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -114,13 +112,13 @@ public partial class FlexiControlForCell : GenericControlReciver {
         try {
             if (backcolumn is { IsDisposed: false } && frontcolumn is { IsDisposed: false }) {
                 // Front Column
-                f.QuickInfo = RowListItem.QuickInfoText(frontcolumn, string.Empty);
+                f.QuickInfo = RowTableElement.QuickInfoText(frontcolumn, string.Empty);
                 f.CustomVocabulary = frontcolumn.Table is { IsDisposed: false } tb ? new HashSet<string>(tb.DictionaryWords) : null;
 
-                var r = TableView.RendererOf(frontcolumn, Constants.Win11);
+                var r = TableView.RendererOf(frontcolumn, Win11);
                 f.Suffix = r switch {
-                    Renderer_TextOneLine rol => rol.Suffix,
-                    Renderer_Number rn => rn.Suffix,
+                    TextOneLineRenderer rol => rol.Suffix,
+                    NumberRenderer rn => rn.Suffix,
                     _ => string.Empty
                 };
 

@@ -1,12 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 using Orientation = BlueBasics.Enums.Orientation;
 
@@ -21,13 +17,13 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     #region Fields
 
-    private readonly List<AbstractListItem> _item = [];
+    private readonly List<ListItem> _item = [];
 
     private readonly object _itemLock = new();
 
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
 
-    private List<AbstractListItem> _checked = [];
+    private List<ListItem> _checked = [];
 
     private Design _controlDesign = Design.Undefined;
 
@@ -55,7 +51,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public event EventHandler? ItemCheckedChanged;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
+    public event EventHandler<ListItemEventArgs>? ItemClicked;
 
     /// <summary>
     /// Wird ausgelöst, wenn die Zusatz-Buttons aktualisiert werden müssen.
@@ -74,7 +70,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     #region Properties
 
-    public static Renderer_Abstract Renderer => Renderer_Abstract.Default;
+    public static Renderer.Renderer Renderer => BlueControls.Renderer.Renderer.Default;
 
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
@@ -100,23 +96,6 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public int BreakAfterItems { get; private set; }
 
-    /// <summary>
-    /// Zusätzlicher Abstand (in Pixeln) zwischen den Items — wird in
-    /// <see cref="CalculateItemPosition"/> zwischen aufeinanderfolgende
-    /// Items eingefügt. Wirkt sich auf alle Appearance-Modi aus, nicht
-    /// nur auf <see cref="ListBoxAppearance.MiniToolbar"/>. Default ist 0
-    /// (Items liegen bündig aneinander, wie bisher).
-    /// </summary>
-    [DefaultValue(0)]
-    public int ItemPadding {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            InvalidateItemOrder();
-        }
-    } = 0;
-
     [DefaultValue(CheckBehavior.SingleSelection)]
     public CheckBehavior CheckBehavior {
         get => _checkBehavior;
@@ -129,7 +108,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public ReadOnlyCollection<string> Checked => _checked.ToListOfString().AsReadOnly();
 
-    public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
+    public ReadOnlyCollection<ListItem> CheckedItems => _checked.AsReadOnly();
 
     /// <summary>
     /// Machnmal ist die Listbox teil eines anderen Controls.
@@ -146,7 +125,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue("")]
     public string FilterText {
@@ -172,7 +151,24 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         }
     }
 
-    public ReadOnlyCollection<AbstractListItem> Items {
+    /// <summary>
+    /// Zusätzlicher Abstand (in Pixeln) zwischen den Items — wird in
+    /// <see cref="CalculateItemPosition"/> zwischen aufeinanderfolgende
+    /// Items eingefügt. Wirkt sich auf alle Appearance-Modi aus, nicht
+    /// nur auf <see cref="ListBoxAppearance.MiniToolbar"/>. Default ist 0
+    /// (Items liegen bündig aneinander, wie bisher).
+    /// </summary>
+    [DefaultValue(0)]
+    public int ItemPadding {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            InvalidateItemOrder();
+        }
+    } = 0;
+
+    public ReadOnlyCollection<ListItem> Items {
         get {
             DoItemOrder();
             return _item.AsReadOnly();
@@ -202,7 +198,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<AbstractListItem> Suggestions { get; } = [];
+    public List<ListItem> Suggestions { get; } = [];
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -230,7 +226,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// Das aktuelle MouseOver-Item. Wird vom äußeren <see cref="ListBox"/> benötigt,
     /// um die Zusatz-Buttons (Minus, Up, Down, Edit) zu positionieren.
     /// </summary>
-    internal AbstractListItem? MouseOverItem { get; private set; }
+    internal ListItem? MouseOverItem { get; private set; }
 
     protected override bool ShowSliderX => false;
 
@@ -240,7 +236,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     #region Indexers
 
-    public AbstractListItem? this[string @internal] {
+    public ListItem? this[string @internal] {
         get {
             try {
                 return _item.GetByKey(@internal);
@@ -251,7 +247,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         }
     }
 
-    public AbstractListItem? this[int no] {
+    public ListItem? this[int no] {
         get {
             try {
                 return (no < 0 || no >= _item.Count) ? null : _item[no];
@@ -266,7 +262,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     #region Methods
 
-    public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
+    public Size CalculateColumnAndSize(Renderer.Renderer renderer) {
         var (biggestItemX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
         if (orientation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), biggestItemX, heightAdded, orientation, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orientation);
@@ -289,14 +285,14 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         }
     }
 
-    public void Check(AbstractListItem ali) => Check(ali.KeyName);
+    public void Check(ListItem ali) => Check(ali.KeyName);
 
     public void Check(string name) {
         if (IsChecked(name)) { return; }
         ValidateCheckStates([.. _checked.ToListOfString(), name], name);
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
+    public List<ListItem>? GetContextMenuItems(object? hotItem) => null;
 
     /// <summary>
     /// Aktualisiert die Design-Zuweisung basierend auf der Appearance.
@@ -346,7 +342,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// <summary>
     /// Fügt ein einzelnes Item hinzu.
     /// </summary>
-    public void ItemAdd(AbstractListItem? item) {
+    public void ItemAdd(ListItem? item) {
         if (item is null) { Develop.DebugError("Item ist null"); return; }
         if (_item.Contains(item)) { Develop.DebugError("Bereits vorhanden!"); return; }
         if (this[item.KeyName] is not null) { Develop.DebugPrint($"Name bereits vorhanden: {item.KeyName}"); return; }
@@ -360,10 +356,10 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// <summary>
     /// Fügt eine Liste von Items hinzu und ersetzt bestehende mit gleichem Key.
     /// </summary>
-    public void ItemAddRange(List<AbstractListItem>? items) {
+    public void ItemAddRange(List<ListItem>? items) {
         if (items is not { Count: > 0 }) { return; }
         foreach (var thisItem in items) {
-            if (_item.GetByKey(thisItem.KeyName) is AbstractListItem existing) {
+            if (_item.GetByKey(thisItem.KeyName) is ListItem existing) {
                 Remove(existing);
             }
             AddAndRegister(thisItem);
@@ -397,12 +393,12 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }
 
-    public void Remove(List<AbstractListItem> items) {
+    public void Remove(List<ListItem> items) {
         items.Where(i => _item.Contains(i)).ToList().ForEach(RemoveAndUnRegister);
         ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }
 
-    public void Remove(AbstractListItem? item) {
+    public void Remove(ListItem? item) {
         if (item is null || !_item.Contains(item)) { return; }
         RemoveAndUnRegister(item);
         ValidateCheckStates(_checked.ToListOfString(), string.Empty);
@@ -416,7 +412,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ValidateCheckStates(_item.ToListOfString(), string.Empty);
     }
 
-    public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
+    public void UnCheck(ListItem ali) => UnCheck(ali.KeyName);
 
     public void UnCheck(string name) {
         if (!IsChecked(name)) { return; }
@@ -462,7 +458,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         Check(wasChecked, true);
     }
 
-    internal void AddAndCheck(AbstractListItem? ali) {
+    internal void AddAndCheck(ListItem? ali) {
         if (ali is null || _item.GetByKey(ali.KeyName) is not null) { return; }
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
@@ -475,7 +471,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ? (_checkBehavior == CheckBehavior.SingleSelection ? Design.OptionButton_TextStyle : Design.CheckBox_TextStyle)
         : Design.Undefined;
 
-    internal Size ComputeAllItemPositions(Size drawAreaControl, int biggestItemX, int heightAdded, Orientation orientation, Renderer_Abstract renderer) {
+    internal Size ComputeAllItemPositions(Size drawAreaControl, int biggestItemX, int heightAdded, Orientation orientation, Renderer.Renderer renderer) {
         try {
             if (Math.Abs(_lastCheckedMaxSize.Width - drawAreaControl.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - drawAreaControl.Height) > 0.1) {
                 _lastCheckedMaxSize = drawAreaControl;
@@ -493,7 +489,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
             var maxX = int.MinValue;
             var maxY = int.MinValue;
-            AbstractListItem? prev = null;
+            ListItem? prev = null;
             var index = -1;
             DoItemOrder();
 
@@ -622,7 +618,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         if (e.Button == System.Windows.Forms.MouseButtons.Left) {
             if (nd is not null) {
                 if (IsAppearanceClickable() && nd.IsClickable() && CheckBehavior != CheckBehavior.AllSelected) { ChangeCheck(nd); }
-                OnItemClicked(new AbstractListItemEventArgs(nd));
+                OnItemClicked(new ListItemEventArgs(nd));
                 nd.LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(nd, HotItemForClick));
             } else if (IsAppearanceClickable() &&
                        CheckBehavior is CheckBehavior.SingleSelection or CheckBehavior.MultiSelection) {
@@ -665,7 +661,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         OnItemLayoutChanged();
     }
 
-    private void AddAndRegister(AbstractListItem item) {
+    private void AddAndRegister(ListItem item) {
         lock (_itemLock) { _item.Add(item); }
         item.CompareKeyChanged += Item_CompareKeyChanged;
         item.PropertyChanged += Item_PropertyChanged;
@@ -694,7 +690,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         return (w, w);
     }
 
-    private (int X, int Y) CalculateItemPosition(AbstractListItem current, AbstractListItem? prev, int index, Orientation layout, Size area, int colWidth) {
+    private (int X, int Y) CalculateItemPosition(ListItem current, ListItem? prev, int index, Orientation layout, Size area, int colWidth) {
         if (prev is null) { return (0, 0); }
         var isCaption = current is TextListItem { IsCaption: true };
         var pad = ItemPadding;
@@ -713,9 +709,9 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         return new Size((int)(control.Width / Zoom), (int)(control.Height / Zoom));
     }
 
-    private void ChangeCheck(AbstractListItem ne) { if (IsChecked(ne)) { UnCheck(ne); } else { Check(ne); } }
+    private void ChangeCheck(ListItem ne) { if (IsChecked(ne)) { UnCheck(ne); } else { Check(ne); } }
 
-    private AbstractListItem? CreateFileItem(string path) {
+    private ListItem? CreateFileItem(string path) {
         if (!IO.FileExists(path)) { return null; }
         return path.FileType() == FileFormat.Image
             ? ItemOf(path, path, path.FileNameWithoutSuffix(), string.Empty)
@@ -740,7 +736,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private bool IsAppearanceClickable() => Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Listbox_Boxes or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.ButtonList;
 
-    private bool IsChecked(AbstractListItem item) => IsChecked(item.KeyName);
+    private bool IsChecked(ListItem item) => IsChecked(item.KeyName);
 
     private bool IsChecked(string name) => _checked.Exists(x => x.KeyName == name);
 
@@ -748,7 +744,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         // CanvasPosition ist ein Layout-ERGEBNIS und wird in ComputeAllItemPositions
         // selbst gesetzt. Darauf erneut Layout/Slider anstoßen, würde einen
         // Rückkopplungs-Loop erzeugen.
-        if (e.PropertyName == nameof(AbstractListItem.CanvasPosition)) {
+        if (e.PropertyName == nameof(ListItem.CanvasPosition)) {
             Invalidate();
             return;
         }
@@ -770,11 +766,11 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    private void OnItemClicked(ListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnItemLayoutChanged() => ItemLayoutChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void RemoveAndUnRegister(AbstractListItem item) {
+    private void RemoveAndUnRegister(ListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChanged;
         item.PropertyChanged -= Item_PropertyChanged;
         lock (_itemLock) { _item.Remove(item); }

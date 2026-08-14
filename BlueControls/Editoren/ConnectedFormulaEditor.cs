@@ -1,18 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.EventArgs;
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad.Abstract;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
+using BlueControls.PadItems.Abstract;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
@@ -26,7 +22,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnFeldHinzu, new EditFieldPadItem());
 
-        GenQuickInfo(btnButton, new ScriptButtonPadItem());
+        GenQuickInfo(btnButton, new ScriptButton());
 
         GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem());
 
@@ -38,7 +34,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem());
 
-        GenQuickInfo(btnFilterConverter, new FilterConverterElementPadItem());
+        GenQuickInfo(btnFilterConverter, new FilterConverterElement());
 
         GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem());
 
@@ -61,7 +57,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     public ConnectedFormula? Formula {
         get;
         private set {
-            if (!Generic.IsAdministrator()) { value = null; }
+            if (!IsAdministrator()) { value = null; }
 
             if (field == value) { return; }
 
@@ -150,7 +146,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     /// </summary>
     protected override bool ShowPadPropertiesWhenNoItemSelected => false;
 
-    private static void GenQuickInfo(Button b, ReciverControlPadItem from) {
+    private static void GenQuickInfo(Button b, ReciverPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";
@@ -168,7 +164,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             }
         }
 
-        if (from is ReciverSenderControlPadItem) {
+        if (from is ReciverSenderPadItem) {
             txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
         }
 
@@ -185,7 +181,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         e.Editing = true;
     }
 
-    private void AddCentered(AbstractPadItem x) {
+    private void AddCentered(PadItem x) {
         var l = Pad.LastClickedItem;
 
         Pad.AddCentered(x);
@@ -194,7 +190,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is ReciverSenderControlPadItem && x is ReciverControlPadItem iaf) {
+        if (l is ReciverSenderPadItem && x is ReciverPadItem iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
@@ -216,13 +212,13 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var oldw = pi.CanvasUsedArea.Width / AutosizableExtension.GridSize;
 
-        var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString1_1(), FormatHolderLongOnlyPositive.Instance);
+        var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString1_1(), BlueBasics.Classes.Formats.LongOnlyPositiveFormat.Instance);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
         var oldh = pi.CanvasUsedArea.Height / AutosizableExtension.GridSize;
 
-        var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString1_1(), FormatHolderLongOnlyPositive.Instance);
+        var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString1_1(), BlueBasics.Classes.Formats.LongOnlyPositiveFormat.Instance);
 
         if (string.IsNullOrEmpty(he)) { return; }
 
@@ -244,7 +240,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnButton_Click(object sender, System.EventArgs e) {
-        var x = new ScriptButtonPadItem();
+        var x = new ScriptButton();
         AddCentered(x);
     }
 
@@ -259,11 +255,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
-        var x = new FilterConverterElementPadItem();
+        var x = new FilterConverterElement();
         AddCentered(x);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, ListItemEventArgs e) {
         FormManager.SaveAllFiles();
         FormulaSet(e.Item.KeyName, null);
     }
@@ -317,7 +313,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var cf = ConnectedFormula.Get(path);
         if (cf is null) { return; }
 
-        var json = ReadAllText(path, Constants.Win1252);
+        var json = ReadAllText(path, Win1252);
         using var doc = JsonDocument.Parse(json);
         cf.ParseJson(doc.RootElement);
 
@@ -351,7 +347,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Formula is not { IsDisposed: false } cf) { return; }
 
         var json = cf.ParseableJson().ToJsonString(new JsonSerializerOptions { WriteIndented = true });
-        System.IO.File.WriteAllText(@"D:\01_Data\test.json", json, Constants.Win1252);
+        System.IO.File.WriteAllText(@"D:\01_Data\test.json", json, Win1252);
     }
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
@@ -379,11 +375,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnWeitereCF_Click(object sender, System.EventArgs e) {
         if (Formula is null) { return; }
 
-        var l = Generic.GetInstanceOfType<IItemToControl>(string.Empty, Formula);
+        var l = GetInstanceOfType<IItemToControl>(string.Empty, Formula);
 
         if (!l.Any()) { return; }
 
-        var i = new List<AbstractListItem>();
+        var i = new List<ListItem>();
 
         foreach (var thisl in l) {
             i.Add(ItemOf(thisl));
@@ -391,7 +387,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, CheckBehavior.SingleSelection, null, AddType.None);
         if (x is not { Count: 1 }) { return; }
-        if (x[0] is not ReadableListItem { Item: AbstractPadItem api }) { return; }
+        if (x[0] is not ReadableListItem { Item: PadItem api }) { return; }
         AddCentered(api);
     }
 
@@ -417,7 +413,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             foreach (var icpi in Formula.Pages) {
                 if (icpi is not { IsDisposed: false, HasItems: true }) { continue; }
 
-                var item = new PagePreviewListItem(icpi);
+                var item = new LayoutPreviewListItem(icpi);
                 lstPages.ItemAdd(item);
 
                 if (icpi.Caption == currentPageCaption) {
@@ -447,7 +443,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula, notAllowedchilds);
 
-        if (!Generic.IsAdministrator()) { return false; }
+        if (!IsAdministrator()) { return false; }
 
         if (filename is null || !FileExists(filename)) {
             //CheckButtons();
@@ -464,17 +460,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         return true;
     }
 
-    private void FormulaSet(ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-        Formula = formular;
-
-        //if (notAllowedchilds is not null && Formula is not null && editable) {
-        //    var l = new List<string>();
-        //    l.AddRange(Formula.NotAllowedChilds);
-        //    l.AddRange(notAllowedchilds);
-
-        //    Formula.NotAllowedChilds = l.AsReadOnly();
-        //}
-    }
+    private void FormulaSet(ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) => Formula = formular;//if (notAllowedchilds is not null && Formula is not null && editable) {//    var l = new List<string>();//    l.AddRange(Formula.NotAllowedChilds);//    l.AddRange(notAllowedchilds);//    Formula.NotAllowedChilds = l.AsReadOnly();//}
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
         var x = new FileExplorerPadItem();
@@ -486,10 +472,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Pad.Items is null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var toparse = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var toparse = ReadAllText(LoadSymbol.FileName, Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
-        var i = ParseableItem.NewByParsing<ReciverControlPadItem>(toparse);
+        var i = ParseableItem.NewByParsing<ReciverPadItem>(toparse);
         if (i is not { IsDisposed: false } api) { return; }
 
         api.GetNewIdsForEverything();
@@ -512,7 +498,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         Pad.Items = p; // triggert Pad_GotNewItemCollection -> DoPages
     }
 
-    private void lstPages_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstPages_ItemClicked(object sender, ListItemEventArgs e) {
         if (Formula is not { IsDisposed: false }) {
             Pad.Items = null;
             return;
@@ -527,7 +513,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void OnBlockStatusChanged() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
         if (Formula is not { IsDisposed: false } cf) { return; }
 
         // Sperrstatus neu ermitteln; ist die Datei frei, wird der Schreibzugriff
@@ -536,7 +522,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void OnInvalidated() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
         if (Formula is not { IsDisposed: false }) { return; }
 
         // Nur im schreibgeschützten Modus neu laden. Im editierbaren Modus hält

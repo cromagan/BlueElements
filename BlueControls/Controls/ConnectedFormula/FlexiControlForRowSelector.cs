@@ -2,7 +2,6 @@
 
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -117,7 +116,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         #endregion
     }
 
-    private void Cb_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+    private void Cb_ItemRemoved(object? sender, ListItemEventArgs e) {
         var fh = FilterHash();
         if (f.Value == e.Item.KeyName) {
             f.Value = string.Empty;

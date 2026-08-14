@@ -1,14 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-
 namespace BlueControls.EventArgs;
 
-public class ContextMenuEventArgs : AbstractListItemEventArgs {
+public class ContextMenuEventArgs : ListItemEventArgs {
 
     #region Constructors
 
-    public ContextMenuEventArgs(AbstractListItem clickedCommand, object? hotItem) : base(clickedCommand) => HotItem = hotItem;
+    public ContextMenuEventArgs(ListItem clickedCommand, object? hotItem) : base(clickedCommand) => HotItem = hotItem;
 
     #endregion
 

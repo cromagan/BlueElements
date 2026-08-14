@@ -1,0 +1,64 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using System.Drawing.Drawing2D;
+
+namespace BluePaint;
+
+public partial class ResizeTool : Tool //BlueControls.Forms.Form //
+{
+    #region Constructors
+
+    public ResizeTool() : base() {
+        InitializeComponent();
+        capInfo.Text = "Bitte Skalierung in Prozent eingeben";
+        flxProzent.Value = "100";
+    }
+
+    #endregion
+
+    #region Methods
+
+    public override void PictureChangedByMainWindow() {
+        base.PictureChangedByMainWindow();
+        DoCapInfo();
+    }
+
+    private void btnDoResize_Click(object sender, EventArgs? e) {
+        var p = OnNeedCurrentPic();
+        if (p is null) { return; }
+        if (!DoubleTryParse(flxProzent.Value, out var pr)) { return; }
+        pr /= 100;
+        var wi = (int)(p.Width * pr);
+        var he = (int)(p.Height * pr);
+        if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) { return; }
+        var bmp2 = p.Resize(wi, he, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
+        OnOverridePic(bmp2, true);
+        OnZoomFit();
+        DoCapInfo();
+    }
+
+    private void DoCapInfo() {
+        var p = OnNeedCurrentPic();
+        if (p is null) {
+            capInfo.Text = "Kein Bild gewählt.";
+            return;
+        }
+        if (!DoubleTryParse(flxProzent.Value, out var pr)) {
+            capInfo.Text = "Keine Prozentzahl angegeben.";
+            return;
+        }
+        pr /= 100;
+        var wi = (int)(p.Width * pr);
+        var he = (int)(p.Height * pr);
+        if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) {
+            capInfo.Text = "Bitte gültigen Wert angeben.";
+            return;
+        }
+        capInfo.Translate = false;
+        capInfo.Text = "Zielgröße: " + (int)(p.Width * pr) + " x " + (int)(p.Height * pr) + " Pixel";
+    }
+
+    private void flxProzent_ValueChanged(object sender, EventArgs e) => DoCapInfo();
+
+    #endregion
+}

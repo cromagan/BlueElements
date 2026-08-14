@@ -436,7 +436,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            OnDisposed(); 
+            OnDisposed();
             Disposed = null;
             PropertyChangedExt = null;
         }

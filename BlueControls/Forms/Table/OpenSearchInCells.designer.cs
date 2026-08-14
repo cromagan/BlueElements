@@ -60,7 +60,7 @@ namespace BlueControls.BlueTableDialogs
             // 
             // grpSonderzeichen
             // 
-            this.grpSonderzeichen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpSonderzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSonderzeichen.CausesValidation = false;
             this.grpSonderzeichen.Controls.Add(this.capSonderzeichen);
             this.grpSonderzeichen.Location = new Point(8, 56);

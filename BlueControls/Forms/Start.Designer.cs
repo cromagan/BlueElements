@@ -54,7 +54,7 @@ namespace BlueControls.Forms {
             this.Forms.Name = "Forms";
             this.Forms.Size = new System.Drawing.Size(362, 304);
             this.Forms.TabIndex = 7;
-            this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Forms_ItemClicked);
+            this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.Forms_ItemClicked);
             // 
             // capApp
             // 

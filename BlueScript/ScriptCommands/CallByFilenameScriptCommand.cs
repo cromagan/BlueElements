@@ -1,0 +1,127 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using System.Text;
+using static BlueBasics.ClassesStatic.IO;
+
+namespace BlueScript.ScriptCommands;
+
+public class CallByFilenameScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "callbyfilename";
+
+    public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
+                                          "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
+
+    public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
+
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
+    public override string Syntax => "CallByFilename(Filename, Attribute0, ...);";
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="scp"></param>
+    /// <param name="ld"></param>
+    /// <param name="normalizedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
+    /// <param name="lineadd">Zb. bei einer Do Schleife, die Zeile, in der das Do steht. Bei Scripten aus dem Dateisytem 0</param>
+    /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
+    /// <param name="addMe"></param>
+    /// <param name="varCol"></param>
+    /// <param name="args"></param>
+    /// <param name="chainlog"></param>
+    /// <returns></returns>
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<ScriptVariable>? addMe, List<string>? args, string chainlog) {
+        if (scp.Stufe > 10) {
+            return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
+        }
+
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
+
+        var tmpv = new VariableCollection();
+        tmpv.AddRange(varCol);
+        if (addMe is not null) {
+            foreach (var thisV in addMe) {
+                tmpv.Remove(thisV.KeyName);
+                tmpv.Add(thisV);
+            }
+        }
+        Script.AddAttributes(tmpv, args); // Args übergeben, weil es auch keine neuen sein dürfen
+
+        var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, null);
+
+        if (scx.Failed) {
+            // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
+            varCol.Clear();
+            varCol.AddRange(tmpv);
+        } else {
+
+            #region Kritische Variablen Disposen
+
+            foreach (var thisVar in tmpv) {
+                if (varCol.GetByKey(thisVar.KeyName) is null) {
+                    thisVar.DisposeContent();
+                }
+            }
+
+            #endregion
+        }
+
+        return scx;
+    }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        var file = attvar.ValueStringGet(0);
+
+        if (!file.IsValidFilepathAndName()) {
+            file = varCol.GetString("AssetFolder") + file;
+        }
+
+        if (!file.IsValidFilepathAndName()) {
+            return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true);
+        }
+
+        if (!FileExists(file)) {
+            return new DoItFeedback($"Datei nicht gefunden: {file}", true);
+        }
+
+        string scripttxt;
+
+        try {
+            scripttxt = ReadAllText(file, Encoding.UTF8);
+        } catch {
+            return new DoItFeedback($"Fehler beim Lesen der Datei: {file}", true);
+        }
+
+        var nr = Script.NormalizedText(scripttxt);
+        if (nr.IsFailed) {
+            return new DoItFeedback($"Fehler in Datei {file}: {nr.FailedReason}", true);
+        }
+        scripttxt = nr.Value as string ?? string.Empty;
+
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix());
+        scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        if (scx.NeedsScriptFix) {
+            return new DoItFeedback($"Unterskript '{file.FileNameWithSuffix()}':\r\n{scx.ProtocolText}", true);
+        }
+        return scx;
+    }
+
+    #endregion
+}

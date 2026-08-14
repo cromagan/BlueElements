@@ -1,13 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -20,7 +17,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     private int _panelMoveDirection;
 
-    private System.Threading.Timer? _panelMover;
+    private readonly System.Threading.Timer? _panelMover;
 
     #endregion
 
@@ -42,7 +39,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool Editable {
@@ -109,7 +106,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
+    public List<ListItem>? GetContextMenuItems(object? hotItem) {
         if (_bitmap is null) { return null; }
         return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
@@ -234,7 +231,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     }
 
     private void PanelMover_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
+        if (Ending || IsDisposed || Disposing) { return; }
 
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {

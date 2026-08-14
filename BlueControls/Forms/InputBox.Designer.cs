@@ -46,11 +46,11 @@ namespace BlueControls.Forms
             this.txbText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txbText_KeyDown);
             this.txbText.EscKey += new System.EventHandler(this.txbText_ESC);
             // 
-            // InputBox
+            // InputBoxScriptCommand
             // 
             this.ClientSize = new System.Drawing.Size(249, 91);
             this.Controls.Add(this.txbText);
-            this.Name = "InputBox";
+            this.Name = "InputBoxScriptCommand";
             this.Shown += new System.EventHandler(this.InputBox_Shown);
             this.Controls.SetChildIndex(this.txbText, 0);
             this.ResumeLayout(false);

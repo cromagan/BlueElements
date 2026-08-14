@@ -1,0 +1,74 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueScript.Classes;
+using System.Diagnostics;
+
+namespace BlueScript.ScriptCommands;
+
+internal class CallScriptCommand : TableGenericScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal, StringVal];
+
+    public override string Command => "call";
+
+    public override string Description => "Ruft eine Subroutine auf.\r\n" +
+        "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
+
+    public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
+
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+
+    public override string Syntax => "CallScriptCommand(SubName, Attribut0, ...);";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(); }
+
+        var vs = attvar.ValueStringGet(0);
+
+        var script = myTb.EventScript.GetByKey(vs, StringComparison.OrdinalIgnoreCase);
+        if (script is null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true); }
+
+        var newat = script.Attributes();
+        foreach (var thisAt in scp.ScriptAttributes) {
+            if (!newat.Contains(thisAt)) {
+                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true);
+            }
+        }
+
+        var nr = Script.NormalizedText(script.Script);
+        if (nr.IsFailed) {
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + nr.FailedReason, true);
+        }
+        var f = nr.Value as string ?? string.Empty;
+
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is StringScriptVariable vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
+        //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
+
+        var sw = Stopwatch.StartNew();
+
+        var scx = CallByFilenameScriptCommand.CallSub(varCol, scp, f, 0, vs, null, a, vs);
+        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
+        scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        if (scx.NeedsScriptFix) {
+            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true);
+        }
+        return scx;
+    }
+
+    #endregion
+}

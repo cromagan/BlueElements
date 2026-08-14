@@ -135,7 +135,7 @@ namespace BlueControls.Forms {
             // 
             // tabStart
             // 
-            this.tabStart.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabStart.Controls.Add(this.grpKomponenteHinzufügen);
             this.tabStart.Controls.Add(this.grpAssistent);
             this.tabStart.Controls.Add(this.grpZoom);
@@ -147,7 +147,7 @@ namespace BlueControls.Forms {
             // 
             // grpKomponenteHinzufügen
             // 
-            this.grpKomponenteHinzufügen.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
             this.grpKomponenteHinzufügen.Dock = DockStyle.Left;
             this.grpKomponenteHinzufügen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -160,7 +160,7 @@ namespace BlueControls.Forms {
             // 
             // grpAssistent
             // 
-            this.grpAssistent.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAssistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAssistent.CausesValidation = false;
             this.grpAssistent.Controls.Add(this.capRasterFangen);
             this.grpAssistent.Controls.Add(this.capRasterAnzeige);
@@ -245,7 +245,7 @@ namespace BlueControls.Forms {
             // 
             // grpZoom
             // 
-            this.grpZoom.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpZoom.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpZoom.CausesValidation = false;
             this.grpZoom.Controls.Add(this.btnZoom11);
             this.grpZoom.Controls.Add(this.btnAuswahl);
@@ -285,7 +285,7 @@ namespace BlueControls.Forms {
             // 
             // tabExport
             // 
-            this.tabExport.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabExport.Controls.Add(this.grpDrucken);
             this.tabExport.Location = new Point(4, 25);
             this.tabExport.Name = "tabExport";
@@ -295,7 +295,7 @@ namespace BlueControls.Forms {
             // 
             // grpDrucken
             // 
-            this.grpDrucken.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDrucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDrucken.CausesValidation = false;
             this.grpDrucken.Controls.Add(this.btnVorschau);
             this.grpDrucken.Controls.Add(this.btnPageSetup);
@@ -357,7 +357,7 @@ namespace BlueControls.Forms {
             // 
             // tabHintergrund
             // 
-            this.tabHintergrund.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabHintergrund.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabHintergrund.Controls.Add(this.grpDesign);
             this.tabHintergrund.Location = new Point(4, 25);
             this.tabHintergrund.Name = "tabHintergrund";
@@ -368,7 +368,7 @@ namespace BlueControls.Forms {
             // 
             // grpDesign
             // 
-            this.grpDesign.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDesign.CausesValidation = false;
             this.grpDesign.Controls.Add(this.btnNoArea);
             this.grpDesign.Controls.Add(this.btnKeinHintergrund);
@@ -430,7 +430,7 @@ namespace BlueControls.Forms {
             this.PadDesign.RegexCheck = null;
             this.PadDesign.Size = new Size(264, 22);
             this.PadDesign.TabIndex = 1;
-            this.PadDesign.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.PadDesign_ItemClicked);
+            this.PadDesign.ItemClicked += new EventHandler<ListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
             // capDesign
             // 
@@ -455,7 +455,7 @@ namespace BlueControls.Forms {
             // 
             // tabElementEigenschaften
             // 
-            this.tabElementEigenschaften.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabElementEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabElementEigenschaften.Controls.Add(this.tabElementEigenschaftenPanel);
             this.tabElementEigenschaften.Location = new Point(4, 25);
             this.tabElementEigenschaften.Name = "tabElementEigenschaften";

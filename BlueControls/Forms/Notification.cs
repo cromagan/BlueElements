@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -30,7 +29,7 @@ public partial class Notification : FloatingForm, IAnimatable {
 
     private readonly int _screenWidth;
 
-    private Action? _buttonAction;
+    private readonly Action? _buttonAction;
 
     private int _cachedHeight;
     private int _cachedWidth;
@@ -240,9 +239,7 @@ public partial class Notification : FloatingForm, IAnimatable {
         _hiddenNow = true;
     }
 
-    private void btnClose_Click(object sender, System.EventArgs e) {
-        _hiddenNow = true;
-    }
+    private void btnClose_Click(object sender, System.EventArgs e) => _hiddenNow = true;
 
     private void CacheScreenValues() {
         _cachedWidth = Width;

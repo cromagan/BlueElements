@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueScript.Classes;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -91,7 +92,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool readOnly, bool virtualcolumns) {
+    public static ScriptVariable? CellToVariable(ColumnItem? column, RowItem? row, bool readOnly, bool virtualcolumns) {
         if (column is not { ScriptType: not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert) }) { return null; }
 
         if (!column.SaveContent) {
@@ -106,31 +107,31 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return CellToVariable(column.KeyName, column.ScriptType, value, readOnly, "Spalte: " + column.ReadableText());
     }
 
-    public static Variable? CellToVariable(string varname, ScriptType scriptType, string value, bool readOnly, string coment) {
+    public static ScriptVariable? CellToVariable(string varname, ScriptType scriptType, string value, bool readOnly, string coment) {
         switch (scriptType) {
             case ScriptType.Bool:
-                return new VariableBool(varname, value.FromPlusMinus(), readOnly, coment);
+                return new BoolScriptVariable(varname, value.FromPlusMinus(), readOnly, coment);
 
             case ScriptType.List:
-                return new VariableListString(varname, [.. value.SplitAndCutByCr()], readOnly, coment);
+                return new ListOfStringsScriptVariable(varname, [.. value.SplitAndCutByCr()], readOnly, coment);
 
             case ScriptType.Numeral:
-                return new VariableDouble(varname, DoubleParse(value), readOnly, coment);
+                return new DoubleScriptVariable(varname, DoubleParse(value), readOnly, coment);
 
             case ScriptType.Numeral_Readonly:
-                return new VariableDouble(varname, DoubleParse(value), true, coment);
+                return new DoubleScriptVariable(varname, DoubleParse(value), true, coment);
 
             case ScriptType.String:
-                return new VariableString(varname, value, readOnly, coment);
+                return new StringScriptVariable(varname, value, readOnly, coment);
 
             case ScriptType.String_Readonly:
-                return new VariableString(varname, value, true, coment);
+                return new StringScriptVariable(varname, value, true, coment);
 
             case ScriptType.Bool_Readonly:
-                return new VariableBool(varname, value.FromPlusMinus(), true, coment);
+                return new BoolScriptVariable(varname, value.FromPlusMinus(), true, coment);
 
             case ScriptType.List_Readonly:
-                return new VariableListString(varname, [.. value.SplitAndCutByCr()], true, coment);
+                return new ListOfStringsScriptVariable(varname, [.. value.SplitAndCutByCr()], true, coment);
 
             case ScriptType.Nicht_vorhanden:
                 return null;
@@ -258,9 +259,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CellSet(string columnKey, int value, string comment) => CellSet(Table?.Column[columnKey], value.ToString1(), comment);
 
-    public string CellSet(ColumnItem column, int value, string comment) {
-        return CellSet(column, value.ToString1(), comment);
-    }
+    public string CellSet(ColumnItem column, int value, string comment) => CellSet(column, value.ToString1(), comment);
 
     public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value is not null ? string.Join('\r', value) : string.Empty, comment);
 
@@ -268,9 +267,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CellSet(string columnKey, DateTime value, string comment) => CellSet(Table?.Column[columnKey], value.ToString5(), comment);
 
-    public string CellSet(ColumnItem column, DateTime value, string comment) {
-        return CellSet(column, value.ToString5(), comment);
-    }
+    public string CellSet(ColumnItem column, DateTime value, string comment) => CellSet(column, value.ToString5(), comment);
 
     /// <summary>
     /// Lenkt den Wert evtl. auf die verlinkte Zelle um
@@ -310,7 +307,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return CellSetInMemory(column, value);
         }
 
-        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment) is { Length: > 0 } message) { return message; }
+        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, UserName, DateTime.UtcNow, comment) is { Length: > 0 } message) { return message; }
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
 
@@ -332,7 +329,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         Brush? b = null;
-        if (sef.Variables?.GetByKey("RowColor") is VariableString vs) {
+        if (sef.Variables?.GetByKey("RowColor") is StringScriptVariable vs) {
             if (!string.IsNullOrEmpty(vs.ValueString)) {
                 if (ColorTryParse(vs.ValueString, out var c)) {
                     b = new SolidBrush(c);
@@ -388,10 +385,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var key = new StringBuilder();
 
         foreach (var thisColumn in columns) {
-            key.Append(CellGetCompareKey(thisColumn) + Constants.FirstSortChar);
+            key.Append(CellGetCompareKey(thisColumn) + FirstSortChar);
         }
 
-        key.Append(Constants.SecondSortChar + KeyName);
+        key.Append(SecondSortChar + KeyName);
         return key.ToString();
     }
 
@@ -523,7 +520,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     //row.CellSet(column, targetRow.KeyName);
                     //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur");
+                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
                     if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
                 }
             }
@@ -722,7 +719,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     if (erg.Contains($"~{vari.KeyName}", StringComparison.OrdinalIgnoreCase)) {
                         var replacewith = vari.ValueForCell;
 
-                        //if (vari is VariableString vs) { replacewith =  vs.v}
+                        //if (vari is String vs) { replacewith =  vs.v}
 
                         if (removeLineBreaks) {
                             replacewith = replacewith.Replace("\r\n", " ");
@@ -980,7 +977,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
         if (mastertoo && tbf.AmITemporaryMaster(MasterTry, MasterUntil, true) && t.TotalMinutes > MyRowLost) { return true; }
 
-        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+        if (!string.Equals(CellGetString(src), UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         return t.TotalSeconds > 3 && t.TotalMinutes < maxminutes; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
     }
@@ -1193,15 +1190,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return string.Empty;
     }
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         InvalidateCheckData();
 
         if (disposing) {
-            OnDisposed(); 
+            OnDisposed();
             Disposed = null;
             Table = null;
             RowChecked = null;
@@ -1280,11 +1275,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return false; // Gar kein "Oder" trifft zu...
         } catch (Exception ex) {
             Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
-            Generic.Pause(0.1, true);
+            Pause(0.1, true);
             Develop.AbortAppIfStackOverflow();
             return MatchesTo(column, filtertyp, searchvalue);
         }
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnRowChecked(RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 

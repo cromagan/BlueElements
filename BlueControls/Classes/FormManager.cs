@@ -61,7 +61,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
 
     public static void SaveEnd(Form? lastForm) {
         Develop.EndLog("SaveEnd: === START ===");
-        Generic.Ending = true;
+        Ending = true;
 
         Develop.EndLog("SaveEnd: Vor SaveAllFiles()");
         SaveAllFiles();

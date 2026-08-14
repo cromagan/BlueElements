@@ -1,13 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Chars;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -25,8 +22,9 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     private const int ScrollStep = 24;
     private readonly List<Rectangle> _chipContentRects = [];
     private readonly TextBox _textBox;
-    private List<ExtCharListItem> _chipItems = [];
+    private List<ListItemChar> _chipItems = [];
     private bool _chipsAbove;
+
     /// <summary>
     /// <c>true</c>, während OnGotFocus den Fokus absichtlich ans innere
     /// <c>_textBox</c> weiterreicht. Das dabei ausgelöste LostFocus wird in
@@ -36,6 +34,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     /// die LostFocus-Kaskade sofort wieder verstecken.
     /// </summary>
     private bool _focusingChild;
+
     private int _hoveredIndex = -1;
     private bool _layoutDirty = true;
     private int _maxScroll;
@@ -88,18 +87,13 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.AllowedChars = value;
     }
 
-    public string ForbiddenChars {
-        get => _textBox.ForbiddenChars;
-        set => _textBox.ForbiddenChars = value;
-    }
-
     public bool ContextMenuDefault {
         get => _textBox.ContextMenuDefault;
         set => _textBox.ContextMenuDefault = value;
     }
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get => _textBox.CustomContextMenuItems;
         set => _textBox.CustomContextMenuItems = value;
     }
@@ -107,6 +101,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     public IReadOnlySet<string>? CustomVocabulary {
         get => _textBox.CustomVocabulary;
         set => _textBox.CustomVocabulary = value;
+    }
+
+    public string ForbiddenChars {
+        get => _textBox.ForbiddenChars;
+        set => _textBox.ForbiddenChars = value;
     }
 
     public int MaxTextLength {
@@ -163,9 +162,9 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
     public ReadOnlyCollection<string> Suggestions {
-        get => _chipItems.Select(c => c.ListItem.KeyName).ToList().AsReadOnly();
+        get => _chipItems.Select(c => c.Item.KeyName).ToList().AsReadOnly();
         set {
-            _chipItems = [.. value.Select(s => new ExtCharListItem(new TextListItem(s, s, null, false, true, string.Empty, string.Empty)))];
+            _chipItems = [.. value.Select(s => new ListItemChar(new TextListItem(s, s, null, false, true, string.Empty, string.Empty)))];
             _scrollOffset = 0;
             _layoutDirty = true;
             Invalidate();
@@ -238,14 +237,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     public new bool Focus() => _textBox.Focus();
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
-
-    /// <summary>
-    /// Liefert die mindestens benötigte Breite, damit der breiteste Chip
-    /// (inkl. Innenabstand) vollständig dargestellt wird und nicht
-    /// abgeschnitten ist.
-    /// </summary>
-    public int GetEstimatedWidth() => GetMaxChipWidth() + 2 * AreaPadding;
+    public List<ListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
 
     public int GetEstimatedHeight(int availableWidth, int textboxHeight, int maxChipRows = 3) {
         if (_chipItems.Count == 0 || SuggestionPosition == SuggestionPosition.ContextMenuOnly || textboxHeight < 1) { return textboxHeight; }
@@ -276,6 +268,13 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         var totalContentHeight = rowCount * (lineH + ChipSpacing) - ChipSpacing;
         return textboxHeight + totalContentHeight + 2 * AreaPadding;
     }
+
+    /// <summary>
+    /// Liefert die mindestens benötigte Breite, damit der breiteste Chip
+    /// (inkl. Innenabstand) vollständig dargestellt wird und nicht
+    /// abgeschnitten ist.
+    /// </summary>
+    public int GetEstimatedWidth() => GetMaxChipWidth() + 2 * AreaPadding;
 
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -333,8 +332,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         if (IsDisposed || _textBox.Focused) { return; }
 
         _focusingChild = true;
-        try { _textBox.Focus(); }
-        finally { _focusingChild = false; }
+        try {
+            _textBox.Focus();
+        } finally {
+            _focusingChild = false;
+        }
     }
 
     protected override void OnLostFocus(System.EventArgs e) {
@@ -349,7 +351,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         var p = _textBox.CursorPosition;
         var hitIndex = HitTestChip(e.X, e.Y);
         if (hitIndex >= 0 && hitIndex < _chipItems.Count) {
-            p = _textBox.Insert(p, _chipItems[hitIndex].ListItem.KeyName);
+            p = _textBox.Insert(p, _chipItems[hitIndex].Item.KeyName);
         }
 
         base.OnMouseDown(e);
@@ -477,18 +479,16 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     /// Bei <see cref="SuggestionPosition.ContextMenuOnly"/> werden die Einträge vom Kontextmenü der internen TextBox eingebunden.
     /// Wird über den Hook <see cref="TextBox.AdditionalContextMenuItems"/> in das Kontextmenü der TextBox transferiert.
     /// </summary>
-    private List<AbstractListItem>? BuildSuggestionMenu(object? hotItem) {
+    private List<ListItem>? BuildSuggestionMenu(object? hotItem) {
         _ = hotItem;
         if (_chipItems.Count == 0 || SuggestionPosition != SuggestionPosition.ContextMenuOnly) { return null; }
 
         var cursorPos = _textBox.CursorPosition;
-        var sugMenu = new List<AbstractListItem> { ItemOf("Vorschläge", true) };
+        var sugMenu = new List<ListItem> { ItemOf("Vorschläge", true) };
 
         foreach (var item in _chipItems) {
-            var text = item.ListItem.KeyName;
-            sugMenu.Add(ItemOf(text, null, (s, e) => {
-                _textBox.CursorPosition = _textBox.Insert(cursorPos, text);
-            }, true, string.Empty));
+            var text = item.Item.KeyName;
+            sugMenu.Add(ItemOf(text, null, (s, e) => _textBox.CursorPosition = _textBox.Insert(cursorPos, text), true, string.Empty));
         }
 
         sugMenu.Add(Separator());

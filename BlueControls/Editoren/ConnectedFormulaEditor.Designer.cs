@@ -137,7 +137,7 @@ namespace BlueControls.Forms {
             // 
             // tabEditorStd
             // 
-            tabEditorStd.BackColor = Color.FromArgb(244, 245, 246);
+            tabEditorStd.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabEditorStd.Controls.Add(grpVorschau);
             tabEditorStd.Controls.Add(grpFelder);
             tabEditorStd.Controls.Add(grpOptik);
@@ -152,7 +152,7 @@ namespace BlueControls.Forms {
             // 
             // grpVorschau
             // 
-            grpVorschau.BackColor = Color.FromArgb(244, 245, 246);
+            grpVorschau.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpVorschau.Controls.Add(btnPfeileAusblenden);
             grpVorschau.Dock = DockStyle.Left;
             grpVorschau.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -176,7 +176,7 @@ namespace BlueControls.Forms {
             // 
             // grpFelder
             // 
-            grpFelder.BackColor = Color.FromArgb(244, 245, 246);
+            grpFelder.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpFelder.Controls.Add(btnSymbolLaden);
             grpFelder.Controls.Add(btnWeitereCF);
             grpFelder.Controls.Add(btnRegionAdd);
@@ -271,7 +271,7 @@ namespace BlueControls.Forms {
             // 
             // grpOptik
             // 
-            grpOptik.BackColor = Color.FromArgb(244, 245, 246);
+            grpOptik.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpOptik.Controls.Add(btnRegisterKarte);
             grpOptik.Controls.Add(btnTabControlAdd);
             grpOptik.Dock = DockStyle.Left;
@@ -307,7 +307,7 @@ namespace BlueControls.Forms {
             // 
             // groupBox1
             // 
-            groupBox1.BackColor = Color.FromArgb(244, 245, 246);
+            groupBox1.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             groupBox1.Controls.Add(btnTable);
             groupBox1.Controls.Add(btnDropdownmenu);
             groupBox1.Controls.Add(btnFilterConverter);
@@ -367,7 +367,7 @@ namespace BlueControls.Forms {
             // 
             // grpAllgemein
             // 
-            grpAllgemein.BackColor = Color.FromArgb(244, 245, 246);
+            grpAllgemein.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpAllgemein.Controls.Add(btnArbeitsbereich);
             grpAllgemein.Dock = DockStyle.Left;
             grpAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -391,7 +391,7 @@ namespace BlueControls.Forms {
             // 
             // tabFile
             // 
-            tabFile.BackColor = Color.FromArgb(244, 245, 246);
+            tabFile.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             tabFile.Controls.Add(grpBETA);
             tabFile.Controls.Add(grpDatei);
             tabFile.Location = new Point(4, 25);
@@ -403,7 +403,7 @@ namespace BlueControls.Forms {
             // 
             // grpDatei
             // 
-            grpDatei.BackColor = Color.FromArgb(244, 245, 246);
+            grpDatei.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpDatei.CausesValidation = false;
             grpDatei.Controls.Add(btnSpeichern);
             grpDatei.Controls.Add(btnLetzteFormulare);
@@ -512,7 +512,7 @@ namespace BlueControls.Forms {
             // 
             // grpBETA
             // 
-            grpBETA.BackColor = Color.FromArgb(244, 245, 246);
+            grpBETA.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
             grpBETA.CausesValidation = false;
             grpBETA.Controls.Add(btnSpeichernBeta);
             grpBETA.Controls.Add(btnOeffnenBeta);

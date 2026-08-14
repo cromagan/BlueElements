@@ -9,13 +9,13 @@ public readonly struct GetEndFeedback {
     internal readonly int ContinuePosition;
     internal readonly string FailedReason = string.Empty;
     internal readonly string NormalizedText;
-    internal readonly Variable? ReturnValue;
+    internal readonly ScriptVariable? ReturnValue;
 
     #endregion
 
     #region Constructors
 
-    public GetEndFeedback(Variable? returnvalue) {
+    public GetEndFeedback(ScriptVariable? returnvalue) {
         ContinuePosition = 0;
         NormalizedText = string.Empty;
         ReturnValue = returnvalue;

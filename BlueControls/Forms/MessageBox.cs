@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Extended_Text;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
@@ -79,7 +77,7 @@ public partial class MessageBox : Form {
         } else {
             mb.Show();
             while (mb._pressed is null) {
-                Generic.Pause(0.1, true);
+                Pause(0.1, true);
             }
         }
 

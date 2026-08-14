@@ -1,14 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
+using BlueControls.PadItems.Abstract;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -38,7 +34,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     public void LoadFile(string fileName) {
         CheckSave();
         Pad.Enabled = true;
-        Pad.Items = new ItemCollectionPadItem(fileName);
+        Pad.Items = new CollectionPadItem(fileName);
         btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
         _lastFileName = fileName;
         Pad.ZoomFit();
@@ -77,7 +73,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnAddText_Click(object sender, System.EventArgs e) {
         var b = new TextPadItem() {
-            Text = string.Empty,
+            TextValue = string.Empty,
             Style = PadStyles.Standard
         };
         Pad.AddCentered(b);
@@ -85,12 +81,12 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-        ItemCollectionPadItem b = [];
+        CollectionPadItem b = [];
         Pad.AddCentered(b);
         b.SetCoordinates(new RectangleF(10, 10, 200, 200));
     }
 
-    private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName);
+    private void btnLastFiles_ItemClicked(object sender, ListItemEventArgs e) => LoadFile(e.Item.KeyName);
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         CheckSave();
@@ -113,11 +109,11 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
-        var l = Generic.GetInstanceOfType<AbstractPadItem>();
+        var l = GetInstanceOfType<PadItem>();
 
         if (!l.Any()) { return; }
 
-        var i = new List<AbstractListItem>();
+        var i = new List<ListItem>();
 
         foreach (var thisl in l) {
             i.Add(ItemOf(thisl));
@@ -126,7 +122,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x is not { Count: 1 }) { return; }
-        if (x[0] is not ReadableListItem { Item: AbstractPadItem api }) { return; }
+        if (x[0] is not ReadableListItem { Item: PadItem api }) { return; }
         Pad.AddCentered(api);
     }
 
@@ -149,7 +145,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     /// veralteten gecachten Bytes liefern (Stale-Cache-Bug).
     /// </summary>
     private static void SaveLayoutToDisk(string fileName, string content) {
-        WriteAllText(fileName, content, Constants.Win1252, false);
+        WriteAllText(fileName, content, Win1252, false);
         ConnectedFormula.Get(fileName)?.Invalidate();
     }
 
@@ -157,10 +153,10 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad.Items is null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var x = ReadAllText(LoadSymbol.FileName, Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
-        var i = ParseableItem.NewByParsing<AbstractPadItem>(x);
+        var i = ParseableItem.NewByParsing<PadItem>(x);
         if (i is null) { return; }
         i.GetNewIdsForEverything();
         Pad.Items.Add(i);

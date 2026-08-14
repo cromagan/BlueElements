@@ -159,7 +159,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        OnDisposed(); 
+        OnDisposed();
         Disposed = null;
         PropertyChanged = null;
         Moved = null;
@@ -206,7 +206,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
                     result.ParseableAdd("ParentName", item.KeyName);
                     break;
 
-                //case ItemCollectionPadItem:
+                //case ItemCollection:
                 //case CreativePad:
                 //    result.ParseableAdd("ParentType", "Main");
                 //    break;

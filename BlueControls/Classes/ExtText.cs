@@ -1,0 +1,1059 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Chars;
+using Char = BlueControls.Chars.Char;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+
+// VTextTyp-Hirachie
+// ~~~~~~~~~~~~~~~~~
+// HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen
+//                       -> Folgestatus: ?_Converted
+// ?_Converted         = Der Text ist immer noch führend, es wurde aber schon konvertiert
+// Chars_Converted     = Der Ursprüngliche Text wurde verworfen, der Text wird Komplett über die Chars gehandlet
+//                       Wird nur bei Textbearbeitung (Key Up o. ä. aktiviert)
+// HTML-Codes:
+// B Fett
+// I kursiv
+// U Unterstrichen
+// STRIKE Durchgestrichen
+// 3 Outline
+// BR Zeilenumbruch
+// FontName
+// FontColor
+// FontOutline
+// BackColor
+// ImageCode
+// ZBX_Store = Zeilenbeginn speichern
+// TOP = Y auf 0 zurücksetzen
+// vState = vState Setzen (mit HTML_Code)
+
+namespace BlueControls.Classes;
+
+public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyleable {
+
+    #region Fields
+
+    private static readonly Dictionary<string, Type> _structuralTagFactories = BuildStructuralTagFactories();
+    private readonly List<Char> _internal = [];
+
+    private int? _heightControl;
+    private volatile int _isDisposedFlag;
+
+    private string _sheetStyle = Win11;
+
+    private Size _textDimensions;
+
+    private string? _tmpHtmlText;
+
+    private string? _tmpPlainText;
+
+    private int? _widthControl;
+
+    private float _zeilenabstand;
+
+    #endregion
+
+    #region Constructors
+
+    public ExtText() {
+        Ausrichtung = Alignment.Top_Left;
+        AreaControl = Rectangle.Empty;
+        _textDimensions = Size.Empty;
+        _zeilenabstand = 1;
+    }
+
+    public ExtText(Design design, States state) : this() {
+        var sh = Skin.DesignOf(design, state);
+        BaseFont = sh.Font;
+        _sheetStyle = Win11;
+    }
+
+    public ExtText(string sheetStyle, PadStyles stylebeginns) : this() {
+        _sheetStyle = sheetStyle;
+        StyleBeginns = stylebeginns;
+        BaseFont = Skin.GetBlueFont(sheetStyle, stylebeginns);
+    }
+
+    public ExtText(string blueFontParseString) : this() {
+        BaseFont = BlueFont.Get(blueFontParseString);
+    }
+
+    public ExtText(string blueFontParseString, string sheetStyle, PadStyles styleBeginns) : this(sheetStyle, styleBeginns) {
+        BaseFont = BlueFont.Get(blueFontParseString);
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? Disposed;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event EventHandler? StyleChanged;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Bestimmt den Zeichenbereich. Zeichen außerhalb werden nicht dargsetellt.
+    /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
+    /// </summary>
+    public Rectangle AreaControl { get; set; }
+
+    public Alignment Ausrichtung { get; set; }
+    public BlueFont BaseFont { get; set; } = BlueFont.DefaultFont;
+    public int Count => _internal.Count;
+
+    public int HeightControl {
+        get {
+            EnsurePositions();
+            return _heightControl ?? -1;
+        }
+    }
+
+    public string HtmlText {
+        get {
+            if (IsDisposed) { return string.Empty; }
+            _tmpHtmlText ??= BuildHtmlText(0, _internal.Count - 1);
+            return _tmpHtmlText;
+        }
+        set {
+            if (IsDisposed) { return; }
+            if (HtmlText == value) { return; }
+            ConvertTextToChar(value, true);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsDisposed => _isDisposedFlag == 1;
+
+    public string PlainText {
+        get {
+            if (IsDisposed) { return string.Empty; }
+            _tmpPlainText ??= BuildPlainText(0, _internal.Count - 1);
+            return _tmpPlainText;
+        }
+        set {
+            if (IsDisposed) { return; }
+            if (PlainText == value) { return; }
+            ConvertTextToChar(value, false);
+            OnPropertyChanged();
+        }
+    }
+
+    public string SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed || _sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnStyleChanged();
+            ResetPosition(false);
+            OnPropertyChanged();
+        }
+    }
+
+    public PadStyles StyleBeginns { get; set; } = PadStyles.Standard;
+
+    /// <summary>
+    /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
+    /// </summary>
+    public Size TextDimensions {
+        get => _textDimensions;
+        set {
+            if (IsDisposed) { return; }
+            if (_textDimensions.Width == value.Width && _textDimensions.Height == value.Height) { return; }
+            _textDimensions = value;
+            ResetPosition(false);
+            OnPropertyChanged();
+        }
+    }
+
+    public int WidthControl {
+        get {
+            EnsurePositions();
+            return _widthControl ?? 0;
+        }
+    }
+
+    public float Zeilenabstand {
+        get => _zeilenabstand;
+        set {
+            if (IsDisposed) { return; }
+            if (Math.Abs(value - _zeilenabstand) < 0.01) { return; }
+            _zeilenabstand = value;
+            ResetPosition(false);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region Indexers
+
+    public Char this[int nr] => _internal[nr];
+
+    #endregion
+
+    #region Methods
+
+    public void ChangeStructuralTag(int first, int last, string? structTag) {
+        var newTags = BuildTagsForStructuralStyle(structTag);
+        var changed = false;
+        for (var cc = first; cc <= Math.Min(last, _internal.Count - 1); cc++) {
+            var tags = _internal[cc].OverrideTags;
+            tags.Clear();
+            tags.AddRange(newTags);
+            _internal[cc].InvalidateFont();
+            changed = true;
+        }
+        if (changed) { ResetPosition(true); }
+    }
+
+    public int Char_Search(float canvasX, float canvasY) {
+        EnsurePositions();
+        if (_internal.Count == 0) { return 0; }
+
+        var bestXDist = double.MaxValue;
+        var bestXPos = -1;
+        var bestYDist = double.MaxValue;
+        var bestYPos = -1;
+
+        for (var i = 0; i < _internal.Count; i++) {
+            var ch = _internal[i];
+            if (ch.SizeCanvas.Width <= 0) { continue; }
+
+            var matchX = canvasX >= ch.PosCanvas.X && canvasX <= ch.PosCanvas.X + ch.SizeCanvas.Width;
+            var matchY = canvasY >= ch.PosCanvas.Y && canvasY <= ch.PosCanvas.Y + ch.SizeCanvas.Height;
+
+            if (matchX && matchY) { return i; }
+
+            if (matchX) {
+                var dy = Math.Abs(canvasY - (ch.PosCanvas.Y + ch.SizeCanvas.Height / 2.0));
+                if (dy < bestYDist) { bestYDist = dy; bestYPos = i; }
+            } else if (matchY) {
+                var dx = Math.Abs(canvasX - (ch.PosCanvas.X + ch.SizeCanvas.Width / 2.0));
+                if (dx < bestXDist) { bestXDist = dx; bestXPos = i; }
+            }
+        }
+
+        if (bestXPos >= 0) { return bestXPos; }
+        if (bestYPos >= 0) { return bestYPos; }
+        return _internal.Count - 1;
+    }
+
+    public Rectangle CursorCanvasPosX(int charPos) {
+        EnsurePositions();
+
+        charPos = Math.Clamp(charPos, 0, _internal.Count);
+
+        float x = 0;
+        float y = 0;
+        float he = 14;
+
+        if (_internal.Count > 0) {
+            if (charPos < _internal.Count) {
+                // Fall 1: Cursor ist vor einem Zeichen
+                var item = _internal[charPos];
+                x = item.PosCanvas.X;
+                y = item.PosCanvas.Y;
+                he = item.SizeCanvas.Height;
+                if (he <= 0) {
+                    for (var d = 1; d <= _internal.Count; d++) {
+                        if (charPos + d < _internal.Count && _internal[charPos + d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos + d].SizeCanvas.Height;
+                            break;
+                        }
+                        if (charPos - d >= 0 && _internal[charPos - d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos - d].SizeCanvas.Height;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                // Fall 2: Cursor ist ganz am Ende des Textes
+                var last = _internal[charPos - 1];
+                if (last.IsLineBreak()) {
+                    // Zeilenumbruch: Cursor springt in die nächste Zeile
+                    x = 0;
+                    y = last.PosCanvas.Y + last.SizeCanvas.Height;
+                } else {
+                    // Kein Umbruch: Cursor steht rechts neben dem letzten Zeichen
+                    x = last.PosCanvas.X + last.SizeCanvas.Width;
+                    y = last.PosCanvas.Y;
+                }
+                he = last.SizeCanvas.Height;
+                if (he <= 0) {
+                    for (var d = 1; d < _internal.Count; d++) {
+                        if (charPos - 1 - d >= 0 && _internal[charPos - 1 - d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos - 1 - d].SizeCanvas.Height;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
+    }
+
+    public int Delete(int first, int last) {
+        if (first >= _internal.Count || first > last) { return first; }
+
+        var (s1, _) = GetCellLinkBounds(first);
+        if (s1 >= 0) { first = s1; }
+
+        var (_, e2) = GetCellLinkBounds(last + 1);
+        if (e2 >= 0) { last = e2; }
+
+        var count = Math.Min(last - first + 1, _internal.Count - first);
+        _internal.RemoveRange(first, count);
+        ResetPosition(true);
+        return first;
+    }
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        OnDisposed();
+        PropertyChanged = null;
+        StyleChanged = null;
+        Disposed = null;
+        foreach (var c in _internal) { c.Dispose(); }
+        _internal.Clear();
+
+        GC.SuppressFinalize(this);
+    }
+
+    public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
+        if (zoom < 0.00001) { return; }
+
+        EnsurePositions();
+
+        var count = _internal.Count;
+        for (var i = 0; i < count; i++) {
+            var t = _internal[i];
+            var controlPos = t.PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
+            var controlSize = t.SizeCanvas.CanvasToControl(zoom);
+
+            if (Char.IsVisible(AreaControl, controlPos, controlSize)) {
+                t.Draw(gr, controlPos, controlSize, zoom);
+            }
+        }
+    }
+
+    public (int start, int end) GetCellLinkBounds(int position) {
+        if (position < 1 || position >= _internal.Count) { return (-1, -1); }
+
+        // Cursor auf CellLinkStart = VOR dem Link, nicht innerhalb
+        if (_internal[position] is CellLinkStartChar) { return (-1, -1); }
+
+        var s = position;
+
+        // Cursor auf CellLinkEnd = noch innerhalb des Links, Suche ab davor
+        if (_internal[s] is CellLinkCharEndChar) { s--; }
+
+        while (s > 0 && _internal[s] is not CellLinkStartChar) {
+            if (_internal[s] is CellLinkCharEndChar) { return (-1, -1); }
+            s--;
+        }
+        if (_internal[s] is not CellLinkStartChar) { return (-1, -1); }
+        var e = s + 1;
+        while (e < _internal.Count && _internal[e] is not CellLinkCharEndChar) { e++; }
+        return e >= _internal.Count ? (-1, -1) : (s, e);
+    }
+
+    public bool Insert(int position, Char c) {
+        if (position < 0 || position > _internal.Count) { return false; }
+        _internal.Insert(position, c);
+        ResetPosition(true);
+        return true;
+    }
+
+    public Size LastSize() {
+        EnsurePositions();
+        return _heightControl is not { } h || _widthControl is not { } w || w < 5 || h < 5
+            ? new Size(32, 16)
+            : new Size(w + 1, h + 1);
+    }
+
+    public void OnStyleChanged() {
+        StyleChanged?.Invoke(this, System.EventArgs.Empty);
+        foreach (var c in _internal) { c.InvalidateFont(); }
+    }
+
+    public int SearchCharIndex(int direction, Type? charType, int fromPosition) {
+        if (direction != 1 && direction != -1) { return -1; }
+        if (fromPosition < 0 || fromPosition >= _internal.Count) { return -1; }
+
+        var idx = fromPosition + direction;
+        while (idx >= 0 && idx < _internal.Count) {
+            var current = _internal[idx];
+            if (charType is null || current.GetType() == charType) {
+                return idx;
+            }
+            idx += direction;
+        }
+        return -1;
+    }
+
+    public string Substring(int startIndex, int length) => BuildPlainText(startIndex, startIndex + length - 1);
+
+    public void UpdateBaseFont(BlueFont font) {
+        if (IsDisposed || BaseFont == font) { return; }
+        BaseFont = font;
+        OnStyleChanged();
+        ResetPosition(true);
+    }
+
+    public string Word(int atPosition) {
+        var s = WordStart(atPosition);
+        var e = WordEnd(atPosition);
+        return s == -1 || e == -1 ? string.Empty : Substring(s, e - s);
+    }
+
+    public bool WordMatchesAt(string word, int position) {
+        if (position + word.Length > _internal.Count + 1) { return false; }
+        if (position > 0 && !_internal[position - 1].IsWordSeparator()) { return false; }
+        if (position + word.Length < _internal.Count && !_internal[position + word.Length].IsWordSeparator()) { return false; }
+        var tt = BuildPlainText(position, position + word.Length - 1);
+        return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
+    }
+
+    internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
+        List<Char> chars, float startX, float startY, float maxWidth,
+        float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
+        var storedX = lineStartX;
+        var currentX = startX;
+        var currentY = startY;
+        float maxRight = 0;
+        float maxBottom = 0;
+        var rowStart = 0;
+        var count = chars.Count;
+
+        for (var i = 0; i <= count; i++) {
+            if (i == count) {
+                NormalizeRowHeight(chars, rowStart, i - 1);
+                rows?.Add((rowStart, i - 1));
+                break;
+            }
+
+            var ch = chars[i];
+
+            if (ch.StoresXPosition) {
+                storedX = currentX;
+            } else if (ch.ResetsYPosition) {
+                currentY = 0;
+            }
+
+            if (!ch.IsSpace() && !ch.HandlesOwnLayout) {
+                if (i > rowStart && maxWidth > 0) {
+                    if (currentX + ch.SizeCanvas.Width + 0.5 > maxWidth) {
+                        if (useWordBreak) { i = FindWordBreak(chars, i, rowStart); }
+                        currentX = storedX;
+                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * lineSpacing;
+                        rows?.Add((rowStart, i - 1));
+                        rowStart = i;
+                        if (i < count) { ch = chars[i]; } else { break; }
+                    }
+                }
+            }
+
+            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth, storedX, lineSpacing);
+
+            if (!ch.IsSpace()) {
+                maxRight = Math.Max(maxRight, mr);
+                maxBottom = Math.Max(maxBottom, mb);
+            }
+
+            currentX = continueX;
+            currentY = continueY;
+
+            if (ch.IsLineBreak()) {
+                currentX = storedX;
+                if (ch.ResetsYPosition) {
+                    NormalizeRowHeight(chars, rowStart, i);
+                    rows?.Add((rowStart, i));
+                } else {
+                    currentY += NormalizeRowHeight(chars, rowStart, i) * lineSpacing;
+                    rows?.Add((rowStart, i));
+                }
+                rowStart = i + 1;
+            }
+        }
+
+        return (currentX, currentY, maxRight, maxBottom);
+    }
+
+    internal string BuildHtmlText(int first, int last) {
+        var end = Math.Min(last, _internal.Count - 1);
+        if (end < first || _internal.Count == 0) { return string.Empty; }
+
+        var sb = new StringBuilder((end - first + 1) * 4);
+        BlueFont? lastFont = null;
+        string? lastStructTag = null;
+
+        for (var z = first; z <= end; z++) {
+            var ec = _internal[z];
+            var currentStructTag = GetStructuralTag(ec.OverrideTags);
+            var ecFont = ec.Font;
+
+            if (lastStructTag != currentStructTag) {
+                if (lastStructTag is not null) {
+                    sb.Append("</").Append(lastStructTag).Append('>');
+                    lastFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard) ?? BaseFont;
+                }
+                if (currentStructTag is not null) {
+                    sb.Append('<').Append(currentStructTag).Append('>');
+                    lastFont = GetStructuralTagFont(currentStructTag);
+                }
+            }
+
+            sb.Append(BuildFontDiffTags(ecFont, lastFont));
+            lastStructTag = currentStructTag;
+            lastFont = ecFont;
+            sb.Append(ec.HtmlText());
+        }
+
+        if (lastStructTag is not null) { sb.Append("</").Append(lastStructTag).Append('>'); }
+
+        return sb.ToString();
+    }
+
+    internal string BuildPlainText(int first, int last) {
+        var end = Math.Min(last, _internal.Count - 1);
+        if (end < first) { return string.Empty; }
+        var sb = new StringBuilder(end - first + 1);
+        for (var i = first; i <= end; i++) {
+            var pt = _internal[i].PlainText();
+            if (pt != "\n") { sb.Append(pt); }
+        }
+        return sb.ToString();
+    }
+
+    internal List<Char> ParseHtmlToChars(string html) {
+        var savedChars = new List<Char>(_internal);
+        _internal.Clear();
+        try {
+            ConvertTextToChar(html, true);
+            return [.. _internal];
+        } finally {
+            _internal.Clear();
+            _internal.AddRange(savedChars);
+        }
+    }
+
+    internal int WordEnd(int pos) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
+            return -1;
+        }
+        while (++pos < _internal.Count) {
+            if (_internal[pos].IsWordSeparator()) { return pos; }
+        }
+        return _internal.Count;
+    }
+
+    internal int WordStart(int pos) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
+            return -1;
+        }
+        while (--pos >= 0) {
+            if (_internal[pos].IsWordSeparator()) { return pos + 1; }
+        }
+        return 0;
+    }
+
+    private static void ApplyFontTag(string cod, string? attribut, Stack<List<string>> stack) {
+        var tags = stack.Pop();
+
+        var tag = cod.ToLowerInvariant() switch {
+            "b" => "b",
+            "/b" => "/b",
+            "i" => "i",
+            "/i" => "/i",
+            "u" => "u",
+            "/u" => "/u",
+            "strike" => "strike",
+            "/strike" => "/strike",
+            "fontsize" => "fontsize=" + (attribut ?? string.Empty),
+            "fontname" => "fontname=" + (attribut ?? string.Empty),
+            "fontcolor" => "fontcolor=" + (attribut ?? string.Empty),
+            "backcolor" => "backcolor=" + (attribut ?? string.Empty),
+            "outlinecolor" or "coloroutline" or "fontoutline" => "outlinecolor=" + (attribut ?? string.Empty),
+            _ => null
+        };
+
+        if (tag is not null) {
+            RemoveConflictingTag(tags, tag);
+            tags.Add(tag);
+        }
+
+        stack.Push(tags);
+    }
+
+    private static string BuildFontDiffTags(BlueFont? font, BlueFont? prevFont) {
+        if (prevFont is null || font is null || prevFont == font) { return string.Empty; }
+        var sb = new StringBuilder(64);
+
+        if (font.Bold != prevFont.Bold) { sb.Append(font.Bold ? "<b>" : "</b>"); }
+        if (font.Italic != prevFont.Italic) { sb.Append(font.Italic ? "<i>" : "</i>"); }
+        if (font.Underline != prevFont.Underline) { sb.Append(font.Underline ? "<u>" : "</u>"); }
+        if (font.StrikeOut != prevFont.StrikeOut) { sb.Append(font.StrikeOut ? "<strike>" : "</strike>"); }
+
+        if (Math.Abs(font.Size - prevFont.Size) > 0.01f) {
+            sb.Append("<fontsize=").Append(Math.Round(font.Size, 3)).Append('>');
+        }
+
+        if (font.FontName != prevFont.FontName) {
+            sb.Append("<fontname=").Append(font.FontName).Append('>');
+        }
+
+        if (font.ColorMain != prevFont.ColorMain) {
+            sb.Append("<fontcolor=").Append(font.ColorMain.ToHtmlCode()).Append('>');
+        }
+
+        if (font.ColorOutline != prevFont.ColorOutline && font.ColorOutline.A > 0) {
+            sb.Append("<outlinecolor=").Append(font.ColorOutline.ToHtmlCode()).Append('>');
+        } else if (prevFont.ColorOutline.A > 0 && font.ColorOutline.A == 0) {
+            sb.Append("<outlinecolor=Transparent>");
+        }
+
+        if (font.ColorBack != prevFont.ColorBack && font.ColorBack.A > 0) {
+            sb.Append("<backcolor=").Append(font.ColorBack.ToHtmlCode()).Append('>');
+        } else if (prevFont.ColorBack.A > 0 && font.ColorBack.A == 0) {
+            sb.Append("<backcolor=Transparent>");
+        }
+
+        return sb.ToString();
+    }
+
+    private static Dictionary<string, Type> BuildStructuralTagFactories() {
+        var factories = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var type in typeof(Char).Assembly.GetTypes()
+            .Where(t => t.IsSubclassOf(typeof(Char)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) is not null)) {
+            var created = Activator.CreateInstance(type, true);
+            if (created is not Char instance) { continue; }
+            var tagName = instance.StructuralTag;
+            if (string.IsNullOrEmpty(tagName)) { continue; }
+            factories[tagName] = type;
+        }
+
+        return factories;
+    }
+
+    private static int FindWordBreak(List<Char> chars, int fromPos, int minPos) {
+        if (chars.Count <= 1) { return 0; }
+        minPos = Math.Max(0, minPos);
+        fromPos = Math.Min(fromPos, chars.Count - 1);
+        fromPos = Math.Max(fromPos, minPos + 1);
+
+        if (chars[fromPos - 1].IsSpace() && !chars[fromPos].IsPossibleLineBreak()) { return fromPos; }
+
+        var started = fromPos;
+        while (fromPos > minPos && chars[fromPos].IsPossibleLineBreak()) {
+            fromPos--;
+        }
+        if (fromPos <= minPos) { return started; }
+
+        while (fromPos > minPos) {
+            if (chars[fromPos].IsPossibleLineBreak()) { return fromPos + 1; }
+            fromPos--;
+        }
+        return started;
+    }
+
+    private static PadStyles GetPadStyleFromStructTag(string structTag) => structTag switch {
+        "h1" => PadStyles.Title,
+        "h2" => PadStyles.Subtitle,
+        "h3" => PadStyles.Chapter,
+        "h5" => PadStyles.Footnote,
+        "h6" => PadStyles.Alternative,
+        "strong" => PadStyles.Emphasized,
+        _ => PadStyles.Standard
+    };
+
+    private static string? GetStructuralTag(List<string> tags) =>
+                                tags.Find(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong");
+
+    private static float NormalizeRowHeight(List<Char> chars, int first, int last) {
+        if (first > last) { return 0f; }
+
+        float maxHeight = 0;
+        var rowBaseY = 0f;
+        for (var i = first; i <= last; i++) {
+            var ch = chars[i];
+            if (ch.SizeCanvas.Height > maxHeight) {
+                maxHeight = ch.SizeCanvas.Height;
+                rowBaseY = ch.PosCanvas.Y;
+            }
+        }
+
+        for (var i = first; i <= last; i++) {
+            var ch = chars[i];
+            if (ch.ResetsYPosition) {
+                ch.PosCanvas = ch.PosCanvas with { Y = ch.PosCanvas.Y + maxHeight - ch.SizeCanvas.Height };
+            } else if (ch.RowAlignment == Alignment.VerticalCenter) {
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f };
+            } else if (ch.RowAlignment == Alignment.Top) {
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY };
+            } else if (ch.SizeCanvas.Height > 0) {
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY + maxHeight - ch.SizeCanvas.Height };
+            }
+        }
+        return maxHeight;
+    }
+
+    private static void RemoveConflictingTag(List<string> tags, string newTag) {
+        var eqIdx = newTag.IndexOf('=');
+        var prefix = eqIdx >= 0 ? newTag[..(eqIdx + 1)] : null;
+
+        for (var i = tags.Count - 1; i >= 0; i--) {
+            if (prefix is not null) {
+                if (tags[i].StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
+                    tags.RemoveAt(i);
+                    return;
+                }
+            } else {
+                if (tags[i] == newTag || tags[i] == "/" + newTag || newTag == "/" + tags[i]) {
+                    tags.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void ApplyAlignment(List<Char> chars, List<(int start, int end)> rows) {
+        if (Ausrichtung == Alignment.Top_Left || rows.Count == 0) { return; }
+
+        var offsetY = 0f;
+        if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { offsetY = (_textDimensions.Height - (_heightControl ?? 0)) / 2f; }
+        if (Ausrichtung.HasFlag(Alignment.Bottom)) { offsetY = _textDimensions.Height - (_heightControl ?? 0); }
+
+        foreach (var (start, end) in rows) {
+            var offsetX = 0f;
+            var lastChar = chars[end];
+
+            if (Ausrichtung.HasFlag(Alignment.Right)) {
+                offsetX = _textDimensions.Width - lastChar.PosCanvas.X - lastChar.SizeCanvas.Width;
+            }
+            if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) {
+                offsetX = (_textDimensions.Width - lastChar.PosCanvas.X - lastChar.SizeCanvas.Width) / 2f;
+            }
+
+            if (offsetX == 0f && offsetY == 0f) { continue; }
+
+            for (var i = start; i <= end; i++) {
+                chars[i].PosCanvas = chars[i].PosCanvas with { X = chars[i].PosCanvas.X + offsetX, Y = chars[i].PosCanvas.Y + offsetY };
+            }
+        }
+    }
+
+    private void ApplyPadStyleStandard(List<string> tags) {
+        tags.RemoveAll(t => t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike"
+            || t.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase));
+
+        var standardFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
+        if (standardFont is not null && standardFont != BaseFont) {
+            if (standardFont.Bold != BaseFont.Bold) { tags.Add(standardFont.Bold ? "b" : "/b"); }
+            if (standardFont.Italic != BaseFont.Italic) { tags.Add(standardFont.Italic ? "i" : "/i"); }
+            if (standardFont.Underline != BaseFont.Underline) { tags.Add(standardFont.Underline ? "u" : "/u"); }
+            if (standardFont.StrikeOut != BaseFont.StrikeOut) { tags.Add(standardFont.StrikeOut ? "strike" : "/strike"); }
+            if (Math.Abs(standardFont.Size - BaseFont.Size) > 0.01f) { tags.Add($"fontsize={Math.Round(standardFont.Size, 3)}"); }
+            if (standardFont.FontName != BaseFont.FontName) { tags.Add($"fontname={standardFont.FontName}"); }
+            if (standardFont.ColorMain != BaseFont.ColorMain) { tags.Add($"fontcolor={standardFont.ColorMain.ToHtmlCode()}"); }
+            if (standardFont.ColorOutline != BaseFont.ColorOutline) { tags.Add($"outlinecolor={standardFont.ColorOutline.ToHtmlCode()}"); }
+            if (standardFont.ColorBack != BaseFont.ColorBack) { tags.Add($"backcolor={standardFont.ColorBack.ToHtmlCode()}"); }
+        }
+    }
+
+    private void ApplyStructuralTag(string cod, string? attribut, Stack<List<string>> stack) {
+        var tags = stack.Peek();
+
+        if (_structuralTagFactories.TryGetValue(cod, out var type)) {
+            var created = Activator.CreateInstance(type);
+            if (created is not Char instance) { return; }
+            instance.InitFromTag(this, tags, attribut);
+            _internal.Add(instance);
+
+            if (instance is CellLinkCharEndChar) {
+                var startIdx = _internal.Count - 2;
+                while (startIdx >= 0 && _internal[startIdx] is not CellLinkStartChar) {
+                    startIdx--;
+                }
+            }
+        } else {
+            _internal.Add(new AsciiChar(this, tags, '<'));
+            foreach (var c in cod)
+                _internal.Add(new AsciiChar(this, tags, c));
+            if (!string.IsNullOrEmpty(attribut)) {
+                _internal.Add(new AsciiChar(this, tags, '='));
+                foreach (var c in attribut)
+                    _internal.Add(new AsciiChar(this, tags, c));
+            }
+            _internal.Add(new AsciiChar(this, tags, '>'));
+        }
+    }
+
+    private void ApplyStyleTag(string cod, Stack<List<string>> stack) {
+        var tags = stack.Pop();
+
+        tags.RemoveAll(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong"
+            || t.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase)
+            || t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike");
+
+        var structTag = cod switch {
+            "H1" => "h1",
+            "H2" => "h2",
+            "H3" => "h3",
+            "H5" => "h5",
+            "H6" => "h6",
+            "H7" or "STRONG" => "strong",
+            _ => null
+        };
+
+        if (structTag is not null) {
+            tags.Add(structTag);
+            var targetFont = Skin.GetBlueFont(SheetStyle, GetPadStyleFromStructTag(structTag));
+            if (targetFont is not null && targetFont != BaseFont) {
+                if (targetFont.Bold != BaseFont.Bold) { tags.Add(targetFont.Bold ? "b" : "/b"); }
+                if (targetFont.Italic != BaseFont.Italic) { tags.Add(targetFont.Italic ? "i" : "/i"); }
+                if (targetFont.Underline != BaseFont.Underline) { tags.Add(targetFont.Underline ? "u" : "/u"); }
+                if (targetFont.StrikeOut != BaseFont.StrikeOut) { tags.Add(targetFont.StrikeOut ? "strike" : "/strike"); }
+                if (Math.Abs(targetFont.Size - BaseFont.Size) > 0.01f) { tags.Add($"fontsize={Math.Round(targetFont.Size, 3)}"); }
+                if (targetFont.FontName != BaseFont.FontName) { tags.Add($"fontname={targetFont.FontName}"); }
+                if (targetFont.ColorMain != BaseFont.ColorMain) { tags.Add($"fontcolor={targetFont.ColorMain.ToHtmlCode()}"); }
+                if (targetFont.ColorOutline != BaseFont.ColorOutline) { tags.Add($"outlinecolor={targetFont.ColorOutline.ToHtmlCode()}"); }
+                if (targetFont.ColorBack != BaseFont.ColorBack) { tags.Add($"backcolor={targetFont.ColorBack.ToHtmlCode()}"); }
+            }
+        } else {
+            ApplyPadStyleStandard(tags);
+        }
+
+        stack.Push(tags);
+    }
+
+    private List<string> BuildTagsForStructuralStyle(string? structTag) {
+        if (structTag is null) { return []; }
+
+        var padStyle = structTag switch {
+            "h1" => PadStyles.Title,
+            "h2" => PadStyles.Subtitle,
+            "h3" => PadStyles.Chapter,
+            "h5" => PadStyles.Footnote,
+            "h6" => PadStyles.Alternative,
+            "strong" => PadStyles.Emphasized,
+            _ => PadStyles.Standard
+        };
+
+        var result = new List<string> { structTag };
+
+        var targetFont = Skin.GetBlueFont(SheetStyle, padStyle);
+        if (targetFont is null || targetFont == BaseFont) { return result; }
+
+        if (targetFont.Bold != BaseFont.Bold) { result.Add(targetFont.Bold ? "b" : "/b"); }
+        if (targetFont.Italic != BaseFont.Italic) { result.Add(targetFont.Italic ? "i" : "/i"); }
+        if (targetFont.Underline != BaseFont.Underline) { result.Add(targetFont.Underline ? "u" : "/u"); }
+        if (targetFont.StrikeOut != BaseFont.StrikeOut) { result.Add(targetFont.StrikeOut ? "strike" : "/strike"); }
+        if (Math.Abs(targetFont.Size - BaseFont.Size) > 0.01f) { result.Add($"fontsize={Math.Round(targetFont.Size, 3)}"); }
+        if (targetFont.FontName != BaseFont.FontName) { result.Add($"fontname={targetFont.FontName}"); }
+        if (targetFont.ColorMain != BaseFont.ColorMain) { result.Add($"fontcolor={targetFont.ColorMain.ToHtmlCode()}"); }
+        if (targetFont.ColorOutline != BaseFont.ColorOutline) { result.Add($"outlinecolor={targetFont.ColorOutline.ToHtmlCode()}"); }
+        if (targetFont.ColorBack != BaseFont.ColorBack) { result.Add($"backcolor={targetFont.ColorBack.ToHtmlCode()}"); }
+
+        return result;
+    }
+
+    private void ComputeLayout() {
+        _widthControl = 0;
+        _heightControl = 0;
+
+        if (_internal.Count == 0) { return; }
+
+        var rows = new List<(int start, int end)>(Math.Max(1, _internal.Count / 50));
+        var (_, _, maxRight, maxBottom) = ComputeSubLayout(
+            _internal, 0, 0, _textDimensions.Width, 0, _zeilenabstand, true, rows);
+
+        _widthControl = (int)(maxRight + 0.5);
+        _heightControl = (int)(maxBottom + 0.5);
+
+        ApplyAlignment(_internal, rows);
+    }
+
+    private void ConvertTextToChar(string text, bool isRich) {
+        if (string.IsNullOrEmpty(text)) {
+            _internal.Clear();
+            ResetPosition(true);
+            return;
+        }
+
+        text = isRich ? text.ConvertFromHtmlToRich() : text.Replace("\r\n", "\r");
+
+        _internal.Clear();
+        _internal.Capacity = Math.Max(_internal.Capacity, text.Length);
+        ResetPosition(true);
+
+        var styleStack = new Stack<List<string>>();
+        styleStack.Push([]);
+
+        var pos = 0;
+        while (pos < text.Length) {
+            var ch = text[pos];
+
+            if (isRich) {
+                switch (ch) {
+                    case '<': {
+                            var endTag = text.IndexOf('>', pos + 1);
+                            if (endTag != -1) {
+                                ParseHtmlTag(text, pos, endTag, styleStack);
+                                pos = endTag;
+                            } else {
+                                var top = styleStack.Peek();
+                                _internal.Add(new AsciiChar(this, top, ch));
+                            }
+                            break;
+                        }
+
+                    case '&': {
+                            var top = styleStack.Peek();
+                            pos = ParseHtmlEntity(text, pos, top);
+                            break;
+                        }
+
+                    default: {
+                            var top = styleStack.Peek();
+                            _internal.Add(new AsciiChar(this, top, ch));
+                            break;
+                        }
+                }
+            } else {
+                var tags = styleStack.Peek();
+                _internal.Add(new AsciiChar(this, tags, ch));
+            }
+            pos++;
+        }
+
+        ResetPosition(true);
+    }
+
+    private void EnsurePositions() {
+        if (_widthControl is null) {
+            ComputeLayout();
+        }
+    }
+
+    private BlueFont GetStructuralTagFont(string structTag) {
+        var padStyle = structTag switch {
+            "h1" => PadStyles.Title,
+            "h2" => PadStyles.Subtitle,
+            "h3" => PadStyles.Chapter,
+            "h5" => PadStyles.Footnote,
+            "h6" => PadStyles.Alternative,
+            "strong" => PadStyles.Emphasized,
+            _ => PadStyles.Standard
+        };
+        return Skin.GetBlueFont(SheetStyle, padStyle) ?? BaseFont;
+    }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private int ParseHtmlEntity(string htmlText, int position, List<string> tags) {
+        var endpos = htmlText.IndexOf(';', position + 1);
+
+        if (endpos <= position || endpos > position + 10) {
+            _internal.Add(new AsciiChar(this, tags, '&'));
+            return position;
+        }
+
+        var entity = htmlText[position..(endpos + 1)];
+        var decoded = System.Net.WebUtility.HtmlDecode(entity);
+        if (decoded != entity && decoded.Length > 0) {
+            foreach (var c in decoded) {
+                _internal.Add(new AsciiChar(this, tags, c));
+            }
+            return endpos;
+        }
+
+        Develop.DebugPrint(ErrorType.Info, "Unbekannter Code: " + entity);
+        _internal.Add(new AsciiChar(this, tags, '&'));
+        return position;
+    }
+
+    private void ParseHtmlTag(string htmlText, int start, int endTagPos, Stack<List<string>> stack) {
+        if (endTagPos <= start) { return; }
+
+        var tagContent = htmlText[(start + 1)..endTagPos];
+        var eqIdx = tagContent.IndexOf('=');
+
+        string cod;
+        string? attribut;
+
+        if (eqIdx < 0) {
+            cod = tagContent.ToUpperInvariant().Trim();
+            attribut = string.Empty;
+        } else {
+            var beforeEq = tagContent[..eqIdx];
+            var spaceIdx = beforeEq.IndexOf(' ');
+
+            if (spaceIdx >= 0) {
+                cod = beforeEq[..spaceIdx].ToUpperInvariant().Trim();
+                attribut = tagContent[(spaceIdx + 1)..].Trim();
+            } else {
+                cod = beforeEq.Replace(" ", string.Empty).ToUpperInvariant().Trim();
+                attribut = tagContent[(eqIdx + 1)..];
+                if (attribut.IsEnclosedBy('"', '"')) { attribut = attribut[1..^1]; }
+                attribut = attribut.Trim();
+            }
+        }
+
+        switch (cod) {
+            case "B" or "/B" or "I" or "/I" or "U" or "/U" or
+                 "STRIKE" or "/STRIKE" or "FONTSIZE" or "FONTNAME" or
+                 "FONTCOLOR" or "BACKCOLOR" or "OUTLINECOLOR" or
+                 "COLOROUTLINE" or "FONTOUTLINE":
+                ApplyFontTag(cod, attribut, stack);
+                break;
+
+            case "H1" or "/H1" or "H2" or "/H2" or "H3" or "/H3" or
+                 "H4" or "H5" or "H6" or "H7" or "H0" or
+                 "STRONG" or "/STRONG" or "P":
+                ApplyStyleTag(cod, stack);
+                break;
+
+            default:
+                ApplyStructuralTag(cod, attribut, stack);
+                break;
+        }
+    }
+
+    private void ResetPosition(bool clearTextCache) {
+        if (IsDisposed) { return; }
+        _widthControl = null;
+        _heightControl = null;
+
+        if (clearTextCache) {
+            _tmpHtmlText = null;
+            _tmpPlainText = null;
+        }
+        OnPropertyChanged("Position");
+    }
+
+    #endregion
+}

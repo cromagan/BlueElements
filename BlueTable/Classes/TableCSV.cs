@@ -1,8 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.ClassesStatic;
-using System.Globalization;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using static BlueBasics.ClassesStatic.IO;
@@ -260,7 +260,7 @@ public class TableCSV : TableFile {
 
             for (var i = 0; i < columnKeyes.Count; i++) {
                 var original = columnKeyes[i];
-                var colName = FormatHolderSystemName.MakeValid(original);
+                var colName = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(original);
                 if (!ColumnItem.IsValidColumnKey(colName)) {
                     colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }
@@ -341,7 +341,7 @@ public class TableCSV : TableFile {
 
                 if (colIndex < fields.Count) {
                     var error = SetValueInternal(TableDataType.UTF8Value_withoutSizeData, col, row,
-                        fields[colIndex], Generic.UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
+                        fields[colIndex], UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
 
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze($"CSV-Ladefehler in Spalte '{col.KeyName}': {error}");

@@ -1,0 +1,38 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using System.Globalization;
+
+namespace BlueScript.ScriptCommands;
+
+internal class ChangeDateTimeFormatScriptCommand : ScriptCommand {
+
+    #region Properties
+
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "changedatetimeformat";
+    public override List<string> Constants => [.. DateTimeFormats];
+    public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
+    public override bool MustUseReturnValue => true;
+    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
+        var d = attvar.ValueDateGet(0);
+
+        if (d is null) {
+            return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true);
+        }
+
+        try {
+            return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture));
+        } catch {
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true);
+        }
+    }
+
+    #endregion
+}

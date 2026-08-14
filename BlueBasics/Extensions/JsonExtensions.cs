@@ -173,9 +173,7 @@ public static partial class Extensions {
 
     public static bool IsObject(this JsonElement json) => json.ValueKind == JsonValueKind.Object;
 
-    public static void Set(this JsonObject json, string key, JsonNode? value) {
-        json[key] = value;
-    }
+    public static void Set(this JsonObject json, string key, JsonNode? value) => json[key] = value;
 
     /// <summary>
     /// Serialisiert ein <see cref="Bitmap" /> unter <paramref name="key" /> als
@@ -192,11 +190,9 @@ public static partial class Extensions {
     /// ISO-8601-Roundtrip-Format (<c>"o"</c>), sodass der Wert verlustfrei
     /// zurückgelesen werden kann - kompatibel zu den Get-Routen, die
     /// <see cref="JsonNode.GetValue{T}" /> bzw.
-    /// <see cref="Converter.DateTimeParse(string)" /> verwenden.
+    /// <see cref="DateTimeParse(string)" /> verwenden.
     /// </summary>
-    public static void Set(this JsonObject json, string key, DateTime value) {
-        json[key] = value.ToString("o", CultureInfo.InvariantCulture);
-    }
+    public static void Set(this JsonObject json, string key, DateTime value) => json[key] = value.ToString("o", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Serialisiert ein <see cref="System.Windows.Forms.Padding" /> unter <paramref name="key" /> als

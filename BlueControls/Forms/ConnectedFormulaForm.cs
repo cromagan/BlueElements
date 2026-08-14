@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using static BlueBasics.ClassesStatic.Develop;
@@ -32,7 +30,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     protected void FormulaSet(string? filename) {
         if (filename is null || !FileExists(filename)) {
-            FormulaSet(null as ItemCollectionPadItem);
+            FormulaSet(null as CollectionPadItem);
             return;
         }
 
@@ -51,7 +49,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
-        if (!Generic.IsAdministrator()) { return; }
+        if (!IsAdministrator()) { return; }
 
         if (cf.AcquireWriteAccess() is { Length: > 0 }) { return; }
 
@@ -64,7 +62,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         Opacity = 1f;
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, ListItemEventArgs e) {
         FormManager.SaveAllFiles();
 
         FormulaSet(e.Item.KeyName);
@@ -89,10 +87,10 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page is not null;
 
-    private void FormulaSet(ItemCollectionPadItem? page) {
+    private void FormulaSet(CollectionPadItem? page) {
         if (IsDisposed) { return; }
 
-        MessageBoxOnError = Generic.IsAdministrator();
+        MessageBoxOnError = IsAdministrator();
 
         CFormula.Page = page;
 
@@ -124,16 +122,16 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         //if (Table != table) {
         //    if (Table is not null) {
-                //        RemoveRow();
-                //        Table.Disposed -= _table_Disposed;
-                //        Table.Row.RowRemoving -= Row_RowRemoving;
+        //        RemoveRow();
+        //        Table.Disposed -= _table_Disposed;
+        //        Table.Row.RowRemoving -= Row_RowRemoving;
         //    }
         //    InvalidateView();
         //    Table = table;
 
         //    if (Table is not null) {
-                //        Table.Disposed += _table_Disposed;
-                //        Table.Row.RowRemoving += Row_RowRemoving;
+        //        Table.Disposed += _table_Disposed;
+        //        Table.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}
 

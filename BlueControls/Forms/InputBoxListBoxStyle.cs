@@ -1,16 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-
 namespace BlueControls.Forms;
 
 public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Fields
 
-    private List<AbstractListItem>? _giveBack;
+    private List<ListItem>? _giveBack;
 
     #endregion
 
@@ -18,7 +14,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     private InputBoxListBoxStyle() : this(string.Empty, null, CheckBehavior.SingleSelection, null, AddType.None, true, false) { }
 
-    private InputBoxListBoxStyle(string txt, List<AbstractListItem>? itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool autosort, bool closeOnItemClick) : base(true, true) {
+    private InputBoxListBoxStyle(string txt, List<ListItem>? itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool autosort, bool closeOnItemClick) : base(true, true) {
         InitializeComponent();
 
         txbText.CheckBehavior = checkBehavior;
@@ -49,23 +45,23 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     public static string Show(string txt, List<string>? items) {
         if (items is not { Count: not 0 }) {
-            return InputBox.Show(txt, string.Empty, FormatHolderText.Instance);
+            return InputBox.Show(txt, string.Empty, BlueBasics.Classes.Formats.TextFormat.Instance);
         }
 
-        List<AbstractListItem> x = [];
+        List<ListItem> x = [];
         x.AddRange(ItemsOf(items));
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
         return erg?.Count != 1 ? string.Empty : erg[0].KeyName;
     }
 
-    public static List<AbstractListItem>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
+    public static List<ListItem>? Show(string txt, List<ListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
         var mb = new InputBoxListBoxStyle(txt, items, checkBehavior, check, addNewAllowed, true, false);
         mb.ShowDialog();
         return mb._giveBack;
     }
 
-    public static void Show(string txt, List<AbstractListItem> items, bool closeOnItemClick) {
+    public static void Show(string txt, List<ListItem> items, bool closeOnItemClick) {
         var mb = new InputBoxListBoxStyle(txt, items, CheckBehavior.SingleSelection, null, AddType.None, true, closeOnItemClick);
         mb.ShowDialog();
     }

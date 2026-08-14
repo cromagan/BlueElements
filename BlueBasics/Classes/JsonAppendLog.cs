@@ -29,9 +29,7 @@ public sealed class JsonAppendLog : IDisposableExtended {
     /// Der StreamWriter wird beim ersten <see cref="Append" /> im Append-Modus
     /// geöffnet (<see cref="FileShare.Read" />).
     /// </summary>
-    public JsonAppendLog(string filename) {
-        _filename = filename;
-    }
+    public JsonAppendLog(string filename) => _filename = filename;
 
     #endregion
 

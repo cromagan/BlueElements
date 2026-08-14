@@ -1,7 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Editoren;
-using BlueScript.Variables;
+using BlueScript.ScriptVariables;
+using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 
 namespace BlueControls;
@@ -38,10 +39,10 @@ public partial class VariableEditor : EditorEasy {
             var inhalt = thisr.CellGetString("Inhalt");
             var kommentar = thisr.CellGetString("Kommentar");
 
-            var v = ParseableItem.NewByTypeName<Variable>(typId);
+            var v = ParseableItem.NewByTypeName<ScriptVariable>(typId);
             if (v is null) {
-                Develop.DebugPrint($"Unbekannter Variablentyp '{typId}' – erzeuge VariableString.");
-                v = new VariableString(name, inhalt, false, kommentar);
+                Develop.DebugPrint($"Unbekannter Variablentyp '{typId}' – erzeuge String.");
+                v = new StringScriptVariable(name, inhalt, false, kommentar);
             } else {
                 v.KeyName = name;
                 v.Comment = kommentar;
@@ -57,16 +58,16 @@ public partial class VariableEditor : EditorEasy {
 
     public RowItem? RowOfVariable(string variable) => tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable];
 
-    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable.KeyName];
+    public RowItem? RowOfVariable(ScriptVariable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
         var tb = Table.Get();
-        var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolderSystemname.Instance, "Variablenname");
+        var na = tb.Column.GenerateAndAdd("Name", "N", SystemnameColumnFormat.Instance, "Variablenname");
         if (na is { IsDisposed: false }) { na.IsFirst = true; }
-        tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolderTextOneLine.Instance, "Variablentyp");
-        tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolderBit.Instance, "Readonly, Schreibgeschützt");
-        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolderTextMultiline.Instance, "Inhalt");
-        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolderTextMultiline.Instance, "Kommentar");
+        tb.Column.GenerateAndAdd("Typ", "T", TextOneLineColumnFormat.Instance, "Variablentyp");
+        tb.Column.GenerateAndAdd("RO", "R", BitColumnFormat.Instance, "Readonly, Schreibgeschützt");
+        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", TextMultilineColumnFormat.Instance, "Inhalt");
+        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", TextMultilineColumnFormat.Instance, "Kommentar");
 
         tb.Column.DisableAllEditing();
 
@@ -78,7 +79,7 @@ public partial class VariableEditor : EditorEasy {
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 is not null) {
                     thisColumn2.EditableWithTextInput = true;
-                    thisColumn2.PermissionGroupsChangeCell = new([Constants.Everybody]);
+                    thisColumn2.PermissionGroupsChangeCell = new([Everybody]);
                 }
             }
 
@@ -86,7 +87,7 @@ public partial class VariableEditor : EditorEasy {
             if (inh is { IsDisposed: false }) { inh.Caption = "Inhalt"; }
             if (kom is { IsDisposed: false }) { kom.Caption = "Kommentar"; }
 
-            tb.PermissionGroupsNewRow = new([Constants.Everybody]);
+            tb.PermissionGroupsNewRow = new([Everybody]);
         }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);

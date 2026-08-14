@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionPad;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Classes;
@@ -28,7 +27,7 @@ public static class Export {
 
         if (loadFile.FileType() != FileFormat.BlueCreativeFile) { return "Datei hat das falsche Format."; }
 
-        using var l = new ItemCollectionPadItem(loadFile);
+        using var l = new CollectionPadItem(loadFile);
 
         if (!l.Any()) { return "Layout nicht gefunden oder fehlerhaft."; }
 
@@ -43,7 +42,7 @@ public static class Export {
 
         bmp.Save(saveFile, ImageFormat.Png);
         bmp.Dispose();
-        Generic.CollectGarbage();
+        CollectGarbage();
 
         return string.Empty;
     }

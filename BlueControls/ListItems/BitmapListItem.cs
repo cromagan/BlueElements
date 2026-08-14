@@ -1,0 +1,234 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using static BlueBasics.ClassesStatic.IO;
+
+namespace BlueControls.ListItems;
+
+public class BitmapListItem : ListItem {
+
+    #region Fields
+
+    private const int ConstMy = 15;
+    private readonly int _captionlines = 2;
+    private Bitmap? _bitmap;
+
+    private string _caption;
+    private List<string> _captiontmp = [];
+
+    private string _imageFilename = string.Empty;
+
+    #endregion
+
+    #region Constructors
+
+    public BitmapListItem(Bitmap? bmp, string keyName, string caption, string quickInfo) : base(keyName, true) {
+        _caption = caption;
+        _captiontmp.Clear();
+        _bitmap = bmp;
+        Padding = 0;
+        Overlays.Clear();
+        QuickInfo = quickInfo;
+    }
+
+    public BitmapListItem(string filename, string keyName, string caption, string quickInfo) : base(keyName, true) {
+        _caption = caption;
+        _captiontmp.Clear();
+        _imageFilename = filename;
+        Padding = 0;
+        Overlays.Clear();
+        QuickInfo = quickInfo;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public Bitmap? Bitmap {
+        get {
+            GetImage();
+            return _bitmap;
+        }
+        set {
+            _imageFilename = string.Empty;
+            _bitmap = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Caption {
+        get => _caption;
+        set {
+            if (_caption == value) { return; }
+            _caption = value;
+            _captiontmp.Clear();
+            OnPropertyChanged();
+        }
+    }
+
+    //public int CaptionLines {
+    //    get => _captionlines;
+    //    set {
+    //        if (value < 1) { value = 1; }
+    //        if (_captionlines == value) { return; }
+    //        _captionlines = value;
+    //        _captiontmp.Clear();
+    //        OnPropertyChanged(string propertyname);
+    //    }
+    //}
+
+    public List<QuickImage> Overlays { get; } = [];
+
+    public int Padding { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) ||
+                                                        Caption.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                                                        _imageFilename.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        if (style == ListBoxAppearance.FileSystem) {
+            return 110 + _captionlines * ConstMy;
+        }
+
+        if (_bitmap is null) { return (int)(columnWidth * 0.8); }
+
+        var sc = (float)_bitmap.Height / _bitmap.Width;
+
+        if (sc > 1) { sc = 1; }
+
+        return (int)(sc * columnWidth);
+    }
+
+    public bool ImageLoaded() => _bitmap is not null;
+
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
+        try {
+            if (_bitmap is null) { return new Size(300, 300); }
+
+            var sc = (float)_bitmap.Height / _bitmap.Width;
+
+            if (sc > 1) { sc = 1; }
+
+            return new Size(300, (int)(sc * 300));
+        } catch {
+            //... wird an anderer Stelle verwendet...
+            Develop.AbortAppIfStackOverflow();
+            return ComputeUntrimmedCanvasSize(itemdesign);
+        }
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            _bitmap?.Dispose();
+            _bitmap = null;
+            _captiontmp.Clear();
+            Overlays.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false); }
+
+        var drawingCoordinates = positionControl;
+        drawingCoordinates.Inflate(-Padding, -Padding);
+        var scaledImagePosition = RectangleF.Empty;
+        var areaOfWholeImage = RectangleF.Empty;
+        var bFont = Skin.GetBlueFont(itemdesign, state);
+        GetImage();
+        if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = BlueFont.SplitByWidth(bFont, _caption, drawingCoordinates.Width, _captionlines); }
+
+        //Point trp;
+
+        bool ok;
+        do {
+            ok = true;
+            if (_bitmap is not null) {
+                try {
+                    lock (_bitmap) {
+                        areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
+                        zoom = (float)Math.Min((drawingCoordinates.Width - Padding * 2) / (double)_bitmap.Width,
+                            (drawingCoordinates.Height - Padding * 2 - _captionlines * ConstMy) / (double)_bitmap.Height);
+                        scaledImagePosition = new RectangleF((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(zoom)) / 2 + drawingCoordinates.Left,
+                            (drawingCoordinates.Height - _bitmap.Height.CanvasToControl(zoom)) / 2 + drawingCoordinates.Top - _captionlines * ConstMy / 2f,
+                            _bitmap.Width.CanvasToControl(zoom),
+                            _bitmap.Height.CanvasToControl(zoom));
+                    }
+                } catch {
+                    ok = false;
+                }
+            }
+        } while (!ok);
+
+        var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
+        scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };
+
+        gr.TranslateTransform(trp.X, trp.Y);
+
+        bool ok2;
+        do {
+            ok2 = true;
+            try {
+                if (_bitmap is not null) {
+                    if (state.HasFlag(States.Standard_Disabled)) {
+                        var bmpDisabled = _bitmap.CloneFromBitmap();
+                        bmpDisabled.ApplyFilter(WindowsXPDisabled.Instance);
+                        gr.DrawImage(bmpDisabled, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
+                        bmpDisabled.Dispose();
+                    } else {
+                        gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
+                    }
+                }
+                foreach (var thisQi in Overlays) {
+                    gr.DrawImageUnscaled(thisQi, (int)(scaledImagePosition.Left + 8), (int)(scaledImagePosition.Top + 8));
+                }
+            } catch {
+                //Trotz lock kommt "Das Objekt wird an anderer Stelle verwendent.
+                // Ein Bitmap?
+                ok2 = false;
+            }
+        } while (!ok2);
+
+        if (!string.IsNullOrEmpty(_caption)) {
+            var c = _captiontmp.Count;
+            var ausgl = (c - _captionlines) * ConstMy / 2;
+            foreach (var thisCap in _captiontmp) {
+                c--;
+                var s = bFont.FormatedText_NeededSize(thisCap, null, 16);
+                var r = new Rectangle((int)(drawingCoordinates.Left + (drawingCoordinates.Width - s.Width) / 2.0),
+                       (int)drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                r.X -= (int)trp.X;
+                r.Y -= (int)trp.Y;
+                r.Y = r.Y - ConstMy * c + ausgl;
+                //r = new Rectangle(r.Left - trp.ControlX, r.Top - trp.Y, r.Width, r.Height);
+                //GenericControl.Skin.Draw_Back(GR, Design.Item_ListBox_Caption, vState, r, null, false);
+                //GenericControl.Skin.Draw_Border(GR, Design.Item_ListBox_Caption, vState, r);
+                Skin.Draw_FormatedText(gr, thisCap, null, Alignment.Horizontal_Vertical_Center, r, Design.Item_ListBox, state, null, false, false);
+            }
+        }
+        gr.TranslateTransform(-trp.X, -trp.Y);
+        gr.ResetTransform();
+        if (drawBorderAndBack) {
+            Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
+        }
+    }
+
+    protected override string GetCompareKey() => KeyName;
+
+    private void GetImage() {
+        if (string.IsNullOrEmpty(_imageFilename)) { return; }
+        if (_bitmap is not null) { return; }
+        try {
+            if (FileExists(_imageFilename)) {
+                _bitmap = Image_FromFile(_imageFilename) as Bitmap;
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint("Fehler beim laden des Bildes", ex);
+        }
+    }
+
+    #endregion
+}

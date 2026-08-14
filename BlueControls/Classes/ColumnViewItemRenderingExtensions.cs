@@ -1,8 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.TableItems;
 using BlueControls.Controls;
-using BlueControls.Renderer;
+using BlueControls.TableElements;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls.Classes;
@@ -96,7 +95,7 @@ public static class ColumnViewItemRenderingExtensions {
 
     public static int ControlColumnWidth(this ColumnViewItem cvi) => GetRenderingData(cvi).ControlColumnWidth ?? 16;
 
-    public static Renderer_Abstract GetRenderer(this ColumnViewItem cvi, string style) {
+    public static Renderer.Renderer GetRenderer(this ColumnViewItem cvi, string style) {
         var data = GetRenderingData(cvi);
         if (data.Renderer is not null) { return data.Renderer; }
 
@@ -111,7 +110,7 @@ public static class ColumnViewItemRenderingExtensions {
         cvi.InvalidateLayout();
     }
 
-    internal static int CalculateCanvasContentWith(ColumnItem? column, Renderer_Abstract renderer) {
+    internal static int CalculateCanvasContentWith(ColumnItem? column, Renderer.Renderer renderer) {
         if (column is not { IsDisposed: false }) { return 16; }
         if (column.Table is not { IsDisposed: false } tb) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
@@ -160,11 +159,11 @@ public static class ColumnViewItemRenderingExtensions {
                 : Math.Min(cvi.CanvasContentWidth(sheetStyle).CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
         }
 
-        cw = Math.Max(cw, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom));
+        cw = Math.Max(cw, FilterBarTableElement.AutoFilterSize.CanvasToControl(zoom));
         cw = Math.Max(cw, minw);
 
         if (parent?.Ansichtbearbeitung ?? false) {
-            cw = Math.Max(cw, (EditBarListItem.ButtonCount * EditBarListItem.ButtonSize + 8).CanvasToControl(zoom));
+            cw = Math.Max(cw, (EditBarTableElement.ButtonCount * EditBarTableElement.ButtonSize + 8).CanvasToControl(zoom));
         }
 
         GetRenderingData(cvi).ControlColumnWidth = cw;

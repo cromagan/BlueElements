@@ -1,14 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Chars;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
-using BlueControls.Extended_Text.MarkRendering;
+using BlueControls.MarkRenderer;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -20,7 +17,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     private const string ExtCharFormat = "BlueElements.ExtChar";
     private readonly ExtText _eTxt;
-    private readonly List<Zone> _zones = [];
+    private readonly List<ZoneMarkRenderer> _zones = [];
 
     private int _blinkCount;
 
@@ -99,16 +96,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     } = string.Empty;
 
-    [DefaultValue("")]
-    public string ForbiddenChars {
-        get;
-        set {
-            if (IsDisposed || field == value) { return; }
-            field = value;
-            GenerateEtxt(false);
-        }
-    } = string.Empty;
-
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
@@ -119,7 +106,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     public override bool ControlMustPressedForZoomWithWheel => true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -134,6 +121,16 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             Invalidate();
         }
     }
+
+    [DefaultValue("")]
+    public string ForbiddenChars {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            GenerateEtxt(false);
+        }
+    } = string.Empty;
 
     [DefaultValue(4000)]
     public int MaxTextLength {
@@ -279,7 +276,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    internal Func<object?, List<AbstractListItem>?>? AdditionalContextMenuItems { get; set; }
+    internal Func<object?, List<ListItem>?>? AdditionalContextMenuItems { get; set; }
 
     internal int CursorPosition {
         get => Math.Max(0, Math.Max(_markStart, _markEnd));
@@ -290,6 +287,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     }
 
+    protected override bool AllowScrollWithoutSliderX => true;
     protected virtual Design Design => Design.TextBox;
 
     /// <summary>
@@ -299,8 +297,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     /// <see cref="EnsureCursorVisible"/>.
     /// </summary>
     protected override bool ShowSliderX => false;
-
-    protected override bool AllowScrollWithoutSliderX => true;
 
     protected override int SmallChangeY => 20;
 
@@ -318,8 +314,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         );
     }
 
-    public virtual List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
-        List<AbstractListItem> contextMenu = [];
+    public virtual List<ListItem>? GetContextMenuItems(object? hotItem) {
+        List<ListItem> contextMenu = [];
         AbortSpellChecking();
 
         if (AdditionalContextMenuItems?.Invoke(hotItem) is { } additional && additional.Count > 0) {
@@ -363,9 +359,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                 contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, true));
 
                 contextMenu.Add(Separator());
-                contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, marked, string.Empty));
-                contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, marked, string.Empty));
-                contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, marked, string.Empty));
+                contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, marked, string.Empty));
+                contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, marked, string.Empty));
+                contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, marked, string.Empty));
             }
         }
 
@@ -375,7 +371,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     public int Insert(int pos, string? nt) {
         if (string.IsNullOrEmpty(nt)) { return pos; }
 
-        var filtered = nt.RemoveChars(Constants.Char_NotFromClip);
+        var filtered = nt.RemoveChars(Char_NotFromClip);
         if (!MultiLine) { filtered = filtered.RemoveChars("\r\n"); }
 
         foreach (var t in filtered) {
@@ -390,15 +386,13 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     public void Mark(string markKey, int first, int last) => Mark(markKey, first, last, null);
 
-    public void Unmark(string markKey) {
-        _zones.RemoveAll(z => z.Type == markKey);
-    }
+    public void Unmark(string markKey) => _zones.RemoveAll(z => z.Type == markKey);
 
     internal void Mark(string markKey, int first, int last, Color? overrideColor) {
-        var renderer = MarkRenderer.AllRenderers[markKey];
+        var renderer = AllRenderers[markKey];
         if (renderer is null) { return; }
         var end = Math.Min(last, _eTxt.Count - 1);
-        _zones.Add(new Zone(renderer, first, end, overrideColor));
+        _zones.Add(new ZoneMarkRenderer(renderer, first, end, overrideColor));
     }
 
     internal void ProcessKey(AsciiKey keyAscii) {
@@ -425,7 +419,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                 if (MultiLine) {
                     _markStart = Char_DelBereich(_markStart, _markEnd, false);
                     _markEnd = -1;
-                    _markStart = Insert(_markStart, new ExtCharCrlfCode(_eTxt, _markStart), true);
+                    _markStart = Insert(_markStart, new CrLfChar(_eTxt, _markStart), true);
                 }
                 break;
 
@@ -488,9 +482,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                 return;
             }
         }
-        var renderer = MarkRenderer.AllRenderers[markKey];
+        var renderer = AllRenderers[markKey];
         if (renderer is null) { return; }
-        _zones.Add(new Zone(renderer, first, end, overrideColor));
+        _zones.Add(new ZoneMarkRenderer(renderer, first, end, overrideColor));
     }
 
     internal bool WordStarts(string word, int position) {
@@ -853,7 +847,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     }
 
     private void Blinker_Tick() {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
         if (IsDisposed) { return; }
         if (_blinkCount < _raiseChangeDelay + 1 && _raiseChangeDelay > 0) {
             _blinkCount++;
@@ -968,7 +962,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     private void Contextmenu_Sonderzeichen(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-        List<AbstractListItem> i = [
+        List<ListItem> i = [
             ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
             ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
             ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
@@ -980,18 +974,18 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (r is not { Count: 1 }) { return; }
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
-        _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
+        _markStart = Insert(_markStart, new Chars.IconChar(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
     private void CreateCellLinkZones() {
-        Unmark(MarkRenderer_CellLink.Type);
+        Unmark(CellLinkMarkRenderer.Type);
         for (var i = 0; i < _eTxt.Count; i++) {
-            if (_eTxt[i] is not ExtCharCellLinkStart) { continue; }
+            if (_eTxt[i] is not CellLinkStartChar) { continue; }
             var startIdx = i + 1;
             var endIdx = startIdx;
-            while (endIdx < _eTxt.Count && _eTxt[endIdx] is not ExtCharCellLinkEnd) { endIdx++; }
+            while (endIdx < _eTxt.Count && _eTxt[endIdx] is not CellLinkCharEndChar) { endIdx++; }
             if (endIdx < _eTxt.Count && endIdx > startIdx) {
-                Mark(MarkRenderer_CellLink.Type, startIdx, endIdx - 1, null);
+                Mark(CellLinkMarkRenderer.Type, startIdx, endIdx - 1, null);
             }
         }
     }
@@ -1152,9 +1146,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     }
 
-    private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
+    private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new AsciiChar(_eTxt, pos, c), raiseEvent);
 
-    private int Insert(int pos, ExtChar chr, bool raiseEvent) {
+    private int Insert(int pos, Chars.Char chr, bool raiseEvent) {
         if (_eTxt.Insert(pos, chr)) {
             ShiftZones(pos, 1);
             if (raiseEvent)
@@ -1171,15 +1165,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             if (linkAllowed && System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat)) {
                 if (System.Windows.Forms.Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     var t = sd.SplitByCr();
-                    var start = new ExtCharCellLinkStart(_eTxt, pos, t[0], t[1], t[2]);
+                    var start = new CellLinkStartChar(_eTxt, pos, t[0], t[1], t[2]);
                     var linkStartIdx = pos;
                     pos = Insert(pos, start, true);
                     if (!string.IsNullOrEmpty(start.DisplayText)) {
                         foreach (var c in start.DisplayText)
-                            pos = Insert(pos, new ExtCharAscii(_eTxt, pos, c), true);
+                            pos = Insert(pos, new AsciiChar(_eTxt, pos, c), true);
                     }
-                    pos = Insert(pos, new ExtCharCellLinkEnd(_eTxt, pos), true);
-                    Mark(MarkRenderer_CellLink.Type, linkStartIdx + 1, pos - 2, null);
+                    pos = Insert(pos, new CellLinkCharEndChar(_eTxt, pos), true);
+                    Mark(CellLinkMarkRenderer.Type, linkStartIdx + 1, pos - 2, null);
                     return pos;
                 }
             }
@@ -1275,7 +1269,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (_markStart == _markEnd) { _markEnd = -1; }
 
         if (swapThem && _markStart > _markEnd && _markEnd > -1) {
-            Generic.Swap(ref _markStart, ref _markEnd);
+            Swap(ref _markStart, ref _markEnd);
         }
 
         if (_markEnd >= 0 && _markStart >= 0) {
@@ -1314,19 +1308,19 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     private void SetupSelectionZone() {
         Selection_Repair(false);
         if (_markEnd < 0) {
-            Unmark(MarkRenderer_Selection.Type);
+            Unmark(SelectionMarkRenderer.Type);
             return;
         }
 
         var mas = Math.Min(_markStart, _markEnd);
         var mae = Math.Max(_markStart, _markEnd);
         if (mas == mae) {
-            Unmark(MarkRenderer_Selection.Type);
+            Unmark(SelectionMarkRenderer.Type);
             return;
         }
 
         var overrideFont = Skin.GetBlueFont(Design, States.Checked);
-        UpdateOrAddMark(MarkRenderer_Selection.Type, mas, mae - 1, overrideFont.ColorMain);
+        UpdateOrAddMark(SelectionMarkRenderer.Type, mas, mae - 1, overrideFont.ColorMain);
     }
 
     private void ShiftZones(int position, int delta) {
@@ -1381,12 +1375,12 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         var x = us.SplitAndCutBy(";");
         switch (x[0]) {
             case "Unmark":
-                Unmark(MarkRenderer_Ringelchen.Type);
+                Unmark(JigglyRedLineMarkRenderer.Type);
                 Invalidate();
                 break;
 
             case "Mark":
-                Mark(MarkRenderer_Ringelchen.Type, IntParse(x[1]), IntParse(x[2]));
+                Mark(JigglyRedLineMarkRenderer.Type, IntParse(x[1]), IntParse(x[2]));
                 Invalidate();
                 break;
 
@@ -1404,8 +1398,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             _mustCheck = true;
             return;
         }
-        _zones.RemoveAll(z => z.Type == MarkRenderer_Ringelchen.Type && !(z.EndPos < startPos || z.StartPos > endPos));
-        if (markAsError) { Mark(MarkRenderer_Ringelchen.Type, startPos, endPos); }
+        _zones.RemoveAll(z => z.Type == JigglyRedLineMarkRenderer.Type && !(z.EndPos < startPos || z.StartPos > endPos));
+        if (markAsError) { Mark(JigglyRedLineMarkRenderer.Type, startPos, endPos); }
         Invalidate();
     }
 

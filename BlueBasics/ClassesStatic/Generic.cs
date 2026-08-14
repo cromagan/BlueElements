@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using Microsoft.Win32;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace BlueBasics.ClassesStatic;
 
@@ -71,7 +71,7 @@ public static class Generic {
 
     public static bool Ending { get; set; }
 
-    public static string UserGroup { get; set; } = Constants.Everybody;
+    public static string UserGroup { get; set; } = Everybody;
 
     public static string UserName {
         get {
@@ -200,7 +200,7 @@ public static class Generic {
         return ToHex(hashBytes);
     }
 
-    public static IEnumerable<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
+    public static IEnumerable<MethodInfo> GetMethodWithAttribute<TAttribute>() where TAttribute : Attribute {
         foreach (var thisType in AllTypes) {
             IEnumerable<MethodInfo> methods;
             try {
@@ -281,7 +281,7 @@ public static class Generic {
 
     public static string GetUniqueKey() {
         // Hashtag: UniqueInternal
-        var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Constants.Char_Numerals);
+        var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Char_Numerals);
         if (neueZeit == _getUniqueKeyLastTime) {
             _getUniqueKeyCount++;
         } else {
@@ -291,7 +291,7 @@ public static class Generic {
         return $"ID_{neueZeit}_{_getUniqueKeyCount.ToString3()}";
     }
 
-    public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
+    public static bool IsAdministrator() => string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase);
 
     public static void LaunchBrowser(string url) {
         var browserName = "iexplore.exe";

@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
 using BlueControls.DrawingHelpers;
 using BlueControls.EventArgs;
@@ -46,7 +44,7 @@ public partial class ZoomPic : CreativePad {
 
     #region Properties
 
-    public GenericTool? ActiveTool {
+    public IDrawsOverlay? ActiveTool {
         get;
         set {
             if (field == value) { return; }
@@ -56,9 +54,9 @@ public partial class ZoomPic : CreativePad {
     }
 
     public Bitmap? Bmp {
-        get => _bmpItem?.Bitmap;
+        get => _bmpItem?.BitmapValue;
         set {
-            if (_bmpItem?.Bitmap == value) { return; }
+            if (_bmpItem?.BitmapValue == value) { return; }
 
             if (value is null || Items is null) {
                 if (_bmpItem is not null) {
@@ -78,7 +76,7 @@ public partial class ZoomPic : CreativePad {
 
             if (!Items.Contains(_bmpItem)) { Items.Add(_bmpItem); }
 
-            _bmpItem.Bitmap = value;
+            _bmpItem.BitmapValue = value;
             _bmpItem.PixelGenau = true;
             _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
             _bmpItem.Bild_Modus = SizeModes.Verzerren;
@@ -162,28 +160,26 @@ public partial class ZoomPic : CreativePad {
             return;
         }
 
-		foreach (var h in Helpers) {
-			if (!h.DrawsAfterOverlay) {
-				h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
-			}
-		}
+        foreach (var h in Helpers) {
+            if (!h.DrawsAfterOverlay) {
+                h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
+            }
+        }
 
-		gr.ResetClip();
+        gr.ResetClip();
 
-		ActiveTool?.DrawOverlay(gr, Zoom, OffsetX, OffsetY, TrimmedMouseDownData, _trimmedCurrentMouseData);
+        ActiveTool?.DrawOverlay(gr, Zoom, OffsetX, OffsetY, TrimmedMouseDownData, _trimmedCurrentMouseData);
 
-		PrintInfoText(gr, CurrentMouseData);
+        PrintInfoText(gr, CurrentMouseData);
 
-		foreach (var h in Helpers) {
-			if (h.DrawsAfterOverlay) {
-				h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
-			}
-		}
+        foreach (var h in Helpers) {
+            if (h.DrawsAfterOverlay) {
+                h.Draw(gr, newCanvasCoords, Zoom, OffsetX, OffsetY, Bmp, MouseDownData, CurrentMouseData, controlDrawArea);
+            }
+        }
     }
 
-    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
-        ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(TrimmedMouseDownData, e));
-    }
+    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) => ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(TrimmedMouseDownData, e));
 
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);

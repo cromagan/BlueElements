@@ -14,7 +14,7 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBox() : this(string.Empty, string.Empty, FormatHolderText.Instance, false) { }
+    private InputBox() : this(string.Empty, string.Empty, BlueBasics.Classes.Formats.TextFormat.Instance, false) { }
 
     private InputBox(string txt, string vorschlagsText, IInputFormat textformat, bool bigMultiLineBox) : base() {
         InitializeComponent();
@@ -30,14 +30,14 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     #region Methods
 
-    public static string Show(string txt) => Show(txt, string.Empty, FormatHolderText.Instance, false);
+    public static string Show(string txt) => Show(txt, string.Empty, BlueBasics.Classes.Formats.TextFormat.Instance, false);
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="vorschlagsText"></param>
-    /// <param name="textformat">Beispiel: BlueBasics.FormatHolder oder BlueTable.FormatHolderText.Instance</param>
+    /// <param name="textformat">Beispiel: BlueBasics.Format oder BlueTable.BlueBasics.Classes.Formats.TextFormat.Instance</param>
     /// <returns></returns>
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat) => Show(txt, vorschlagsText, textformat, false);

@@ -56,7 +56,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
         _maxCacheSize = maxCacheSize;
         _dict = new ConcurrentDictionary<TKey, TValue>();
         _trimAction = TrimToMax;
-        Generic.RegisterCacheTrim(_trimAction);
+        RegisterCacheTrim(_trimAction);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
         _maxCacheSize = maxCacheSize;
         _dict = new ConcurrentDictionary<TKey, TValue>(comparer);
         _trimAction = TrimToMax;
-        Generic.RegisterCacheTrim(_trimAction);
+        RegisterCacheTrim(_trimAction);
     }
 
     #endregion
@@ -191,7 +191,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// </summary>
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        Generic.UnregisterCacheTrim(_trimAction);
+        UnregisterCacheTrim(_trimAction);
         ClearCore();
         OnDisposed();
         GC.SuppressFinalize(this);
@@ -293,9 +293,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// Use-After-Dispose — insbesondere vor dem stillen Hinzufügen von Einträgen,
     /// die nie wieder disposet würden (Memory-Leak).
     /// </summary>
-    private void ThrowIfDisposed() {
-        ObjectDisposedException.ThrowIf(_isDisposedFlag != 0, this);
-    }
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_isDisposedFlag != 0, this);
 
     /// <summary>
     /// Internes Trim ohne Dispose-Prüfung. Wird vom registrierten

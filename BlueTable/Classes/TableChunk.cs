@@ -5,8 +5,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using static BlueTable.Classes.Chunk;
 using static BlueBasics.Interfaces.IHasKeyNameExtension;
+using static BlueTable.Classes.Chunk;
 
 namespace BlueTable.Classes;
 
@@ -149,7 +149,7 @@ public class TableChunk : TableFile {
     public override bool IsRecentlyUsed {
         get {
             if (_lastUsed.IsEmpty) { return false; }
-            var threshold = DateTime.UtcNow.AddMinutes(-Chunk.SkipIfUnusedMinutes);
+            var threshold = DateTime.UtcNow.AddMinutes(-SkipIfUnusedMinutes);
             foreach (var kvp in _lastUsed) {
                 if (kvp.Value > threshold) { return true; }
             }
@@ -196,7 +196,7 @@ public class TableChunk : TableFile {
                 return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
             case ChunkType.ByName:
-                var t = FormatHolderSystemName.MakeValid(chunkvalue).TrimStart('_');
+                var t = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(chunkvalue).TrimStart('_');
                 return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
 
             default:
@@ -593,7 +593,7 @@ public class TableChunk : TableFile {
                     .Select(x => x.Id)
                     .ToList();
             } else {
-                chunkIds = [.. chunkIds.OrderBy(_ => Constants.GlobalRnd.Next()).Take(count)];
+                chunkIds = [.. chunkIds.OrderBy(_ => GlobalRnd.Next()).Take(count)];
             }
         }
 

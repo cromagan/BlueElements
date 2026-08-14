@@ -357,15 +357,15 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// </summary>
     public static void RevokeWriteAccessAll() {
         var snapshot = _writeAccessHolders.Values.ToList();
-        Develop.EndLog($"RevokeWriteAccessAll: {snapshot.Count} Lock(s) zu entfernen");
+        EndLog($"RevokeWriteAccessAll: {snapshot.Count} Lock(s) zu entfernen");
         var done = 0;
         foreach (var mu in snapshot) {
             done++;
-            Develop.EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Vor RevokeWriteAccess '{mu.Filename}'");
+            EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Vor RevokeWriteAccess '{mu.Filename}'");
             mu.RevokeWriteAccess();
-            Develop.EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Nach RevokeWriteAccess '{mu.Filename}'");
+            EndLog($"RevokeWriteAccessAll: [{done}/{snapshot.Count}] Nach RevokeWriteAccess '{mu.Filename}'");
         }
-        Develop.EndLog("RevokeWriteAccessAll: ENDE");
+        EndLog("RevokeWriteAccessAll: ENDE");
     }
 
     /// <summary>
@@ -434,7 +434,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <see cref="string.Empty"/> bei Erfolg.
     /// </summary>
     public string AcquireWriteAccess() {
-        if (Develop.AllReadOnly) { return string.Empty; }
+        if (AllReadOnly) { return string.Empty; }
 
         if (!IsMyLock()) {
             var blocker = BlockFile.BlockerMessage(Filename, MyId);
@@ -595,7 +595,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Markiert den Chunk als fehlgeschlagen geladen.
     /// </summary>
-    public void MarkLoadFailed() { LoadFailed = true; }
+    public void MarkLoadFailed() => LoadFailed = true;
 
     public bool NeedsLoading() {
         if (_fileInfo is null) { return true; }
@@ -616,7 +616,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
         try {
             Save().GetAwaiter().GetResult();
         } catch (Exception ex) {
-            Develop.DebugPrint("Fehler beim Speichern vor Freigabe des Schreibzugriffs", ex);
+            DebugPrint("Fehler beim Speichern vor Freigabe des Schreibzugriffs", ex);
         }
     }
 
@@ -739,7 +739,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             var dataToWrite = MustZipped ? data.ZipIt() : data;
             if (dataToWrite is null || dataToWrite.Length == 0) { return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern"); }
 
-            var backup = IO.BackupName(filename);
+            var backup = BackupName(filename);
             var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
             var result = WriteAllBytes(tmpFile, dataToWrite);
@@ -1009,7 +1009,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
             var result = ExtendedSave
-                ? IO.SaveExtended(Filename, contentToWrite)
+                ? SaveExtended(Filename, contentToWrite)
                 : WriteAllBytes(Filename, contentToWrite);
 
             if (result.IsFailed) { return result; }

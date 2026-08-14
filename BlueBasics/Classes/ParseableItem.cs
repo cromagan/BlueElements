@@ -59,7 +59,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
             // NewByParsing schlägt lautlos fehl). Daher gegen null UND leer prüfen.
             // BindingFlags.Static explizit: sonst findet GetProperty auch
             // Instance-Properties und GetValue(null, null) wirft TargetException.
-            if ((string?)t.GetProperty("ClassId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
+            if ((string?)t.GetProperty("ClassId", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                           ?.GetValue(null, null) is { Length: > 0 } ci) {
                 _classIdByType[t] = ci;
                 return ci;

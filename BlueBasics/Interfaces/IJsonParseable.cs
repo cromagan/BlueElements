@@ -119,20 +119,18 @@ public static class JsonParseableExtension {
     /// Primitive Typen werden direkt konvertiert, alles andere über
     /// <see cref="JsonSerializer" /> serialisiert.
     /// </summary>
-    public static JsonNode? AsJsonNode(object? value) {
-        return value switch {
-            null => null,
-            JsonNode jn => jn,
-            string s => JsonValue.Create(s),
-            int i => JsonValue.Create(i),
-            long l => JsonValue.Create(l),
-            float f => JsonValue.Create(f),
-            double d => JsonValue.Create(d),
-            bool b => JsonValue.Create(b),
-            DateTime dt => JsonValue.Create(dt.ToString("o")),
-            _ => JsonSerializer.SerializeToNode(value)
-        };
-    }
+    public static JsonNode? AsJsonNode(object? value) => value switch {
+        null => null,
+        JsonNode jn => jn,
+        string s => JsonValue.Create(s),
+        int i => JsonValue.Create(i),
+        long l => JsonValue.Create(l),
+        float f => JsonValue.Create(f),
+        double d => JsonValue.Create(d),
+        bool b => JsonValue.Create(b),
+        DateTime dt => JsonValue.Create(dt.ToString("o")),
+        _ => JsonSerializer.SerializeToNode(value)
+    };
 
     /// <summary>
     /// Erzeugt die <see cref="JsonPathChangedEventArgs" /> für einen

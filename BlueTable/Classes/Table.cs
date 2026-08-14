@@ -1,8 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueScript.Classes;
 using BlueScript.EventArgs;
-using BlueTable.AdditionalScriptMethods;
-using BlueTable.AdditionalScriptVariables;
 using BlueTable.ClassesStatic;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
@@ -47,7 +46,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private readonly List<string> _tags = [];
 
-    private readonly List<Variable> _variables = [];
+    private readonly List<ScriptVariable> _variables = [];
 
     private string _assetFolder;
 
@@ -116,7 +115,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
         lock (AllFilesLocker) {
-            KeyName = FormatHolderSystemName.MakeValid(tablename);
+            KeyName = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(tablename);
 
             if (!IsValidTableName(KeyName)) {
                 Develop.DebugError("Tabellenname ungültig: " + tablename);
@@ -184,7 +183,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     #region Properties
 
     /// <summary>
-    /// Eigenes Register aller lebenden Table-Instanzen, geordnet nach
+    /// Eigenes Register aller lebenden TableScriptCommand-Instanzen, geordnet nach
     /// <see cref="KeyName" />. Schlüsselseitig Case-Insensitive.
     /// </summary>
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
@@ -682,7 +681,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 file = file.FileNameWithoutSuffix();
             }
 
-            file = FormatHolderSystemName.MakeValid(file);
+            file = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(file);
 
             // Race-Safe über den Helper: Caching, Locking und AllowDuplicates
             // werden dort behandelt. Create (bzw. CreateInstance) macht die
@@ -751,7 +750,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (t.StartsWith("DATABASE", StringComparison.Ordinal)) { return false; }
         if (t.StartsWith("TABLE", StringComparison.Ordinal)) { return false; }
 
-        if (tablename.IsFormat(FormatHolderSystemName.Instance, false) is { Length: > 0 }) { return false; }
+        if (tablename.IsFormat(BlueBasics.Classes.Formats.SystemNameFormat.Instance, false) is { Length: > 0 }) { return false; }
 
         if (t == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -876,20 +875,20 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             snapshot = [.. LiveInstances.Values];
         }
 
-        Develop.EndLog($"Table.SaveAll: Start mit {snapshot.Count} Table(n)");
+        Develop.EndLog($"TableScriptCommand.SaveAll: Start mit {snapshot.Count} TableScriptCommand(n)");
 
         var count = 0;
         Parallel.ForEach(snapshot, thisFile => {
             if (thisFile is TableFile tbf) {
                 var key = tbf.KeyName;
-                Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                Develop.EndLog($"TableScriptCommand.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
                 Interlocked.Increment(ref count);
                 tbf.Save();
-                Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                Develop.EndLog($"TableScriptCommand.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
             }
         });
 
-        Develop.EndLog($"Table.SaveAll: Ende, {count} Table(n) gespeichert");
+        Develop.EndLog($"TableScriptCommand.SaveAll: Ende, {count} TableScriptCommand(n) gespeichert");
 
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
     }
@@ -910,7 +909,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
+    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
         if (failedReason is null || string.IsNullOrEmpty(failedReason)) {
@@ -1051,7 +1050,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public virtual bool BeSureToBeUpToDate(bool firstTime) => true;
 
     /// <summary>
-    /// Info: Table.HasValueChangedScript kann schnell die Existenz Abgefragt werden
+    /// Info: TableScriptCommand.HasValueChangedScript kann schnell die Existenz Abgefragt werden
     /// </summary>
     /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>
     /// <returns></returns>
@@ -1221,26 +1220,26 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 if (v is not null) { vars.Add(v); }
             }
 
-            vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
-            vars.Add(new VariableString(KeyInputRowKey, row.KeyName, true, "Der interne Zeilenschlüssel der Zeile, mit der das Skript aufgerufen wurde."));
-            vars.Add(new VariableString(KeyChunk, row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
+            vars.Add(new BlueScript.ScriptVariables.RowScriptVariable("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new StringScriptVariable(KeyInputRowKey, row.KeyName, true, "Der interne Zeilenschlüssel der Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new StringScriptVariable(KeyChunk, row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
         }
 
         if (filter is not null) {
             var num = 0;
             foreach (var thisFilter in filter) {
-                vars.Add(new VariableFilterItem($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));
+                vars.Add(new BlueScript.ScriptVariables.FilterScriptVariable($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));
                 num++;
             }
         }
 
         if (tableHeadVariables) {
             foreach (var thisvar in Variables.ToStringableListVariable()) {
-                // Typ der Original-Variable erhalten (VariableBool, VariableDouble, …),
+                // Typ der Original-Variable erhalten (Bool, Double, …),
                 // damit WriteBackVariables -> Combine den Wert typsicher zurückschreiben kann.
                 // NewByTypeName + GetValueFrom statt Clone: gleicher Mechanismus wie in
-                // VariableCollection.Combine, ohne Serialisierungs-Roundtrip.
-                var v = ParseableItem.NewByTypeName<Variable>(thisvar.MyClassId);
+                // Collection.Combine, ohne Serialisierungs-Roundtrip.
+                var v = ParseableItem.NewByTypeName<ScriptVariable>(thisvar.MyClassId);
                 if (v is null) {
                     Develop.DebugPrint(nameof(CreateVariableCollection) + ": Typ " + thisvar.MyClassId + " konnte nicht erzeugt werden.");
                     continue;
@@ -1253,34 +1252,34 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
         }
 
-        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
-        vars.Add(new VariableString("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
-        vars.Add(new VariableTable("CurrentTable", this, true, "Die aktuelle Tabelle"));
-        vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
-        vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle"));
-        vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde."));
-        vars.Add(new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"));
+        vars.Add(new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new StringScriptVariable("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new StringScriptVariable("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new BoolScriptVariable("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
+        vars.Add(new StringScriptVariable("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
+        vars.Add(new BlueScript.ScriptVariables.TableScriptVariable("CurrentTable", this, true, "Die aktuelle Tabelle"));
+        vars.Add(new BoolScriptVariable("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
+        vars.Add(new DoubleScriptVariable("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle"));
+        vars.Add(new StringScriptVariable("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde."));
+        vars.Add(new BlueScript.ScriptVariables.RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"));
 
         if (Column.First is { IsDisposed: false } fc) {
-            vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
+            vars.Add(new StringScriptVariable("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
             if (row is not null) {
-                vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte der Zeile als String"));
+                vars.Add(new StringScriptVariable("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte der Zeile als String"));
                 // Andere Row Felder siehe oben
             }
         }
 
-        //  vars.Add(new VariableString("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
+        //  vars.Add(new String("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
 
-        vars.Add(new VariableString("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
-        vars.Add(new VariableBool(KeyExtendend, extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
-        vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
+        vars.Add(new StringScriptVariable("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        vars.Add(new BoolScriptVariable(KeyExtendend, extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
+        vars.Add(new ListOfStringsScriptVariable("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
         if (virtualcolumns) {
-            vars.Add(new VariableString("RowColor", string.Empty, false, "Die Zeilenfarbe\r\nMuss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320"));
+            vars.Add(new StringScriptVariable("RowColor", string.Empty, false, "Die Zeilenfarbe\r\nMuss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320"));
         }
 
         #endregion
@@ -1331,28 +1330,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         RenumberRows(r, "Benutzerdefinierte Sortierung aktiviert");
 
         ConvertChapterColumnsToSingleLine();
-    }
-
-    /// <summary>
-    /// Nummeriert die übergebenen Zeilen in der übergebenen Reihenfolge fortlaufend
-    /// (1, 2, 3, ...) und schreibt die Werte in die Systemspalte für die
-    /// benutzerdefinierte Sortierung (<see cref="ColumnCollection.SysRowSortIndex"/>).
-    /// Dispose-Zustände werden übersprungen. Ist keine Sortierspalte aktiv, ist die
-    /// Methode eine No-Op. Event-Suppression muss der Aufrufer übernehmen — bei
-    /// vielen Zeilen löst jedes <see cref="RowItem.CellSet"/> synchron teure
-    /// Layout-Aktualisierungen aus.
-    /// </summary>
-    public void RenumberRows(IEnumerable<RowItem> rowsInOrder, string reason) {
-        if (IsDisposed) { return; }
-        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
-
-        var nr = 1;
-        foreach (var thisRow in rowsInOrder) {
-            if (thisRow is { IsDisposed: false }) {
-                thisRow.CellSet(sortCol, nr, reason);
-                nr++;
-            }
-        }
     }
 
     public void EnableScript() {
@@ -1416,19 +1393,19 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             AddAttributes(vars, args ?? []);
 
-            var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
+            var meth = ScriptCommand.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) {
-                meth.Add(Method_SetError.Method);
-                var gn = Method.AllMethods.Instances.FirstOrDefault(m => m.Command == "getnote");
+                meth.Add(SetErrorScriptCommand.Method);
+                var gn = ScriptCommand.AllMethods.Instances.FirstOrDefault(m => m.Command == "getnote");
                 if (gn is not null) { meth.Add(gn); }
             }
 
             #region Diagnose-Variablen bei Skript-Fehlern
 
             var varCount = vars.Count;
-            vars.Add(new VariableDouble("AvailableMethodCount", meth.Count, true, "Anzahl der verfügbaren Methoden. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
-            vars.Add(new VariableDouble("AvailableVariableCount", varCount, true, "Anzahl der verfügbaren Variablen. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
+            vars.Add(new DoubleScriptVariable("AvailableMethodCount", meth.Count, true, "Anzahl der verfügbaren Methoden. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
+            vars.Add(new DoubleScriptVariable("AvailableVariableCount", varCount, true, "Anzahl der verfügbaren Variablen. Diagnose-Variable bei Skript-Fehlern, um zu prüfen, ob alles richtig geladen wurde."));
 
             #endregion
 
@@ -1633,10 +1610,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
-                                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
-                            CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1690,7 +1667,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     /// <summary>
     /// Prüft, ob das Skript des angegebenen Typs ausführbar (OK) ist.
-    /// Info: ValueChangedScript kann schnell mit Table.HasValueChangedScript abgefragt werden.
+    /// Info: ValueChangedScript kann schnell mit TableScriptCommand.HasValueChangedScript abgefragt werden.
     /// </summary>
     /// <param name="type">Der Skript-Ereignistyp.</param>
     /// <param name="notExistingValue">Der Wert, der zurückgegeben werden soll, wenn das Skript NICHT vorhanden ist.</param>
@@ -1916,7 +1893,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert.
         // Rows werden in Speicher-Reihenfolge ausgegeben (SortDefinition bzw. KeyName),
-        // damit eine deterministische Datei entsteht - siehe Table.RowsInSaveOrder().
+        // damit eine deterministische Datei entsteht - siehe TableScriptCommand.RowsInSaveOrder().
         if (Column is { IsDisposed: false, Count: > 0 }) { json.Set("columns", Column.ParseableJson()["columns"]?.DeepClone()); }
         if (Row is { IsDisposed: false, Count: > 0 }) {
             JsonArray rowsJson = [];
@@ -1933,7 +1910,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public void ParseFinishedJson(JsonObject parsed) { }
 
     public void ParseJson(JsonObject json) {
-        // Table ist über ChangeData zentral gesteuert. Diese Implementierung
+        // TableScriptCommand ist über ChangeData zentral gesteuert. Diese Implementierung
         // spiegelt den Zustand wider, ohne die bestehenden Lade-Routinen zu
         // ersetzen. Sie ist rein additiv und für Partial-Updates geeignet.
         // Felder werden direkt gesetzt (analog zu ColumnItem/RowItem.ParseJson),
@@ -2089,6 +2066,28 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return false;
     }
 
+    /// <summary>
+    /// Nummeriert die übergebenen Zeilen in der übergebenen Reihenfolge fortlaufend
+    /// (1, 2, 3, ...) und schreibt die Werte in die Systemspalte für die
+    /// benutzerdefinierte Sortierung (<see cref="ColumnCollection.SysRowSortIndex"/>).
+    /// Dispose-Zustände werden übersprungen. Ist keine Sortierspalte aktiv, ist die
+    /// Methode eine No-Op. Event-Suppression muss der Aufrufer übernehmen — bei
+    /// vielen Zeilen löst jedes <see cref="RowItem.CellSet"/> synchron teure
+    /// Layout-Aktualisierungen aus.
+    /// </summary>
+    public void RenumberRows(IEnumerable<RowItem> rowsInOrder, string reason) {
+        if (IsDisposed) { return; }
+        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+
+        var nr = 1;
+        foreach (var thisRow in rowsInOrder) {
+            if (thisRow is { IsDisposed: false }) {
+                thisRow.CellSet(sortCol, nr, reason);
+                nr++;
+            }
+        }
+    }
+
     public virtual void ReorganizeChunks() { }
 
     public virtual void RepairAfterParse() {
@@ -2238,7 +2237,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
         if (existingScript is null) { return false; }
 

@@ -1,17 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
 /// <summary>
-/// Eine modernisierte ListBox-Komponente zur Darstellung und Verwaltung von AbstractListItems.
+/// Eine modernisierte ListBox-Komponente zur Darstellung und Verwaltung von ListItems.
 /// Hostet ein <see cref="ListBoxCore"/>-Control für die Kern-Logik und stellt die
 /// zusätzlichen Steuerelemente (Hinzu, Löschen, Verschieben, Bearbeiten) bereit.
 /// </summary>
@@ -60,13 +57,13 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     /// </summary>
     public event EventHandler<AddItemEventArgs>? AddClicked;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
+    public event EventHandler<ListItemEventArgs>? ItemAddedByClick;
 
     public event EventHandler? ItemCheckedChanged;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
+    public event EventHandler<ListItemEventArgs>? ItemClicked;
 
-    public event EventHandler<AbstractListItemEventArgs>? RemoveClicked;
+    public event EventHandler<ListItemEventArgs>? RemoveClicked;
 
     public event EventHandler<SwapEventArgs>? UpDownClicked;
 
@@ -106,7 +103,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     }
 
     public ReadOnlyCollection<string> Checked => lstBox.Checked;
-    public ReadOnlyCollection<AbstractListItem> CheckedItems => lstBox.CheckedItems;
+    public ReadOnlyCollection<ListItem> CheckedItems => lstBox.CheckedItems;
 
     [DefaultValue(null)]
     public IContextMenu? ContextMenuConnectedControl {
@@ -121,7 +118,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     }
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+    public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get => lstBox.CustomContextMenuItems;
         set => lstBox.CustomContextMenuItems = value;
     }
@@ -159,7 +156,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         set => lstBox.ItemPadding = value;
     }
 
-    public ReadOnlyCollection<AbstractListItem> Items => lstBox.Items;
+    public ReadOnlyCollection<ListItem> Items => lstBox.Items;
 
     [DefaultValue(false)]
     public bool MoveAllowed {
@@ -176,7 +173,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<AbstractListItem> Suggestions => lstBox.Suggestions;
+    public List<ListItem> Suggestions => lstBox.Suggestions;
 
     [DefaultValue(true)]
     public bool Translate {
@@ -194,31 +191,31 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     #region Indexers
 
-    public AbstractListItem? this[string @internal] => lstBox[@internal];
-    public AbstractListItem? this[int no] => lstBox[no];
+    public ListItem? this[string @internal] => lstBox[@internal];
+    public ListItem? this[int no] => lstBox[no];
 
     #endregion
 
     #region Methods
 
-    public void AddAndCheck(AbstractListItem? ali) => lstBox.AddAndCheck(ali);
+    public void AddAndCheck(ListItem? ali) => lstBox.AddAndCheck(ali);
 
-    public Size CalculateColumnAndSize(Renderer_Abstract renderer) => lstBox.CalculateColumnAndSize(renderer);
+    public Size CalculateColumnAndSize(Renderer.Renderer renderer) => lstBox.CalculateColumnAndSize(renderer);
 
     public void Check(IEnumerable<string> toCheck, bool uncheckOther) => lstBox.Check(toCheck, uncheckOther);
 
-    public void Check(AbstractListItem ali) => lstBox.Check(ali);
+    public void Check(ListItem ali) => lstBox.Check(ali);
 
     public void Check(string name) => lstBox.Check(name);
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => lstBox.GetContextMenuItems(hotItem);
+    public List<ListItem>? GetContextMenuItems(object? hotItem) => lstBox.GetContextMenuItems(hotItem);
 
-    public void ItemAdd(AbstractListItem? item) {
+    public void ItemAdd(ListItem? item) {
         lstBox.ItemAdd(item);
         ScheduleAddAreaUpdate();
     }
 
-    public void ItemAddRange(List<AbstractListItem>? items) {
+    public void ItemAddRange(List<ListItem>? items) {
         lstBox.ItemAddRange(items);
         ScheduleAddAreaUpdate();
     }
@@ -238,12 +235,12 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         ScheduleAddAreaUpdate();
     }
 
-    public void Remove(List<AbstractListItem> items) {
+    public void Remove(List<ListItem> items) {
         lstBox.Remove(items);
         ScheduleAddAreaUpdate();
     }
 
-    public void Remove(AbstractListItem? item) {
+    public void Remove(ListItem? item) {
         lstBox.Remove(item);
         ScheduleAddAreaUpdate();
     }
@@ -253,7 +250,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         ScheduleAddAreaUpdate();
     }
 
-    public void UnCheck(AbstractListItem ali) => lstBox.UnCheck(ali);
+    public void UnCheck(ListItem ali) => lstBox.UnCheck(ali);
 
     public void UnCheck(string name) => lstBox.UnCheck(name);
 
@@ -283,7 +280,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         try { lstBox.Focus(); } finally { _focusingChild = false; }
     }
 
-    protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
+    protected virtual void OnItemAddedByClick(ListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     /// <summary>
     /// Löst das <see cref="ItemCheckedChanged"/>-Event aus. Abgeleitete Klassen
@@ -291,7 +288,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     /// </summary>
     protected virtual void OnItemCheckedChanged(System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
 
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    protected virtual void OnItemClicked(ListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     /// <summary>
     /// Feuert das LostFocus-Event erst, wenn der Fokus das Control
@@ -305,7 +302,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         base.OnLostFocus(e);
     }
 
-    protected virtual void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
+    protected virtual void OnRemoveClicked(ListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
@@ -317,22 +314,20 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         UpdateAddArea();
     }
 
-    private void AddAndRaise(AbstractListItem? ali) {
+    private void AddAndRaise(ListItem? ali) {
         if (ali is not { } item) { return; }
         lstBox.AddAndCheck(item);
         if (ItemEditAllowed && item is ReadableListItem { Item: IEditable ie }) { ie.Edit(); }
-        OnItemAddedByClick(new AbstractListItemEventArgs(item));
+        OnItemAddedByClick(new ListItemEventArgs(item));
     }
 
     private void AddInput_EnterKey(object? sender, System.EventArgs e) {
         if (btnPlus.Enabled) { btnPlus_Click(sender, e); }
     }
 
-    private void AddInput_TextChanged(object? sender, System.EventArgs e) {
-        btnPlus.Enabled = IsAddTextValid(CurrentAddText());
-    }
+    private void AddInput_TextChanged(object? sender, System.EventArgs e) => btnPlus.Enabled = IsAddTextValid(CurrentAddText());
 
-    private List<AbstractListItem> AvailableSuggestions() =>
+    private List<ListItem> AvailableSuggestions() =>
         Suggestions.Where(s => lstBox[s.KeyName] is null).ToList();
 
     private void btnDown_Click(object sender, System.EventArgs e) {
@@ -365,7 +360,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
             // Items können gewählt werden, aber auch gelöscht
             lstBox.Remove(tmp);
         }
-        OnRemoveClicked(new AbstractListItemEventArgs(tmp));
+        OnRemoveClicked(new ListItemEventArgs(tmp));
         lstBox.DoMouseMovement(p.X, p.Y);
     }
 
@@ -404,7 +399,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         }
     }
 
-    private void CbxAdd_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) { }
+    private void CbxAdd_ItemAddedByClick(object? sender, ListItemEventArgs e) { }
 
     private void ClearAddInput() {
         txtAdd.Text = string.Empty;
@@ -423,7 +418,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     private void Core_ItemCheckedChanged(object? sender, System.EventArgs e) => OnItemCheckedChanged(e);
 
-    private void Core_ItemClicked(object? sender, AbstractListItemEventArgs e) => OnItemClicked(e);
+    private void Core_ItemClicked(object? sender, ListItemEventArgs e) => OnItemClicked(e);
 
     private void Core_ItemLayoutChanged(object? sender, System.EventArgs e) {
         ScheduleAddAreaUpdate();
@@ -446,7 +441,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         return cbxAdd.Text.Length > 0 ? cbxAdd.Text : txtAdd.Text;
     }
 
-    private void DropDownItemClicked(object? sender, AbstractListItemEventArgs e) {
+    private void DropDownItemClicked(object? sender, ListItemEventArgs e) {
         var args = new AddItemEventArgs(e.Item.KeyName);
         OnAddClicked(args);
         if (!args.Cancel) {
