@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_InputBox : Method {
+public class MethodInputBox : Method {
 
     #region Properties
 
@@ -34,9 +34,9 @@ public class Method_InputBox : Method {
         string result;
 
         if (suggestions.Count > 0) {
-            result = InputBoxComboStyle.Show(txt, FormatHolder_Text.Instance, suggestions, true);
+            result = InputBoxComboStyle.Show(txt, FormatHolderText.Instance, suggestions, true);
         } else {
-            result = InputBox.Show(txt, defaultText, FormatHolder_Text.Instance);
+            result = InputBox.Show(txt, defaultText, FormatHolderText.Instance);
         }
 
         return new DoItFeedback(result);

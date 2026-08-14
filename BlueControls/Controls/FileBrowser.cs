@@ -360,7 +360,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var n = it.KeyName;
 
-        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder_Text.Instance);
+        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolderText.Instance);
 
         if (n.FileNameWithoutSuffix() == n) { return; }
 

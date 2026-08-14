@@ -338,6 +338,16 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended, ISu
 
     public void BeginInit() => _initializing = true;
 
+    /// <summary>
+    /// Berechnet die für das Control benötigte Größe anhand der aktuell
+    /// gesetzten Eigenschaften (z. B. <see cref="ListItems" /> oder die
+    /// Chip-Fläche der Suggestions). Strategien, die keine besondere Größe
+    /// fordern, geben die übergebene Größe unverändert zurück. Die TableView
+    /// ruft diese Methode einheitlich auf und fragt dabei weder den
+    /// konkreten Strategy-Typ noch das Control ab.
+    /// </summary>
+    public virtual Size CalculateRequiredSize(int minWidth, int minHeight) => new(minWidth, minHeight);
+
     public abstract void CreateControl();
 
     public void Dispose() {

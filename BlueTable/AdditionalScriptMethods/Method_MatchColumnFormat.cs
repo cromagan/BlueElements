@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_MatchColumnFormat : Method_TableGeneric {
+internal class MethodMatchColumnFormat : Method_TableGeneric {
 
     #region Properties
 

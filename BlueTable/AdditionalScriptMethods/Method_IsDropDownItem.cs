@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_IsDropDownItem : Method_TableGeneric {
+internal class MethodIsDropDownItem : Method_TableGeneric {
 
     #region Properties
 

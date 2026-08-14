@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_StringToUTF8 : Method {
+internal class MethodStringToUTF8 : Method {
 
     #region Properties
 

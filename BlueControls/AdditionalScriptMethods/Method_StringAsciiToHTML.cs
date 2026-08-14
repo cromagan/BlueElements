@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_StringAsciiToHTML : Method {
+internal class MethodStringAsciiToHTML : Method {
 
     #region Properties
 

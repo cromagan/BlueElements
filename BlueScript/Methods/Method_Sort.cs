@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Sort : Method {
+internal class MethodSort : Method {
 
     #region Properties
 

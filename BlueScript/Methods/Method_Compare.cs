@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Compare : Method {
+internal class MethodCompare : Method {
 
     #region Properties
 

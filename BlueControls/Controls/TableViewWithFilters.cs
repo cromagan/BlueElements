@@ -1107,7 +1107,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
 
-        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolder_SystemName.Instance);
+        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolderSystemName.Instance);
         if (string.IsNullOrEmpty(name)) { return; }
 
         SaveCurrentView(name);

@@ -157,7 +157,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     #region Methods
 
     public static bool IsValidName(string name) {
-        if (name.IsFormat(FormatHolder_Text.Instance, false) is { Length: > 0 }) { return false; }
+        if (name.IsFormat(FormatHolderText.Instance, false) is { Length: > 0 }) { return false; }
         if (string.Equals(name, "New script", StringComparison.OrdinalIgnoreCase)) { return false; }
         return true;
     }

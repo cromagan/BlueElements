@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_SetIfExists : Method {
+internal class MethodSetIfExists : Method {
 
     #region Properties
 

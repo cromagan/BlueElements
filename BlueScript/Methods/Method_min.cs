@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Min : Method {
+internal class MethodMin : Method {
 
     #region Properties
 

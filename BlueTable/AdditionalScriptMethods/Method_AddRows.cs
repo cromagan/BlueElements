@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_AddRows : Method_TableGeneric {
+public class MethodAddRows : Method_TableGeneric {
 
     #region Properties
 

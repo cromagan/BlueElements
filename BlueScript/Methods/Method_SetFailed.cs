@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-public class Method_SetFailed : Method {
+public class MethodSetFailed : Method {
 
     #region Properties
 

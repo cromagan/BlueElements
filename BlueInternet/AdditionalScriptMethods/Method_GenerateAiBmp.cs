@@ -4,7 +4,7 @@ using static BlueScript.Variables.VariableAi;
 
 namespace BlueScript.Methods;
 
-internal class Method_GenerateAiBmp : Method {
+internal class MethodGenerateAiBmp : Method {
 
     #region Properties
 

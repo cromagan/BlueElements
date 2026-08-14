@@ -1565,7 +1565,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //if (IsDisposed) { return; }
 
         //if (_function.ToString() == ((int)_function).ToString()) {
-        //    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
+        //    this.GetStyleFrom(ColumnFormatHolderTextOneLine.Instance);
         //}
 
         if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
@@ -1592,7 +1592,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         //        #region Aus Dateinamen den Tablename extrahieren
 
-        //        if (!_linkedTableTableName.Contains("|") && _linkedTableTableName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+        //        if (!_linkedTableTableName.Contains("|") && _linkedTableTableName.IsFormat(FormatHolderFilepathAndName.Instance)) {
         //            _linkedTableTableName = _linkedTableTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
         //            LinkedTableTableName = MakeValidTableName(_linkedTableTableName);
         //        }
@@ -1692,7 +1692,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderTextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Ersteller";
                     EditableWithDropdown = true;
                     ShowValuesOfOtherCellsInDropdown = true;
@@ -1719,7 +1719,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderTextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1735,10 +1735,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _ignoreAtRowFilter = true;
                 _minTextLength = 19;
 
-                this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolderDateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderDateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
@@ -1759,7 +1759,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 50;
                 _maxCellLength = 50;
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
+                    this.GetStyleFrom(ColumnFormatHolderTextOneLine.Instance);
                     Caption = "Zeilen-Schlüssel";
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
@@ -1776,10 +1776,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _minTextLength = 0;
-                this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolderDateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderDateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
@@ -1805,7 +1805,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _ignoreAtRowFilter = true;
                 _minTextLength = 19;
 
-                this.GetStyleFrom(FormatHolder_DateTimeWithMilliSeconds.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolderDateTimeWithMilliSeconds.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 _editableWithTextInput = false;
                 _spellCheckingEnabled = false;
@@ -1814,7 +1814,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _permissionGroupsChangeCell.Clear();
 
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderDateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Änder-Datum";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1850,7 +1850,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     FilterOptions = FilterOptions.Enabled;
                     IgnoreAtRowFilter = true;
                     Align = AlignmentHorizontal.Rechts;
-                    this.GetStyleFrom(ColumnFormatHolder_Bit.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderBit.Instance); // HIer ColumnFormatHolder
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
                     LineStyleLeft = ColumnLineStyle.Dick;
@@ -1875,7 +1875,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _multiLine = true;
 
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
+                    this.GetStyleFrom(ColumnFormatHolderTextOneLine.Instance);
                     DefaultRenderer = "CellNote";
                     Caption = "Notizen";
                     ForeColor = Color.FromArgb(80, 80, 80);
@@ -1909,7 +1909,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
 
                 if (allDefaultValues) {
-                    this.GetStyleFrom(ColumnFormatHolder_Bit.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolderBit.Instance); // HIer ColumnFormatHolder
                     Caption = "Abgeschlossen";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
@@ -1934,7 +1934,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _ignoreAtRowFilter = true;
                 _scriptType = ScriptType.Nicht_vorhanden; // Keine Änderungen an der Zeile erkennen
 
-                this.GetStyleFrom(FormatHolder_LongOnlyPositive.Instance);
+                this.GetStyleFrom(FormatHolderLongOnlyPositive.Instance);
                 if (allDefaultValues) {
                     Align = AlignmentHorizontal.Rechts;
                     Caption = "Zeile";
@@ -2384,7 +2384,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.ColumnKeyOfLinkedTable:
 
-                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder_Long.Instance, false) is { Length: > 0 } ? value : string.Empty;
+                _columnKeyOfLinkedTable = value.IsFormat(FormatHolderLong.Instance, false) is { Length: > 0 } ? value : string.Empty;
 
                 break;
 

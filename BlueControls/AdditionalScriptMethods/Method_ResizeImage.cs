@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_ResizeImage : Method {
+public class MethodResizeImage : Method {
 
     #region Properties
 

@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_MsgBox : Method {
+public class MethodMsgBox : Method {
 
     #region Properties
 

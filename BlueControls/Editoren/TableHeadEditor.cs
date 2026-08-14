@@ -181,23 +181,23 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
         var tb = Table.Get();
-        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder_TextOneLine.Instance);
-        if (tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance) is { } f) {
+        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolderTextOneLine.Instance);
+        if (tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolderTextOneLine.Instance) is { } f) {
             f.IsFirst = true;
         }
-        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder_LongOnlyPositive.Instance);
-        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder_TextOneLine.Instance);
-        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder_DateTime.Instance);
-        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder_ImageCode.Instance);
-        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolderLongOnlyPositive.Instance);
+        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolderTextOneLine.Instance);
+        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolderDateTime.Instance);
+        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolderImageCode.Instance);
+        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolderTextOneLine.Instance);
         tb.Column.DisableAllEditing();
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
@@ -296,13 +296,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         GenerateInfoText();
     }
 
-    private static string CellToPlainText(string cellText, bool textFormatingAllowed) {
-        if (!textFormatingAllowed) { return cellText; }
-        var decoded = System.Net.WebUtility.HtmlDecode(cellText);
-
-        return Constants.HtmlTagRegex().Replace(decoded, string.Empty);
-    }
-
     private static List<string> ExtractWordsFromTable(Table tb) {
         var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -313,7 +306,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
                 var cellText = row.CellGetString(column);
                 if (string.IsNullOrEmpty(cellText)) { continue; }
 
-                var plainText = CellToPlainText(cellText, column.TextFormatingAllowed);
+                var plainText = column.TextFormatingAllowed ? cellText.HtmlToPlain() : cellText;
 
                 foreach (Match match in Constants.WordPatternRegex().Matches(plainText)) {
                     if (match.Length > 1 && !SpellDictionary.ContainsWord(match.Value)) {

@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_RowDeleteFilter : Method_TableGeneric {
+public class MethodRowDeleteFilter : Method_TableGeneric {
 
     #region Properties
 

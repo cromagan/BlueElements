@@ -144,18 +144,14 @@ public sealed class CaptionBarListItem : RowBackground {
 
         tableView.BeginEdit(
             EditTypeTable.Textfeld_mit_Vorschlägen,
-            new Point(colX, headPos.Y),
-            new Size(colW, headPos.Height),
+            new Rectangle(colX, headPos.Y, colW, headPos.Height),
             col.CaptionGroup(Caption).Replace("\r", "\r\n"),
             v => ApplyCaptionGroup(tableView, anchor, v),
-            ColumnFormatHolder_TextMultiline.Instance,
-            null, null, null,
-            string.Empty,
-            true,
-            headPos.Height,
-            ItemsOf(suggestions),
+            ColumnFormatHolderTextMultiline.Instance,
             null,
-            tableView.Zoom);
+            null,
+            ItemsOf(suggestions),
+            null);
         return true;
     }
 

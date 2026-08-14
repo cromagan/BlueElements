@@ -116,7 +116,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
         lock (AllFilesLocker) {
-            KeyName = FormatHolder_SystemName.MakeValid(tablename);
+            KeyName = FormatHolderSystemName.MakeValid(tablename);
 
             if (!IsValidTableName(KeyName)) {
                 Develop.DebugError("Tabellenname ungültig: " + tablename);
@@ -682,7 +682,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 file = file.FileNameWithoutSuffix();
             }
 
-            file = FormatHolder_SystemName.MakeValid(file);
+            file = FormatHolderSystemName.MakeValid(file);
 
             // Race-Safe über den Helper: Caching, Locking und AllowDuplicates
             // werden dort behandelt. Create (bzw. CreateInstance) macht die
@@ -751,7 +751,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (t.StartsWith("DATABASE", StringComparison.Ordinal)) { return false; }
         if (t.StartsWith("TABLE", StringComparison.Ordinal)) { return false; }
 
-        if (tablename.IsFormat(FormatHolder_SystemName.Instance, false) is { Length: > 0 }) { return false; }
+        if (tablename.IsFormat(FormatHolderSystemName.Instance, false) is { Length: > 0 }) { return false; }
 
         if (t == "ALL_TAB_COLS") { return false; } // system-name
 

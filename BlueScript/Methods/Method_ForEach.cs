@@ -4,7 +4,7 @@ using BlueBasics.Enums;
 
 namespace BlueScript.Methods;
 
-internal class Method_ForEach : Method {
+internal class MethodForEach : Method {
 
     #region Properties
 

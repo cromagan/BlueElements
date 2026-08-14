@@ -27,6 +27,15 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     private readonly TextBox _textBox;
     private List<ExtCharListItem> _chipItems = [];
     private bool _chipsAbove;
+    /// <summary>
+    /// <c>true</c>, während OnGotFocus den Fokus absichtlich ans innere
+    /// <c>_textBox</c> weiterreicht. Das dabei ausgelöste LostFocus wird in
+    /// <see cref="OnLostFocus" /> unterdrückt — sonst würde (z. B. beim
+    /// Übergang vom Dropdown in das Textfeld) die äußere TextBoxSuggestions
+    /// vorzeitig ein LostFocus feuern und das gerade geöffnete Textfeld über
+    /// die LostFocus-Kaskade sofort wieder verstecken.
+    /// </summary>
+    private bool _focusingChild;
     private int _hoveredIndex = -1;
     private bool _layoutDirty = true;
     private int _maxScroll;
@@ -231,6 +240,13 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
 
+    /// <summary>
+    /// Liefert die mindestens benötigte Breite, damit der breiteste Chip
+    /// (inkl. Innenabstand) vollständig dargestellt wird und nicht
+    /// abgeschnitten ist.
+    /// </summary>
+    public int GetEstimatedWidth() => GetMaxChipWidth() + 2 * AreaPadding;
+
     public int GetEstimatedHeight(int availableWidth, int textboxHeight, int maxChipRows = 3) {
         if (_chipItems.Count == 0 || SuggestionPosition == SuggestionPosition.ContextMenuOnly || textboxHeight < 1) { return textboxHeight; }
 
@@ -314,13 +330,15 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     protected override void OnGotFocus(System.EventArgs e) {
         base.OnGotFocus(e);
-        if (!_textBox.Focused) {
-            _textBox.Focus();
-        }
+        if (IsDisposed || _textBox.Focused) { return; }
+
+        _focusingChild = true;
+        try { _textBox.Focus(); }
+        finally { _focusingChild = false; }
     }
 
     protected override void OnLostFocus(System.EventArgs e) {
-        if (ContainsFocus || _textBox.Focused) { return; }
+        if (_focusingChild || ContainsFocus || _textBox.Focused) { return; }
         base.OnLostFocus(e);
     }
 
@@ -508,9 +526,19 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
         if (TextboxSize != Size.Empty) {
             var areaW = Width - 2 * AreaPadding;
+            var availableChipHeight = Height - TextboxSize.Height;
+            var oneRowHeight = lineH + 2 * AreaPadding;
+
+            // Reicht der Platz nicht für eine Chip-Zeile, wird der
+            // Suggestion-Bereich komplett ausgeblendet.
+            if (availableChipHeight < oneRowHeight) {
+                _suggestionArea = Rectangle.Empty;
+                PositionTextBox(DisplayRectangle);
+                return;
+            }
+
             BuildChipRects(chipSizes, areaW, lineH, true);
-            var chipAreaHeight = Math.Max(lineH + 2 * AreaPadding,
-                Math.Min(_totalContentHeight + 2 * AreaPadding, Height - TextboxSize.Height));
+            var chipAreaHeight = Math.Min(_totalContentHeight + 2 * AreaPadding, availableChipHeight);
 
             Rectangle tbRect;
             if (_chipsAbove) {

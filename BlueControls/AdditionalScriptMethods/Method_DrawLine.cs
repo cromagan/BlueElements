@@ -6,7 +6,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_DrawLine : Method {
+public class MethodDrawLine : Method {
 
     #region Properties
 

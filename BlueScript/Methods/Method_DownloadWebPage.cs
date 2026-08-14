@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_DownloadWebPage : Method {
+internal class MethodDownloadWebPage : Method {
 
     #region Fields
 

@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_RemoveXmlTags : Method {
+internal class MethodRemoveXmlTags : Method {
 
     #region Properties
 

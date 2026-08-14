@@ -9,7 +9,7 @@ using BlueTable.AdditionalScriptVariables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_AddRow : Method_TableGeneric {
+public class MethodAddRow : Method_TableGeneric {
 
     #region Properties
 

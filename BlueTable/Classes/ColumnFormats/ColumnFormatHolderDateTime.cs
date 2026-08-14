@@ -1,0 +1,30 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueTable.Classes;
+
+public class ColumnFormatHolderDateTime : ColumnFormatHolder {
+
+    #region Constructors
+
+    public ColumnFormatHolderDateTime() : base(FormatHolderDateTime.Instance) {
+        Align = AlignmentHorizontal.Links;
+        SortType = SortierTyp.Datum_Uhrzeit;
+        DoOpticalTranslation = TranslationType.Datum;
+        AfterEditQuickSortRemoveDouble = false;
+        ScriptType = ScriptType.String;
+        EditableWithDropdown = false;
+        EditableWithTextInput = true;
+        DropDownItems = new(Array.Empty<string>());
+        ShowValuesOfOtherCellsInDropdown = false;
+        DefaultRenderer = "DateTime";
+        RendererSettings = "{ClassId=\"DateTime\", UTCToLocal=+, ShowSymbol=+}";
+    }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolderDateTime.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
+}

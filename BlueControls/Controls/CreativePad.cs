@@ -656,7 +656,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     //private void ContextMenu_Page(object sender, AbstractListItemEventArgs e) {
     //    if (e.Data is not AbstractPadItem item) { return; }
-    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder_Systemname.Instance);
+    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolderSystemname.Instance);
     //    Unselect();
     //}
     private void ContextMenu_Export(object? sender, ContextMenuEventArgs e) {
@@ -695,7 +695,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     //private void ContextMenu_Umbenennen(object? sender, ContextMenuEventArgs e) {
     //    if (e.HotItem is not PointM pm) { return; }
-    //    var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder_SystemName.Instance);
+    //    var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolderSystemName.Instance);
     //    if (!string.IsNullOrEmpty(t)) {
     //        pm.KeyName = t;
     //    }
@@ -703,7 +703,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     //private void ContextMenu_Verschieben(object? sender, ContextMenuEventArgs e) {
     //    if (e.HotItem is not PointM pm) { return; }
-    //    var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder_SystemName.Instance);
+    //    var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolderSystemName.Instance);
     //    if (!string.IsNullOrEmpty(tn)) {
     //        if (pm.Parent is AbstractPadItem api2) {
     //            var p = Items?.GetJointPoint(tn, api2);

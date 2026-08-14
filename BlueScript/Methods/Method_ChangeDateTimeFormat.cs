@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace BlueScript.Methods;
 
-internal class Method_ChangeDateTimeFormat : Method {
+internal class MethodChangeDateTimeFormat : Method {
 
     #region Properties
 

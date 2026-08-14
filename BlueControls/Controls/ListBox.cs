@@ -23,6 +23,14 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     private bool _addAreaUpdateQueued;
 
+    /// <summary>
+    /// <c>true</c>, während OnGotFocus den Fokus absichtlich ans innere lstBox
+    /// weiterreicht. Das dabei ausgelöste LostFocus der äußeren ListBox wird
+    /// in <see cref="OnLostFocus" /> unterdrückt, damit das Control nicht
+    /// vorzeitig geschlossen wird.
+    /// </summary>
+    private bool _focusingChild;
+
     #endregion
 
     #region Constructors
@@ -30,6 +38,14 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     public ListBox() {
         InitializeComponent();
         lstBox.AddAreaVisible = AddAllowed != AddType.None;
+
+        // Der Fokus liegt immer auf dem inneren lstBox, nie auf der äußeren
+        // ListBox (siehe OnGotFocus). Dadurch verändern Item-Klicks den Fokus
+        // nicht und lösen kein vorzeitiges LostFocus aus — wichtig für
+        // Inline-Dropdowns, die sonst beim ersten Klick geschlossen würden,
+        // bevor der Wert übernommen ist. lstBox.LostFocus wird zur Sicherheit
+        // weitergeleitet, damit das Schließen beim Klick außerhalb funktioniert.
+        lstBox.LostFocus += LstBox_LostFocus;
     }
 
     #endregion
@@ -252,6 +268,21 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         UpdateAddArea();
     }
 
+    /// <summary>
+    /// Reicht den Fokus an das innere lstBox weiter. So liegt der Fokus immer
+    /// auf dem Kind; Item-Klicks verändern den Fokus nicht und lösen kein
+    /// vorzeitiges LostFocus der äußeren ListBox aus. Das beim Weiterreichen
+    /// entstehende LostFocus wird über <see cref="_focusingChild" /> in
+    /// <see cref="OnLostFocus" /> unterdrückt.
+    /// </summary>
+    protected override void OnGotFocus(System.EventArgs e) {
+        base.OnGotFocus(e);
+        if (IsDisposed || lstBox.Focused) { return; }
+
+        _focusingChild = true;
+        try { lstBox.Focus(); } finally { _focusingChild = false; }
+    }
+
     protected virtual void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     /// <summary>
@@ -261,6 +292,18 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     protected virtual void OnItemCheckedChanged(System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
 
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    /// <summary>
+    /// Feuert das LostFocus-Event erst, wenn der Fokus das Control
+    /// einschließlich des inneren <c>lstBox</c> wirklich verlassen hat.
+    /// Ein Wechsel des Fokus zwischen äußerer ListBox und innerem lstBox
+    /// löst somit KEIN LostFocus aus — wichtig für Inline-Dropdowns, die
+    /// sonst beim ersten Item-Klick vorzeitig geschlossen würden.
+    /// </summary>
+    protected override void OnLostFocus(System.EventArgs e) {
+        if (_focusingChild || ContainsFocus) { return; }
+        base.OnLostFocus(e);
+    }
 
     protected virtual void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
@@ -448,6 +491,8 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
             && Suggestions.GetByKey(text) is null && Suggestions.Count > 0) { return false; }
         return true;
     }
+
+    private void LstBox_LostFocus(object? sender, System.EventArgs e) => OnLostFocus(e);
 
     private void OnUpDownClicked(int index1, int index2) => UpDownClicked?.Invoke(this, new SwapEventArgs(index1, index2));
 

@@ -5,7 +5,7 @@ using System.Globalization;
 namespace BlueScript.Methods;
 
 
-internal class Method_MaxDate : Method {
+internal class MethodMaxDate : Method {
 
     #region Properties
 

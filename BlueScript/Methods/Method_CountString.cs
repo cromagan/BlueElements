@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_CountString : Method {
+internal class MethodCountString : Method {
 
     #region Properties
 

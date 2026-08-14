@@ -4,7 +4,7 @@ using BlueTable.AdditionalScriptVariables;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_Table : Method {
+internal class MethodTable : Method {
 
     #region Properties
 

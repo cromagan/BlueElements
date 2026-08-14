@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_RemoveDoubleSpaces : Method {
+internal class MethodRemoveDoubleSpaces : Method {
 
     #region Properties
 

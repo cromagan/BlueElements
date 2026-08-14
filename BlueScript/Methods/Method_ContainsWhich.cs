@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace BlueScript.Methods;
 
 
-internal class Method_ContainsWhitch : Method {
+internal class MethodContainsWhitch : Method {
 
     #region Properties
 

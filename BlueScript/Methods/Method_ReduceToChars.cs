@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_ReduceToChars : Method {
+internal class MethodReduceToChars : Method {
 
     #region Properties
 

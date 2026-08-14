@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Round : Method {
+internal class MethodRound : Method {
 
     #region Properties
 

@@ -3,7 +3,7 @@
 namespace BlueTable.AdditionalScriptMethods;
 
 
-public class Method_UniqueRowId : Method {
+public class MethodUniqueRowId : Method {
 
     #region Properties
 

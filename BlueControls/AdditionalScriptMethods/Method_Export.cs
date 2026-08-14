@@ -4,11 +4,12 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
+using BlueTable.ClassesStatic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_Export : Method_TableGeneric {
+internal class MethodExport : Method_TableGeneric {
 
     #region Properties
 
@@ -100,7 +101,7 @@ internal class Method_Export : Method_TableGeneric {
                 //    }
 
                 case "CSV":
-                    var t = Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
+                    var t = CsvHelper.ExportCsv(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true); }
                     if (WriteAllText(filn, t, BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true); }
                     break;

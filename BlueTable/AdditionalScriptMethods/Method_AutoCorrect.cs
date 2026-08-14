@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_AutoCorrect : Method_TableGeneric {
+internal class MethodAutoCorrect : Method_TableGeneric {
 
     #region Properties
 

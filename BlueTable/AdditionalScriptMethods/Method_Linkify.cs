@@ -4,7 +4,7 @@ using BlueTable.AdditionalScriptVariables;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_Linkify : Method_TableGeneric {
+public class MethodLinkify : Method_TableGeneric {
 
     #region Properties
 

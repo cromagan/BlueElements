@@ -4,7 +4,7 @@ using static BlueScript.Variables.VariableAi;
 
 namespace BlueScript.Methods;
 
-internal class Method_AskAi : Method {
+internal class MethodAskAi : Method {
 
     #region Properties
 

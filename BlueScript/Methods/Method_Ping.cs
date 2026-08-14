@@ -5,7 +5,7 @@ using System.Net.NetworkInformation;
 namespace BlueScript.Methods;
 
 
-internal class Method_Ping : Method {
+internal class MethodPing : Method {
 
     #region Properties
 

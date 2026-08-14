@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-public class Method_Break : Method {
+public class MethodBreak : Method {
 
     #region Fields
 

@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_SumFilter : Method_TableGeneric {
+public class MethodSumFilter : Method_TableGeneric {
 
     #region Properties
 

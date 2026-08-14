@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_Number : Method {
+internal class MethodNumber : Method {
 
     #region Properties
 

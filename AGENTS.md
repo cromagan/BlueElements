@@ -69,7 +69,7 @@ Welche Code-Analyzers auf `error` stehen, ist der `.editorconfig` zu entnehmen �
 ## Selbstständige Reparatur
 
 Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
-- **XML-Doc-Kommentare** Veraltet, unklar oder fehlerhaft, reparieren
+- **XML-Doc-Kommentare und Inline-Kommentare prägnant halten** — Veraltet, unklar oder fehlerhaft, reparieren. Jeder Kommentar auf das Wesentliche reduziert: eine Summary beschreibt WAS die Methode macht, nicht WIE oder WER sie aufruft. Keine Querverweise auf Aufrufer, keine `<see cref="..."/>`-Ketten ins Detail. Keine historischen Bezüge wie „ersetzt das alte", „früher", „bisher", „ursprünglich". Eine bis zwei Zeilen reichen fast immer.
 - **Felder statt redundanter Variablen** — wenn eine lokale Variable nur ein Feld kapselt, direkt das Feld nutzen. Neue Hilfsvariablen nur erstellen, wenn sie echte zusätzliche Logik enthalten
 - **`AsSpan()` / Range-Syntax `[x..y]`** statt `Substring`
 - **Überflüssige String-Checks vermeiden** — Muster wie `var f =... ;  If (string.IsNullOrEmpty(f)) {return f;}` unwandeln in `if (... is { Length: > 0 } f) {return f;}`. Ziel: Einzeiliger kürzerer Code

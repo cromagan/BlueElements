@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Split : Method {
+internal class MethodSplit : Method {
 
     #region Properties
 

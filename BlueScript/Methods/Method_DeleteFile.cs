@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_DeleteFile : Method {
+internal class MethodDeleteFile : Method {
 
     #region Properties
 

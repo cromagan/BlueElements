@@ -139,7 +139,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         if (rowCount >= 2) {
                             CaptionPosition = CaptionPosition.Über_dem_Feld;
                             Size = new Size(200, 16 + (24 * rowCount));
-                            this.GetStyleFrom(FormatHolder_Text.Instance);
+                            this.GetStyleFrom(FormatHolderText.Instance);
                             MultiLine = true;
                         } else {
                             CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
@@ -147,28 +147,28 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             MultiLine = false;
                             switch (_accessor) {
                                 case Accessor<string>:
-                                    this.GetStyleFrom(FormatHolder_Text.Instance);
+                                    this.GetStyleFrom(FormatHolderText.Instance);
                                     break;
 
                                 case Accessor<long>:
                                 case Accessor<int>:
-                                    this.GetStyleFrom(FormatHolder_Long.Instance);
+                                    this.GetStyleFrom(FormatHolderLong.Instance);
                                     break;
 
                                 case Accessor<float>:
-                                    this.GetStyleFrom(FormatHolder_Float.Instance);
+                                    this.GetStyleFrom(FormatHolderFloat.Instance);
                                     break;
 
                                 case Accessor<double>:
-                                    this.GetStyleFrom(FormatHolder_Float.Instance);
+                                    this.GetStyleFrom(FormatHolderFloat.Instance);
                                     break;
 
                                 case Accessor<Color>:
-                                    this.GetStyleFrom(FormatHolder_Text.Instance);
+                                    this.GetStyleFrom(FormatHolderText.Instance);
                                     break;
 
                                 default:
-                                    this.GetStyleFrom(FormatHolder_Text.Instance);
+                                    this.GetStyleFrom(FormatHolderText.Instance);
                                     break;
                             }
                         }

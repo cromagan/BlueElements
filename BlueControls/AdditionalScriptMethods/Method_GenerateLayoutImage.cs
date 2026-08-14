@@ -8,7 +8,7 @@ using BlueTable.AdditionalScriptMethods;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_GenerateLayoutImage : Method_TableGeneric {
+public class MethodGenerateLayoutImage : Method_TableGeneric {
 
     #region Properties
 

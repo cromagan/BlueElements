@@ -20,6 +20,21 @@ public class FlexiStrategyTextBoxSuggestions : FlexiStrategyBase {
 
     #region Methods
 
+    /// <summary>
+    /// Übernimmt die TextBox-Größe am Control und ermittelt die zusätzlich
+    /// benötigte Gesamthöhe (Textbox + Chip-Fläche der Suggestions) über
+    /// <see cref="TextBoxSuggestions.GetEstimatedHeight" />. Die Breite wird
+    /// dabei so vergrößert, dass der breiteste Chip vollständig Platz findet
+    /// und nicht abgeschnitten wird; das umbrechende Verhalten nach unten
+    /// bleibt unverändert.
+    /// </summary>
+    public override Size CalculateRequiredSize(int minWidth, int minHeight) {
+        if (_control is not { } c) { return new Size(minWidth, minHeight); }
+        var width = Math.Max(minWidth, c.GetEstimatedWidth());
+        c.TextboxSize = new Size(width, minHeight);
+        return new Size(width, c.GetEstimatedHeight(width, minHeight));
+    }
+
     public override void CreateControl() {
         _control = new TextBoxSuggestions();
     }

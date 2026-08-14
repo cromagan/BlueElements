@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace BlueScript.Methods;
 
 
-internal class Method_ReplaceList : Method {
+internal class MethodReplaceList : Method {
 
     #region Properties
 

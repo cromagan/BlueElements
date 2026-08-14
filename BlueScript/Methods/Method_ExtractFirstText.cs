@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_ExtractFirstText : Method {
+internal class MethodExtractFirstText : Method {
 
     #region Properties
 

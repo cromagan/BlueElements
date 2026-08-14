@@ -577,7 +577,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     private void VariablesManager_SaveSet(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
 
-        var name = InputBox.Show("Variablen speichern unter:", string.Empty, FormatHolder_SystemName.Instance);
+        var name = InputBox.Show("Variablen speichern unter:", string.Empty, FormatHolderSystemName.Instance);
         if (string.IsNullOrEmpty(name)) { return; }
 
         SaveCurrentVariableSet(name);

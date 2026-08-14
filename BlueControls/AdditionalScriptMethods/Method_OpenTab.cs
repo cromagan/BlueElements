@@ -9,7 +9,7 @@ using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_OpenTab : Method {
+internal class MethodOpenTab : Method {
 
     #region Properties
 

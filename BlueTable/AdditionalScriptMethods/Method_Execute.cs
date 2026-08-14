@@ -3,7 +3,7 @@
 namespace BlueTable.AdditionalScriptMethods;
 
 
-internal class Method_Execute : Method {
+internal class MethodExecute : Method {
 
     #region Properties
 

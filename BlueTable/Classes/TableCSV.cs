@@ -79,16 +79,6 @@ public class TableCSV : TableFile {
         return true;
     }
 
-    /// <summary>
-    /// Stellt sicher, dass die System-Spalte SYS_ROWKEY existiert. Ohne diese
-    /// Spalte können Zeilen bei erneuten Laden nicht eindeutig zugeordnet werden.
-    /// </summary>
-    public override void RepairAfterParse() {
-        Column.GenerateAndAddSystem(SystemColumnKeys.RowKey);
-
-        base.RepairAfterParse();
-    }
-
     public override void LoadFromFile(string fileNameToLoad, string freeze) {
         // .hbdb ist eine Begleitdatei – die zugehörige .csv laden
         if (fileNameToLoad.EndsWith(HbdbSuffix, StringComparison.OrdinalIgnoreCase)) {
@@ -97,6 +87,16 @@ public class TableCSV : TableFile {
             fileNameToLoad = csvFile;
         }
         base.LoadFromFile(fileNameToLoad, freeze);
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass die System-Spalte SYS_ROWKEY existiert. Ohne diese
+    /// Spalte können Zeilen bei erneuten Laden nicht eindeutig zugeordnet werden.
+    /// </summary>
+    public override void RepairAfterParse() {
+        Column.GenerateAndAddSystem(SystemColumnKeys.RowKey);
+
+        base.RepairAfterParse();
     }
 
     public void SetSeparator(char separator) {
@@ -260,7 +260,7 @@ public class TableCSV : TableFile {
 
             for (var i = 0; i < columnKeyes.Count; i++) {
                 var original = columnKeyes[i];
-                var colName = FormatHolder_SystemName.MakeValid(original);
+                var colName = FormatHolderSystemName.MakeValid(original);
                 if (!ColumnItem.IsValidColumnKey(colName)) {
                     colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }

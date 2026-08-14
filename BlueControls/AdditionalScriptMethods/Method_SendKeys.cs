@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_SendKeys : Method {
+internal class MethodSendKeys : Method {
 
     #region Properties
 

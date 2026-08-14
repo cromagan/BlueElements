@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_DateTimeDifferenceInDays : Method {
+internal class MethodDateTimeDifferenceInDays : Method {
 
     #region Properties
 

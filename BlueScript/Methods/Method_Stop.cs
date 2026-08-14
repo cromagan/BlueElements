@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-public class Method_Stop : Method {
+public class MethodStop : Method {
 
     #region Properties
 

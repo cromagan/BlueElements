@@ -4,7 +4,7 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-internal class Method_MoveDirectory : Method {
+internal class MethodMoveDirectory : Method {
 
     #region Properties
 

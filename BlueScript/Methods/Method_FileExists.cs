@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_FileExists : Method {
+internal class MethodFileExists : Method {
 
     #region Properties
 

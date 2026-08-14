@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace BlueScript.Methods;
 
 
-internal class Method_StringShortenWord : Method {
+internal class MethodStringShortenWord : Method {
 
     #region Properties
 

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using System.Windows.Forms;
 
 namespace BlueControls.Classes.TableItems;
 
@@ -253,6 +254,45 @@ public sealed class RowListItem : RowBackground {
         return BeginCellEdit(tableView, mouseOverColumn, this, Row, true, Row.ChunkValue);
     }
 
+    /// <summary>
+    /// Setzt die Tastatur-Aktionen auf der Cursor-Zelle um (Ctrl+X/C/V, F2,
+    /// Delete). Aufgerufen aus <see cref="TableView.OnKeyDown" />, sobald die
+    /// dort behandelten Navigations-Tasten verarbeitet wurden.
+    /// </summary>
+    public override void HandleKeyDown(ColumnViewItem? cursorColumn, TableView tableView, KeyEventArgs e) {
+        if (cursorColumn?.Column is not { IsDisposed: false } c) { return; }
+        if (Row is not { IsDisposed: false }) { return; }
+
+        switch (e.KeyCode) {
+            case Keys.X:
+                if (e.Modifiers == Keys.Control) {
+                    CopyCellContent(cursorColumn, tableView);
+                    TableView.NotEditableInfo(TableView.UserEdited(tableView, c.DefaultValueForColumn(), cursorColumn, this, true));
+                }
+                break;
+
+            case Keys.C:
+                if (e.Modifiers == Keys.Control) {
+                    CopyCellContent(cursorColumn, tableView);
+                }
+                break;
+
+            case Keys.V:
+                if (e.Modifiers == Keys.Control) {
+                    tableView.ContextMenu_ContentPaste(null, null);
+                }
+                break;
+
+            case Keys.F2:
+                _ = BeginCellEdit(tableView, cursorColumn, this, Row, true, Row.ChunkValue);
+                break;
+
+            case Keys.Delete:
+                TableView.NotEditableInfo(TableView.UserEdited(tableView, c.DefaultValueForColumn(), cursorColumn, this, true));
+                break;
+        }
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return 18; }
 
@@ -361,6 +401,16 @@ public sealed class RowListItem : RowBackground {
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Kopiert den Inhalt der Cursor-Zelle in die Zwischenablage und zeigt
+    /// die Bestätigung an der Zell-Position an. Gemeinsame Logik für
+    /// Ctrl+C (Kopieren) und Ctrl+X (Ausschneiden).
+    /// </summary>
+    private void CopyCellContent(ColumnViewItem cursorColumn, TableView tableView) {
+        var cp = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+        TableView.CopyToClipboard(cursorColumn.Column, Row, true, tableView.PointToScreen(new Point(cursorColumn.ControlColumnRight(tableView.OffsetX), cp.Y)));
     }
 
     #endregion

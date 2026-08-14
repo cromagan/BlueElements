@@ -3,7 +3,7 @@
 namespace BlueTable.AdditionalScriptMethods;
 
 
-public class Method_RowCount : Method_TableGeneric {
+public class MethodRowCount : Method_TableGeneric {
 
     #region Properties
 

@@ -5,7 +5,7 @@ using System.Drawing;
 namespace BlueScript.Methods;
 
 
-internal class Method_DownloadImage : Method {
+internal class MethodDownloadImage : Method {
 
     #region Fields
 

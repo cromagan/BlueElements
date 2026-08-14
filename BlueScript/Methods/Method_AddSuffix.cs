@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_AddSuffix : Method {
+internal class MethodAddSuffix : Method {
 
     #region Properties
 

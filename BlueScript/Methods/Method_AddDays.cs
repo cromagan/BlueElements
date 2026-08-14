@@ -5,7 +5,7 @@ using System.Globalization;
 namespace BlueScript.Methods;
 
 
-internal class Method_AddDays : Method {
+internal class MethodAddDays : Method {
 
     #region Properties
 

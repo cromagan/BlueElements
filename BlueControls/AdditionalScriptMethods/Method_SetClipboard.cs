@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_SetClipboard : Method {
+internal class MethodSetClipboard : Method {
 
     #region Properties
 

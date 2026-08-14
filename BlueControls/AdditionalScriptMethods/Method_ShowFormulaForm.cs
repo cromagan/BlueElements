@@ -8,7 +8,7 @@ using BlueTable.AdditionalScriptMethods;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_ShowFormulaForm : Method {
+public class MethodShowFormulaForm : Method {
 
     #region Properties
 

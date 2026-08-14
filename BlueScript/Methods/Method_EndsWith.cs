@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_EndsWith : Method {
+internal class MethodEndsWith : Method {
 
     #region Properties
 

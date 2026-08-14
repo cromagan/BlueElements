@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Filenpath : Method {
+internal class MethodFilenpath : Method {
 
     #region Properties
 

@@ -20,6 +20,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Classes.Table;
 using BlueControls.Classes.TableItems;
 using static BlueControls.Interfaces.MiniToolbarExtension;
+using BlueTable.ClassesStatic;
 
 namespace BlueControls.Controls;
 
@@ -36,37 +37,19 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private readonly Dictionary<string, RowBackground> _allViewItems = [];
 
     /// <summary>
-    /// Wird beim Aufbau der View (<see cref="CalculateAllViewItems_AddCaptionsAndRows"/>)
-    /// pro aktuellem Kapitel-Header befüllt. Der Key ist die Header-Instanz aus
-    /// <see cref="_sortedViewItems"/>, der Wert alle Zeilen des Blocks — auch
-    /// die eingeklappten. So liefert <see cref="GetChapterBlockRows"/> einen
-    /// vollständigen Block, ohne dass der Block aufklappen muss (z. B. für
-    /// Drag/Drop eines zugeklappten Kapitels).
+    /// Pro Kapitel-Header alle Block-Zeilen (auch eingeklappte), für Drag/Drop zugeklappter Kapitel.
     /// </summary>
     private readonly Dictionary<RowCaptionListItem, List<RowItem>> _chapterBlockRows = [];
 
-    /// <summary>
-    /// Großschreibung
-    /// </summary>
     private readonly List<string> _collapsed = [];
 
     /// <summary>
-    /// NumberStyle (SYS_ROWSORTINDEX aktiv): Menge der KeyNames der ersten
-    /// Zeile unter jedem eingeklappten Header-Block. Dient dazu, dass
-    /// derselbe Chapter-Text mehrfach auftreten kann — jeder Block ist
-    /// unabhängig auf-/zuklappbar. Der Key ist stabil gegen UI-Änderungen,
-    /// solange die Zeile nicht gelöscht wird.
+    /// NumberStyle: KeyNames der ersten Zeile je eingeklapptem Block. Erlaubt unabhängiges Auf-/Zuklappen gleicher Chapter-Texte.
     /// </summary>
     private readonly HashSet<string> _collapsedBlockFirstRowKeys = [];
 
     /// <summary>
-    /// Cache der Inline-Edit-Strategien, schlüsselweise nach
-    /// <see cref="EditTypeTable" />. Jede Strategie wird beim ersten Gebrauch
-    /// lazy erzeugt und für alle weiteren Edits wiederverwendet, damit das
-    /// teure Control (inkl. Item-Listen-Setup) nicht jedes Mal neu aufgebaut
-    /// werden muss. Der Cache ist <see cref="IDisposable" /> und wird beim
-    /// Freigeben der TableView disposet — dabei werden auch alle enthaltenen
-    /// Strategien (und damit ihre Controls) freigegeben.
+    /// Lazy Cache der Inline-Edit-Strategien nach EditTypeTable. Wird beim Dispose der TableView mit freigegeben.
     /// </summary>
     private readonly ConcurrentCache<EditTypeTable, FlexiStrategyBase> _editStrategyCache = new(16);
 
@@ -78,33 +61,32 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private int _dragInsertIndex = -1;
 
     /// <summary>
-    /// Das Objekt, das gerade per Drag/Drop verschoben wird.
-    /// Entweder ein <see cref="ColumnViewItem"/>, ein <see cref="RowItem"/>
-    /// oder ein <see cref="RowCaptionListItem"/> (Kapitel-Block).
+    /// Bei MouseDown ermittelter Drag-Kandidat (ColumnViewItem, RowItem oder RowCaptionListItem); null, solange kein Drag-Vorgang ansteht.
     /// </summary>
     private object? _dragItem;
 
     private Point _dragMouseDown;
 
     /// <summary>
-    /// Zell-Kontext des aktiven Dropdown-Edits. Wird beim Öffnen der
-    /// <see cref="FlexiStrategyDropDownListBox" /> gesetzt und im
-    /// <see cref="Edit_ValueChanged" />-Event-Handler benötigt,
-    /// um die Toggle-/Commit-Logik auszuführen.
+    /// Zell-Kontext des aktiven Dropdown-Edits, für die Toggle-/Commit-Logik.
     /// </summary>
     private CellExtEventArgs? _dropdownCellInfo;
 
     /// <summary>
-    /// Commit-Callback des gerade aktiven Inline-Edits. Wird beim Starten
-    /// eines Edits gesetzt und beim Schließen (<see cref="Edit_Close"/>)
-    /// mit dem neuen Text aufgerufen; danach wieder auf <c>null</c>.
-    /// Am Ende wird immer nur ein String an eine
-    /// konkrete Ziel-Stelle (Zelle, Caption, Kapitel, …) geschrieben,
-    /// und genau diese Setter-Referenz hält dieses Feld bereit.
+    /// Commit-Callback des aktiven Inline-Edits; wird beim Schließen mit dem neuen Text aufgerufen, danach null.
     /// </summary>
     private Action<string>? _editCommit;
 
+    /// <summary>
+    /// true während BeginEdit ein neues Edit aufbaut. Darin entstehende LostFocus-Events dürfen CloseAllComponents nicht auslösen.
+    /// </summary>
+    private bool _isBeginningEdit;
+
+    /// <summary>
+    /// true, sobald die Maus die DragSize-Schwelle überschritten hat und der Drag tatsächlich läuft (im Gegensatz zu _dragItem, das bereits bei MouseDown gesetzt wird).
+    /// </summary>
     private bool _isDragging;
+
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
@@ -195,7 +177,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
+    /// Gibt an, ob das Standard-Kontextmenu angezeigt werden soll.
     /// </summary>
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
@@ -211,36 +193,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 field = tcvc.GetByKey(_arrangement);
                 if (field is null && tcvc.Count > 1) { field = tcvc[1]; }
                 if (field is null && tcvc.Count > 0) { field = tcvc[0]; }
-                // Arrangement wurde neu aufgebaut: Batching-Flag zurücksetzen,
-                // damit der nächste RowAdded wieder eine Invalidierung auslöst.
                 _pendingRowAddedRebuild = false;
             }
 
-            // Lokale Kopie des Backing-Fields: Invalidate_CurrentArrangement kann
-            // (z. B. über Table-Disposed oder synchrones Refresh im Table-Setter)
-            // field zwischen den einzelnen Zugriffen auf null setzen. Mit der lokalen
-            // Variablen wird auf einer konsistenten Momentaufnahme gearbeitet.
+            // Lokale Kopie: field kann zwischen den Zugriffen null werden (Table-Disposed, Refresh).
             var ca = field;
 
             if (ca is { IsDisposed: false }) {
                 ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
-                // On-demand virtuelle Spalten ein-/ausblenden:
-                // - Hinzufügen: NUR bei Admins — in Ansicht 0 IMMER am Ende
-                //   (nur visuell, nicht persistent), sonst bei Ansichtbearbeitung
-                //   (oder wenn die Tabelle Spalten hat, aber keine im Arrangement liegt)
-                // - Pin: wenn mindestens eine Zeile angepinnt ist
-                // Persistente virtuelle Spalten (VIR_…) stehen bereits in der
-                // Collection und werden vom Reconcile nicht angerührt.
-                // Die Number-Spalte hat keinen on-demand-Trigger.
+                // On-demand virtuelle Spalten: Hinzufügen bei Admins, Pin bei angepinnten Zeilen.
                 var needAdd = tb.IsAdministrator()
                     && (IsAnsicht0(ca) || Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
                 var needPin = PinnedRows.Count > 0;
 
                 ca.ReconcileVirtualColumns(needPin, needAdd);
             } else if (ca is { IsDisposed: true }) {
-                // Veraltete (disposete) Collection verwerfen, beim nächsten
-                // Zugriff wird neu aufgebaut.
                 field = null;
                 return null;
             }
@@ -273,9 +241,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
-    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
-    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen. Leerer String
-    /// bedeutet: normales Bearbeitungsverhalten (Textbox/Dropdown).
+    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle statt der Bearbeitung ausgeführt wird. Leer = Standardbearbeitung.
     /// </summary>
     [DefaultValue("")]
     public string DoubleClickScript { get; set; } = string.Empty;
@@ -291,16 +257,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zusammengeführtes Ergebnis aus Filter und FilterFix.
-    /// Dies ist der tatsächlich aktive Filter, der die angezeigten Zeilen bestimmt.
-    /// Wird automatisch bei Änderungen von Filter oder FilterFix aktualisiert.
+    /// Zusammengeführtes Ergebnis aus Filter und FilterFix. Bestimmt die angezeigten Zeilen.
     /// </summary>
     public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
 
     /// <summary>
-    /// Fixfilter, die von übergeordneten Elementen (ConnectedFormula) übergeben wurden.
-    /// Können vom Benutzer nicht geändert werden.
-    /// Werden bei FilterCombined berücksichtigt und auch im FilterOutput weitergegeben.
+    /// Fixfilter von übergeordneten Elementen (ConnectedFormula), nicht vom Benutzer änderbar.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
@@ -353,7 +315,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Aktuell zugewiesene Tabelle. Beim Setzen werden alle Events automatisch angebunden/abgemeldet.
+    /// Aktuell zugewiesene Tabelle. Events werden beim Setzen angebunden/abgemeldet.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -363,10 +325,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         set {
             if (field == value) { return; }
 
-            // Passwort-Prüfung bei verschlüsselten Tabellen. Die Tabelle lädt
-            // immer ohne Passwort; erst bei der Anzeige wird das Passwort
-            // angefordert. Bei falschem/fehlendem Passwort wird der
-            // Tabellenwechsel verworfen — die alte Anzeige bleibt aktiv.
+            // Bei verschlüsselten Tabellen wird das Passwort erst bei der Anzeige angefordert. Bei falschem Passwort bleibt die alte Anzeige aktiv.
             if (value is { IsDisposed: false, Unlocked: false } tbLocked) {
                 var pwd = Table_NeedPassword();
                 if (!string.IsNullOrEmpty(pwd) &&
@@ -442,18 +401,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public bool Translate { get; set; } = true;
 
     /// <summary>
-    /// Interne Benutzerfilter (AutoFilter, Textsuche, FlexiControls).
-    /// Dürfen vom Control frei geändert werden.
-    /// Werden zusammen mit FilterFix in FilterCombined zusammengeführt.
+    /// Benutzerfilter (AutoFilter, Textsuche). Werden mit FilterFix in FilterCombined zusammengeführt.
     /// </summary>
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
     /// <summary>
-    /// Maximaler Indent aller aktuell in <see cref="_sortedViewItems"/>
-    /// enthaltenen Zeilen. Wird für die Breitenberechnung von
-    /// <see cref="ColumnViewItemRenderingExtensions.ComputeAllColumnPositions"/>
-    /// und <see cref="CalculateCanvasMaxBounds"/> benötigt, damit beim
-    /// Aufklappen von Kapiteln die eingerückten Spalten nicht abgeschnitten werden.
+    /// Maximaler Indent aller sichtbaren Zeilen, für Breiten- und Höhenberechnung.
     /// </summary>
     internal int MaxIndentOfRows => _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
 
@@ -462,12 +415,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     protected override int SmallChangeY => 10;
 
     /// <summary>
-    /// Liefert die aktuell aktive Inline-Edit-Strategie, falls vorhanden.
-    /// "Aktiv" bedeutet: Ihr Control ist sichtbar und nicht disposet. Da zu
-    /// jedem Zeitpunkt höchstens eine Strategie aktiv ist, reicht eine lineare
-    /// Suche über den <see cref="_editStrategyCache" />. Ersetzt das frühere
-    /// <c>_editStrategy</c>-Feld — die Aktiv-Markierung wird jetzt rein aus dem
-    /// Sichtbarkeitszustand des Controls abgeleitet.
+    /// Aktive Inline-Edit-Strategie (Control sichtbar und nicht disposet), sonst null.
     /// </summary>
     private FlexiStrategyBase? ActiveEditStrategy {
         get {
@@ -606,11 +554,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Erzeugt den Kontext für ein Rechtsklick-Menü mit Angabe der
-    /// <see cref="ColumnViewItem" />. Dies ist für virtuelle Spalten
-    /// (Pin, Nummer, Hinzufügen) erforderlich, die kein eigenes
-    /// <see cref="ColumnItem" /> haben. Ist der ViewItem einer echten
-    /// Spalte zugeordnet, wird deren ColumnItem zusätzlich gesetzt.
+    /// Erzeugt den Kontext für ein Rechtsklick-Menü. Für virtuelle Spalten wird das ViewItem gesetzt, sonst das ColumnItem.
     /// </summary>
     public static object ContextMenuItemGenerate(TableView tableView, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
         return new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView, ViewItem = viewItem };
@@ -671,9 +615,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         var tb = Get();
-        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance);
-        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder_DateTime.Instance);
-        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_TextOneLine.Instance);
+        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolderTextOneLine.Instance);
+        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolderDateTime.Instance);
+        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolderTextOneLine.Instance);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
 
         if (colText is { IsDisposed: false }) {
@@ -726,35 +670,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var chosenValue = selected.CellGetString(colText);
         row.CellSet(column, chosenValue, "Undo-Befehl");
         tb.Dispose();
-    }
-
-    public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-        var columns = columnList?.ToList() ?? [.. tbl.Column.Where(c => c is not null)];
-
-        var sb = new StringBuilder();
-        switch (firstRow) {
-            case FirstRow.Without:
-                break;
-
-            case FirstRow.ColumnCaption:
-                AppendCsvRow(sb, columns, c => c.ReadableText().Replace(';', '|').Replace(" |", "|").Replace("| ", "|"));
-                break;
-
-            case FirstRow.ColumnInternalName:
-                AppendCsvRow(sb, columns, c => c.KeyName);
-                break;
-
-            default:
-                Develop.DebugPrint(firstRow);
-                break;
-        }
-
-        foreach (var thisRow in sortedRows) {
-            if (thisRow is not { IsDisposed: false }) { continue; }
-            AppendCsvRow(sb, columns, c => FormatCellForCsv(thisRow, c));
-        }
-
-        return sb.ToString().TrimEnd('\r', '\n');
     }
 
     public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView, ColumnViewItem? viewItem) GetContextData(object? context) {
@@ -825,10 +740,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Erzeugt einen Renderer aus Typname und serialisierten Einstellungen.
-    /// Wird für virtuelle Spalten benötigt, die kein eigenes ColumnItem haben.
-    /// Bei ungültigem Typ oder fehlerhaften Einstellungen wird der
-    /// Standard-Renderer geliefert.
+    /// Erzeugt einen Renderer aus Typname und Einstellungen. Für virtuelle Spalten ohne ColumnItem. Fallback: Standard-Renderer.
     /// </summary>
     public static Renderer_Abstract RendererOf(string? rendererString, string rendererSettings, string style) {
         if (string.IsNullOrEmpty(rendererString)) { return Renderer_Abstract.Default; }
@@ -954,7 +866,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     //        return lcolumn is not null && lrow is not null ? ContentSize(lcolumn, lrow, renderer)
     //            : new CanvasSize(16, 16);
     //    }
-    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder_Text.Instance);
+    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolderText.Instance);
 
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Table? table, string showingKey) {
         if (columnArrangementSelector is not { IsDisposed: false }) { return; }
@@ -1032,23 +944,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is null || column is null ||
             CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
             AllViewItems is not { } avi || !avi.ContainsValue(row)) {
-            // Verwaiste Referenzen über die stabile RowItem-/ColumnItem-Identität
-            // migrieren. Ein Neuaufbau (RemoveRowItems in Cell_CellValueChanged,
-            // Invalidate_CurrentArrangement via Row_RowAdded) kann neue ViewItem-
-            // Instanzen erzeugt haben, sodass die übergebenen Parameter verwaist
-            // sind. Typisches Szenario: asynchrones Skript feuert Cell_CellValueChanged
-            // zwischen dem Lesen von CursorPosRow in Cursor_Move und dem Aufruf
-            // von CursorPos_Set. Ohne Migration würde die Position verworfen und
-            // die Tastatur-Navigation bricht ab.
+            // Verwaiste Referenzen über die stabile RowItem-/ColumnItem-Identität migrieren.
             var oldRli = row as RowListItem;
             var colItem = column?.Column;
             var rowItem = oldRli?.Row;
             var chapter = oldRli?.AlignsToChapter;
             var ca = CurrentArrangement;
             var freshCol = colItem is { IsDisposed: false } && ca is { IsDisposed: false } ? ca[colItem] : null;
-            // RowItem + Kapitel-Caption nutzen, nicht _rowLookup — sonst wird
-            // bei mehrfacher Anzeige einer Row in verschiedenen Kapiteln das
-            // falsche RowListItem geliefert.
+            // _rowLookup umgehen: bei mehrfacher Anzeige einer Row würde sonst das falsche Kapitel geliefert.
             var freshRow = rowItem is { IsDisposed: false } ? GetRow(rowItem, chapter) : null;
 
             if (freshCol is not null && freshRow is not null
@@ -1112,12 +1015,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
-    public string Export_CSV(FirstRow firstRow) => Table is null ? string.Empty : Export_CSV(Table, firstRow, CurrentArrangement?.ListOfUsedColumn(), RowsVisibleUnique());
+    public string Export_CSV(FirstRow firstRow) => Table is null ? string.Empty : CsvHelper.ExportCsv(Table, firstRow, CurrentArrangement?.ListOfUsedColumn(), RowsVisibleUnique());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return string.Empty; }
         List<ColumnItem> l = [onlyColumn];
-        return Export_CSV(Table, firstRow, l, RowsVisibleUnique());
+        return CsvHelper.ExportCsv(Table, firstRow, l, RowsVisibleUnique());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
@@ -1154,9 +1057,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 if (thisItem is RowListItem { IsDisposed: false } rdli && rdli.Visible) {
                     da.RowBeginn();
                     foreach (var thisColumn in ca) {
-                        // thisColumn.Column ist bei virtuellen Spalten (Pin, Nummer, …) null.
-                        // Früher wurde im else-Zweig thisColumn.Column.BackColor gelesen —
-                        // das würde eine NRE auslösen, denn genau dann ist Column null.
+                        // Column ist bei virtuellen Spalten (Pin, Nummer) null.
                         if (thisColumn.Column is { IsDisposed: false } col) {
                             da.CellAdd(string.Join("<br>", rdli.Row.CellGetList(col)), col.BackColor);
                         }
@@ -1175,9 +1076,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
+    /// Setzt den Fokus auf die TableView.
     /// </summary>
-    /// <returns></returns>
     public new void Focus() {
         if (Focused) { return; }
         base.Focus();
@@ -1384,10 +1284,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         if (CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
 
-        // CellCollection.IsCellEditable kann bei Chunk-Spalten über TableChunk.IsValueEditable
-        // einen Chunk-Ladevorgang auslösen, der OnLoaded und damit Invalidate_CurrentArrangement
-        // feuert. Das bisherige ColumnViewItem ist danach nicht mehr im neu erzeugten Arrangement
-        // enthalten. Deswegen über die zugrundeliegende Spalte neu auflösen.
+        // Chunk-Ladevorgang kann Invalidate_CurrentArrangement auslösen, danach ColumnViewItem neu auflösen.
         if (cellInThisTableColumn?.Column is { IsDisposed: false } col) {
             cellInThisTableColumn = CurrentArrangement?[col];
         }
@@ -1550,9 +1447,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Schaltet den Auf-/Zuklapp-Zustand aller Kapitel um: Ist mindestens
-    /// ein Kapitel ausgeklappt, werden alle geschlossen. Sind alle
-    /// eingeklappt, werden alle geöffnet.
+    /// Klappt alle Kapitel zu, falls eines ausgeklappt ist; sonst alle auf.
     /// </summary>
     public void ToggleAllChapters() {
         if (AllViewItems is not { } avi) { return; }
@@ -1593,14 +1488,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
         var idx = _sortedViewItems.IndexOf(row);
-        // Asynchrone Skript-Abarbeitung (Cell_CellValueChanged → RemoveRowItems)
-        // kann zwischen dem Lesen von CursorPosRow in Cursor_Move und diesem
-        // Aufruf neue RowListItem-Instanzen erzeugt haben. Dann ist row
-        // verwaist und IndexOf liefert -1. Über RowItem-Identität UND Kapitel-
-        // Caption die aktuelle Instanz suchen (übernimmt auch das korrekte
-        // Kapitel, falls die Row in mehreren angezeigt wird). Ohne diesen
-        // Fallback würde View_NextRow null liefern, Cursor_Move gar nicht
-        // mehr weiterwandern und CursorPos_Set die Position verwerfen.
+        // Verwaiste Instanz über RowItem-Identität + Kapitel-Caption auflösen.
         if (idx < 0) {
             var fresh = GetRow(row.Row, row.AlignsToChapter);
             if (fresh is not null) {
@@ -1615,8 +1503,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
         var idx = _sortedViewItems.IndexOf(row);
-        // Siehe View_NextRow: verwaiste Instanz über RowItem-Identität +
-        // Kapitel-Caption auflösen.
+        // Siehe View_NextRow.
         if (idx < 0) {
             var fresh = GetRow(row.Row, row.AlignsToChapter);
             if (fresh is not null) {
@@ -1809,117 +1696,97 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Universeller Einstieg für alle Inline-Edits. Die Aufrufer (üblicherweise
-    /// die <see cref="RowBackground" />-Subklassen via <c>HandleDoubleClick</c>
-    /// bzw. <c>HandleKeyPress</c>) übergeben Position, Edit-Typ und Commit-
-    /// Logik direkt. TableView kümmert sich nur noch um Strategy-Auswahl,
-    /// Konfiguration und Aktivierung des Controls — nicht mehr um die
-    /// Herkunft des Werts.
-    /// Strategien mit <see cref="FlexiStrategyBase.SupportsSuggestions" /> erhalten
-    /// hier einheitlich ihre Auswahlliste, sofern der Aufrufer keine vorbelegt.
+    /// Universeller Einstieg für alle Inline-Edits: wählt die Strategie, konfiguriert das Control und aktiviert es.
     /// </summary>
     internal void BeginEdit(
         EditTypeTable editType,
-        Point location,
-        Size size,
+        Rectangle bounds,
         string value,
         Action<string> commit,
-        ColumnFormatHolder? styleTemplate,
-        ColumnItem? styleColumn,
+        IColumnInputFormat? styleSource,
         ColumnItem? contentColumn,
         RowItem? contentRow,
-        string quickInfo,
-        bool multiLine,
-        int parentHeight,
         List<AbstractListItem>? listItems,
-        CellExtEventArgs? cellInfo,
-        float zoom) {
+        CellExtEventArgs? cellInfo) {
         if (IsDisposed) { return; }
 
-        HideAllEditControls();
+        // LostFocus während des Aufbaus ignorieren (Abbau/Fokus-Übergabe).
+        _isBeginningEdit = true;
+        try {
+            HideAllEditControls();
 
-        var strategy = GetOrCreateEditStrategy(editType);
-        if (strategy.Control is not System.Windows.Forms.Control c) { return; }
+            var strategy = GetOrCreateEditStrategy(editType);
+            if (strategy.Control is not System.Windows.Forms.Control c) { return; }
 
-        // Auswahllisten (Vorschläge) einheitlich für alle Strategien mit
-        // NeedsSuggestions ermitteln — sofern der Aufrufer keine eigenen
-        // Items übergibt. Die content-Spalte hat Vorrang vor der Style-Spalte
-        // (LinkedCell-Auflösung), der Renderer wird aus dem CellView geholt.
-        var items = listItems;
-        if (strategy.SupportsSuggestions && items is not { Count: > 0 }) {
-            items = CollectEditItems(contentColumn, styleColumn, contentRow, cellInfo);
-        }
+            // Vorschläge ermitteln, falls keine Items übergeben wurden.
+            var items = listItems;
+            if (strategy.SupportsSuggestions && items is not { Count: > 0 }) {
+                items = CollectEditItems(contentColumn, styleSource as ColumnItem, contentRow, cellInfo);
+            }
 
-        // Dropdown-Sonderfall: Ohne Items ist kein Dropdown möglich. Wenn die
-        // Spalte Text erlaubt, auf Textfeld zurückfallen, sonst abbrechen.
-        // Die "Erweiterte Eingabe" wird bei Text-Erlaubnis als zusätzlicher
-        // Eintrag angeboten (Auswertung in DropDownMenu_ItemClicked).
-        if (editType == EditTypeTable.Dropdown_Single) {
-            if (contentColumn is not { IsDisposed: false } contentHolderCellColumn) { return; }
+            // Dropdown ohne Items: auf Textfeld zurückfallen oder abbrechen. "Erweiterte Eingabe" bei Text-Erlaubnis.
+            if (editType == EditTypeTable.Dropdown_Single) {
+                if (contentColumn is not { IsDisposed: false } contentHolderCellColumn) { return; }
 
-            if (items is not { Count: > 0 }) {
-                if (contentHolderCellColumn.EditableWithTextInput) {
-                    BeginEdit(EditTypeTable.Textfeld, location, size, value, commit, styleTemplate, styleColumn, contentColumn, contentRow, quickInfo, multiLine, parentHeight, listItems, cellInfo, zoom);
-
-                    return;
-                } else {
+                if (items is not { Count: > 0 }) {
+                    if (contentHolderCellColumn.EditableWithTextInput) {
+                        BeginEdit(EditTypeTable.Textfeld, bounds, value, commit, styleSource, contentColumn, contentRow, listItems, cellInfo);
+                        return;
+                    }
                     NotEditableInfo("Keine Items zum Auswählen vorhanden.");
+                    return;
                 }
-                return;
+
+                if (contentHolderCellColumn.EditableWithTextInput) {
+                    items.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
+                    items.Add(SeparatorWith(FirstSortChar + "2"));
+                }
             }
 
-            if (contentHolderCellColumn.EditableWithTextInput) {
-                items.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
-                items.Add(SeparatorWith(FirstSortChar + "2"));
+            // Style, MultiLine und QuickInfo aus der Style-Quelle ableiten.
+            strategy.BeginInit();
+            if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
+            strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
+            strategy.Zoom = Zoom;
+            strategy.QuickInfo = (styleSource as IReadableTextWithKey)?.QuickInfo ?? string.Empty;
+            strategy.ParentHeight = bounds.Height;
+            if (items is { Count: > 0 }) { strategy.ListItems = items; }
+
+            // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
+            if (editType == EditTypeTable.Dropdown_Single) {
+                strategy.CheckBehavior = CheckBehavior.MultiSelection;
+                strategy.AutoSort = true;
             }
+
+            strategy.EndInit();
+
+            // Strategie-spezifische Größe berechnen.
+            var size = strategy.CalculateRequiredSize(bounds.Width, bounds.Height);
+
+            // TableView hat das letzte Wort: das Control darf nicht über den
+            // sichtbaren Bereich hinausragen.
+            var area = AvailableControlPaintArea;
+            size.Width = Math.Min(size.Width, Math.Max(area.Right - bounds.X, 1));
+            size.Height = Math.Min(size.Height, Math.Max(area.Bottom - bounds.Y, 1));
+
+            c.Location = bounds.Location;
+            c.Size = size;
+            strategy.SetValueToControl(value);
+
+            // Dropdown committet über ValueChanged; alle anderen über den Callback.
+            if (editType == EditTypeTable.Dropdown_Single) {
+                _dropdownCellInfo = cellInfo;
+                _editCommit = null;
+            } else {
+                _editCommit = commit;
+            }
+
+            c.Visible = true;
+            c.BringToFront();
+            c.Focus();
+        } finally {
+            _isBeginningEdit = false;
         }
-
-        strategy.BeginInit();
-        if (styleTemplate is { } template) {
-            strategy.GetStyleFrom(template);
-        } else if (styleColumn is { IsDisposed: false } col) {
-            strategy.GetStyleFrom(col);
-        }
-        strategy.Zoom = zoom;
-        strategy.QuickInfo = quickInfo;
-        strategy.MultiLine = multiLine;
-        strategy.ParentHeight = parentHeight;
-        if (items is { Count: > 0 }) { strategy.ListItems = items; }
-
-        // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
-        if (editType == EditTypeTable.Dropdown_Single) {
-            strategy.CheckBehavior = CheckBehavior.MultiSelection;
-            strategy.AutoSort = true;
-        }
-
-        strategy.EndInit();
-
-        // Größenberechnung: TextBoxSuggestions schätzt die Höhe anhand der
-        // Vorschläge, das Dropdown wird so groß wie die Items es verlangen.
-        if (strategy.Control is TextBoxSuggestions tbs) {
-            tbs.TextboxSize = size;
-            size = new Size(size.Width, tbs.GetEstimatedHeight(size.Width, size.Height));
-        } else if (strategy is FlexiStrategyDropDownListBox ddStrategy) {
-            size = ddStrategy.CalculateRequiredSize(size.Width, size.Height);
-        }
-
-        c.Location = location;
-        c.Size = size;
-        strategy.SetValueToControl(value);
-
-        // Commit-Setup: Dropdown committet pro Item-Klick über ValueChanged
-        // (siehe DropDownStrategy_ValueChanged) und braucht _editCommit nicht;
-        // alle anderen Strategien committen über den übergebenen Callback.
-        if (editType == EditTypeTable.Dropdown_Single) {
-            _dropdownCellInfo = cellInfo;
-            _editCommit = null;
-        } else {
-            _editCommit = commit;
-        }
-
-        c.Visible = true;
-        c.BringToFront();
-        c.Focus();
     }
 
     internal void BeginSmoothScrollToColumn(int targetX, int targetY) {
@@ -1932,6 +1799,21 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _pendingSmoothScroll = false;
         Invalidate();
         SmoothScrollTo(targetX, targetY);
+    }
+
+    internal void ContextMenu_ContentPaste(object? sender, ContextMenuEventArgs? e) {
+        if (CursorPosColumn?.Column is not { IsDisposed: false } column || CursorPosRow?.Row is not { IsDisposed: false } row) {
+            NotEditableInfo("Interner Fehler.");
+            return;
+        }
+
+        if (!Clipboard.ContainsText()) {
+            NotEditableInfo("Kein Text in der Zwischenablage.");
+            return;
+        }
+        var ntxt = Clipboard.GetText();
+        if (row.CellGetString(column) == ntxt) { return; }
+        NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
     internal void EnsureVisibleX(int controlX) {
@@ -1964,15 +1846,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Ermittelt die Zeilen des zusammenhängenden Kapitel-Blocks, der unter
-    /// dem übergebenen Header beginnt. Primär über das Mapping
-    /// <see cref="_chapterBlockRows"/>, das beim View-Aufbau pro Header alle
-    /// Block-Zeilen enthält — auch die eingeklappten. So funktioniert der
-    /// Zugriff unabhängig vom Aufklapp-Zustand (z. B. Drag eines zugeklappten
-    /// Kapitels). Fällt das Mapping leer aus, wird als Fallback in
-    /// <see cref="_sortedViewItems"/> per Referenzgleichheit gesucht; der Block
-    /// endet am nächsten Kapitel-Header. Wird der Header nicht gefunden,
-    /// wird <c>null</c> zurückgegeben.
+    /// Liefert alle Zeilen des Kapitel-Blocks unter dem Header — auch eingeklappte. Fallback: Suche in _sortedViewItems bis zum nächsten Header.
     /// </summary>
     internal List<RowItem>? GetChapterBlockRows(RowCaptionListItem header) {
         if (_chapterBlockRows.TryGetValue(header, out var mapped) && mapped is not null) {
@@ -2034,8 +1908,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Prüft, ob das angegebene Arrangement die Ansicht 0 ("Alle Spalten") ist.
-    /// In Ansicht 0 darf die Reihenfolge nicht verändert werden.
+    /// Prüft, ob das Arrangement die Ansicht 0 ("Alle Spalten") ist, in der keine Reihenfolgeänderung erlaubt ist.
     /// </summary>
     internal bool IsAnsicht0(ColumnViewCollection ca) {
         if (Table is not { IsDisposed: false } tb) { return false; }
@@ -2058,37 +1931,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var x = AvailableControlPaintArea.Width;
         var y = AvailableControlPaintArea.Height;
 
-        // WICHTIG: CurrentArrangement VOR AllViewItems abfragen.
-        // CurrentArrangement ruft ComputeAllColumnPositions mit der
-        // aktuellen AvailableControlPaintArea-Breite auf und aktualisiert
-        // damit den Spaltenbreiten-Cache. AllViewItems/CalculateAllViewItems
-        // liest diesen Cache (ControlColumnsWidth), um die CanvasPosition-
-        // Breite jeder Zeile zu setzen. Wäre AllViewItems zuerst dran,
-        // würde mit einer veralteten (z. B. schmaleren) Breite gerechnet -
-        // die Folge: nach einem Slider-Visibility-Wechsel bleibt
-        // CanvasPosition.Width zu klein und DrawExplicit übermalt das
-        // rechte Ende der letzten Spalte mit der Hintergrundfarbe.
+        // WICHTIG: CurrentArrangement VOR AllViewItems abfragen — sonst wird mit veralteter Spaltenbreite gerechnet.
         if (CurrentArrangement is { } ca) {
-            // Indent wird beim Zeichnen zu den Spalten-Positionen addiert
-            // (RowBackground.DrawExplicit). Daher muss der maximale Indent aller
-            // sichtbaren Zeilen auch in die Canvas-Breite einfließen — sonst
-            // werden eingerückte Spalten am rechten Rand abgeschnitten.
+            // Indent in die Canvas-Breite einfließen, sonst werden eingerückte Spalten abgeschnitten.
             x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom) + RowBackground.IndentWidth * MaxIndentOfRows;
         }
 
-        // AllViewItems sicherstellen, damit _sortedViewItems befüllt ist.
-        // Ohne diesen Aufruf wäre _sortedViewItems leer, weil DrawControl
-        // erst NACH base.DrawControl() auf AllViewItems zugreift.
+        // _sortedViewItems sicherstellen.
         _ = AllViewItems;
 
         if (_sortedViewItems is { Count: > 0 }) {
-            // Höhe aus den bereits berechneten CanvasPosition-Werten ableiten.
-            // CalculateAllViewItems_CalculateYPosition hat die Positionen mit
-            // dem korrekten Zoom berechnet (HeightInControl mit echter Canvas-
-            // Gesamtbreite). Der frühere Weg über CanvasItemData bzw.
-            // UntrimmedCanvasSize rechnete stets mit Zoom 1 und lieferte bei
-            // Zoom > 100 % eine zu kleine Gesamthöhe — die letzte Zeile ließ
-            // sich dann nicht mehr erreichen.
+            // Höhe aus den mit korrektem Zoom berechneten CanvasPosition-Werten.
             y = _sortedViewItems.Max(i => i.CanvasPosition.Bottom);
         }
 
@@ -2221,18 +2074,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
             ca.SheetStyle = SheetStyle;
-            // Indent-Breite abziehen, damit ScaleToFit die Spalten so
-            // skaliert, dass eingerückte Zeilen vollständig sichtbar bleiben.
+            // Indent-Breite abziehen, damit eingerückte Zeilen sichtbar bleiben.
             var availWidth = AvailableControlPaintArea.Width - RowBackground.IndentWidth.CanvasToControl(Zoom) * MaxIndentOfRows;
             ca.ComputeAllColumnPositions(Math.Max(16, availWidth), Zoom);
 
-            // Haupt-Aufbau-Routine ------------------------------------
-            // Zuerst Zeilen (ohne IgnoreYOffset) zeichnen, dann Kopfzeilen (mit IgnoreYOffset) darüber,
-            // damit der Spaltenkopf beim Scrollen nicht von Zeilen überdeckt wird.
-            // Die Where-Enumeratoren sind bewusst lazy; ein ToList würde bei jedem Paint
-            // neue Listen allozieren.
-            // Normale Zeilen, die vollständig hinter dem fixierten Header liegen,
-            // werden über den clipTop-Parameter ausgeschlossen und gar nicht erst gezeichnet.
+            // Haupt-Aufbau: Zeilen zeichnen, dann Kopfzeilen darüber. Lazy Where-Enumeratoren.
             var rowsTop = RowsAreaTop();
             DrawItems(_sortedViewItems.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, rowsTop);
             DrawItems(_sortedViewItems.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, 0);
@@ -2309,42 +2155,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed
             || Table is not { IsDisposed: false }
             || CurrentArrangement is not { IsDisposed: false }
-            || CursorPosColumn?.Column is not { IsDisposed: false } c
-            || CursorPosRow?.Row is not { IsDisposed: false } r) { return; }
+            || CursorPosColumn?.Column is not { IsDisposed: false }
+            || CursorPosRow?.Row is not { IsDisposed: false }) { return; }
 
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
             _isinKeyDown = true;
             try {
-                //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-
-                // var chunkval = r.ChunkValue;
                 switch (e.KeyCode) {
-                    //case Keys.Oemcomma: // normales ,
-                    //    if (e.Modifiers == Keys.Control) {
-                    //        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, chunkval);
-                    //        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
-                    //        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
-                    //        if (string.IsNullOrEmpty(lp) && newRow?.Row is not null) {
-                    //            UserEdited(this, newRow.Row.CellGetString(c), CursorPosColumn, CursorPosRow, true, oldval);
-                    //        } else {
-                    //            NotEditableInfo(lp);
-                    //        }
-                    //    }
-                    //    break;
-
-                    case Keys.X:
-                        if (e.Modifiers == Keys.Control) {
-                            var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
-                            CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
-                            NotEditableInfo(UserEdited(this, c.DefaultValueForColumn(), CursorPosColumn, CursorPosRow, true));
-                        }
-                        break;
-
-                    case Keys.Delete:
-                        NotEditableInfo(UserEdited(this, c.DefaultValueForColumn(), CursorPosColumn, CursorPosRow, true));
-                        break;
-
                     case Keys.Left:
                         Cursor_Move(Direction.Links);
                         break;
@@ -2369,29 +2187,18 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                         HideMiniToolbar();
                         break;
 
-                    case Keys.C:
-                        if (e.Modifiers == Keys.Control) {
-                            var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
-                            CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
-                        }
-                        break;
-
                     case Keys.F:
                         if (e.Modifiers == Keys.Control) {
                             OpenSearchInCells();
                         }
                         break;
-
-                    case Keys.F2:
-                        Cell_Edit(CursorPosColumn, CursorPosRow, true, r.ChunkValue);
-                        break;
-
-                    case Keys.V:
-                        if (e.Modifiers == Keys.Control) {
-                            PasteToCursor();
-                        }
-                        break;
                 }
+
+                // Zell-Aktionen (Ausschneiden, Kopieren, Einfügen, Editieren
+                // via F2, Löschen) werden — analog zum Doppelklick — an das
+                // unter dem Cursor liegende Row-Item delegiert. Die TableView
+                // behält nur die Navigations-Tasten oben selbst.
+                CursorPosRow?.HandleKeyDown(CursorPosColumn, this, e);
             } finally {
                 _isinKeyDown = false;
             }
@@ -2404,10 +2211,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
-        // Wurde eine Edit-TextBox durch Klick auf die Tabelle geschlossen
-        // (LostFocus), konsumiert dieser Klick nur das Schließen — die
-        // eigentliche Aktion (Cursor setzen etc.) darf erst beim nächsten
-        // Klick erfolgen.
+        // Edit wurde durch Klick geschlossen → Klick nur konsumieren, Aktion beim nächsten Klick.
         if (_consumeNextMouseDown) {
             _consumeNextMouseDown = false;
             return;
@@ -2416,17 +2220,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         lock (_lockUserAction) {
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
-            //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             try {
                 var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
-                // Die beiden Befehle nur in Mouse Down!
-                // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
-                // Das könnte auch sehr Zeit intensiv sein. Dann kann die Maus inzwischen wo ander sein.
-                // Somit würde das Ereignis doppelt und dreifach ausgelöste werden können.
-                // Beipiel: MouseDown-> Bildchen im Pad erzeugen, dauert.... Maus bewegt sich
-                //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
-                // Auf-/Zuklappen NUR über den Pfeil-Button links.
-                // Klick auf das Wort startet Drag/Drop (siehe unten).
+                // Auf-/Zuklappen nur über den Pfeil-Button, Klick auf das Wort startet Drag/Drop.
                 if (_mouseOverRow is RowCaptionListItem rcli
                     && rcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)) {
                     CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
@@ -2437,10 +2233,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 EnsureVisible(_mouseOverColumn, _mouseOverRow);
                 CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
 
-                // Drag/Drop-Potential speichern.
-                // Der Drag selbst startet erst in OnMouseMove nach Überschreiten
-                // einer Bewegungsschwelle (vermeidet versehentliches Dragging bei Klick).
-                // Bei einem Kapitel-Header werden alle Zeilen des Blocks verschoben.
+                // Drag/Drop-Potential speichern; Drag startet in OnMouseMove nach Bewegungsschwelle.
                 _dragItem = null;
 
                 if (e.Button == MouseButtons.Left && !IsAnsicht0(ca)
@@ -2456,9 +2249,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                                && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
                                && dragRcli.CanEditChapter
                                && Table.Column.SysRowSortIndex is { IsDisposed: false }) {
-                        // Den Block NICHT aufklappen — GetChapterBlockRows
-                        // liefert über _chapterBlockRows alle Zeilen des
-                        // Blocks, auch wenn er eingeklappt ist.
+                        // Block nicht aufklappen — GetChapterBlockRows liefert alle Zeilen auch eingeklappt.
                         _ = AllViewItems; // _sortedViewItems sicherstellen
 
                         // Den aktuellen Header über die Mausposition finden.
@@ -2515,10 +2306,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                         var inside = AvailableControlPaintArea.Contains(e.ControlX, e.ControlY);
                         if (_dragItem is ColumnViewItem) {
                             _dragInsertIndex = inside ? CalculateColumnSortInsertIndex(e.ControlX) : -1;
-                            AutoScrollDuringColumnDrag(e.ControlX);
+                            AutoScrollDuringDrag(e.ControlX, null);
                         } else {
                             _dragInsertIndex = inside ? CalculateRowSortInsertIndex(e.ControlY) : -1;
-                            AutoScrollDuringDrag(e.ControlY);
+                            AutoScrollDuringDrag(null, e.ControlY);
                         }
                         Invalidate();
                         return;
@@ -2677,16 +2468,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         base.WndProc(ref m);
     }
 
-    private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
-        for (var colNr = 0; colNr < columns.Count; colNr++) {
-            if (columns[colNr] is { } col) {
-                sb.Append(formatter(col));
-                if (colNr < columns.Count - 1) { sb.Append(';'); }
-            }
-        }
-        sb.Append("\r\n");
-    }
-
     private static void CalculateAllViewItems_AddCaptions(Dictionary<string, RowBackground> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows) {
         HashSet<string> allCaps = [];
 
@@ -2714,14 +2495,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss.
-    /// Eine Zeile gehört direkt zu ihrem Kapitel — auch wenn dasselbe Kapitel
-    /// gleichzeitig Parent anderer Kapitel ist (keine "X\Ohne"-Sub-Section mehr).
-    /// Zeilen ohne Kapitelwert erhalten einen leeren String und erscheinen auf
-    /// der obersten Ebene ohne Header.
-    /// Angepinnte Zeilen erhalten zusätzlich einen leeren String als Marker
-    /// für die Darstellung ganz oben; sie werden über <see cref="RowListItem.MarkYellow"/>
-    /// identifiziert.
+    /// Kapitel-Zuordnungen einer Zeile. Angepinnte Zeilen erhalten zusätzlich einen leeren Marker für die Darstellung ganz oben.
     /// </summary>
     private static List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement) {
         List<string> capsOfRow = [];
@@ -2783,16 +2557,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Factory für den <see cref="_editStrategyCache" />: erzeugt zur
-    /// übergebenen <paramref name="editType" /> die passende neue Strategie.
-    /// Aufruf erfolgt ausschließlich über <see cref="ConcurrentCache{TKey, TValue}.GetOrAdd" />,
-    /// sodass jede Strategie pro TableView höchstens einmal angelegt wird.
+    /// Erzeugt die Strategie zum übergebenen Edit-Typ.
     /// </summary>
     private static FlexiStrategyBase CreateEditStrategy(EditTypeTable editType) => editType switch {
         EditTypeTable.Textfeld => new FlexiStrategyTextBox(),
         EditTypeTable.Textfeld_mit_Auswahlknopf => new FlexiStrategyComboBox(),
         EditTypeTable.Textfeld_mit_Vorschlägen => new FlexiStrategyTextBoxSuggestions(),
-        EditTypeTable.Dropdown_Single => new FlexiStrategyDropDownListBox(),
+        EditTypeTable.Dropdown_Single => new FlexiStrategyListBoxFramed(),
         _ => throw new ArgumentOutOfRangeException(nameof(editType), editType, "Nicht unterstützter Edit-Typ für Inline-Edit.")
     };
 
@@ -2921,8 +2692,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zeichnet das ausgefüllte Rechteck mit halbtransparentem Rahmen
-    /// als Einfüge-Indikator für Drag/Drop-Operationen.
+    /// Zeichnet ein halbtransparentes Rechteck als Drag/Drop-Einfüge-Indikator.
     /// </summary>
     private static void DrawInsertIndicatorRect(Graphics gr, Rectangle rect) {
         using var brush = new SolidBrush(Color.FromArgb(40, 0, 120, 215));
@@ -2949,22 +2719,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         } catch { }
     }
 
-    private static string FormatCellForCsv(RowItem row, ColumnItem column) {
-        var tmp = row.CellGetString(column);
-
-        if (column.TextFormatingAllowed) {
-            using var t = new ExtText();
-            t.HtmlText = tmp;
-            tmp = t.PlainText;
-        }
-
-        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
-    }
-
     /// <summary>
-    /// Holt ein Kopf-Element (<see cref="AbstractListItem"/>) aus <paramref name="allItems"/>
-    /// oder legt es neu an. Alle Kopf-Elemente liegen oberhalb des Scroll-Bereichs,
-    /// daher wird <see cref="AbstractListItem.IgnoreYOffset"/> hier zentral auf <c>true</c> gesetzt.
+    /// Holt ein Kopf-Element aus allItems oder legt es neu an. IgnoreYOffset wird zentral auf true gesetzt.
     /// </summary>
     private static T GetOrCreateHeadItem<T>(Dictionary<string, RowBackground> allItems, string identifier, ColumnViewCollection arrangement, Func<T> factory) where T : RowBackground {
         if (allItems.TryGetValue(identifier, out var existing) && existing is T typed) {
@@ -2979,9 +2735,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Prüft, ob ein Vorgänger-Pfad (strict ancestor) von <paramref name="chapterText"/>
-    /// in <paramref name="collapsedParents"/> enthalten ist. Entspricht der bisherigen
-    /// <c>StartsWith(parent + "\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
+    /// Prüft, ob ein Vorgänger-Pfad von chapterText in collapsedParents enthalten ist.
     /// </summary>
     private static bool HasCollapsedAncestor(string chapterText, HashSet<string> collapsedParents) {
         var pos = chapterText.IndexOf(RowCaptionListItem.Kapiteltrenner);
@@ -2993,17 +2747,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Ein Drop-Ziel ist jede sichtbare, nicht disposed Zeile oder jeder
-    /// Kapitel-Header. Letzterer wird wie eine Zeile behandelt, damit direkt
-    /// unter ihm abgelegt werden kann.
+    /// true bei sichtbaren, nicht disposed Zeilen oder Kapitel-Headern.
     /// </summary>
     private static bool IsDroppableTarget(RowBackground item)
         => item is RowListItem or RowCaptionListItem && !item.IsDisposed && item.Visible;
 
     /// <summary>
-    /// Ermittelt den nächsten freien Default-Wert "NEU_X" für die angegebene
-    /// Spalte. X startet bei 1 und wird hochgezählt, bis ein Wert gefunden ist,
-    /// der in keiner bestehenden Zeile der Tabelle in dieser Spalte vorkommt.
+    /// Liefert den nächsten freien Default-Wert "NEU_X" für die Spalte.
     /// </summary>
     private static string NextNewDefaultValue(Table tb, ColumnItem column) {
         var n = 1;
@@ -3022,10 +2772,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Liefert entweder eine Einzelelement-Liste (wenn <paramref name="row"/> gesetzt)
-    /// oder eine Kopie aller <paramref name="rows"/>. Typischer Aufruf in
-    /// Kontextmenü-Handlern, die sowohl mit einer einzelnen als auch mit mehreren
-    /// markierten Zeilen arbeiten können.
+    /// Einzelelement-Liste bei gesetzter row, sonst Kopie aller rows.
     /// </summary>
     private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
         => row is not null ? [row] : [.. rows];
@@ -3038,10 +2785,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void _Table_TableLoaded(object? sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
-        // Wird auch bei einem Reload ausgeführt.
-        // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
-        // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
-        // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Tabelle auch änsdert....
 
         if (e.IsFirst) {
             if (_storedView is not null) {
@@ -3228,9 +2971,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var headX = columnviewitem.ControlColumnLeft(OffsetX);
         //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
-        // Altes AutoFilter explizit schließen, bevor ein neues erstellt wird.
-        // Ohne diesen Aufruf würde das alte _autoFilter samt seiner Event-
-        // Subscription leaked werden (AutoFilter_Close übernimmt Unsubscribe + Dispose).
+        // Altes AutoFilter schließen (verhindert Event-Subscription-Leak).
         AutoFilter_Close();
 
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(SheetStyle), columnviewitem.GetRenderer(SheetStyle));
@@ -3239,26 +2980,26 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
 
-    private void AutoScrollDuringColumnDrag(int controlX) {
+    private void AutoScrollDuringDrag(int? controlX, int? controlY) {
         var area = AvailableControlPaintArea;
-        var threshold = (int)(20 * Zoom);
+        var threshold = 20.CanvasToControl(Zoom);
 
-        if (controlX < area.Left + threshold) {
-            OffsetX += 20;
-        } else if (controlX > area.Right - threshold) {
-            OffsetX -= 20;
+        if (controlX is { }) {
+            if (controlX < area.Left + threshold) {
+                OffsetX += 20;
+            } else if (controlX > area.Right - threshold) {
+                OffsetX -= 20;
+            }
         }
-    }
 
-    private void AutoScrollDuringDrag(int controlY) {
-        var area = AvailableControlPaintArea;
-        var threshold = (int)(20 * Zoom);
-        var rowsTop = RowsAreaTop();
+        if (controlY is { }) {
+            var rowsTop = RowsAreaTop();
 
-        if (controlY < rowsTop + threshold) {
-            OffsetY += 20;
-        } else if (controlY > area.Bottom - threshold) {
-            OffsetY -= 20;
+            if (controlY < rowsTop + threshold) {
+                OffsetY += 20;
+            } else if (controlY > area.Bottom - threshold) {
+                OffsetY -= 20;
+            }
         }
     }
 
@@ -3276,14 +3017,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
 
-        // SortUsed() ist null, wenn die Tabelle weder eine SortDefinition noch
-        // eine SysRowSortIndex-Spalte besitzt — z. B. eine Tabelle ohne echte
-        // Spalten (nur virtuelle). Bisher führte das zum Early-Return oben,
-        // wobei allItems geleert wurde: AddFootElements lief nie, das
-        // TableEndListItem fehlte beim Zeichnen und die TableView zeigte
-        // "Fehler in der Zeilenberechung". Mit einer leeren Sortierung läuft
-        // die Pipeline vollständig durch (Head/Foot/Rows), sodass auch reine
-        // virtuelle Spalten normal gerendert werden.
+        // SortUsed() ist null bei Tabellen ohne echte Spalten. Leere Sortierung lässt die Pipeline vollständig durchlaufen.
         var sortused = SortUsed() ?? new RowSortDefinition(tb, (ColumnItem?)null, false);
 
         if (arrangement.ControlColumnsWidth() <= 0 && arrangement.Count > 0) {
@@ -3295,11 +3029,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
         List<RowItem> pinnedRows = [.. PinnedRows];
-        // BUGFIX Performance: Bisher wurde hier sortused.SortedRows(FilterCombined.Rows) aufgerufen.
-        // Das war eine verschwendete Sortierung: filteredRows wird unten NUR iterativ konsumiert
-        // (AddCaptions, CalculateAllViewItems_Rows). Die echte Sortierung passiert erst weiter unten
-        // über UserDefCompareKey (Zeile ~2868) und das OrderBy(item => item.CompareKey()) bei ~2663.
-        // SortedRows hat zudem je Zeile einen CompareKey-String allokriert (Doppelmoral mit Zeile 2868).
+        // filteredRows wird nur iterativ konsumiert; die echte Sortierung passiert später über UserDefCompareKey.
         List<RowItem> filteredRows = [.. FilterCombined.Rows];
 
         List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
@@ -3341,54 +3071,37 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Einheitlicher Caption- und Zeilen-Aufbau für beide Modi (NumberStyle
-    /// und hierarchisch). Die Zeilen werden in ihrer sortierten Reihenfolge
-    /// durchlaufen — die Sortierung ist die EINZIGE Unterscheidung zwischen
-    /// den Modi (siehe <see cref="CalculateAllViewItems_Rows"/>). Bei jedem
-    /// Kapitel-Wechsel werden die benötigten Header eingefügt, inkl. Hierarchie
-    /// (Unterkapitel). Im NumberStyle kann dasselbe Kapitel mehrfach auftreten,
-    /// wenn seine Zeilen verstreut sind — jeder Block ist unabhängig auf-/zuklappbar.
-    /// Im hierarchischen Modus sind die Zeilen nach Kapitel-Pfad sortiert,
-    /// sodass jedes Kapitel genau einmal erscheint.
+    /// Einheitlicher Caption- und Zeilen-Aufbau. Fügt bei jedem Kapitel-Wechsel die benötigten Header inkl. Hierarchie ein.
     /// </summary>
     private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, RowBackground> allItems, List<RowBackground> sortedItems, List<RowListItem> sortedRows) {
         _chapterBlockRows.Clear();
 
         var numberStyle = Table is { IsDisposed: false } tbNs && tbNs.Column.SysRowSortIndex is { IsDisposed: false };
 
-        // Angepinnte Zeilen ganz oben — ohne Kapitel-Header.
-        // Sie werden über den leeren Chapter-Marker (MarkYellow + leer)
-        // identifiziert und aus dem regulären Chapter-Fluss herausgelöst.
+        // Angepinnte Zeilen ganz oben — ohne Kapitel-Header (MarkYellow + leer).
         foreach (var rli in sortedRows) {
             if (rli.MarkYellow && string.IsNullOrEmpty(rli.AlignsToChapter)) {
                 sortedItems.Add(rli);
             }
         }
 
-        // _collapsed enthält nur die direkt eingeklappten Kapitel. Um auch
-        // Nachfahren zu verbergen, zusätzlich auf eingeklappte Vorfahren prüfen.
+        // _collapsed enthält nur direkt eingeklappte Kapitel; Nachfahren über HasCollapsedAncestor verbergen.
         var collapsedSet = new HashSet<string>(_collapsed, StringComparer.OrdinalIgnoreCase);
 
         string? lastChapter = null;
         List<RowItem>? currentBlockRows = null;
         var blockCollapsed = false;
 
-        // NumberStyle: aktives eingeklapptes Vorfahr-Kapitel, dessen
-        // Nachfahren ebenfalls verbergen werden. Im NumberStyle sind Blöcke
-        // zwar unabhängig auf-/zuklappbar, aber ein zugeklapptes Kapitel
-        // muss auch seine Sub-Kapitel verbergen (wie im hierarchischen Modus).
+        // NumberStyle: eingeklapptes Vorfahr-Kapitel, dessen Nachfahren ebenfalls verbergen werden.
         string? collapsedAncestor = null;
 
         foreach (var rli in sortedRows) {
-            // Pinned-Top-Variante überspringen (bereits oben ausgegeben)
             if (rli.MarkYellow && string.IsNullOrEmpty(rli.AlignsToChapter)) { continue; }
 
             var chapter = rli.AlignsToChapter;
 
             if (string.IsNullOrEmpty(chapter)) {
-                // NumberStyle mit Kapitel-Spalte: auch ein leerer Kapitel-Wert
-                // wird als eigener Block behandelt — ohne Überschrift, aber
-                // auf-/zuklappbar. Sonst: Zeile ohne Header auf oberster Ebene.
+                // NumberStyle: leerer Kapitel-Wert wird als eigener Block behandelt. Sonst: Zeile ohne Header.
                 if (!numberStyle || rli.Arrangement?.ColumnForChapter is not { IsDisposed: false }) {
                     sortedItems.Add(rli);
                     lastChapter = null;
@@ -3399,10 +3112,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 }
             }
 
-            // NumberStyle: Zeile unter eingeklapptem Vorfahr? → komplett
-            // verbergen (Header und Zeile). Die Zeile wird dennoch in den
-            // Block des Vorfahrs aufgenommen, damit Drag/Drop des zugeklappten
-            // Vorfahrs alle Zeilen — inkl. Sub-Kapitel — bewegt.
+            // NumberStyle: Zeile unter eingeklapptem Vorfahr verbergen, aber in den Block aufnehmen (für Drag/Drop).
             if (numberStyle && collapsedAncestor is { Length: > 0 } anc
                 && chapter.StartsWith(anc + RowCaptionListItem.Kapiteltrenner, StringComparison.OrdinalIgnoreCase)) {
                 if (currentBlockRows is not null && rli.Row is { IsDisposed: false } descRow) {
@@ -3416,8 +3126,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (!string.Equals(chapter, lastChapter, StringComparison.OrdinalIgnoreCase)) {
                 var hierarchy = chapter.ChapterPathHierarchy();
                 if (hierarchy.Count == 0) {
-                    // Leeres Kapitel (nur im NumberStyle mit Kapitel-Spalte
-                    // erreichbar): einzelner Header auf Ebene 0.
+                    // Leeres Kapitel (nur NumberStyle): einzelner Header auf Ebene 0.
                     hierarchy = [string.Empty];
                 }
                 var lastHierarchy = string.IsNullOrEmpty(lastChapter) ? [] : lastChapter.ChapterPathHierarchy();
@@ -3429,17 +3138,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     lcpDepth++;
                 }
 
-                // Kehren wir an einen Vorfahren zurück (lcpDepth == hierarchy.Count),
-                // den Leaf-Header erneut anzeigen, damit der neue Block klar
-                // abgegrenzt ist. Andernfalls nur neue/veränderte Tiefen ausgeben.
+                // Bei Rückkehr an einen Vorfahr den Leaf-Header erneut anzeigen.
                 var startDepth = lcpDepth == hierarchy.Count ? Math.Max(0, hierarchy.Count - 1) : lcpDepth;
 
                 for (var i = startDepth; i < hierarchy.Count; i++) {
                     var headerChapter = hierarchy[i];
 
-                    // Hierarchisch: Vorfahr eingeklappt? → Header und Zeilen
-                    // komplett überspringen. Der Parent-Header selbst wurde
-                    // bereits (eingeklappt) ausgegeben.
+                    // Hierarchisch: eingeklappter Vorfahr → Header und Zeilen überspringen.
                     if (!numberStyle && HasCollapsedAncestor(headerChapter, collapsedSet)) {
                         blockCollapsed = true;
                         break;
@@ -3454,9 +3159,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                     RowCaptionListItem headerItem;
                     if (allItems.TryGetValue(RowCaptionListItem.Identifier(headerChapter), out var capItem) && capItem is RowCaptionListItem rcli) {
-                        // NumberStyle: neue Instanz pro Block, da dasselbe Kapitel
-                        // mehrfach vorkommen kann. Hierarchisch: Original-Instanz
-                        // wiederverwenden, damit IsExpanded-Zustand erhalten bleibt.
+                        // NumberStyle: neue Instanz pro Block. Hierarchisch: Original wiederverwenden (IsExpanded erhalten).
                         headerItem = numberStyle
                             ? new RowCaptionListItem(rcli.ChapterText, rliArr)
                             : rcli;
@@ -3465,10 +3168,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     }
 
                     if (i == hierarchy.Count - 1) {
-                        // Leaf: Block beginnt hier. Collapse-Zustand bestimmen.
+                        // Leaf: Collapse-Zustand bestimmen.
                         if (numberStyle) {
-                            // NumberStyle: pro Block anhand der ersten Zeile —
-                            // so bleibt jeder Block unabhängig auf/zu klappbar.
+                            // NumberStyle: pro Block anhand der ersten Zeile.
                             blockCollapsed = rli.Row is { IsDisposed: false } firstRow
                                              && _collapsedBlockFirstRowKeys.Contains(firstRow.KeyName);
                         } else {
@@ -3479,9 +3181,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                         currentBlockRows = [];
                         _chapterBlockRows[headerItem] = currentBlockRows;
                     } else {
-                        // Vorfahr-Header: nur optische Gliederung.
-                        // NumberStyle: immer expanded. Hierarchisch: entsprechend
-                        // des Collapse-Zustands dieses Kapitels.
+                        // Vorfahr-Header: nur optische Gliederung. NumberStyle: immer expanded.
                         headerItem.IsExpanded = numberStyle || !collapsedSet.Contains(headerChapter);
                     }
 
@@ -3496,16 +3196,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 sortedItems.Add(rli);
             }
 
-            // Block-Zeilen immer sammeln — auch eingeklappte, damit Drag/Drop
-            // eines zugeklappten Blocks funktioniert.
+            // Block-Zeilen immer sammeln (auch eingeklappte, für Drag/Drop).
             if (currentBlockRows is not null && rli.Row is { IsDisposed: false } blockRow) {
                 currentBlockRows.Add(blockRow);
             }
 
-            // NumberStyle: eingeklappte Blöcke als Vorfahr merken, damit
-            // nachfolgende Sub-Kapitel ebenfalls verbergen werden. Ein
-            // nicht eingeklappter Block setzt den Vorfahr zurück — der
-            // sichtbare Block beendet den Gültigkeitsbereich des Vorfahrs.
+            // NumberStyle: eingeklappte Blöcke als Vorfahr merken, nicht eingeklappte setzen zurück.
             if (numberStyle) {
                 collapsedAncestor = blockCollapsed ? chapter : null;
             }
@@ -3611,11 +3307,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Berechnet die Variable _collapsed. Enthält NUR die direkt
-    /// eingeklappten Kapitel (als Großschreibung). Nachfahren von
-    /// eingeklappten Kapiteln werden in CalculateAllViewItems_AddCaptionsAndRows
-    /// via HasCollapsedAncestor behandelt — dort wird entschieden, ob ein
-    /// Sub-Header bzw. dessen Zeilen angezeigt werden.
+    /// Befüllt _collapsed mit den direkt eingeklappten Kapiteln (als Großschreibung).
     /// </summary>
     private void CalculateAllViewItems_Collapsed(Dictionary<string, RowBackground> allItems) {
         _collapsed.Clear();
@@ -3699,8 +3391,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Berechnet den Einfüge-Index (Index in CurrentArrangement) für das Spalten-Drag/Drop,
-    /// basierend auf der Maus-X-Position.
+    /// Einfüge-Index für Spalten-Drag/Drop anhand der Maus-X-Position.
     /// </summary>
     private int CalculateColumnSortInsertIndex(int controlX) {
         if (CurrentArrangement is not { IsDisposed: false } ca) { return -1; }
@@ -3722,17 +3413,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Berechnet den Einfüge-Index für den Drag/Drop der SYS_ROWSORTINDEX-Spalte,
-    /// basierend auf der Maus-Y-Position. Der Index bezieht sich auf
-    /// <see cref="_sortedViewItems"/> (Header + Zeilen) — NICHT auf
-    /// <see cref="_cachedRowViewItems"/>. Ein <see cref="RowCaptionListItem"/>
-    /// wird dabei wie ein <see cref="RowListItem"/> als Drop-Ziel behandelt,
-    /// damit eine Zeile direkt unter einem Kapitel-Header (als erste Zeile des
-    /// Blocks) abgelegt werden kann. Wird jedoch ein gesamter Kapitel-Block
-    /// (<see cref="RowCaptionListItem"/>) verschoben, wird die Position über
-    /// <see cref="EnsureValidChapterInsertIndex"/> so korrigiert, dass der
-    /// Vorgänger weder ein anders lautender Kapitel-Header noch ein anderer
-    /// Spezial-Eintrag ist. Rückgabe -1 bedeutet: kein gültiges Ziel.
+    /// Einfüge-Index für Zeilen-Drag/Drop anhand der Maus-Y-Position. -1 = kein gültiges Ziel.
     /// </summary>
     private int CalculateRowSortInsertIndex(int controlY) {
         if (_sortedViewItems is not { Count: > 0 }) { return -1; }
@@ -3757,11 +3438,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
-        // Skripte können auf Hintergrund-Threads laufen und WriteBackVariables
-        // feuert CellValueChanged synchron auf dem aufrufenden Thread. Ohne
-        // Marshalling greifen UI- und Skript-Thread gleichzeitig auf
-        // _allViewItems zu → "Collection was modified". BeginInvoke blockiert
-        // den Skript-Thread nicht (vermeidet Deadlocks bei mehrfachem WriteBack).
+        // Skript-Threads feuern CellValueChanged synchron; ohne Marshalling konkurrieren UI- und Skript-Thread auf _allViewItems.
         if (InvokeRequired) {
             BeginInvoke(new Action(() => Cell_CellValueChanged(sender, e)));
             return;
@@ -3792,26 +3469,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         Invalidate();
-    }
-
-    /// <summary>
-    /// Dünner Dispatcher für Tastatur-/Kontextmenü-gesteuerte Zell-Edits
-    /// (z. B. F2-Taste, "#Erweitert"-Fallback aus dem Dropdown-Menü).
-    /// Die eigentliche Logik liegt in
-    /// <see cref="RowBackground.BeginCellEdit" /> und wird pro Item-Typ
-    /// aufgerufen. Doppelklicks laufen direkt über
-    /// <see cref="RowBackground.HandleDoubleClick" />, ohne diesen Dispatcher.
-    /// </summary>
-    private void Cell_Edit(ColumnViewItem? viewItem, RowBackground? rowItem, bool preverDropDown, string? chunkval) {
-        switch (rowItem) {
-            case RowListItem rli:
-                rli.BeginCellEdit(this, viewItem, rli, rli.Row, preverDropDown, chunkval);
-                break;
-
-            case NewRowListItem nrli:
-                nrli.BeginCellEdit(this, viewItem, nrli, null, preverDropDown, chunkval);
-                break;
-        }
     }
 
     private (ColumnViewItem?, RowBackground?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) {
@@ -3853,11 +3510,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Ermittelt die Auswahlliste (Vorschläge) für eine Strategie mit
-    /// <see cref="FlexiStrategyBase.SupportsSuggestions" />. Die content-Spalte
-    /// hat Vorrang vor der Style-Spalte (LinkedCell-Auflösung). Der Renderer
-    /// wird aus dem CellView von <paramref name="cellInfo" /> geholt, falls
-    /// vorhanden — sonst direkt aus der Spalte erzeugt.
+    /// Auswahlliste für eine Strategie mit Suggestions. Content-Spalte hat Vorrang vor Style-Spalte.
     /// </summary>
     private List<AbstractListItem> CollectEditItems(ColumnItem? contentColumn, ColumnItem? styleColumn, RowItem? contentRow, CellExtEventArgs? cellInfo) {
         var column = contentColumn ?? styleColumn;
@@ -3907,8 +3560,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenü");
     }
 
-    private void ContextMenu_ContentPaste(object? sender, ContextMenuEventArgs e) => PasteToCursor();
-
     private void ContextMenu_CopyAll(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
@@ -3943,10 +3594,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { } ca) { return; }
 
-        // Sowohl "Spalte permanent löschen" (Ansicht 0) als auch
-        // "Spalte ausblenden" sind ausschließlich Tabellen-Administratoren
-        // gestattet. Der Enabled-Zustand im Kontextmenü ist nur UI, daher
-        // hier die defensively Prüfung.
+        // Defensive Admin-Prüfung (Enabled-Zustand im Kontextmenü ist nur UI).
         if (!tb.IsAdministrator()) { return; }
 
         if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
@@ -3955,10 +3603,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var currentArr = tcvc.GetByKey(ca.KeyName);
         if (currentArr is null) { return; }
 
-        // Virtuelle Spalte (Pin, Nummer, Hinzufügen) hat kein ColumnItem
-        // und wird nur aus der aktuellen Ansicht ausgeblendet.
-        // Echte Spalten haben StorageKey is null und werden weiter unten
-        // behandelt — hier keinesfalls anfassen (sonst werden sie versehentlich entfernt).
+        // Virtuelle Spalte (kein ColumnItem) nur ausblenden. Echte Spalten weiter unten behandeln.
         if (column is null) {
             if (viewItem?.StorageKey is { } sk && currentArr.FirstOrDefault(x => x.StorageKey == sk) is { } vItem) {
                 currentArr.Remove(vItem);
@@ -4009,29 +3654,21 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var (_, row, _, _, _) = GetContextData(e.HotItem);
         if (row is not { IsDisposed: false } srcRow) { return; }
 
-        // Neue Zeilen sind unabhängig vom Kapitel möglich. Gehört die Zeile
-        // keinem Kapitel an (oder gibt es keine Kapitel-Spalte), bleibt das
-        // Kapitel einfach leer.
         ColumnItem? chapterCol = ca.ColumnForChapter is { IsDisposed: false } cc ? cc : null;
         var chapterValue = chapterCol is not null ? srcRow.CellGetString(chapterCol) : string.Empty;
 
-        // Filter bauen: bestehende Filter (inkl. aktiver Chunk-Filterung)
-        // übernehmen. Der Chunk-Wert für die neue Zeile wird daraus erkannt.
+        // Filter inkl. Chunk-Filterung übernehmen; Chunk-Wert daraus erkennen.
         using var fc = new FilterCollection(tb, "Neue Zeile aus Mini-Toolbar");
         fc.AddIfNotExists(FilterCombined);
 
         if (chapterValue is { Length: > 0 } && chapterCol is not null) {
             fc.RemoveOtherAndAdd(new FilterItem(chapterCol, FilterType.Istgleich, chapterValue));
         } else if (chapterCol is not null) {
-            // Kein Kapitel — bestehenden Kapitel-Filter entfernen, damit die
-            // neue Zeile ohne Kapitel angelegt wird.
+            // Ohne Kapitel: bestehenden Kapitel-Filter entfernen.
             fc.Remove(chapterCol);
         }
 
-        // Alle zwingenden Spalten befüllen, für die noch kein Filter existiert:
-        // Die First-Spalte sowie jede Spalte einer UniqueValueDefinition
-        // erhält den nächsten freien Default-Wert "NEU_X". Bereits gesetzte
-        // Filter (z. B. Chunk-Filter aus FilterCombined) haben Vorrang.
+        // Zwingende Spalten (First, UniqueValue) mit Default-Wert "NEU_X" befüllen. Bestehende Filter haben Vorrang.
         var defaultColumns = new HashSet<ColumnItem>(ReferenceEqualityComparer.Instance);
         if (tb.Column.First is { IsDisposed: false } firstCol) {
             defaultColumns.Add(firstCol);
@@ -4054,10 +3691,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
 
-        // Bei aktivem SysRowSortIndex (NumberStyle): neue Zeile direkt UNTER
-        // der Quell-Zeile einsortieren. GenerateAndAdd hat sie ans Ende gelegt
-        // (max+1) — wir verschieben sie jetzt auf srcIdx+1 und schieben alle
-        // nachfolgenden Zeilen um eine Position nach unten.
+        // NumberStyle: neue Zeile unter der Quell-Zeile einsortieren (nachfolgende hochschieben).
         if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
             var srcIdx = srcRow.CellGetInteger(sortCol);
 
@@ -4249,22 +3883,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void DoCursorPos() {
-        // Nach einem Neuaufbau (CalculateAllViewItems) können CursorPosRow/
-        // CursorPosColumn auf verwaiste Instanzen zeigen — z.B. wenn
-        // RemoveRowItems in Cell_CellValueChanged die alten RowListItems
-        // entfernt und CalculateAllViewItems_Rows neue Instanzen erzeugt hat,
-        // oder wenn Row_RowAdded → Invalidate_CurrentArrangement ein neues
-        // ColumnViewCollection mit neuen ColumnViewItems angelegt hat. Über die
-        // stabile RowItem-/ColumnItem-Identität die aktuellen Instanzen finden.
-        // Die Cursorposition (Zeile/Spalte) ändert sich dadurch nicht, daher
-        // werden keine Events ausgelöst. Ohne diese Pflege würde CursorPos_Set
-        // beim nächsten Validieren (in _Table_ViewChanged oder Cursor_Move) die
-        // Position verwerfen — die Tastatur-Navigation bricht ab.
+        // Verwaiste CursorPosRow-/CursorPosColumn-Instanzen nach einem Neuaufbau migrieren.
         if (CursorPosRow is { Row: { IsDisposed: false } cursorRow } oldRli) {
-            // Über RowItem-Identität UND Kapitel-Caption migrieren, nicht über
-            // _rowLookup (das nur das erste RowListItem pro Row speichert und
-            // bei mehrfacher Anzeige einer Row in verschiedenen Kapiteln das
-            // falsche liefern würde).
+            // Über RowItem-Identität + Kapitel-Caption migrieren, nicht über _rowLookup.
             var freshRli = GetRow(cursorRow, oldRli.AlignsToChapter);
             if (freshRli is not null && !ReferenceEquals(freshRli, oldRli)) {
                 CursorPosRow = freshRli;
@@ -4283,9 +3904,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Führt den Benutzerfilter (Filter) und die Fixfilter (FilterFix) zusammen
-    /// und schreibt das Ergebnis in FilterCombined.
-    /// Wird bei jeder Änderung von Filter oder FilterFix aufgerufen.
+    /// Führt Filter und FilterFix zusammen und schreibt das Ergebnis in FilterCombined.
     /// </summary>
     private void DoFilterCombined() {
         var filterEmpty = Filter.Count == 0;
@@ -4315,12 +3934,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
         if (sourceRows.Count == 0) { return; }
 
-        // Alle CellSets in dieser Methode gebündelt feuern (Kapitel-Update +
-        // Neu-Nummerierung). Ohne Suppression löst JEDER CellSet synchron
-        // Cell_CellValueChanged aus — mit CurrentArrangement-Zugriff,
-        // ComputeAllColumnPositions, Invalidate_AllViewItems usw. Bei N Zeilen
-        // entstehen N teure Voll-Layouts hintereinander. ResumeEvents feuert
-        // einmalig ViewChanged → ein einziger Aufbau am Ende.
+        // CellSets bündeln: ohne Suppression entstünden N teure Voll-Layouts, ResumeEvents feuert einmalig ViewChanged.
         tb.SuppressEvents();
         try {
             // Alle Zeilen in der aktuellen Sortierung sammeln
@@ -4332,13 +3946,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 if (sr is { IsDisposed: false }) { sortedRows.Remove(sr); }
             }
 
-            // Einfüge-Position in der sortierten Liste bestimmen.
-            // insertIndex ist ein Index in _sortedViewItems (Header + Zeilen).
-            // Die Ziel-Position ist "vor" der ersten Zeile (RowListItem) ab
-            // insertIndex — ein Header als Drop-Ziel bedeutet "erste Zeile unter
-            // diesem Kapitel". Bei eingeklappten Kapiteln sind die Zeilen nicht
-            // in _sortedViewItems; dann wird die erste Zeile des Blocks aus
-            // _chapterBlockRows verwendet.
+            // Ziel-Position: erste Zeile ab insertIndex; Header als Drop-Ziel = erste Zeile unter dem Kapitel.
+            // Eingeklappte Kapitel: erste Zeile aus _chapterBlockRows.
             RowItem? targetRow = null;
             for (var i = Math.Max(0, insertIndex); i < _sortedViewItems.Count; i++) {
                 if (_sortedViewItems[i] is RowListItem tRli && tRli.Row is { IsDisposed: false }) {
@@ -4385,10 +3994,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zeichnet den Einfüge-Indikator für das Spalten-Drag/Drop.
-    /// Der Indikator ist 16 Pixel breit (jeweils 8 Pixel in die linke und rechte Spalte),
-    /// um die Einfüge-Position zwischen zwei Spalten zu markieren.
-    /// Entspricht die Einfüge-Position der aktuellen Position, wird die eigene Spalte markiert.
+    /// Zeichnet den Einfüge-Indikator (16px breit) für das Spalten-Drag/Drop.
     /// </summary>
     private void DrawColumnSortInsertIndicator(Graphics gr, ColumnViewCollection ca) {
         var area = AvailableControlPaintArea;
@@ -4438,10 +4044,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zeichnet den Einfüge-Indikator für das Zeilen-Drag/Drop.
-    /// Der Indikator ist 16 Pixel hoch (jeweils 8 Pixel in die obere und untere Zeile),
-    /// um die Einfüge-Position zwischen zwei Zeilen zu markieren.
-    /// Entspricht die Einfüge-Position der aktuellen Position, wird die eigene Zeile markiert.
+    /// Zeichnet den Einfüge-Indikator (16px hoch) für das Zeilen-Drag/Drop.
     /// </summary>
     private void DrawRowSortInsertIndicator(Graphics gr, ColumnViewCollection ca) {
         if (_sortedViewItems is not { Count: > 0 }) { return; }
@@ -4485,58 +4088,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Toggle-/Commit-Logik für einen Klick auf ein Dropdown-Item. Wird
-    /// aus <see cref="Edit_ValueChanged" /> aufgerufen, nachdem
-    /// die Inline-ListBox bereits geschlossen wurde.
-    /// Behandelt MultiLine-Spalten (Mehrfachauswahl mit Toggle), SingleLine-
-    /// Spalten (Wert setzen bzw. bei erneutem Klick leeren), die
-    /// "Erweiterte Eingabe" (Fallback auf TextBox) sowie neue Zeilen.
-    /// </summary>
-    private void DropDownMenu_ItemClicked(string toAdd, CellExtEventArgs ck) {
-        if (CurrentArrangement is not { IsDisposed: false }) { return; }
-
-        if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
-
-        var toRemove = string.Empty;
-        if (toAdd == "#Erweitert") {
-            Cell_Edit(ck.ColumnView, ck.RowData, false, ck.RowData?.Row.ChunkValue ?? FilterCombined.ChunkVal);
-            return;
-        }
-        if (ck.RowData?.Row is not { IsDisposed: false } r) {
-            // Neue Zeile!
-            NotEditableInfo(UserEdited(this, toAdd, ck.ColumnView, null, false));
-            return;
-        }
-
-        if (c.MultiLine) {
-            var li = r.CellGetList(c);
-            if (li.Contains(toAdd, StringComparer.OrdinalIgnoreCase)) {
-                // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
-                if (li.Count > 1 || c.MinTextLength < 1) {
-                    toRemove = toAdd;
-                    toAdd = string.Empty;
-                }
-            }
-            if (!string.IsNullOrEmpty(toRemove)) { li.RemoveString(toRemove, false); }
-            if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
-            NotEditableInfo(UserEdited(this, string.Join('\r', li), ck.ColumnView, ck.RowData, false));
-        } else {
-            if (c.MinTextLength < 1) {
-                if (toAdd == ck.RowData.Row.CellGetString(c)) {
-                    NotEditableInfo(UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false));
-                    return;
-                }
-            }
-            NotEditableInfo(UserEdited(this, toAdd, ck.ColumnView, ck.RowData, false));
-        }
-    }
-
-    /// <summary>
-    /// Schließt das aktuelle Edit und committet den Wert über den
-    /// zugehörigen <see cref="_editCommit" />-Callback. Hat kein Edit aktiv,
-    /// ist die Tabelle disposed oder der Callback fehlt, wird nur
-    /// <see cref="EndEdit" /> aufgerufen. Entspricht der alten
-    /// <c>TXTBox_Close</c>-Logik ohne die Tags-Auswertung.
+    /// Schließt das aktive Edit und committet den Wert über _editCommit. Ohne aktives Edit nur EndEdit.
     /// </summary>
     private void Edit_Close() {
         if (IsDisposed || ActiveEditStrategy is not { } strategy) { return; }
@@ -4558,23 +4110,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Edit_EscKey(object? sender, System.EventArgs e) {
-        // Esc bricht den Edit ab: Commit-Referenz verwerfen, dann alles
-        // schließen. _editCommit muss vor EndEdit null werden, damit das
-        // nachfolgende Edit_Close in CloseAllComponents keinen Commit
-        // mehr auslöst.
+        // Commit-Referenz vor EndEdit verwerfen, damit kein Commit ausgelöst wird.
         _editCommit = null;
         EndEdit();
         CloseAllComponents();
     }
 
     private void Edit_LostFocus(object? sender, System.EventArgs e) {
+        // Während BeginEdit ignorieren (Abbau/Fokus-Übergabe).
+        if (_isBeginningEdit) {
+            return;
+        }
+
         if (ActiveEditStrategy?.Control is { } activeControl) {
             if (FloatingForm.IsShowing(activeControl)) { return; }
 
-            // Ist das Edit-Control noch sichtbar, wurde der Fokusverlust durch
-            // einen Klick auf die Tabelle ausgelöst (nicht durch Enter/Tab/Esc —
-            // dort wird Visible vorher über EndEdit auf false gesetzt). Den
-            // folgenden MouseDown konsumieren, damit der Cursor nicht springt.
+            // Noch sichtbares Control: Fokusverlust durch Tabellenklick → nächsten MouseDown konsumieren.
             if (activeControl.Visible) {
                 _consumeNextMouseDown = true;
             }
@@ -4586,24 +4137,41 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void Edit_TabKey(object? sender, System.EventArgs e) => CloseAllComponents();
 
     /// <summary>
-    /// Event-Handler für das <see cref="FlexiStrategyBase.ValueChanged" />-Event
-    /// der aktiven Edit-Strategie. Hat nur während eines Dropdown-Edits eine
-    /// Wirkung (sonst ist <see cref="_dropdownCellInfo" /> null und der Handler
-    /// bricht ab). Verbirgt das Inline-Control und reicht die Toggle-/Commit-
-    /// Logik an <see cref="DropDownMenu_ItemClicked" /> weiter.
+    /// Wertänderung der aktiven Edit-Strategie. Nur bei Dropdown aktiv: übernimmt die gehakte Menge als Zellwert; "#Erweitert" öffnet den Text-Editor.
     /// </summary>
     private void Edit_ValueChanged(object? sender, TextEventArgs e) {
         if (_dropdownCellInfo is not { } cell) { return; }
-        EndEdit();
-        Focus();
-        DropDownMenu_ItemClicked(e.Text, cell);
+
+        var values = e.Text.SplitAndCutByCr().ToList();
+
+        // "#Erweitert": Dropdown durch Text-Editor ersetzen (BeginEdit schließt das Dropdown selbstständig).
+        if (values.Contains("#Erweitert")) {
+            if (cell.RowData is { } rd) {
+                _ = rd.BeginCellEdit(this, cell.ColumnView, rd, rd.Row, false, rd.Row.ChunkValue ?? FilterCombined.ChunkVal);
+            } else {
+                EndEdit();
+            }
+            return;
+        }
+
+        if (CurrentArrangement is not { IsDisposed: false }) { return; }
+        if (cell.ColumnView?.Column is not { IsDisposed: false }) { return; }
+
+        var committedValue = string.Join('\r', values);
+
+        // Bei einer neuen Zeile gibt es noch keine RowData-Referenz.
+        if (cell.RowData?.Row is not { IsDisposed: false }) {
+            NotEditableInfo(UserEdited(this, committedValue, cell.ColumnView, null, false));
+        } else {
+            NotEditableInfo(UserEdited(this, committedValue, cell.ColumnView, cell.RowData, false));
+        }
+
+        // ListBox-Check-Status mit dem Zellwert synchronisieren.
+        SyncDropDownSelection(committedValue);
     }
 
     /// <summary>
-    /// Beendet das aktuelle Edit ohne Commit. Macht das Control unsichtbar
-    /// und löscht den Commit-Callback. Welche Strategie aktiv war, wird
-    /// beim nächsten Aufruf von <see cref="ActiveEditStrategy" /> neu
-    /// ermittelt — ein separater Merker wird nicht gepflegt.
+    /// Beendet das aktive Edit ohne Commit.
     /// </summary>
     private void EndEdit() {
         HideAllEditControls();
@@ -4612,23 +4180,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Korrigiert den Einfüge-Index beim Verschieben eines Kapitel-Blocks
-    /// (<see cref="RowCaptionListItem"/>). Der direkte Vorgänger der Zielposition
-    /// muss entweder eine feste Y-Position haben
-    /// (<see cref="RowBackground.IgnoreYOffset"/> — z. B. Spaltenkopf,
-    /// Neue-Zeile-Eintrag), ein <see cref="RowListItem"/> oder ein
-    /// <see cref="RowCaptionListItem"/> mit derselben Überschrift wie
-    /// <paramref name="draggedChapter"/> sein. Ein Kapitel-Header mit anderer
-    /// Überschrift als direkter Vorgänger ist verboten — der einzufügende
-    /// Kapitel-Header würde sonst einen leeren Block direkt unter einem anderen
-    /// Header erzeugen. Gleichnamige Kapitel dürfen jedoch direkt aufeinander
-    /// folgen (sie verschmelzen zu einem gemeinsamen Block). Ausnahme: ist der
-    /// Vorgänger eingeklappt, sind seine Zeilen zwar ausgeblendet, aber
-    /// vorhanden — ein direktes Aufeinandertreffen der Header ist dann
-    /// zulässig. Die Position wird dafür solange nach oben verschoben, bis ein
-    /// gültiger Vorgänger gefunden ist (bzw. der Listenanfang erreicht ist).
-    /// Ist <paramref name="draggedChapter"/> null (kein Kapitel-Block wird
-    /// verschoben), wird <paramref name="index"/> unverändert zurückgegeben.
+    /// Korrigiert den Einfüge-Index beim Verschieben eines Kapitel-Blocks, damit der Vorgänger kein anders lautender Header ist.
     /// </summary>
     private int EnsureValidChapterInsertIndex(int index, RowCaptionListItem? draggedChapter) {
         if (draggedChapter is null) { return index; }
@@ -4638,9 +4190,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (predecessor.IgnoreYOffset || predecessor is RowListItem) { break; }
             if (predecessor is RowCaptionListItem predChapter) {
                 if (string.Equals(predChapter.ChapterText, draggedChapter.ChapterText, StringComparison.OrdinalIgnoreCase)) { break; }
-                // Eingeklappter Vorgänger: Seine Zeilen sind vorhanden, nur
-                // ausgeblendet. Ein direktes Aufeinandertreffen der Header
-                // ist daher zulässig.
+                // Eingeklappter Vorgänger: direktes Aufeinandertreffen der Header ist zulässig.
                 if (IsChapterCollapsed(predChapter)) { break; }
             }
             index--;
@@ -4699,8 +4249,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void FilterCombined_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
 
     /// <summary>
-    /// Filtert die übergebenen Zeilen auf solche, die per Drag/Drop verschoben
-    /// werden dürfen: nicht disposed, nicht angepinnt und editierbar.
+    /// Filtert auf nicht angepinnte, editierbare Zeilen.
     /// </summary>
     private List<RowItem> FilterDraggableRows(IEnumerable<RowItem> rows) {
         var result = new List<RowItem>();
@@ -4721,9 +4270,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
     /// <summary>
-    /// Durchläuft <see cref="_sortedViewItems"/> ab <paramref name="startIndex"/> mit der
-    /// Schrittweite <paramref name="step"/> und liefert das erste sichtbare <see cref="RowListItem"/>.
-    /// Aufrufer müssen zuvor <c>_ = AllViewItems</c> ausgeführt haben, damit die Liste befüllt ist.
+    /// Erstes sichtbares RowListItem ab startIndex mit der Schrittweite step.
     /// </summary>
     private RowListItem? FindVisibleRowListItem(int startIndex, int step) {
         for (var i = startIndex; i >= 0 && i < _sortedViewItems.Count; i += step) {
@@ -4765,8 +4312,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Erstes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
-    /// ab <paramref name="fromIndex"/> oder null.
+    /// Erstes Drop-Ziel ab fromIndex oder null.
     /// </summary>
     private RowBackground? FirstDroppableViewItem(int fromIndex) {
         for (var i = Math.Max(0, fromIndex); i < _sortedViewItems.Count; i++) {
@@ -4776,9 +4322,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Liefert die verschiebbaren Quell-Zeilen für das übergebene Drag-Objekt.
-    /// <paramref name="item"/> ist entweder ein <see cref="RowItem"/> (Einzelzeile)
-    /// oder ein <see cref="RowCaptionListItem"/> (gesamter Kapitel-Block).
+    /// Verschiebbare Quell-Zeilen: Einzelzeile (RowItem) oder gesamter Kapitel-Block (RowCaptionListItem).
     /// </summary>
     private List<RowItem> GetDragSourceRows(object? item) {
         switch (item) {
@@ -4794,15 +4338,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Holt eine gecachte Strategie für den übergebenen Edit-Typ oder erzeugt
-    /// sie beim ersten Aufruf (lazy über den <see cref="_editStrategyCache" />).
-    /// Das zugehörige Control wird einmalig erzeugt, zur
-    /// <see cref="Control.Controls" />-Collection der TableView hinzugefügt
-    /// und mit den TableView-spezifischen Event-Handlern verdrahtet. Die
-    /// Event-Weiterleitung (Enter-/Esc-/Tab-Key, LostFocus, ValueChanged)
-    /// übernimmt die Strategie selbst — die TableView abonniert nur noch
-    /// die Strategie-Events und muss nicht mehr auf konkrete Control-Typen
-    /// (TextBox, ListBox usw.) casten.
+    /// Holt eine gecachte Strategie oder erzeugt sie. Verdrahtet die Event-Handler beim erstmaligen Anlegen.
     /// </summary>
     private FlexiStrategyBase GetOrCreateEditStrategy(EditTypeTable editType) {
         var strategy = _editStrategyCache.GetOrAdd(editType, CreateEditStrategy);
@@ -4825,15 +4361,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Liefert das <see cref="RowListItem"/> für die übergebene Row.
-    /// Ist <paramref name="chapter"/> null, wird das erste gefundene
-    /// RowListItem der Row geliefert (über <c>_rowLookup</c>, das per
-    /// <c>TryAdd</c> das erste speichert) — ausreichend, wenn Kapitel
-    /// irrelevant ist. Ist <paramref name="chapter"/> gesetzt, wird die
-    /// exakte Kombination aus Row und Kapitel-Caption gesucht — wichtig,
-    /// wenn eine Row in mehreren Kapiteln angezeigt wird. Die Lookup mit
-    /// Kapitel erfolgt O(1) über <see cref="RowListItem.Identifier(RowItem, string)"/>,
-    /// der der Schlüssel in <c>_allViewItems</c> ist.
+    /// <summary>
+    /// Liefert das RowListItem für eine Row. Bei gesetztem chapter die exakte Kombination, sonst das erste gefundene.
     /// </summary>
     private RowListItem? GetRow(RowItem? row, string? chapter) {
         if (row is not { IsDisposed: false }) { return null; }
@@ -4849,17 +4378,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Macht alle Inline-Edit-Controls unsichtbar. Da zu jedem Zeitpunkt
-    /// höchstens ein Edit aktiv ist, ist die Iteration effektiv ein No-Op,
-    /// wenn gerade kein Edit läuft. Sicher gegen bereits freigegebenen Cache.
+    /// Macht alle Inline-Edit-Controls unsichtbar.
     /// </summary>
     private void HideAllEditControls() {
         if (_editStrategyCache.IsDisposed) { return; }
-        // Sobald alle Edit-Controls verborgen werden, ist auch der
-        // Dropdown-Kontext hinfällig. Wird u. a. aus BeginEdit aufgerufen,
-        // bevor ein neues Edit startet — da ValueChanged jetzt einheitlich
-        // an allen Strategien hängt, darf _dropdownCellInfo hier nicht
-        // stehen bleiben.
+        // Dropdown-Kontext verwerfen.
         _dropdownCellInfo = null;
         foreach (var strategy in _editStrategyCache.Values) {
             if (strategy.Control is System.Windows.Forms.Control c
@@ -4871,10 +4394,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Gibt wahr, wenn der Block unter dem übergebenen Header eingeklappt ist.
-    /// Im NumberStyle wird der Zustand pro Block in
-    /// <see cref="_collapsedBlockFirstRowKeys"/> gespeichert, sonst am
-    /// <see cref="RowCaptionListItem.IsExpanded"/> des Originals.
+    /// true, wenn der Block unter dem Header eingeklappt ist.
     /// </summary>
     private bool IsChapterCollapsed(RowCaptionListItem rcli) {
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
@@ -4899,8 +4419,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Letztes Drop-Ziel (Zeile oder Kapitel-Header) in <see cref="_sortedViewItems"/>
-    /// oder null.
+    /// Letztes Drop-Ziel oder null.
     /// </summary>
     private RowBackground? LastDroppableViewItem() {
         for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
@@ -4915,8 +4434,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                                // Bestehenden Code belassen
-                                FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                                    // Bestehenden Code belassen
+                                    FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
@@ -4942,21 +4461,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void PasteToCursor() {
-        if (CursorPosColumn?.Column is not { IsDisposed: false } column || CursorPosRow?.Row is not { IsDisposed: false } row) {
-            NotEditableInfo("Interner Fehler.");
-            return;
-        }
-
-        if (!Clipboard.ContainsText()) {
-            NotEditableInfo("Kein Text in der Zwischenablage.");
-            return;
-        }
-        var ntxt = Clipboard.GetText();
-        if (row.CellGetString(column) == ntxt) { return; }
-        NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
-    }
-
     private void RemoveRowItems(RowItem row) {
         var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && !rli.IsDisposed && rli.Row == row)
                                      .Select(kvp => kvp.Key)
@@ -4970,14 +4474,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Row_RowAdded(object? sender, RowEventArgs e) {
-        // RowAdded - da sind wirklich neue ZEilen in die Datenbank gekommen.
-        // Deswegen können sich die Spaltenbreiten ändern.
-        // Bei Bulk-Operationen (Load, Generate, Clear+Neu) feuern viele RowAdded-Events
-        // in Folge. Der teure Invalidate_CurrentArrangement (setzt CurrentArrangement=null
-        // und erzwingt ein ParseAll beim nächsten Paint) wird daher gebündelt: nur das
-        // erste Event pro Paint-Zyklus führt ihn aus, alle weiteren setzen lediglich
-        // _mustDoAllViewItems, damit die neuen Zeilen beim nächsten Aufbau berücksichtigt
-        // werden. Das Flag wird in DrawControl zurückgesetzt.
+        // Bulk-Batching: Invalidate_CurrentArrangement nur beim ersten Event pro Paint-Zyklus, Rest setzt _mustDoAllViewItems.
         if (_pendingRowAddedRebuild) {
             _mustDoAllViewItems = true;
             return;
@@ -5013,13 +4510,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Ermittelt das Zeilen-Element an der übergebenen Control-Y-Koordinate.
-    /// Im Gegensatz zu <see cref="AbstractListItemExtension.ElementAtPosition"/>
-    /// werden hierbei Elemente mit <see cref="AbstractListItem.IgnoreYOffset"/>
-    /// (Spaltenkopf, Filterleiste, etc.) bevorzugt behandelt, da diese beim
-    /// Zeichnen über den Zeilen liegen. Ohne diese Bevorzugung würde bei
-    /// nach unten gescrolltem Y-Offset ein Klick auf den Spaltenkopf als
-    /// Klick auf die darunterliegende Zeile gewertet werden.
+    /// Zeilen-Element an der Control-Y-Position. IgnoreYOffset-Elemente (Spaltenkopf etc.) werden bevorzugt.
     /// </summary>
     private RowBackground? RowItemAtPosition(int controlY) {
         if (_sortedViewItems is not { Count: > 0 }) {
@@ -5035,11 +4526,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Liefert die Y-Control-Koordinate, an der der Zeilenbereich beginnt
-    /// (also die Unterkante aller IgnoreYOffset-Elemente wie Spaltenkopf,
-    /// Filterleiste etc.). Drag/Drop-Operationen nutzen diesen Wert, um
-    /// den Indikator nicht in den Head zu zeichnen und AutoScroll korrekt
-    /// auf den Zeilenbereich zu begrenzen.
+    /// Y-Koordinate, an der der Zeilenbereich beginnt (Unterkante aller IgnoreYOffset-Elemente).
     /// </summary>
     private int RowsAreaTop() {
         _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
@@ -5058,13 +4545,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Setzt den Auf-/Ausklapp-Zustand eines Kapitel-Headers auf den
-    /// übergebenen Wert. Im NumberStyle (SYS_ROWSORTINDEX aktiv) wird der
-    /// Zustand pro Block in <see cref="_collapsedBlockFirstRowKeys"/> abgelegt
-    /// — der Block wird über den Key der ersten Zeile unter dem Header
-    /// identifiziert. So bleibt jeder Block unabhängig, auch wenn derselbe
-    /// Chapter-Text mehrfach vorkommt. Im Standard-Modus wird der Zustand am
-    /// Original-Caption in <see cref="_allViewItems"/> synchronisiert.
+    /// Setzt den Auf-/Zuklapp-Zustand eines Kapitel-Headers. NumberStyle: pro Block über _collapsedBlockFirstRowKeys; sonst am Original-Caption.
     /// </summary>
     private void SetChapterExpanded(RowCaptionListItem rcli, bool expanded) {
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
@@ -5088,10 +4569,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an. Die Entscheidung,
-    /// ob die Toolbar tatsächlich erscheint (oder ob sie bei einem erneuten
-    /// Klick auf dieselbe Zelle ausgeschaltet bleibt), trifft
-    /// <see cref="IMiniToolbar.MiniToolbarShow"/> anhand des übergebenen HotItems.
+    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an.
     /// </summary>
     private void ShowMiniToolbarAt(ColumnViewItem column, RowBackground? rowItem, RowItem row) {
         if (column.Column is not { IsDisposed: false }) { return; }
@@ -5112,12 +4590,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Sucht den ersten und letzten Index in <see cref="_sortedViewItems"/>,
-    /// dessen Row in <paramref name="srcRows"/> enthalten ist. Wird ein
-    /// Kapitel-Block verschoben, gehört der Header (<see cref="RowCaptionListItem"/>
-    /// aus <paramref name="dragItem"/>) ebenfalls zum Quell-Bereich. Ist der Block
-    /// eingeklappt, sind seine Zeilen nicht in <see cref="_sortedViewItems"/>
-    /// enthalten — der Quell-Bereich ist dann nur der Header selbst.
+    /// Erster und letzter Index in _sortedViewItems der Drag-Quell-Zeilen. Bei Kapitel-Block gehört der Header zum Bereich.
     /// </summary>
     private (int firstIdx, int lastIdx) SourceIndexRange(List<RowItem> srcRows, object? dragItem) {
         var first = -1;
@@ -5144,22 +4617,23 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return (first, last);
     }
 
+    /// <summary>
+    /// Synchronisiert die Haken der offenen Dropdown-ListBox mit dem übergebenen Wert.
+    /// </summary>
+    private void SyncDropDownSelection(string value) => ActiveEditStrategy?.SetValueToControl(value);
+
     private void Table_InvalidateView(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
     }
 
     /// <summary>
-    /// Schaltet den Auf-/Ausklapp-Zustand eines Kapitel-Headers um.
-    /// Siehe <see cref="SetChapterExpanded"/> für die Details zur
-    /// Zustandsverwaltung im NumberStyle.
+    /// Schaltet den Auf-/Zuklapp-Zustand eines Kapitel-Headers um.
     /// </summary>
     private void ToggleChapterExpanded(RowCaptionListItem rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
 
     /// <summary>
-    /// Aktualisiert das Kapitel der verschobenen Zeile, wenn sie in einen
-    /// anderen Kapitel-Bereich verschoben wurde. Das Ziel-Kapitel wird anhand
-    /// der direkt oberhalb liegenden Zeile bestimmt (oder unterhalb am Anfang).
+    /// Aktualisiert das Kapitel der verschobenen Zeile anhand des Ziel-Kapitels oberhalb der Mausposition.
     /// </summary>
     private void UpdateChapterOnRowSortMove(RowListItem sourceRli, int mouseControlY) {
         if (sourceRli.Arrangement is not { IsDisposed: false } ca) { return; }
@@ -5168,15 +4642,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         _ = AllViewItems; // _sortedViewItems sicherstellen
 
-        // Ziel-Kapitel anhand der Mausposition bestimmen: _sortedViewItems
-        // (mit Headern und Zeilen) wird top-down iteriert. Der letzte Header,
-        // dessen Top-Kante auf oder oberhalb der Mausposition liegt, ist das
-        // Ziel-Kapitel. Sobald ein Item unterhalb der Maus beginnt, wird
-        // abgebrochen. So wird auch erkannt, wenn die Maus direkt auf einem
-        // Kapitel-Header steht (die Zeile soll als erste unter diesem
-        // Kapitel landen) — früher wurde fälschlich die Nachbar-ZEILE
-        // oberhalb herangezogen, was an Kapitel-Grenzen das falsche Kapitel
-        // lieferte.
+        // Ziel-Kapitel: letzter Header, dessen Top-Kante auf oder oberhalb der Mausposition liegt.
         string? targetChapterText = null;
 
         foreach (var item in _sortedViewItems) {

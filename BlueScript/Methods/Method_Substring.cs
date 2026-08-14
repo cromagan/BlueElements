@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_Substring : Method {
+internal class MethodSubstring : Method {
 
     #region Properties
 

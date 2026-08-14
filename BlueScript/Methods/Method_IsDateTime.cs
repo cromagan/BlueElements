@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_IsDateTime : Method {
+internal class MethodIsDateTime : Method {
 
     #region Properties
 

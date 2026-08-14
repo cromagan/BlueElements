@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_ToUpper : Method {
+internal class MethodToUpper : Method {
 
     #region Properties
 

@@ -79,15 +79,15 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
     private static void GenerateTable(TableViewWithFilters tableView) {
         var tb = Table.Get();
 
-        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", ColumnFormatHolder_LongOnlyPositive.Instance);
+        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", ColumnFormatHolderLongOnlyPositive.Instance);
         if (cNr is { IsDisposed: false }) { cNr.IsFirst = true; }
 
-        tb.Column.GenerateAndAdd("Position", "Position", ColumnFormatHolder_LongOnlyPositive.Instance);
-        tb.Column.GenerateAndAdd("Routine", "Routine", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("DataType", "DataType", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Wert", "Wert", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Position", "Position", ColumnFormatHolderLongOnlyPositive.Instance);
+        tb.Column.GenerateAndAdd("Routine", "Routine", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("DataType", "DataType", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Wert", "Wert", ColumnFormatHolderTextOneLine.Instance);
 
         tb.Column.DisableAllEditing();
 

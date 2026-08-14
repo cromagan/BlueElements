@@ -49,7 +49,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     public static string Show(string txt, List<string>? items) {
         if (items is not { Count: not 0 }) {
-            return InputBox.Show(txt, string.Empty, FormatHolder_Text.Instance);
+            return InputBox.Show(txt, string.Empty, FormatHolderText.Instance);
         }
 
         List<AbstractListItem> x = [];

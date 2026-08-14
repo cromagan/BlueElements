@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_RandomInt : Method {
+internal class MethodRandomInt : Method {
 
     #region Properties
 

@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace BlueScript.Methods;
 
-internal class Method_LoadImage : Method {
+internal class MethodLoadImage : Method {
 
     #region Properties
 

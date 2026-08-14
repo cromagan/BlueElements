@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_ClipboardText : Method {
+internal class MethodClipboardText : Method {
 
     #region Properties
 

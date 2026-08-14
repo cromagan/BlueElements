@@ -769,20 +769,20 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (tblFilterliste.Table is null) {
             var tb = Table.Get();
             //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder_TextOneLine.Instance);
+            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolderTextOneLine.Instance);
             if (spn is not { IsDisposed: false }) { return; }
             spn.IsFirst = true;
-            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder_Bit.Instance);
+            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolderBit.Instance);
             if (vis is not { IsDisposed: false }) { return; }
-            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder_Systemname.Instance);
+            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolderSystemname.Instance);
             if (sp is not { IsDisposed: false }) { return; }
 
-            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolder_ImageCode.Instance);
+            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolderImageCode.Instance);
             if (info is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder_TextOneLine.Instance);
+            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolderTextOneLine.Instance);
             if (b is not { IsDisposed: false }) { return; }
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;

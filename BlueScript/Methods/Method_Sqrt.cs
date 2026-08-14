@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Sqrt : Method {
+internal class MethodSqrt : Method {
 
     #region Properties
 

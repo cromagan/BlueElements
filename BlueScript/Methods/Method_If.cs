@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-public class Method_If : Method {
+public class MethodIf : Method {
 
     #region Fields
 

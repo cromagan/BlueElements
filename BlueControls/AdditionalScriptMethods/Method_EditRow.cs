@@ -8,7 +8,7 @@ using BlueTable.AdditionalScriptMethods;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_EditRow : Method_TableGeneric {
+public class MethodEditRow : Method_TableGeneric {
 
     #region Properties
 

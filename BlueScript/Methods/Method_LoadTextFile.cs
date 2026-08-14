@@ -7,7 +7,7 @@ using System.Text;
 namespace BlueScript.Methods;
 
 
-internal class Method_LoadTextFile : Method {
+internal class MethodLoadTextFile : Method {
 
     #region Properties
 

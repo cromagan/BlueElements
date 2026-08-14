@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Max : Method {
+internal class MethodMax : Method {
 
     #region Properties
 

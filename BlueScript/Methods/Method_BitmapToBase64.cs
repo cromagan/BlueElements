@@ -6,7 +6,7 @@ using static BlueScript.Variables.VariableBitmap;
 namespace BlueScript.Methods;
 
 
-internal class Method_BitmapToBase64 : Method {
+internal class MethodBitmapToBase64 : Method {
 
     #region Properties
 

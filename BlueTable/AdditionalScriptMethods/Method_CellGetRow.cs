@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_CellGetRow : Method_TableGeneric {
+public class MethodCellGetRow : Method_TableGeneric {
 
     #region Properties
 

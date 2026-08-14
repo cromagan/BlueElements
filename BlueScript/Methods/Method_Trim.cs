@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Trim : Method {
+internal class MethodTrim : Method {
 
     #region Properties
 

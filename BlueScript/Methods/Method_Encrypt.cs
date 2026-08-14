@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Encrypt : Method {
+internal class MethodEncrypt : Method {
 
     #region Properties
 

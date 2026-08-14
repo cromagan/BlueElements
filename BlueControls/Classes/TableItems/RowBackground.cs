@@ -5,6 +5,7 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace BlueControls.Classes.TableItems;
 
@@ -46,9 +47,9 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
     #region Events
 
-    public event EventHandler? Disposed;
-
     public event EventHandler? CompareKeyChanged;
+
+    public event EventHandler? Disposed;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -321,6 +322,34 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     public virtual bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) => false;
 
     /// <summary>
+    /// Wird bei einem Tastendruck aufgerufen, während diese Zeile unter dem
+    /// Cursor liegt. Die konkrete Zeilen-Implementierung übernimmt die
+    /// Zell-Aktionen (Ausschneiden, Kopieren, Einfügen, Editieren via F2,
+    /// Löschen) — analog zu <see cref="HandleDoubleClick" />, das von der
+    /// <see cref="TableView" /> bei einem Doppelklick dispatcht wird.
+    /// Die <see cref="TableView" /> behält dagegen die reinen Navigations-
+    /// Tasten (Pfeile, Bild-Auf/Ab, Strg+F) selbst.
+    /// </summary>
+    public virtual void HandleKeyDown(ColumnViewItem? cursorColumn, TableView tableView, KeyEventArgs e) { }
+
+    public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
+
+    public virtual bool IsClickable() => true;
+
+    public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
+
+    public Size UntrimmedCanvasSize(Design itemdesign) {
+        if (_untrimmedCanvasSize.IsEmpty) {
+            _untrimmedCanvasSize = ComputeUntrimmedCanvasSize(itemdesign);
+        }
+        return _untrimmedCanvasSize;
+    }
+
+    internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
+
+    /// <summary>
     /// Gemeinsame Logik für den Start einer Zell-Editierung direkt über
     /// <see cref="TableView.BeginEdit" />. Wird von <see cref="RowListItem" />
     /// (mit echter Row) und <see cref="NewRowListItem" /> (mit <c>null</c>)
@@ -331,8 +360,12 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     /// Strategien mit NeedsSuggestions übernimmt die <see cref="TableView" />
     /// dort einheitlich.
     /// </summary>
+    /// <param name="tableView"></param>
+    /// <param name="viewItem"></param>
     /// <param name="row">Die Row, in der editiert wird — <c>null</c> für
     /// "neue Zeile".</param>
+    /// <param name="preferDropDown"></param>
+    /// <param name="chunkValue"></param>
     /// <param name="rowContainer">Das sichtbare Item (RowListItem oder
     /// NewRowListItem), das für die Positionsberechnung herangezogen wird.</param>
     /// <returns><c>true</c>, wenn ein Edit gestartet wurde (oder die Zelle
@@ -397,7 +430,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
                     : string.Empty;
 
                 // Position / Größe der Zelle berechnen, damit die
-                // FlexiStrategyDropDownListBox an der richtigen Stelle
+                // FlexiStrategyListBox an der richtigen Stelle
                 // erscheint. Die tatsächliche Größe (größer als die Zelle)
                 // wird in TableView.BeginEdit berechnet.
                 var ddZoom = tableView.Zoom;
@@ -410,20 +443,14 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
                 tableView.BeginEdit(
                     EditTypeTable.Dropdown_Single,
-                    ddLocation,
-                    ddSize,
+                    new Rectangle(ddLocation, ddSize),
                     ddValue,
                     _ => { },
-                    null,
                     originalColumn,
                     contentHolderCellColumn,
                     contentHolderCellRow,
-                    string.Empty,
-                    false,
-                    0,
                     null,
-                    new CellExtEventArgs(viewItem, rli),
-                    tableView.Zoom);
+                    new CellExtEventArgs(viewItem, rli));
                 return true;
 
             case EditTypeTable.Textfeld:
@@ -475,57 +502,22 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
 
         tableView.BeginEdit(
             effectiveType,
-            location,
-            size,
+            new Rectangle(location, size),
             cellText,
             v => ApplyCellValue(tableView, viewItem, rowContainer as RowListItem, v),
-            null,
             originalColumn,
             null,
             null,
-            originalColumn.QuickInfo,
-            false,
-            controlPos.Height,
             items,
-            null,
-            tableView.Zoom);
+            null);
         return true;
     }
 
-    /// <summary>
-    /// Schreibt den übergebenen Wert als neuen Zellinhalt — inkl. Formatprüfung
-    /// und Rückmeldung bei Fehler (über <see cref="TableView.UserEdited" />).
-    /// Commit-Callback aus <see cref="BeginCellEdit" />, der an
-    /// <see cref="TableView.BeginEdit" /> übergeben wird.
-    /// </summary>
-    private void ApplyCellValue(TableView tableView, ColumnViewItem? column, RowListItem? row, string value) {
-        TableView.NotEditableInfo(TableView.UserEdited(tableView, value, column, row, true));
-    }
-
-    public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
-
-    public virtual bool IsClickable() => true;
-
-    public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
-
-    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
-
-    public Size UntrimmedCanvasSize(Design itemdesign) {
-        if (_untrimmedCanvasSize.IsEmpty) {
-            _untrimmedCanvasSize = ComputeUntrimmedCanvasSize(itemdesign);
-        }
-        return _untrimmedCanvasSize;
-    }
-
-    internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
-
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
-
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        OnDisposed(); 
+        OnDisposed();
 
         if (disposing) {
             Arrangement = null;
@@ -609,6 +601,18 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     protected void Invalidate_UntrimmedCanvasSize() => _untrimmedCanvasSize = Size.Empty;
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    /// <summary>
+    /// Schreibt den übergebenen Wert als neuen Zellinhalt — inkl. Formatprüfung
+    /// und Rückmeldung bei Fehler (über <see cref="TableView.UserEdited" />).
+    /// Commit-Callback aus <see cref="BeginCellEdit" />, der an
+    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// </summary>
+    private void ApplyCellValue(TableView tableView, ColumnViewItem? column, RowListItem? row, string value) {
+        TableView.NotEditableInfo(TableView.UserEdited(tableView, value, column, row, true));
+    }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

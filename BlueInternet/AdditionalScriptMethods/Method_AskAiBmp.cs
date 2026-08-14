@@ -5,7 +5,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-internal class Method_AskAiBmp : Method {
+internal class MethodAskAiBmp : Method {
 
     #region Properties
 

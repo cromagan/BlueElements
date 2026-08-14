@@ -6,7 +6,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_Screenarea : Method {
+public class MethodScreenarea : Method {
 
     #region Properties
 

@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_ImportCsv : Method_TableGeneric {
+internal class MethodImportCsv : Method_TableGeneric {
 
     #region Properties
 

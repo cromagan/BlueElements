@@ -5,7 +5,7 @@ using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_RowIsNull : Method {
+public class MethodRowIsNull : Method {
 
     #region Properties
 

@@ -33,13 +33,13 @@ public partial class GlobalMonitor : Form {
     public static void GenerateLogTable(Controls.TableViewWithFilters tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
         var tb = Table.Get();
-        var tbID = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance);
+        var tbID = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolderTextOneLine.Instance);
         tbID?.IsFirst = true;
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder_ImageCode.Instance);
-        var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder_DateTime.Instance);
-        tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder_TextOneLine.Instance);
-        tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder_Long.Instance);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolderImageCode.Instance);
+        var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolderDateTime.Instance);
+        tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolderTextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolderLong.Instance);
 
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {

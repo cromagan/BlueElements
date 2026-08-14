@@ -7,7 +7,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-internal class Method_SaveImage : Method {
+internal class MethodSaveImage : Method {
 
     #region Properties
 

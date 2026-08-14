@@ -317,17 +317,17 @@ public static class IO {
 
     /// <summary>
     /// Prüft, ob der übergebene Text ein gültiger Verzeichnispfad ist
-    /// (ohne Dateiname). Ersetzt IsFormat(FormatHolder_Filepath.Instance, ...).
+    /// (ohne Dateiname). Ersetzt IsFormat(FormatHolderFilepath.Instance, ...).
     /// </summary>
     public static bool IsValidFilePath(this string directory) =>
-        directory.IsFormat(FormatHolder_Filepath.Instance, false) is { Length: 0 };
+        directory.IsFormat(FormatHolderFilepath.Instance, false) is { Length: 0 };
 
     /// <summary>
     /// Prüft, ob der übergebene Text ein gültiger Dateiname inkl. Pfad ist.
-    /// Ersetzt IsFormat(FormatHolder_FilepathAndName.Instance, ...).
+    /// Ersetzt IsFormat(FormatHolderFilepathAndName.Instance, ...).
     /// </summary>
     public static bool IsValidFilepathAndName(this string filename) =>
-        filename.IsFormat(FormatHolder_FilepathAndName.Instance, false) is { Length: 0 };
+        filename.IsFormat(FormatHolderFilepathAndName.Instance, false) is { Length: 0 };
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist

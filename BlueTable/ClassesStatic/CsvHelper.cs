@@ -25,6 +25,35 @@ public static class CsvHelper {
     public static List<string> EscapeCSVFields(List<string> fields, char separator) =>
         fields.Select(field => EscapeCSVField(field, separator)).ToList();
 
+    public static string ExportCsv(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
+        var columns = columnList?.ToList() ?? [.. tbl.Column.Where(c => c is not null)];
+
+        var sb = new StringBuilder();
+        switch (firstRow) {
+            case FirstRow.Without:
+                break;
+
+            case FirstRow.ColumnCaption:
+                AppendCsvRow(sb, columns, c => c.ReadableText().Replace(';', '|').Replace(" |", "|").Replace("| ", "|"));
+                break;
+
+            case FirstRow.ColumnInternalName:
+                AppendCsvRow(sb, columns, c => c.KeyName);
+                break;
+
+            default:
+                Develop.DebugPrint(firstRow);
+                break;
+        }
+
+        foreach (var thisRow in sortedRows) {
+            if (thisRow is not { IsDisposed: false }) { continue; }
+            AppendCsvRow(sb, columns, c => FormatCellForCsv(thisRow, c));
+        }
+
+        return sb.ToString().TrimEnd('\r', '\n');
+    }
+
     /// <summary>
     /// Serialisiert die Tabelle zu einem CSV-String. Spalten- und Zeilenauswahl
     /// erfolgen einheitlich über <see cref="Table.ColumnsInSaveOrder" /> bzw.
@@ -111,7 +140,7 @@ public static class CsvHelper {
                 Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, leerer Spaltenname.", 0);
                 return "Abbruch,<br>leerer Spaltenname.";
             }
-            zeil[0][spaltNo] = FormatHolder_SystemName.MakeValid(zeil[0][spaltNo]);
+            zeil[0][spaltNo] = FormatHolderSystemName.MakeValid(zeil[0][spaltNo]);
 
             var col = table.Column[zeil[0][spaltNo]];
             if (col is null) {
@@ -258,6 +287,26 @@ public static class CsvHelper {
         }
 
         yield return currentField.ToString();
+    }
+
+    private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
+        for (var colNr = 0; colNr < columns.Count; colNr++) {
+            if (columns[colNr] is { } col) {
+                sb.Append(formatter(col));
+                if (colNr < columns.Count - 1) { sb.Append(';'); }
+            }
+        }
+        sb.Append("\r\n");
+    }
+
+    private static string FormatCellForCsv(RowItem row, ColumnItem column) {
+        var tmp = row.CellGetString(column);
+
+        if (column.TextFormatingAllowed) {
+            tmp = tmp.HtmlToPlain();
+        }
+
+        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
     }
 
     #endregion

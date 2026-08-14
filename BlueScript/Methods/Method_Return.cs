@@ -3,7 +3,7 @@
 namespace BlueScript.Methods;
 
 
-internal class Method_Return : Method {
+internal class MethodReturn : Method {
 
     #region Properties
 

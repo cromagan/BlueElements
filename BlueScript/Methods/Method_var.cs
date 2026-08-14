@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_Var : Method {
+internal class MethodVar : Method {
 
     #region Fields
 

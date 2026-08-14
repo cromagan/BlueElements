@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_Ai : Method {
+internal class MethodAi : Method {
 
     #region Properties
 

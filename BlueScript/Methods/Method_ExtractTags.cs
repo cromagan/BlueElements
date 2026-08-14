@@ -2,7 +2,7 @@
 
 namespace BlueScript.Methods;
 
-internal class Method_ExtractTags : Method {
+internal class MethodExtractTags : Method {
 
     #region Properties
 

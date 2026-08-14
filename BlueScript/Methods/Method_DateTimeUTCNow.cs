@@ -5,7 +5,7 @@ using System.Globalization;
 namespace BlueScript.Methods;
 
 
-internal class Method_DateTimeNowUTC : Method {
+internal class MethodDateTimeNowUTC : Method {
 
     #region Properties
 

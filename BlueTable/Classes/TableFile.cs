@@ -79,12 +79,12 @@ public class TableFile : Table {
 
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
-    public TableFile(string filename, Table? source) : base(FormatHolder_SystemName.MakeValid(filename), null) {
+    public TableFile(string filename, Table? source) : base(FormatHolderSystemName.MakeValid(filename), null) {
         // Developer-Safeguard: Der Dateiname muss bereits ein gültiger Systemname sein.
         // Die Validierung beim Aufrufer (z.B. CreateTable) muss sicherstellen,
         // dass MakeValid den Basisnamen nicht verändert.
         var baseName = filename.FileNameWithoutSuffix();
-        if (!string.Equals(baseName, FormatHolder_SystemName.MakeValid(baseName), StringComparison.OrdinalIgnoreCase)) {
+        if (!string.Equals(baseName, FormatHolderSystemName.MakeValid(baseName), StringComparison.OrdinalIgnoreCase)) {
             throw DebugError($"Dateiname '{baseName}' ist kein gültiger Systemname für eine Tabelle.");
         }
 
@@ -401,7 +401,7 @@ public class TableFile : Table {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(KeyName, FormatHolder_SystemName.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(KeyName, FormatHolderSystemName.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
                 DebugPrint("Tabellenname stimmt nicht: " + Filename);
             }
         }

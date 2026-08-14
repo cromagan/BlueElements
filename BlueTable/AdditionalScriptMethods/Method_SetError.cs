@@ -2,7 +2,7 @@
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_SetError : Method_TableGeneric {
+public class MethodSetError : Method_TableGeneric {
 
     #region Fields
 

@@ -280,18 +280,14 @@ public sealed class ColumnsHeadListItem : RowBackground {
 
         tableView.BeginEdit(
             EditTypeTable.Textfeld,
-            new Point(colX, headPos.Y),
-            new Size(colW, headPos.Height),
+            new Rectangle(colX, headPos.Y, colW, headPos.Height),
             col.Caption.Replace("\r", "\r\n"),
             v => ApplyCaption(tableView, cvi, v),
-            ColumnFormatHolder_TextMultiline.Instance,
-            null, null, null,
-            string.Empty,
-            true,
-            headPos.Height,
+            ColumnFormatHolderTextMultiline.Instance,
             null,
             null,
-            tableView.Zoom);
+            null,
+            null);
         return true;
     }
 

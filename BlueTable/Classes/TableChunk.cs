@@ -196,7 +196,7 @@ public class TableChunk : TableFile {
                 return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
             case ChunkType.ByName:
-                var t = FormatHolder_SystemName.MakeValid(chunkvalue).TrimStart('_');
+                var t = FormatHolderSystemName.MakeValid(chunkvalue).TrimStart('_');
                 return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
 
             default:

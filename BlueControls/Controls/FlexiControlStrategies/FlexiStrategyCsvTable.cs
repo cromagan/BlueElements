@@ -43,6 +43,7 @@ public class FlexiStrategyCsvTable : FlexiStrategyBase {
             tb.Row.RowAdded += Table_ContentChanged;
             tb.Row.RowRemoved += Table_ContentChanged;
         }
+        _control?.LostFocus += Control_LostFocus;
     }
 
     public override void UnsubscribeEvents() {
@@ -51,6 +52,7 @@ public class FlexiStrategyCsvTable : FlexiStrategyBase {
             tb.Row.RowAdded -= Table_ContentChanged;
             tb.Row.RowRemoved -= Table_ContentChanged;
         }
+        _control?.LostFocus -= Control_LostFocus;
     }
 
     protected override void ApplyStyle() {
@@ -141,7 +143,7 @@ public class FlexiStrategyCsvTable : FlexiStrategyBase {
         foreach (var raw in StrategyParameter.SplitBy(";")) {
             var name = raw.Trim();
             if (string.IsNullOrEmpty(name)) { continue; }
-            var c = _table.Column.GenerateAndAdd(name, name, ColumnFormatHolder_TextOneLine.Instance);
+            var c = _table.Column.GenerateAndAdd(name, name, ColumnFormatHolderTextOneLine.Instance);
             if (!added && c is { IsDisposed: false }) {
                 c.IsFirst = true;
                 added = true;
@@ -150,7 +152,7 @@ public class FlexiStrategyCsvTable : FlexiStrategyBase {
 
         // Fallback: mindestens eine Spalte, falls StrategyParameter leer.
         if (!added) {
-            var c = _table.Column.GenerateAndAdd("Wert", "Wert", ColumnFormatHolder_TextOneLine.Instance);
+            var c = _table.Column.GenerateAndAdd("Wert", "Wert", ColumnFormatHolderTextOneLine.Instance);
             if (c is { IsDisposed: false }) { c.IsFirst = true; }
         }
 
@@ -178,6 +180,8 @@ public class FlexiStrategyCsvTable : FlexiStrategyBase {
             newTb.Row.RowRemoved += Table_ContentChanged;
         }
     }
+
+    private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
     private void LoadCsvIntoTable(string value) {
         if (_table is not { IsDisposed: false } tb) { return; }

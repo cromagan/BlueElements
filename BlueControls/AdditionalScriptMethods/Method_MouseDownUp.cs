@@ -7,7 +7,7 @@ using BlueScript.Variables;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_MouseDownUp : Method, ICommandBuilder {
+internal class MethodMouseDownUp : Method, ICommandBuilder {
 
     #region Properties
 

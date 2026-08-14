@@ -854,6 +854,14 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string RemoveXmlTags(this string text) => HtmlTagRegex().Replace(text, string.Empty);
 
+    /// <summary>
+    /// Wandelt HTML in reinen Text um: loest Entities auf und entfernt alle Tags.
+    /// </summary>
+    public static string HtmlToPlain(this string text) {
+        if (string.IsNullOrEmpty(text)) { return string.Empty; }
+        return System.Net.WebUtility.HtmlDecode(text).RemoveXmlTags();
+    }
+
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
         if (string.IsNullOrEmpty(txt) || string.IsNullOrEmpty(alt)) { return txt; }
         return Regex.Replace(txt, Regex.Escape(alt), neu, options);

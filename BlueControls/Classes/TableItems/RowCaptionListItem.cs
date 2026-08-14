@@ -95,18 +95,14 @@ public sealed class RowCaptionListItem : RowBackground {
 
         tableView.BeginEdit(
             EditTypeTable.Textfeld,
-            new Point(0, capPos.Y),
-            new Size(tableView.Width, capPos.Height),
+            new Rectangle(0, capPos.Y, tableView.Width, capPos.Height),
             ChapterText.ChapterPathLastName(),
             v => ApplyChapter(tableView, blockRows, v),
-            ColumnFormatHolder_TextOneLine.Instance,
-            null, null, null,
-            string.Empty,
-            false,
-            capPos.Height,
+            ColumnFormatHolderTextOneLine.Instance,
             null,
             null,
-            tableView.Zoom);
+            null,
+            null);
         return true;
     }
 

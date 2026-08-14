@@ -8,7 +8,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_CheckBitmap : Method, ICommandBuilder {
+internal class MethodCheckBitmap : Method, ICommandBuilder {
 
     #region Properties
 
@@ -45,7 +45,7 @@ internal class Method_CheckBitmap : Method, ICommandBuilder {
 
         if (c.Screen is null) { return string.Empty; }
 
-        var n = InputBox.Show("Variablenname:", "result", FormatHolder_SystemName.Instance);
+        var n = InputBox.Show("Variablenname:", "result", FormatHolderSystemName.Instance);
 
         if (string.IsNullOrEmpty(n)) {
             n = "result";
