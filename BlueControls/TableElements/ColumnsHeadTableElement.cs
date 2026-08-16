@@ -101,7 +101,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
         #region ColumnFormat
 
         var fmtAdded = false;
-        foreach (var format in BlueTable.Classes.ColumnFormat.AllFormats.Instances.OrderBy(f => f.ReadableText(), StringComparer.OrdinalIgnoreCase)) {
+        foreach (var format in ColumnFormat.AllFormats.Instances.OrderBy(f => f.ReadableText(), StringComparer.OrdinalIgnoreCase)) {
             if (!fmtAdded) {
                 items.Add(ItemOf("Neue Spalten aus Vorlagen", "Neue Spalten aus Vorlagen", true, "2"));
                 fmtAdded = true;
@@ -365,7 +365,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
             if (parts.Length == 2) {
                 var formatName = parts[0];
                 var targetKey = parts[1];
-                var format = BlueTable.Classes.ColumnFormat.AllFormats[formatName];
+                var format = ColumnFormat.AllFormats[formatName];
                 if (format is not null && tb.Column.GenerateAndAdd(targetKey, targetKey, format) is { } genCol) {
                     newCol = new ColumnViewItem(genCol);
                 }

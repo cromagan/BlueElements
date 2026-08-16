@@ -21,7 +21,7 @@ public class SortedRowsScriptCommand : TableGenericScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
-        if (attvar.Attributes[0] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
+        if (attvar.Attributes[0] is not TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
 
         var r = tb.SortDefinition?.SortedRows(tb.Row) ?? new RowSortDefinition(tb, tb.Column.First, false).SortedRows(tb.Row);
         return new DoItFeedback(new ListOfRowsScriptVariable(r));

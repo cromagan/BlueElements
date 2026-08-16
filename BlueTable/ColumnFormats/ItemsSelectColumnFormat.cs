@@ -4,7 +4,7 @@ using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueTable.ColumnFormats;
 
-public class ItemsSelectColumnFormat : Classes.ColumnFormat {
+public class ItemsSelectColumnFormat : ColumnFormat {
 
     #region Fields
 
@@ -21,7 +21,7 @@ public class ItemsSelectColumnFormat : Classes.ColumnFormat {
         DoOpticalTranslation = TranslationType.Übersetzen;
         AfterEditQuickSortRemoveDouble = true;
         ScriptType = ScriptType.String;
-        EditableWithDropdown = true;
+        ControlStrategy = "Combobox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = true;
@@ -34,7 +34,7 @@ public class ItemsSelectColumnFormat : Classes.ColumnFormat {
 
     #region Properties
 
-    public static Classes.ColumnFormat Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormat Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

@@ -40,7 +40,7 @@ internal class ForEachScriptCommand : ScriptCommand {
 
         for (var index = 0; index < l.Count; index++) {
             var addme = new List<ScriptVariable>() {
-                new ScriptVariables.StringScriptVariable(varnam, l[index], true, "Iterations-Variable"),
+                new StringScriptVariable(varnam, l[index], true, "Iterations-Variable"),
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 

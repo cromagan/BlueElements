@@ -530,7 +530,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ControlStrategy Strategy => _strategy ?? ControlStrategy.Cached(ControlStrategy);
+    public ControlStrategy Strategy => _strategy ?? ControlStrategies.ControlStrategy.Cached(ControlStrategy);
 
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
@@ -673,7 +673,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 return;
             }
 
-            _strategy = ControlStrategy.CreateNew(ControlStrategy);
+            _strategy = ControlStrategies.ControlStrategy.CreateNew(ControlStrategy);
 
             _strategy.CreateControl();
 

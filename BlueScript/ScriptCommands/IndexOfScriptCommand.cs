@@ -25,7 +25,7 @@ internal class IndexOfScriptCommand : ScriptCommand {
         var sens = attvar.ValueBoolGet(1) ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         var pos = -1;
 
-        if (attvar.Attributes[0] is ScriptVariables.StringScriptVariable v) {
+        if (attvar.Attributes[0] is StringScriptVariable v) {
             pos = v.ValueString.IndexOf(search, sens);
         } else if (attvar.Attributes[0] is ListOfStringsScriptVariable vl) {
             pos = vl.ValueList.FindIndex(x => x.Equals(search, sens));

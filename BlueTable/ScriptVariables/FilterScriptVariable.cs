@@ -6,20 +6,20 @@ public class FilterScriptVariable : ScriptVariable {
 
     #region Fields
 
-    private BlueTable.Classes.FilterItem? _filter;
+    private FilterItem? _filter;
     private string _lastText = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public FilterScriptVariable(BlueTable.Classes.FilterItem value) : this(DummyName(), value, true, string.Empty) { }
+    public FilterScriptVariable(FilterItem value) : this(DummyName(), value, true, string.Empty) { }
 
     public FilterScriptVariable() : this(string.Empty, null, true, string.Empty) { }
 
     public FilterScriptVariable(string name) : this(name, null, true, string.Empty) { }
 
-    public FilterScriptVariable(string name, BlueTable.Classes.FilterItem? value, bool ronly, string comment) : base(name, ronly, comment) {
+    public FilterScriptVariable(string name, FilterItem? value, bool ronly, string comment) : base(name, ronly, comment) {
         _filter = value;
         GetText();
     }
@@ -40,7 +40,7 @@ public class FilterScriptVariable : ScriptVariable {
 
     public override bool ToStringPossible => false;
 
-    public BlueTable.Classes.FilterItem? ValueFilterItem {
+    public FilterItem? ValueFilterItem {
         get => _filter;
         private set {
             if (ReadOnly) { return; }

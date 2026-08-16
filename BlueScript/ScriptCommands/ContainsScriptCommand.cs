@@ -26,7 +26,7 @@ internal class ContainsScriptCommand : ScriptCommand {
         var wordlist = new List<string>();
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs1) {
+            if (attvar.Attributes[z] is StringScriptVariable vs1) {
                 wordlist.Add(vs1.ValueString);
             } else if (attvar.Attributes[z] is ListOfStringsScriptVariable vl1) {
                 wordlist.AddRange(vl1.ValueList);
@@ -45,7 +45,7 @@ internal class ContainsScriptCommand : ScriptCommand {
             return wordlist.Exists(thisW => x.Contains(thisW, comparer)) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
-        if (attvar.Attributes[0] is ScriptVariables.StringScriptVariable vs2) {
+        if (attvar.Attributes[0] is StringScriptVariable vs2) {
             foreach (var thisW in wordlist) {
                 // ScriptVariables.String.Contains benötigt StringComparison, nicht StringComparer.
                 if (vs2.ValueString.Contains(thisW, comparison)) {

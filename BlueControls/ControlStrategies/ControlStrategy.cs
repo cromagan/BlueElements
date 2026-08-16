@@ -340,27 +340,54 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
 
     /// <summary>
     /// Übersetzt die Zahlen des entfernten Enums ControlStrategyFormula in die ClassId
-    /// der zugehörigen Strategie. Für unbekannte Zahlen wird null geliefert.
+    /// der zugehörigen Strategie. Unbekannte Zahlen liefern None.
     /// </summary>
     public static string ClassIdFromLegacyControlStrategy(string legacyControlStrategy) {
         if (!legacyControlStrategy.IsLong()) { return legacyControlStrategy; }
 
-        return legacyControlStrategy switch {
-            -1 => NoneControlStrategy.ClassId,
-            0 => TextBoxControlStrategy.ClassId,
-            1 => ComboBoxControlStrategy.ClassId,
-            2 => SwapListBoxControlStrategy.ClassId,
-            3 => TextBoxSuggestionsControlStrategy.ClassId,
-            4 => YesNoButtonControlStrategy.ClassId,
-            5 => ColorButtonControlStrategy.ClassId,
-            22 => TextControlStrategy.ClassId,
-            23 => CaptionControlStrategy.ClassId,
-            26 => ListBoxControlStrategy.ClassId,
-            1000 => LineControlStrategy.ClassId,
-            1001 => CommandButtonControlStrategy.ClassId,
-            1002 => TableControlStrategy.ClassId,
-            _ => NoneControlStrategy.ClassId
-        };
+        switch (LongParse(legacyControlStrategy)) {
+            case -1:
+                return NoneControlStrategy.ClassId;
+
+            case 0:
+                return TextBoxControlStrategy.ClassId;
+
+            case 1:
+                return ComboBoxControlStrategy.ClassId;
+
+            case 2:
+                return SwapListBoxControlStrategy.ClassId;
+
+            case 3:
+                return TextBoxSuggestionsControlStrategy.ClassId;
+
+            case 4:
+                return YesNoButtonControlStrategy.ClassId;
+
+            case 5:
+                return ColorButtonControlStrategy.ClassId;
+
+            case 22:
+                return TextControlStrategy.ClassId;
+
+            case 23:
+                return CaptionControlStrategy.ClassId;
+
+            case 26:
+                return ListBoxControlStrategy.ClassId;
+
+            case 1000:
+                return LineControlStrategy.ClassId;
+
+            case 1001:
+                return CommandButtonControlStrategy.ClassId;
+
+            case 1002:
+                return TableControlStrategy.ClassId;
+
+            default:
+                return NoneControlStrategy.ClassId;
+        }
     }
 
     /// <summary>
@@ -404,6 +431,18 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
     public virtual void HandleCaptionClick() { }
 
     public virtual Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    /// <summary>
+    /// Prüft, ob die Strategie zu einer Spalte mit den übergebenen
+    /// Bearbeitungs-Fähigkeiten passt. Basis-Implementierung vergleicht
+    /// gegen <see cref="SupportsTextEdit" /> und <see cref="SupportsSuggestions" />.
+    /// </summary>
+    public bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) {
+        if (SupportsTextEdit && SupportsSuggestions) { return textEditable || mayHaveDropdownItems; }
+        if (SupportsTextEdit) { return textEditable; }
+        if (SupportsSuggestions) { return mayHaveDropdownItems; }
+        return false;
+    }
 
     public void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
 

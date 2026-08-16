@@ -22,7 +22,7 @@ internal class RemoveScriptCommand : ScriptCommand {
 
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs) {
+            if (attvar.Attributes[z] is StringScriptVariable vs) {
                 tmpList.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
             } else if (attvar.Attributes[z] is ListOfStringsScriptVariable vl) {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));

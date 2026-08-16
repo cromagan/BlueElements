@@ -1220,7 +1220,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 if (v is not null) { vars.Add(v); }
             }
 
-            vars.Add(new BlueScript.ScriptVariables.RowScriptVariable("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new RowScriptVariable("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
             vars.Add(new StringScriptVariable(KeyInputRowKey, row.KeyName, true, "Der interne Zeilenschlüssel der Zeile, mit der das Skript aufgerufen wurde."));
             vars.Add(new StringScriptVariable(KeyChunk, row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
         }
@@ -1228,7 +1228,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (filter is not null) {
             var num = 0;
             foreach (var thisFilter in filter) {
-                vars.Add(new BlueScript.ScriptVariables.FilterScriptVariable($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));
+                vars.Add(new FilterScriptVariable($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));
                 num++;
             }
         }
@@ -1257,11 +1257,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         vars.Add(new StringScriptVariable("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         vars.Add(new BoolScriptVariable("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
         vars.Add(new StringScriptVariable("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
-        vars.Add(new BlueScript.ScriptVariables.TableScriptVariable("CurrentTable", this, true, "Die aktuelle Tabelle"));
+        vars.Add(new TableScriptVariable("CurrentTable", this, true, "Die aktuelle Tabelle"));
         vars.Add(new BoolScriptVariable("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         vars.Add(new DoubleScriptVariable("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle"));
         vars.Add(new StringScriptVariable("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde."));
-        vars.Add(new BlueScript.ScriptVariables.RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"));
+        vars.Add(new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"));
 
         if (Column.First is { IsDisposed: false } fc) {
             vars.Add(new StringScriptVariable("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));

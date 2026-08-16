@@ -4,7 +4,7 @@ using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueTable.ColumnFormats;
 
-public class DateTimeColumnFormat : Classes.ColumnFormat {
+public class DateTimeColumnFormat : ColumnFormat {
 
     #region Constructors
 
@@ -14,7 +14,7 @@ public class DateTimeColumnFormat : Classes.ColumnFormat {
         DoOpticalTranslation = TranslationType.Datum;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        EditableWithDropdown = false;
+        ControlStrategy = "Texbox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
@@ -26,7 +26,7 @@ public class DateTimeColumnFormat : Classes.ColumnFormat {
 
     #region Properties
 
-    public static Classes.ColumnFormat Instance => AllFormats[Formats.DateTimeFormat.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormat Instance => AllFormats[Formats.DateTimeFormat.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

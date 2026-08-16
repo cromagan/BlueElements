@@ -466,10 +466,8 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
         }
 
         var indentOffset = IndentWidth.CanvasToControl(zoom) * rowContainer.Indent;
-        var addWith = strategy is ComboBoxControlStrategy ? 20 : 0;
-        var totalWidth = viewItem.ControlColumnWidth() + addWith;
         var location = new Point(viewItem.ControlColumnLeft(offsetX) + indentOffset, controlPos.Y);
-        var size = new Size(totalWidth, controlPos.Height);
+        var size = new Size(viewItem.ControlColumnWidth(), controlPos.Height);
 
         // Für ComboBox / Suggestions die Items vorab besorgen. Fallbacks
         // (z. B. Auswahl ohne Items) macht TableView.BeginEdit zentral.

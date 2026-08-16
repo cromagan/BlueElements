@@ -28,7 +28,7 @@ internal class DownloadWebPageScriptCommand : ScriptCommand {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(AllowedCharsVariableName);
 
-        if (Last.GetByKey(varn) is ScriptVariables.StringScriptVariable vb) {
+        if (Last.GetByKey(varn) is StringScriptVariable vb) {
             return new DoItFeedback(vb.ValueString);
         }
 
@@ -36,7 +36,7 @@ internal class DownloadWebPageScriptCommand : ScriptCommand {
             CollectGarbage();
             var txt = Download(url);
 
-            Last.Add(new ScriptVariables.StringScriptVariable(varn, txt, true, string.Empty));
+            Last.Add(new StringScriptVariable(varn, txt, true, string.Empty));
             return new DoItFeedback(txt);
         } catch {
             return new DoItFeedback(string.Empty);

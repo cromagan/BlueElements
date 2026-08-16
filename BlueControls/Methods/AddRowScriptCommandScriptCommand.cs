@@ -29,7 +29,7 @@ public class AddRowScriptCommandScriptCommand : TableGenericScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
-        if (attvar.Attributes[0] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) {
+        if (attvar.Attributes[0] is not TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) {
             return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 

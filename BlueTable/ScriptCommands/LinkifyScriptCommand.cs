@@ -35,7 +35,7 @@ public class LinkifyScriptCommand : TableGenericScriptCommand {
         var inputText = attvar.ValueStringGet(0);
 
         // Parameter 2: Zieltabelle
-        if (attvar.Attributes[1] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) {
+        if (attvar.Attributes[1] is not TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) {
             return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 

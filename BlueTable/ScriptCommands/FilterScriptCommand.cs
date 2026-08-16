@@ -27,11 +27,11 @@ public class FilterScriptCommand : TableGenericScriptCommand {
 
     #region Methods
 
-    public static (FilterCollection? allFi, string failedReason, bool needsScriptFix) ObjectToFilter(IReadOnlyList<ScriptVariable> attributes, int ab, BlueTable.Classes.Table? sourcetable, string user, bool must) {
+    public static (FilterCollection? allFi, string failedReason, bool needsScriptFix) ObjectToFilter(IReadOnlyList<ScriptVariable> attributes, int ab, Table? sourcetable, string user, bool must) {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not ScriptVariables.FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein FilterScriptCommand.", true); } // new DoItFeedback(infos.LogData, s, "Kein FilterScriptCommand übergeben.");
+            if (attributes[z] is not FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein FilterScriptCommand.", true); } // new DoItFeedback(infos.LogData, s, "Kein FilterScriptCommand übergeben.");
 
             if (fi.ValueFilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen FilterScriptCommand.", true); }
 
@@ -88,7 +88,7 @@ public class FilterScriptCommand : TableGenericScriptCommand {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
-        if (attvar.Attributes[0] is not ScriptVariables.TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
+        if (attvar.Attributes[0] is not TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
 
         //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false); }
 
@@ -117,7 +117,7 @@ public class FilterScriptCommand : TableGenericScriptCommand {
 
         filterColumn.AddSystemInfo("FilterScriptCommand in Script", tb, scp.ScriptName);
 
-        return new DoItFeedback(new ScriptVariables.FilterScriptVariable(fii));
+        return new DoItFeedback(new FilterScriptVariable(fii));
     }
 
     #endregion

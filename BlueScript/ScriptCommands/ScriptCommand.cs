@@ -226,7 +226,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix);
                     }
-                    txt = "[\"" + string.Join("\",\"", l.Attributes.OfType<ScriptVariables.StringScriptVariable>().Select(vs => vs.ValueString)) + "\"]";
+                    txt = "[\"" + string.Join("\",\"", l.Attributes.OfType<StringScriptVariable>().Select(vs => vs.ValueString)) + "\"]";
                 }
             }
         }

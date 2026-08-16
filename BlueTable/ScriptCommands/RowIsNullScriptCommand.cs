@@ -20,7 +20,7 @@ public class RowIsNullScriptCommand : ScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
-        if (attvar.Attributes[0] is not ScriptVariables.RowScriptVariable vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true); }
+        if (attvar.Attributes[0] is not RowScriptVariable vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true); }
 
         return new DoItFeedback(vr.IsNullOrEmpty);
     }

@@ -20,7 +20,7 @@ internal class IsNumeralScriptCommand : ScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.Attributes[0] is DoubleScriptVariable) { return DoItFeedback.Wahr(); }
-        if (attvar.Attributes[0] is ScriptVariables.StringScriptVariable vs) {
+        if (attvar.Attributes[0] is StringScriptVariable vs) {
             if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
         }
         return DoItFeedback.Falsch();

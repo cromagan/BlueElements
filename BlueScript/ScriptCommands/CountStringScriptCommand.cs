@@ -23,7 +23,7 @@ internal class CountStringScriptCommand : ScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         switch (attvar.Attributes[0]) {
-            case ScriptVariables.StringScriptVariable vs:
+            case StringScriptVariable vs:
                 return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
 
             case ListOfStringsScriptVariable vl:

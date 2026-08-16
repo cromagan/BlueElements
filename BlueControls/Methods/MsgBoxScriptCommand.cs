@@ -14,8 +14,8 @@ public class MsgBoxScriptCommand : ScriptCommand {
     public override string Command => "msgbox";
     public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer eine Schaltfläche drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
+    public override string Returns => DoubleScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
-    public override string Returns => Double.ShortName_Variable;
     public override string Syntax => "MsgBoxScriptCommand(Text, Bild, Schaltflächenbeschriftung, ...);";
 
     #endregion

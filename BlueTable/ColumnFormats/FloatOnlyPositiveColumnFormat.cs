@@ -4,7 +4,7 @@ using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueTable.ColumnFormats;
 
-public class FloatOnlyPositiveColumnFormat : Classes.ColumnFormat {
+public class FloatOnlyPositiveColumnFormat : ColumnFormat {
 
     #region Constructors
 
@@ -14,7 +14,7 @@ public class FloatOnlyPositiveColumnFormat : Classes.ColumnFormat {
         DoOpticalTranslation = TranslationType.Zahl;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.Numeral;
-        EditableWithDropdown = false;
+        ControlStrategy = "Texbox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
@@ -26,7 +26,7 @@ public class FloatOnlyPositiveColumnFormat : Classes.ColumnFormat {
 
     #region Properties
 
-    public static Classes.ColumnFormat Instance => AllFormats[Formats.FloatOnlyPositiveFormat.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormat Instance => AllFormats[Formats.FloatOnlyPositiveFormat.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

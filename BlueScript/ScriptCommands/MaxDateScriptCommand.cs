@@ -27,7 +27,7 @@ internal class MaxDateScriptCommand : ScriptCommand {
         var l = new List<string>();
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs) { l.Add(vs.ValueString); }
+            if (attvar.Attributes[z] is StringScriptVariable vs) { l.Add(vs.ValueString); }
             if (attvar.Attributes[z] is ListOfStringsScriptVariable vl) { l.AddRange(vl.ValueList); }
         }
 

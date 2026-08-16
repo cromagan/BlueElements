@@ -42,7 +42,7 @@ internal class ForEachRow2ScriptCommand : TableGenericScriptCommand {
 
         for (var index = 0; index < r.Count; index++) {
             var addme = new List<ScriptVariable>() {
-                new ScriptVariables.RowScriptVariable(varnam, r[index], true, "Iterations-Variable"),
+                new RowScriptVariable(varnam, r[index], true, "Iterations-Variable"),
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 

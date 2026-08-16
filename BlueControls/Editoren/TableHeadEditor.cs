@@ -208,7 +208,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         if (az is { IsDisposed: false }) {
-            var o = new Renderer.DateTimeRenderer {
+            var o = new DateTimeRenderer {
                 UTCToLocal = true,
                 ShowSymbol = true
             };

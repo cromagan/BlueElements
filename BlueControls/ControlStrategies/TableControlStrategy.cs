@@ -69,7 +69,6 @@ public class TableControlStrategy : ControlStrategy {
 
         // Tabelle neu aufbauen, wenn sich Spalten oder Sortiermodus geändert hat.
         if (_table is null or { IsDisposed: true }
-            || _lastColumns != StrategyParameter
             || _lastAutoSort != AutoSort) {
             BuildTable();
         }

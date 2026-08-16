@@ -21,7 +21,7 @@ internal class AddScriptCommand : ScriptCommand {
 
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs) {
+            if (attvar.Attributes[z] is StringScriptVariable vs) {
                 tmpList.Add(vs.ValueString);
             }
             if (attvar.Attributes[z] is ListOfStringsScriptVariable vl) {

@@ -12,7 +12,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     #region Fields
 
-    private System.Drawing.Bitmap? _bitmap;
+    private Bitmap? _bitmap;
 
     /// <summary>
     /// Base64-kodiertes PNG des aktuellen Bildes. Wird beim Setzen der
@@ -32,7 +32,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
-    public BitmapPadItem(string keyName, System.Drawing.Bitmap? bmp, Size size) : base(keyName) {
+    public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         // Suppress-Modus whrend der Konstruktion: Property-Setter lsen keine
         // Change-Events aus. Siehe ParseableItem.ISupportInitialize.
         BeginInit();
@@ -62,7 +62,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         }
     } = SizeModes.EmptySpace;
 
-    public System.Drawing.Bitmap? BitmapValue {
+    public Bitmap? BitmapValue {
         get {
             if (_bitmap is null && _rawImageBase64 is { Length: > 0 } raw) {
                 _bitmap = Base64ToBitmap(raw);
@@ -147,7 +147,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         e.ShowDialog();
 
         if (!FileExists(e.FileName)) { return; }
-        BitmapValue = (System.Drawing.Bitmap?)Image_FromFile(e.FileName);
+        BitmapValue = (Bitmap?)Image_FromFile(e.FileName);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -280,7 +280,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         if (!("~" + variable.KeyName + "~").Equals(Platzhalter_Für_Layout, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         switch (variable) {
-            case BlueScript.ScriptVariables.BitmapScriptVariable vbmp:
+            case BitmapScriptVariable vbmp:
                 if (vbmp.ValueBitmap is { } bmp1) {
                     BitmapValue = bmp1;
                     return true;
@@ -288,7 +288,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
                 return false;
 
             case StringScriptVariable filn:
-                if (FileExists(filn.ValueString) && Image_FromFile(filn.ValueString) is System.Drawing.Bitmap bmp2) {
+                if (FileExists(filn.ValueString) && Image_FromFile(filn.ValueString) is Bitmap bmp2) {
                     BitmapValue = bmp2;
                     return true;
                 }

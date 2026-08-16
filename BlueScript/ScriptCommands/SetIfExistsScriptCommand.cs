@@ -26,7 +26,7 @@ internal class SetIfExistsScriptCommand : ScriptCommand {
             if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich.", true); }
 
             switch (attvar.Attributes[z]) {
-                case ScriptVariables.StringScriptVariable vs:
+                case StringScriptVariable vs:
                     if (attvar.ValueStringSet(0, vs.ValueString) is { } dif) { return dif; }
                     return DoItFeedback.Null();
 

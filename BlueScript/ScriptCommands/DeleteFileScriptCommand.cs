@@ -10,10 +10,8 @@ internal class DeleteFileScriptCommand : ScriptCommand {
     public override string Command => "deletefile";
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
-    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-
     public override string Returns => BoolScriptVariable.ShortName_Variable;
-
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "DeleteFile(Filename)";
 
     #endregion
@@ -24,7 +22,7 @@ internal class DeleteFileScriptCommand : ScriptCommand {
         var files = new List<string>();
 
         foreach (var thisAtt in attvar.Attributes) {
-            if (thisAtt is ScriptVariables.StringScriptVariable vs1) { files.Add(vs1.ValueString); }
+            if (thisAtt is StringScriptVariable vs1) { files.Add(vs1.ValueString); }
             if (thisAtt is ListOfStringsScriptVariable vl1) { files.AddRange(vl1.ValueList); }
         }
         files = files.SortedDistinctList();

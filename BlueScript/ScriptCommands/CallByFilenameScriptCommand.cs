@@ -110,7 +110,7 @@ public class CallByFilenameScriptCommand : ScriptCommand {
 
         var a = new List<string>();
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs1) { a.Add(vs1.ValueString); }
+            if (attvar.Attributes[z] is StringScriptVariable vs1) { a.Add(vs1.ValueString); }
         }
 
         #endregion

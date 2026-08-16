@@ -8,20 +8,20 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
 
     private string _lastText = string.Empty;
     private string? _pendingTableKey;
-    private BlueTable.Classes.Table? _table;
+    private Table? _table;
 
     #endregion
 
     #region Constructors
 
-    public TableScriptVariable(string name, BlueTable.Classes.Table? value, bool ronly, string comment) : base(name, ronly, comment) {
+    public TableScriptVariable(string name, Table? value, bool ronly, string comment) : base(name, ronly, comment) {
         _table = value;
         GetText();
     }
 
     public TableScriptVariable() : this(string.Empty, null, true, string.Empty) { }
 
-    public TableScriptVariable(BlueTable.Classes.Table? value) : this(DummyName(), value, true, string.Empty) { }
+    public TableScriptVariable(Table? value) : this(DummyName(), value, true, string.Empty) { }
 
     public TableScriptVariable(string name) : this(name, null, true, string.Empty) { }
 
@@ -43,7 +43,7 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
     /// <summary>
     /// Explizite Implementierung, da ein Member nicht wie die Klasse selbst heißen darf.
     /// </summary>
-    BlueTable.Classes.Table? IHasTable.Table => ValueTable;
+    Table? IHasTable.Table => ValueTable;
 
     public override bool ToStringPossible => true;
 
@@ -57,7 +57,7 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
         }
     }
 
-    public BlueTable.Classes.Table? ValueTable {
+    public Table? ValueTable {
         get {
             if (_table is null && _pendingTableKey is { Length: > 0 } key) {
                 _table = Table.Get(key);
@@ -99,7 +99,7 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
                 _table = null;
                 break;
 
-            case BlueTable.Classes.Table tb:
+            case Table tb:
                 _table = tb;
                 break;
 

@@ -43,7 +43,7 @@ public partial class VariableEditor : EditorEasy {
             var v = ParseableItem.NewByTypeName<ScriptVariable>(typId);
             if (v is null) {
                 Develop.DebugPrint($"Unbekannter Variablentyp '{typId}' – erzeuge String.");
-                v = new StringScriptVariable(name, inhalt, false, kommentar);
+                v = new String(name, inhalt, false, kommentar);
             } else {
                 v.KeyName = name;
                 v.Comment = kommentar;

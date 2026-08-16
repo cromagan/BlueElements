@@ -31,7 +31,7 @@ internal class ContainsWhitchScriptCommand : ScriptCommand {
         var wordlist = new List<string>();
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is ScriptVariables.StringScriptVariable vs1) { wordlist.Add(vs1.ValueString); }
+            if (attvar.Attributes[z] is StringScriptVariable vs1) { wordlist.Add(vs1.ValueString); }
             if (attvar.Attributes[z] is ListOfStringsScriptVariable vl1) { wordlist.AddRange(vl1.ValueList); }
         }
         wordlist = wordlist.SortedDistinctList();
@@ -41,7 +41,7 @@ internal class ContainsWhitchScriptCommand : ScriptCommand {
         var rx = RegexOptions.IgnoreCase;
         if (attvar.ValueBoolGet(1)) { rx = RegexOptions.None; }
 
-        if (attvar.Attributes[0] is ScriptVariables.StringScriptVariable vs2) {
+        if (attvar.Attributes[0] is StringScriptVariable vs2) {
             foreach (var thisW in wordlist) {
                 if (vs2.ValueString.IndexOfWord(thisW, 0, rx) >= 0) {
                     found.AddIfNotExists(thisW);

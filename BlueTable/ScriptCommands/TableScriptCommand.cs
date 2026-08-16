@@ -31,7 +31,7 @@ internal class TableScriptCommand : ScriptCommand {
             return new DoItFeedback($"Tabelle '{filn}' ist passwortgeschützt und kann im Skript nicht verwendet werden.", true);
         }
 
-        return new DoItFeedback(new ScriptVariables.TableScriptVariable(tb));
+        return new DoItFeedback(new TableScriptVariable(tb));
     }
 
     #endregion

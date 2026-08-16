@@ -23,7 +23,7 @@ internal class PingScriptCommand : ScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         try {
-            var p = new System.Net.NetworkInformation.Ping();
+            var p = new Ping();
             var r = p.Send(attvar.ValueStringGet(0));
             if (r.Status == IPStatus.Success) {
                 return new DoItFeedback(r.RoundtripTime);

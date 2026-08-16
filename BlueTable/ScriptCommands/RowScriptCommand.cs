@@ -12,7 +12,7 @@ public static class Row_Extension {
     public static RowItem? ValueRowGet(this SplittedAttributesFeedback attvar, int varno) {
         if (varno < 0 || varno >= attvar.Attributes.Count) { return null; }
 
-        return attvar.Attributes[varno] is ScriptVariables.RowScriptVariable vro ? vro.ValueRowItem : null;
+        return attvar.Attributes[varno] is RowScriptVariable vro ? vro.ValueRowItem : null;
     }
 
     #endregion
@@ -45,7 +45,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
 
     #region Methods
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new ScriptVariables.RowScriptVariable(row));
+    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new RowScriptVariable(row));
 
     public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
         if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true); }

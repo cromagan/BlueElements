@@ -24,7 +24,7 @@ internal class ExtractTagsScriptCommand : ScriptCommand {
         varCol.RemoveWithComment(comment);
 
         var tags = new List<string>();
-        if (attvar.Attributes[0] is ScriptVariables.StringScriptVariable vs) {
+        if (attvar.Attributes[0] is StringScriptVariable vs) {
             tags.Add(vs.ValueString);
         } else if (attvar.Attributes[0] is ListOfStringsScriptVariable vl) {
             tags.AddRange(vl.ValueList);
@@ -37,7 +37,7 @@ internal class ExtractTagsScriptCommand : ScriptCommand {
                 var vn = x[0].ToLowerInvariant().ReduceToChars(AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    varCol.Add(new ScriptVariables.StringScriptVariable("extracted_" + vn, thisv, true, comment));
+                    varCol.Add(new StringScriptVariable("extracted_" + vn, thisv, true, comment));
                 }
             }
         }

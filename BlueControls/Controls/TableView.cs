@@ -71,11 +71,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private Point _dragMouseDown;
 
     /// <summary>
-    /// Zell-Kontext des aktiven Dropdown-Edits, für die Toggle-/Commit-Logik.
-    /// </summary>
-    private CellExtEventArgs? _dropdownCellInfo;
-
-    /// <summary>
     /// Commit-Callback des aktiven Inline-Edits; wird beim Schließen mit dem neuen Text aufgerufen, danach null.
     /// </summary>
     private Action<string>? _editCommit;
@@ -116,7 +111,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private JsonObject? _storedView;
 
-    private System.DateTime? _tableDrawError;
+    private DateTime? _tableDrawError;
 
     #endregion
 
@@ -1831,7 +1826,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
 
             // Nur echte Dropdowns committen über ValueChanged, alle anderen über den Callback.
-            var isDropdown = strategy is ListBoxControlStrategy or FramedListBoxControlStrategie;
+            var isDropdown = strategy is ListBoxControlStrategy;
 
             // Style, MultiLine und QuickInfo aus der Style-Quelle ableiten.
             strategy.BeginInit();
@@ -1866,7 +1861,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             // Dropdown committet über ValueChanged; alle anderen über den Callback.
             if (isDropdown) {
-                _dropdownCellInfo = cellInfo;
                 _editCommit = null;
             } else {
                 _editCommit = commit;
@@ -4220,36 +4214,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void Edit_TabKey(object? sender, System.EventArgs e) => CloseAllComponents();
 
     /// <summary>
-    /// Wertänderung der aktiven Edit-Strategie. Nur bei Dropdown aktiv: übernimmt die gehakte Menge als Zellwert.
-    /// </summary>
-    private void Edit_ValueChanged(object? sender, TextEventArgs e) {
-        if (_dropdownCellInfo is not { } cell) { return; }
-
-        var values = e.Text.SplitAndCutByCr().ToList();
-
-        if (CurrentArrangement is not { IsDisposed: false }) { return; }
-        if (cell.ColumnView?.Column is not { IsDisposed: false }) { return; }
-
-        var committedValue = string.Join('\r', values);
-
-        // Bei einer neuen Zeile gibt es noch keine RowData-Referenz.
-        if (cell.RowData?.Row is not { IsDisposed: false }) {
-            NotEditableInfo(UserEdited(this, committedValue, cell.ColumnView, null, false));
-        } else {
-            NotEditableInfo(UserEdited(this, committedValue, cell.ColumnView, cell.RowData, false));
-        }
-
-        // ListBox-Check-Status mit dem Zellwert synchronisieren.
-        SyncDropDownSelection(committedValue);
-    }
-
-    /// <summary>
     /// Beendet das aktive Edit ohne Commit.
     /// </summary>
     private void EndEdit() {
         HideAllEditControls();
         _editCommit = null;
-        _dropdownCellInfo = null;
     }
 
     /// <summary>
@@ -4427,7 +4396,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.EscKey += Edit_EscKey;
             strategy.TabKey += Edit_TabKey;
             strategy.LostFocus += Edit_LostFocus;
-            strategy.ValueChanged += Edit_ValueChanged;
         }
 
         return strategy;
@@ -4454,8 +4422,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     private void HideAllEditControls() {
         if (_controlStrategyCache.IsDisposed) { return; }
-        // Dropdown-Kontext verwerfen.
-        _dropdownCellInfo = null;
+
         foreach (var strategy in _controlStrategyCache.Values) {
             if (strategy.Control is Control c
                 && !c.IsDisposed
@@ -4688,11 +4655,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         return (first, last);
     }
-
-    /// <summary>
-    /// Synchronisiert die Haken der offenen Dropdown-ListBox mit dem übergebenen Wert.
-    /// </summary>
-    private void SyncDropDownSelection(string value) => ActiveControlStrategy?.SetValueToControl(value);
 
     private void Table_InvalidateView(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }

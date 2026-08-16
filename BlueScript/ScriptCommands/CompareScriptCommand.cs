@@ -39,7 +39,7 @@ internal class CompareScriptCommand : ScriptCommand {
                     val = vf.ValueForReplace;
                     break;
 
-                case ScriptVariables.StringScriptVariable vs:
+                case StringScriptVariable vs:
                     if (!hasval && !string.IsNullOrEmpty(vs.ValueString)) { hasval = true; }
                     val = vs.ValueForReplace;
                     break;

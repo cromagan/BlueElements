@@ -30,4 +30,5 @@ internal class StringHTMLToAsciiScriptCommand : ScriptCommand {
     }
 
     #endregion
+
 }

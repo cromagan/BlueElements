@@ -35,8 +35,8 @@ public abstract class TableGenericScriptCommand : ScriptCommand {
         return MyTable(scp)?.Column[c.KeyName];
     }
 
-    protected static BlueTable.Classes.Table? MyTable(ScriptProperties scp) {
-        if (scp.AdditionalInfo is BlueTable.Classes.Table { IsDisposed: false } tb) { return tb; }
+    protected static Table? MyTable(ScriptProperties scp) {
+        if (scp.AdditionalInfo is Table { IsDisposed: false } tb) { return tb; }
         if (scp.AdditionalInfo is RowItem r) { return r.Table; }
         return null;
     }

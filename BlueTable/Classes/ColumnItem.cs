@@ -471,7 +471,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// ClassId der Bearbeitungs-Strategie der Spalte (z. B. "Textfeld" oder "Dropdown_mit_Rahmen").
+    /// ClassId der Bearbeitungs-Strategie der Spalte (z. B. "Texbox" oder "Combobox").
     /// </summary>
     public string ControlStrategy {
         get => _controlStrategy;
@@ -1370,7 +1370,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnKeys.RowSortIndex;
 
     public bool MayHaveDropDown() {
-        return _showValuesOfOtherCellsInDropdown || _dropDownItems.Count > 0;
+        return _relationType == RelationType.DropDownValues
+            || _showValuesOfOtherCellsInDropdown
+            || _dropDownItems.Count > 0;
     }
 
     public bool MultilinePossible() {
@@ -1482,7 +1484,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _isKeyColumn = json.GetBool("iskeycolumn", _isKeyColumn);
         _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
         _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
-        _controlStrategy = json.GetString("controlstrategy", "Textfeld");
+        _controlStrategy = json.GetString("controlstrategy", "Texbox");
         _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
         _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
         _minTextLength = json.GetInt("mintextlength", 0);
@@ -2373,7 +2375,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
         }
 
-        if (_controlStrategy is "Dropdown" or "Dropdown_mit_Rahmen") {
+        if (_controlStrategy == "Combobox") {
             if (_relationType != RelationType.DropDownValues) {
                 if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
             }
@@ -2601,33 +2603,31 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_relationType == RelationType.DropDownValues) {
-            _controlStrategy = "Dropdown_mit_Rahmen";
+            _controlStrategy = "Combobox";
             return;
         }
 
         var hasItems = _dropDownItems.Count > 0 || _showValuesOfOtherCellsInDropdown;
 
         if (!_legacyDropdown) {
-            _controlStrategy = hasItems ? "Textfeld_mit_Vorschlägen" : "Textfeld";
+            _controlStrategy = hasItems ? "TextBoxSuggestions" : "Texbox";
             return;
         }
 
         if (_editableWithTextInput) {
             if (hasItems && (_textFormatingAllowed || (_multiLine && !_afterEditQuickSortRemoveDouble))) {
-                _controlStrategy = "Textfeld_mit_Vorschlägen";
+                _controlStrategy = "TextBoxSuggestions";
                 return;
             }
-
             if (_multiLine) {
-                _controlStrategy = "Dropdown_mit_Rahmen";
+                _controlStrategy = "Listbox";
                 return;
             }
 
-            _controlStrategy = "Textfeld_mit_Auswahlknopf";
+            _controlStrategy = "Combobox";
             return;
         }
-
-        _controlStrategy = "Dropdown_mit_Rahmen";
+        _controlStrategy = "Combobox";
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);

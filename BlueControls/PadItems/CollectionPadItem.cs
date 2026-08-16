@@ -698,7 +698,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     /// wird AutoZoomFit ignoriert, damit die Vorschau nicht vom Seiteneffekt des
     /// CreativePad (der AutoZoomFit auf false setzt) abhängt.
     /// </summary>
-    public System.Drawing.Bitmap? GeneratePreviewBitmap(int maxSize) {
+    public Bitmap? GeneratePreviewBitmap(int maxSize) {
         var usedArea = UsedAreaOfItems();
         if (usedArea.Width <= 0 || usedArea.Height <= 0) { return null; }
 
@@ -709,7 +709,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
         var bmpH = (int)Math.Round(usedArea.Height * zoom);
         if (bmpW <= 0 || bmpH <= 0) { return null; }
 
-        var bmp = new System.Drawing.Bitmap(bmpW, bmpH);
+        var bmp = new Bitmap(bmpW, bmpH);
         using var gr = Graphics.FromImage(bmp);
 
         var offsetX = -usedArea.Left * zoom;

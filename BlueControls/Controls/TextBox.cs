@@ -974,7 +974,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (r is not { Count: 1 }) { return; }
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
-        _markStart = Insert(_markStart, new Chars.IconChar(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
+        _markStart = Insert(_markStart, new IconChar(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
     private void CreateCellLinkZones() {

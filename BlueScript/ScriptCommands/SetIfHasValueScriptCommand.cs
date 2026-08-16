@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 internal class SetIfHasValueScriptCommand : ScriptCommand {
 
     #region Properties
@@ -31,7 +30,7 @@ internal class SetIfHasValueScriptCommand : ScriptCommand {
                     }
                     break;
 
-                case ScriptVariables.StringScriptVariable vs:
+                case StringScriptVariable vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
                         return attvar.ValueStringSet(0, vs.ValueString) ?? DoItFeedback.Null();
                     }

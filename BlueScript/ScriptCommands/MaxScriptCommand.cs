@@ -32,7 +32,7 @@ internal class MaxScriptCommand : ScriptCommand {
                     l.Add(vf.ValueNum);
                     break;
 
-                case ScriptVariables.StringScriptVariable vs:
+                case StringScriptVariable vs:
                     if (DoubleTryParse(vs.ValueString, out var r)) {
                         l.Add(r);
                     }

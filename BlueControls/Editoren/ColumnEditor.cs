@@ -47,13 +47,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
         }
 
-        foreach (var thiss in ControlStrategy.AllStrategies.Instances) {
-            cbxControlStrategy.ItemAdd(ItemOf(thiss.ReadableText(), thiss.KeyName, thiss.SymbolForReadableText()));
-        }
-
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
-        foreach (var thisItem in BlueTable.Classes.ColumnFormat.AllFormats.Instances) {
+        foreach (var thisItem in ColumnFormat.AllFormats.Instances) {
             var bli = new BitmapListItem(thisItem.SymbolForReadableText() is { } s ? (Bitmap)s : null, thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
                 QuickInfo = thisItem.QuickInfo
@@ -464,6 +460,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxLinkedTable.Text = c.LinkedTableTableName;
         txbAutoRemove.Text = c.ForbiddenChars.EncodeControlChars();
         cbxLinkedTable_TextChanged(cbxLinkedTable, System.EventArgs.Empty);
+        RefillControlStrategyItems();
         capInfos.Text = ColumnUsage(c);
     }
 
@@ -691,8 +688,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler is DropdownNotSelectedAddAll
                    or DropdownNotSelectedItems) {
-            solutions.Add(CreateSolution("Textfeld mit Vorschlägen wählen", () => cbxControlStrategy.Text = TextBoxSuggestionsControlStrategy.ClassId, cbxControlStrategy));
-            solutions.Add(CreateSolution("Listbox wählen", () => cbxControlStrategy.Text = ListBoxControlStrategy.ClassId, cbxControlStrategy));
+            // Alle Strategien mit Auswahlliste, die laut IsAllowed zur aktuellen Konfiguration passen.
+            var textEditable = btnEditableStandard.Checked;
+            var mayHave = MayHaveDropdownItems();
+
+            foreach (var thiss in ControlStrategy.AllStrategies.Instances.Where(s => s.SupportsSuggestions && s.IsAllowed(textEditable, mayHave)).OrderBy(s => s.ReadableText())) {
+                var strategy = thiss;
+                solutions.Add(CreateSolution(strategy.ReadableText() + " wählen", () => cbxControlStrategy.Text = strategy.KeyName, cbxControlStrategy));
+            }
+
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
                 txbMinTextLength.Text = "0";
@@ -882,13 +886,27 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
     private void lstStyles_ItemClicked(object sender, EventArgs.ListItemEventArgs e) {
-        var chf = BlueTable.Classes.ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
+        var chf = ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
         if (chf is null) { return; }
 
         if (!AllOk()) { return; }
         if (InputItem is not ColumnItem c) { return; }
         c.GetStyleFrom(chf);
         Column_DatenAuslesen();
+    }
+
+    /// <summary>
+    /// True, wenn die Spalte aktuell Dropdown-Items haben kann: explizite Items,
+    /// Werte anderer Zellen oder eine verknüpfte Tabelle mit Dropdown-Werten.
+    /// </summary>
+    private bool MayHaveDropdownItems() {
+        if (cbxRelationType.Text == ((int)RelationType.DropDownValues).ToString1()) { return true; }
+        if (btnOtherValuesToo.Checked) { return true; }
+
+        foreach (var thisItem in txbAuswaehlbareWerte.Text.SplitAndCutByCr()) {
+            if (!string.IsNullOrWhiteSpace(thisItem)) { return true; }
+        }
+        return false;
     }
 
     private void OpenTabAndFocusControl(Control? control) {
@@ -899,6 +917,18 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             tabControl.SelectedTab = parentTab;
         }
         control.Focus();
+    }
+
+    /// <summary>
+    /// Baut die Items der Strategy-ComboBox anhand der aktuellen Editier-Einstellungen
+    /// per <see cref="ControlStrategy.IsAllowed" /> neu. Der aktuelle Text bleibt erhalten.
+    /// </summary>
+    private void RefillControlStrategyItems() {
+        cbxControlStrategy.ItemClear();
+
+        foreach (var thiss in ControlStrategy.AllStrategies.Instances) {
+            cbxControlStrategy.ItemAdd(ItemOf(thiss.ReadableText(), thiss.KeyName, thiss.SymbolForReadableText()));
+        }
     }
 
     private void SetLinkedCellFilter() {

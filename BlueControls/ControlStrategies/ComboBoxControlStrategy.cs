@@ -29,6 +29,13 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     #region Methods
 
+    /// <summary>
+    /// Vergrößert die Breite um den Dropdown-Knopf, damit der Zell-Text
+    /// beim Edit nicht vom Knopf überdeckt wird.
+    /// </summary>
+    public override Size CalculateRequiredSize(int minWidth, int minHeight) =>
+        new(minWidth + (_control?.btnDropDown.Width ?? 0), minHeight);
+
     public override void CreateControl() => _control = new ComboBox();
 
     public override void HandleCaptionClick() {

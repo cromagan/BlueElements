@@ -116,14 +116,15 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     #region Methods
 
     /// <summary>
-    /// Alle Strategien, die freie Text-Eingabe oder eine Auswahlliste unterstützen.
+    /// Alle Strategien, die zur Spalten-Konfiguration (Text-Eingabe und/oder
+    /// Auswahlliste) passen.
     /// </summary>
-    public static List<ListItem> GetAllowedControlStrategys() {
+    public static List<ListItem> GetAllowedControlStrategys(bool textEditable, bool mayHaveDropdownItems) {
         var l = new List<ListItem>();
 
         foreach (var thisStrategy in ControlStrategies.ControlStrategy.AllStrategies.Instances) {
-            if (thisStrategy.SupportsTextEdit || thisStrategy.SupportsSuggestions) {
-                l.Add(new ReadableListItem(thisStrategy));
+            if (thisStrategy.IsAllowed(textEditable, mayHaveDropdownItems)) {
+                l.Add(new ReadableListItem(thisStrategy, true, string.Empty));
             }
         }
         return l;
@@ -164,12 +165,12 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
         result.Add(new FlexiControlForProperty<string>(() => ColumnKey, lst));
 
-        if (Column is not { IsDisposed: false }) { return result; }
+        if (Column is not { IsDisposed: false } col) { return result; }
 
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
         result.Add(new FlexiControlForProperty<bool>(() => AutoX));
         result.Add(new FlexiControlForProperty<bool>(() => AutoNext));
-        result.Add(new FlexiControlForProperty<string>(() => ControlStrategy, GetAllowedControlStrategys()));
+        result.Add(new FlexiControlForProperty<string>(() => ControlStrategy, GetAllowedControlStrategys(col.EditableWithTextInput, col.MayHaveDropDown())));
 
         return result;
     }
