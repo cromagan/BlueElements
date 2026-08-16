@@ -1656,7 +1656,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
-        return CellCollection.IsCellEditable(fc, null, chunkValue);
+        return IsCellEditable(fc, null, chunkValue, true);
     }
 
     public bool IsRowScriptPossible() {

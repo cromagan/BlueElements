@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
@@ -448,7 +449,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             var flx = new FlexiControl {
                 Caption = name + ":",
                 CaptionPosition = CaptionPosition.Links_neben_dem_Feld,
-                EditType = EditTypeFormula.Textfeld,
+                ControlStrategy = TextBoxControlStrategy.ClassId,
                 Tag = name
             };
 

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueTable.Enums;
 using System;
 using System.Diagnostics;
@@ -38,7 +39,7 @@ namespace BluePaint
             // 
             this.flxProzent.Caption = "Skalieren auf:";
             this.flxProzent.CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-            this.flxProzent.EditType = EditTypeFormula.Textfeld;
+            this.flxProzent.ControlStrategy = TextBoxControlStrategy.ClassId;
             this.flxProzent.Location = new Point(8, 8);
             this.flxProzent.Name = "flxProzent";
             this.flxProzent.Size = new Size(168, 32);

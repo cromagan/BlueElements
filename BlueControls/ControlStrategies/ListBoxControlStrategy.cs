@@ -5,14 +5,7 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.ControlStrategies;
 
-/// <summary>
-/// Listen-Strategie für <see cref="EditTypeFormula.Listbox" />. Zeigt eine
-/// vollwertige ListBox mit Mehrfachauswahl, Vorschlägen, Verschieben und
-/// Entfernen — eingesetzt im FlexiControl-/ConnectedFormula-Kontext und
-/// unverändert als Inline-Dropdown in der TableView
-/// (<see cref="EditTypeTable.Dropdown_Single" />).
-/// </summary>
-public class ListBoxControlStrategie : ControlStrategie {
+public class ListBoxControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -22,7 +15,11 @@ public class ListBoxControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "Listbox";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;
 
@@ -67,11 +64,15 @@ public class ListBoxControlStrategie : ControlStrategie {
         _control.ItemClear();
     }
 
+    public override string ReadableText() => "Listbox";
+
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
         _control?.RemoveClicked += ListBox_ItemRemoved;
         _control?.LostFocus += Control_LostFocus;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Pfeil_Unten_Scrollbar");
 
     public override void UnsubscribeEvents() {
         _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
@@ -116,13 +117,12 @@ public class ListBoxControlStrategie : ControlStrategie {
             }
         }
 
-        _control.AddAllowed = AddAllowed != AddType.None
-            ? AddAllowed
-            : UserEditDialogType switch {
-                EditTypeTable.Textfeld => AddType.Text,
-                EditTypeTable.Textfeld_mit_Vorschlägen => AddType.Text,
-                _ => AddType.None
-            };
+        if (AddAllowed != AddType.None) {
+            _control.AddAllowed = AddAllowed;
+        } else {
+            _control.AddAllowed = TextInputAllowed ? AddType.Text : AddType.None;
+        }
+
         _control.CustomContextMenuItems = CustomContextMenuItems;
         _control.QuickInfo = QuickInfo;
         _control.Zoom = Zoom;

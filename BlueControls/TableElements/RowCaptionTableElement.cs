@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueTable.ColumnFormats;
 
 namespace BlueControls.TableElements;
@@ -92,7 +93,7 @@ public sealed class RowCaptionTableElement : TableElement {
         var capPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
 
         tableView.BeginEdit(
-            EditTypeTable.Textfeld,
+            TextBoxControlStrategy.ClassId,
             new Rectangle(0, capPos.Y, tableView.Width, capPos.Height),
             ChapterText.ChapterPathLastName(),
             v => ApplyChapter(tableView, blockRows, v),

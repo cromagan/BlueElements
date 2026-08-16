@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueTable.Enums;
@@ -353,7 +354,7 @@ namespace BlueControls.Forms {
             // 
             this.flxAbstand.Caption = "Abstand:";
             this.flxAbstand.CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-            this.flxAbstand.EditType = EditTypeFormula.Textfeld;
+            this.flxAbstand.ControlStrategy = TextBoxControlStrategy.ClassId;
             this.flxAbstand.Location = new Point(296, 8);
             this.flxAbstand.Name = "flxAbstand";
             this.flxAbstand.QuickInfo = "Abstand zwischen zwei Einträgen";
@@ -366,7 +367,7 @@ namespace BlueControls.Forms {
             // 
             this.flxHöhe.Caption = "Höhe";
             this.flxHöhe.CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-            this.flxHöhe.EditType = EditTypeFormula.Textfeld;
+            this.flxHöhe.ControlStrategy = TextBoxControlStrategy.ClassId;
             this.flxHöhe.Location = new Point(152, 8);
             this.flxHöhe.Name = "flxHöhe";
             this.flxHöhe.QuickInfo = "Höhe des endgültigen Bildes";
@@ -379,7 +380,7 @@ namespace BlueControls.Forms {
             // 
             this.flxBreite.Caption = "Breite:";
             this.flxBreite.CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-            this.flxBreite.EditType = EditTypeFormula.Textfeld;
+            this.flxBreite.ControlStrategy = TextBoxControlStrategy.ClassId;
             this.flxBreite.Location = new Point(8, 8);
             this.flxBreite.Name = "flxBreite";
             this.flxBreite.QuickInfo = "Breite des endgültigen Bildes";

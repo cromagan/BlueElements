@@ -4,7 +4,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class ButtonColorControlStrategie : ControlStrategie {
+public class ColorButtonControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -14,7 +14,11 @@ public class ButtonColorControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "ColorButton";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 

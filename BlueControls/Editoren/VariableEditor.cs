@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using BlueControls.Editoren;
 using BlueScript.ScriptVariables;
 using BlueTable.ColumnFormats;
@@ -79,6 +80,7 @@ public partial class VariableEditor : EditorEasy {
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 is not null) {
                     thisColumn2.EditableWithTextInput = true;
+                    thisColumn2.ControlStrategy = TextBoxControlStrategy.ClassId;
                     thisColumn2.PermissionGroupsChangeCell = new([Everybody]);
                 }
             }

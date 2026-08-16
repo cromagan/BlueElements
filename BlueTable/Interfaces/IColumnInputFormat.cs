@@ -15,8 +15,10 @@ public interface IColumnInputFormat : IInputFormat {
     string DefaultRenderer { get; set; }
     TranslationType DoOpticalTranslation { get; set; }
     ReadOnlyCollection<string> DropDownItems { get; set; }
-    bool EditableWithDropdown { get; set; }
     bool EditableWithTextInput { get; set; }
+
+    string ControlStrategy { get; set; }
+
     string RendererSettings { get; set; }
     ScriptType ScriptType { get; set; }
     bool ShowValuesOfOtherCellsInDropdown { get; set; }
@@ -36,7 +38,7 @@ public static class ColumnInputFormatExtensions {
 
         t.Align = source.Align;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
-        t.EditableWithDropdown = source.EditableWithDropdown;
+        t.ControlStrategy = source.ControlStrategy;
         t.DropDownItems = source.DropDownItems;
         t.ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
         t.ScriptType = source.ScriptType;

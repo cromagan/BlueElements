@@ -4,7 +4,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class ButtonCommandControlStrategie : ControlStrategie {
+public class CommandButtonControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -14,7 +14,13 @@ public class ButtonCommandControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "CommandButton";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override bool IsCommandButton => true;
+
+    public override string KeyName => ClassId;
 
     #endregion
 

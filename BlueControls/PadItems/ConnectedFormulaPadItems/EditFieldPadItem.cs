@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using System.Windows.Forms;
 
@@ -40,7 +41,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     public bool AutoSizeableHeight {
         get {
-            if (EditType == EditTypeFormula.nur_als_Text_anzeigen) {
+            if (ControlStrategies.ControlStrategy.Cached(ControlStrategy).IsCaptionOnly) {
                 return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
@@ -92,9 +93,10 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     } = string.Empty;
 
-    public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
-
-    public EditTypeFormula EditType {
+    /// <summary>
+    /// ClassId der ControlStrategie, mit der die Zelle im Formular bearbeitet wird.
+    /// </summary>
+    public string ControlStrategy {
         get;
         set {
             if (IsDisposed) { return; }
@@ -102,8 +104,9 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
             field = value;
             OnPropertyChanged();
         }
-    } = EditTypeFormula.Textfeld;
+    } = TextBoxControlStrategy.ClassId;
 
+    public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;
@@ -112,14 +115,15 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static List<ListItem> GetAllowedEditTypes(ColumnItem? column) {
+    /// <summary>
+    /// Alle Strategien, die freie Text-Eingabe oder eine Auswahlliste unterstützen.
+    /// </summary>
+    public static List<ListItem> GetAllowedControlStrategys() {
         var l = new List<ListItem>();
-        if (column is not { IsDisposed: false }) { return l; }
-        var t = typeof(EditTypeFormula);
 
-        foreach (int z1 in Enum.GetValues(t)) {
-            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem((Enum.GetName(t, z1) ?? string.Empty).Replace('_', ' '), z1.ToString1(), null, false, true, string.Empty, string.Empty));
+        foreach (var thisStrategy in ControlStrategies.ControlStrategy.AllStrategies.Instances) {
+            if (thisStrategy.SupportsTextEdit || thisStrategy.SupportsSuggestions) {
+                l.Add(new ReadableListItem(thisStrategy));
             }
         }
         return l;
@@ -130,7 +134,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
         var con = new FlexiControlForCell {
             ColumnKey = ColumnKey,
-            EditType = EditType,
+            ControlStrategy = ControlStrategy,
             CaptionPosition = CaptionPosition,
             AutoNext = AutoNext,
         };
@@ -165,7 +169,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
         result.Add(new FlexiControlForProperty<bool>(() => AutoX));
         result.Add(new FlexiControlForProperty<bool>(() => AutoNext));
-        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, GetAllowedEditTypes(Column)));
+        result.Add(new FlexiControlForProperty<string>(() => ControlStrategy, GetAllowedControlStrategys()));
 
         return result;
     }
@@ -175,7 +179,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         List<string> result = [.. base.ParseableItems()];
 
         result.ParseableAdd("ColumnName", ColumnKey);
-        result.ParseableAdd("EditType", EditType);
+        result.ParseableAdd("EditType", ControlStrategy);
         result.ParseableAdd("Caption", CaptionPosition);
         result.ParseableAdd("AutoDistance", AutoX);
         result.ParseableAdd("AutoNext", AutoNext);
@@ -185,7 +189,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
         json.Set("columnkey", ColumnKey);
-        json.Set("edittype", (int)EditType);
+        json.Set("controlstrategy", ControlStrategy);
         json.Set("caption", (int)CaptionPosition);
         json.Set("autodistance", AutoX);
         json.Set("autonext", AutoNext);
@@ -196,7 +200,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         BeginInit();
         try {
             ColumnKey = json.GetString("columnkey", ColumnKey);
-            EditType = json.GetEnum("edittype", EditType);
+            ControlStrategy = json.GetString("controlstrategy", ControlStrategy);
             CaptionPosition = json.GetEnum("caption", CaptionPosition);
             AutoX = json.GetBool("autodistance", AutoX);
             AutoNext = json.GetBool("autonext", AutoNext);
@@ -218,7 +222,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
                 return true;
 
             case "edittype":
-                EditType = (EditTypeFormula)IntParse(value);
+                ControlStrategy = ControlStrategies.ControlStrategy.ClassIdFromLegacyControlStrategy(value);
                 return true;
 
             case "caption":
@@ -258,7 +262,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         //if (Column is null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":");
         //}
 
         if (!forPrinting) {

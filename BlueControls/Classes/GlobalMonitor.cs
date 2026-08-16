@@ -38,15 +38,12 @@ public partial class GlobalMonitor : Form {
         tb.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
         var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", DateTimeColumnFormat.Instance);
         tb.Column.GenerateAndAdd("category", "Kategorie", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Message", "Message", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("Message", "Message", TextMultilineColumnFormat.Instance);
         tb.Column.GenerateAndAdd("Indent", "Stufe", LongColumnFormat.Instance);
 
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
-                thisColumn.MultiLine = true;
-                thisColumn.EditableWithTextInput = false;
-                thisColumn.EditableWithDropdown = false;
-                thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
+                thisColumn.DisableAllEditing();
             }
         }
 

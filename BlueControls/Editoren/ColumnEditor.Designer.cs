@@ -67,8 +67,9 @@ namespace BlueControls.BlueTableDialogs {
             btnIgnoreLock = new Button();
             lbxCellEditor = new ListBox();
             btnEditableStandard = new Button();
+            cbxControlStrategy = new ComboBox();
             capUserGroupEdit = new Caption();
-            btnEditableDropdown = new Button();
+            capControlStrategy = new Caption();
             chkSaveContent = new Button();
             tabAutoKorrektur = new TabPage();
             btnCalculateMaxCellLength = new Button();
@@ -109,7 +110,7 @@ namespace BlueControls.BlueTableDialogs {
             capAllowedChars = new Caption();
             cbxLinkedTable = new ComboBox();
             capLinkedTable = new Caption();
-            BlueFrame1 = new GroupBox();
+            grpAllgemein = new GroupBox();
             capInfo = new Caption();
             capInternalName = new Caption();
             txbName = new TextBox();
@@ -148,7 +149,7 @@ namespace BlueControls.BlueTableDialogs {
             tabFilter.SuspendLayout();
             tabQuickInfo.SuspendLayout();
             tabSonstiges.SuspendLayout();
-            BlueFrame1.SuspendLayout();
+            grpAllgemein.SuspendLayout();
             tabControl.SuspendLayout();
             tabDatenFormat.SuspendLayout();
             grpStyles.SuspendLayout();
@@ -517,8 +518,9 @@ namespace BlueControls.BlueTableDialogs {
             tabBearbeitung.Controls.Add(btnIgnoreLock);
             tabBearbeitung.Controls.Add(lbxCellEditor);
             tabBearbeitung.Controls.Add(btnEditableStandard);
+            tabBearbeitung.Controls.Add(cbxControlStrategy);
             tabBearbeitung.Controls.Add(capUserGroupEdit);
-            tabBearbeitung.Controls.Add(btnEditableDropdown);
+            tabBearbeitung.Controls.Add(capControlStrategy);
             tabBearbeitung.Location = new Point(4, 25);
             tabBearbeitung.Name = "tabBearbeitung";
             tabBearbeitung.Padding = new Padding(3);
@@ -599,6 +601,15 @@ namespace BlueControls.BlueTableDialogs {
             btnEditableStandard.TabIndex = 4;
             btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Im Regelfall als Text-Eingabe";
             // 
+            // cbxControlStrategy
+            // 
+            cbxControlStrategy.DropDownStyle = DropDownMode.DropDownList;
+            cbxControlStrategy.Location = new Point(8, 40);
+            cbxControlStrategy.Name = "cbxControlStrategy";
+            cbxControlStrategy.RegexCheck = null;
+            cbxControlStrategy.Size = new Size(544, 24);
+            cbxControlStrategy.TabIndex = 4;
+            // 
             // capUserGroupEdit
             // 
             capUserGroupEdit.CausesValidation = false;
@@ -607,14 +618,13 @@ namespace BlueControls.BlueTableDialogs {
             capUserGroupEdit.Size = new Size(328, 32);
             capUserGroupEdit.Text = "<b>Folgende Benutzergruppen dürfen den Inhalt der Zellen bearbeiten:";
             // 
-            // btnEditableDropdown
+            // capControlStrategy
             // 
-            btnEditableDropdown.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnEditableDropdown.Location = new Point(8, 56);
-            btnEditableDropdown.Name = "btnEditableDropdown";
-            btnEditableDropdown.Size = new Size(544, 16);
-            btnEditableDropdown.TabIndex = 5;
-            btnEditableDropdown.Text = "Benutzer-Bearbeitung mit <b>Auswahl-Menü (Dropdown-Menü)</b> erlauben";
+            capControlStrategy.CausesValidation = false;
+            capControlStrategy.Location = new Point(8, 16);
+            capControlStrategy.Name = "capControlStrategy";
+            capControlStrategy.Size = new Size(216, 16);
+            capControlStrategy.Text = "Bearbeitungs-Methode:";
             // 
             // chkSaveContent
             // 
@@ -1019,22 +1029,22 @@ namespace BlueControls.BlueTableDialogs {
             capLinkedTable.Size = new Size(152, 16);
             capLinkedTable.Text = "Vernküpfte Tabelle:";
             // 
-            // BlueFrame1
+            // grpAllgemein
             // 
-            BlueFrame1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            BlueFrame1.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
-            BlueFrame1.CausesValidation = false;
-            BlueFrame1.Controls.Add(capInfo);
-            BlueFrame1.Controls.Add(capInternalName);
-            BlueFrame1.Controls.Add(txbName);
-            BlueFrame1.Controls.Add(capCaption);
-            BlueFrame1.Controls.Add(txbCaption);
-            BlueFrame1.Location = new Point(8, 24);
-            BlueFrame1.Name = "BlueFrame1";
-            BlueFrame1.Size = new Size(1102, 104);
-            BlueFrame1.TabIndex = 16;
-            BlueFrame1.TabStop = false;
-            BlueFrame1.Text = "Allgemein";
+            grpAllgemein.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpAllgemein.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            grpAllgemein.CausesValidation = false;
+            grpAllgemein.Controls.Add(capInfo);
+            grpAllgemein.Controls.Add(capInternalName);
+            grpAllgemein.Controls.Add(txbName);
+            grpAllgemein.Controls.Add(capCaption);
+            grpAllgemein.Controls.Add(txbCaption);
+            grpAllgemein.Location = new Point(8, 24);
+            grpAllgemein.Name = "grpAllgemein";
+            grpAllgemein.Size = new Size(1102, 104);
+            grpAllgemein.TabIndex = 16;
+            grpAllgemein.TabStop = false;
+            grpAllgemein.Text = "Allgemein";
             // 
             // capInfo
             // 
@@ -1394,7 +1404,7 @@ namespace BlueControls.BlueTableDialogs {
             Controls.Add(butAktuellVor);
             Controls.Add(butAktuellZurueck);
             Controls.Add(tabControl);
-            Controls.Add(BlueFrame1);
+            Controls.Add(grpAllgemein);
             Controls.Add(btnOk);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             Name = "ColumnEditor";
@@ -1406,7 +1416,7 @@ namespace BlueControls.BlueTableDialogs {
             tabFilter.ResumeLayout(false);
             tabQuickInfo.ResumeLayout(false);
             tabSonstiges.ResumeLayout(false);
-            BlueFrame1.ResumeLayout(false);
+            grpAllgemein.ResumeLayout(false);
             tabControl.ResumeLayout(false);
             tabDatenFormat.ResumeLayout(false);
             grpStyles.ResumeLayout(false);
@@ -1432,9 +1442,10 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnBackColor;
         private Caption capCaption;
         private TextBox txbCaption;
-        private GroupBox BlueFrame1;
-        private Button btnEditableDropdown;
+        private GroupBox grpAllgemein;
         private Button btnEditableStandard;
+        private ComboBox cbxControlStrategy;
+        private Caption capControlStrategy;
         private TextBox txbAuswaehlbareWerte;
         private TextBox txbMinTextLength;
         private Caption capMinTextLength;

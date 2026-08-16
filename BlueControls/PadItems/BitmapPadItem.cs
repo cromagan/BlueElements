@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
 using static BlueBasics.ClassesStatic.IO;
@@ -167,7 +168,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
             platzhalterFlex.QuickInfo = icpi.GetExportVariablesInfo(platzhalterFlex.QuickInfo, bitmapVars.Count);
 
             if (bitmapVars.Count > 0) {
-                platzhalterFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+                platzhalterFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
                 platzhalterFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
                 platzhalterFlex.ListItems = [.. bitmapVars.Select(v => ItemOf($"~{v.KeyName}~"))];
             }

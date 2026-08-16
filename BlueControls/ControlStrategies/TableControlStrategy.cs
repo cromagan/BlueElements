@@ -8,13 +8,13 @@ namespace BlueControls.ControlStrategies;
 
 /// <summary>
 /// Strategy, die eine <see cref="TableView" /> mit bearbeitbaren CSV-Daten anzeigt.
-/// <see cref="ControlStrategie.StrategyParameter" /> enthält die Spaltennamen,
+/// <see cref="ControlStrategy.StrategyParameter" /> enthält die Spaltennamen,
 /// getrennt mit ";" (z. B. "Spalte1;Spalte2;Spalte3"). Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
-/// Bei <see cref="ControlStrategie.AutoSort" /> == false werden Zeilennummern
+/// Bei <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern
 /// über die Systemspalte SYS_ROWSORTINDEX eingeblendet.
 /// </summary>
-public class TableControlStrategie : ControlStrategie {
+public class TableControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -29,7 +29,11 @@ public class TableControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "Table";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 

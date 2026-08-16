@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 
@@ -18,7 +19,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
     public FlexiControlForRowSelector(Table? table, string caption, string showFormat) : base(false, false, false) {
         InitializeComponent();
         f.CaptionPosition = CaptionPosition.Über_dem_Feld;
-        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        f.ControlStrategy = ComboBoxControlStrategy.ClassId;
 
         f.Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
@@ -33,7 +34,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
     #region Properties
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
-    public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
+    public string ControlStrategy { get => f.ControlStrategy; internal set => f.ControlStrategy = value; }
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Classes;
 using BlueScript.ScriptVariables;
@@ -16,11 +17,6 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     #region Fields
 
     private FlexiControlForDelegate? _button;
-
-    /// <summary>
-    /// Variablen zum Zeitpunkt des letzten Fehlers.
-    /// </summary>
-    private List<ScriptVariable>? _lastSavedVariables;
 
     #endregion
 
@@ -104,11 +100,11 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     /// Variablen zum Zeitpunkt des letzten Fehlers.
     /// </summary>
     public List<ScriptVariable>? LastSavedVariables {
-        get => _lastSavedVariables;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (value == _lastSavedVariables) { return; }
-            _lastSavedVariables = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -217,7 +213,7 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
         var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false } inTable) {
             var entityFlex = new FlexiControlForProperty<string>(() => EntityID);
-            entityFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+            entityFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
             entityFlex.ListItems = [.. inTable.Column.Where(c => !c.IsDisposed).Select(c => ItemOf($"~{c.KeyName}~"))];
             entityFlex.Height = 24;
             entityFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
@@ -353,7 +349,7 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
         //if (Column is null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        //DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        //DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":");
         //}
 
         if (!forPrinting) {

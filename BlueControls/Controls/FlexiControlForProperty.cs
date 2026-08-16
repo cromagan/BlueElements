@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Windows.Forms;
@@ -70,7 +71,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         GenFehlerText();
 
         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-        EditType = EditTypeFormula.Textfeld;
+        ControlStrategy = TextBoxControlStrategy.ClassId;
         Size = new Size(200, 24);
 
         CheckBehavior = checkBehavior;
@@ -89,13 +90,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         #endregion
 
-        UserEditDialogType = default;
-
         #region Art des Steuerelements bestimmen
 
         switch (_accessor) {
             case Accessor<bool>: {
-                    EditType = EditTypeFormula.Ja_Nein_Knopf;
+                    ControlStrategy = YesNoButtonControlStrategy.ClassId;
                     var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
                     Size = new Size(s1.Width + 30, 22);
                     break;
@@ -104,7 +103,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             case Accessor<List<string>>:
             case Accessor<ReadOnlyCollection<string>>: {
                     CaptionPosition = CaptionPosition.Über_dem_Feld;
-                    EditType = EditTypeFormula.Listbox;
+                    ControlStrategy = ListBoxControlStrategy.ClassId;
                     Size = new Size(200, 16 + (24 * rowCount));
                     RaiseChangeDelay = 1;
                     TextInputAllowed = false;
@@ -114,7 +113,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
                     if (allPossibleItems is not null) {
-                        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+                        ControlStrategy = ComboBoxControlStrategy.ClassId;
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
                         var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_TextBox);
@@ -125,16 +124,16 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         RaiseChangeDelay = 1;
                         TextInputAllowed = false;
                     } else if (_accessor.Get() is IEditable) {
-                        EditType = EditTypeFormula.Button;
+                        ControlStrategy = CommandButtonControlStrategy.ClassId;
                         ImageCode = "Stift|16";
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
                         Caption = "bearbeiten";
                     } else if (_accessor.Get() is null) {
                         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-                        EditType = EditTypeFormula.nur_als_Text_anzeigen;
+                        ControlStrategy = TextControlStrategy.ClassId;
                     } else {
-                        EditType = EditTypeFormula.Textfeld;
+                        ControlStrategy = TextBoxControlStrategy.ClassId;
                         if (rowCount >= 2) {
                             CaptionPosition = CaptionPosition.Über_dem_Feld;
                             Size = new Size(200, 16 + (24 * rowCount));
@@ -189,7 +188,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         GenFehlerText();
 
         CheckEnabledState();
-
     }
 
     #endregion
@@ -338,13 +336,16 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     switch (_accessor.Get()) {
                         case null:
                             break;
+
                         case IEditable:
                             break;
+
                         case Enum:
                             var ef = IntParse(Value);
                             var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                             if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                             break;
+
                         default:
                             Develop.DebugError("Art unbekannt!");
                             break;

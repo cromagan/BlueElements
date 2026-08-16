@@ -138,86 +138,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     }
 
     /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// </summary>
-    public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
-        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
-
-        if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
-
-        var oldChunk = newChunkValue;
-
-        if (!column.EditableWithTextInput && !column.EditableWithDropdown && !tb.PowerEdit) {
-            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
-        }
-
-        if (ColumnItem.UserEditDialogTypeInTable(column, false, true) == EditTypeTable.None) {
-            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für die Spalte definiert.";
-        }
-
-        if (row is null) {
-            if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
-                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
-            }
-
-            if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null, true)) {
-                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
-            }
-
-            if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue is not null) {
-                if (cvc != tb.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
-            }
-        } else {
-            if (!tb.PowerEdit && tb.Column.SysLocked is not null) {
-                if (column != tb.Column.SysLocked && row.CellGetBoolean(tb.Column.SysLocked) && !column.EditAllowedDespiteLock) {
-                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
-                }
-            }
-            oldChunk = row.ChunkValue;
-        }
-
-        if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
-        }
-
-        var f = tb.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return $"Tabellensperre: {f}"; }
-
-        if (column.RelationType == RelationType.CellValues) {
-            if (row is null) { return "Verlinkungs-Fehler"; }
-
-            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
-
-            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
-
-            if (lcolumn?.Table is not { IsDisposed: false } tb2) { return "Verknüpfte Tabelle verworfen."; }
-
-            tb2.PowerEdit = tb.PowerEdit;
-
-            if (lrow is not null) {
-                var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
-                return !string.IsNullOrEmpty(tmp) ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp : string.Empty;
-            }
-
-            if (canrepair) { return string.Empty; }
-
-            return "Allgemeiner Fehler.";
-        }
-
-        if (row is null && tb.Column.ChunkValueColumn == tb.Column.First && newChunkValue is null) {
-            // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
-            // Wir wissen nicht, was das Ziel ist.
-            return string.Empty;
-        }
-
-        if (oldChunk != newChunkValue) {
-            if (tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk) is { Length: > 0 } aadc) { return aadc; }
-        }
-
-        return tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-    }
-
-    /// <summary>
     /// Erstellt den String-Key für Serialisierung und Undo.
     /// </summary>
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
@@ -430,8 +350,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
@@ -443,6 +361,8 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         Table = null;
         _internal.Clear();
     }
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

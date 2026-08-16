@@ -27,8 +27,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Events
 
-    public event EventHandler? Disposed;
-
     public event EventHandler<ColumnEventArgs>? ColumnAdded;
 
     public event EventHandler<ColumnEventArgs>? ColumnDisposed;
@@ -38,6 +36,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public event EventHandler? ColumnRemoved;
 
     public event EventHandler<ColumnEventArgs>? ColumnRemoving;
+
+    public event EventHandler? Disposed;
 
     public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
@@ -133,11 +133,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public void DisableAllEditing() {
         if (Table is not { IsDisposed: false } tb) { return; }
         foreach (var thisColumn in tb.Column) {
-            thisColumn.EditableWithTextInput = false;
-            thisColumn.EditableWithDropdown = false;
-            thisColumn.EditAllowedDespiteLock = false;
-            thisColumn.ShowValuesOfOtherCellsInDropdown = false;
-            thisColumn.DropDownItems = new List<string>().AsReadOnly();
+            thisColumn.DisableAllEditing();
         }
     }
 
@@ -243,6 +239,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public IEnumerator<ColumnItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
+            return this[key];
+        }
+        return null;
+    }
+
     public void GetSystems() {
         SysCellNote = null;
         SysLocked = null;
@@ -320,8 +323,35 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
+    public void OnPropertyChangedExt(string relativePath, object? value) {
+        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
+        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
+    }
+
+    public JsonObject ParseableJson() {
+        var json = new JsonObject();
+        json.SetArrayIfNotEmpty("columns", _internal.Values.Cast<IJsonStringable>());
+        return json;
+    }
+
+    public void ParseFinishedJson(JsonObject parsed) { }
+
+    public void ParseJson(JsonObject json) {
+        // Spalten werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
+        // Hier nur die Eigenschaften aktualisieren, falls Spalten bereits existieren.
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (json["columns"] is not JsonArray cols) { return; }
+
+        foreach (var item in cols) {
+            if (item is not JsonObject jo) { continue; }
+            var key = jo.GetString("key", string.Empty);
+            if (key is not { Length: > 0 }) { continue; }
+            if (this[key] is { } c) { c.ParseJson(jo); }
+        }
+    }
+
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
-                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment));
+                                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment));
 
     public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -484,10 +514,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
-
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
@@ -551,6 +577,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ColumnAdded?.Invoke(this, e);
     }
 
+    private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
+
     private void OnColumnPropertyChanged(object? sender, System.EventArgs e) {
         if (sender is ColumnItem ci) { ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs(ci)); }
     }
@@ -569,39 +597,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ColumnRemoving?.Invoke(this, e);
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
-            return this[key];
-        }
-        return null;
-    }
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.SetArrayIfNotEmpty("columns", _internal.Values.Cast<IJsonStringable>());
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        // Spalten werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
-        // Hier nur die Eigenschaften aktualisieren, falls Spalten bereits existieren.
-        if (Table is not { IsDisposed: false } tb) { return; }
-        if (json["columns"] is not JsonArray cols) { return; }
-
-        foreach (var item in cols) {
-            if (item is not JsonObject jo) { continue; }
-            var key = jo.GetString("key", string.Empty);
-            if (key is not { Length: > 0 }) { continue; }
-            if (this[key] is { } c) { c.ParseJson(jo); }
-        }
-    }
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

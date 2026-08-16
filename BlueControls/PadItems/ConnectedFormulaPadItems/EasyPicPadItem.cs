@@ -134,7 +134,7 @@ public class EasyPicPadItem : ReciverPadItem, IItemToControl, IAutosizable {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "Bilddatei");
 
         base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);

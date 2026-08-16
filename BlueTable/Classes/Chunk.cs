@@ -247,6 +247,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.FilterOptions, ((int)c.FilterOptions).ToString1(), name);
         SaveToByteList(bytes, TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
         SaveToByteList(bytes, TableDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ControlStrategy, c.ControlStrategy, name);
         SaveToByteList(bytes, TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
@@ -258,7 +259,6 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.BackgroundStyle, ((long)c.BackgroundStyle).ToString1(), name);
         SaveToByteList(bytes, TableDataType.RelationType, ((int)c.RelationType).ToString1(), name);
         SaveToByteList(bytes, TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString1(), name);
-        SaveToByteList(bytes, TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.DropDownItems, string.Join('\r', c.DropDownItems), name);
         SaveToByteList(bytes, TableDataType.LinkedCellFilter, string.Join('\r', c.LinkedCellFilter), name);
         SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, string.Join('\r', c.AfterEditAutoReplace), name);
@@ -302,19 +302,6 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        if (disposing) {
-            LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
-
-            OnDisposed();
-            Disposed = null;
-
-            Invalidate();
-        }
     }
 
     /// <summary>
@@ -399,6 +386,19 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
 
     public override string ToString() => KeyName;
+
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            LiveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
+
+            OnDisposed();
+            Disposed = null;
+
+            Invalidate();
+        }
+    }
 
     /// <summary>
     /// Disposed die Instanz und trägt sie aus dem <see cref="LiveInstances"/>-Register aus.

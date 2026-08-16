@@ -4,7 +4,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class ButtonYesNoControlStrategie : ControlStrategie {
+public class YesNoButtonControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -14,7 +14,11 @@ public class ButtonYesNoControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "YesNoButton";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 

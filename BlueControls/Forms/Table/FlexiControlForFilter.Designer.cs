@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;
-using BlueTable.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -20,7 +20,6 @@ namespace BlueControls.Controls{
             // f
             // 
             this.f.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.f.EditType = EditTypeFormula.Line;
             this.f.Location = new System.Drawing.Point(0, 0);
             this.f.Name = "f";
             this.f.Size = new System.Drawing.Size(150, 150);

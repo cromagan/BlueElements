@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.Editoren;
 using BlueControls.Renderer;
 using BlueTable.ColumnFormats;
@@ -44,6 +45,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         foreach (var thisr in Renderer.Renderer.AllRenderers.Instances) {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
+        }
+
+        foreach (var thiss in ControlStrategy.AllStrategies.Instances) {
+            cbxControlStrategy.ItemAdd(ItemOf(thiss.ReadableText(), thiss.KeyName, thiss.SymbolForReadableText()));
         }
 
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
@@ -428,8 +433,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkFilterOnlyOr.Checked = c.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
         chkFilterOnlyAND.Checked = c.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
         btnZeilenFilterIgnorieren.Checked = c.IgnoreAtRowFilter;
+        cbxControlStrategy.Text = c.ControlStrategy;
         btnEditableStandard.Checked = c.EditableWithTextInput;
-        btnEditableDropdown.Checked = c.EditableWithDropdown;
         txbMinTextLength.Text = c.MinTextLength.ToString1();
         btnAutoEditAutoSort.Checked = c.AfterEditQuickSortRemoveDouble;
         txbRunden.Text = c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty;
@@ -524,8 +529,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.CaptionBitmapCode = txbSpaltenbild.Text;
         c.ColumnTags = txbTags.Text;
         c.RegexCheck = txbRegex.Text;
+        c.ControlStrategy = cbxControlStrategy.Text;
         c.EditableWithTextInput = btnEditableStandard.Checked;
-        c.EditableWithDropdown = btnEditableDropdown.Checked;
         c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
@@ -686,15 +691,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler is DropdownNotSelectedAddAll
                    or DropdownNotSelectedItems) {
-            solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => btnEditableDropdown.Checked = true, btnEditableDropdown));
+            solutions.Add(CreateSolution("Textfeld mit Vorschlägen wählen", () => cbxControlStrategy.Text = TextBoxSuggestionsControlStrategy.ClassId, cbxControlStrategy));
+            solutions.Add(CreateSolution("Listbox wählen", () => cbxControlStrategy.Text = ListBoxControlStrategy.ClassId, cbxControlStrategy));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
                 txbMinTextLength.Text = "0";
                 txbAuswaehlbareWerte.Text = string.Empty;
             }, txbAuswaehlbareWerte));
-            if (fehler == DropdownNotSelectedItems) {
-                solutions.Add(CreateSolution("Als Vorschläge verwenden (Texteingabe aktivieren)", () => btnEditableStandard.Checked = true, btnEditableStandard));
-            }
         }
 
         if (fehler == RemoveEditPermissions) {
@@ -786,8 +789,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
+            b.ControlStrategy = ComboBoxControlStrategy.ClassId;
             b.MinTextLength = 1;
-            b.EditableWithDropdown = true;
 
             var dd = b.DropDownItems.Clone();
             var or = new List<string>();

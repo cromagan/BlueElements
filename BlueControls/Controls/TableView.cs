@@ -45,15 +45,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private readonly HashSet<string> _collapsedBlockFirstRowKeys = [];
 
     /// <summary>
-    /// Lazy Cache der Inline-Edit-Strategien nach EditTypeTable. Wird beim Dispose der TableView mit freigegeben.
+    /// Lazy Cache der Inline-Edit-Strategien nach ClassId. Wird beim Dispose der TableView mit freigegeben.
     /// </summary>
-    private readonly ConcurrentCache<EditTypeTable, ControlStrategie> _editStrategyCache = new(16);
+    private readonly ConcurrentCache<string, ControlStrategy> _controlStrategyCache = new(16);
 
     private readonly object _lockUserAction = new();
+
+    private readonly Dictionary<RowItem, RowTableElement> _rowLookup = [];
+
     private string _arrangement = string.Empty;
+
     private AutoFilter? _autoFilter;
+
     private List<RowTableElement> _cachedRowViewItems = [];
+
     private bool _consumeNextMouseDown;
+
     private int _dragInsertIndex = -1;
 
     /// <summary>
@@ -84,20 +91,31 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private bool _isDragging;
 
     private bool _isinDoubleClick;
+
     private bool _isinKeyDown;
+
     private bool _isinMouseDown;
+
     private bool _isinMouseMove;
+
     private bool _isinSizeChanged;
 
     private bool _mustDoAllViewItems = true;
+
     private string _newRowsAllowed = string.Empty;
+
     private bool _pendingRowAddedRebuild;
+
     private bool _pendingSmoothScroll;
-    private readonly Dictionary<RowItem, RowTableElement> _rowLookup = [];
+
     private List<RowItem> _rowsVisibleUnique = new([]);
+
     private RowSortDefinition? _sortDefinitionTemporary;
+
     private List<TableElement> _sortedViewItems = [];
+
     private JsonObject? _storedView;
+
     private System.DateTime? _tableDrawError;
 
     #endregion
@@ -413,10 +431,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// <summary>
     /// Aktive Inline-Edit-Strategie (Control sichtbar und nicht disposet), sonst null.
     /// </summary>
-    private ControlStrategie? ActiveEditStrategy {
+    private ControlStrategy? ActiveControlStrategy {
         get {
-            if (_editStrategyCache.IsDisposed) { return null; }
-            foreach (var strategy in _editStrategyCache.Values) {
+            if (_controlStrategyCache.IsDisposed) { return null; }
+            foreach (var strategy in _controlStrategyCache.Values) {
                 if (strategy.Control is Control c
                     && c.Visible
                     && !c.IsDisposed) {
@@ -681,6 +699,82 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsvScriptCommand x = new(table, csvtxt);
         x.ShowDialog();
+    }
+
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// </summary>
+    public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
+        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
+
+        if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
+
+        var oldChunk = newChunkValue;
+
+        if (ControlStrategy.Cached(column.ControlStrategy) is NoneControlStrategy && !tb.PowerEdit) {
+            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
+        }
+
+        if (row is null) {
+            if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
+                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
+            }
+
+            if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null, true)) {
+                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
+            }
+
+            if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue is not null) {
+                if (cvc != tb.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
+            }
+        } else {
+            if (!tb.PowerEdit && tb.Column.SysLocked is not null) {
+                if (column != tb.Column.SysLocked && row.CellGetBoolean(tb.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
+                }
+            }
+            oldChunk = row.ChunkValue;
+        }
+
+        if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
+            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
+        }
+
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return $"Tabellensperre: {f}"; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            if (row is null) { return "Verlinkungs-Fehler"; }
+
+            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
+
+            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
+
+            if (lcolumn?.Table is not { IsDisposed: false } tb2) { return "Verknüpfte Tabelle verworfen."; }
+
+            tb2.PowerEdit = tb.PowerEdit;
+
+            if (lrow is not null) {
+                var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
+                return !string.IsNullOrEmpty(tmp) ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp : string.Empty;
+            }
+
+            if (canrepair) { return string.Empty; }
+
+            return "Allgemeiner Fehler.";
+        }
+
+        if (row is null && tb.Column.ChunkValueColumn == tb.Column.First && newChunkValue is null) {
+            // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
+            // Wir wissen nicht, was das Ziel ist.
+            return string.Empty;
+        }
+
+        if (oldChunk != newChunkValue) {
+            if (tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk) is { Length: > 0 } aadc) { return aadc; }
+        }
+
+        return tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
     }
 
     public static List<string> Permission_AllUsed(bool mitRowCreator) {
@@ -1134,7 +1228,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             #region Zelle
 
             if (column is not null && row is not null) {
-                var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, row, row.ChunkValue));
+                var editable = string.IsNullOrEmpty(TableView.IsCellEditable(column, row, row.ChunkValue));
 
                 contextMenu.Add(ItemOf("Zelle", true));
 
@@ -1276,7 +1370,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
-        if (CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
+        if (IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
 
         // Chunk-Ladevorgang kann Invalidate_CurrentArrangement auslösen, danach ColumnViewItem neu auflösen.
         if (cellInThisTableColumn?.Column is { IsDisposed: false } col) {
@@ -1693,7 +1787,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Universeller Einstieg für alle Inline-Edits: wählt die Strategie, konfiguriert das Control und aktiviert es.
     /// </summary>
     internal void BeginEdit(
-        EditTypeTable editType,
+        string editStrategyKey,
         Rectangle bounds,
         string value,
         Action<string> commit,
@@ -1709,7 +1803,18 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         try {
             HideAllEditControls();
 
-            var strategy = GetOrCreateEditStrategy(editType);
+            var strategy = GetOrCreateControlStrategy(editStrategyKey);
+
+            if (strategy is NoneControlStrategy) {
+                NotEditableInfo("Diese Spalte kann nicht bearbeitet werden.");
+                return;
+            }
+
+            if (strategy is DragDropControlStrategy) {
+                NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
+                return;
+            }
+
             if (strategy.Control is not Control c) { return; }
 
             // Vorschläge ermitteln, falls keine Items übergeben wurden.
@@ -1718,36 +1823,28 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 items = CollectEditItems(contentColumn, styleSource as ColumnItem, contentRow, cellInfo);
             }
 
-            // Dropdown ohne Items: auf Textfeld zurückfallen oder abbrechen. "Erweiterte Eingabe" bei Text-Erlaubnis.
-            if (editType == EditTypeTable.Dropdown_Single) {
-                if (contentColumn is not { IsDisposed: false } contentHolderCellColumn) { return; }
-
-                if (items is not { Count: > 0 }) {
-                    if (contentHolderCellColumn.EditableWithTextInput) {
-                        BeginEdit(EditTypeTable.Textfeld, bounds, value, commit, styleSource, contentColumn, contentRow, listItems, cellInfo);
-                        return;
-                    }
-                    NotEditableInfo("Keine Items zum Auswählen vorhanden.");
-                    return;
-                }
-
-                if (contentHolderCellColumn.EditableWithTextInput) {
-                    items.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
-                    items.Add(SeparatorWith(FirstSortChar + "2"));
-                }
+            // Auswahl-Strategie ohne Items und ohne Text-Fähigkeit: auf Textfeld zurückfallen.
+            if (strategy.SupportsSuggestions && items is not { Count: > 0 } && !strategy.SupportsTextEdit) {
+                strategy = GetOrCreateControlStrategy(TextBoxControlStrategy.ClassId);
+                if (strategy.Control is not Control fallbackControl) { return; }
+                c = fallbackControl;
             }
+
+            // Nur echte Dropdowns committen über ValueChanged, alle anderen über den Callback.
+            var isDropdown = strategy is ListBoxControlStrategy or FramedListBoxControlStrategie;
 
             // Style, MultiLine und QuickInfo aus der Style-Quelle ableiten.
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
+
             strategy.Zoom = Zoom;
             strategy.QuickInfo = (styleSource as IReadableTextWithKey)?.QuickInfo ?? string.Empty;
             strategy.ParentHeight = bounds.Height;
             if (items is { Count: > 0 }) { strategy.ListItems = items; }
 
             // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
-            if (editType == EditTypeTable.Dropdown_Single) {
+            if (strategy.SupportsSuggestions && contentColumn.MayHaveDropDown()) {
                 strategy.CheckBehavior = CheckBehavior.MultiSelection;
                 strategy.AutoSort = true;
             }
@@ -1768,7 +1865,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.SetValueToControl(value);
 
             // Dropdown committet über ValueChanged; alle anderen über den Callback.
-            if (editType == EditTypeTable.Dropdown_Single) {
+            if (isDropdown) {
                 _dropdownCellInfo = cellInfo;
                 _editCommit = null;
             } else {
@@ -1965,7 +2062,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                 HideAllEditControls();
                 _editCommit = null;
-                _editStrategyCache.Dispose();
+                _controlStrategyCache.Dispose();
 
                 Table = null; // Wichtig um Events zu lösen
             }
@@ -2237,7 +2334,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                         && dragRli.Row is { IsDisposed: false } dragRow
                         && !PinnedRows.Contains(dragRow)
                         && Table.Column.SysRowSortIndex is { IsDisposed: false }
-                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
+                        && string.IsNullOrEmpty(TableView.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
                         _dragItem = dragRow;
                     } else if (_mouseOverRow is RowCaptionTableElement dragRcli
                                && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
@@ -2456,7 +2553,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     protected override void WndProc(ref Message m) {
         const int WM_MOUSEWHEEL = 0x020A;
-        if (m.Msg == WM_MOUSEWHEEL && ActiveEditStrategy is not null) {
+        if (m.Msg == WM_MOUSEWHEEL && ActiveControlStrategy is not null) {
             return;
         }
         base.WndProc(ref m);
@@ -2551,15 +2648,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Erzeugt die Strategie zum übergebenen Edit-Typ.
+    /// Erzeugt die Strategie zum übergebenen Strategy-Key (ClassId).
     /// </summary>
-    private static ControlStrategie CreateEditStrategy(EditTypeTable editType) => editType switch {
-        EditTypeTable.Textfeld => new TextBoxControlStrategie(),
-        EditTypeTable.Textfeld_mit_Auswahlknopf => new ComboBoxControlStrategie(),
-        EditTypeTable.Textfeld_mit_Vorschlägen => new FlexiTextBoxSuggestions(),
-        EditTypeTable.Dropdown_Single => new FramedListBoxControlStrategie(),
-        _ => throw new ArgumentOutOfRangeException(nameof(editType), editType, "Nicht unterstützter Edit-Typ für Inline-Edit.")
-    };
+    private static ControlStrategy CreateControlStrategy(string editStrategyKey) => ControlStrategy.CreateNew(editStrategyKey);
 
     private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
         var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
@@ -4083,7 +4174,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Schließt das aktive Edit und committet den Wert über _editCommit. Ohne aktives Edit nur EndEdit.
     /// </summary>
     private void Edit_Close() {
-        if (IsDisposed || ActiveEditStrategy is not { } strategy) { return; }
+        if (IsDisposed || ActiveControlStrategy is not { } strategy) { return; }
 
         if (Table is not { IsDisposed: false } || _editCommit is not { } commit) {
             EndEdit();
@@ -4097,7 +4188,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Edit_EnterKey(object? sender, System.EventArgs e) {
-        if (sender is ControlStrategie { MultiLine: true }) { return; }
+        if (sender is ControlStrategy { MultiLine: true }) { return; }
         CloseAllComponents();
     }
 
@@ -4114,7 +4205,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
 
-        if (ActiveEditStrategy?.Control is { } activeControl) {
+        if (ActiveControlStrategy?.Control is { } activeControl) {
             if (FloatingForm.IsShowing(activeControl)) { return; }
 
             // Noch sichtbares Control: Fokusverlust durch Tabellenklick → nächsten MouseDown konsumieren.
@@ -4129,22 +4220,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void Edit_TabKey(object? sender, System.EventArgs e) => CloseAllComponents();
 
     /// <summary>
-    /// Wertänderung der aktiven Edit-Strategie. Nur bei Dropdown aktiv: übernimmt die gehakte Menge als Zellwert; "#Erweitert" öffnet den Text-Editor.
+    /// Wertänderung der aktiven Edit-Strategie. Nur bei Dropdown aktiv: übernimmt die gehakte Menge als Zellwert.
     /// </summary>
     private void Edit_ValueChanged(object? sender, TextEventArgs e) {
         if (_dropdownCellInfo is not { } cell) { return; }
 
         var values = e.Text.SplitAndCutByCr().ToList();
-
-        // "#Erweitert": Dropdown durch Text-Editor ersetzen (BeginEdit schließt das Dropdown selbstständig).
-        if (values.Contains("#Erweitert")) {
-            if (cell.RowData is { } rd) {
-                _ = rd.BeginCellEdit(this, cell.ColumnView, rd, rd.Row, false, rd.Row.ChunkValue ?? FilterCombined.ChunkVal);
-            } else {
-                EndEdit();
-            }
-            return;
-        }
 
         if (CurrentArrangement is not { IsDisposed: false }) { return; }
         if (cell.ColumnView?.Column is not { IsDisposed: false }) { return; }
@@ -4251,7 +4332,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         foreach (var br in rows) {
             if (br is { IsDisposed: false }
                 && !PinnedRows.Contains(br)
-                && string.IsNullOrEmpty(CellCollection.IsCellEditable(sortCol, br, br.ChunkValue))) {
+                && string.IsNullOrEmpty(TableView.IsCellEditable(sortCol, br, br.ChunkValue))) {
                 result.Add(br);
             }
         }
@@ -4332,8 +4413,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// <summary>
     /// Holt eine gecachte Strategie oder erzeugt sie. Verdrahtet die Event-Handler beim erstmaligen Anlegen.
     /// </summary>
-    private ControlStrategie GetOrCreateEditStrategy(EditTypeTable editType) {
-        var strategy = _editStrategyCache.GetOrAdd(editType, CreateEditStrategy);
+    private ControlStrategy GetOrCreateControlStrategy(string editStrategyKey) {
+        var strategy = _controlStrategyCache.GetOrAdd(editStrategyKey, CreateControlStrategy);
 
         if (strategy.Control is null) {
             strategy.CreateControl();
@@ -4352,7 +4433,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return strategy;
     }
 
-    /// <summary>
     /// <summary>
     /// Liefert das RowListItem für eine Row. Bei gesetztem chapter die exakte Kombination, sonst das erste gefundene.
     /// </summary>
@@ -4373,10 +4453,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Macht alle Inline-Edit-Controls unsichtbar.
     /// </summary>
     private void HideAllEditControls() {
-        if (_editStrategyCache.IsDisposed) { return; }
+        if (_controlStrategyCache.IsDisposed) { return; }
         // Dropdown-Kontext verwerfen.
         _dropdownCellInfo = null;
-        foreach (var strategy in _editStrategyCache.Values) {
+        foreach (var strategy in _controlStrategyCache.Values) {
             if (strategy.Control is Control c
                 && !c.IsDisposed
                 && c.Visible) {
@@ -4612,7 +4692,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// <summary>
     /// Synchronisiert die Haken der offenen Dropdown-ListBox mit dem übergebenen Wert.
     /// </summary>
-    private void SyncDropDownSelection(string value) => ActiveEditStrategy?.SetValueToControl(value);
+    private void SyncDropDownSelection(string value) => ActiveControlStrategy?.SetValueToControl(value);
 
     private void Table_InvalidateView(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }

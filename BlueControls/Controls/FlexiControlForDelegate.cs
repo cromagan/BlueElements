@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -79,7 +80,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
         Size = new Size(200, 24);
 
-        EditType = EditTypeFormula.Button;
+        ControlStrategy = CommandButtonControlStrategy.ClassId;
         CaptionPosition = CaptionPosition.ohne;
         Caption = text;
         if (image is { } im) {

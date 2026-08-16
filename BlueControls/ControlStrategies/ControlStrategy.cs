@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISupportInitialize {
+public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupportInitialize, IReadableTextWithKey {
 
     #region Fields
 
+    public static readonly AssemblyAwareCache<ControlStrategy> AllStrategies = new();
+
     private bool _initializing;
+
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -135,7 +138,25 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
         }
     } = string.Empty;
 
+    /// <summary>
+    /// True, wenn die Strategie weder Text-Eingabe noch Vorschläge
+    /// unterstützt und damit nur eine Beschriftung anzeigt.
+    /// </summary>
+    public bool IsCaptionOnly => !SupportsSuggestions && !SupportsTextEdit;
+
+    /// <summary>
+    /// True, wenn die Strategie ein Kommando-Knopf ist, der statt einer
+    /// Wert-Eingabe ExecuteCommand auslöst.
+    /// </summary>
+    public virtual bool IsCommandButton => false;
+
     public bool IsDisposed => _isDisposedFlag == 1;
+
+    /// <summary>
+    /// Eindeutiger, stabiler Key der Strategie (identisch zur statischen ClassId).
+    /// Dient als Auswahl- und Serialisierungsschlüssel am ColumnItem.
+    /// </summary>
+    public virtual string KeyName => GetType().Name;
 
     public List<ListItem>? ListItems {
         get;
@@ -198,7 +219,7 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
             field = value;
             if (!_initializing) { ApplyStyle(); }
         }
-    }
+    } = string.Empty;
 
     public int RaiseChangeDelay {
         get;
@@ -236,19 +257,6 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
         }
     }
 
-    /// <summary>
-    /// Generischer Strategie-Parameter, der pro Strategy unterschiedlich verwendet wird.
-    /// Bei der CSV-Table-Strategy z. B. die Spaltennamen, getrennt mit ";".
-    /// </summary>
-    public string StrategyParameter {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!_initializing) { ApplyStyle(); }
-        }
-    } = string.Empty;
-
     public string Suffix {
         get;
         set {
@@ -277,6 +285,17 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
     /// </summary>
     public virtual bool SupportsSuggestions => false;
 
+    /// <summary>
+    /// True, wenn diese Strategie freie Text-Eingabe erlaubt. Fester Wert pro
+    /// Klasse, nicht konfigurierbar.
+    /// </summary>
+    public virtual bool SupportsTextEdit => false;
+
+    /// <summary>
+    /// True, wenn die Strategie Wörter im Text hervorheben kann (HighlightWordsAsync).
+    /// </summary>
+    public virtual bool SupportsWordHighlighting => false;
+
     public bool TextFormatingAllowed {
         get;
         set {
@@ -287,15 +306,6 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
     }
 
     public bool TextInputAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!_initializing) { ApplyStyle(); }
-        }
-    }
-
-    public EditTypeTable UserEditDialogType {
         get;
         set {
             if (field == value) { return; }
@@ -318,21 +328,53 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
 
     #region Methods
 
-    public static ControlStrategie? GetStrategy(EditTypeFormula editType) => editType switch {
-        EditTypeFormula.Textfeld => new TextBoxControlStrategie(),
-        EditTypeFormula.Textfeld_mit_Suggestions => new FlexiTextBoxSuggestions(),
-        EditTypeFormula.Textfeld_mit_Auswahlknopf => new ComboBoxControlStrategie(),
-        EditTypeFormula.Listbox => new ListBoxControlStrategie(),
-        EditTypeFormula.SwapListBox => new SwapListBoxControlStrategie(),
-        EditTypeFormula.Ja_Nein_Knopf => new ButtonYesNoControlStrategie(),
-        EditTypeFormula.Button => new ButtonCommandControlStrategie(),
-        EditTypeFormula.Farb_Auswahl_Dialog => new ButtonColorControlStrategie(),
-        EditTypeFormula.Line => new LineControlStrategie(),
-        EditTypeFormula.als_Überschrift_anzeigen => new GroupBoxControlStrategie(),
-        EditTypeFormula.nur_als_Text_anzeigen => new CaptionControlStrategie(),
-        EditTypeFormula.CSV_Table => new TableControlStrategie(),
-        _ => null
-    };
+    /// <summary>
+    /// Liefert die dauerhaft gecachte Prototyp-Instanz zur Strategy (KeyName).
+    /// Unbekannte Schlüssel fallen wie bei <see cref="CreateNew" /> auf die
+    /// Textfeld-Strategie zurück. Nur für Fähigkeitsabfragen nutzen — die
+    /// Instanz erzeugt keine Controls und darf weder konfiguriert noch
+    /// verworfen werden.
+    /// </summary>
+    public static ControlStrategy Cached(string? editStrategyKey) =>
+        AllStrategies[editStrategyKey] ?? AllStrategies[TextBoxControlStrategy.ClassId] ?? new TextBoxControlStrategy();
+
+    /// <summary>
+    /// Übersetzt die Zahlen des entfernten Enums ControlStrategyFormula in die ClassId
+    /// der zugehörigen Strategie. Für unbekannte Zahlen wird null geliefert.
+    /// </summary>
+    public static string ClassIdFromLegacyControlStrategy(string legacyControlStrategy) {
+        if (!legacyControlStrategy.IsLong()) { return legacyControlStrategy; }
+
+        return legacyControlStrategy switch {
+            -1 => NoneControlStrategy.ClassId,
+            0 => TextBoxControlStrategy.ClassId,
+            1 => ComboBoxControlStrategy.ClassId,
+            2 => SwapListBoxControlStrategy.ClassId,
+            3 => TextBoxSuggestionsControlStrategy.ClassId,
+            4 => YesNoButtonControlStrategy.ClassId,
+            5 => ColorButtonControlStrategy.ClassId,
+            22 => TextControlStrategy.ClassId,
+            23 => CaptionControlStrategy.ClassId,
+            26 => ListBoxControlStrategy.ClassId,
+            1000 => LineControlStrategy.ClassId,
+            1001 => CommandButtonControlStrategy.ClassId,
+            1002 => TableControlStrategy.ClassId,
+            _ => NoneControlStrategy.ClassId
+        };
+    }
+
+    /// <summary>
+    /// Erzeugt eine frische Instanz zur übergebenen Strategy (KeyName) —
+    /// inklusive None und DragDrop. Unbekannte Keys liefern die Textfeld-Strategie.
+    /// </summary>
+    public static ControlStrategy CreateNew(string? editStrategyKey) {
+        var type = AllStrategies[editStrategyKey]?.GetType();
+        if (type is not null && Activator.CreateInstance(type) is ControlStrategy strategy) {
+            return strategy;
+        }
+
+        return new TextBoxControlStrategy();
+    }
 
     public void BeginInit() => _initializing = true;
 
@@ -366,6 +408,11 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
     public void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
 
     /// <summary>
+    /// Lesbarer Anzeigename der Strategie, z. B. für Auswahllisten.
+    /// </summary>
+    public virtual string ReadableText() => GetType().Name;
+
+    /// <summary>
     /// Setz den Wert zum Control und löst kein Event aus
     /// </summary>
     /// <param name="value"></param>
@@ -378,6 +425,11 @@ public abstract class ControlStrategie : IInputFormat, IDisposableExtended, ISup
     }
 
     public abstract void SubscribeEvents();
+
+    /// <summary>
+    /// Symbol zur Darstellung der Strategie, z. B. in Auswahllisten.
+    /// </summary>
+    public virtual QuickImage? SymbolForReadableText() => null;
 
     public abstract void UnsubscribeEvents();
 

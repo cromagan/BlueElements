@@ -64,7 +64,7 @@ public class MonitorPadItem : ReciverPadItem, IItemToControl, IAutosizable {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        //DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
+        //DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "Monitor");
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);

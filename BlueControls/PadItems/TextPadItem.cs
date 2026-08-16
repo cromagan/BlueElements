@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
@@ -125,7 +126,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
             textFlex.QuickInfo = icpi.GetExportVariablesInfo(textFlex.QuickInfo, applicableVars.Count);
 
             if (applicableVars.Count > 0) {
-                textFlex.EditType = EditTypeFormula.Textfeld_mit_Suggestions;
+                textFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
                 textFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
                 textFlex.ListItems = [.. applicableVars.Select(v => ItemOf($"~{v.KeyName}~"))];
             }

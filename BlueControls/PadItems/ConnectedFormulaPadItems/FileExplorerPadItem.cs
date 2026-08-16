@@ -199,7 +199,7 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "C:\\", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "C:\\");
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);

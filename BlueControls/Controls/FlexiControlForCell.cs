@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls.ConnectedFormula;
+using BlueControls.ControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
@@ -31,16 +32,16 @@ public partial class FlexiControlForCell : GenericControlReciver {
     /// <summary>
     /// Für den Designer
     /// </summary>
-    public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
+    public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, NoneControlStrategy.ClassId) { }
 
-    public FlexiControlForCell(string columnKey, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
+    public FlexiControlForCell(string columnKey, CaptionPosition captionPosition, string strategy) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(300, 300);
         f.ShowInfoWhenDisabled = true;
         f.CaptionPosition = captionPosition;
-        f.EditType = editType;
+        f.ControlStrategy = strategy;
         _columnKey = columnKey;
     }
 
@@ -93,13 +94,13 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
+    public string ControlStrategy { get => f.ControlStrategy; set => f.ControlStrategy = value; }
+
     [DefaultValue(-1)]
     public int ControlX {
         get => f.ControlX;
         set => f.ControlX = value;
     }
-
-    public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
 
     public string Value => f.Value;
 
@@ -124,7 +125,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
                 // Back Column
                 f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
-                f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
                 f.TextInputAllowed = backcolumn.EditableWithTextInput;
                 f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
                 f.GetStyleFrom(backcolumn);
@@ -134,7 +134,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 ]);
             } else {
                 f.ListItems = null;
-                f.TextInputAllowed = false;
                 f.RaiseChangeDelay = 1;
                 f.CustomContextMenuItems = null;
             }
@@ -267,7 +266,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private async Task ActivateMarker() {
         if (IsDisposed || !Visible || !Enabled) { return; }
-        if (f.EditType != EditTypeFormula.Textfeld) { return; }
+        if (!f.Strategy.SupportsWordHighlighting) { return; }
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (string.IsNullOrEmpty(f.Value)) { return; }
         if (_column is not { IsDisposed: false }) { return; }
@@ -324,7 +323,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             return;
         }
 
-        f.DisabledReason = CellCollection.IsCellEditable(column, row, row.ChunkValue); // Rechteverwaltung einfliesen lassen.
+        f.DisabledReason = TableView.IsCellEditable(column, row, row.ChunkValue); // Rechteverwaltung einfliesen lassen.
     }
 
     private void F_ControlAdded(object? sender, ControlEventArgs e) {
@@ -358,7 +357,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private void Invalidate_CachedColumn() => _column = null;
 
     private void RestartMarker() {
-        if (f.EditType != EditTypeFormula.Textfeld) { return; }
+        if (!f.Strategy.SupportsWordHighlighting) { return; }
         // Fire-and-forget Pattern für Event-Handler
         Task.Run(async () => {
             try {

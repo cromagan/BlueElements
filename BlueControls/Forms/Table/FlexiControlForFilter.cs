@@ -2,6 +2,7 @@
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls.ConnectedFormula;
+using BlueControls.ControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.TableElements;
@@ -242,9 +243,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (filterSingle is not null && filterSingleo is not null && filterSingle.Equals(filterSingleo)) { return; }
 
-        var editTypeBefore = f.EditType;
+        var strategyBefore = f.Strategy;
         UpdateFilterData(filterSingle);
-        if (Einschnappen && editTypeBefore != EditTypeFormula.Button && f.EditType == EditTypeFormula.Button) {
+        if (Einschnappen && !strategyBefore.IsCommandButton && f.Strategy.IsCommandButton) {
             NextControl(NavigationDirection.Next);
         }
     }
@@ -285,7 +286,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     private void SetupButton(CaptionPosition captionPos) {
         f.CaptionPosition = captionPos;
-        f.EditType = EditTypeFormula.Button;
+        f.ControlStrategy = CommandButtonControlStrategy.ClassId;
         f.CreateSubControls();
         var filterSingle = FilterInput?[FilterSingleColumn];
 
@@ -320,7 +321,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (stackTrace.FrameCount > 100) {
             f.DisabledReason = "Interner Fehler\r\nEndlosschleife abgefangen.";
             f.Caption = "Interner Fehler";
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            f.ControlStrategy = TextControlStrategy.ClassId;
             FilterOutput.ChangeTo(new FilterItem(FilterSingleColumn?.Table, string.Empty));
             Invalidate_FilterOutput();
             return;
@@ -333,7 +334,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (FilterSingleColumn?.Table is not { IsDisposed: false } tb) {
             f.DisabledReason = "Bezug zum Filter verloren.";
             f.Caption = "?";
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            f.ControlStrategy = TextControlStrategy.ClassId;
             QuickInfo = string.Empty;
             f.Value = string.Empty;
             Invalidate_FilterOutput();
@@ -347,7 +348,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (FilterOutput.IsDisposed) {
             f.DisabledReason = "Ausgangsfilter verworfen.";
             f.Caption = "?";
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            f.ControlStrategy = TextControlStrategy.ClassId;
             return;
         }
 
@@ -434,7 +435,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
 
         if (!FilterSingleColumn.AutoFilterSymbolPossible()) {
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            f.ControlStrategy = TextControlStrategy.ClassId;
             f.DisabledReason = "Kein Filter erlaubt";
             return;
         }
@@ -443,7 +444,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
-        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        f.ControlStrategy = ComboBoxControlStrategy.ClassId;
         f.TextInputAllowed = TextEntryAllowed();
         f.RaiseChangeDelay = 1;
         f.ListItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];

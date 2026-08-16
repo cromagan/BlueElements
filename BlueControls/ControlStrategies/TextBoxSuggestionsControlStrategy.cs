@@ -4,7 +4,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class TextBoxSuggestionsControlStrategie : ControlStrategie {
+public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -14,9 +14,15 @@ public class TextBoxSuggestionsControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "TextBoxSuggestions";
+
     public override System.Windows.Forms.Control? Control => _control;
 
+    public override string KeyName => ClassId;
+
     public override bool SupportsSuggestions => true;
+
+    public override bool SupportsTextEdit => true;
 
     #endregion
 
@@ -39,6 +45,8 @@ public class TextBoxSuggestionsControlStrategie : ControlStrategie {
 
     public override void CreateControl() => _control = new TextBoxSuggestions();
 
+    public override string ReadableText() => "Textfeld mit Vorschlägen";
+
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_TextBoxSuggestions;
         _control?.EnterKey += Control_EnterKey;
@@ -46,6 +54,8 @@ public class TextBoxSuggestionsControlStrategie : ControlStrategie {
         _control?.TabKey += Control_TabKey;
         _control?.LostFocus += Control_LostFocus;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld2");
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBoxSuggestions;

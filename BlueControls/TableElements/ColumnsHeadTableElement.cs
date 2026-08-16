@@ -2,6 +2,7 @@
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueTable.ColumnFormats;
 
 namespace BlueControls.TableElements;
@@ -278,7 +279,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
         var colW = cvi.ControlColumnWidth();
 
         tableView.BeginEdit(
-            EditTypeTable.Textfeld,
+            TextBoxControlStrategy.ClassId,
             new Rectangle(colX, headPos.Y, colW, headPos.Height),
             col.Caption.Replace("\r", "\r\n"),
             v => ApplyCaption(tableView, cvi, v),

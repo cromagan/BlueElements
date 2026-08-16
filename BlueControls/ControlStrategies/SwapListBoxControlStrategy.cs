@@ -4,7 +4,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class SwapListBoxControlStrategie : ControlStrategie {
+public class SwapListBoxControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -14,7 +14,11 @@ public class SwapListBoxControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "SwapListBox";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 
@@ -33,21 +37,22 @@ public class SwapListBoxControlStrategie : ControlStrategie {
     }
 
     protected override void ApplyStyle() {
-        _control?.SuggestionsClear();
+        if (_control is not { } c) { return; }
+
+        c.SuggestionsClear();
         if (ListItems is not null) {
             var itemsToAdd = new List<ListItem>(ListItems);
             if (AutoSort) { itemsToAdd.Sort(); }
-            _control?.SuggestionsAdd(itemsToAdd);
+            c.SuggestionsAdd(itemsToAdd);
         }
 
-        _control?.AddAllowed = AddAllowed != AddType.None
-        ? AddAllowed
-        : UserEditDialogType switch {
-            EditTypeTable.Textfeld => AddType.Text,
-            EditTypeTable.Textfeld_mit_Vorschlägen => AddType.Text,
-            _ => AddType.None
-        };
-        _control?.QuickInfo = QuickInfo;
+        if (AddAllowed != AddType.None) {
+            c.AddAllowed = AddAllowed;
+        } else {
+            c.AddAllowed = TextInputAllowed ? AddType.Text : AddType.None;
+        }
+
+        c.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControlInternal(string value) => _control?.Check(value.SplitAndCutByCr());

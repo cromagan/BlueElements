@@ -4,29 +4,36 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
-public class LineControlStrategie : ControlStrategie {
+public class CaptionControlStrategy : ControlStrategy {
 
     #region Fields
 
-    private Line? _control;
+    private GroupBox? _control;
 
     #endregion
 
     #region Properties
 
+    public static string ClassId => "Caption";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 
     #region Methods
 
-    public override void CreateControl() => _control = new Line() { Orientation = Orientation.Waagerecht };
+    public override void CreateControl() => _control = new GroupBox() {
+        GroupBoxStyle = GroupBoxStyle.NormalBold,
+        Text = string.Empty
+    };
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 
-    protected override void ApplyStyle() => _control?.QuickInfo = QuickInfo;
+    protected override void ApplyStyle() => _control?.Text = Caption;
 
     protected override void SetValueToControlInternal(string value) { }
 

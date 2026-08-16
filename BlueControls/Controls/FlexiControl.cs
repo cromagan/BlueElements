@@ -19,7 +19,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Caption? _captionObject;
 
     private Caption? _infoCaption;
-    private ControlStrategie? _strategy;
+    private ControlStrategy? _strategy;
 
     #endregion
 
@@ -29,7 +29,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
-        EditType = EditTypeFormula.Line;
+        ControlStrategy = LineControlStrategy.ClassId;
+
         Size = new Size(200, 8);
         CreateSubControls();
     }
@@ -43,7 +44,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public FlexiControl(string captionText, int width, bool isCaption) : base(false, false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        EditType = isCaption ? EditTypeFormula.als_Überschrift_anzeigen : EditTypeFormula.nur_als_Text_anzeigen;
+        ControlStrategy = isCaption ? CaptionControlStrategy.ClassId : TextControlStrategy.ClassId;
 
         Caption = captionText;
         CaptionPosition = CaptionPosition.ohne;
@@ -193,6 +194,25 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     } = CheckBehavior.MultiSelection;
 
     /// <summary>
+    /// ClassId der ControlStrategie, die das Bearbeitungs-Control erzeugt.
+    /// </summary>
+    [DefaultValue("None")]
+    public string ControlStrategy {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; RemoveStrategy(); }));
+                return;
+            }
+
+            field = value;
+            RemoveStrategy();
+        }
+    } = NoneControlStrategy.ClassId;
+
+    /// <summary>
     /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
     /// </summary>
     [DefaultValue(-1)]
@@ -269,22 +289,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             DoEnabledState();
         }
     } = string.Empty;
-
-    [DefaultValue(EditTypeFormula.None)]
-    public EditTypeFormula EditType {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; RemoveStrategy(); }));
-                return;
-            }
-
-            field = value;
-            RemoveStrategy();
-        }
-    }
 
     /// <summary>
     /// DisabledReason befüllen, um das Steuerelement zu disablen
@@ -519,27 +523,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     /// <summary>
-    /// Generischer Strategie-Parameter, der pro Strategy unterschiedlich verwendet wird.
-    /// Siehe <see cref="ControlStrategie.StrategyParameter"/>.
+    /// Zur ControlStrategy passende Strategie. Nach CreateSubControls die aktive
+    /// Instanz, davor die gecachte Prototyp-Instanz. Nur für
+    /// Fähigkeitsabfragen nutzen.
     /// </summary>
-    [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string StrategyParameter {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.StrategyParameter = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.StrategyParameter = value;
-        }
-    } = string.Empty;
+    public ControlStrategy Strategy => _strategy ?? ControlStrategy.Cached(ControlStrategy);
 
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
@@ -631,24 +622,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = true;
 
-    [DefaultValue(EditTypeTable.None)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public EditTypeTable UserEditDialogType {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.UserEditDialogType = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.UserEditDialogType = value;
-        }
-    } = EditTypeTable.None;
-
     [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -700,11 +673,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 return;
             }
 
-            _strategy = ControlStrategie.GetStrategy(EditType);
-            if (_strategy is null) {
-                Allinitialized = true;
-                return;
-            }
+            _strategy = ControlStrategy.CreateNew(ControlStrategy);
 
             _strategy.CreateControl();
 
@@ -725,7 +694,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.RegexCheck = RegexCheck;
             _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
             _strategy.TextFormatingAllowed = TextFormatingAllowed;
-            _strategy.StrategyParameter = StrategyParameter;
             _strategy.CustomVocabulary = CustomVocabulary;
             _strategy.Suffix = Suffix;
             _strategy.SuggestionPosition = SuggestionPosition;
@@ -735,7 +703,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.CustomContextMenuItems = CustomContextMenuItems;
             _strategy.RaiseChangeDelay = RaiseChangeDelay;
             _strategy.TextInputAllowed = TextInputAllowed;
-            _strategy.UserEditDialogType = UserEditDialogType;
 
             StandardBehandlung(_strategy.Control);
 

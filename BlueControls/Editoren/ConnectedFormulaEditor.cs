@@ -34,7 +34,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem());
 
-        GenQuickInfo(btnFilterConverter, new FilterConverterElement());
+        GenQuickInfo(btnFilterConverter, new FilterConverterPadItem());
 
         GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem());
 
@@ -255,7 +255,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
-        var x = new FilterConverterElement();
+        var x = new FilterConverterPadItem();
         AddCentered(x);
     }
 

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -363,13 +364,12 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
     /// <param name="viewItem"></param>
     /// <param name="row">Die Row, in der editiert wird — <c>null</c> für
     /// "neue Zeile".</param>
-    /// <param name="preferDropDown"></param>
     /// <param name="chunkValue"></param>
     /// <param name="rowContainer">Das sichtbare Item (RowListItem oder
     /// NewRowTableElement), das für die Positionsberechnung herangezogen wird.</param>
     /// <returns><c>true</c>, wenn ein Edit gestartet wurde (oder die Zelle
     /// bewusst nicht editierbar ist, der Klick also verarbeitet wurde).</returns>
-    protected internal bool BeginCellEdit(TableView tableView, ColumnViewItem? viewItem, TableElement rowContainer, RowItem? row, bool preferDropDown, string? chunkValue) {
+    protected internal bool BeginCellEdit(TableView tableView, ColumnViewItem? viewItem, TableElement rowContainer, RowItem? row, string? chunkValue) {
         var notEditableReason = tableView.IsCellEditable(viewItem, rowContainer as RowTableElement, chunkValue, true);
         if (notEditableReason is { Length: > 0 } f) {
             TableView.NotEditableInfo(f);
@@ -383,7 +383,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
 
         // LinkedCell-Auflösung nur bei echter Row und Relations-Spalte.
         // Position, Style und Commit basieren weiterhin auf der Original-Spalte;
-        // nur der EditType und das Dropdown werden über die Ziel-Spalte bestimmt.
+        // nur der ControlStrategy und das Dropdown werden über die Ziel-Spalte bestimmt.
         var contentHolderCellColumn = originalColumn;
         var contentHolderCellRow = row;
         if (contentHolderCellRow is { IsDisposed: false } cr && originalColumn.RelationType == RelationType.CellValues) {
@@ -395,74 +395,60 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
             return true;
         }
 
-        var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, preferDropDown);
-        if (dia == EditTypeTable.None && (contentHolderCellColumn.Table?.PowerEdit ?? false)) {
-            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, false, true);
+        var dia = contentHolderCellColumn.ControlStrategy;
+        var strategy = ControlStrategy.Cached(dia);
+
+        if (strategy is DragDropControlStrategy) {
+            TableView.NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
+            return true;
         }
 
-        switch (dia) {
-            case EditTypeTable.None:
+        if (strategy.SupportsSuggestions && !strategy.SupportsTextEdit) {
+            // Dropdown benötigt ein echtes RowListItem als Container.
+            if (rowContainer is not RowTableElement rli) { return true; }
+
+            // Bei LinkedCell-Spalten (column != originalColumn) kann für
+            // eine neue Zeile kein Dropdown erstellt werden.
+            if (contentHolderCellColumn != originalColumn && contentHolderCellRow is null) {
+                TableView.NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
                 return true;
+            }
 
-            case EditTypeTable.DragDrop:
-                TableView.NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
-                return true;
+            contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
 
-            case EditTypeTable.Dropdown_Single:
-                // Dropdown benötigt ein echtes RowListItem als Container.
-                if (rowContainer is not RowTableElement rli) { return true; }
+            // Aktuell ausgewählte Werte der Zelle als Startwert für das
+            // Dropdown. Die Auswahlliste ermittelt TableView über
+            // NeedsSuggestions einheitlich in BeginEdit.
+            var ddValue = contentHolderCellRow is { IsDisposed: false } cr2
+                ? string.Join('\r', cr2.CellGetList(contentHolderCellColumn))
+                : string.Empty;
 
-                // Bei LinkedCell-Spalten (column != originalColumn) kann für
-                // eine neue Zeile kein Dropdown erstellt werden.
-                if (contentHolderCellColumn != originalColumn && contentHolderCellRow is null) {
-                    TableView.NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-                    return true;
-                }
+            // Position / Größe der Zelle berechnen, damit die
+            // FlexiListBox an der richtigen Stelle
+            // erscheint. Die tatsächliche Größe (größer als die Zelle)
+            // wird in TableView.BeginEdit berechnet.
+            var ddZoom = tableView.Zoom;
+            var ddOffsetX = tableView.OffsetX;
+            var ddOffsetY = tableView.OffsetY;
+            var ddControlPos = rowContainer.ControlPosition(ddZoom, ddOffsetX, ddOffsetY);
+            var ddIndentOffset = IndentWidth.CanvasToControl(ddZoom) * rowContainer.Indent;
+            var ddLocation = new Point(viewItem.ControlColumnLeft(ddOffsetX) + ddIndentOffset, ddControlPos.Y);
+            var ddSize = new Size(viewItem.ControlColumnWidth(), ddControlPos.Height);
 
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-
-                // Aktuell ausgewählte Werte der Zelle als Startwert für das
-                // Dropdown. Die Auswahlliste ermittelt TableView über
-                // NeedsSuggestions einheitlich in BeginEdit.
-                var ddValue = contentHolderCellRow is { IsDisposed: false } cr2
-                    ? string.Join('\r', cr2.CellGetList(contentHolderCellColumn))
-                    : string.Empty;
-
-                // Position / Größe der Zelle berechnen, damit die
-                // FlexiListBox an der richtigen Stelle
-                // erscheint. Die tatsächliche Größe (größer als die Zelle)
-                // wird in TableView.BeginEdit berechnet.
-                var ddZoom = tableView.Zoom;
-                var ddOffsetX = tableView.OffsetX;
-                var ddOffsetY = tableView.OffsetY;
-                var ddControlPos = rowContainer.ControlPosition(ddZoom, ddOffsetX, ddOffsetY);
-                var ddIndentOffset = IndentWidth.CanvasToControl(ddZoom) * rowContainer.Indent;
-                var ddLocation = new Point(viewItem.ControlColumnLeft(ddOffsetX) + ddIndentOffset, ddControlPos.Y);
-                var ddSize = new Size(viewItem.ControlColumnWidth(), ddControlPos.Height);
-
-                tableView.BeginEdit(
-                    EditTypeTable.Dropdown_Single,
-                    new Rectangle(ddLocation, ddSize),
-                    ddValue,
-                    _ => { },
-                    originalColumn,
-                    contentHolderCellColumn,
-                    contentHolderCellRow,
-                    null,
-                    new CellExtEventArgs(viewItem, rli));
-                return true;
-
-            case EditTypeTable.Textfeld:
-            case EditTypeTable.Textfeld_mit_Auswahlknopf:
-            case EditTypeTable.Textfeld_mit_Vorschlägen:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                break;
-
-            default:
-                Develop.DebugPrint(dia);
-                TableView.NotEditableInfo("Unbekannte Bearbeitungs-Methode");
-                return true;
+            tableView.BeginEdit(
+                dia,
+                new Rectangle(ddLocation, ddSize),
+                ddValue,
+                _ => { },
+                originalColumn,
+                contentHolderCellColumn,
+                contentHolderCellRow,
+                null,
+                new CellExtEventArgs(viewItem, rli));
+            return true;
         }
+
+        contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
 
         // Position / Size — entspricht der früheren GetEditBounds + ConfigureAndActivateCellEdit-Logik.
         var zoom = tableView.Zoom;
@@ -480,27 +466,22 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
         }
 
         var indentOffset = IndentWidth.CanvasToControl(zoom) * rowContainer.Indent;
-        var addWith = dia == EditTypeTable.Textfeld_mit_Auswahlknopf ? 20 : 0;
+        var addWith = strategy is ComboBoxControlStrategy ? 20 : 0;
         var totalWidth = viewItem.ControlColumnWidth() + addWith;
         var location = new Point(viewItem.ControlColumnLeft(offsetX) + indentOffset, controlPos.Y);
         var size = new Size(totalWidth, controlPos.Height);
 
-        // Für ComboBox / Suggestions die Items vorab besorgen und ggf.
-        // auf eine einfache TextBox zurückfallen.
+        // Für ComboBox / Suggestions die Items vorab besorgen. Fallbacks
+        // (z. B. Auswahl ohne Items) macht TableView.BeginEdit zentral.
         List<ListItem>? items = null;
-        var effectiveType = dia;
         var renderer = viewItem.GetRenderer(rowContainer.SheetStyle);
 
-        if (dia == EditTypeTable.Textfeld_mit_Auswahlknopf) {
+        if (strategy.SupportsSuggestions) {
             items = ItemsOf(originalColumn, contentHolderCellRow, 1000, renderer);
-            if (items.Count == 0) { effectiveType = EditTypeTable.Textfeld; }
-        } else if (dia == EditTypeTable.Textfeld_mit_Vorschlägen) {
-            items = ItemsOf(originalColumn, null, 1000, renderer);
-            if (items.Count is 0 or > 30) { effectiveType = EditTypeTable.Textfeld; }
         }
 
         tableView.BeginEdit(
-            effectiveType,
+            dia,
             new Rectangle(location, size),
             cellText,
             v => ApplyCellValue(tableView, viewItem, rowContainer as RowTableElement, v),

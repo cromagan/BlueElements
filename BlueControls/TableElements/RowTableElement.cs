@@ -245,13 +245,13 @@ public sealed class RowTableElement : TableElement {
 
     /// <summary>
     /// Startet die Inline-Editierung der angeklickten Zelle. Die gesamte
-    /// Logik (Editability, LinkedCell-Auflösung, EditType, Position) liegt in
+    /// Logik (Editability, LinkedCell-Auflösung, ControlStrategy, Position) liegt in
     /// der Basisklasse <see cref="TableElement.BeginCellEdit" />.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
         if (mouseOverColumn is null) { return false; }
         if (Row is not { IsDisposed: false }) { return false; }
-        return BeginCellEdit(tableView, mouseOverColumn, this, Row, true, Row.ChunkValue);
+        return BeginCellEdit(tableView, mouseOverColumn, this, Row, Row.ChunkValue);
     }
 
     /// <summary>
@@ -284,7 +284,7 @@ public sealed class RowTableElement : TableElement {
                 break;
 
             case Keys.F2:
-                _ = BeginCellEdit(tableView, cursorColumn, this, Row, true, Row.ChunkValue);
+                _ = BeginCellEdit(tableView, cursorColumn, this, Row, Row.ChunkValue);
                 break;
 
             case Keys.Delete:

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using System.Windows.Forms;
 
@@ -10,7 +11,7 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
 
     #region Fields
 
-    private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+    private string _controlStrategy = ComboBoxControlStrategy.ClassId;
 
     #endregion
 
@@ -75,7 +76,7 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlForRowSelector(TableOutput, Caption, Anzeige) {
-            EditType = _bearbeitung,
+            ControlStrategy = _controlStrategy,
             CaptionPosition = CaptionPosition
         };
 
@@ -104,7 +105,7 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
 
         result.ParseableAdd("CaptionText", Caption);
         result.ParseableAdd("ShowFormat", Anzeige);
-        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("EditType", _controlStrategy);
         result.ParseableAdd("Caption", CaptionPosition);
         //result.ParseableAdd("ID", ColorId);
 
@@ -115,7 +116,7 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
         var json = base.ParseableJson();
         json.Set("captiontext", Caption);
         json.Set("showformat", Anzeige);
-        json.Set("edittype", (int)_bearbeitung);
+        json.Set("controlstratgey", _controlStrategy);
         json.Set("caption", (int)CaptionPosition);
         return json;
     }
@@ -125,7 +126,7 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
         try {
             Caption = json.GetString("captiontext", Caption);
             Anzeige = json.GetString("showformat", Anzeige);
-            _bearbeitung = json.GetEnum("edittype", _bearbeitung);
+            _controlStrategy = json.GetString("controlstratgey", _controlStrategy);
             CaptionPosition = json.GetEnum("caption", CaptionPosition);
             base.ParseJson(json);
         } finally {
@@ -140,7 +141,8 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
                 return true;
 
             case "edittype":
-                _bearbeitung = (EditTypeFormula)IntParse(value);
+                _controlStrategy = ControlStrategy.ClassIdFromLegacyControlStrategy(value) ?? ComboBoxControlStrategy.ClassId;
+
                 return true;
 
             case "caption":
@@ -169,10 +171,10 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionControl, zoom, forPrinting, OutputColorId);
-            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption);
             DrawColorScheme(gr, positionControl, zoom, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Caption);
         }
 
         base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);

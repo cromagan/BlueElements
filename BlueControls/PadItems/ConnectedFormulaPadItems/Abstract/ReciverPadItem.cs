@@ -516,8 +516,7 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
         DrawArrow(gr, positionControl, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
     }
 
-    protected static void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
-        _ = edittype;
+    protected static void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt) {
         Point cap;
         var uc = positionControl.ToRect();
 

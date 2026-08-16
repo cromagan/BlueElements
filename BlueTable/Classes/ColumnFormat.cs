@@ -40,14 +40,13 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
 
     public string AllowedChars { get => _format.AllowedChars; set { } }
 
+    public string ControlStrategy { get; set; } = "None";
     public string DefaultRenderer { get; set; } = string.Empty;
 
     public TranslationType DoOpticalTranslation { get; set; }
 
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
-    public bool EditableWithDropdown { get; set; }
     public bool EditableWithTextInput { get; set; }
-
     public string ForbiddenChars { get => _format.ForbiddenChars; set { } }
 
     // IHasKeyName

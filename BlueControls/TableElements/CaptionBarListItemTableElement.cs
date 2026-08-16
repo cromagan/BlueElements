@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.ControlStrategies;
 using BlueTable.ColumnFormats;
 
 namespace BlueControls.TableElements;
@@ -143,7 +144,7 @@ public sealed class CaptionBarListItemTableElement : TableElement {
         var colW = anchor.ControlColumnWidth();
 
         tableView.BeginEdit(
-            EditTypeTable.Textfeld_mit_Vorschlägen,
+            TextBoxSuggestionsControlStrategy.ClassId,
             new Rectangle(colX, headPos.Y, colW, headPos.Height),
             col.CaptionGroup(Caption).Replace("\r", "\r\n"),
             v => ApplyCaptionGroup(tableView, anchor, v),

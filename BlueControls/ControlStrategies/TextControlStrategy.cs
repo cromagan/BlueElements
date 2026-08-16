@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public class CaptionControlStrategie : ControlStrategie {
+public class TextControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -16,7 +16,11 @@ public class CaptionControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "Text";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
 
     #endregion
 

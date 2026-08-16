@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public class TextBoxControlStrategie : ControlStrategie {
+public class TextBoxControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -20,7 +20,15 @@ public class TextBoxControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "Texbox";
+
     public override System.Windows.Forms.Control? Control => _control;
+
+    public override string KeyName => ClassId;
+
+    public override bool SupportsTextEdit => true;
+
+    public override bool SupportsWordHighlighting => true;
 
     #endregion
 
@@ -84,6 +92,8 @@ public class TextBoxControlStrategie : ControlStrategie {
         }, cancellationToken);
     }
 
+    public override string ReadableText() => "Textfeld";
+
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_TextBox;
         _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
@@ -93,6 +103,8 @@ public class TextBoxControlStrategie : ControlStrategie {
         _control?.TabKey += Control_TabKey;
         _control?.LostFocus += Control_LostFocus;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld");
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBox;

@@ -5,7 +5,7 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.ControlStrategies;
 
-public class ComboBoxControlStrategie : ControlStrategie {
+public class ComboBoxControlStrategy : ControlStrategy {
 
     #region Fields
 
@@ -16,9 +16,14 @@ public class ComboBoxControlStrategie : ControlStrategie {
 
     #region Properties
 
+    public static string ClassId => "Combobox";
+
     public override System.Windows.Forms.Control? Control => _control;
 
+    public override string KeyName => ClassId;
+
     public override bool SupportsSuggestions => true;
+    public override bool SupportsTextEdit => true;
 
     #endregion
 
@@ -31,6 +36,8 @@ public class ComboBoxControlStrategie : ControlStrategie {
         _control?.ShowMenu(this, new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0));
     }
 
+    public override string ReadableText() => "Textfeld mit Auswahlknopf";
+
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_ComboBox;
         _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
@@ -42,6 +49,8 @@ public class ComboBoxControlStrategie : ControlStrategie {
         _control?.TabKey += Control_TabKey;
         _control?.LostFocus += Control_LostFocus;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld");
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_ComboBox;

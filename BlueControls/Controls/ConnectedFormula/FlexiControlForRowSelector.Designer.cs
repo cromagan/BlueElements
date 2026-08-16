@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
-using BlueTable.Enums;
+using BlueControls.ControlStrategies;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -24,7 +24,6 @@ namespace BlueControls.Controls;
             // f
             // 
             this.f.Dock = DockStyle.Fill;
-            this.f.EditType = EditTypeFormula.Line;
             this.f.Location = new Point(0, 0);
             this.f.Name = "f";
             this.f.RemoveAllowed = true;

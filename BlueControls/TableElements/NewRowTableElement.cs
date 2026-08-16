@@ -100,7 +100,7 @@ public sealed class NewRowTableElement : TableElement {
         var chunkValue = tb.Column.ChunkValueColumn == tb.Column.First
             ? null
             : FilterCombined?.ChunkVal;
-        return BeginCellEdit(tableView, mouseOverColumn, this, null, true, chunkValue);
+        return BeginCellEdit(tableView, mouseOverColumn, this, null, chunkValue);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

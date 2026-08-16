@@ -206,7 +206,9 @@ public enum TableDataType : byte {
     //co_AutoFilterErweitertErlaubt_alt = 140,
     EditableWithTextInput = 141,
 
+    // Wert 142 war EditableWithDropdown — wird lesend zur ControlStrategy migriert, daher nicht obsolete.
     EditableWithDropdown = 142,
+
     ValueRequired = 143,
     ShowValuesOfOtherCellsInDropdown = 144,
     SortAndRemoveDoubleAfterEdit = 145,
@@ -221,6 +223,7 @@ public enum TableDataType : byte {
     //ColumnIdentify = 151,
     //co_CompactView_alt = 152,
     //ShowMultiLineInOneLine = 153,
+    ControlStrategy = 148,
 
     EditAllowedDespiteLock = 154,
 
