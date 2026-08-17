@@ -87,12 +87,8 @@
   <Using Include="BlueBasics" />
   <Using Include="BlueBasics.ClassesStatic" />
   <Using Include="BlueTable.Classes" />
-    <Using Include="BlueTable.Classes.Table" Alias="Table" />
-    <Using Include="BlueTable.Classes.RowItem" Alias="RowItem" />
-    <Using Include="BlueTable.Classes.FilterItem" Alias="FilterItem" />
   <Using Include="BlueBasics.Classes" />
   <Using Include="BlueControls.Classes" />
-  <Using Include="BlueBasics.ImageFilters.WindowsXPDisabledImageFilter" Alias="WindowsXPDisabled" />
   <Using Include="BlueBasics.Interfaces" />
   <Using Include="BlueTable.Enums" />
   <Using Include="BlueBasics.Extensions" Static="true" />
@@ -101,8 +97,6 @@
   <Using Include="BlueControls.Interfaces" />
   <Using Include="BlueBasics.Enums" />
   <Using Include="BlueScript.ScriptCommands" />
-    <Using Include="BlueScript.ScriptVariables.StringScriptVariable" Alias="String" />
-    <Using Include="BlueScript.ScriptVariables.DoubleScriptVariable" Alias="Double" />
   <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
   <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
   <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />

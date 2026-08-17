@@ -66,6 +66,7 @@ namespace BlueControls.BlueTableDialogs {
             capImmerWerte = new Caption();
             btnIgnoreLock = new Button();
             lbxCellEditor = new ListBox();
+            StrategyEditor = new ScrollPanel();
             btnEditableStandard = new Button();
             cbxControlStrategy = new ComboBox();
             capUserGroupEdit = new Caption();
@@ -163,7 +164,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAnzeige
             // 
-            tabAnzeige.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabAnzeige.BackColor = Color.FromArgb(255, 255, 255);
             tabAnzeige.Controls.Add(cbxBackground);
             tabAnzeige.Controls.Add(capHintergrund);
             tabAnzeige.Controls.Add(cbxRenderer);
@@ -513,10 +514,11 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabBearbeitung
             // 
-            tabBearbeitung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabBearbeitung.BackColor = Color.FromArgb(255, 255, 255);
             tabBearbeitung.Controls.Add(grpAuswahlmenuOptionen);
             tabBearbeitung.Controls.Add(btnIgnoreLock);
             tabBearbeitung.Controls.Add(lbxCellEditor);
+            tabBearbeitung.Controls.Add(StrategyEditor);
             tabBearbeitung.Controls.Add(btnEditableStandard);
             tabBearbeitung.Controls.Add(cbxControlStrategy);
             tabBearbeitung.Controls.Add(capUserGroupEdit);
@@ -531,14 +533,14 @@ namespace BlueControls.BlueTableDialogs {
             // grpAuswahlmenuOptionen
             // 
             grpAuswahlmenuOptionen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            grpAuswahlmenuOptionen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            grpAuswahlmenuOptionen.BackColor = Color.FromArgb(255, 255, 255);
             grpAuswahlmenuOptionen.CausesValidation = false;
             grpAuswahlmenuOptionen.Controls.Add(btnOtherValuesToo);
             grpAuswahlmenuOptionen.Controls.Add(txbAuswaehlbareWerte);
             grpAuswahlmenuOptionen.Controls.Add(capImmerWerte);
-            grpAuswahlmenuOptionen.Location = new Point(32, 80);
+            grpAuswahlmenuOptionen.Location = new Point(8, 280);
             grpAuswahlmenuOptionen.Name = "grpAuswahlmenuOptionen";
-            grpAuswahlmenuOptionen.Size = new Size(536, 504);
+            grpAuswahlmenuOptionen.Size = new Size(552, 304);
             grpAuswahlmenuOptionen.TabIndex = 0;
             grpAuswahlmenuOptionen.TabStop = false;
             grpAuswahlmenuOptionen.Text = "Auswahlmenü-Optionen:";
@@ -547,9 +549,9 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnOtherValuesToo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnOtherValuesToo.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnOtherValuesToo.Location = new Point(8, 464);
+            btnOtherValuesToo.Location = new Point(8, 264);
             btnOtherValuesToo.Name = "btnOtherValuesToo";
-            btnOtherValuesToo.Size = new Size(512, 32);
+            btnOtherValuesToo.Size = new Size(528, 32);
             btnOtherValuesToo.TabIndex = 7;
             btnOtherValuesToo.Text = "Auch Werte, die in anderen Zellen derselben Spalte vorhanden sind, werden zum Auswählen vorgeschlagen";
             // 
@@ -557,18 +559,18 @@ namespace BlueControls.BlueTableDialogs {
             // 
             txbAuswaehlbareWerte.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             txbAuswaehlbareWerte.Cursor = Cursors.IBeam;
-            txbAuswaehlbareWerte.Location = new Point(8, 64);
+            txbAuswaehlbareWerte.Location = new Point(8, 56);
             txbAuswaehlbareWerte.MultiLine = true;
             txbAuswaehlbareWerte.Name = "txbAuswaehlbareWerte";
             txbAuswaehlbareWerte.RegexCheck = null;
-            txbAuswaehlbareWerte.Size = new Size(520, 392);
+            txbAuswaehlbareWerte.Size = new Size(536, 208);
             txbAuswaehlbareWerte.SpellCheckingEnabled = true;
             txbAuswaehlbareWerte.TabIndex = 0;
             // 
             // capImmerWerte
             // 
             capImmerWerte.CausesValidation = false;
-            capImmerWerte.Location = new Point(8, 40);
+            capImmerWerte.Location = new Point(8, 24);
             capImmerWerte.Name = "capImmerWerte";
             capImmerWerte.Size = new Size(440, 24);
             capImmerWerte.Text = "<b><u>Immer auswählbare Werte:";
@@ -592,23 +594,32 @@ namespace BlueControls.BlueTableDialogs {
             lbxCellEditor.Size = new Size(328, 272);
             lbxCellEditor.TabIndex = 26;
             // 
+            // StrategyEditor
+            // 
+            StrategyEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            StrategyEditor.Location = new Point(8, 96);
+            StrategyEditor.Name = "StrategyEditor";
+            StrategyEditor.Size = new Size(552, 184);
+            StrategyEditor.TabIndex = 28;
+            // 
             // btnEditableStandard
             // 
             btnEditableStandard.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnEditableStandard.Location = new Point(8, 16);
+            btnEditableStandard.Location = new Point(8, 56);
             btnEditableStandard.Name = "btnEditableStandard";
-            btnEditableStandard.Size = new Size(544, 32);
+            btnEditableStandard.Size = new Size(552, 32);
             btnEditableStandard.TabIndex = 4;
             btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Im Regelfall als Text-Eingabe";
             // 
             // cbxControlStrategy
             // 
             cbxControlStrategy.DropDownStyle = DropDownMode.DropDownList;
-            cbxControlStrategy.Location = new Point(8, 40);
+            cbxControlStrategy.Location = new Point(8, 32);
             cbxControlStrategy.Name = "cbxControlStrategy";
             cbxControlStrategy.RegexCheck = null;
-            cbxControlStrategy.Size = new Size(544, 24);
+            cbxControlStrategy.Size = new Size(552, 24);
             cbxControlStrategy.TabIndex = 4;
+            cbxControlStrategy.TextChanged += cbxControlStrategy_TextChanged;
             // 
             // capUserGroupEdit
             // 
@@ -637,7 +648,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAutoKorrektur
             // 
-            tabAutoKorrektur.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabAutoKorrektur.BackColor = Color.FromArgb(255, 255, 255);
             tabAutoKorrektur.Controls.Add(btnCalculateMaxCellLength);
             tabAutoKorrektur.Controls.Add(txbAutoReplace);
             tabAutoKorrektur.Controls.Add(capAutoReplace);
@@ -771,7 +782,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabFilter
             // 
-            tabFilter.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabFilter.BackColor = Color.FromArgb(255, 255, 255);
             tabFilter.Controls.Add(chkFilterOnlyOr);
             tabFilter.Controls.Add(chkFilterOnlyAND);
             tabFilter.Controls.Add(capJokerValue);
@@ -860,7 +871,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabQuickInfo
             // 
-            tabQuickInfo.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabQuickInfo.BackColor = Color.FromArgb(255, 255, 255);
             tabQuickInfo.Controls.Add(txbAdminInfo);
             tabQuickInfo.Controls.Add(txbQuickinfo);
             tabQuickInfo.Controls.Add(capAdminInfo);
@@ -928,7 +939,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSonstiges
             // 
-            tabSonstiges.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabSonstiges.BackColor = Color.FromArgb(255, 255, 255);
             tabSonstiges.Controls.Add(txbTags);
             tabSonstiges.Controls.Add(capTags);
             tabSonstiges.Location = new Point(4, 25);
@@ -1032,7 +1043,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpAllgemein
             // 
             grpAllgemein.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            grpAllgemein.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            grpAllgemein.BackColor = Color.FromArgb(240, 240, 240);
             grpAllgemein.CausesValidation = false;
             grpAllgemein.Controls.Add(capInfo);
             grpAllgemein.Controls.Add(capInternalName);
@@ -1135,7 +1146,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabDatenFormat
             // 
-            tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabDatenFormat.BackColor = Color.FromArgb(255, 255, 255);
             tabDatenFormat.Controls.Add(grpStyles);
             tabDatenFormat.Controls.Add(capInfos);
             tabDatenFormat.Controls.Add(btnSystemInfo);
@@ -1171,7 +1182,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpStyles
             // 
             grpStyles.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            grpStyles.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            grpStyles.BackColor = Color.FromArgb(255, 255, 255);
             grpStyles.Controls.Add(lstStyles);
             grpStyles.Location = new Point(8, 360);
             grpStyles.Name = "grpStyles";
@@ -1283,7 +1294,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSpaltenVerlinkung
             // 
-            tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabSpaltenVerlinkung.BackColor = Color.FromArgb(255, 255, 255);
             tabSpaltenVerlinkung.Controls.Add(cbxRelationType);
             tabSpaltenVerlinkung.Controls.Add(capOtherTable);
             tabSpaltenVerlinkung.Controls.Add(tblFilterliste);
@@ -1320,7 +1331,6 @@ namespace BlueControls.BlueTableDialogs {
             tblFilterliste.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tblFilterliste.Ansichtbearbeitung = false;
             tblFilterliste.Location = new Point(8, 112);
-            tblFilterliste.MiniToolbarEnabled = false;
             tblFilterliste.Name = "tblFilterliste";
             tblFilterliste.PowerEdit = false;
             tblFilterliste.Size = new Size(1073, 472);
@@ -1533,6 +1543,7 @@ namespace BlueControls.BlueTableDialogs {
         private ComboBox cbxRenderer;
         private Caption capRenderer;
         private ScrollPanel RendererEditor;
+        private ScrollPanel StrategyEditor;
         private Button btnSystemInfo;
         private Button chkIsKeyColumn;
         private Button chkIsFirst;

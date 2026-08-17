@@ -2,7 +2,7 @@
 
 namespace BlueControls.Enums;
 
-public enum WndProc : int {
+public enum WndProc {
     WM_NULL = 0x0,
     WM_CREATE = 0x1,
     WM_DESTROY = 0x2,

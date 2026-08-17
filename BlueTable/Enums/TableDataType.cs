@@ -224,6 +224,7 @@ public enum TableDataType : byte {
     //co_CompactView_alt = 152,
     //ShowMultiLineInOneLine = 153,
     ControlStrategy = 148,
+    ControlStrategyParameter = 149,
 
     EditAllowedDespiteLock = 154,
 

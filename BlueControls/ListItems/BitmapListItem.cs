@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.ImageFilters;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.ListItems;
@@ -175,7 +176,7 @@ public class BitmapListItem : ListItem {
                 if (_bitmap is not null) {
                     if (state.HasFlag(States.Standard_Disabled)) {
                         var bmpDisabled = _bitmap.CloneFromBitmap();
-                        bmpDisabled.ApplyFilter(WindowsXPDisabled.Instance);
+                        bmpDisabled.ApplyFilter(WindowsXPDisabledImageFilter.Instance);
                         gr.DrawImage(bmpDisabled, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
                         bmpDisabled.Dispose();
                     } else {

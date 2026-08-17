@@ -978,7 +978,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             filter.Insert(0, new FilterItem(cf, FilterType.Istgleich, $"{tc.MyId}_{_stressTestCounter}"));
         }
 
-        if (tc.Row.GenerateAndAdd([.. filter], "Stresstest").Value is not RowItem row) {
+        if (tc.Row.GenerateAndAdd([.. filter], "Stresstest").Value is not RowItem) {
             // Zeile konnte nicht erstellt werden (z.B. Edit-Sperre durch andere
             // Instanz) — nichts tun, der nächste Tick kommt in 5 s wieder.
             return;

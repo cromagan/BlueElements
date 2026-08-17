@@ -16,7 +16,7 @@ public class CommandButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "CommandButton";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override bool IsCommandButton => true;
 

@@ -260,31 +260,18 @@ Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiCo
 EventScript, werden die TableHead-Variablen richtig zurückgeschrieben?
 
 ## Aufgabe
-ControlStratgies muss ISimpleEditor implementieren. Nur TableControlStrategie nutz dieses für die Spaltenköpfe.
+ControlStratgies muss ISimpleEditor implementieren. Nur TableControlStrategie nutzt dieses für die Spaltenköpfe.
 Der ColumnEditor und ConnectedFormual (Field) müssen diese Optionen anzeigen
 
 ## Aufgabe
-ControlStratgies: Füge eine option hinzu "Frame" mit den GroupBoxStyles
-Dann schaltet ControlCategorey selbst bim erstellen des Controls eine Groupbox dazwischen und gibt dies als Control zurück.
-
-## Aufgabe
-TableView hat zeiwmal IsCellEditable. Repariere und bringe Ordnung rein
-
-## Aufgabe
-GetAllowedControlStrategys ändern. Und zwar so, das ControlStratgy eine Function hat:IsAllowed vor. Dort wird dann TextEditable uns mayHaveDropdownItems übergeben und das wird gegenverglichen.
-Das soll dann auch der ColumnEditor (u. a. in ErrorReason_Editing) benutzen.
-
-## Aufgabe
-        var addWith = strategy is ComboBoxControlStrategy ? 20 : 0;
-entfernen!
-Stratgeieyn haben eine RequiredTextSize, dass benutzen!
+ControlStratgies: Füge eine option hinzu "Border".
+Dann schaltet ControlCategorey selbst bim erstellen des Controls eine Groupbox dazwischen und gibt die Groupbox als Control zurück.
+Border soll auswählbar sein in den ISimpleEditor properties.
 
 ## Aufgabe
 Schau, wo DisableAllEditing du noch benutzen kannst.
 
-## Aufgabe
-MigrateLegacyControlStrategy muss ClassID benutzen aus den Strategies.
-Repariera auch gleich die ColumnFormat ControlStrategy Namen, die habe ich verändern
+
 
 
 

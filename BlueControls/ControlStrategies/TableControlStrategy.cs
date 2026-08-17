@@ -8,8 +8,8 @@ namespace BlueControls.ControlStrategies;
 
 /// <summary>
 /// Strategy, die eine <see cref="TableView" /> mit bearbeitbaren CSV-Daten anzeigt.
-/// <see cref="ControlStrategy.StrategyParameter" /> enthält die Spaltennamen,
-/// getrennt mit ";" (z. B. "Spalte1;Spalte2;Spalte3"). Der Value ist CSV-serialisiert:
+/// <see cref="Columns" /> enthält die Spaltennamen, getrennt mit ";"
+/// (z. B. "Spalte1;Spalte2;Spalte3"). Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
 /// Bei <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern
 /// über die Systemspalte SYS_ROWSORTINDEX eingeblendet.
@@ -31,15 +31,35 @@ public class TableControlStrategy : ControlStrategy {
 
     public static string ClassId => "Table";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    /// <summary>
+    /// Die Spaltenköpfe der eingebetteten Tabelle, mit ";" getrennt.
+    /// </summary>
+    public string Columns {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    } = string.Empty;
 
+    public override string Description => "Zeigt eine kleine Tabelle mit eigenen Spalten. Die Spaltenköpfe werden mit ';' getrennt angegeben.";
     public override string KeyName => ClassId;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
 
     public override void CreateControl() => _control = new TableView();
+
+    /// <summary>
+    /// Option der Strategie: die Spaltenköpfe der eingebetteten Tabelle.
+    /// </summary>
+    public override List<GenericControl> GetProperties(int widthOfControl)
+        => [.. base.GetProperties(widthOfControl), new FlexiControlForProperty<string>(() => Columns, "Spaltenköpfe")];
 
     public override void SubscribeEvents() {
         if (_table is { IsDisposed: false } tb) {
@@ -69,7 +89,8 @@ public class TableControlStrategy : ControlStrategy {
 
         // Tabelle neu aufbauen, wenn sich Spalten oder Sortiermodus geändert hat.
         if (_table is null or { IsDisposed: true }
-            || _lastAutoSort != AutoSort) {
+            || _lastAutoSort != AutoSort
+            || _lastColumns != Columns) {
             BuildTable();
         }
 
@@ -141,9 +162,9 @@ public class TableControlStrategy : ControlStrategy {
         _table.TableAdmin = new[] { Everybody }.AsReadOnly();
         _table.PermissionGroupsNewRow = new[] { Everybody }.AsReadOnly();
 
-        // Spalten aus StrategyParameter ("Spalte1;Spalte2;Spalte3") erzeugen.
+        // Spalten aus Columns ("Spalte1;Spalte2;Spalte3") erzeugen.
         var added = false;
-        foreach (var raw in StrategyParameter.SplitBy(";")) {
+        foreach (var raw in Columns.SplitBy(";")) {
             var name = raw.Trim();
             if (string.IsNullOrEmpty(name)) { continue; }
             var c = _table.Column.GenerateAndAdd(name, name, TextOneLineColumnFormat.Instance);
@@ -153,7 +174,7 @@ public class TableControlStrategy : ControlStrategy {
             }
         }
 
-        // Fallback: mindestens eine Spalte, falls StrategyParameter leer.
+        // Fallback: mindestens eine Spalte, falls Columns leer.
         if (!added) {
             var c = _table.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
             if (c is { IsDisposed: false }) { c.IsFirst = true; }
@@ -174,7 +195,7 @@ public class TableControlStrategy : ControlStrategy {
 
         BuildArrangement();
 
-        _lastColumns = StrategyParameter;
+        _lastColumns = Columns;
         _lastAutoSort = AutoSort;
 
         if (_table is { IsDisposed: false } newTb) {
@@ -185,6 +206,19 @@ public class TableControlStrategy : ControlStrategy {
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    public override JsonObject ParseableJson() {
+        var json = base.ParseableJson();
+
+        json.Set("columns", Columns);
+
+        return json;
+    }
+
+    public override void ParseJson(JsonObject json) {
+        Columns = json.GetString("columns", Columns);
+        base.ParseJson(json);
+    }
 
     private void LoadCsvIntoTable(string value) {
         if (_table is not { IsDisposed: false } tb) { return; }

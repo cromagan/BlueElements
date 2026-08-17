@@ -16,7 +16,7 @@ public class ColorButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "ColorButton";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

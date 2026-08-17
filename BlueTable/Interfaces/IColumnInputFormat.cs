@@ -19,6 +19,8 @@ public interface IColumnInputFormat : IInputFormat {
 
     string ControlStrategy { get; set; }
 
+    string ControlStrategyParameter { get; set; }
+
     string RendererSettings { get; set; }
     ScriptType ScriptType { get; set; }
     bool ShowValuesOfOtherCellsInDropdown { get; set; }
@@ -39,6 +41,7 @@ public static class ColumnInputFormatExtensions {
         t.Align = source.Align;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
         t.ControlStrategy = source.ControlStrategy;
+        t.ControlStrategyParameter = source.ControlStrategyParameter;
         t.DropDownItems = source.DropDownItems;
         t.ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
         t.ScriptType = source.ScriptType;

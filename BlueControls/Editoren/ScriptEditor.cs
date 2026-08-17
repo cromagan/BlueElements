@@ -255,7 +255,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         var vc = new VariableCollection();
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                vc.Add(new String(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
+                vc.Add(new StringScriptVariable(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
             }
         }
         return vc;

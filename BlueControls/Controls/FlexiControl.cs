@@ -213,6 +213,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     } = NoneControlStrategy.ClassId;
 
     /// <summary>
+    /// Parse-Code der strategie-spezifischen Werte der ControlStrategie —
+    /// analog zu RendererSettings beim Renderer.
+    /// </summary>
+    [DefaultValue("")]
+    public string ControlStrategyParameter {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; RemoveStrategy(); }));
+                return;
+            }
+
+            field = value;
+            RemoveStrategy();
+        }
+    } = string.Empty;
+
+    /// <summary>
     /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
     /// </summary>
     [DefaultValue(-1)]
@@ -678,6 +698,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.CreateControl();
 
             _strategy.BeginInit();
+            _strategy.ParseJson(ControlStrategyParameter);
             _strategy.Caption = Caption;
             _strategy.ImageCode = ImageCode;
 

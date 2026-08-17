@@ -73,6 +73,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string _columnTags;
 
     private string _controlStrategy = string.Empty;
+    private string _controlStrategyParameter = string.Empty;
     private string _defaultRenderer;
 
     private TranslationType _doOpticalTranslation;
@@ -480,6 +481,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_controlStrategy == value) { return; }
 
             Table?.ChangeData(TableDataType.ControlStrategy, this, _controlStrategy, value);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Zusatz-Parameter zur Bearbeitungs-Strategie (z. B. die Spaltenköpfe der Tabellen-Strategie).
+    /// </summary>
+    public string ControlStrategyParameter {
+        get => _controlStrategyParameter;
+        set {
+            if (IsDisposed) { return; }
+            if (_controlStrategyParameter == value) { return; }
+
+            Table?.ChangeData(TableDataType.ControlStrategyParameter, this, _controlStrategyParameter, value);
             OnPropertyChanged();
         }
     }
@@ -1424,6 +1439,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("relationship_to_first", _relationship_to_First);
         json.Set("ignoreatrowfilter", _ignoreAtRowFilter);
         json.Set("controlstrategy", _controlStrategy);
+        json.Set("controlstrategyparameter", _controlStrategyParameter);
         json.Set("editablewithtextinput", _editableWithTextInput);
         json.Set("editalloweddespitelock", _editAllowedDespiteLock);
         json.Set("mintextlength", _minTextLength);
@@ -1485,6 +1501,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
         _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
         _controlStrategy = json.GetString("controlstrategy", "Texbox");
+        _controlStrategyParameter = json.GetString("controlstrategyparameter", string.Empty);
         _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
         _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
         _minTextLength = json.GetInt("mintextlength", 0);
@@ -2141,6 +2158,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.ControlStrategy:
                 _controlStrategy = value;
+                break;
+
+            case TableDataType.ControlStrategyParameter:
+                _controlStrategyParameter = value;
                 break;
 
             case TableDataType.SpellCheckingEnabled:

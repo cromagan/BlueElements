@@ -20,6 +20,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private readonly TableView? _table;
     private Renderer.Renderer? _renderer;
+    private ControlStrategy? _strategyOptions;
     private bool _writeAccessLost;
 
     #endregion
@@ -330,6 +331,18 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column_DatenAuslesen();
     }
 
+    private void cbxControlStrategy_TextChanged(object? sender, System.EventArgs e) {
+        if (_strategyOptions is { IsDisposed: false } old) { old.Dispose(); }
+        _strategyOptions = null;
+
+        if (InputItem is ColumnItem { IsDisposed: false } c) {
+            _strategyOptions = ControlStrategy.CreateNew(cbxControlStrategy.Text);
+            _strategyOptions.ParseJson(c.ControlStrategyParameter);
+        }
+
+        _strategyOptions.DoForm(StrategyEditor);
+    }
+
     private void cbxLinkedTable_TextChanged(object sender, System.EventArgs e) {
         if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
 
@@ -430,6 +443,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkFilterOnlyAND.Checked = c.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
         btnZeilenFilterIgnorieren.Checked = c.IgnoreAtRowFilter;
         cbxControlStrategy.Text = c.ControlStrategy;
+        cbxControlStrategy_TextChanged(cbxControlStrategy, System.EventArgs.Empty);
         btnEditableStandard.Checked = c.EditableWithTextInput;
         txbMinTextLength.Text = c.MinTextLength.ToString1();
         btnAutoEditAutoSort.Checked = c.AfterEditQuickSortRemoveDouble;
@@ -527,6 +541,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.ColumnTags = txbTags.Text;
         c.RegexCheck = txbRegex.Text;
         c.ControlStrategy = cbxControlStrategy.Text;
+        c.ControlStrategyParameter = _strategyOptions?.ParseableJson().ToJsonString() ?? string.Empty;
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;

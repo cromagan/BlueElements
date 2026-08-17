@@ -41,6 +41,7 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
     public string AllowedChars { get => _format.AllowedChars; set { } }
 
     public string ControlStrategy { get; set; } = "None";
+    public string ControlStrategyParameter { get; set; } = string.Empty;
     public string DefaultRenderer { get; set; } = string.Empty;
 
     public TranslationType DoOpticalTranslation { get; set; }

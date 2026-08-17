@@ -339,7 +339,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public void ParseJson(JsonObject json) {
         // Spalten werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
         // Hier nur die Eigenschaften aktualisieren, falls Spalten bereits existieren.
-        if (Table is not { IsDisposed: false } tb) { return; }
+        if (Table is not { IsDisposed: false }) { return; }
         if (json["columns"] is not JsonArray cols) { return; }
 
         foreach (var item in cols) {

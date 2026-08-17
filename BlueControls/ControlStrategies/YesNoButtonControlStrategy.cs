@@ -16,7 +16,7 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "YesNoButton";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

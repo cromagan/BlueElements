@@ -8,21 +8,25 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupportInitialize, IReadableTextWithKey {
+public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposableExtended, ISupportInitialize, IReadableTextWithKey, ISimpleEditor {
 
     #region Fields
 
     public static readonly AssemblyAwareCache<ControlStrategy> AllStrategies = new();
 
-    private bool _initializing;
+    private GroupBox? _borderBox;
 
     private volatile int _isDisposedFlag;
+
+    private int _suspendCount;
 
     #endregion
 
     #region Events
 
     public event EventHandler? Disposed;
+
+    public event EventHandler? DoUpdateSideOptionMenu;
 
     public event EventHandler? DropDownShowing;
 
@@ -38,6 +42,8 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
+    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
+
     public event EventHandler? TabKey;
 
     public event EventHandler<TextEventArgs>? ValueChanged;
@@ -51,7 +57,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -60,7 +66,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -69,7 +75,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -78,7 +84,20 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
+        }
+    }
+
+    /// <summary>
+    /// Schaltet eine GroupBox als Rahmen um das erstellte Control.
+    /// <see cref="Control" /> gibt dann die GroupBox zurück.
+    /// </summary>
+    public bool Border {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!IsEventsSuppressed) { OnDoUpdateSideOptionMenu(); }
         }
     }
 
@@ -87,7 +106,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -96,18 +115,33 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
-    public abstract System.Windows.Forms.Control? Control { get; }
+    /// <summary>
+    /// Das sichtbare Control der Strategie. Bei aktivem <see cref="Border" />
+    /// wird das erzeugte Control in eine GroupBox gefasst und diese zurückgegeben.
+    /// </summary>
+    public System.Windows.Forms.Control? Control {
+        get {
+            if (!Border) { return ControlCore; }
+            if (_borderBox is { IsDisposed: false } box) { return box; }
+            if (ControlCore is not { IsDisposed: false } inner) { return ControlCore; }
+
+            _borderBox = new GroupBox { Text = string.Empty };
+            inner.Dock = System.Windows.Forms.DockStyle.Fill;
+            _borderBox.Controls.Add(inner);
+            return _borderBox;
+        }
+    }
 
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get;
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -116,16 +150,22 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
+
+    /// <summary>
+    /// Beschreibung der Strategie-Optionen für den Property-Editor.
+    /// Leer, wenn die Strategie keine Optionen hat.
+    /// </summary>
+    public virtual string Description => string.Empty;
 
     public string ForbiddenChars {
         get;
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -134,7 +174,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -153,6 +193,13 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
     public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
+    /// True, während sich die Strategie in einer Initialisierungs- oder
+    /// Parse-Phase befindet (zwischen <see cref="BeginInit" /> und
+    /// <see cref="EndInit" />). Property-Setter lösen dann kein ApplyStyle aus.
+    /// </summary>
+    public bool IsEventsSuppressed => _suspendCount > 0;
+
+    /// <summary>
     /// Eindeutiger, stabiler Key der Strategie (identisch zur statischen ClassId).
     /// Dient als Auswahl- und Serialisierungsschlüssel am ColumnItem.
     /// </summary>
@@ -163,7 +210,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -172,7 +219,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -181,7 +228,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -190,7 +237,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -199,7 +246,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -208,7 +255,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -217,7 +264,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -226,7 +273,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = 1;
 
@@ -235,7 +282,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -244,7 +291,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -253,7 +300,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -262,7 +309,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -271,7 +318,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = SuggestionPosition.Bottom;
 
@@ -301,7 +348,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -310,7 +357,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
@@ -320,9 +367,14 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         set {
             if (field == value) { return; }
             field = value;
-            if (!_initializing) { ApplyStyle(); }
+            if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = 1f;
+
+    /// <summary>
+    /// Das von der konkreten Strategie erzeugte Control ohne Rahmen.
+    /// </summary>
+    protected abstract System.Windows.Forms.Control? ControlCore { get; }
 
     #endregion
 
@@ -339,7 +391,7 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         AllStrategies[editStrategyKey] ?? AllStrategies[TextBoxControlStrategy.ClassId] ?? new TextBoxControlStrategy();
 
     /// <summary>
-    /// Übersetzt die Zahlen des entfernten Enums ControlStrategyFormula in die ClassId
+    /// Übersetzt die Zahlen des entfernten enums ControlStrategyFormula in die ClassId
     /// der zugehörigen Strategie. Unbekannte Zahlen liefern None.
     /// </summary>
     public static string ClassIdFromLegacyControlStrategy(string legacyControlStrategy) {
@@ -403,7 +455,10 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         return new TextBoxControlStrategy();
     }
 
-    public void BeginInit() => _initializing = true;
+    public void BeginInit() {
+        if (IsDisposed) { return; }
+        _suspendCount++;
+    }
 
     /// <summary>
     /// Berechnet die für das Control benötigte Größe anhand der aktuell
@@ -423,10 +478,21 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
     }
 
     public void EndInit() {
-        if (!_initializing) { return; }
-        _initializing = false;
-        ApplyStyle();
+        if (IsDisposed || _suspendCount == 0) { return; }
+        _suspendCount--;
+        if (!IsEventsSuppressed) { ApplyStyle(); }
     }
+
+    /// <summary>
+    /// Optionen der Strategie für den Property-Editor.
+    /// Leer, wenn die Strategie keine konfigurierbaren Optionen hat.
+    /// </summary>
+    public virtual List<GenericControl> GetProperties(int widthOfControl) => [new FlexiControlForProperty<bool>(() => Border, "Rahmen")];
+
+    /// <summary>
+    /// Strategien haben keine Sub-Items im JSON-Pfad.
+    /// </summary>
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
 
     public virtual void HandleCaptionClick() { }
 
@@ -444,7 +510,25 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
         return false;
     }
 
+    public void OnPropertyChangedExt(string relativePath, object? value) =>
+        PropertyChangedExt?.Invoke(this, JsonParseableExtension.BuildSubItemEventArgs(this, relativePath, value));
+
     public void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
+
+    public virtual JsonObject ParseableJson() {
+        var json = new JsonObject();
+
+        json.Set("classid", KeyName);
+        if (Border) { json.Set("border", Border); }
+
+        return json;
+    }
+
+    public virtual void ParseFinishedJson(JsonObject parsed) { }
+
+    public virtual void ParseJson(JsonObject json) {
+        Border = json.GetBool("border", Border);
+    }
 
     /// <summary>
     /// Lesbarer Anzeigename der Strategie, z. B. für Auswahllisten.
@@ -484,6 +568,8 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
 
             UnsubscribeEvents();
 
+            Disposed = null;
+            DoUpdateSideOptionMenu = null;
             DropDownShowing = null;
             EnterKey = null;
             EscKey = null;
@@ -493,14 +579,18 @@ public abstract class ControlStrategy : IInputFormat, IDisposableExtended, ISupp
             NavigateToNext = null;
             TabKey = null;
             ValueChanged = null;
-            Disposed = null;
 
-            if (Control is { IsDisposed: false } control) {
+            if (_borderBox is { IsDisposed: false } box) {
+                box.Visible = false;
+                box.Dispose(); // Disposed auch das eingebettete Control
+            } else if (ControlCore is { IsDisposed: false } control) {
                 control.Visible = false;
                 control.Dispose();
             }
         }
     }
+
+    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 

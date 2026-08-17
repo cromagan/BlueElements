@@ -433,17 +433,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e is null || Items is null) { return null; }
 
-        var tmp = Items.HotItem(e.ControlPoint, topLevel, mustEnabled, Zoom, OffsetX, OffsetY);
-        if (LastClickedItem is { IsDisposed: false, Enabled: true } bpi) {
-            var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
-            //if (bpi is ComicCompPadItem ccpi) {
-            //    foreach (var thisPoint in ccpi.JointPoints) {
-            //        if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) { return thisPoint; }
-            //    }
-            //}
-        }
-
-        return tmp;
+        return Items.HotItem(e.ControlPoint, topLevel, mustEnabled, Zoom, OffsetX, OffsetY);
     }
 
     protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>

@@ -18,7 +18,7 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Combobox";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

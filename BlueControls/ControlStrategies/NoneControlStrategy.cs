@@ -12,7 +12,7 @@ public class NoneControlStrategy : ControlStrategy {
 
     public static string ClassId => "None";
 
-    public override System.Windows.Forms.Control? Control => null;
+    protected override System.Windows.Forms.Control? ControlCore => null;
 
     public override string KeyName => ClassId;
 

@@ -483,3 +483,9 @@ dotnet_diagnostic.S108.severity = suggestion
 # Leerer Catch
 dotnet_diagnostic.S2486.severity = suggestion
 
+# S1939: Inheritance list should not be redundant
+dotnet_diagnostic.S1939.severity = error
+
+# S1481: Remove Unused local Variable
+dotnet_diagnostic.S1481.severity = error
+

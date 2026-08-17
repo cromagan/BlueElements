@@ -183,7 +183,7 @@ public class LinePadItem : PadItem, IStyleableOne {
     }
 
     public override void PointMoved(object? sender, MoveEventArgs e) {
-        if (sender is not PointM point) { return; }
+        if (sender is not PointM) { return; }
 
         CalcTempPoints();
         CalculateJointMiddle(_point1, _point2);

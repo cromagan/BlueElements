@@ -74,15 +74,15 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         VariableCollection vars =
         [
-            new String("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
-            new String("User", UserName, true,
+            new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
+            new StringScriptVariable("User", UserName, true,
                 "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
 
-            new String("Usergroup", UserGroup, true,
+            new StringScriptVariable("Usergroup", UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             //vars.Add(new ListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
-            new String("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
-            new String("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+            new StringScriptVariable("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
+            new StringScriptVariable("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 

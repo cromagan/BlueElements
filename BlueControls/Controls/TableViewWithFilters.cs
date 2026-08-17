@@ -272,7 +272,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
 
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
+    public string IsCellEditableInView(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditableInView(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
 
     public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
 

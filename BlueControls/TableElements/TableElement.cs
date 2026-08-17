@@ -370,7 +370,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
     /// <returns><c>true</c>, wenn ein Edit gestartet wurde (oder die Zelle
     /// bewusst nicht editierbar ist, der Klick also verarbeitet wurde).</returns>
     protected internal bool BeginCellEdit(TableView tableView, ColumnViewItem? viewItem, TableElement rowContainer, RowItem? row, string? chunkValue) {
-        var notEditableReason = tableView.IsCellEditable(viewItem, rowContainer as RowTableElement, chunkValue, true);
+        var notEditableReason = tableView.IsCellEditableInView(viewItem, rowContainer as RowTableElement, chunkValue, true);
         if (notEditableReason is { Length: > 0 } f) {
             TableView.NotEditableInfo(f);
             return true;
@@ -534,7 +534,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
                     }
                 }
                 Brush? backcolor = null;
-                if (this is RowTableElement rli && rli.Row is { IsDisposed: false } r && r.Table is { ChangesRowColor: true } tb) {
+                if (this is RowTableElement rli && rli.Row is { IsDisposed: false } r && r.Table is { ChangesRowColor: true }) {
                     backcolor = r.CheckRow().RowColor;
                 }
 

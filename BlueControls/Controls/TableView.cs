@@ -697,7 +697,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// Prüft auf Tabellen-Ebene (Rechte, Sperren, Verknüpfungen), ob die Zelle
+    /// bearbeitet werden kann — ohne Bezug zur Ansicht.
+    /// Gibt einen Fehlergrund oder einen leeren String zurück.
     /// </summary>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
         if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
@@ -1364,7 +1366,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         ImportCsv(tb, csvtxt);
     }
 
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
+    /// <summary>
+    /// Prüft die Editierbarkeit auf Tabellen-Ebene und zusätzlich, ob die Zelle
+    /// in der aktuellen Ansicht liegt und sichtbar ist. Mit maychangeview wird
+    /// die Zelle vorher ggf. sichtbar gescrollt.
+    /// Gibt einen Fehlergrund oder einen leeren String zurück.
+    /// </summary>
+    public string IsCellEditableInView(ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         if (IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
 
         // Chunk-Ladevorgang kann Invalidate_CurrentArrangement auslösen, danach ColumnViewItem neu auflösen.
@@ -1720,7 +1728,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.IsCellEditable(cellInThisTableColumn, null, newChunkVal, true);
+            var fe = table.IsCellEditableInView(cellInThisTableColumn, null, newChunkVal, true);
             if (string.IsNullOrWhiteSpace(fe)) {
                 fe = Table.IsCellEditable(cellInThisTableColumn?.Column, null, newChunkVal, false);
             }
@@ -1755,7 +1763,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 newChunkVal = newValue;
             }
 
-            var check1 = table.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
+            var check1 = table.IsCellEditableInView(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
             if (string.IsNullOrWhiteSpace(check1)) {
                 check1 = Table.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, false);
             }
@@ -1798,7 +1806,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         try {
             HideAllEditControls();
 
-            var strategy = GetOrCreateControlStrategy(editStrategyKey);
+            var strategyParameter = styleSource?.ControlStrategyParameter ?? string.Empty;
+            var strategy = GetOrCreateControlStrategy(editStrategyKey, strategyParameter);
 
             if (strategy is NoneControlStrategy) {
                 NotEditableInfo("Diese Spalte kann nicht bearbeitet werden.");
@@ -1820,7 +1829,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             // Auswahl-Strategie ohne Items und ohne Text-Fähigkeit: auf Textfeld zurückfallen.
             if (strategy.SupportsSuggestions && items is not { Count: > 0 } && !strategy.SupportsTextEdit) {
-                strategy = GetOrCreateControlStrategy(TextBoxControlStrategy.ClassId);
+                strategy = GetOrCreateControlStrategy(TextBoxControlStrategy.ClassId, string.Empty);
                 if (strategy.Control is not Control fallbackControl) { return; }
                 c = fallbackControl;
             }
@@ -1832,6 +1841,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
+            strategy.ParseJson(strategyParameter);
 
             strategy.Zoom = Zoom;
             strategy.QuickInfo = (styleSource as IReadableTextWithKey)?.QuickInfo ?? string.Empty;
@@ -4008,7 +4018,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void DoRowSortReorder(List<RowItem> sourceRows, int insertIndex, bool isChapterBlock, int mouseControlY) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return; }
         if (sourceRows.Count == 0) { return; }
 
         // CellSets bündeln: ohne Suppression entstünden N teure Voll-Layouts, ResumeEvents feuert einmalig ViewChanged.
@@ -4381,9 +4391,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     /// <summary>
     /// Holt eine gecachte Strategie oder erzeugt sie. Verdrahtet die Event-Handler beim erstmaligen Anlegen.
+    /// Der Parse-Code gehört zum Cache-Schlüssel, damit Instanzen keine Werte
+    /// einer anderen Konfiguration übernehmen.
     /// </summary>
-    private ControlStrategy GetOrCreateControlStrategy(string editStrategyKey) {
-        var strategy = _controlStrategyCache.GetOrAdd(editStrategyKey, CreateControlStrategy);
+    private ControlStrategy GetOrCreateControlStrategy(string editStrategyKey, string strategyParameter) {
+        var cacheKey = strategyParameter is { Length: > 0 } ? editStrategyKey + "|" + strategyParameter : editStrategyKey;
+        var strategy = _controlStrategyCache.GetOrAdd(cacheKey, _ => CreateControlStrategy(editStrategyKey));
 
         if (strategy.Control is null) {
             strategy.CreateControl();

@@ -319,7 +319,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
     }
 
     public override void PointMoved(object? sender, MoveEventArgs e) {
-        if (sender is not PointM point) { return; }
+        if (sender is not PointM) { return; }
 
         CalculateOtherPoints();
         base.PointMoved(sender, e);

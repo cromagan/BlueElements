@@ -17,7 +17,7 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Listbox";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

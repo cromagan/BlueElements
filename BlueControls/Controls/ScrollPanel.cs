@@ -93,11 +93,12 @@ public class ScrollPanel : ZoomPad {
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);
 
-        if (ChildLayout == ChildLayout.None) { return; }
         if (Width < 10 || Height < 10) { return; }
 
+        // Hintergrund immer zeichnen, sonst bleiben Fragmente anderer Controls stehen (v. a. im Designer)
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 
+        if (ChildLayout == ChildLayout.None) { return; }
         if (OffsetX == _lastOffsetX && OffsetY == _lastOffsetY) { return; }
 
         PositionChildren();

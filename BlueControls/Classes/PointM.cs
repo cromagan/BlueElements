@@ -155,8 +155,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public Point CanvasToControl(float zoom, float offsetX, float offsetY) => new Point(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
         OnDisposed();
@@ -321,6 +319,8 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

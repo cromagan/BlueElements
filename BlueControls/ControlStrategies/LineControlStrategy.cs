@@ -16,7 +16,7 @@ public class LineControlStrategy : ControlStrategy {
 
     public static string ClassId => "Line";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

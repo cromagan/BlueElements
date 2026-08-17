@@ -35,7 +35,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="expr"></param>
     /// <param name="list"></param>
     /// <param name="texteditAllowed"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, true) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, true) {
+        // Erst nach dem Basis-Konstruktor: CreateSubControls hat die Strategy
+        // bereits erzeugt, der Setter propagated den Wert an diese weiter.
+        TextInputAllowed = texteditAllowed;
+    }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige, mit der angegeben Anzahl an Zeilen.

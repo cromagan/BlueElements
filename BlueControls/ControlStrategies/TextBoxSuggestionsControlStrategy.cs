@@ -16,7 +16,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     public static string ClassId => "TextBoxSuggestions";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

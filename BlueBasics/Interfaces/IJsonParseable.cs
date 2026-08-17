@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.ComponentModel;
+
 namespace BlueBasics.Interfaces;
 
 /// <summary>
@@ -179,8 +181,27 @@ public static class JsonParseableExtension {
     /// gleiche Objekt an <see cref="IJsonParseable.ParseFinishedJson" /> weiter.
     /// </summary>
     public static void ParseJson(this IJsonParseable parsable, JsonObject toParse) {
-        parsable.ParseJson(toParse);
-        parsable.ParseFinishedJson(toParse);
+        if (parsable is ISupportInitialize pi) { pi.BeginInit(); }
+        try {
+            parsable.ParseJson(toParse);
+            parsable.ParseFinishedJson(toParse);
+        } finally {
+            if (parsable is ISupportInitialize pi2) { pi2.EndInit(); }
+        }
+    }
+
+    /// <summary>
+    /// Pendant zu <see cref="ParseJson(IJsonParseable, JsonObject)" /> für
+    /// Aufrufer, die den JSON-Text als String haben. Ungültige oder leere
+    /// Eingaben (auch Alt-Format) werden stillschweigend ignoriert.
+    /// Implementierer von <see cref="ISupportInitialize" /> werden während
+    /// des Parsens gekapselt.
+    /// </summary>
+    public static void ParseJson(this IJsonParseable parsable, string toParse) {
+        if (toParse is not { Length: > 0 }) { return; }
+        if (JsonNode.Parse(toParse) is JsonObject jo) {
+            parsable.ParseJson(jo);
+        }
     }
 
     /// <summary>

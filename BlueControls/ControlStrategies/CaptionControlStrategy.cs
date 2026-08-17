@@ -16,7 +16,7 @@ public class CaptionControlStrategy : ControlStrategy {
 
     public static string ClassId => "Caption";
 
-    public override System.Windows.Forms.Control? Control => _control;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     public override string KeyName => ClassId;
 

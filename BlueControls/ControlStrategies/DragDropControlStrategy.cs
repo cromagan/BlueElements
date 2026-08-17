@@ -12,7 +12,7 @@ public class DragDropControlStrategy : ControlStrategy {
 
     public static string ClassId => "DragDrop";
 
-    public override System.Windows.Forms.Control? Control => null;
+    protected override System.Windows.Forms.Control? ControlCore => null;
 
     public override string KeyName => ClassId;
 
