@@ -79,6 +79,8 @@ public class TableControlStrategy : ControlStrategy {
         _control?.LostFocus -= Control_LostFocus;
     }
 
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Tabelle);
+
     protected override void ApplyStyle() {
         if (_control is null) { return; }
 

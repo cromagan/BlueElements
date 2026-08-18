@@ -18,6 +18,8 @@ public class ColorButtonControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Zeigt einen Knopf, mit dem eine Farbe gewählt werden kann.";
+
     public override string KeyName => ClassId;
 
     #endregion
@@ -32,6 +34,8 @@ public class ColorButtonControlStrategy : ControlStrategy {
     };
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Farbrad);
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 

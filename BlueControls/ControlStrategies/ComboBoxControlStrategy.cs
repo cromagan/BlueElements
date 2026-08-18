@@ -20,6 +20,8 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.";
+
     public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;
@@ -57,7 +59,7 @@ public class ComboBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Textfeld);
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_ComboBox;

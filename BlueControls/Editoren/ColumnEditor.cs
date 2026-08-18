@@ -45,7 +45,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
         foreach (var thisr in Renderer.Renderer.AllRenderers.Instances) {
-            cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
+            cbxRenderer.ItemAdd(ItemOf(thisr, thisr.MyClassId));
         }
 
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
@@ -942,7 +942,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxControlStrategy.ItemClear();
 
         foreach (var thiss in ControlStrategy.AllStrategies.Instances) {
-            cbxControlStrategy.ItemAdd(ItemOf(thiss.ReadableText(), thiss.KeyName, thiss.SymbolForReadableText()));
+            cbxControlStrategy.ItemAdd(ItemOf(thiss));
         }
     }
 

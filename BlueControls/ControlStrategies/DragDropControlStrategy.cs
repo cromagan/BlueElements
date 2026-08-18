@@ -14,6 +14,8 @@ public class DragDropControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => null;
 
+    public override string Description => "Der Wert ergibt sich automatisch durch Verschieben der Zeilen, z. B. der Sortierindex.";
+
     public override string KeyName => ClassId;
 
     #endregion
@@ -26,7 +28,7 @@ public class DragDropControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() { }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Pfeil_Unten");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Pfeil_Unten);
 
     public override void UnsubscribeEvents() { }
 

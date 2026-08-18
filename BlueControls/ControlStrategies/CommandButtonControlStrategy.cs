@@ -18,6 +18,8 @@ public class CommandButtonControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Zeigt einen Knopf, der anstelle einer Wert-Eingabe ein Kommando auslöst.";
+
     public override bool IsCommandButton => true;
 
     public override string KeyName => ClassId;
@@ -37,6 +39,8 @@ public class CommandButtonControlStrategy : ControlStrategy {
         _control?.Click += CommandButton_Click;
         _control?.LostFocus += Control_LostFocus;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Schaltfläche);
 
     public override void UnsubscribeEvents() {
         _control?.Click -= CommandButton_Click;

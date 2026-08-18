@@ -24,6 +24,8 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Einfaches Textfeld zur freien Eingabe von Text.";
+
     public override string KeyName => ClassId;
 
     public override bool SupportsTextEdit => true;
@@ -104,7 +106,7 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Textfeld);
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBox;

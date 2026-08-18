@@ -19,6 +19,8 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Zeigt eine Liste, deren Einträge ausgewählt, verschoben und entfernt werden können.";
+
     public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;
@@ -72,7 +74,7 @@ public class ListBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Pfeil_Unten_Scrollbar");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Pfeil_Unten_Scrollbar);
 
     public override void UnsubscribeEvents() {
         _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
@@ -139,15 +141,29 @@ public class ListBoxControlStrategy : ControlStrategy {
             }
         }
         _control.Check(values, true);
+        SyncCheckedText();
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) {
-        if (_control is { } c) { OnValueChanged(string.Join('\r', c.Checked)); }
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(SyncCheckedText());
+
+    private void ListBox_ItemRemoved(object? sender, ListItemEventArgs e) {
+        // RemoveAndUnRegister feuert kein ItemCheckedChanged, Text hier explizit syncen.
+        SyncCheckedText();
+        OnItemRemoved(e);
     }
 
-    private void ListBox_ItemRemoved(object? sender, ListItemEventArgs e) => OnItemRemoved(e);
+    /// <summary>
+    /// Hält Control.Text synchron mit den gecheckten Keys. Der Wert-Commit
+    /// der TableView (Edit_Close) liest den Wert über Control.Text.
+    /// </summary>
+    private string SyncCheckedText() {
+        if (_control is not { } c) { return string.Empty; }
+        var value = string.Join('\r', c.Checked);
+        c.Text = value;
+        return value;
+    }
 
     #endregion
 }

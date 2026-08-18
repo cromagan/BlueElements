@@ -1834,9 +1834,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 c = fallbackControl;
             }
 
-            // Nur echte Dropdowns committen über ValueChanged, alle anderen über den Callback.
-            var isDropdown = strategy is ListBoxControlStrategy;
-
             // Style, MultiLine und QuickInfo aus der Style-Quelle ableiten.
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
@@ -1849,7 +1846,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (items is { Count: > 0 }) { strategy.ListItems = items; }
 
             // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
-            if (strategy.SupportsSuggestions && contentColumn.MayHaveDropDown()) {
+            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown()) {
                 strategy.CheckBehavior = CheckBehavior.MultiSelection;
                 strategy.AutoSort = true;
             }
@@ -1869,12 +1866,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             c.Size = size;
             strategy.SetValueToControl(value);
 
-            // Dropdown committet über ValueChanged; alle anderen über den Callback.
-            if (isDropdown) {
-                _editCommit = null;
-            } else {
-                _editCommit = commit;
-            }
+            _editCommit = commit;
 
             c.Visible = true;
             c.BringToFront();

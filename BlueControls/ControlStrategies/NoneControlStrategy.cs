@@ -14,6 +14,8 @@ public class NoneControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => null;
 
+    public override string Description => "Deaktiviert die Bearbeitung: Der Wert kann vom Benutzer nicht geändert werden.";
+
     public override string KeyName => ClassId;
 
     #endregion
@@ -26,7 +28,7 @@ public class NoneControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() { }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Kreuz");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
 
     public override void UnsubscribeEvents() { }
 

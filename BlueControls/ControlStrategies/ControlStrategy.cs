@@ -155,8 +155,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     }
 
     /// <summary>
-    /// Beschreibung der Strategie-Optionen für den Property-Editor.
-    /// Leer, wenn die Strategie keine Optionen hat.
+    /// Kurze Beschreibung der Strategie für den Property-Editor.
     /// </summary>
     public virtual string Description => string.Empty;
 

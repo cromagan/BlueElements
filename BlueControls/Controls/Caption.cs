@@ -143,7 +143,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         TextDimensions = new Size(maxwidth, -1),
     };
 
-    private static bool QuickModePossible(string text) => !text.Contains('<') && !text.Contains('\r');
+    private static bool QuickModePossible(string text) => !text.Contains('<') && !text.Contains('\r') && !text.Contains('&');
 
     private void GetDesign() {
         _design = Design.Undefined;

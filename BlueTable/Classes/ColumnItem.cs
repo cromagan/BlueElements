@@ -177,7 +177,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //_AutofilterTextFilterErlaubt = true;
         //_AutoFilterErweitertErlaubt = true;
         _ignoreAtRowFilter = false;
-        _controlStrategy = "None";
+        _controlStrategy = string.Empty;
         _editableWithTextInput = false;
         _showValuesOfOtherCellsInDropdown = false;
         _afterEditQuickSortRemoveDouble = false;
@@ -2089,7 +2089,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.DropDownItems:
                 _dropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
-                MigrateLegacyControlStrategy();
                 break;
 
             case TableDataType.LinkedCellFilter:
@@ -2611,8 +2610,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     /// <summary>
     /// Rechnet die legacy-Flags (TableDataType 141/142) in die ControlStrategy um.
-    /// Wird nach jedem Nachladen abhängiger Werte erneut aufgerufen, bis alle
-    /// relevanten Daten stehen (Regeln 1–7 der Migrationstabelle).
+    /// Läuft nur in Repair(), wenn alle Attribute geparst sind (Regeln 1–7 der Migrationstabelle).
     /// </summary>
     private void MigrateLegacyControlStrategy() {
         if (!string.IsNullOrEmpty(_controlStrategy)) { return; }

@@ -22,7 +22,7 @@ public class ReadableListItem : ListItem {
         UserDefCompareKey = userDefCompareKey;
         _text = item.ReadableText();
         _symbol = item.SymbolForReadableText();
-        QuickInfo = string.IsNullOrEmpty(quickinfo) ? _text.CreateHtmlCodes() : quickinfo;
+        QuickInfo = BuildQuickInfo(item, quickinfo);
         Item = item;
     }
 
@@ -131,6 +131,19 @@ public class ReadableListItem : ListItem {
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
 
+    /// <summary>
+    /// Baut die QuickInfo: die übergebene Info (oder der encodierte Text) und bei
+    /// ISimpleEditor-Objekten deren Description unter einem Trennstrich.
+    /// </summary>
+    private string BuildQuickInfo(IReadableText? item, string baseQuickInfo) {
+        var qi = string.IsNullOrEmpty(baseQuickInfo) ? _text.CreateHtmlCodes() : baseQuickInfo;
+
+        if (item is ISimpleEditor { Description: { Length: > 0 } } se) {
+            qi += "<hr>" + se.Description.CreateHtmlCodes();
+        }
+        return qi;
+    }
+
     private int ErrorHeightFor(int availableWidth, Design itemdesign) {
         if (!HasError() || availableWidth <= ErrorIndent) { return 0; }
 
@@ -173,7 +186,7 @@ public class ReadableListItem : ListItem {
             _text = Item.ReadableText();
             _symbol = Item.SymbolForReadableText();
             if (Item is IHasKeyName hkn) { KeyName = hkn.KeyName; }
-            if (Item is IReadableTextWithKey rtk) { QuickInfo = rtk.QuickInfo; }
+            if (Item is IReadableTextWithKey rtk) { QuickInfo = BuildQuickInfo(Item, rtk.QuickInfo); }
         }
         Invalidate_UntrimmedCanvasSize();
     }

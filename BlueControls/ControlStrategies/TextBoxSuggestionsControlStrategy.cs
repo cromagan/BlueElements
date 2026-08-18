@@ -18,6 +18,8 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Textfeld, das zusätzlich auswählbare Vorschläge als Chips anbietet.";
+
     public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;
@@ -55,7 +57,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get("Textfeld2");
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Textfeld2);
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBoxSuggestions;

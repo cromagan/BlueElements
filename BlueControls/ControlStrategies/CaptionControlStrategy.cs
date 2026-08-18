@@ -18,6 +18,8 @@ public class CaptionControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Zeigt eine fette Beschriftung als Gruppen-Rahmen ohne Wert-Bearbeitung.";
+
     public override string KeyName => ClassId;
 
     #endregion
@@ -30,6 +32,8 @@ public class CaptionControlStrategy : ControlStrategy {
     };
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Groupbox);
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 

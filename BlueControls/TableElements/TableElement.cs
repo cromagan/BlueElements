@@ -439,7 +439,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
                 dia,
                 new Rectangle(ddLocation, ddSize),
                 ddValue,
-                _ => { },
+                v => ApplyCellValue(tableView, viewItem, rli, v),
                 originalColumn,
                 contentHolderCellColumn,
                 contentHolderCellRow,

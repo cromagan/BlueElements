@@ -20,6 +20,8 @@ public class TextControlStrategy : ControlStrategy {
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
+    public override string Description => "Zeigt den Wert als hervorgehobenen, nicht editierbaren Text.";
+
     public override string KeyName => ClassId;
 
     #endregion
@@ -31,6 +33,8 @@ public class TextControlStrategy : ControlStrategy {
     public override Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Gänsefüßchen);
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 
