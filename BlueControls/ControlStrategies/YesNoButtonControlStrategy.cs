@@ -24,13 +24,6 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     #region Methods
 
-    public override void CreateControl() => _control = new Button() {
-        Name = "YesNoButton",
-        ButtonStyle = ButtonStyle.Yes_or_No,
-        Text = string.Empty,
-        ImageCode = string.Empty
-    };
-
     public override void SubscribeEvents() {
         _control?.CheckedChanged += YesNoButton_CheckedChanged;
         _control?.LostFocus += Control_LostFocus;
@@ -45,13 +38,23 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     protected override void ApplyStyle() => _control?.QuickInfo = QuickInfo;
 
+    protected override void CreateControlCore() => _control = new Button() {
+        Name = "YesNoButton",
+        ButtonStyle = ButtonStyle.Yes_or_No,
+        Text = string.Empty,
+        ImageCode = string.Empty
+    };
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = c.Checked.ToPlusMinus();
+    }
+
     protected override void SetValueToControlInternal(string value) => _control?.Checked = value.FromPlusMinus();
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
-    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) {
-        if (_control is { } c) { OnValueChanged(c.Checked.ToPlusMinus()); }
-    }
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

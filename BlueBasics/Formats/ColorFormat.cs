@@ -17,9 +17,7 @@ public class ColorFormat : Format {
     public ColorFormat() : base(Keyname, QuickImage.Get(ImageCode.Farbrad, 16)) {
         RegexCheck = @"^#([0-9a-f]{6}|[0-9a-f]{8})$";
         AllowedChars = Char_Numerals + "#abcdef";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 9;
         MinTextLength = 7;

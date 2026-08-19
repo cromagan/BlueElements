@@ -13,9 +13,7 @@ public class DateFormat : Format {
     public DateFormat() : base(Keyname, QuickImage.Get(ImageCode.Uhr, 16)) {
         RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$";
         AllowedChars = Char_Numerals + ".";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.DateTime;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 10;
         MinTextLength = 10;

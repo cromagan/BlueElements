@@ -398,8 +398,8 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INoti
         var dia = contentHolderCellColumn.ControlStrategy;
         var strategy = ControlStrategy.Cached(dia);
 
-        if (strategy is DragDropControlStrategy) {
-            TableView.NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
+        if (strategy.NotEditableReason is { Length: > 0 } strategyReason) {
+            TableView.NotEditableInfo(strategyReason);
             return true;
         }
 

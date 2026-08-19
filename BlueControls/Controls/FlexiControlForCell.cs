@@ -97,10 +97,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
     public string ControlStrategy { get => f.ControlStrategy; set => f.ControlStrategy = value; }
 
     /// <summary>
-    /// Parse-Code der strategie-spezifischen Werte der ControlStrategie.
+    /// Parameter der strategie-spezifischen Werte der ControlStrategie als Json.
     /// </summary>
-    [DefaultValue("")]
-    public string ControlStrategyParameter { get => f.ControlStrategyParameter; set => f.ControlStrategyParameter = value; }
+    public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; set => f.ControlStrategyParameter = value; }
 
     [DefaultValue(-1)]
     public int ControlX {

@@ -13,9 +13,7 @@ public class LongOnlyPositiveFormat : Format {
     public LongOnlyPositiveFormat() : base(Keyname, QuickImage.Get(ImageCode.Ganzzahl, 16)) {
         RegexCheck = @"^(([1-9]\d*)|0)$";
         AllowedChars = Char_Numerals;
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.Integer;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = long.MaxValue.ToString1().Length;
         MinTextLength = 1;

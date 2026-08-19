@@ -73,7 +73,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string _columnTags;
 
     private string _controlStrategy = string.Empty;
-    private string _controlStrategyParameter = string.Empty;
+    private JsonObject _controlStrategyParameter = new();
     private string _defaultRenderer;
 
     private TranslationType _doOpticalTranslation;
@@ -90,6 +90,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _isKeyColumn;
     private string _keyName;
     private bool _legacyDropdown;
+    private bool _legacySpellChecking;
+    private bool _legacyTextFormating;
     private ColumnLineStyle _lineStyleLeft;
     private ColumnLineStyle _lineStyleRight;
 
@@ -112,8 +114,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private ScriptType _scriptType;
     private bool _showValuesOfOtherCellsInDropdown;
     private SortierTyp _sortType;
-    private bool _spellCheckingEnabled;
-    private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
 
     #endregion
@@ -185,14 +185,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _fixedColumnWidth = 0;
         _afterEditAutoCorrect = false;
         _afterEditDoUCase = false;
-        _textFormatingAllowed = false;
         _additionalFormatCheck = AdditionalCheck.None;
         _scriptType = ScriptType.undefiniert;
         _forbiddenChars = string.Empty;
         _autoFilterJoker = string.Empty;
         _saveContent = true;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
-        _spellCheckingEnabled = false;
         //_CompactView = true;
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
         _editAllowedDespiteLock = false;
@@ -488,13 +486,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Zusatz-Parameter zur Bearbeitungs-Strategie (z. B. die Spaltenköpfe der Tabellen-Strategie).
     /// </summary>
-    public string ControlStrategyParameter {
+    public JsonObject ControlStrategyParameter {
         get => _controlStrategyParameter;
         set {
             if (IsDisposed) { return; }
-            if (_controlStrategyParameter == value) { return; }
+            if (_controlStrategyParameter.ToJsonString() == value.ToJsonString()) { return; }
 
-            Table?.ChangeData(TableDataType.ControlStrategyParameter, this, _controlStrategyParameter, value);
+            Table?.ChangeData(TableDataType.ControlStrategyParameter, this, _controlStrategyParameter.ToJsonString(), value.ToJsonString());
             OnPropertyChanged();
         }
     }
@@ -605,7 +603,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditDoUCase) { return true; }
             if (_forbiddenChars is { Length: > 0 }) { return true; }
             if (_afterEditRound > -1) { return true; }
-            if (_textFormatingAllowed) { return true; }
+            if (TextFormatingAllowed) { return true; }
 
             // _maxCellLength wird absichtlich ignoriert
 
@@ -943,16 +941,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public bool SpellCheckingEnabled {
-        get => _spellCheckingEnabled;
-        set {
-            if (IsDisposed) { return; }
-            if (_spellCheckingEnabled == value) { return; }
-
-            Table?.ChangeData(TableDataType.SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus());
-            OnPropertyChanged();
-        }
-    }
+    /// <summary>
+    /// Rechtschreibprüfung der Bearbeitungs-Strategie. Wird automatisch aus dem
+    /// ControlStrategyParameter ("spellcheckingenabled") übernommen.
+    /// </summary>
+    public bool SpellCheckingEnabled { get; private set; }
 
     public Table? Table {
         get;
@@ -967,16 +960,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public bool TextFormatingAllowed {
-        get => _textFormatingAllowed;
-        set {
-            if (IsDisposed) { return; }
-            if (_textFormatingAllowed == value) { return; }
-
-            Table?.ChangeData(TableDataType.TextFormatingAllowed, this, _textFormatingAllowed.ToPlusMinus(), value.ToPlusMinus());
-            OnPropertyChanged();
-        }
-    }
+    /// <summary>
+    /// Erlaubte Text-Formatierung (Fett, Kursiv etc.) der Bearbeitungs-Strategie.
+    /// Wird automatisch aus dem ControlStrategyParameter ("textformatingallowed") übernommen.
+    /// </summary>
+    public bool TextFormatingAllowed { get; private set; }
 
     bool IHasSettings.UsesSettings => _value_for_Chunk != ChunkType.None;
 
@@ -1082,7 +1070,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_forbiddenChars is { Length: > 0 }) { value = value.RemoveChars(_forbiddenChars); }
 
-        if (_textFormatingAllowed) { value = value.CreateHtmlCodes(); }
+        if (TextFormatingAllowed) { value = value.CreateHtmlCodes(); }
 
         if (_afterEditAutoReplace.Count > 0) {
             List<string> l = [.. value.SplitAndCutByCr()];
@@ -1439,7 +1427,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("relationship_to_first", _relationship_to_First);
         json.Set("ignoreatrowfilter", _ignoreAtRowFilter);
         json.Set("controlstrategy", _controlStrategy);
-        json.Set("controlstrategyparameter", _controlStrategyParameter);
+        json.Set("controlstrategyparameter", _controlStrategyParameter.DeepClone());
         json.Set("editablewithtextinput", _editableWithTextInput);
         json.Set("editalloweddespitelock", _editAllowedDespiteLock);
         json.Set("mintextlength", _minTextLength);
@@ -1449,9 +1437,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("aftereditautocorrect", _afterEditAutoCorrect);
         json.Set("aftereditdoucase", _afterEditDoUCase);
         json.Set("forbiddenchars", _forbiddenChars);
-        json.Set("textformatingallowed", _textFormatingAllowed);
         json.Set("savecontent", _saveContent);
-        json.Set("spellcheckingenabled", _spellCheckingEnabled);
         json.Set("fixedcolumnwidth", _fixedColumnWidth);
         json.Set("maxtextlength", _maxTextLength);
         json.Set("maxcelllength", _maxCellLength);
@@ -1501,7 +1487,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
         _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
         _controlStrategy = json.GetString("controlstrategy", "Texbox");
-        _controlStrategyParameter = json.GetString("controlstrategyparameter", string.Empty);
+        _controlStrategyParameter = json.GetJson("controlstrategyparameter") is JsonObject jo ? (JsonObject)jo.DeepClone() : new JsonObject();
+        SpellCheckingEnabled = _controlStrategyParameter.GetBool("spellcheckingenabled");
+        TextFormatingAllowed = _controlStrategyParameter.GetBool("textformatingallowed");
         _editableWithTextInput = json.GetBool("editablewithtextinput", _editableWithTextInput);
         _editAllowedDespiteLock = json.GetBool("editalloweddespitelock", _editAllowedDespiteLock);
         _minTextLength = json.GetInt("mintextlength", 0);
@@ -1512,9 +1500,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
         _afterEditDoUCase = json.GetBool("aftereditdoucase", _afterEditDoUCase);
         _forbiddenChars = json.GetString("forbiddenchars", string.Empty).DistinctCharsSorted();
-        _textFormatingAllowed = json.GetBool("textformatingallowed", _textFormatingAllowed);
         _saveContent = json.GetBool("savecontent", _saveContent);
-        _spellCheckingEnabled = json.GetBool("spellcheckingenabled", _spellCheckingEnabled);
         _fixedColumnWidth = json.GetInt("fixedcolumnwidth", _fixedColumnWidth);
         _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
         _maxCellLength = json.GetInt("maxcelllength", _maxCellLength);
@@ -1610,7 +1596,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     this.GetStyleFrom(TextOneLineColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Ersteller";
                     ShowValuesOfOtherCellsInDropdown = true;
-                    SpellCheckingEnabled = false;
                     ForeColor = System.Drawing.Color.FromArgb(0, 0, 128);
                     BackColor = System.Drawing.Color.FromArgb(185, 186, 255);
                 }
@@ -1625,7 +1610,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _isKeyColumn = false;
                 _isFirst = false;
                 _ignoreAtRowFilter = true;
-                _spellCheckingEnabled = false;
                 _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
                 _maxTextLength = 20;
                 _maxCellLength = 20;
@@ -1643,7 +1627,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.DateCreated:
-                _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(Formats.DateTimeFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
@@ -1659,7 +1642,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case SystemColumnKeys.RowKey:
                 _minTextLength = 5;
-                _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.List_Readonly) {
                     _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
@@ -1681,7 +1663,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _minTextLength = 0;
                 this.GetStyleFrom(Formats.DateTimeFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
@@ -1709,12 +1690,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(Formats.DateTimeWithMilliSecondsFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
-                _spellCheckingEnabled = false;
                 _scriptType = ScriptType.Nicht_vorhanden; // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
 
@@ -1731,7 +1710,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.Correct:
                 _minTextLength = 1;
                 _isFirst = false;
-                _spellCheckingEnabled = false;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1762,7 +1740,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.CellNote:
                 _minTextLength = 0;
                 _isFirst = false;
-                _spellCheckingEnabled = false;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1787,7 +1764,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.Locked:
                 _minTextLength = 1;
                 _isFirst = false;
-                _spellCheckingEnabled = false;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1824,7 +1800,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                _spellCheckingEnabled = false;
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLength = 19;
                 _maxCellLength = 19;
@@ -2160,11 +2135,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.ControlStrategyParameter:
-                _controlStrategyParameter = value;
+                _controlStrategyParameter = value.ParseAsJsonObject();
+                SpellCheckingEnabled = _controlStrategyParameter.GetBool("spellcheckingenabled");
+                TextFormatingAllowed = _controlStrategyParameter.GetBool("textformatingallowed");
                 break;
 
             case TableDataType.SpellCheckingEnabled:
-                _spellCheckingEnabled = value.FromPlusMinus();
+                _legacySpellChecking = value.FromPlusMinus();
                 break;
 
             case TableDataType.ValueRequired:
@@ -2251,7 +2228,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.TextFormatingAllowed:
-                _textFormatingAllowed = value.FromPlusMinus();
+                _legacyTextFormating = value.FromPlusMinus();
                 break;
 
             case TableDataType.ColumnKeyOfLinkedTable:
@@ -2380,7 +2357,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     private string? ErrorReason_Editing() {
-        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
+        if (SpellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
 
         if (_controlStrategy == "None") {
             if (_editAllowedDespiteLock) { return EditDespiteLockNeedsMethod; }
@@ -2609,11 +2586,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private void LinkedTable_Disposed(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
 
     /// <summary>
-    /// Rechnet die legacy-Flags (TableDataType 141/142) in die ControlStrategy um.
+    /// Rechnet die legacy-Flags (TableDataType 141/142/156/199) in die ControlStrategy um.
     /// Läuft nur in Repair(), wenn alle Attribute geparst sind (Regeln 1–7 der Migrationstabelle).
     /// </summary>
     private void MigrateLegacyControlStrategy() {
         if (!string.IsNullOrEmpty(_controlStrategy)) { return; }
+
+        // Legacy-Flags 156/199 in die Strategy-Parameter übernehmen.
+        // Vor der Strategie-Berechnung, da diese TextFormatingAllowed auswertet.
+        _controlStrategyParameter.Set("spellcheckingenabled", _legacySpellChecking);
+        _controlStrategyParameter.Set("textformatingallowed", _legacyTextFormating);
+        SpellCheckingEnabled = _legacySpellChecking;
+        TextFormatingAllowed = _legacyTextFormating;
 
         if (!_legacyDropdown && !_editableWithTextInput) {
             DisableAllEditing();
@@ -2634,7 +2618,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_editableWithTextInput) {
-            if (hasItems && (_textFormatingAllowed || (_multiLine && !_afterEditQuickSortRemoveDouble))) {
+            if (hasItems && (TextFormatingAllowed || (_multiLine && !_afterEditQuickSortRemoveDouble))) {
                 _controlStrategy = "TextBoxSuggestions";
                 return;
             }

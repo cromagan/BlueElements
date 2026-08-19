@@ -16,13 +16,19 @@ public class DragDropControlStrategy : ControlStrategy {
 
     public override string Description => "Der Wert ergibt sich automatisch durch Verschieben der Zeilen, z. B. der Sortierindex.";
 
+    public override bool IsSpecial => true;
+
     public override string KeyName => ClassId;
+
+    public override string NotEditableReason => "Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.";
 
     #endregion
 
     #region Methods
 
-    public override void CreateControl() { }
+    protected override void CreateControlCore() { }
+
+    protected override void ForceWriteBackValue() { }
 
     public override string ReadableText() => "Automatisch durch Verschieben";
 

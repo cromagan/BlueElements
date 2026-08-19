@@ -5,6 +5,7 @@ using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
+using BlueTable.Interfaces;
 using System.Globalization;
 
 namespace BlueControls.PadItems;
@@ -127,8 +128,11 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
 
             if (applicableVars.Count > 0) {
                 textFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
-                textFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
                 textFlex.ListItems = [.. applicableVars.Select(v => ItemOf($"~{v.KeyName}~"))];
+
+                if (textFlex.Strategy is TextBoxSuggestionsControlStrategy tbs) {
+                    tbs.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+                }
             }
         }
 

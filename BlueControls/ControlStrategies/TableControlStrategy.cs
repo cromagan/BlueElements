@@ -18,10 +18,10 @@ public class TableControlStrategy : ControlStrategy {
 
     #region Fields
 
+    private const string _columnsKey = "columns";
     private TableView? _control;
     private bool _lastAutoSort = true;
     private string _lastColumns = "\u0001";
-    private string _pendingValue = string.Empty;
     private bool _suppressEvents;
     private Table? _table;
 
@@ -39,6 +39,9 @@ public class TableControlStrategy : ControlStrategy {
         set {
             if (field == value) { return; }
             field = value;
+
+            ControlStrategyParameter.Set(_columnsKey, value);
+
             if (IsEventsSuppressed) { return; }
             OnDoUpdateSideOptionMenu();
             ApplyStyle();
@@ -52,8 +55,6 @@ public class TableControlStrategy : ControlStrategy {
     #endregion
 
     #region Methods
-
-    public override void CreateControl() => _control = new TableView();
 
     /// <summary>
     /// Option der Strategie: die Spaltenköpfe der eingebetteten Tabelle.
@@ -70,6 +71,8 @@ public class TableControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Tabelle);
+
     public override void UnsubscribeEvents() {
         if (_table is { IsDisposed: false } tb) {
             tb.CellValueChanged -= Table_ContentChanged;
@@ -79,15 +82,8 @@ public class TableControlStrategy : ControlStrategy {
         _control?.LostFocus -= Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Tabelle);
-
     protected override void ApplyStyle() {
         if (_control is null) { return; }
-
-        // Bei bestehender Tabelle: aktuellen Wert sichern, bevor evtl. neu aufgebaut wird.
-        if (_table is { IsDisposed: false } tb && !_suppressEvents) {
-            _pendingValue = CsvHelper.ExportCSV(tb, ';', false);
-        }
 
         // Tabelle neu aufbauen, wenn sich Spalten oder Sortiermodus geändert hat.
         if (_table is null or { IsDisposed: true }
@@ -101,12 +97,16 @@ public class TableControlStrategy : ControlStrategy {
             _control.Arrangement = string.Empty;
         }
         _control.Zoom = Zoom;
-        LoadCsvIntoTable(_pendingValue);
+
         _control.QuickInfo = QuickInfo;
     }
 
+    protected override void CreateControlCore() => _control = new TableView();
+
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            base.Dispose(disposing);
+
             if (_table is { IsDisposed: false } tb) {
                 tb.CellValueChanged -= Table_ContentChanged;
                 tb.Row.RowAdded -= Table_ContentChanged;
@@ -115,11 +115,19 @@ public class TableControlStrategy : ControlStrategy {
             if (_table is { IsDisposed: false }) { _table.Dispose(); }
             _table = null;
         }
-        base.Dispose(disposing);
+    }
+
+    protected override void ForceWriteBackValue() {
+        if (_table is not { IsDisposed: false } tb) { return; }
+        Value = CsvHelper.ExportCSV(tb, ';', false);
+    }
+
+    protected override void ReadParameters(JsonObject json) {
+        base.ReadParameters(json);
+        Columns = json.GetString(_columnsKey, Columns);
     }
 
     protected override void SetValueToControlInternal(string value) {
-        _pendingValue = value;
         if (_table is not { IsDisposed: false } tb) { return; }
         // Durch Benutzereingabe ausgelöste Value-Änderungen nicht neu laden,
         // die Tabelle enthält den Wert bereits.
@@ -209,19 +217,6 @@ public class TableControlStrategy : ControlStrategy {
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
-    public override JsonObject ParseableJson() {
-        var json = base.ParseableJson();
-
-        json.Set("columns", Columns);
-
-        return json;
-    }
-
-    public override void ParseJson(JsonObject json) {
-        Columns = json.GetString("columns", Columns);
-        base.ParseJson(json);
-    }
-
     private void LoadCsvIntoTable(string value) {
         if (_table is not { IsDisposed: false } tb) { return; }
 
@@ -252,11 +247,7 @@ public class TableControlStrategy : ControlStrategy {
         }
     }
 
-    private void Table_ContentChanged(object? sender, System.EventArgs e) {
-        if (_suppressEvents) { return; }
-        if (_table is not { IsDisposed: false } tb) { return; }
-        OnValueChanged(CsvHelper.ExportCSV(tb, ';', false));
-    }
+    private void Table_ContentChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

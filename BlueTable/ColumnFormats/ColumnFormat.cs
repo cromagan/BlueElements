@@ -41,7 +41,7 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
     public string AllowedChars { get => _format.AllowedChars; set { } }
 
     public string ControlStrategy { get; set; } = "None";
-    public string ControlStrategyParameter { get; set; } = string.Empty;
+    public JsonObject ControlStrategyParameter { get; set; } = new();
     public string DefaultRenderer { get; set; } = string.Empty;
 
     public TranslationType DoOpticalTranslation { get; set; }
@@ -65,8 +65,6 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
     public ScriptType ScriptType { get; set; }
     public bool ShowValuesOfOtherCellsInDropdown { get; set; }
     public SortierTyp SortType { get; set; }
-    public bool SpellCheckingEnabled { get => _format.SpellCheckingEnabled; set { } }
-    public bool TextFormatingAllowed { get => _format.TextFormatingAllowed; set { } }
 
     #endregion
 

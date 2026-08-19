@@ -30,14 +30,19 @@ public class FlexiControlForProperty<T> : FlexiControl {
     public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list) : this(expr, list, false) { }
 
     /// <summary>
+    /// Anzeige als Dropdown-Feld mit eigener Beschriftung
+    /// </summary>
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText, List<ListItem>? list) : this(expr, captionText, 1, list, CheckBehavior.MultiSelection, AddType.None, true) { }
+
+    /// <summary>
     /// Anzeige als Dropdown-Feld
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
     /// <param name="texteditAllowed"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, List<ListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, true) {
-        // Erst nach dem Basis-Konstruktor: CreateSubControls hat die Strategy
-        // bereits erzeugt, der Setter propagated den Wert an diese weiter.
+        // Der Basis-Konstruktor hat die Strategy bereits erzeugt,
+        // der Setter propagated den Wert an diese weiter.
         TextInputAllowed = texteditAllowed;
     }
 
@@ -83,8 +88,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         AutoSort = autoSort;
         ListItems = allPossibleItems;
 
-        #region Caption setzen
-
         if (string.IsNullOrEmpty(captionText)) {
             var x = _accessor.Name.SplitAndCutBy("__");
             Caption = x[0].Replace('_', ' ') + ":";
@@ -92,98 +95,31 @@ public class FlexiControlForProperty<T> : FlexiControl {
             Caption = captionText.TrimEnd(':') + ":";
         }
 
-        #endregion
-
-        #region Art des Steuerelements bestimmen
-
         switch (_accessor) {
-            case Accessor<bool>: {
-                    ControlStrategy = YesNoButtonControlStrategy.ClassId;
-                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
-                    Size = new Size(s1.Width + 30, 22);
-                    break;
-                }
+            case Accessor<bool>:
+                ControlStrategy = YesNoButtonControlStrategy.ClassId;
+                var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
+                Size = new Size(s1.Width + 30, 22);
+                break;
 
             case Accessor<List<string>>:
-            case Accessor<ReadOnlyCollection<string>>: {
-                    CaptionPosition = CaptionPosition.Über_dem_Feld;
-                    ControlStrategy = ListBoxControlStrategy.ClassId;
-                    Size = new Size(200, 16 + (24 * rowCount));
-                    RaiseChangeDelay = 1;
-                    TextInputAllowed = false;
-                    break;
-                }
+            case Accessor<ReadOnlyCollection<string>>:
+                CaptionPosition = CaptionPosition.Über_dem_Feld;
+                ControlStrategy = ListBoxControlStrategy.ClassId;
+                Size = new Size(200, 16 + (24 * rowCount));
+                RaiseChangeDelay = 1;
+                TextInputAllowed = false;
+                break;
 
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
-            {
-                    if (allPossibleItems is not null) {
-                        ControlStrategy = ComboBoxControlStrategy.ClassId;
-                        var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
-
-                        var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_TextBox);
-                        var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
-                        var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
-                        Size = new Size(x2, y2);
-
-                        RaiseChangeDelay = 1;
-                        TextInputAllowed = false;
-                    } else if (_accessor.Get() is IEditable) {
-                        ControlStrategy = CommandButtonControlStrategy.ClassId;
-                        ImageCode = "Stift|16";
-                        var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
-                        Size = new Size(s1.Width + 30, 22);
-                        Caption = "bearbeiten";
-                    } else if (_accessor.Get() is null) {
-                        CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-                        ControlStrategy = TextControlStrategy.ClassId;
-                    } else {
-                        ControlStrategy = TextBoxControlStrategy.ClassId;
-                        if (rowCount >= 2) {
-                            CaptionPosition = CaptionPosition.Über_dem_Feld;
-                            Size = new Size(200, 16 + (24 * rowCount));
-                            this.GetStyleFrom(Formats.TextFormat.Instance);
-                            MultiLine = true;
-                        } else {
-                            CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-                            Size = new Size(200, 24);
-                            MultiLine = false;
-                            switch (_accessor) {
-                                case Accessor<string>:
-                                    this.GetStyleFrom(Formats.TextFormat.Instance);
-                                    break;
-
-                                case Accessor<long>:
-                                case Accessor<int>:
-                                    this.GetStyleFrom(Formats.LongFormat.Instance);
-                                    break;
-
-                                case Accessor<float>:
-                                    this.GetStyleFrom(Formats.FloatFormat.Instance);
-                                    break;
-
-                                case Accessor<double>:
-                                    this.GetStyleFrom(Formats.FloatFormat.Instance);
-                                    break;
-
-                                case Accessor<Color>:
-                                    this.GetStyleFrom(Formats.TextFormat.Instance);
-                                    break;
-
-                                default:
-                                    this.GetStyleFrom(Formats.TextFormat.Instance);
-                                    break;
-                            }
-                        }
-                        RaiseChangeDelay = 1;
-                        TextInputAllowed = false;
-                    }
-                    break;
-                }
+                SetupTypeDependent(_accessor, rowCount, allPossibleItems);
+                break;
         }
 
-        #endregion
-
-        CreateSubControls();
+        if (Strategy is CommandButtonControlStrategy button) {
+            button.ButtonCaption = "bearbeiten";
+            button.ButtonImageCode = "Stift|16";
+        }
 
         QuickInfo = _accessor.QuickInfo;
         _accessor.ValueChanged += _accessor_ValueChanged;
@@ -238,6 +174,19 @@ public class FlexiControlForProperty<T> : FlexiControl {
         if (IsDisposed) { return; }
         GenFehlerText();
         base.OnValueChanged();
+    }
+
+    private static BlueBasics.Formats.Format InputFormatFor(Accessor<T> accessor) {
+        switch (accessor) {
+            case Accessor<long> or Accessor<int>:
+                return Formats.LongFormat.Instance;
+
+            case Accessor<float> or Accessor<double>:
+                return Formats.FloatFormat.Instance;
+
+            default:
+                return Formats.TextFormat.Instance;
+        }
     }
 
     private void _accessor_ValueChanged(object? sender, System.EventArgs e) {
@@ -362,6 +311,53 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     private void GenFehlerText() => InfoText = string.Empty;
+
+    private void SetupTypeDependent(Accessor<T> accessor, int rowCount, List<ListItem>? allPossibleItems) {
+        var value = accessor.Get();
+
+        if (allPossibleItems is not null) {
+            ControlStrategy = ComboBoxControlStrategy.ClassId;
+            var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
+
+            var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_TextBox);
+            var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
+            var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
+            Size = new Size(x2, y2);
+
+            RaiseChangeDelay = 1;
+            TextInputAllowed = false;
+            return;
+        }
+
+        if (value is IEditable) {
+            ControlStrategy = CommandButtonControlStrategy.ClassId;
+            var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
+            Size = new Size(s1.Width + 30, 22);
+            Caption = "bearbeiten";
+            return;
+        }
+
+        if (value is null) {
+            CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
+            ControlStrategy = TextControlStrategy.ClassId;
+            return;
+        }
+
+        ControlStrategy = TextBoxControlStrategy.ClassId;
+        if (rowCount >= 2) {
+            CaptionPosition = CaptionPosition.Über_dem_Feld;
+            Size = new Size(200, 16 + (24 * rowCount));
+            this.GetStyleFrom(Formats.TextFormat.Instance);
+            MultiLine = true;
+        } else {
+            CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
+            Size = new Size(200, 24);
+            MultiLine = false;
+            this.GetStyleFrom(InputFormatFor(accessor));
+        }
+        RaiseChangeDelay = 1;
+        TextInputAllowed = false;
+    }
 
     private void SetValueFromProperty() {
         if (IsDisposed) { return; }

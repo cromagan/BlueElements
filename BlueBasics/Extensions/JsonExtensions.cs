@@ -169,6 +169,19 @@ public static partial class Extensions {
     public static List<string> GetStringList(this JsonObject json, string key) =>
         json[key] is JsonArray arr ? arr.ToStringList() : [];
 
+    /// <summary>
+    /// Parst einen Json-String in ein JsonObject. Leere oder ungültige
+    /// Eingaben liefern ein leeres Objekt.
+    /// </summary>
+    public static JsonObject ParseAsJsonObject(this string json) {
+        if (json is { Length: > 0 }) {
+            try {
+                if (JsonNode.Parse(json) is JsonObject jo) { return jo; }
+            } catch { }
+        }
+        return new JsonObject();
+    }
+
     public static bool IsArray(this JsonElement json) => json.ValueKind == JsonValueKind.Array;
 
     public static bool IsObject(this JsonElement json) => json.ValueKind == JsonValueKind.Object;

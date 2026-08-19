@@ -14,9 +14,7 @@ public class UrlFormat : Format {
         //    https://regex101.com/r/S2CbwM/1
         RegexCheck = @"^(https:|http:|www\.)\S*$";
         AllowedChars = Char_Numerals + Char_AZ + Char_az + "äöüÄÖÜ:?=&.,-_/";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 2048;
         MinTextLength = 4;

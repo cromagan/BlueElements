@@ -15,6 +15,8 @@ public class RichTextColumnFormat : ColumnFormat {
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
         ControlStrategy = "Texbox";
+        ControlStrategyParameter.Set("spellcheckingenabled", true);
+        ControlStrategyParameter.Set("textformatingallowed", true);
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;

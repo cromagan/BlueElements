@@ -285,25 +285,30 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void SetupButton(CaptionPosition captionPos) {
+        var filterSingle = FilterInput?[FilterSingleColumn];
+
+        string buttonText;
+        if (captionPos == CaptionPosition.ohne && filterSingle is not null) {
+            buttonText = filterSingle.ReadableText();
+        } else if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
+            buttonText = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
+        } else {
+            buttonText = LanguageTool.DoTranslate("Gewählt: " + f.Value);
+            GenerateQickInfoText(null);
+        }
+
         f.CaptionPosition = captionPos;
         f.ControlStrategy = CommandButtonControlStrategy.ClassId;
-        f.CreateSubControls();
-        var filterSingle = FilterInput?[FilterSingleColumn];
+
+        if (f.Strategy is CommandButtonControlStrategy button) {
+            button.ButtonCaption = buttonText;
+            button.ButtonImageCode = captionPos == CaptionPosition.ohne && filterSingle is not null ? "Trichter|16||1" : "Trichter|16";
+        }
 
         f.Translate = false;
 
-        if (f.CaptionPosition == CaptionPosition.ohne && filterSingle is not null) {
-            f.ImageCode = "Trichter|16||1";
-            f.Caption = filterSingle.ReadableText();
-        } else {
-            if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
-                f.ImageCode = "Trichter|16";
-                f.Caption = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
-            } else {
-                f.ImageCode = "Trichter|16";
-                f.Caption = LanguageTool.DoTranslate("Gewählt: " + f.Value);
-                GenerateQickInfoText(null);
-            }
+        if (captionPos != CaptionPosition.ohne) {
+            f.Caption = buttonText;
         }
     }
 

@@ -13,9 +13,7 @@ public class TextMultilineFormat : Format {
     public TextMultilineFormat() : base(Keyname, QuickImage.Get(ImageCode.Textfeld, 16)) {
         AllowedChars = string.Empty;
         RegexCheck = string.Empty;
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = true;
         MultiLine = true;
         MaxTextLength = 4000;
         MinTextLength = 0;

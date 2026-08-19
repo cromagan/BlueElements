@@ -143,7 +143,10 @@ Kein Console.Writeline und auch ein Develop.DebugPrint
 Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden sollen.
 
 ## Sonstiges
-Erinnere mich im September daran:
- ValueRequired = 143 zu entfernen und 143 zu den obsoleten Werten hinzuzufügen.
- _legacyDropdown zu  entfernen und 142 zu den obsoleten Werten hinzuzufügen.
+Erinnere mich im September daran, diese Werte zu entfernen und  zu den obsoleten Werten hinzuzufügen.
+ValueRequired = 143 
+EditableWithDropdown=  142 und _legacyDropdown
+TextFormatingAllowed = 199 und _legacyTextFormating
+SpellCheckingEnabled = 156 und _legacySpellChecking
+
 

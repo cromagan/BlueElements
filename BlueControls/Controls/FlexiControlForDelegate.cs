@@ -30,9 +30,11 @@ public class FlexiControlForDelegate : FlexiControl {
             case IReadableTextWithKey irt:
                 Init(editable.Edit, $"{editable.CaptionForEditor} '{irt.KeyName}' bearbeiten", irt.SymbolForReadableText());
                 break;
+
             case IReadableText ir:
                 Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", ir.SymbolForReadableText());
                 break;
+
             default:
                 Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(BlueBasics.Enums.ImageCode.Smiley, 22));
                 break;
@@ -82,10 +84,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
         ControlStrategy = CommandButtonControlStrategy.ClassId;
         CaptionPosition = CaptionPosition.ohne;
-        Caption = text;
-        if (image is { } im) {
-            ImageCode = im.KeyName;
-        }
+
         var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, Design.Caption, Translate, -1);
 
         Size = new Size(s0.Width + 50 + 22, 30);
@@ -94,8 +93,10 @@ public class FlexiControlForDelegate : FlexiControl {
 
         CheckEnabledState();
 
-        CreateSubControls();
-
+        if (Strategy is CommandButtonControlStrategy button) {
+            button.ButtonCaption = text;
+            button.ButtonImageCode = image is { } im ? im.KeyName : string.Empty;
+        }
     }
 
     #endregion

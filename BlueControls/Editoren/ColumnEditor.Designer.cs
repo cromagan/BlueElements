@@ -39,7 +39,6 @@ namespace BlueControls.BlueTableDialogs {
             btnBackColor = new Button();
             capUeberschrift3 = new Caption();
             capRenderer = new Caption();
-            btnSpellChecking = new Button();
             capUeberschrift1 = new Caption();
             cbxTranslate = new ComboBox();
             capTranslate = new Caption();
@@ -53,7 +52,6 @@ namespace BlueControls.BlueTableDialogs {
             capAlign = new Caption();
             cbxScriptType = new ComboBox();
             capScriptType = new Caption();
-            chkFormatierungErlaubt = new Button();
             cbxAdditionalCheck = new ComboBox();
             capcbxAdditionalCheck = new Caption();
             cbxChunk = new ComboBox();
@@ -180,7 +178,6 @@ namespace BlueControls.BlueTableDialogs {
             tabAnzeige.Controls.Add(btnBackColor);
             tabAnzeige.Controls.Add(capUeberschrift3);
             tabAnzeige.Controls.Add(capRenderer);
-            tabAnzeige.Controls.Add(btnSpellChecking);
             tabAnzeige.Controls.Add(capUeberschrift1);
             tabAnzeige.Controls.Add(cbxTranslate);
             tabAnzeige.Controls.Add(capTranslate);
@@ -334,15 +331,6 @@ namespace BlueControls.BlueTableDialogs {
             capRenderer.Size = new Size(160, 16);
             capRenderer.Text = "Standard-Renderer:";
             // 
-            // btnSpellChecking
-            // 
-            btnSpellChecking.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnSpellChecking.Location = new Point(8, 200);
-            btnSpellChecking.Name = "btnSpellChecking";
-            btnSpellChecking.Size = new Size(200, 16);
-            btnSpellChecking.TabIndex = 33;
-            btnSpellChecking.Text = "Rechtschreibprüfung aktivieren";
-            // 
             // capUeberschrift1
             // 
             capUeberschrift1.CausesValidation = false;
@@ -457,15 +445,6 @@ namespace BlueControls.BlueTableDialogs {
             capScriptType.Name = "capScriptType";
             capScriptType.Size = new Size(216, 24);
             capScriptType.Text = "Im Skript ist der Datentyp:";
-            // 
-            // chkFormatierungErlaubt
-            // 
-            chkFormatierungErlaubt.ButtonStyle = ButtonStyle.Checkbox_Text;
-            chkFormatierungErlaubt.Location = new Point(312, 8);
-            chkFormatierungErlaubt.Name = "chkFormatierungErlaubt";
-            chkFormatierungErlaubt.Size = new Size(296, 16);
-            chkFormatierungErlaubt.TabIndex = 41;
-            chkFormatierungErlaubt.Text = "Text-Formatierung erlaubt (Fett, Kursiv, etc.)";
             // 
             // cbxAdditionalCheck
             // 
@@ -1165,7 +1144,6 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(txbRegex);
             tabDatenFormat.Controls.Add(capRegex);
             tabDatenFormat.Controls.Add(capAllowedChars);
-            tabDatenFormat.Controls.Add(chkFormatierungErlaubt);
             tabDatenFormat.Controls.Add(cbxAdditionalCheck);
             tabDatenFormat.Controls.Add(capcbxAdditionalCheck);
             tabDatenFormat.Controls.Add(cbxScriptType);
@@ -1483,7 +1461,6 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabSonstiges;
         private Button btnIgnoreLock;
         private Button chkSaveContent;
-        private Button btnSpellChecking;
         private Caption capSpaltenbild;
         private TextBox txbJoker;
         private Caption capJokerValue;
@@ -1522,7 +1499,6 @@ namespace BlueControls.BlueTableDialogs {
         private ComboBox cbxSort;
         private ComboBox cbxTranslate;
         private Caption capTranslate;
-        private Button chkFormatierungErlaubt;
         private ComboBox cbxAdditionalCheck;
         private Caption capcbxAdditionalCheck;
         private ComboBox cbxScriptType;

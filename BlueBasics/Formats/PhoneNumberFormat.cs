@@ -14,9 +14,7 @@ public class PhoneNumberFormat : Format {
         //https://regex101.com/r/OzJr8j/1
         RegexCheck = @"^[+][1-9][\s0-9]*[0-9]$";
         AllowedChars = Char_Numerals + "+ ";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 15;
         MinTextLength = 3;

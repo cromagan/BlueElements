@@ -1,12 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
 public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     #region Fields
+
+    private const string _suggestionPositionKey = "suggestionposition";
 
     private TextBoxSuggestions? _control;
 
@@ -16,15 +19,53 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     public static string ClassId => "TextBoxSuggestions";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Textfeld, das zusätzlich auswählbare Vorschläge als Chips anbietet.";
-
     public override string KeyName => ClassId;
 
-    public override bool SupportsSuggestions => true;
+    public bool SpellCheckingEnabled {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
 
+            ControlStrategyParameter.Set(TextBoxControlStrategy.SpellCheckingEnabledKey, value);
+
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    }
+
+    public SuggestionPosition SuggestionPosition {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+
+            ControlStrategyParameter.Set(_suggestionPositionKey, (int)value);
+
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    } = SuggestionPosition.Bottom;
+
+    public override bool SupportsSuggestions => true;
     public override bool SupportsTextEdit => true;
+
+    public bool TextFormatingAllowed {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            ControlStrategyParameter.Set(TextBoxControlStrategy.TextFormatingAllowedKey, value);
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    }
+
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
@@ -45,7 +86,11 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         return new Size(width, c.GetEstimatedHeight(width, minHeight));
     }
 
-    public override void CreateControl() => _control = new TextBoxSuggestions();
+    public override List<GenericControl> GetProperties(int widthOfControl)
+        => [.. base.GetProperties(widthOfControl),
+            new FlexiControlForProperty<bool>(() => SpellCheckingEnabled, "Rechtschreibprüfung"),
+            new FlexiControlForProperty<bool>(() => TextFormatingAllowed, "Formatierung erlauben"),
+            new FlexiControlForProperty<SuggestionPosition>(() => SuggestionPosition, "Position der Vorschläge", ItemsOf(typeof(SuggestionPosition)))];
 
     public override string ReadableText() => "Textfeld mit Vorschlägen";
 
@@ -75,6 +120,8 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         _control.GetStyleFrom(this);
         _control.CustomVocabulary = CustomVocabulary;
         _control.Suffix = Suffix;
+        _control.SpellCheckingEnabled = SpellCheckingEnabled;
+        _control.TextFormatingAllowed = TextFormatingAllowed;
         _control.SuggestionPosition = SuggestionPosition;
         _control.Verhalten = ParentHeight > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
@@ -89,6 +136,20 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         }
     }
 
+    protected override void CreateControlCore() => _control = new TextBoxSuggestions();
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = c.Text;
+    }
+
+    protected override void ReadParameters(JsonObject json) {
+        base.ReadParameters(json);
+        SpellCheckingEnabled = json.GetBool(TextBoxControlStrategy.SpellCheckingEnabledKey, SpellCheckingEnabled);
+        TextFormatingAllowed = json.GetBool(TextBoxControlStrategy.TextFormatingAllowedKey, TextFormatingAllowed);
+        SuggestionPosition = json.GetEnum(_suggestionPositionKey, SuggestionPosition);
+    }
+
     protected override void SetValueToControlInternal(string value) {
         if (_control is { } c) { c.Text = value; }
     }
@@ -101,7 +162,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
-    private void ValueChanged_TextBoxSuggestions(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
+    private void ValueChanged_TextBoxSuggestions(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

@@ -5,6 +5,7 @@ using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Classes;
 using BlueScript.ScriptVariables;
+using BlueTable.Interfaces;
 using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
@@ -216,7 +217,11 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
             entityFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
             entityFlex.ListItems = [.. inTable.Column.Where(c => !c.IsDisposed).Select(c => ItemOf($"~{c.KeyName}~"))];
             entityFlex.Height = 24;
-            entityFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+
+            if (entityFlex.Strategy is TextBoxSuggestionsControlStrategy tbs) {
+                tbs.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+            }
+
             result.Add(entityFlex);
             _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
             result.Add(_button);

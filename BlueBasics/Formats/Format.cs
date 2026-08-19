@@ -34,10 +34,6 @@ public abstract class Format : IInputFormat, IReadableTextWithKey {
     public string QuickInfo { get; set; } = string.Empty;
     public string RegexCheck { get; set; } = string.Empty;
 
-    public bool SpellCheckingEnabled { get; set; }
-
-    public bool TextFormatingAllowed { get; set; }
-
     #endregion
 
     #region Methods

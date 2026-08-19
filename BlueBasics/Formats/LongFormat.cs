@@ -13,9 +13,7 @@ public class LongFormat : Format {
     public LongFormat() : base(Keyname, QuickImage.Get(ImageCode.Ganzzahl, 16)) {
         RegexCheck = @"^((-?[1-9]\d*)|0)$";
         AllowedChars = Char_Numerals + "-";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.Integer;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = long.MinValue.ToString1().Length;
         MinTextLength = 1;

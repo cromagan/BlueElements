@@ -3,6 +3,7 @@
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.MarkRenderer;
+using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,13 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     #region Fields
 
+    /// <summary>
+    /// JSON-Keys innerhalb von ControlStrategyParameter.
+    /// </summary>
+    public const string SpellCheckingEnabledKey = "spellcheckingenabled";
+
+    public const string TextFormatingAllowedKey = "textformatingallowed";
+
     private TextBox? _control;
     private EventHandler<NavigationDirectionEventArgs>? _navigateHandler;
 
@@ -22,21 +30,46 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Texbox";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Einfaches Textfeld zur freien Eingabe von Text.";
-
     public override string KeyName => ClassId;
 
-    public override bool SupportsTextEdit => true;
+    public bool SpellCheckingEnabled {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            ControlStrategyParameter.Set(SpellCheckingEnabledKey, value);
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    }
 
+    public override bool SupportsTextEdit => true;
     public override bool SupportsWordHighlighting => true;
+
+    public bool TextFormatingAllowed {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            ControlStrategyParameter.Set(TextFormatingAllowedKey, value);
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    }
+
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
 
-    public override void CreateControl() => _control = new TextBox();
+    public override List<GenericControl> GetProperties(int widthOfControl)
+        => [.. base.GetProperties(widthOfControl),
+            new FlexiControlForProperty<bool>(() => SpellCheckingEnabled, "Rechtschreibprüfung"),
+            new FlexiControlForProperty<bool>(() => TextFormatingAllowed, "Formatierung erlauben")];
 
     public override async Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) {
         if (_control is not { IsDisposed: false } txb) { return; }
@@ -123,11 +156,26 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.GetStyleFrom(this);
         _control?.CustomVocabulary = CustomVocabulary;
         _control?.Suffix = Suffix;
+        _control?.SpellCheckingEnabled = SpellCheckingEnabled;
+        _control?.TextFormatingAllowed = TextFormatingAllowed;
         _control?.Verhalten = ParentHeight > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         _control?.QuickInfo = QuickInfo;
         _control?.Zoom = Zoom;
+    }
+
+    protected override void CreateControlCore() => _control = new TextBox();
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = c.Text;
+    }
+
+    protected override void ReadParameters(JsonObject json) {
+        base.ReadParameters(json);
+        SpellCheckingEnabled = json.GetBool(SpellCheckingEnabledKey, SpellCheckingEnabled);
+        TextFormatingAllowed = json.GetBool(TextFormatingAllowedKey, TextFormatingAllowed);
     }
 
     protected override void SetValueToControlInternal(string value) => _control?.Text = value;
@@ -140,10 +188,7 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
-    private void ValueChanged_TextBox(object? sender, System.EventArgs e) {
-        if (_control is not { IsDisposed: false }) { return; }
-        OnValueChanged(_control.Text);
-    }
+    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

@@ -36,20 +36,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     /// <summary>
-    /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
+    /// Erzeugt eine fette Caption (isCaption) oder einen hervorgehobenen Info-Text.
+    /// Der Text wird immer als Value an die Strategie übergeben.
     /// </summary>
-    /// <param name="captionText"></param>
-    /// <param name="width"></param>
-    /// <param name="isCaption"></param>
     public FlexiControl(string captionText, int width, bool isCaption) : base(false, false, false) {
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
         ControlStrategy = isCaption ? CaptionControlStrategy.ClassId : TextControlStrategy.ClassId;
 
-        Caption = captionText;
+        Value = captionText;
         CaptionPosition = CaptionPosition.ohne;
 
-        Size = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, width);
+        Size = BlueControls.Controls.Caption.RequiredTextSize(captionText, Design.Caption, Translate, width);
         CreateSubControls();
     }
 
@@ -150,12 +146,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.Caption = value; UpdateLayout(); }));
+                Invoke(new Action(() => { field = value; UpdateLayout(); }));
                 return;
             }
 
             field = value;
-            _strategy?.Caption = value;
             UpdateLayout();
         }
     } = "";
@@ -213,11 +208,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     } = NoneControlStrategy.ClassId;
 
     /// <summary>
-    /// Parse-Code der strategie-spezifischen Werte der ControlStrategie —
-    /// analog zu RendererSettings beim Renderer.
+    /// Parameter der ControlStrategie als Json — analog zu RendererSettings beim Renderer.
     /// </summary>
-    [DefaultValue("")]
-    public string ControlStrategyParameter {
+    public JsonObject ControlStrategyParameter {
         get;
         set {
             if (field == value) { return; }
@@ -230,7 +223,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             field = value;
             RemoveStrategy();
         }
-    } = string.Empty;
+    } = new();
 
     /// <summary>
     /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
@@ -336,24 +329,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     } = string.Empty;
 
     [DefaultValue("")]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string ImageCode {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.ImageCode = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.ImageCode = value;
-        }
-    } = string.Empty;
-
-    [DefaultValue("")]
     [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
     public string InfoText {
         get;
@@ -368,7 +343,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     public bool Initializing { get; private set; }
 
@@ -526,31 +501,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [DefaultValue(false)]
-    public bool SpellCheckingEnabled {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.SpellCheckingEnabled = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.SpellCheckingEnabled = value;
-        }
-    }
-
     /// <summary>
-    /// Zur ControlStrategy passende Strategie. Nach CreateSubControls die aktive
-    /// Instanz, davor die gecachte Prototyp-Instanz. Nur für
-    /// Fähigkeitsabfragen nutzen.
+    /// Aktive Strategie; wird beim ersten Zugriff automatisch erzeugt.
+    /// Bleibt die Erzeugung erfolglos, die gecachte Prototyp-Instanz.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ControlStrategy Strategy => _strategy ?? ControlStrategies.ControlStrategy.Cached(ControlStrategy);
+    public ControlStrategy Strategy {
+        get {
+            if (!Allinitialized && !Initializing && !IsDisposed) { CreateSubControls(); }
+            return _strategy ?? ControlStrategies.ControlStrategy.Cached(ControlStrategy);
+        }
+    }
 
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
@@ -571,44 +534,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
-    [DefaultValue(SuggestionPosition.Bottom)]
-    public SuggestionPosition SuggestionPosition {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.SuggestionPosition = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.SuggestionPosition = value;
-        }
-    } = SuggestionPosition.Bottom;
-
     [Obsolete("Value anstelle Text benutzen", true)]
     [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new string Text { get; set; } = string.Empty;
-
-    [DefaultValue(false)]
-    public bool TextFormatingAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.TextFormatingAllowed = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.TextFormatingAllowed = value;
-        }
-    } = false;
 
     [DefaultValue(false)]
     public bool TextInputAllowed {
@@ -654,14 +585,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (InvokeRequired) {
                 Invoke(new Action(() => {
                     field = value;
-                    _strategy?.SetValueToControl(value);
+                    _strategy?.Value = value;
                     OnValueChanged();
                 }));
                 return;
             }
 
             field = value; // Value muss hier gespeichtert werden, ansonsten verlieren Controls beim stragie-Wechsel den Wert
-            _strategy?.SetValueToControl(value);
+            _strategy?.Value = value;
             OnValueChanged();
         }
     } = string.Empty;
@@ -672,91 +603,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void BeginUpdate() => _strategy?.BeginInit();
 
-    /// <summary>
-    /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
-    /// Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-    public void CreateSubControls() {
-        if (InvokeRequired) {
-            Invoke(new Action(CreateSubControls));
-            return;
-        }
-        if (IsDisposed) { return; }
-        if (Allinitialized || Initializing) { return; }
-
-        Initializing = true;
-
-        try {
-            if (Width < 5 || Height < 5) {
-                Develop.DebugPrint("Width / Height zu klein");
-                Allinitialized = true;
-                return;
-            }
-
-            _strategy = ControlStrategies.ControlStrategy.CreateNew(ControlStrategy);
-
-            _strategy.CreateControl();
-
-            _strategy.BeginInit();
-            _strategy.ParseJson(ControlStrategyParameter);
-            _strategy.Caption = Caption;
-            _strategy.ImageCode = ImageCode;
-
-            _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
-            _strategy.AddAllowed = AddAllowed;
-            _strategy.AllowedChars = AllowedChars;
-            _strategy.ForbiddenChars = ForbiddenChars;
-            _strategy.AutoSort = AutoSort;
-            _strategy.CheckBehavior = CheckBehavior;
-            _strategy.MaxTextLength = MaxTextLength;
-            _strategy.MinTextLength = MinTextLength;
-            _strategy.MultiLine = MultiLine;
-            _strategy.MoveAllowed = MoveAllowed;
-            _strategy.RegexCheck = RegexCheck;
-            _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
-            _strategy.TextFormatingAllowed = TextFormatingAllowed;
-            _strategy.CustomVocabulary = CustomVocabulary;
-            _strategy.Suffix = Suffix;
-            _strategy.SuggestionPosition = SuggestionPosition;
-            _strategy.ParentHeight = Height;
-            _strategy.QuickInfo = QuickInfo;
-            _strategy.ListItems = ListItems;
-            _strategy.CustomContextMenuItems = CustomContextMenuItems;
-            _strategy.RaiseChangeDelay = RaiseChangeDelay;
-            _strategy.TextInputAllowed = TextInputAllowed;
-
-            StandardBehandlung(_strategy.Control);
-
-            _strategy.SetValueToControl(Value);
-
-            Allinitialized = true;
-            _strategy.EndInit();
-
-            // Value-Setter abonniert Events nur bei Wertänderung (Überspringt "" == "").
-            // Daher hier sicherstellen, dass die Strategy-Events immer genau einmal abonniert sind.
-            _strategy.UnsubscribeEvents();
-            _strategy.SubscribeEvents();
-
-            DoEnabledState();
-
-            _strategy.ValueChanged += Strategy_ValueChanged;
-            _strategy.NavigateToNext += Strategy_NavigateToNext;
-            _strategy.ExecuteCommand += Strategy_ExecuteCommand;
-            _strategy.DropDownShowing += Strategy_DropDownShowing;
-            _strategy.ItemRemoved += Strategy_ItemRemoved;
-        } catch {
-            _strategy?.Dispose();
-            _strategy = null;
-            Allinitialized = true;
-        } finally {
-            Initializing = false;
-        }
-    }
-
     public void EndUpdate() => _strategy?.EndInit();
 
     public Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) =>
-                _strategy?.HighlightWordsAsync(words, ownWord, cancellationToken) ?? Task.CompletedTask;
+                    _strategy?.HighlightWordsAsync(words, ownWord, cancellationToken) ?? Task.CompletedTask;
 
     public bool WasValueClicked() => _strategy?.WasValueClicked() ?? false;
 
@@ -824,7 +674,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void OnQuickInfoChanged() {
         if (IsDisposed) { return; }
         base.OnQuickInfoChanged();
-        if (_strategy?.Control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
+        if (_strategy is { } s) { s.QuickInfo = QuickInfo; }
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -863,6 +713,85 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         _captionObject.FitSize();
         _captionObject.BringToFront();
+    }
+
+    /// <summary>
+    /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
+    /// Die Events werden Registriert und auch der Wert gesetzt.
+    /// </summary>
+    private void CreateSubControls() {
+        if (InvokeRequired) {
+            Invoke(new Action(CreateSubControls));
+            return;
+        }
+        if (IsDisposed) { return; }
+        if (Allinitialized || Initializing) { return; }
+
+        Initializing = true;
+
+        try {
+            if (Width < 5 || Height < 5) {
+                Develop.DebugPrint("Width / Height zu klein");
+                Allinitialized = true;
+                return;
+            }
+
+            _strategy = ControlStrategies.ControlStrategy.CreateNew(ControlStrategy);
+
+            var _strategyControl = _strategy.CreateControl();
+
+            _strategy.BeginInit();
+            _strategy.ControlStrategyParameter = ControlStrategyParameter;
+
+            _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
+            _strategy.AddAllowed = AddAllowed;
+            _strategy.AllowedChars = AllowedChars;
+            _strategy.ForbiddenChars = ForbiddenChars;
+            _strategy.AutoSort = AutoSort;
+            _strategy.CheckBehavior = CheckBehavior;
+            _strategy.MaxTextLength = MaxTextLength;
+            _strategy.MinTextLength = MinTextLength;
+            _strategy.MultiLine = MultiLine;
+            _strategy.MoveAllowed = MoveAllowed;
+            _strategy.RegexCheck = RegexCheck;
+            _strategy.CustomVocabulary = CustomVocabulary;
+            _strategy.Suffix = Suffix;
+            _strategy.ParentHeight = Height;
+            _strategy.QuickInfo = QuickInfo;
+            _strategy.ListItems = ListItems;
+            _strategy.CustomContextMenuItems = CustomContextMenuItems;
+            _strategy.RaiseChangeDelay = RaiseChangeDelay;
+            _strategy.TextInputAllowed = TextInputAllowed;
+
+            Control_Create_Caption();
+            PositionStrategyControl();
+            Controls.Add(_strategyControl);
+
+            _strategy.Value = Value;
+
+            Allinitialized = true;
+            _strategy.EndInit();
+
+            // Value-Setter abonniert Events nur bei Wertänderung (Überspringt "" == "").
+            // Daher hier sicherstellen, dass die Strategy-Events immer genau einmal abonniert sind.
+            _strategy.UnsubscribeEvents();
+            _strategy.SubscribeEvents();
+
+            DoEnabledState();
+
+            _strategy.ValueChanged += Strategy_ValueChanged;
+            _strategy.NavigateToNext += Strategy_NavigateToNext;
+            _strategy.ExecuteCommand += Strategy_ExecuteCommand;
+            _strategy.DropDownShowing += Strategy_DropDownShowing;
+            _strategy.ItemRemoved += Strategy_ItemRemoved;
+        } catch {
+            _strategy?.Dispose();
+            _strategy = null;
+            Allinitialized = true;
+        } finally {
+            Invalidate();
+            Initializing = false;
+        }
     }
 
     private void DoEnabledState() {
@@ -931,37 +860,37 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void PositionStrategyControl(System.Windows.Forms.Control? control) {
-        if (control is null) { return; }
+    private void PositionStrategyControl() {
+        if (_strategy is null) { return; }
 
         switch (CaptionPosition) {
             case CaptionPosition.ohne:
-                control.Left = 0;
-                control.Top = 0;
-                control.Width = Width;
-                control.Height = Height;
+                _strategy.Left = 0;
+                _strategy.Top = 0;
+                _strategy.Width = Width;
+                _strategy.Height = Height;
                 break;
 
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
                 var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
-                control.Left = Math.Max(ControlX, s1.Width + Skin.PaddingSmal);
-                control.Top = 0;
-                control.Width = Width - control.Left;
-                control.Height = Height;
+                _strategy.Left = Math.Max(ControlX, s1.Width + Skin.PaddingSmal);
+                _strategy.Top = 0;
+                _strategy.Width = Width - _strategy.Left;
+                _strategy.Height = Height;
                 break;
 
             default:
                 var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
-                control.Left = 0;
-                control.Top = Math.Max(ControlX, s2.Height);
-                control.Width = Width;
-                control.Height = Height - s2.Height;
+                _strategy.Left = 0;
+                _strategy.Top = Math.Max(ControlX, s2.Height);
+                _strategy.Width = Width;
+                _strategy.Height = Height - s2.Height;
                 break;
         }
-        control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
-        control.Visible = true;
+        _strategy.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
+        _strategy.Visible = true;
     }
 
     /// <summary>
@@ -976,20 +905,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _strategy.Dispose();
         _strategy = null;
         Allinitialized = false;
-    }
-
-    /// <summary>
-    /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
-    /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
-    /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
-    /// </summary>
-    private void StandardBehandlung(System.Windows.Forms.Control? control) {
-        if (control is null) { return; }
-
-        Control_Create_Caption();
-        PositionStrategyControl(control);
-        Controls.Add(control);
-        Invalidate();
     }
 
     private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
@@ -1014,7 +929,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         Control_Create_Caption();
-        PositionStrategyControl(_strategy?.Control);
+        PositionStrategyControl();
         Invalidate();
     }
 

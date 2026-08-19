@@ -248,11 +248,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
         SaveToByteList(bytes, TableDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ControlStrategy, c.ControlStrategy, name);
-        SaveToByteList(bytes, TableDataType.ControlStrategyParameter, c.ControlStrategyParameter, name);
+        SaveToByteList(bytes, TableDataType.ControlStrategyParameter, c.ControlStrategyParameter.ToJsonString(), name);
         SaveToByteList(bytes, TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
-        SaveToByteList(bytes, TableDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
-        SaveToByteList(bytes, TableDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ForeColor, c.ForeColor.ToArgb().ToString1(), name);
         SaveToByteList(bytes, TableDataType.BackColor, c.BackColor.ToArgb().ToString1(), name);
         SaveToByteList(bytes, TableDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToString1(), name);

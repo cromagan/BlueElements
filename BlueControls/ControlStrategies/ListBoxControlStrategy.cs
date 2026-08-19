@@ -17,13 +17,10 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Listbox";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt eine Liste, deren Einträge ausgewählt, verschoben und entfernt werden können.";
-
     public override string KeyName => ClassId;
-
     public override bool SupportsSuggestions => true;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
@@ -59,11 +56,6 @@ public class ListBoxControlStrategy : ControlStrategy {
         }
 
         return new Size(biggestItemX, heightAdded);
-    }
-
-    public override void CreateControl() {
-        _control = new ListBox() { CheckBehavior = CheckBehavior.MultiSelection };
-        _control.ItemClear();
     }
 
     public override string ReadableText() => "Listbox";
@@ -130,6 +122,16 @@ public class ListBoxControlStrategy : ControlStrategy {
         _control.Zoom = Zoom;
     }
 
+    protected override void CreateControlCore() {
+        _control = new ListBox() { CheckBehavior = CheckBehavior.MultiSelection };
+        _control.ItemClear();
+    }
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = string.Join('\r', c.Checked);
+    }
+
     protected override void SetValueToControlInternal(string value) {
         if (_control is null) { return; }
 
@@ -141,29 +143,13 @@ public class ListBoxControlStrategy : ControlStrategy {
             }
         }
         _control.Check(values, true);
-        SyncCheckedText();
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(SyncCheckedText());
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
-    private void ListBox_ItemRemoved(object? sender, ListItemEventArgs e) {
-        // RemoveAndUnRegister feuert kein ItemCheckedChanged, Text hier explizit syncen.
-        SyncCheckedText();
-        OnItemRemoved(e);
-    }
-
-    /// <summary>
-    /// Hält Control.Text synchron mit den gecheckten Keys. Der Wert-Commit
-    /// der TableView (Edit_Close) liest den Wert über Control.Text.
-    /// </summary>
-    private string SyncCheckedText() {
-        if (_control is not { } c) { return string.Empty; }
-        var value = string.Join('\r', c.Checked);
-        c.Text = value;
-        return value;
-    }
+    private void ListBox_ItemRemoved(object? sender, ListItemEventArgs e) => OnItemRemoved(e);
 
     #endregion
 }

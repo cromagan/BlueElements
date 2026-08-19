@@ -16,17 +16,13 @@ public class SwapListBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "SwapListBox";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt eine Liste mit ankreuzbaren Einträgen; mehrere Werte sind gleichzeitig wählbar.";
-
     public override string KeyName => ClassId;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
-
-    public override void CreateControl() => _control = new SwapListBox();
 
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;
@@ -59,13 +55,18 @@ public class SwapListBoxControlStrategy : ControlStrategy {
         c.QuickInfo = QuickInfo;
     }
 
+    protected override void CreateControlCore() => _control = new SwapListBox();
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = string.Join('\r', c.Checked);
+    }
+
     protected override void SetValueToControlInternal(string value) => _control?.Check(value.SplitAndCutByCr());
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
-    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) {
-        if (_control is { } c) { OnValueChanged(string.Join('\r', c.Checked)); }
-    }
+    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

@@ -430,11 +430,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         get {
             if (_controlStrategyCache.IsDisposed) { return null; }
             foreach (var strategy in _controlStrategyCache.Values) {
-                if (strategy.Control is Control c
-                    && c.Visible
-                    && !c.IsDisposed) {
-                    return strategy;
-                }
+                if (strategy.Visible) { return strategy; }
             }
             return null;
         }
@@ -708,9 +704,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var oldChunk = newChunkValue;
 
-        if (ControlStrategy.Cached(column.ControlStrategy) is NoneControlStrategy && !tb.PowerEdit) {
-            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
-        }
+        var strategy = ControlStrategy.Cached(column.ControlStrategy);
+        if (!strategy.SupportsValueChange && !tb.PowerEdit) { return strategy.NotEditableReason; }
 
         if (row is null) {
             if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
@@ -1806,16 +1801,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         try {
             HideAllEditControls();
 
-            var strategyParameter = styleSource?.ControlStrategyParameter ?? string.Empty;
+            var strategyParameter = styleSource?.ControlStrategyParameter ?? new JsonObject();
             var strategy = GetOrCreateControlStrategy(editStrategyKey, strategyParameter);
 
-            if (strategy is NoneControlStrategy) {
-                NotEditableInfo("Diese Spalte kann nicht bearbeitet werden.");
-                return;
-            }
-
-            if (strategy is DragDropControlStrategy) {
-                NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
+            if (strategy.NotEditableReason is { Length: > 0 } notEditableReason) {
+                NotEditableInfo(notEditableReason);
                 return;
             }
 
@@ -1829,7 +1819,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             // Auswahl-Strategie ohne Items und ohne Text-Fähigkeit: auf Textfeld zurückfallen.
             if (strategy.SupportsSuggestions && items is not { Count: > 0 } && !strategy.SupportsTextEdit) {
-                strategy = GetOrCreateControlStrategy(TextBoxControlStrategy.ClassId, string.Empty);
+                strategy = GetOrCreateControlStrategy(TextBoxControlStrategy.ClassId, strategyParameter);
                 if (strategy.Control is not Control fallbackControl) { return; }
                 c = fallbackControl;
             }
@@ -1838,7 +1828,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
-            strategy.ParseJson(strategyParameter);
 
             strategy.Zoom = Zoom;
             strategy.QuickInfo = (styleSource as IReadableTextWithKey)?.QuickInfo ?? string.Empty;
@@ -1864,7 +1853,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             c.Location = bounds.Location;
             c.Size = size;
-            strategy.SetValueToControl(value);
+            strategy.Value = value;
 
             _editCommit = commit;
 
@@ -4383,11 +4372,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     /// <summary>
     /// Holt eine gecachte Strategie oder erzeugt sie. Verdrahtet die Event-Handler beim erstmaligen Anlegen.
-    /// Der Parse-Code gehört zum Cache-Schlüssel, damit Instanzen keine Werte
+    /// Der Parameter gehört zum Cache-Schlüssel, damit Instanzen keine Werte
     /// einer anderen Konfiguration übernehmen.
     /// </summary>
-    private ControlStrategy GetOrCreateControlStrategy(string editStrategyKey, string strategyParameter) {
-        var cacheKey = strategyParameter is { Length: > 0 } ? editStrategyKey + "|" + strategyParameter : editStrategyKey;
+    private ControlStrategy GetOrCreateControlStrategy(string editStrategyKey, JsonObject strategyParameter) {
+        var cacheKey = strategyParameter.Count > 0 ? editStrategyKey + "|" + strategyParameter.ToJsonString() : editStrategyKey;
         var strategy = _controlStrategyCache.GetOrAdd(cacheKey, _ => CreateControlStrategy(editStrategyKey));
 
         if (strategy.Control is null) {
@@ -4402,6 +4391,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.TabKey += Edit_TabKey;
             strategy.LostFocus += Edit_LostFocus;
         }
+
+        strategy.ControlStrategyParameter = strategyParameter;
 
         return strategy;
     }

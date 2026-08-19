@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposableExtended, ISupportInitialize, IReadableTextWithKey, ISimpleEditor {
+public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize, IReadableTextWithKey, ISimpleEditor, IInputFormat {
 
     #region Fields
 
     public static readonly AssemblyAwareCache<ControlStrategy> AllStrategies = new();
 
+    /// <summary>
+    /// Json-Key für <see cref="Border" /> innerhalb von <see cref="ControlStrategyParameter" />.
+    /// </summary>
+    private const string _borderKey = "border";
+
     private GroupBox? _borderBox;
 
     private volatile int _isDisposedFlag;
-
     private int _suspendCount;
 
     #endregion
@@ -42,8 +46,6 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
-
     public event EventHandler? TabKey;
 
     public event EventHandler<TextEventArgs>? ValueChanged;
@@ -55,7 +57,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public AddType AddAllowed {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -64,7 +66,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public AdditionalCheck AdditionalFormatCheck {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -73,16 +75,24 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public string AllowedChars {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
+    public System.Windows.Forms.AnchorStyles Anchor {
+        get => Control?.Anchor ?? default;
+        set {
+            if (IsDisposed) { return; }
+            if (Control is { } c) { c.Anchor = value; }
+        }
+    }
+
     public bool AutoSort {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -95,36 +105,31 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public bool Border {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
+
+            ControlStrategyParameter.Set(_borderKey, true);
+
             if (!IsEventsSuppressed) { OnDoUpdateSideOptionMenu(); }
         }
     }
 
-    public string Caption {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!IsEventsSuppressed) { ApplyStyle(); }
-        }
-    } = string.Empty;
-
     public CheckBehavior CheckBehavior {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
     /// <summary>
-    /// Das sichtbare Control der Strategie. Bei aktivem <see cref="Border" />
+    /// Das anzuzeigende Control der Strategie. Bei aktivem <see cref="Border" />
     /// wird das erzeugte Control in eine GroupBox gefasst und diese zurückgegeben.
     /// </summary>
     public System.Windows.Forms.Control? Control {
         get {
+            if (IsDisposed) { return null; }
             if (!Border) { return ControlCore; }
             if (_borderBox is { IsDisposed: false } box) { return box; }
             if (ControlCore is not { IsDisposed: false } inner) { return ControlCore; }
@@ -136,10 +141,31 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
         }
     }
 
+    /// <summary>
+    /// Parameter der Strategie als Json. Jede Strategie liest daraus nur ihre
+    /// eigenen Keys in ihre Properties (siehe <see cref="ReadParameters" />);
+    /// unbekannte Keys werden verworfen. Ändert eine Property ihren Wert,
+    /// schreibt sie den zugehörigen Key zurück, sodass das Json immer den
+    /// aktuellen Zustand abbildet.
+    /// </summary>
+    public JsonObject ControlStrategyParameter {
+        get;
+        set {
+            if (IsDisposed) { return; }
+            BeginInit();
+            try {
+                field = new JsonObject();
+                ReadParameters(value);
+            } finally {
+                EndInit();
+            }
+        }
+    } = new();
+
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -148,7 +174,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public IReadOnlySet<string>? CustomVocabulary {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -162,26 +188,19 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public string ForbiddenChars {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
 
-    public string ImageCode {
-        get;
+    public int Height {
+        get => Control?.Height ?? 0;
         set {
-            if (field == value) { return; }
-            field = value;
-            if (!IsEventsSuppressed) { ApplyStyle(); }
+            if (IsDisposed) { return; }
+            if (Control is { } c) { c.Height = value; }
         }
-    } = string.Empty;
-
-    /// <summary>
-    /// True, wenn die Strategie weder Text-Eingabe noch Vorschläge
-    /// unterstützt und damit nur eine Beschriftung anzeigt.
-    /// </summary>
-    public bool IsCaptionOnly => !SupportsSuggestions && !SupportsTextEdit;
+    }
 
     /// <summary>
     /// True, wenn die Strategie ein Kommando-Knopf ist, der statt einer
@@ -199,15 +218,30 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public bool IsEventsSuppressed => _suspendCount > 0;
 
     /// <summary>
+    /// True für Strategien, die im ColumnEditor nicht wählbar sind, weil sie
+    /// nur vom System gesetzt werden (DragDrop) oder Spezial-Kontexten
+    /// dienen (Text, Line, Caption).
+    /// </summary>
+    public virtual bool IsSpecial => false;
+
+    /// <summary>
     /// Eindeutiger, stabiler Key der Strategie (identisch zur statischen ClassId).
     /// Dient als Auswahl- und Serialisierungsschlüssel am ColumnItem.
     /// </summary>
     public virtual string KeyName => GetType().Name;
 
+    public int Left {
+        get => Control?.Left ?? 0;
+        set {
+            if (IsDisposed) { return; }
+            if (Control is { } c) { c.Left = value; }
+        }
+    }
+
     public List<ListItem>? ListItems {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -216,7 +250,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public int MaxTextLength {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -225,7 +259,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public int MinTextLength {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -234,7 +268,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public bool MoveAllowed {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -243,16 +277,22 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public bool MultiLine {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
+    /// <summary>
+    /// Meldung, warum kein Edit-Control geöffnet wird. Leer, wenn die
+    /// Strategie eine Eingabe erlaubt.
+    /// </summary>
+    public virtual string NotEditableReason => string.Empty;
+
     public int ParentHeight {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -261,7 +301,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public string QuickInfo {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -270,7 +310,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public int RaiseChangeDelay {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -279,7 +319,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public string RegexCheck {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -288,16 +328,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public bool RemoveAllowed {
         get;
         set {
-            if (field == value) { return; }
-            field = value;
-            if (!IsEventsSuppressed) { ApplyStyle(); }
-        }
-    }
-
-    public bool SpellCheckingEnabled {
-        get;
-        set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -306,20 +337,11 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public string Suffix {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     } = string.Empty;
-
-    public SuggestionPosition SuggestionPosition {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!IsEventsSuppressed) { ApplyStyle(); }
-        }
-    } = SuggestionPosition.Bottom;
 
     /// <summary>
     /// Gibt an, ob diese Strategie eine Auswahlliste (Vorschläge) handhaben kann.
@@ -338,25 +360,68 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public virtual bool SupportsTextEdit => false;
 
     /// <summary>
+    /// True, wenn der Benutzer den Wert grundsätzlich ändern kann — auch
+    /// ohne Edit-Control, z. B. durch Verschieben der Zeile.
+    /// </summary>
+    public virtual bool SupportsValueChange => true;
+
+    /// <summary>
     /// True, wenn die Strategie Wörter im Text hervorheben kann (HighlightWordsAsync).
     /// </summary>
     public virtual bool SupportsWordHighlighting => false;
 
-    public bool TextFormatingAllowed {
+    public bool TextInputAllowed {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
     }
 
-    public bool TextInputAllowed {
-        get;
+    public int Top {
+        get => Control?.Top ?? 0;
         set {
-            if (field == value) { return; }
+            if (IsDisposed) { return; }
+            if (Control is { } c) { c.Top = value; }
+        }
+    }
+
+    /// <summary>
+    /// Setzt den Wert im Control und löst <see cref="ValueChanged" /> aus.
+    /// Prüft bewusst nicht IsDisposed: <see cref="ForceWriteBackValue" /> läuft
+    /// während des Dispose und muss den Wert noch propagieren können.
+    /// </summary>
+    public string Value {
+        protected get;
+        set {
             field = value;
-            if (!IsEventsSuppressed) { ApplyStyle(); }
+
+            UnsubscribeEvents();
+
+            SetValueToControlInternal(value);
+
+            SubscribeEvents();
+
+            OnValueChanged(value);
+        }
+    } = string.Empty;
+
+    public bool Visible {
+        get => Control is { Visible: true, IsDisposed: false };
+        set {
+            if (IsDisposed) { return; }
+            if (Control is not { IsDisposed: false } c) { return; }
+            if (!value) { ForceWriteBackValue(); }
+            c.Visible = value;
+        }
+    }
+
+    public int Width {
+        get => Control?.Width ?? 0;
+        set {
+            if (IsDisposed) { return; }
+            if (Control is { } c) { c.Width = value; }
         }
     }
 
@@ -364,7 +429,7 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     public float Zoom {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
@@ -469,7 +534,15 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     /// </summary>
     public virtual Size CalculateRequiredSize(int minWidth, int minHeight) => new(minWidth, minHeight);
 
-    public abstract void CreateControl();
+    /// <summary>
+    /// Erzeugt das Control der Strategie und gibt das anzuzeigende Control
+    /// zurück — bei aktivem <see cref="Border" /> die umgebende GroupBox.
+    /// Strategien ohne Control (None, DragDrop) geben null zurück.
+    /// </summary>
+    public System.Windows.Forms.Control? CreateControl() {
+        if (ControlCore is null) { CreateControlCore(); }
+        return Control;
+    }
 
     public void Dispose() {
         Dispose(true);
@@ -488,11 +561,6 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
     /// </summary>
     public virtual List<GenericControl> GetProperties(int widthOfControl) => [new FlexiControlForProperty<bool>(() => Border, "Rahmen")];
 
-    /// <summary>
-    /// Strategien haben keine Sub-Items im JSON-Pfad.
-    /// </summary>
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
     public virtual void HandleCaptionClick() { }
 
     public virtual Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
@@ -509,42 +577,10 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
         return false;
     }
 
-    public void OnPropertyChangedExt(string relativePath, object? value) =>
-        PropertyChangedExt?.Invoke(this, JsonParseableExtension.BuildSubItemEventArgs(this, relativePath, value));
-
-    public void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
-
-    public virtual JsonObject ParseableJson() {
-        var json = new JsonObject();
-
-        json.Set("classid", KeyName);
-        if (Border) { json.Set("border", Border); }
-
-        return json;
-    }
-
-    public virtual void ParseFinishedJson(JsonObject parsed) { }
-
-    public virtual void ParseJson(JsonObject json) {
-        Border = json.GetBool("border", Border);
-    }
-
     /// <summary>
     /// Lesbarer Anzeigename der Strategie, z. B. für Auswahllisten.
     /// </summary>
     public virtual string ReadableText() => GetType().Name;
-
-    /// <summary>
-    /// Setz den Wert zum Control und löst kein Event aus
-    /// </summary>
-    /// <param name="value"></param>
-    public void SetValueToControl(string value) {
-        UnsubscribeEvents();
-
-        SetValueToControlInternal(value);
-
-        SubscribeEvents();
-    }
 
     public abstract void SubscribeEvents();
 
@@ -559,10 +595,13 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
 
     protected abstract void ApplyStyle();
 
+    protected abstract void CreateControlCore();
+
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
+            ForceWriteBackValue();
             OnDisposed();
 
             UnsubscribeEvents();
@@ -589,6 +628,14 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
         }
     }
 
+    /// <summary>
+    /// Holt den aktuellen Wert vom Control und schreibt ihn über den
+    /// Value-Setter zurück, sodass <see cref="ValueChanged" /> ausgelöst wird.
+    /// Wird beim Dispose, beim Unsichtbarmachen und von den
+    /// ValueChanged-Routinen der Strategien aufgerufen.
+    /// </summary>
+    protected abstract void ForceWriteBackValue();
+
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
@@ -607,9 +654,17 @@ public abstract class ControlStrategy : IJsonParseable, IInputFormat, IDisposabl
 
     protected void OnTabKey() => TabKey?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Übernimmt die eigenen Keys aus dem Json in die Properties. Unbekannte
+    /// Keys werden ignoriert und damit verworfen.
+    /// </summary>
+    protected virtual void ReadParameters(JsonObject json) => Border = json.GetBool(_borderKey, Border);
+
     protected abstract void SetValueToControlInternal(string value);
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
 
     #endregion
 }

@@ -2,11 +2,5 @@
 
 namespace BlueBasics.Interfaces;
 
-public interface IReadableTextWithKey : IReadableText, IHasKeyName {
-
-    #region Properties
-
-    string QuickInfo { get; }
-
-    #endregion
+public interface IReadableTextWithKey : IReadableText, IHasKeyName, IHasQuickInfo {
 }

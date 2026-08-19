@@ -18,14 +18,13 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Combobox";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.";
-
     public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;
     public override bool SupportsTextEdit => true;
+
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
@@ -37,8 +36,6 @@ public class ComboBoxControlStrategy : ControlStrategy {
     /// </summary>
     public override Size CalculateRequiredSize(int minWidth, int minHeight) =>
         new(minWidth + (_control?.btnDropDown.Width ?? 0), minHeight);
-
-    public override void CreateControl() => _control = new ComboBox();
 
     public override void HandleCaptionClick() {
         _control?.Focus();
@@ -88,6 +85,13 @@ public class ComboBoxControlStrategy : ControlStrategy {
         _control?.QuickInfo = QuickInfo;
     }
 
+    protected override void CreateControlCore() => _control = new ComboBox();
+
+    protected override void ForceWriteBackValue() {
+        if (_control is not { IsDisposed: false } c) { return; }
+        Value = c.Text;
+    }
+
     protected override void SetValueToControlInternal(string value) => _control?.Text = value;
 
     private void ComboBox_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
@@ -102,7 +106,7 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
-    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
+    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => ForceWriteBackValue();
 
     #endregion
 }

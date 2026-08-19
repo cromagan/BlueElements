@@ -19,9 +19,7 @@ public class EMailFormat : Format {
         //http://emailregex.com/
         RegexCheck = "^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$";
         AllowedChars = Char_Numerals + Char_AZ + Char_az + "@.-_";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 320;
         MinTextLength = 5;

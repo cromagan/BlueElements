@@ -12,15 +12,12 @@ public interface IColumnInputFormat : IInputFormat {
     bool AfterEditQuickSortRemoveDouble { get; set; }
     int AfterEditRound { get; set; }
     AlignmentHorizontal Align { get; set; }
+    string ControlStrategy { get; set; }
+    JsonObject ControlStrategyParameter { get; set; }
     string DefaultRenderer { get; set; }
     TranslationType DoOpticalTranslation { get; set; }
     ReadOnlyCollection<string> DropDownItems { get; set; }
     bool EditableWithTextInput { get; set; }
-
-    string ControlStrategy { get; set; }
-
-    string ControlStrategyParameter { get; set; }
-
     string RendererSettings { get; set; }
     ScriptType ScriptType { get; set; }
     bool ShowValuesOfOtherCellsInDropdown { get; set; }

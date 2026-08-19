@@ -13,9 +13,7 @@ public class TextWithFormatFormat : Format {
     public TextWithFormatFormat() : base(Keyname, QuickImage.Get(ImageCode.Word, 16)) {
         AllowedChars = string.Empty;
         RegexCheck = string.Empty;
-        TextFormatingAllowed = true;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = true;
         MultiLine = true;
         MaxTextLength = 4000;
         MinTextLength = 0;

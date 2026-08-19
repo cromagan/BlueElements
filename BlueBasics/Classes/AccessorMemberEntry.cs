@@ -9,7 +9,7 @@ namespace BlueBasics.Classes;
 /// Schreibzugriff auf ein Property oder Feld über <see cref="PropertyInfo" />
 /// bzw. <see cref="FieldInfo" />.
 /// </summary>
-internal sealed class AccessorMemberEntry<T> {
+internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
 
     #region Fields
 

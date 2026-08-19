@@ -4,6 +4,7 @@ using BlueControls.Controls;
 using BlueControls.ControlStrategies;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
+using BlueTable.Interfaces;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.PadItems;
@@ -169,8 +170,11 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
             if (bitmapVars.Count > 0) {
                 platzhalterFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
-                platzhalterFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
                 platzhalterFlex.ListItems = [.. bitmapVars.Select(v => ItemOf($"~{v.KeyName}~"))];
+
+                if (platzhalterFlex.Strategy is TextBoxSuggestionsControlStrategy tbs) {
+                    tbs.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+                }
             }
         }
 

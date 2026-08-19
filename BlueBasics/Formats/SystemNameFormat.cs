@@ -17,9 +17,7 @@ public class SystemNameFormat : Format {
     public SystemNameFormat() : base(Keyname, QuickImage.Get(ImageCode.Variable, 16)) {
         AllowedChars = Char_AZ + Char_az + Char_Numerals + "_";
         RegexCheck = @"^[A-Za-z]\S*[A-Za-z0-9]$";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 128;
         MinTextLength = 2;

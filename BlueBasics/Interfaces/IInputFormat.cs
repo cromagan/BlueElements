@@ -2,7 +2,7 @@
 
 namespace BlueBasics.Interfaces;
 
-public interface IInputFormat {
+public interface IInputFormat : IHasQuickInfo {
 
     #region Properties
 
@@ -29,10 +29,6 @@ public interface IInputFormat {
 
     string RegexCheck { get; set; }
 
-    bool SpellCheckingEnabled { get; set; }
-
-    bool TextFormatingAllowed { get; set; }
-
     #endregion
 }
 
@@ -41,8 +37,8 @@ public static class InputFormatExtensions {
     #region Methods
 
     /// <summary>
-    /// Setzt: AllowedChars, ForbiddenChars, RegexCheck, TextFormatingAllowed,
-    /// AdditionalFormatCheck, SpellCheckingEnabled, MaxTextLength, MinTextLength und Multiline
+    /// Setzt: AllowedChars, ForbiddenChars, RegexCheck,
+    /// AdditionalFormatCheck, MaxTextLength, MinTextLength und Multiline
     /// </summary>
     public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
         if (source is null || t is null) { return; }
@@ -54,8 +50,6 @@ public static class InputFormatExtensions {
         t.MultiLine = source.MultiLine;
         t.MaxTextLength = source.MaxTextLength;
         t.MinTextLength = source.MinTextLength;
-        t.SpellCheckingEnabled = source.SpellCheckingEnabled;
-        t.TextFormatingAllowed = source.TextFormatingAllowed;
     }
 
     public static string IsFormat(this List<string> list, IInputFormat formatToCheck) {
@@ -131,8 +125,6 @@ public static class InputFormatExtensions {
             t.ForbiddenChars == source.ForbiddenChars &&
             t.RegexCheck == source.RegexCheck &&
             t.MultiLine == source.MultiLine &&
-            t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-            t.TextFormatingAllowed == source.TextFormatingAllowed &&
             t.MinTextLength == source.MinTextLength &&
             t.MaxTextLength == source.MaxTextLength;
 
@@ -143,9 +135,7 @@ public static class InputFormatExtensions {
         var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
                    t.AllowedChars == source.AllowedChars &&
                    t.ForbiddenChars == source.ForbiddenChars &&
-                   t.RegexCheck == source.RegexCheck &&
-                   t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-                   t.TextFormatingAllowed == source.TextFormatingAllowed;
+                   t.RegexCheck == source.RegexCheck;
         if (!x) { return false; }
 
         if (t.MaxTextLength < 4000) {

@@ -337,7 +337,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (InputItem is ColumnItem { IsDisposed: false } c) {
             _strategyOptions = ControlStrategy.CreateNew(cbxControlStrategy.Text);
-            _strategyOptions.ParseJson(c.ControlStrategyParameter);
+            _strategyOptions.ControlStrategyParameter = c.ControlStrategyParameter;
         }
 
         _strategyOptions.DoForm(StrategyEditor);
@@ -457,8 +457,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbUeberschift3.Text = c.CaptionGroup3;
         txbSpaltenbild.Text = c.CaptionBitmapCode;
         chkSaveContent.Checked = c.SaveContent;
-        chkFormatierungErlaubt.Checked = c.TextFormatingAllowed;
-        btnSpellChecking.Checked = c.SpellCheckingEnabled;
         txbAuswaehlbareWerte.Text = string.Join('\r', c.DropDownItems);
         txbAutoReplace.Text = string.Join('\r', c.AfterEditAutoReplace);
         txbRegex.Text = c.RegexCheck;
@@ -519,8 +517,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         c.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
         c.SaveContent = chkSaveContent.Checked;
-        c.TextFormatingAllowed = chkFormatierungErlaubt.Checked;
-        c.SpellCheckingEnabled = btnSpellChecking.Checked;
         var tmpf = FilterOptions.None;
         if (btnAutoFilterMoeglich.Checked) { tmpf |= FilterOptions.Enabled; }
         if (btnAutoFilterTXTErlaubt.Checked) { tmpf |= FilterOptions.TextFilterEnabled; }
@@ -541,7 +537,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.ColumnTags = txbTags.Text;
         c.RegexCheck = txbRegex.Text;
         c.ControlStrategy = cbxControlStrategy.Text;
-        c.ControlStrategyParameter = _strategyOptions?.ParseableJson().ToJsonString() ?? string.Empty;
+        c.ControlStrategyParameter = _strategyOptions?.ControlStrategyParameter ?? new JsonObject();
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
@@ -691,10 +687,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler == ChunkExtendedFilterInvalid) {
             solutions.Add(CreateSolution("Erweiterte AutoFilter deaktivieren", () => btnAutoFilterErweitertErlaubt.Checked = false, btnAutoFilterErweitertErlaubt));
-        }
-
-        if (fehler == SpellCheckNotPossible) {
-            solutions.Add(CreateSolution("Rechtschreibprüfung deaktivieren", () => btnSpellChecking.Checked = false, btnSpellChecking));
         }
 
         if (fehler == NoDropdownItems) {
@@ -941,7 +933,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void RefillControlStrategyItems() {
         cbxControlStrategy.ItemClear();
 
-        foreach (var thiss in ControlStrategy.AllStrategies.Instances) {
+        foreach (var thiss in ControlStrategy.AllStrategies.Instances.Where(s => !s.IsSpecial)) {
             cbxControlStrategy.ItemAdd(ItemOf(thiss));
         }
     }

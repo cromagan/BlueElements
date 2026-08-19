@@ -8,7 +8,7 @@ namespace BlueBasics.Classes;
 // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
 // https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
 
-public class Accessor<T> : IDisposableExtended {
+public class Accessor<T> : IDisposableExtended, IHasQuickInfo {
 
     #region Fields
 

@@ -22,6 +22,7 @@ public class TextOneLineColumnFormat : ColumnFormat {
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
         ControlStrategy = "Texbox";
+        ControlStrategyParameter.Set("spellcheckingenabled", true);
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;

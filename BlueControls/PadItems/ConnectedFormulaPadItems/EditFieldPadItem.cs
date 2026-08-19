@@ -47,7 +47,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     public bool AutoSizeableHeight {
         get {
-            if (ControlStrategies.ControlStrategy.Cached(ControlStrategy).IsCaptionOnly) {
+            if (ControlStrategies.ControlStrategy.Cached(ControlStrategy).IsSpecial) {
                 return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
@@ -114,19 +114,19 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     } = TextBoxControlStrategy.ClassId;
 
     /// <summary>
-    /// Parse-Code der strategie-spezifischen Werte der ControlStrategie
-    /// (z. B. die Spaltenköpfe der Tabellen-Strategie und den Rahmen) —
+    /// Parameter der strategie-spezifischen Werte der ControlStrategie
+    /// (z. B. die Spaltenköpfe der Tabellen-Strategie und den Rahmen) als Json —
     /// analog zu RendererSettings beim Renderer.
     /// </summary>
-    public string ControlStrategyParameter {
+    public JsonObject ControlStrategyParameter {
         get;
         set {
             if (IsDisposed) { return; }
-            if (field == value) { return; }
+            if (field.ToJsonString() == value.ToJsonString()) { return; }
             field = value;
             OnPropertyChanged();
         }
-    } = string.Empty;
+    } = new();
 
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
     public override bool InputMustBeOneRow => true;
@@ -206,7 +206,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
         result.ParseableAdd("ColumnName", ColumnKey);
         result.ParseableAdd("EditType", ControlStrategy);
-        result.ParseableAdd("EditTypeParameter", ControlStrategyParameter);
+        result.ParseableAdd("EditTypeParameter", ControlStrategyParameter.ToJsonString());
         result.ParseableAdd("Caption", CaptionPosition);
         result.ParseableAdd("AutoDistance", AutoX);
         result.ParseableAdd("AutoNext", AutoNext);
@@ -217,7 +217,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         var json = base.ParseableJson();
         json.Set("columnkey", ColumnKey);
         json.Set("controlstrategy", ControlStrategy);
-        json.Set("controlstrategyparameter", ControlStrategyParameter);
+        json.Set("controlstrategyparameter", ControlStrategyParameter.DeepClone());
         json.Set("caption", (int)CaptionPosition);
         json.Set("autodistance", AutoX);
         json.Set("autonext", AutoNext);
@@ -229,7 +229,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         try {
             ColumnKey = json.GetString("columnkey", ColumnKey);
             ControlStrategy = json.GetString("controlstrategy", ControlStrategy);
-            ControlStrategyParameter = json.GetString("controlstrategyparameter", ControlStrategyParameter);
+            ControlStrategyParameter = json.GetJson("controlstrategyparameter") is JsonObject jo ? (JsonObject)jo.DeepClone() : new JsonObject();
             CaptionPosition = json.GetEnum("caption", CaptionPosition);
             AutoX = json.GetBool("autodistance", AutoX);
             AutoNext = json.GetBool("autonext", AutoNext);
@@ -255,7 +255,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
                 return true;
 
             case "edittypeparameter":
-                ControlStrategyParameter = value;
+                ControlStrategyParameter = value.ParseAsJsonObject();
                 return true;
 
             case "caption":
@@ -334,14 +334,14 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         DisposeStrategyOptions();
 
         _strategyOptions = ControlStrategies.ControlStrategy.CreateNew(ControlStrategy);
-        _strategyOptions.ParseJson(ControlStrategyParameter);
+        _strategyOptions.ControlStrategyParameter = ControlStrategyParameter;
         _strategyOptions.DoUpdateSideOptionMenu += StrategyOptions_DoUpdateSideOptionMenu;
         return _strategyOptions;
     }
 
     private void StrategyOptions_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) {
         if (_strategyOptions is not { IsDisposed: false } s) { return; }
-        ControlStrategyParameter = s.ParseableJson().ToJsonString();
+        ControlStrategyParameter = s.ControlStrategyParameter.DeepClone().AsObject();
     }
 
     #endregion

@@ -20,13 +20,17 @@ public class LineControlStrategy : ControlStrategy {
 
     public override string Description => "Zeigt eine waagerechte Trennlinie ohne Wert-Bearbeitung.";
 
+    public override bool IsSpecial => true;
+
     public override string KeyName => ClassId;
 
     #endregion
 
     #region Methods
 
-    public override void CreateControl() => _control = new Line() { Orientation = Orientation.Waagerecht };
+    protected override void CreateControlCore() => _control = new Line() { Orientation = Orientation.Waagerecht };
+
+    protected override void ForceWriteBackValue() { }
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 

@@ -18,9 +18,7 @@ public class FilepathAndNameFormat : Format {
         // https://regex101.com/r/5f7WVt/1
         RegexCheck = @"^([A-Za-z]:|\\\\[^\\\/:*?""<>|\r\n]+)\\(?:[^\\\/:*?""<>|\r\n]+\\)*[^\\\/:*?""<>|\r\n]+$";
         AllowedChars = Char_Numerals + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°`:;.,=+-_ ";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 512;
         MinTextLength = 4;

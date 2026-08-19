@@ -4,6 +4,7 @@ using BlueControls.Controls;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
+using BlueTable.Interfaces;
 using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
@@ -146,8 +147,11 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
 
             var filterWertFlex = new FlexiControlForProperty<string>(() => Filter_Wert);
             filterWertFlex.ControlStrategy = TextBoxSuggestionsControlStrategy.ClassId;
-            filterWertFlex.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
             filterWertFlex.Height = 24;
+
+            if (filterWertFlex.Strategy is TextBoxSuggestionsControlStrategy tbs) {
+                tbs.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
+            }
 
             var inr = GetFilterFromGet();
             if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false } inTable) {

@@ -10,6 +10,8 @@ public class TextControlStrategy : ControlStrategy {
 
     #region Fields
 
+    private const string _imageCodeKey = "imagecode";
+
     private Caption? _control;
 
     #endregion
@@ -18,17 +20,35 @@ public class TextControlStrategy : ControlStrategy {
 
     public static string ClassId => "Text";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt den Wert als hervorgehobenen, nicht editierbaren Text.";
 
+    /// <summary>
+    /// Bildcode des Symbols vor dem Text.
+    /// </summary>
+    public string ImageCode {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            ControlStrategyParameter.Set(_imageCodeKey, value);
+
+            if (IsEventsSuppressed) { return; }
+            OnDoUpdateSideOptionMenu();
+            ApplyStyle();
+        }
+    } = string.Empty;
+
+    public override bool IsSpecial => true;
     public override string KeyName => ClassId;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
 
-    public override void CreateControl() => _control = new Caption();
+    public override List<GenericControl> GetProperties(int widthOfControl)
+        => [.. base.GetProperties(widthOfControl),
+            new FlexiControlForProperty<string>(() => ImageCode, "Bildcode")];
 
     public override Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -38,11 +58,25 @@ public class TextControlStrategy : ControlStrategy {
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 
-    protected override void ApplyStyle() => _control?.QuickInfo = QuickInfo;
+    protected override void ApplyStyle() {
+        if (_control is not { IsDisposed: false }) { return; }
+        _control.QuickInfo = QuickInfo;
+        SetValueToControlInternal(Value);
+    }
+
+    protected override void CreateControlCore() => _control = new Caption();
+
+    protected override void ForceWriteBackValue() { }
+
+    protected override void ReadParameters(JsonObject json) {
+        base.ReadParameters(json);
+        ImageCode = json.GetString(_imageCodeKey, ImageCode);
+    }
 
     protected override void SetValueToControlInternal(string value) {
-        var text = string.IsNullOrEmpty(value) ? Caption : $"<b><i>{value}</b>";
+        var text = string.IsNullOrEmpty(value) ? string.Empty : $"<b><i>{value}</b>";
         var image = string.IsNullOrEmpty(ImageCode) ? string.Empty : $"<imagecode={ImageCode}>";
+
         _control?.Text = $"{image}{text} {Suffix}";
     }
 

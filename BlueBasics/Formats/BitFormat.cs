@@ -17,9 +17,7 @@ public class BitFormat : Format {
     public BitFormat() : base(Keyname, QuickImage.Get(ImageCode.Häkchen, 16)) {
         AllowedChars = "+-";
         RegexCheck = "^([+]|[-])$";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.None;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 1;
         MinTextLength = 1;

@@ -206,7 +206,7 @@ public enum TableDataType : byte {
     //co_AutoFilterErweitertErlaubt_alt = 140,
     EditableWithTextInput = 141,
 
-    // Wert 142 war EditableWithDropdown — wird lesend zur ControlStrategy migriert, daher nicht obsolete.
+    [Obsolete("Legacy, wird lesend zur ControlStrategy migriert")]
     EditableWithDropdown = 142,
 
     ValueRequired = 143,
@@ -224,11 +224,13 @@ public enum TableDataType : byte {
     //co_CompactView_alt = 152,
     //ShowMultiLineInOneLine = 153,
     ControlStrategy = 148,
+
     ControlStrategyParameter = 149,
 
     EditAllowedDespiteLock = 154,
 
     //ShowUndo = 155,
+    [Obsolete("Legacy, wird lesend zur ControlStrategy migriert")]
     SpellCheckingEnabled = 156,
 
     //co_TagsInternal = 157,
@@ -286,6 +288,8 @@ public enum TableDataType : byte {
     FilterOptions = 196,
     CaptionBitmapCode = 197,
     DoOpticalTranslation = 198,
+
+    [Obsolete("Legacy, wird lesend zur ControlStrategy migriert")]
     TextFormatingAllowed = 199,
 
     //Value_withoutSizeData = 200,

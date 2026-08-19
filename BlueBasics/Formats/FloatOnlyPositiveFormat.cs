@@ -18,9 +18,7 @@ public class FloatOnlyPositiveFormat : Format {
         //https://regex101.com/r/onr0NZ/1
         RegexCheck = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$";
         AllowedChars = Char_Numerals + ".,";
-        TextFormatingAllowed = false;
         AdditionalFormatCheck = AdditionalCheck.Float;
-        SpellCheckingEnabled = false;
         MultiLine = false;
         MaxTextLength = 255;
         MinTextLength = 1;

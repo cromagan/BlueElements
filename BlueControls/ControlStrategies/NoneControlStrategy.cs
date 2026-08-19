@@ -18,11 +18,17 @@ public class NoneControlStrategy : ControlStrategy {
 
     public override string KeyName => ClassId;
 
+    public override string NotEditableReason => "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
+
+    public override bool SupportsValueChange => false;
+
     #endregion
 
     #region Methods
 
-    public override void CreateControl() { }
+    protected override void CreateControlCore() { }
+
+    protected override void ForceWriteBackValue() { }
 
     public override string ReadableText() => "Keine Bearbeitung";
 
