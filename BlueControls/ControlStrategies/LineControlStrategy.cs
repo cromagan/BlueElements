@@ -16,21 +16,19 @@ public class LineControlStrategy : ControlStrategy {
 
     public static string ClassId => "Line";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt eine waagerechte Trennlinie ohne Wert-Bearbeitung.";
 
     public override bool IsSpecial => true;
 
     public override string KeyName => ClassId;
 
+    protected override System.Windows.Forms.Control? ControlCore => _control;
+
     #endregion
 
     #region Methods
 
-    protected override void CreateControlCore() => _control = new Line() { Orientation = Orientation.Waagerecht };
-
-    protected override void ForceWriteBackValue() { }
+    public override string ReadableText() => "Linie";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 
@@ -39,6 +37,10 @@ public class LineControlStrategy : ControlStrategy {
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 
     protected override void ApplyStyle() => _control?.QuickInfo = QuickInfo;
+
+    protected override void CreateControlCore() => _control = new Line() { Orientation = Orientation.Waagerecht };
+
+    protected override void ForceWriteBackValue() { }
 
     protected override void SetValueToControlInternal(string value) { }
 

@@ -15,7 +15,7 @@ namespace BlueControls.TableElements;
 /// gesamte für TableView nötige Item-Plumbing (Positionierung, Zeichnen, Sortierung,
 /// Disposing) selbst. Alle konkreten Zeilen-Typen leiten von <see cref="TableElement"/> ab.
 /// </summary>
-public abstract class TableElement : IStyleable, IComparable, IHasKeyName, INotifyPropertyChanged, IDisposableExtended {
+public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQuickInfo, INotifyPropertyChanged, IDisposableExtended {
 
     #region Fields
 

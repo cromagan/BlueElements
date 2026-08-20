@@ -108,7 +108,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
             if (IsDisposed || field == value) { return; }
             field = value;
 
-            ControlStrategyParameter.Set(_borderKey, true);
+            ControlStrategyParameter.Set(_borderKey, value);
 
             if (!IsEventsSuppressed) { OnDoUpdateSideOptionMenu(); }
         }
@@ -126,17 +126,33 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Das anzuzeigende Control der Strategie. Bei aktivem <see cref="Border" />
     /// wird das erzeugte Control in eine GroupBox gefasst und diese zurückgegeben.
+    /// Hat das Control bereits einen Parent, übernimmt die Box dessen Platz.
     /// </summary>
     public System.Windows.Forms.Control? Control {
         get {
             if (IsDisposed) { return null; }
-            if (!Border) { return ControlCore; }
-            if (_borderBox is { IsDisposed: false } box) { return box; }
-            if (ControlCore is not { IsDisposed: false } inner) { return ControlCore; }
 
-            _borderBox = new GroupBox { Text = string.Empty };
+            if (!Border) {
+                if (_borderBox is { IsDisposed: false } oldBox) { RemoveBorderBox(oldBox); }
+                return ControlCore;
+            }
+
+            if (_borderBox is { IsDisposed: false }) { return _borderBox; }
+            if (ControlCore is not { IsDisposed: false } inner) { return null; }
+
+            var parent = inner.Parent;
+            var bounds = inner.Bounds;
+            var anchor = inner.Anchor;
+
+            _borderBox = new GroupBox { GroupBoxStyle = GroupBoxStyle.RoundRect, Text = string.Empty };
             inner.Dock = System.Windows.Forms.DockStyle.Fill;
             _borderBox.Controls.Add(inner);
+
+            if (parent is { IsDisposed: false }) {
+                _borderBox.SetBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                _borderBox.Anchor = anchor;
+                parent.Controls.Add(_borderBox);
+            }
             return _borderBox;
         }
     }
@@ -532,7 +548,13 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// ruft diese Methode einheitlich auf und fragt dabei weder den
     /// konkreten Strategy-Typ noch das Control ab.
     /// </summary>
-    public virtual Size CalculateRequiredSize(int minWidth, int minHeight) => new(minWidth, minHeight);
+    public virtual Size CalculateRequiredSize(int minWidth, int minHeight) {
+        if (!Border || _borderBox is not { IsDisposed: false } box) { return new Size(minWidth, minHeight); }
+
+        // Rahmen-Insets ausgleichen, damit das eingebettete Control voll sichtbar bleibt.
+        var display = box.DisplayRectangle;
+        return new Size(minWidth + box.Width - display.Width, minHeight + box.Height - display.Height);
+    }
 
     /// <summary>
     /// Erzeugt das Control der Strategie und gibt das anzuzeigende Control
@@ -553,6 +575,19 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         if (IsDisposed || _suspendCount == 0) { return; }
         _suspendCount--;
         if (!IsEventsSuppressed) { ApplyStyle(); }
+    }
+
+    /// <summary>
+    /// Setzt den Fokus auf das werttragende Control — bei aktivem
+    /// <see cref="Border" /> auf das eingebettete Control statt die Rahmen-Box.
+    /// </summary>
+    public void Focus() {
+        if (IsDisposed) { return; }
+        if (Border && ControlCore is { } core) {
+            core.Focus();
+            return;
+        }
+        Control?.Focus();
     }
 
     /// <summary>
@@ -580,7 +615,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Lesbarer Anzeigename der Strategie, z. B. für Auswahllisten.
     /// </summary>
-    public virtual string ReadableText() => GetType().Name;
+    public abstract string ReadableText();
 
     public abstract void SubscribeEvents();
 
@@ -665,6 +700,29 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
+
+    /// <summary>
+    /// Entfernt die Rahmen-Box und bettet das Control wieder direkt beim bisherigen Parent der Box ein.
+    /// </summary>
+    private void RemoveBorderBox(GroupBox box) {
+        if (ControlCore is { IsDisposed: false } inner) {
+            var parent = box.Parent;
+            var bounds = box.Bounds;
+            var anchor = box.Anchor;
+
+            inner.Dock = System.Windows.Forms.DockStyle.None;
+            box.Controls.Remove(inner);
+
+            if (parent is { IsDisposed: false }) {
+                inner.SetBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                inner.Anchor = anchor;
+                parent.Controls.Add(inner);
+            }
+        }
+        box.Visible = false;
+        box.Dispose();
+        _borderBox = null;
+    }
 
     #endregion
 }

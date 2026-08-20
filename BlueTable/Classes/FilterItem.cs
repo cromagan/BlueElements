@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable, IEquatable<FilterItem> {
+public sealed class FilterItem : IReadableText, IHasQuickInfo, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable, IEquatable<FilterItem> {
 
     #region Fields
 

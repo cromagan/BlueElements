@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>bcr</AssemblyName>
+    <TargetFramework>net8.0-windows</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <StartupObject>BeCreativeCLI.Program</StartupObject>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
+    
+    <!-- Assembly-Metadaten -->
+    <AssemblyTitle>BeCreativeCLI</AssemblyTitle>
+    <Product>BeCreativeCLI</Product>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2026 Christian Peter</Copyright>
+    
+    <!-- Versionierung -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+
+    <!-- Plattformen -->
+    <Platforms>AnyCPU;x86</Platforms>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  
+  <ItemGroup>
+  <!-- Code-Analyzer -->
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+  
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+	<!-- Projekt-Referenzen -->
+    <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text" />
+    <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueBasics.Enums" />
+    <Using Include="BlueBasics.Interfaces" />
+    <Using Include="BlueTable.Classes" />
+    <Using Include="BlueTable.ClassesStatic" />
+    <Using Include="BlueTable.Enums" />
+    <Using Include="BlueBasics.ClassesStatic.Develop" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.IO" Static="true" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+  </ItemGroup>
+
+</Project>

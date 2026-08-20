@@ -738,8 +738,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             _strategy = ControlStrategies.ControlStrategy.CreateNew(ControlStrategy);
 
-            var _strategyControl = _strategy.CreateControl();
-
             _strategy.BeginInit();
             _strategy.ControlStrategyParameter = ControlStrategyParameter;
 
@@ -762,6 +760,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.CustomContextMenuItems = CustomContextMenuItems;
             _strategy.RaiseChangeDelay = RaiseChangeDelay;
             _strategy.TextInputAllowed = TextInputAllowed;
+
+            // Control erst nach den Parametern erzeugen — Border bestimmt, welches Control zurückgegeben wird.
+            var _strategyControl = _strategy.CreateControl();
 
             Control_Create_Caption();
             PositionStrategyControl();

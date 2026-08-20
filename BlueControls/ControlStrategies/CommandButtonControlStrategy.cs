@@ -65,6 +65,8 @@ public class CommandButtonControlStrategy : ControlStrategy {
             new FlexiControlForProperty<string>(() => ButtonCaption, "Beschriftung"),
             new FlexiControlForProperty<string>(() => ButtonImageCode, "Bildcode")];
 
+    public override string ReadableText() => "Drückbarer Knopf";
+
     public override void SubscribeEvents() {
         _control?.Click += CommandButton_Click;
         _control?.LostFocus += Control_LostFocus;

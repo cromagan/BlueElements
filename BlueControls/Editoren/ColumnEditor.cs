@@ -715,6 +715,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Berechtigungen entfernen", lbxCellEditor.UncheckAll, lbxCellEditor));
         }
 
+        if (fehler == NewValuesNeedMethod) {
+            solutions.Add(CreateSolution("Eingabe neuer Werte deaktivieren", () => btnEditableStandard.Checked = false, btnEditableStandard));
+            solutions.Add(CreateSolution("Textfeld als Bearbeitungsmethode wählen", () => cbxControlStrategy.Text = TextBoxControlStrategy.ClassId, cbxControlStrategy));
+        }
+
         if (fehler == FilterCombinationInvalid) {
             solutions.Add(CreateSolution("Filter zurücksetzen", () => {
                 btnAutoFilterMoeglich.Checked = true;

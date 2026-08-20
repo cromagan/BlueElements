@@ -83,12 +83,14 @@ public class ListBoxControlStrategy : ControlStrategy {
         _control.MoveAllowed = MoveAllowed;
         _control.RemoveAllowed = RemoveAllowed;
 
+        // Nur die ausgewählten Werte übernehmen — abgewählte Einträge dürfen
+        // durch einen Style-Wechsel nicht wieder in den Wert zurückkommen.
+        var currentKeys = _control.Checked.ToList();
+
         if (AddAllowed == AddType.Suggestions) {
             // Suggestions-Modus: ListItems sind Vorschläge für das Hinzufügen-Menü,
             // keine direkten Listeneinträge. Die ausgewählten Werte bleiben als
             // Listeneinträge erhalten und werden mit den passenden Suggestions-Items aktualisiert.
-            var currentKeys = _control.Items.Select(i => i.KeyName).ToList();
-
             _control.Suggestions.Clear();
             if (ListItems is not null) {
                 var suggestions = new List<ListItem>(ListItems);
@@ -100,7 +102,6 @@ public class ListBoxControlStrategy : ControlStrategy {
             foreach (var key in currentKeys) {
                 _control.ItemAdd(_control.Suggestions.GetByKey(key) ?? ItemOf(key));
             }
-            _control.Check(currentKeys, true);
         } else {
             _control.ItemClear();
             _control.Suggestions.Clear();
@@ -109,7 +110,14 @@ public class ListBoxControlStrategy : ControlStrategy {
                 if (AutoSort) { itemsToAdd.Sort(); }
                 _control.ItemAddRange(itemsToAdd);
             }
+            // Ausgewählte Werte, die nicht mehr in ListItems stehen, als Eintrag
+            // erhalten — sonst fielen sie beim nächsten Write-Back aus dem Wert.
+            foreach (var key in currentKeys) {
+                if (_control[key] is null) { _control.ItemAdd(ItemOf(key)); }
+            }
         }
+
+        _control.Check(currentKeys, true);
 
         if (AddAllowed != AddType.None) {
             _control.AddAllowed = AddAllowed;

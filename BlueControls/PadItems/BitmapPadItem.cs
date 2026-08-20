@@ -4,7 +4,6 @@ using BlueControls.Controls;
 using BlueControls.ControlStrategies;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
-using BlueTable.Interfaces;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.PadItems;

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : System.Windows.Forms.Control, IDisposableExtended {
+public class GenericControl : System.Windows.Forms.Control, IDisposableExtended, IHasQuickInfo {
 
     #region Fields
 

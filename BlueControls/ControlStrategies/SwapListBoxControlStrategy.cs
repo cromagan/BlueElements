@@ -17,12 +17,16 @@ public class SwapListBoxControlStrategy : ControlStrategy {
     public static string ClassId => "SwapListBox";
 
     public override string Description => "Zeigt eine Liste mit ankreuzbaren Einträgen; mehrere Werte sind gleichzeitig wählbar.";
+
     public override string KeyName => ClassId;
+
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
+
+    public override string ReadableText() => "Listbox mit separaten Werten";
 
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;

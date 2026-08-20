@@ -254,6 +254,12 @@ public class TableCSV : TableFile {
 
         var startLine = 0;
 
+        // Spalten in der Reihenfolge der CSV-Felder sammeln. Nur darüber ist die
+        // Wertzuordnung korrekt - die interne Column-Collection hat eine andere
+        // (Speicher-)Reihenfolge. Null-Einträge halten den Feld-Index stabil,
+        // wenn eine Spalte nicht erzeugt werden konnte.
+        List<ColumnItem?> csvColumns = [];
+
         if (FirstLineIsHeader) {
             List<string> columnKeyes = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
             startLine = 1;
@@ -279,6 +285,8 @@ public class TableCSV : TableFile {
                     col = Column[colName];
                     if (col is not null && !col.IsSystemColumn()) { col.Caption = original; }
                 }
+
+                csvColumns.Add(col);
             }
         } else {
             var firstLineFields = new List<string>(CsvHelper.ParseCSVLine(lines[0], _separator));
@@ -292,23 +300,16 @@ public class TableCSV : TableFile {
                         TableDataType.Command_AddColumnByName, colName, Reason.NoUndo_NoInvalidate))) {
                         Develop.DebugError($"CSV-Spalte konnte nicht erzeugt werden: '{colName}'");
                     }
+                    col = Column[colName];
                 }
+
+                csvColumns.Add(col);
             }
         }
 
-        // Index der SYS_ROWKEY-Spalte ermitteln (falls vorhanden).
+        // Position der SYS_ROWKEY-Spalte innerhalb der CSV-Felder ermitteln (falls vorhanden).
         // Ist sie vorhanden, wird ihr Wert als RowKey verwendet.
-        var sysRowKeyIndex = -1;
-        if (Column.SysRowKey is { IsDisposed: false } srk) {
-            var idx = 0;
-            foreach (var col in Column) {
-                if (col == srk) {
-                    sysRowKeyIndex = idx;
-                    break;
-                }
-                idx++;
-            }
-        }
+        var sysRowKeyIndex = Column.SysRowKey is { IsDisposed: false } srk ? csvColumns.IndexOf(srk) : -1;
 
         for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
             var fields = new List<string>(CsvHelper.ParseCSVLine(lines[lineIndex], _separator));
@@ -335,9 +336,8 @@ public class TableCSV : TableFile {
                 return false;
             }
 
-            var colIndex = 0;
-            foreach (var col in Column) {
-                if (col.IsDisposed) { continue; }
+            for (var colIndex = 0; colIndex < csvColumns.Count; colIndex++) {
+                if (csvColumns[colIndex] is not { IsDisposed: false } col) { continue; }
 
                 if (colIndex < fields.Count) {
                     var error = SetValueInternal(TableDataType.UTF8Value_withoutSizeData, col, row,
@@ -348,7 +348,6 @@ public class TableCSV : TableFile {
                         return false;
                     }
                 }
-                colIndex++;
             }
         }
 

@@ -5,7 +5,6 @@ using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;
 using BlueControls.PadItems.Abstract;
 using BlueScript.ScriptVariables;
-using BlueTable.Interfaces;
 using System.Globalization;
 
 namespace BlueControls.PadItems;

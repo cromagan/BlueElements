@@ -5,7 +5,6 @@ using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Classes;
 using BlueScript.ScriptVariables;
-using BlueTable.Interfaces;
 using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;

@@ -356,7 +356,7 @@ public static class ListItemExtension {
     #endregion
 }
 
-public abstract class ListItem : IComparable, IHasKeyName, INotifyPropertyChanged, IDisposableExtended {
+public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotifyPropertyChanged, IDisposableExtended {
 
     #region Fields
 

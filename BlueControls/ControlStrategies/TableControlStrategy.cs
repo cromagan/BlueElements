@@ -19,10 +19,15 @@ public class TableControlStrategy : ControlStrategy {
     #region Fields
 
     private const string _columnsKey = "columns";
+
     private TableView? _control;
+
     private bool _lastAutoSort = true;
+
     private string _lastColumns = "\u0001";
+
     private bool _suppressEvents;
+
     private Table? _table;
 
     #endregion
@@ -49,7 +54,9 @@ public class TableControlStrategy : ControlStrategy {
     } = string.Empty;
 
     public override string Description => "Zeigt eine kleine Tabelle mit eigenen Spalten. Die Spaltenköpfe werden mit ';' getrennt angegeben.";
+
     public override string KeyName => ClassId;
+
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
@@ -61,6 +68,8 @@ public class TableControlStrategy : ControlStrategy {
     /// </summary>
     public override List<GenericControl> GetProperties(int widthOfControl)
         => [.. base.GetProperties(widthOfControl), new FlexiControlForProperty<string>(() => Columns, "Spaltenköpfe")];
+
+    public override string ReadableText() => "Tabellenansicht";
 
     public override void SubscribeEvents() {
         if (_table is { IsDisposed: false } tb) {
@@ -128,6 +137,9 @@ public class TableControlStrategy : ControlStrategy {
     }
 
     protected override void SetValueToControlInternal(string value) {
+        // Value kann vor dem ersten ApplyStyle gesetzt werden (FlexiControl-Reihenfolge):
+        // dann die Tabelle hier on-demand aufbauen, sonst würde der Wert verworfen.
+        if (_table is not { IsDisposed: false }) { ApplyStyle(); }
         if (_table is not { IsDisposed: false } tb) { return; }
         // Durch Benutzereingabe ausgelöste Value-Änderungen nicht neu laden,
         // die Tabelle enthält den Wert bereits.

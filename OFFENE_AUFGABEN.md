@@ -221,23 +221,6 @@ Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 Entferne ich den Fehler im EventScriptEditor, wird das ListItem nicht aktualisiert
 
 ## Aufgabe
-IsFormat soll anstelle von bool einen STRING zurückgeben, WAS der GRund ist.
-UserEdited in Tablview soll diese Info anzeigen.
-IInputFormat muss erweitert werden mit MinTextLength und die überladungen mit von IsFormat mit valueRequired entfernt werden.
-ColumnItem muss ebenfalls _valueRequired durch MinTextLength ersetzt werden. Als neues Feld, _valueRequired wird gelesen und bei True MinTextLength gesetzt.  Aber nur noch MinTextLength gespeichert.
-Genau so muss IInputFormat sowas wie vorbiddenChars bekommen, dass dann _afterEditAutoRemoveChar ersetzt.
-IsFormat muss dass dann prüfen, aber ColiumnItem nimmt es trotzdem her zum löschen. Wichtig: \r usw. muss ebenfalls funktionieren. 
-
-Dann alle Formate anpassen.
-
-
-## Aufgabe
-Mache aus dem hier: 
-IsFormat(FormatHolder_FilepathAndName.Instance, 
-IsFormat(FormatHolder_Filepath.Instance
-Schnelle neue Metjoden in IO. Sowas wie: IsValidFilePath und IsValidFilepathAndName
-
-## Aufgabe
 Prüfe alle LINQ, ob Exists RICHTIG ist und ob evtl.TrueForAll oder FalseForAll benutzt werden sollte.
 
 ## Aufgabe
@@ -245,28 +228,13 @@ Verändere ich den Wert, der für eine Verlinkte Zelle zuständig ist, ändert s
 Aufgefallen, wenn die Zeile des neuen Wertes nicht existiert.
 
 ## Aufgabe
-Mache einen neuen Renderer für ZELLEN.
-Texte normal darstellen.
-AUSSER die Zeile beginnt mit "CaptionStartSequence"
-Beginnt eine der Mehrzeilingen Einträge mit der Sequenz, wird es als Überschrift dargestellt
-
-Dann baue noch einen replace ein, der eine Sequenze entfernt und wie Tab behandelt. Evtl. kann das mit extText gelöst werden.
-
-## Aufgabe
 IInputFormat um eine `TextCase`-Eigenschaft ergänzen (None/Upper/Lower/Title), die die Groß-/Kleinschreibung bei der Eingabe erzwingt.
 Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiControl`) müssen dies bei der Eingabe und beim `AfterEdit` berücksichtigen.
 
 ## Aufgabe
-EventScript, werden die TableHead-Variablen richtig zurückgeschrieben?
-
-## Aufgabe
-ControlStratgies muss ISimpleEditor implementieren. Nur TableControlStrategie nutzt dieses für die Spaltenköpfe.
-Der ColumnEditor und ConnectedFormual (Field) müssen diese Optionen anzeigen
-
-## Aufgabe
-ControlStratgies: Füge eine option hinzu "Border".
-Dann schaltet ControlCategorey selbst bim erstellen des Controls eine Groupbox dazwischen und gibt die Groupbox als Control zurück.
-Border soll auswählbar sein in den ISimpleEditor properties.
+Füge eine neue Berechtigungsgruppe hinzu: #CLI
+Diese soll immer und überall vorgeschlagen werden.
+Dann starte die CLI-Commands mit der Benutzergruppe #CLI
 
 ## Aufgabe
 Schau, wo DisableAllEditing du noch benutzen kannst.

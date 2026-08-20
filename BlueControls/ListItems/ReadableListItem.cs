@@ -186,7 +186,7 @@ public class ReadableListItem : ListItem {
             _text = Item.ReadableText();
             _symbol = Item.SymbolForReadableText();
             if (Item is IHasKeyName hkn) { KeyName = hkn.KeyName; }
-            if (Item is IReadableTextWithKey rtk) { QuickInfo = BuildQuickInfo(Item, rtk.QuickInfo); }
+            if (Item is IHasQuickInfo hqi) { QuickInfo = BuildQuickInfo(Item, hqi.QuickInfo); }
         }
         Invalidate_UntrimmedCanvasSize();
     }

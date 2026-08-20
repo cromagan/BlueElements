@@ -1567,6 +1567,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         MigrateLegacyControlStrategy();
 
         ResetSystemToDefault(false);
+
+        if (_controlStrategy == "None") { DisableAllEditing(); }
+
         CheckIfIAmAKeyColumn();
 
         SystemInfoReset(false);
@@ -2360,6 +2363,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (SpellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
 
         if (_controlStrategy == "None") {
+            if (_editableWithTextInput) { return NewValuesNeedMethod; }
             if (_editAllowedDespiteLock) { return EditDespiteLockNeedsMethod; }
 
             if (_permissionGroupsChangeCell.Count > 0) { return RemoveEditPermissions; }

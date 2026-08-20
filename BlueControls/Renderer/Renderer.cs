@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.Renderer;
 
-public abstract class Renderer : ParseableItem, IReadableText, ISimpleEditor {
+public abstract class Renderer : ParseableItem, IReadableText, IHasQuickInfo, ISimpleEditor {
 
     #region Fields
 

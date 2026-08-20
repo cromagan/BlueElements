@@ -58,6 +58,7 @@ public static class ColumnErrorConstants {
     public const string MultilineButCrForbidden = "Mehrzeilige Spalten dürfen \\r (Wagenrücklauf) nicht verbieten!";
     public const string MultilineNotSupported = "Format unterstützt keine mehrzeiligen Texte.";
     public const string MustIgnoreRowFilter = "Spalten ohne Inhaltsspeicherung müssen bei Zeilenfiltern ignoriert werden.";
+    public const string NewValuesNeedMethod = "Wenn der Benutzer neue Werte eingeben darf, muss eine Bearbeitungsmethode definiert sein.";
     public const string NoAutoFilterRemoveJoker = "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen";
     public const string NoDropdownItems = "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt.";
     public const string NoLinkedFilterDefined = "Keine Filter für verknüpfte Tabelle definiert.";

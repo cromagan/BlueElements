@@ -39,7 +39,9 @@ public class TextControlStrategy : ControlStrategy {
     } = string.Empty;
 
     public override bool IsSpecial => true;
+
     public override string KeyName => ClassId;
+
     protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
@@ -51,6 +53,8 @@ public class TextControlStrategy : ControlStrategy {
             new FlexiControlForProperty<string>(() => ImageCode, "Bildcode")];
 
     public override Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public override string ReadableText() => "Reine Textanzeige";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 

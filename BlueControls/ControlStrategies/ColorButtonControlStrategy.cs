@@ -16,15 +16,15 @@ public class ColorButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "ColorButton";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt einen Knopf, mit dem eine Farbe gewählt werden kann.";
-
     public override string KeyName => ClassId;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
+
+    public override string ReadableText() => "Farbauswahl";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 

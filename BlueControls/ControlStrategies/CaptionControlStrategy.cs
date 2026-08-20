@@ -16,24 +16,16 @@ public class CaptionControlStrategy : ControlStrategy {
 
     public static string ClassId => "Caption";
 
-    protected override System.Windows.Forms.Control? ControlCore => _control;
-
     public override string Description => "Zeigt den Wert als fette Beschriftung in einem Gruppen-Rahmen ohne Bearbeitung.";
-
     public override bool IsSpecial => true;
-
     public override string KeyName => ClassId;
+    protected override System.Windows.Forms.Control? ControlCore => _control;
 
     #endregion
 
     #region Methods
 
-    protected override void CreateControlCore() => _control = new GroupBox() {
-        GroupBoxStyle = GroupBoxStyle.NormalBold,
-        Text = string.Empty
-    };
-
-    protected override void ForceWriteBackValue() { }
+    public override string ReadableText() => "Überschrift";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 
@@ -42,6 +34,13 @@ public class CaptionControlStrategy : ControlStrategy {
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 
     protected override void ApplyStyle() => SetValueToControlInternal(Value);
+
+    protected override void CreateControlCore() => _control = new GroupBox() {
+        GroupBoxStyle = GroupBoxStyle.NormalBold,
+        Text = string.Empty
+    };
+
+    protected override void ForceWriteBackValue() { }
 
     protected override void SetValueToControlInternal(string value) => _control?.Text = value;
 

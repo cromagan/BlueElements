@@ -12,7 +12,7 @@ namespace BlueControls.BlueTableDialogs;
 /// <see cref="GetProperties" /> als generische Steuerelemente; die Anzeige
 /// übernimmt der generische Dialog (<see cref="InputBoxEditor" />).
 /// </summary>
-public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor {
+public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuickInfo {
 
     #region Fields
 

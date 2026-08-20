@@ -23,7 +23,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     #region Fields
 
-    public const string TableVersion = "4.10";
+    public const string TableVersion = "4.11";
 
     internal readonly object _undoLock = new();
 

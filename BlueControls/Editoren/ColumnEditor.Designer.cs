@@ -517,9 +517,9 @@ namespace BlueControls.BlueTableDialogs {
             grpAuswahlmenuOptionen.Controls.Add(btnOtherValuesToo);
             grpAuswahlmenuOptionen.Controls.Add(txbAuswaehlbareWerte);
             grpAuswahlmenuOptionen.Controls.Add(capImmerWerte);
-            grpAuswahlmenuOptionen.Location = new Point(8, 280);
+            grpAuswahlmenuOptionen.Location = new Point(568, 8);
             grpAuswahlmenuOptionen.Name = "grpAuswahlmenuOptionen";
-            grpAuswahlmenuOptionen.Size = new Size(552, 304);
+            grpAuswahlmenuOptionen.Size = new Size(520, 576);
             grpAuswahlmenuOptionen.TabIndex = 0;
             grpAuswahlmenuOptionen.TabStop = false;
             grpAuswahlmenuOptionen.Text = "Auswahlmenü-Optionen:";
@@ -528,9 +528,9 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnOtherValuesToo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnOtherValuesToo.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnOtherValuesToo.Location = new Point(8, 264);
+            btnOtherValuesToo.Location = new Point(8, 536);
             btnOtherValuesToo.Name = "btnOtherValuesToo";
-            btnOtherValuesToo.Size = new Size(528, 32);
+            btnOtherValuesToo.Size = new Size(496, 32);
             btnOtherValuesToo.TabIndex = 7;
             btnOtherValuesToo.Text = "Auch Werte, die in anderen Zellen derselben Spalte vorhanden sind, werden zum Auswählen vorgeschlagen";
             // 
@@ -542,7 +542,7 @@ namespace BlueControls.BlueTableDialogs {
             txbAuswaehlbareWerte.MultiLine = true;
             txbAuswaehlbareWerte.Name = "txbAuswaehlbareWerte";
             txbAuswaehlbareWerte.RegexCheck = null;
-            txbAuswaehlbareWerte.Size = new Size(536, 208);
+            txbAuswaehlbareWerte.Size = new Size(504, 480);
             txbAuswaehlbareWerte.SpellCheckingEnabled = true;
             txbAuswaehlbareWerte.TabIndex = 0;
             // 
@@ -557,9 +557,9 @@ namespace BlueControls.BlueTableDialogs {
             // btnIgnoreLock
             // 
             btnIgnoreLock.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnIgnoreLock.Location = new Point(592, 328);
+            btnIgnoreLock.Location = new Point(8, 560);
             btnIgnoreLock.Name = "btnIgnoreLock";
-            btnIgnoreLock.Size = new Size(288, 32);
+            btnIgnoreLock.Size = new Size(552, 24);
             btnIgnoreLock.TabIndex = 27;
             btnIgnoreLock.Text = "Die Bearbeitung ist auch möglich, wenn die Zeile abgeschlossen ist.";
             // 
@@ -568,27 +568,27 @@ namespace BlueControls.BlueTableDialogs {
             lbxCellEditor.Appearance = ListBoxAppearance.Listbox_Boxes;
             lbxCellEditor.CheckBehavior = CheckBehavior.MultiSelection;
             lbxCellEditor.FilterText = null;
-            lbxCellEditor.Location = new Point(576, 48);
+            lbxCellEditor.Location = new Point(8, 392);
             lbxCellEditor.Name = "lbxCellEditor";
-            lbxCellEditor.Size = new Size(328, 272);
+            lbxCellEditor.Size = new Size(552, 168);
             lbxCellEditor.TabIndex = 26;
             // 
             // StrategyEditor
             // 
             StrategyEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            StrategyEditor.Location = new Point(8, 96);
+            StrategyEditor.Location = new Point(8, 64);
             StrategyEditor.Name = "StrategyEditor";
-            StrategyEditor.Size = new Size(552, 184);
+            StrategyEditor.Size = new Size(552, 264);
             StrategyEditor.TabIndex = 28;
             // 
             // btnEditableStandard
             // 
             btnEditableStandard.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnEditableStandard.Location = new Point(8, 56);
+            btnEditableStandard.Location = new Point(8, 328);
             btnEditableStandard.Name = "btnEditableStandard";
-            btnEditableStandard.Size = new Size(552, 32);
+            btnEditableStandard.Size = new Size(552, 40);
             btnEditableStandard.TabIndex = 4;
-            btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Im Regelfall als Text-Eingabe";
+            btnEditableStandard.Text = "Benutzer darf <b>neue Werte</b> eingeben<br><i>Bei Auswahllisten: zusätzlich zur Liste";
             // 
             // cbxControlStrategy
             // 
@@ -603,9 +603,9 @@ namespace BlueControls.BlueTableDialogs {
             // capUserGroupEdit
             // 
             capUserGroupEdit.CausesValidation = false;
-            capUserGroupEdit.Location = new Point(576, 16);
+            capUserGroupEdit.Location = new Point(8, 368);
             capUserGroupEdit.Name = "capUserGroupEdit";
-            capUserGroupEdit.Size = new Size(328, 32);
+            capUserGroupEdit.Size = new Size(552, 24);
             capUserGroupEdit.Text = "<b>Folgende Benutzergruppen dürfen den Inhalt der Zellen bearbeiten:";
             // 
             // capControlStrategy
@@ -943,7 +943,7 @@ namespace BlueControls.BlueTableDialogs {
             // capTags
             // 
             capTags.CausesValidation = false;
-            capTags.Location = new Point(4, 15);
+            capTags.Location = new Point(8, 16);
             capTags.Name = "capTags";
             capTags.Size = new Size(144, 16);
             capTags.Text = "Sonstige Daten (Tags):";

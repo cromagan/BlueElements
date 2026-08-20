@@ -76,6 +76,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private Action<string>? _editCommit;
 
     /// <summary>
+    /// Letzter über <see cref="ControlStrategy.ValueChanged" /> gemeldeter Wert des aktiven Edits —
+    /// ValueChanged ist der einzige Rückschreib-Weg (feuert bei Eingaben, Dispose und Visible = false).
+    /// </summary>
+    private string _editValue = string.Empty;
+
+    /// <summary>
     /// true während BeginEdit ein neues Edit aufbaut. Darin entstehende LostFocus-Events dürfen CloseAllComponents nicht auslösen.
     /// </summary>
     private bool _isBeginningEdit;
@@ -1830,7 +1836,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
 
             strategy.Zoom = Zoom;
-            strategy.QuickInfo = (styleSource as IReadableTextWithKey)?.QuickInfo ?? string.Empty;
+            strategy.QuickInfo = styleSource?.QuickInfo ?? string.Empty;
             strategy.ParentHeight = bounds.Height;
             if (items is { Count: > 0 }) { strategy.ListItems = items; }
 
@@ -1859,7 +1865,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             c.Visible = true;
             c.BringToFront();
-            c.Focus();
+            strategy.Focus();
         } finally {
             _isBeginningEdit = false;
         }
@@ -4159,16 +4165,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Schließt das aktive Edit und committet den Wert über _editCommit. Ohne aktives Edit nur EndEdit.
     /// </summary>
     private void Edit_Close() {
-        if (IsDisposed || ActiveControlStrategy is not { } strategy) { return; }
+        if (IsDisposed || ActiveControlStrategy is null) { return; }
 
         if (Table is not { IsDisposed: false } || _editCommit is not { } commit) {
             EndEdit();
             return;
         }
 
-        var value = strategy.Control?.Text ?? string.Empty;
+        // EndEdit versteckt das Edit → ForceWriteBackValue → ValueChanged → _editValue.
         EndEdit();
-        commit(value);
+        commit(_editValue);
         Focus();
     }
 
@@ -4203,6 +4209,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Edit_TabKey(object? sender, System.EventArgs e) => CloseAllComponents();
+
+    private void Edit_ValueChanged(object? sender, TextEventArgs e) => _editValue = e.Text;
 
     /// <summary>
     /// Beendet das aktive Edit ohne Commit.
@@ -4379,6 +4387,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var cacheKey = strategyParameter.Count > 0 ? editStrategyKey + "|" + strategyParameter.ToJsonString() : editStrategyKey;
         var strategy = _controlStrategyCache.GetOrAdd(cacheKey, _ => CreateControlStrategy(editStrategyKey));
 
+        // Parameter vor dem Erzeugen setzen — Border bestimmt, welches Control erzeugt und verwaltet wird.
+        strategy.ControlStrategyParameter = strategyParameter;
+
         if (strategy.Control is null) {
             strategy.CreateControl();
             if (strategy.Control is Control c) {
@@ -4390,9 +4401,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.EscKey += Edit_EscKey;
             strategy.TabKey += Edit_TabKey;
             strategy.LostFocus += Edit_LostFocus;
+            strategy.ValueChanged += Edit_ValueChanged;
         }
-
-        strategy.ControlStrategyParameter = strategyParameter;
 
         return strategy;
     }
@@ -4414,17 +4424,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Macht alle Inline-Edit-Controls unsichtbar.
+    /// Macht alle Inline-Edit-Controls unsichtbar. Läuft über strategy.Visible,
+    /// sodass jede Strategie ihren Wert über ValueChanged zurückschreibt.
     /// </summary>
     private void HideAllEditControls() {
         if (_controlStrategyCache.IsDisposed) { return; }
 
         foreach (var strategy in _controlStrategyCache.Values) {
-            if (strategy.Control is Control c
-                && !c.IsDisposed
-                && c.Visible) {
-                c.Visible = false;
-            }
+            if (strategy.Visible) { strategy.Visible = false; }
         }
     }
 

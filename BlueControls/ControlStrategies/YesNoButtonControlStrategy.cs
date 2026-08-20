@@ -24,6 +24,8 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     #region Methods
 
+    public override string ReadableText() => "Ja/Nein-Knopf";
+
     public override void SubscribeEvents() {
         _control?.CheckedChanged += YesNoButton_CheckedChanged;
         _control?.LostFocus += Control_LostFocus;
