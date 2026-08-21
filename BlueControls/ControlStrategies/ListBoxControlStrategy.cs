@@ -77,6 +77,9 @@ public class ListBoxControlStrategy : ControlStrategy {
     protected override void ApplyStyle() {
         if (_control is null) { return; }
 
+        // Mit Rahmen wirkt die Liste wie ein geöffnetes Dropdown-Menü.
+        _control.Appearance = Border ? ListBoxAppearance.DropdownSelectbox : ListBoxAppearance.Listbox;
+
         _control.CheckBehavior = CheckBehavior;
         _control.AutoSort = AutoSort;
         _control.Translate = true;

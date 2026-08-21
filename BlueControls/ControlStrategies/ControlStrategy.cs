@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
-public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize, IReadableTextWithKey, ISimpleEditor, IInputFormat {
+public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize, IReadableTextWithKey, ISimpleEditor, IErrorCheckable, IInputFormat {
 
     #region Fields
 
@@ -144,7 +144,11 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
             var bounds = inner.Bounds;
             var anchor = inner.Anchor;
 
-            _borderBox = new GroupBox { GroupBoxStyle = GroupBoxStyle.RoundRect, Text = string.Empty };
+            _borderBox = new GroupBox {
+                GroupBoxStyle = GroupBoxStyle.DropdownMenu,
+                Text = string.Empty,
+                Padding = new System.Windows.Forms.Padding(Skin.PaddingMedium)
+            };
             inner.Dock = System.Windows.Forms.DockStyle.Fill;
             _borderBox.Controls.Add(inner);
 
@@ -576,6 +580,11 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         _suspendCount--;
         if (!IsEventsSuppressed) { ApplyStyle(); }
     }
+
+    /// <summary>
+    /// Meldung, warum die Konfiguration der Strategie ungültig ist. Leer, wenn sie gültig ist.
+    /// </summary>
+    public virtual string ErrorReason() => string.Empty;
 
     /// <summary>
     /// Setzt den Fokus auf das werttragende Control — bei aktivem

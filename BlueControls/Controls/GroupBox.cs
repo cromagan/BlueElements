@@ -26,6 +26,20 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
         }
     } = GroupBoxStyle.Normal;
 
+    /// <summary>
+    /// RoundRect- und Dropdown-Stile zeichnen keine Caption. Deshalb wird oben
+    /// kein Platz für eine Überschrift reserviert — das Padding gilt auf allen
+    /// Seiten gleich.
+    /// </summary>
+    public override Rectangle DisplayRectangle {
+        get {
+            if (GroupBoxStyle is not (GroupBoxStyle.RoundRect or GroupBoxStyle.DropdownMenu)) { return base.DisplayRectangle; }
+
+            var p = Padding;
+            return new Rectangle(p.Left, p.Top, Math.Max(Width - p.Horizontal, 0), Math.Max(Height - p.Vertical, 0));
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -57,6 +71,13 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 if (c.Height > 10) {
                     Skin.Draw_Back(gr, Design.GroupBox_RoundRect, state, r, null, true);
                     Skin.Draw_Border(gr, Design.GroupBox_RoundRect, state, r);
+                }
+                break;
+
+            case GroupBoxStyle.DropdownMenu:
+                if (c.Height > 10) {
+                    Skin.Draw_Back(gr, Design.Form_SelectBox_Dropdown, state, r, null, true);
+                    Skin.Draw_Border(gr, Design.Form_SelectBox_Dropdown, state, r);
                 }
                 break;
 
@@ -140,8 +161,9 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
         var l = GenericControl.Typ(Parent);
         if (GroupBoxStyle == GroupBoxStyle.RibbonBar) { l = ParentType.RibbonPage; }
 
-        if (GroupBoxStyle == GroupBoxStyle.RoundRect) {
-            base.BackColor = Skin.Color_Back(Design.GroupBox_RoundRect, States.Standard);
+        if (GroupBoxStyle is GroupBoxStyle.RoundRect or GroupBoxStyle.DropdownMenu) {
+            var design = GroupBoxStyle == GroupBoxStyle.DropdownMenu ? Design.Form_SelectBox_Dropdown : Design.GroupBox_RoundRect;
+            base.BackColor = Skin.Color_Back(design, States.Standard);
             return;
         }
 

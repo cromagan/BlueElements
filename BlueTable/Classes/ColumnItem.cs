@@ -1568,7 +1568,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         ResetSystemToDefault(false);
 
-        if (_controlStrategy == "None") { DisableAllEditing(); }
+        //if (_controlStrategy == "None") { DisableAllEditing(); }
 
         CheckIfIAmAKeyColumn();
 

@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.IO;
+
 namespace BeCreativeCLI;
 
 /// <summary>
@@ -30,6 +32,13 @@ public abstract class CliCommand : IHasKeyName {
     /// </summary>
     public virtual List<string> Flags => [];
 
+    /// <summary>
+    /// True, solange eine Shell-Session läuft. Geladene Tabellen werden dann
+    /// nicht freigegeben, damit Folgebefehle dieselbe Instanz — und damit
+    /// denselben Fragment-Writer — nutzen.
+    /// </summary>
+    protected static bool SessionActive { get; set; }
+
     string IHasKeyName.KeyName => Command.ToUpperInvariant();
 
     public abstract string Syntax { get; }
@@ -42,6 +51,14 @@ public abstract class CliCommand : IHasKeyName {
                             All.Find(c => string.Equals(c.Command, name, StringComparison.OrdinalIgnoreCase));
 
     public abstract int DoIt(CliArgs args);
+
+    /// <summary>
+    /// Gibt eine geladene Tabelle frei. In einer Shell-Session bleibt die Instanz
+    /// im Live-Cache erhalten, sonst wird sie disposet (Writer wird geschlossen).
+    /// </summary>
+    protected static void Release(Table tbl) {
+        if (!SessionActive) { tbl.Dispose(); }
+    }
 
     /// <summary>
     /// Löst eine Spalte über die Option --column auf.
@@ -75,9 +92,41 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Lädt die Tabelle aus dem ersten Positionsargument.
+    /// Lädt die Tabelle aus dem ersten Positionsargument. Ohne Pfadangabe wird
+    /// das aktuelle Verzeichnis als Suchpfad ergänzt. Gibt bei Problemen
+    /// (nicht gefunden, passwortgeschützt) eine Fehlermeldung aus und liefert null.
     /// </summary>
-    protected static Table? LoadTable(CliArgs args) => args[0] is { Length: > 0 } name ? Table.Get(name) : null;
+    protected static Table? LoadTable(CliArgs args) {
+        if (args[0] is not { Length: > 0 } name) { return null; }
+
+        if (!name.IsValidFilepathAndName() && !name.Contains('|')) {
+            try {
+                name = Path.GetFullPath(name);
+            } catch {
+                Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
+                return null;
+            }
+        }
+
+        var tbl = Table.Get(name);
+
+        if (tbl is not { IsDisposed: false }) {
+            Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
+            return null;
+        }
+
+        // Passwortgeschützte Tabellen geben sofort einen Fehler zurück —
+        // sie können über die CLI nicht benutzt werden.
+        var problem = tbl.Unlocked ? null : "Tabelle '" + tbl.KeyName + "' ist passwortgeschützt und kann über die CLI nicht benutzt werden.";
+
+        if (problem is not null) {
+            Console.Error.WriteLine(problem);
+            tbl.Dispose();
+            return null;
+        }
+
+        return tbl;
+    }
 
     /// <summary>
     /// Liest die Option --max (0 = unbegrenzt). Liefert null, wenn die Angabe gültig ist, ansonsten die Fehlerbeschreibung.

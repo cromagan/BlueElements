@@ -27,14 +27,25 @@ public class AddRowCliCommand : CliCommand {
 
         var tbl = LoadTable(args);
 
-        if (tbl is null) {
-            Console.Error.WriteLine("Tabelle nicht gefunden: " + args[0]);
-            return 1;
-        }
+        if (tbl is null) { return 1; }
 
         try {
-            if (tbl.Column.First is not { IsDisposed: false } firstColumn) {
+            // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
+            var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
+
+            if (firstColumn is not { IsDisposed: false }) {
                 Console.Error.WriteLine("Die Tabelle hat keine erste Spalte.");
+                return 1;
+            }
+
+            // Wie eine Benutzereingabe: Neue-Zeilen-Rechte und Bearbeitungsrechte der ersten Spalte prüfen.
+            if (!tbl.PermissionCheck(tbl.PermissionGroupsNewRow, null, true)) {
+                Console.Error.WriteLine("Keine Rechte für neue Zeilen: #CLI bei 'Neue Zeilen anlegen' ergänzen.");
+                return 1;
+            }
+
+            if (!tbl.PermissionCheck(firstColumn.PermissionGroupsChangeCell, null, true)) {
+                Console.Error.WriteLine("Keine Rechte für die Spalte " + firstColumn.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
                 return 1;
             }
 
@@ -50,7 +61,7 @@ public class AddRowCliCommand : CliCommand {
             Console.Out.WriteLine($"Key der neuen Zeile: {row.KeyName}");
             return SaveTable(tbl);
         } finally {
-            tbl.Dispose();
+            Release(tbl);
         }
     }
 

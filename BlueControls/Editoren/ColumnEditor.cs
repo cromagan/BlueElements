@@ -239,6 +239,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (string.IsNullOrEmpty(feh)) {
             Column_DatenZurückschreiben();
             if (string.IsNullOrEmpty(feh) && InputItem is ColumnItem { IsDisposed: false } col2) { feh = col2.ErrorReason(); }
+            if (string.IsNullOrEmpty(feh) && _strategyOptions is { IsDisposed: false } strat) { feh = strat.ErrorReason(); }
         }
 
         if (!string.IsNullOrEmpty(feh)) {
@@ -341,7 +342,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         _strategyOptions.DoForm(StrategyEditor);
+
+        _strategyOptions?.DoUpdateSideOptionMenu += _strategyOptions_DoUpdateSideOptionMenu;
     }
+
+    private void _strategyOptions_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _strategyOptions.DoForm(StrategyEditor);
 
     private void cbxLinkedTable_TextChanged(object sender, System.EventArgs e) {
         if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }

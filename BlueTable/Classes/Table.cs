@@ -853,6 +853,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 l.Add(Everybody);
             } else if (string.Equals(thisUser, Administrator, StringComparison.OrdinalIgnoreCase)) {
                 l.Add(Administrator);
+            } else if (string.Equals(thisUser, Cli, StringComparison.OrdinalIgnoreCase)) {
+                l.Add(Cli);
             } else if (string.Equals(thisUser, "#RowCreator", StringComparison.OrdinalIgnoreCase)) {
                 l.Add("#RowCreator");
             } else if (thisUser.StartsWith("#USER:", StringComparison.OrdinalIgnoreCase)) {
@@ -1927,6 +1929,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         _createDate = json.GetString("createdate", _createDate);
         LoadedVersion = json.GetString("version", LoadedVersion);
         _globalShowPass = json.GetString("globalshowpass", _globalShowPass);
+        // Wie beim binären Laden: Eine gesetzte Passwort-Tabelle gilt als gesperrt,
+        // die Abfrage erfolgt erst bei der Anzeige (bzw. wird von Skript/CLI abgelehnt).
+        if (!string.IsNullOrEmpty(_globalShowPass)) { Unlocked = false; }
         _rowQuickInfo = json.GetString("rowquickinfo", _rowQuickInfo);
         _standardFormulaFile = json.GetString("standardformulafile", _standardFormulaFile);
         _temporaryTableMasterApp = json.GetString("temporarytablemasterapp", _temporaryTableMasterApp);

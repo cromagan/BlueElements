@@ -22,6 +22,26 @@ Exe-Name: `bcr` (AssemblyName), Projektname: `BeCreativeCLI`.
 
 Daten-Ausgabe erfolgt als CSV auf stdout, Fehler und Develop-Meldungen auf stderr.
 
+## Rechte und Benutzergruppe
+
+Die CLI arbeitet nie als `#Administrator`, sondern mit der Benutzergruppe `#CLI`
+und dem Benutzernamen `CLI_<Windows-Benutzer>`. Bearbeitungen werden wie
+Benutzereingaben geprüft — `#CLI` (Groß-/Kleinschreibung egal) muss also
+entsprechend als Recht eingetragen sein:
+
+| Befehl | Erforderliches Recht |
+|--------|----------------------|
+| cellset | `#CLI` bei den Bearbeitungsrechten der Spalte |
+| addrow | `#CLI` bei 'Neue Zeilen anlegen' und den Bearbeitungsrechten der ersten Spalte |
+| delrow | `#CLI` bei den Tabellen-Administratoren |
+
+`#CLI` wird in allen Benutzergruppen-Auswahl-Dialogen angeboten (analog `#Administrator`).
+
+## Passwortgeschützte Tabellen
+
+Tabellen mit Kennwort geben in allen Befehlen sofort einen Fehler zurück —
+sie können über die CLI nicht benutzt werden (auch Lesen nicht).
+
 ## Zeilenadressierung
 
 Alle Befehle, die Zeilen ansprechen (`get`, `set`, `delrow`, `info --row`, `content`),
@@ -54,9 +74,11 @@ Bei `get` muss die Trefferzahl exakt 1 sein, sonst Fehler mit Trefferanzahl.
 | set | `bcr set <tabelle> --column <name> --value <wert>` + Zeilenadressierung | Zellwert setzen, alle Treffer |
 | addrow | `bcr addrow <tabelle> [--firstvalue <wert>]` | Zeile anlegen |
 | delrow | `bcr delrow <tabelle>` + Zeilenadressierung | Alle Treffer löschen |
+| shell | `bcr shell` | Session-Modus: Befehle zeilenweise lesen, Tabellen bleiben geladen |
 
 `tabelle` ist ein Dateipfad oder Tabellenname; unterstützte Suffixe über `Table.Get()`:
-`.bdb`, `.csv`, `.hbdb`, `.mbdb`, `.tblh`, `.tblj`, `.mtblj`
+`.bdb`, `.csv`, `.hbdb`, `.mbdb`, `.tblh`, `.tblj`, `.mtblj`.
+Ohne Pfadangabe wird das aktuelle Verzeichnis als Suchpfad verwendet (auch bei relativen Pfaden).
 
 ## Fragment-Tabellen (.mbdb / .mtblj)
 
@@ -64,6 +86,31 @@ Bei `get` muss die Trefferzahl exakt 1 sein, sonst Fehler mit Trefferanzahl.
 (Standard-Mechanik des Systems). Die Komplettierung in die Hauptdatei übernimmt später
 der temporäre Master-Mechanismus. Die CLI disposen die Tabelleninstanz sauber, damit
 der Writer ordentlich geschlossen wird.
+
+## Session-Modus (bcr shell)
+
+`bcr shell` hält eine Instanz offen: Befehle werden zeilenweise gelesen, Tabellen
+bleiben über den Live-Instanz-Cache geladen — damit entsteht pro Tabelle **eine**
+Fragment-Datei pro Session statt eine pro Befehl.
+
+```
+bcr shell
+bcr> info MeineTabelle
+bcr> addrow MeineTabelle --firstvalue "Neuer Eintrag"
+bcr> exit
+```
+
+- Beenden: `exit`, `quit` oder Dateiende (STRG+Z / STRG+D).
+- Leerzeilen werden ignoriert, `#` kommentiert eine Zeile aus.
+- Anführungszeichen gruppieren Werte (`--value "Zwei Worte"`), `""` ergibt ein
+  einzelnes Anführungszeichen im Wert.
+- Der Prompt erscheint nur auf stderr und nur bei interaktiver Nutzung — stdout
+  bleibt reine Datenausgabe, Pipes funktionieren:
+  `"addrow T --firstvalue X" | bcr shell` bzw. `Get-Content befehle.txt | bcr shell`.
+- Exit-Code der Session: der erste von null abweichende Exit-Code eines Befehls
+  (0, wenn alle erfolgreich waren). Fehler brechen die Session nicht ab.
+- Beim Programmende schließt und disposet der Prozess alle Tabellen und Writer
+  sauber — in der Session erfolgt kein explizites Dispose nach einzelnen Befehlen.
 
 ## Code-Stil
 

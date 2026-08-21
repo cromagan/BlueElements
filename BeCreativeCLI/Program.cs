@@ -12,7 +12,10 @@ internal static class Program {
         Console.OutputEncoding = new UTF8Encoding(false);
 
         StartService();
-        UserGroup = Administrator;
+        // Die CLI arbeitet niemals als Administrator: Benutzergruppe #CLI, Benutzername CLI_<Windows-Benutzer>.
+        // Bearbeitungen durchlaufen damit die gleichen Rechteprüfungen wie Benutzereingaben.
+        UserName = "CLI_" + UserName;
+        UserGroup = Cli;
         MessageDG += Program_MessageDG;
 
         if (args.Length == 0) {

@@ -32,16 +32,13 @@ public class ExportCliCommand : CliCommand {
 
         var tbl = LoadTable(args);
 
-        if (tbl is null) {
-            Console.Error.WriteLine("Tabelle nicht gefunden: " + args[0]);
-            return 1;
-        }
+        if (tbl is null) { return 1; }
 
         try {
             Console.Out.Write(CsvHelper.ExportCSV(tbl, separator, !args.Flag("noheader")));
             return 0;
         } finally {
-            tbl.Dispose();
+            Release(tbl);
         }
     }
 

@@ -20,6 +20,7 @@ public static partial class Constants {
     public const string Char_DateiSonderZeichen = "\\/:*?\"<>|\r\n";
     public const string Char_Numerals = "0123456789";
     public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
+    public const string Cli = "#CLI";
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
     public const string KeyChunk = "Chunk";

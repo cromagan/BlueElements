@@ -29,12 +29,16 @@ public class DelRowCliCommand : CliCommand {
 
         var tbl = LoadTable(args);
 
-        if (tbl is null) {
-            Console.Error.WriteLine("Tabelle nicht gefunden: " + args[0]);
-            return 1;
-        }
+        if (tbl is null) { return 1; }
 
         try {
+            // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
+            // (#CLI muss also bei den Tabellen-Administratoren stehen).
+            if (!tbl.IsAdministrator()) {
+                Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
+                return 1;
+            }
+
             var (rows, error) = ResolveRows(tbl, args);
 
             if (error is not null) {
@@ -70,7 +74,7 @@ public class DelRowCliCommand : CliCommand {
 
             return failed > 0 ? 1 : 0;
         } finally {
-            tbl.Dispose();
+            Release(tbl);
         }
     }
 

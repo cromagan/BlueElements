@@ -29,10 +29,7 @@ public class CellSetCliCommand : CliCommand {
 
         var tbl = LoadTable(args);
 
-        if (tbl is null) {
-            Console.Error.WriteLine("Tabelle nicht gefunden: " + args[0]);
-            return 1;
-        }
+        if (tbl is null) { return 1; }
 
         try {
             var column = ColumnOfOption(tbl, args);
@@ -55,21 +52,37 @@ public class CellSetCliCommand : CliCommand {
             }
 
             var value = args.Option("value") ?? string.Empty;
+            var done = 0;
+            var permissionDenied = false;
 
             foreach (var row in rows) {
+                // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
+                if (!tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName}: Keine Rechte, um diesen Wert zu ändern.");
+                    permissionDenied = true;
+                    continue;
+                }
+
                 var failed = row.CellSet(column, value, "bcr set");
 
                 if (!string.IsNullOrEmpty(failed)) {
                     Console.Error.WriteLine($"Zeile {row.KeyName} konnte nicht gesetzt werden: {failed}");
                 } else {
                     Console.Error.WriteLine($"Wert gesetzt in {row.KeyName}");
+                    done++;
                 }
             }
 
-            Console.Out.WriteLine(rows.Count.ToString1() + " Zeile(n) aktualisiert.");
+            if (permissionDenied) {
+                Console.Error.WriteLine("Keine Rechte für die Spalte " + column.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
+            }
+
+            if (done == 0) { return 1; }
+
+            Console.Out.WriteLine(done.ToString1() + " Zeile(n) aktualisiert.");
             return SaveTable(tbl);
         } finally {
-            tbl.Dispose();
+            Release(tbl);
         }
     }
 

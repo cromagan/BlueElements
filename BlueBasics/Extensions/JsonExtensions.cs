@@ -232,6 +232,15 @@ public static partial class Extensions {
     }
 
     /// <summary>
+    /// Serialisiert eine Liste von Strings als JSON-Array unter dem Key - auch bei
+    /// leerer Liste, damit ein vorhandener Eintrag beim Zurücklesen geleert wird.
+    /// </summary>
+    public static void Set(this JsonObject json, string key, List<string> values) {
+        JsonArray array = [.. values];
+        json[key] = array;
+    }
+
+    /// <summary>
     /// Erzeugt aus einer Sequenz von <see cref="IJsonStringable" />-Objekten ein
     /// <see cref="JsonArray" /> (jedes Element via <see cref="IJsonStringable.ParseableJson" />)
     /// und weist es unter <paramref name="key" /> zu. Bei leerer Quelle erfolgt keine

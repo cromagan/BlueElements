@@ -8,9 +8,10 @@ namespace BlueControls.ControlStrategies;
 
 /// <summary>
 /// Strategy, die eine <see cref="TableView" /> mit bearbeitbaren CSV-Daten anzeigt.
-/// <see cref="Columns" /> enthält die Spaltennamen, getrennt mit ";"
-/// (z. B. "Spalte1;Spalte2;Spalte3"). Der Value ist CSV-serialisiert:
+/// <see cref="Columns" /> enthält die Spaltenbeschriftungen; die internen
+/// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
+/// Das Kontextmenü einer Zeile wird durch das Skript "Zeile löschen" ersetzt.
 /// Bei <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern
 /// über die Systemspalte SYS_ROWSORTINDEX eingeblendet.
 /// </summary>
@@ -20,11 +21,13 @@ public class TableControlStrategy : ControlStrategy {
 
     private const string _columnsKey = "columns";
 
+    private const string _deleteRowScriptKey = "Zeile löschen";
+
     private TableView? _control;
 
     private bool _lastAutoSort = true;
 
-    private string _lastColumns = "\u0001";
+    private List<string> _lastColumns = [];
 
     private bool _suppressEvents;
 
@@ -37,23 +40,22 @@ public class TableControlStrategy : ControlStrategy {
     public static string ClassId => "Table";
 
     /// <summary>
-    /// Die Spaltenköpfe der eingebetteten Tabelle, mit ";" getrennt.
+    /// Die Spaltenbeschriftungen der eingebetteten Tabelle.
     /// </summary>
-    public string Columns {
+    public List<string> Columns {
         get;
         set {
             if (field == value) { return; }
             field = value;
-
             ControlStrategyParameter.Set(_columnsKey, value);
 
             if (IsEventsSuppressed) { return; }
             OnDoUpdateSideOptionMenu();
             ApplyStyle();
         }
-    } = string.Empty;
+    } = [];
 
-    public override string Description => "Zeigt eine kleine Tabelle mit eigenen Spalten. Die Spaltenköpfe werden mit ';' getrennt angegeben.";
+    public override string Description => "Zeigt eine kleine Tabelle mit eigenen Spalten. Die Spalten werden in einer Liste verwaltet, Zeilen lassen sich über das Kontextmenü löschen.";
 
     public override string KeyName => ClassId;
 
@@ -64,10 +66,17 @@ public class TableControlStrategy : ControlStrategy {
     #region Methods
 
     /// <summary>
-    /// Option der Strategie: die Spaltenköpfe der eingebetteten Tabelle.
+    /// Option der Strategie: die Spaltenbeschriftungen der eingebetteten Tabelle.
     /// </summary>
-    public override List<GenericControl> GetProperties(int widthOfControl)
-        => [.. base.GetProperties(widthOfControl), new FlexiControlForProperty<string>(() => Columns, "Spaltenköpfe")];
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        var columnEditor = new FlexiControlForProperty<List<string>>(
+            () => Columns, "Spalten", 6, null, CheckBehavior.AllSelected, AddType.Text, false) {
+            RemoveAllowed = true,
+            MoveAllowed = true
+        };
+
+        return [.. base.GetProperties(widthOfControl), columnEditor];
+    }
 
     public override string ReadableText() => "Tabellenansicht";
 
@@ -97,7 +106,7 @@ public class TableControlStrategy : ControlStrategy {
         // Tabelle neu aufbauen, wenn sich Spalten oder Sortiermodus geändert hat.
         if (_table is null or { IsDisposed: true }
             || _lastAutoSort != AutoSort
-            || _lastColumns != Columns) {
+            || Columns.IsDifferentTo(_lastColumns)) {
             BuildTable();
         }
 
@@ -133,7 +142,7 @@ public class TableControlStrategy : ControlStrategy {
 
     protected override void ReadParameters(JsonObject json) {
         base.ReadParameters(json);
-        Columns = json.GetString(_columnsKey, Columns);
+        Columns = json.GetListString(_columnsKey, Columns);
     }
 
     protected override void SetValueToControlInternal(string value) {
@@ -156,6 +165,7 @@ public class TableControlStrategy : ControlStrategy {
         var view = tcvc[1];
         view.RemoveAll();
         view.KeyName = "CSV-Ansicht";
+        view.Kontextmenu_Skripte = new[] { _deleteRowScriptKey }.AsReadOnly();
 
         // Zeilennummern-Spalte nur, wenn SysRowSortIndex aktiv ist (!AutoSort).
         if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
@@ -184,23 +194,23 @@ public class TableControlStrategy : ControlStrategy {
         _table.TableAdmin = new[] { Everybody }.AsReadOnly();
         _table.PermissionGroupsNewRow = new[] { Everybody }.AsReadOnly();
 
-        // Spalten aus Columns ("Spalte1;Spalte2;Spalte3") erzeugen.
-        var added = false;
-        foreach (var raw in Columns.SplitBy(";")) {
-            var name = raw.Trim();
-            if (string.IsNullOrEmpty(name)) { continue; }
-            var c = _table.Column.GenerateAndAdd(name, name, TextOneLineColumnFormat.Instance);
-            if (!added && c is { IsDisposed: false }) {
-                c.IsFirst = true;
-                added = true;
-            }
+        // Spalten erzeugen: der Benutzer-Text wird zur Caption,
+        // der interne Schlüssel ist "Column_" + laufende Nummer.
+        ColumnItem? firstColumn = null;
+        var nr = 0;
+        foreach (var caption in Columns) {
+            if (caption.Trim() is not { Length: > 0 } cap) { continue; }
+            nr++;
+            var c = _table.Column.GenerateAndAdd("Column_" + nr.ToString1(), cap, TextOneLineColumnFormat.Instance);
+            if (firstColumn is null && c is { IsDisposed: false }) { firstColumn = c; }
         }
 
         // Fallback: mindestens eine Spalte, falls Columns leer.
-        if (!added) {
-            var c = _table.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
-            if (c is { IsDisposed: false }) { c.IsFirst = true; }
-        }
+        firstColumn ??= _table.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
+        if (firstColumn is { IsDisposed: false }) { firstColumn.IsFirst = true; }
+
+        // Systemspalten für Zeilen-Skripte (rowdelete) bereitstellen.
+        _table.Column.GenerateAndAddSystem(SystemColumnKeys.RowState, SystemColumnKeys.DateChanged);
 
         _table.RepairAfterParse();
 
@@ -215,9 +225,15 @@ public class TableControlStrategy : ControlStrategy {
             _table.EnableCustomSort();
         }
 
+        // Systemspalten sind Laufzeit-Hilfsspalten und gehören nicht in den CSV-Value.
+        foreach (var c in _table.Column.Where(c => c.IsSystemColumn())) {
+            c.SaveContent = false;
+        }
+
+        CreateDeleteRowScript();
         BuildArrangement();
 
-        _lastColumns = Columns;
+        _lastColumns = [.. Columns];
         _lastAutoSort = AutoSort;
 
         if (_table is { IsDisposed: false } newTb) {
@@ -228,6 +244,28 @@ public class TableControlStrategy : ControlStrategy {
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    private void CreateDeleteRowScript() {
+        if (_table is not { IsDisposed: false } tb) { return; }
+
+        var script = new TableScriptDescription(
+            tb,
+            _deleteRowScriptKey,
+            "rowdelete(CurrentRow);",
+            "Zeile|16|||||||||Kreuz",
+            "Löscht die Zeile, auf die geklickt wurde.",
+            string.Empty,
+            new[] { Everybody }.AsReadOnly(),
+            ScriptEventTypes.Ohne_Auslöser,
+            true,
+            true,
+            string.Empty,
+            null,
+            0,
+            0);
+
+        tb.EventScript = new[] { script }.AsReadOnly();
+    }
 
     private void LoadCsvIntoTable(string value) {
         if (_table is not { IsDisposed: false } tb) { return; }
