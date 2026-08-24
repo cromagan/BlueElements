@@ -11,19 +11,24 @@ namespace BlueControls.ControlStrategies;
 /// <see cref="Columns" /> enthält die Spaltenbeschriftungen; die internen
 /// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
-/// Das Kontextmenü einer Zeile wird durch das Skript "Zeile löschen" ersetzt.
-/// Bei <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern
-/// über die Systemspalte SYS_ROWSORTINDEX eingeblendet.
+/// Beginnt eine Zeile (erste Spalte) mit "##", wird der Text als Überschrift in die
+/// Kapitel-Spalte geschrieben. Das Kontextmenü einer Zeile wird durch das Skript
+/// "Zeile löschen" ersetzt. Bei <see cref="ControlStrategy.AutoSort" /> == false werden
+/// Zeilennummern über die Systemspalte SYS_ROWSORTINDEX eingeblendet.
 /// </summary>
 public class TableControlStrategy : ControlStrategy {
 
     #region Fields
+
+    private const string _chapterColumnKey = "Ueberschrift";
 
     private const string _columnsKey = "columns";
 
     private const string _deleteRowScriptKey = "Zeile löschen";
 
     private TableView? _control;
+
+    private bool _isConvertingHeadings;
 
     private bool _lastAutoSort = true;
 
@@ -137,7 +142,7 @@ public class TableControlStrategy : ControlStrategy {
 
     protected override void ForceWriteBackValue() {
         if (_table is not { IsDisposed: false } tb) { return; }
-        Value = CsvHelper.ExportCSV(tb, ';', false);
+        Value = ExportCurrentValue(tb);
     }
 
     protected override void ReadParameters(JsonObject json) {
@@ -152,7 +157,7 @@ public class TableControlStrategy : ControlStrategy {
         if (_table is not { IsDisposed: false } tb) { return; }
         // Durch Benutzereingabe ausgelöste Value-Änderungen nicht neu laden,
         // die Tabelle enthält den Wert bereits.
-        if (!_suppressEvents && CsvHelper.ExportCSV(tb, ';', false) == value) { return; }
+        if (!_suppressEvents && ExportCurrentValue(tb) == value) { return; }
         LoadCsvIntoTable(value);
     }
 
@@ -166,13 +171,15 @@ public class TableControlStrategy : ControlStrategy {
         view.RemoveAll();
         view.KeyName = "CSV-Ansicht";
         view.Kontextmenu_Skripte = new[] { _deleteRowScriptKey }.AsReadOnly();
+        view.ColumnForChapter = tb.Column[_chapterColumnKey];
 
         // Zeilennummern-Spalte nur, wenn SysRowSortIndex aktiv ist (!AutoSort).
         if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
             view.Add(new NumberColumnItem());
         }
 
-        view.ShowColumns(tb.Column.Where(c => !c.IsSystemColumn()).Select(c => c.KeyName).ToArray());
+        // Die Kapitel-Spalte erscheint nur als Überschriften-Zeile, nicht als Datenspalte.
+        view.ShowColumns(tb.Column.Where(c => !c.IsSystemColumn() && c.KeyName != _chapterColumnKey).Select(c => c.KeyName).ToArray());
         view.Repair(1);
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
@@ -209,6 +216,11 @@ public class TableControlStrategy : ControlStrategy {
         firstColumn ??= _table.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
         if (firstColumn is { IsDisposed: false }) { firstColumn.IsFirst = true; }
 
+        // Kapitel-Spalte für ##-Überschriften. SaveContent = false: der Wert wird
+        // beim Export als "## "-Präfix der ersten Spalte serialisiert, nicht als eigenes Feld.
+        var chapterColumn = _table.Column.GenerateAndAdd(_chapterColumnKey, "Überschrift", TextOneLineColumnFormat.Instance);
+        if (chapterColumn is { IsDisposed: false }) { chapterColumn.SaveContent = false; }
+
         // Systemspalten für Zeilen-Skripte (rowdelete) bereitstellen.
         _table.Column.GenerateAndAddSystem(SystemColumnKeys.RowState, SystemColumnKeys.DateChanged);
 
@@ -243,7 +255,19 @@ public class TableControlStrategy : ControlStrategy {
         }
     }
 
-    private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+    private void Control_LostFocus(object? sender, System.EventArgs e) {
+        if (_control is not { IsDisposed: false } c) { return; }
+        if (!c.IsHandleCreated) { OnLostFocus(); return; }
+
+        // LostFocus feuert auch mitten in der Fokus-Übergabe an Kind-Controls
+        // (z. B. das Inline-Edit der Tabelle) — bevor das Kind den Fokus erhalten
+        // hat. Die Prüfung daher verzögert ausführen.
+        _ = c.BeginInvoke(new System.Action(Control_LostFocusDeferred));
+    }
+
+    private void Control_LostFocusDeferred() {
+        if (_control is { IsDisposed: false, ContainsFocus: false }) { OnLostFocus(); }
+    }
 
     private void CreateDeleteRowScript() {
         if (_table is not { IsDisposed: false } tb) { return; }
@@ -251,7 +275,7 @@ public class TableControlStrategy : ControlStrategy {
         var script = new TableScriptDescription(
             tb,
             _deleteRowScriptKey,
-            "rowdelete(CurrentRow);",
+            "rowdelete(CurrentRow);\r\nShortSuccessMessage = \"Zeile gelöscht\";",
             "Zeile|16|||||||||Kreuz",
             "Löscht die Zeile, auf die geklickt wurde.",
             string.Empty,
@@ -265,6 +289,59 @@ public class TableControlStrategy : ControlStrategy {
             0);
 
         tb.EventScript = new[] { script }.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Verschiebt Zeilen, deren erste Spalte mit ## beginnt, in die Kapitel-Spalte.
+    /// "##Text" und "## Text" werden gleichermaßen erkannt; die Überschrift ist
+    /// der restliche Text ohne führende Leerzeichen.
+    /// </summary>
+    private void ConvertHeadingRows() {
+        if (_table is not { IsDisposed: false } tb) { return; }
+        if (tb.Column.First is not { IsDisposed: false } first) { return; }
+        if (tb.Column[_chapterColumnKey] is not { IsDisposed: false } chapter) { return; }
+
+        _isConvertingHeadings = true;
+        try {
+            foreach (var row in tb.Row) {
+                if (row is not { IsDisposed: false }) { continue; }
+
+                var text = row.CellGetString(first).Trim();
+                if (!text.StartsWith("##", StringComparison.Ordinal)) { continue; }
+
+                var caption = text[2..].Trim();
+                row.CellSet(first, string.Empty, "Überschrift");
+                row.CellSet(chapter, caption, "Überschrift");
+            }
+        } finally {
+            _isConvertingHeadings = false;
+        }
+    }
+
+    /// <summary>
+    /// Serialisiert die Tabelle als CSV. Zeilen mit Kapitel schreiben "## Kapitel"
+    /// in die erste Spalte; die Kapitel-Spalte selbst ist nicht Teil des Value.
+    /// </summary>
+    private static string ExportCurrentValue(Table tb) {
+        var columns = tb.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+        if (columns.Count == 0) { return string.Empty; }
+
+        var chapter = tb.Column[_chapterColumnKey];
+        var lines = new List<string>();
+
+        foreach (var row in tb.RowsInSaveOrder()) {
+            var heading = chapter is { IsDisposed: false } ch ? row.CellGetString(ch).Trim() : string.Empty;
+
+            var fields = new List<string>();
+            for (var i = 0; i < columns.Count; i++) {
+                var cellValue = row.CellGetString(columns[i]);
+                if (i == 0 && heading.Length > 0) { cellValue = "## " + heading; }
+                fields.Add(CsvHelper.EscapeCSVField(cellValue, ';'));
+            }
+            lines.Add(string.Join(';', fields));
+        }
+
+        return string.Join('\r', lines);
     }
 
     private void LoadCsvIntoTable(string value) {
@@ -292,12 +369,19 @@ public class TableControlStrategy : ControlStrategy {
             if (!AutoSort && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
                 tb.RenumberRows(tb.Row, "CSV neu nummeriert");
             }
+
+            // "## "-Zeilen aus dem CSV in die Kapitel-Spalte übernehmen.
+            ConvertHeadingRows();
         } finally {
             _suppressEvents = false;
         }
     }
 
-    private void Table_ContentChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
+    private void Table_ContentChanged(object? sender, System.EventArgs e) {
+        // ##-Eingaben in die Kapitel-Spalte umleiten, dann den Value aktualisieren.
+        if (!_suppressEvents && !_isConvertingHeadings) { ConvertHeadingRows(); }
+        ForceWriteBackValue();
+    }
 
     #endregion
 }

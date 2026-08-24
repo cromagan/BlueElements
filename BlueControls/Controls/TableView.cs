@@ -7,6 +7,7 @@ using BlueControls.EventArgs;
 using BlueControls.TableElements;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
+using BlueScript.ScriptVariables;
 using BlueTable.ClassesStatic;
 using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
@@ -558,7 +559,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
 
         if (!s.Failed) {
-            QuickNote.Show(NoteSymbols.Ok, "Skript erfolgreich ausgeführt");
+            SuccessMessage(s);
         } else {
             Forms.MessageBox.Show("Skript abgebrochen:\r\n" + s.ProtocolText, ImageCode.Kreuz, "OK");
         }
@@ -2295,8 +2296,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
         // Edit wurde durch Klick geschlossen → Klick nur konsumieren, Aktion beim nächsten Klick.
+        // Die Drag-Vorbereitung läuft dennoch, damit eine Zeile in derselben Geste gezogen werden kann.
         if (_consumeNextMouseDown) {
             _consumeNextMouseDown = false;
+            var (consumeColumn, consumeRow) = CellOnCoordinate(ca, e);
+            PrepareDragItem(ca, e, consumeColumn, consumeRow);
             return;
         }
 
@@ -2316,44 +2320,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 EnsureVisible(_mouseOverColumn, _mouseOverRow);
                 CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
 
-                // Drag/Drop-Potential speichern; Drag startet in OnMouseMove nach Bewegungsschwelle.
-                _dragItem = null;
-
-                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca)
-                    && _mouseOverColumn is { IsDisposed: false } dragCvi && dragCvi.IsOk()) {
-                    var mc = dragCvi.Column;
-                    if (_mouseOverRow is RowTableElement dragRli
-                        && dragRli.Row is { IsDisposed: false } dragRow
-                        && !PinnedRows.Contains(dragRow)
-                        && Table.Column.SysRowSortIndex is { IsDisposed: false }
-                        && string.IsNullOrEmpty(TableView.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
-                        _dragItem = dragRow;
-                    } else if (_mouseOverRow is RowCaptionTableElement dragRcli
-                               && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
-                               && dragRcli.CanEditChapter
-                               && Table.Column.SysRowSortIndex is { IsDisposed: false }) {
-                        // Block nicht aufklappen — GetChapterBlockRows liefert alle Zeilen auch eingeklappt.
-                        _ = AllViewItems; // _sortedViewItems sicherstellen
-
-                        // Den aktuellen Header über die Mausposition finden.
-                        var blockHeader = _sortedViewItems?.OfType<RowCaptionTableElement>()
-                            .FirstOrDefault(h => string.Equals(h.ChapterText, dragRcli.ChapterText, StringComparison.OrdinalIgnoreCase)
-                                                 && h.ControlPosition(Zoom, OffsetX, OffsetY).Contains(e.ControlX, e.ControlY))
-                            ?? dragRcli;
-
-                        // Nur als Drag-Quelle merken, wenn der Block verschiebbare Zeilen enthält.
-                        if (GetDragSourceRows(blockHeader).Count > 0) {
-                            _dragItem = blockHeader;
-                        }
-                    } else if (_mouseOverRow is TableElement { IgnoreYOffset: true } and not NewRowTableElement
-                               && Table.IsAdministrator()) {
-                        _dragItem = dragCvi;
-                    }
-
-                    if (_dragItem is not null) {
-                        _dragMouseDown = new Point(e.ControlX, e.ControlY);
-                    }
-                }
+                PrepareDragItem(ca, e, _mouseOverColumn, _mouseOverRow);
             } finally {
                 _isinMouseDown = false;
             }
@@ -2538,6 +2505,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     protected void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
 
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+
+        // Wird die Ansicht unsichtbar, müssen alle offenen Bearbeitungs-Fenster
+        // schließen und ihre Werte committen.
+        if (!Visible) {
+            CloseAllComponents();
+        }
+    }
+
     protected override void OnZoomChanged() {
         Invalidate_CurrentArrangement();
         base.OnZoomChanged();
@@ -2700,6 +2677,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         var fehler = new List<ScriptEndedFeedback>();
+        ScriptEndedFeedback? erfolg = null;
         Progressbar? _pg = null;
 
         if (rows.Count > 3) {
@@ -2742,6 +2720,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             if (fb?.Failed == true) {
                 fehler.Add(fb);
+            } else {
+                erfolg = fb;
             }
 
             rows.RemoveAt(0);
@@ -2756,7 +2736,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 if (generic) {
                     Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
                 } else {
-                    Forms.MessageBox.Show($"{info2}Erfolgreich ausgeführt.", ImageCode.HäkchenDoppelt, "Ok");
+                    SuccessMessage(erfolg);
                 }
             }
         } else {
@@ -2853,6 +2833,31 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
         => row is not null ? [row] : [.. rows];
+
+    /// <summary>
+    /// Zeigt die Meldung aus der Skript-Variable ShortSuccessMessage an:
+    /// bis drei Wörter als QuickNote am Mauszeiger, längere Texte als MessageBox.
+    /// Gibt true zurück, wenn eine Meldung angezeigt wurde.
+    /// </summary>
+    private static void SuccessMessage(ScriptEndedFeedback? feedback) {
+        if (feedback?.Variables?.GetByKey(KeyShortSuccessMessage) is not StringScriptVariable sm) {
+            QuickNote.Show(NoteSymbols.Ok, "Skript erfolgreich ausgeführt");
+            return;
+        }
+
+        var txt = sm.ValueString;
+        if (string.IsNullOrWhiteSpace(txt)) {
+            QuickNote.Show(NoteSymbols.Ok, "Skript erfolgreich ausgeführt");
+            return;
+        }
+
+        var words = txt.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        if (words.Length <= 3) {
+            QuickNote.Show(NoteSymbols.Ok, txt);
+        } else {
+            Forms.MessageBox.Show(txt, ImageCode.HäkchenDoppelt, "OK");
+        }
+    }
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Table = null;
 
@@ -4197,8 +4202,18 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
 
-        if (ActiveControlStrategy?.Control is { } activeControl) {
+        var active = ActiveControlStrategy;
+
+        // Veraltete Meldungen ignorieren: nur das aktuell sichtbare Edit reagiert auf Fokusverlust.
+        if (active is not null && sender is not null && !ReferenceEquals(sender, active)) {
+            return;
+        }
+
+        if (active?.Control is { } activeControl) {
             if (FloatingForm.IsShowing(activeControl)) { return; }
+
+            // Fokus an ein Kind-Control übergeben (z. B. Inline-Edit einer eingebetteten Tabelle).
+            if (activeControl.ContainsFocus) { return; }
 
             // Noch sichtbares Control: Fokusverlust durch Tabellenklick → nächsten MouseDown konsumieren.
             if (activeControl.Visible) {
@@ -4477,8 +4492,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                                    // Bestehenden Code belassen
-                                    FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                                        // Bestehenden Code belassen
+                                        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
@@ -4503,6 +4518,54 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Ermittelt den Drag-Kandidaten für die aktuelle Mausposition. Der eigentliche
+    /// Drag startet in OnMouseMove, sobald die Bewegungsschwelle überschritten ist.
+    /// </summary>
+    private void PrepareDragItem(ColumnViewCollection ca, CanvasMouseEventArgs e, ColumnViewItem? mouseOverColumn, TableElement? mouseOverRow) {
+        _dragItem = null;
+
+        if (e.Button != MouseButtons.Left || IsAnsicht0(ca)) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (mouseOverColumn is not { IsDisposed: false } dragCvi || !dragCvi.IsOk()) { return; }
+
+        // Virtuelle Spalten (z. B. Zeilennummer) haben kein ColumnItem — die
+        // Editier-Prüfung läuft dann gegen die Sortier-Spalte.
+        var mc = dragCvi.Column ?? tb.Column.SysRowSortIndex;
+
+        if (mouseOverRow is RowTableElement dragRli
+            && dragRli.Row is { IsDisposed: false } dragRow
+            && !PinnedRows.Contains(dragRow)
+            && tb.Column.SysRowSortIndex is { IsDisposed: false }
+            && string.IsNullOrEmpty(TableView.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
+            _dragItem = dragRow;
+        } else if (mouseOverRow is RowCaptionTableElement dragRcli
+                   && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
+                   && dragRcli.CanEditChapter
+                   && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            // Block nicht aufklappen — GetChapterBlockRows liefert alle Zeilen auch eingeklappt.
+            _ = AllViewItems; // _sortedViewItems sicherstellen
+
+            // Den aktuellen Header über die Mausposition finden.
+            var blockHeader = _sortedViewItems?.OfType<RowCaptionTableElement>()
+                .FirstOrDefault(h => string.Equals(h.ChapterText, dragRcli.ChapterText, StringComparison.OrdinalIgnoreCase)
+                                     && h.ControlPosition(Zoom, OffsetX, OffsetY).Contains(e.ControlX, e.ControlY))
+                ?? dragRcli;
+
+            // Nur als Drag-Quelle merken, wenn der Block verschiebbare Zeilen enthält.
+            if (GetDragSourceRows(blockHeader).Count > 0) {
+                _dragItem = blockHeader;
+            }
+        } else if (mouseOverRow is TableElement { IgnoreYOffset: true } and not NewRowTableElement
+                   && tb.IsAdministrator()) {
+            _dragItem = dragCvi;
+        }
+
+        if (_dragItem is not null) {
+            _dragMouseDown = new Point(e.ControlX, e.ControlY);
+        }
+    }
 
     private void RemoveRowItems(RowItem row) {
         var toRemove = _allViewItems.Where(kvp => kvp.Value is RowTableElement rli && !rli.IsDisposed && rli.Row == row)

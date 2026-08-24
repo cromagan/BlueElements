@@ -2,13 +2,13 @@
 
 namespace BeCreativeCLI.CliCommands;
 
-public class CellSetCliCommand : CliCommand {
+public class TableCellSetCliCommand : CliCommand {
 
     #region Properties
 
-    public override string Command => "cellset";
-    public override string Description => "Setzt den Wert einer Zelle in allen adressierten Zeilen und speichert die Tabelle.";
-    public override string Syntax => "bcr cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override string Command => "table-cellset";
+    public override string Description => "Tabellen: Setzt den Wert einer Zelle in allen adressierten Zeilen und speichert die Tabelle.";
+    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion
 
@@ -63,7 +63,7 @@ public class CellSetCliCommand : CliCommand {
                     continue;
                 }
 
-                var failed = row.CellSet(column, value, "bcr set");
+                var failed = row.CellSet(column, value, "bcr table-cellset");
 
                 if (!string.IsNullOrEmpty(failed)) {
                     Console.Error.WriteLine($"Zeile {row.KeyName} konnte nicht gesetzt werden: {failed}");

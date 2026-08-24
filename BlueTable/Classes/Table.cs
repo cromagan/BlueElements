@@ -23,6 +23,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     #region Fields
 
+    public const string KeyShortSuccessMessage = "ShortSuccessMessage";
+
     public const string TableVersion = "4.11";
 
     internal readonly object _undoLock = new();
@@ -1394,6 +1396,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             AddAttributes(vars, args ?? []);
+
+            // Nur bei Skripten, die von außerhalb angestoßen werden können (Benutzergruppen vorhanden):
+            // Erfolgsmeldung, die nach dem Skript statt der Standardmeldung angezeigt wird.
+            if (script.UserGroups.Count > 0) {
+                vars.Add(new StringScriptVariable(KeyShortSuccessMessage, string.Empty, false, "Kann im Skript gesetzt werden, um die Erfolgsmeldung zu beeinflussen.\r\nBis drei Wörter: Anzeige als QuickNote am Mauszeiger.\r\nLängere Texte: Anzeige in einer MessageBox."));
+            }
 
             var meth = ScriptCommand.GetMethods(script.AllowedMethodsMaxLevel(extended));
 

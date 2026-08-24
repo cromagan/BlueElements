@@ -97,6 +97,24 @@ public abstract class CliCommand : IHasKeyName {
     /// (nicht gefunden, passwortgeschützt) eine Fehlermeldung aus und liefert null.
     /// </summary>
     protected static Table? LoadTable(CliArgs args) {
+        var tbl = LoadTableIgnoreLock(args);
+
+        if (tbl is null) { return null; }
+
+        if (!tbl.Unlocked) {
+            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' ist passwortgeschützt — in einer Shell-Session mit 'table-password' entsperren.");
+            tbl.Dispose();
+            return null;
+        }
+
+        return tbl;
+    }
+
+    /// <summary>
+    /// Lädt die Tabelle wie <see cref="LoadTable" />, akzeptiert aber auch gesperrte
+    /// Tabellen. Benötigt für 'table-password', das vor der Prüfung entsperren muss.
+    /// </summary>
+    protected static Table? LoadTableIgnoreLock(CliArgs args) {
         if (args[0] is not { Length: > 0 } name) { return null; }
 
         if (!name.IsValidFilepathAndName() && !name.Contains('|')) {
@@ -112,16 +130,6 @@ public abstract class CliCommand : IHasKeyName {
 
         if (tbl is not { IsDisposed: false }) {
             Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
-            return null;
-        }
-
-        // Passwortgeschützte Tabellen geben sofort einen Fehler zurück —
-        // sie können über die CLI nicht benutzt werden.
-        var problem = tbl.Unlocked ? null : "Tabelle '" + tbl.KeyName + "' ist passwortgeschützt und kann über die CLI nicht benutzt werden.";
-
-        if (problem is not null) {
-            Console.Error.WriteLine(problem);
-            tbl.Dispose();
             return null;
         }
 

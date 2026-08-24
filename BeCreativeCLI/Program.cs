@@ -20,7 +20,7 @@ internal static class Program {
 
         if (args.Length == 0) {
             Console.Error.WriteLine("BeCreative (bcr) — © 2026 Christian Peter, cp33@gmx.de");
-            Console.Error.WriteLine("Kommandozeilen-Werkzeug zur Bearbeitung von Datenbanken und Tabellen.");
+            Console.Error.WriteLine("Kommandozeilen-Werkzeug für BeCreative-Dateien — aktuell werden nur Tabellen unterstützt (Befehlspräfix: table-).");
             Console.Error.WriteLine();
             Console.Error.WriteLine("Benutzung: bcr <befehl> [optionen]");
             Console.Error.WriteLine("  bcr help              Listet alle verfügbaren Befehle auf.");

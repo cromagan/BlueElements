@@ -2,13 +2,13 @@
 
 namespace BeCreativeCLI.CliCommands;
 
-public class CellGetCliCommand : CliCommand {
+public class TableCellGetCliCommand : CliCommand {
 
     #region Properties
 
-    public override string Command => "cellget";
-    public override string Description => "Zeigt den Wert einer Zelle an. Die Zeile muss eindeutig adressiert sein.";
-    public override string Syntax => "bcr cellget <tabelle> --column <spalte> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override string Command => "table-cellget";
+    public override string Description => "Tabellen: Zeigt den Wert einer Zelle an. Die Zeile muss eindeutig adressiert sein.";
+    public override string Syntax => "bcr table-cellget <tabelle> --column <spalte> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion
 

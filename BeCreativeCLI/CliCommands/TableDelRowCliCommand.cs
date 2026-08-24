@@ -2,13 +2,13 @@
 
 namespace BeCreativeCLI.CliCommands;
 
-public class DelRowCliCommand : CliCommand {
+public class TableDelRowCliCommand : CliCommand {
 
     #region Properties
 
-    public override string Command => "delrow";
-    public override string Description => "Löscht alle adressierten Zeilen.";
-    public override string Syntax => "bcr delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override string Command => "table-delrow";
+    public override string Description => "Tabellen: Löscht alle adressierten Zeilen.";
+    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion
 
@@ -55,7 +55,7 @@ public class DelRowCliCommand : CliCommand {
             var failed = 0;
 
             foreach (var r in rows) {
-                var opr = RowCollection.Remove(r, "bcr delrow");
+                var opr = RowCollection.Remove(r, "bcr table-delrow");
 
                 if (opr.IsFailed) {
                     Console.Error.WriteLine("Key: " + r.KeyName + " löschen fehlgeschlagen: " + opr.FailedReason);

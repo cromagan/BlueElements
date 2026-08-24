@@ -2,13 +2,13 @@
 
 namespace BeCreativeCLI.CliCommands;
 
-public class AddRowCliCommand : CliCommand {
+public class TableAddRowCliCommand : CliCommand {
 
     #region Properties
 
-    public override string Command => "addrow";
-    public override string Description => "Legt eine neue Zeile an. Der Wert setzt die erste Spalte (Primärschlüssel) der Tabelle.";
-    public override string Syntax => "bcr addrow <tabelle> [--firstvalue <wert>]";
+    public override string Command => "table-addrow";
+    public override string Description => "Tabellen: Legt eine neue Zeile an. Der Wert setzt die erste Spalte (Primärschlüssel) der Tabelle.";
+    public override string Syntax => "bcr table-addrow <tabelle> [--firstvalue <wert>]";
 
     #endregion
 
@@ -21,7 +21,7 @@ public class AddRowCliCommand : CliCommand {
         }
 
         if (args.HasOption("rowkey")) {
-            Console.Error.WriteLine("--rowkey wird von addrow nicht unterstützt. Stattdessen --firstvalue verwenden.");
+            Console.Error.WriteLine("--rowkey wird von table-addrow nicht unterstützt. Stattdessen --firstvalue verwenden.");
             return 2;
         }
 
@@ -51,7 +51,7 @@ public class AddRowCliCommand : CliCommand {
 
             var value = args.Option("firstvalue") ?? string.Empty;
 
-            var opr = tbl.Row.GenerateAndAdd([new FilterItem(firstColumn, FilterType.Istgleich, value)], "bcr addrow");
+            var opr = tbl.Row.GenerateAndAdd([new FilterItem(firstColumn, FilterType.Istgleich, value)], "bcr table-addrow");
 
             if (opr.IsFailed || opr.Value is not RowItem row) {
                 Console.Error.WriteLine("Zeile konnte nicht angelegt werden: " + opr.FailedReason);
