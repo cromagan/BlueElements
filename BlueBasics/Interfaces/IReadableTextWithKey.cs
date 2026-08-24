@@ -2,5 +2,4 @@
 
 namespace BlueBasics.Interfaces;
 
-public interface IReadableTextWithKey : IReadableText, IHasKeyName, IHasQuickInfo {
-}
+public interface IReadableTextWithKey : IReadableText, IHasKeyName, IHasQuickInfo {}

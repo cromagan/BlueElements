@@ -2,7 +2,7 @@
 
 using System.Windows.Forms;
 
-namespace BluePaint.Source;
+namespace BluePaint;
 
 internal static class Program {
 

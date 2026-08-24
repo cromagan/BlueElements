@@ -109,7 +109,7 @@
 </ItemGroup>
 
 <ItemGroup>
-  <Compile Update="Editoren\RowSortDefinitionEditor.cs">
+  <Compile Update="Editors\RowSortDefinitionEditor.cs">
     <SubType>UserControl</SubType>
   </Compile>
 </ItemGroup>

@@ -7,7 +7,7 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
-public class AddRowScriptCommandScriptCommand : TableGenericScriptCommand {
+public class AddRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
