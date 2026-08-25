@@ -779,7 +779,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
             }
         }
 
-        return string.IsNullOrEmpty(baseQuickInfo) ? status : baseQuickInfo + "<hr>" + status;
+        return string.IsNullOrEmpty(baseQuickInfo) ? status : baseQuickInfo + "<br><hr><br>" + status;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

@@ -287,7 +287,8 @@ public sealed class ColumnsHeadTableElement : TableElement {
             null,
             null,
             null,
-            null);
+            null,
+            Font_Head_Default);
         return true;
     }
 

@@ -127,6 +127,9 @@ public class TextBoxControlStrategy : ControlStrategy {
         }, cancellationToken);
     }
 
+    public override Size CalculateRequiredSize(int minWidth, int minHeight) =>
+        base.CalculateRequiredSize(minWidth, MultiLine ? minHeight : Math.Min(minHeight, SingleLineHeight.CanvasToControl(Zoom)));
+
     public override string ReadableText() => "Textfeld";
 
     public override void SubscribeEvents() {
@@ -158,7 +161,7 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.Suffix = Suffix;
         _control?.SpellCheckingEnabled = SpellCheckingEnabled;
         _control?.TextFormatingAllowed = TextFormatingAllowed;
-        _control?.Verhalten = ParentHeight > 20
+        _control?.Verhalten = ParentHeight > 20.CanvasToControl(Zoom)
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         _control?.QuickInfo = QuickInfo;

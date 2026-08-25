@@ -444,7 +444,8 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
                 contentHolderCellColumn,
                 contentHolderCellRow,
                 null,
-                new CellExtEventArgs(viewItem, rli));
+                new CellExtEventArgs(viewItem, rli),
+                Skin.GetBlueFont(SheetStyle, PadStyles.Standard));
             return true;
         }
 
@@ -487,7 +488,8 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
             null,
             null,
             items,
-            null);
+            null,
+            Skin.GetBlueFont(SheetStyle, PadStyles.Standard));
         return true;
     }
 

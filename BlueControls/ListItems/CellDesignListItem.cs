@@ -42,7 +42,7 @@ public class CellDesignListItem : ListItem {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
         }
-        _cellRenderer.Draw(gr, KeyName, null, positionControl.ToRect(), _translate, _align, 1f, itemdesign, state);
+        _cellRenderer.Draw(gr, KeyName, null, positionControl.ToRect(), _translate, _align, zoom, itemdesign, state);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
         }

@@ -5,6 +5,22 @@
 Beginne JEDE Antwort mit meinem Namen: Christian
 
 
+## ProjectAtlas (Atlas) benutzen
+
+Das Repo ist mit ProjectAtlas indexiert (`.projectatlas/`). Für Code-Navigation Atlas-Tools VOR den eingebauten grep/glob/read benutzen:
+
+- Vor JEDER Aufgabe: `atlas_scan` oder `atlas_watch_once` ausführen, damit der Index aktuell ist (ich arbeite parallel am Repo — der Index veraltet schnell)
+- Session-Start: `atlas_session_brief` mit der Aufgabe als Query — liefert Startpunkte statt blindem Suchen
+- Dateien/Symbole/Inhalte finden: `atlas_files`, `atlas_symbols`, `atlas_search` statt grep/glob
+- Quelltext lesen: `atlas_outline` und `atlas_slice` (Symbol- oder Zeilenbereiche) statt ganzer Dateien lesen
+- Nach eigenen Datei-Änderungen: `atlas_watch_once` ausführen, damit der Index aktuell bleibt
+
+Nur wenn Atlas nichts liefert (z. B. Index veraltet oder Typ nicht erfasst), auf grep/glob/read zurückfallen.
+
+- Geklappt hat es, wenn die Ausgabe unter `scan:` Abschnitte wie `overview`, `text_index` und `symbols` mit Dateizahlen zeigt (z. B. `files: 1057`, `symbols.parsed: 802`).
+- Referenzwerte vom 25.08.2026: 1057 Dateien, 70 Ordner, 890 textindiziert, 9452 Symbole, 33262 Relationen.
+
+
 ## Build & Ausführung
 
 ```bash

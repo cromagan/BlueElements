@@ -11,6 +11,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Fields
 
+    /// <summary>
+    /// Platzbedarf eines Scrollbalkens (Breite des senkrechten, Höhe des
+    /// waagerechten Sliders).
+    /// </summary>
+    public const int SliderSize = 18;
+
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
 
     private Size _lastSize;
@@ -56,8 +62,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             field = new(
                 0,
                 0,
-                Size.Width - (SliderY.Visible ? SliderY.Width : 0),
-                Size.Height - (SliderX.Visible ? SliderX.Height : 0)
+                Size.Width - (SliderY.Visible ? SliderSize : 0),
+                Size.Height - (SliderX.Visible ? SliderSize : 0)
             );
             _lastSize = Size;
             _lastSliderXVisible = SliderX.Visible;
@@ -292,10 +298,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected abstract RectangleF CalculateCanvasMaxBounds();
 
-    /// <summary>
-    /// Verwendete Ressourcen bereinigen.
-    /// </summary>
-    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected void CancelSmoothScroll() {
         _scrollAnimator?.Dispose();
         _scrollAnimator = null;
@@ -485,7 +487,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var tmpCanvasMaxBounds = CanvasMaxBounds;
 
         var freiraumNoSliders = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
-        var freiraumBoth = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
+        var freiraumBoth = CollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderSize, Size.Height - SliderSize), Zoom);
 
         var oldSliderYVisible = SliderY.Visible;
         var oldSliderXVisible = SliderX.Visible;

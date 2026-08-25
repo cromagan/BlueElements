@@ -123,7 +123,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         _control.SpellCheckingEnabled = SpellCheckingEnabled;
         _control.TextFormatingAllowed = TextFormatingAllowed;
         _control.SuggestionPosition = SuggestionPosition;
-        _control.Verhalten = ParentHeight > 20
+        _control.Verhalten = ParentHeight > 20.CanvasToControl(Zoom)
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         _control.QuickInfo = QuickInfo;

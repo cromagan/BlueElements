@@ -19,5 +19,17 @@ public sealed class RenderingData {
 
     public Renderer.Renderer? Renderer { get; set; }
 
+    /// <summary>
+    /// Renderer-Name (ClassId), aus dem <see cref="Renderer" /> erzeugt wurde.
+    /// Weicht er vom aktuellen Spaltenwert ab, wird der Renderer neu erzeugt.
+    /// </summary>
+    public string? RendererName { get; set; }
+
+    /// <summary>
+    /// Serialisierte Renderer-Einstellungen, aus denen <see cref="Renderer" /> erzeugt
+    /// wurden. Weichen sie vom aktuellen Spaltenwert ab, wird der Renderer neu erzeugt.
+    /// </summary>
+    public string? RendererSettings { get; set; }
+
     #endregion
 }

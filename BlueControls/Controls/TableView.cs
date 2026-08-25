@@ -426,6 +426,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// </summary>
     internal int MaxIndentOfRows => _sortedViewItems is { Count: > 0 } items ? items.Max(i => i.Indent) : 0;
 
+    /// <summary>
+    /// Alle sortierten View-Items (Spaltenköpfe, Zeilen, Fußelemente). Löst
+    /// bei Bedarf den Neuaufbau aus.
+    /// </summary>
+    internal List<TableElement> SortedViewItems {
+        get {
+            _ = AllViewItems;
+            return _sortedViewItems;
+        }
+    }
+
     protected override bool ShowSliderX => true;
 
     protected override int SmallChangeY => 10;
@@ -1179,12 +1190,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             if (CurrentArrangement is not { } ca) { return contextMenu; }
 
-            if (ca.Kontextmenu_Skripte.Count > 0 && row is not null) {
-                foreach (var thisString in ca.Kontextmenu_Skripte) {
-                    if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
-                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.NeedRow && thiss.IsOk();
+            if (ca.Kontextmenu_Skripte.Count > 0) {
+                // Benutzermenü aktiv: ausschließlich dessen Skripte anbieten —
+                // und nur auf Zeilen. An allen anderen Positionen (z. B.
+                // Spaltenkopf) wird kein Kontextmenü geöffnet.
+                if (row is not null) {
+                    foreach (var thisString in ca.Kontextmenu_Skripte) {
+                        if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
+                            var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null, true) && thiss.NeedRow && thiss.IsOk();
 
-                        contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
+                            contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
+                        }
                     }
                 }
                 return contextMenu;
@@ -1695,6 +1711,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         #endregion
 
+        if (contentHolderCellRow == null && string.IsNullOrEmpty(newValue)) {
+            return "Abbruch";
+        }
+
         #region Format prüfen
 
         if (formatWarnung) {
@@ -1791,6 +1811,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     /// <summary>
     /// Universeller Einstieg für alle Inline-Edits: wählt die Strategie, konfiguriert das Control und aktiviert es.
+    /// Der Editor-Zoom wird aus <paramref name="displayFont" /> und der TextBox-Skin-Font berechnet,
+    /// damit der Edit-Text dieselbe Größe hat wie der angezeigte Inhalt.
     /// </summary>
     internal void BeginEdit(
         string editStrategyKey,
@@ -1801,7 +1823,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         ColumnItem? contentColumn,
         RowItem? contentRow,
         List<ListItem>? listItems,
-        CellExtEventArgs? cellInfo) {
+        CellExtEventArgs? cellInfo,
+        BlueFont? displayFont) {
         if (IsDisposed) { return; }
 
         // LostFocus während des Aufbaus ignorieren (Abbau/Fokus-Übergabe).
@@ -1837,7 +1860,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
 
-            strategy.Zoom = Zoom;
+            if (displayFont is { }
+                && Skin.GetBlueFont(Design.TextBox, States.Standard) is { } editorFont
+                && editorFont.Size > 0) {
+                strategy.Zoom = Zoom * (displayFont.Size / editorFont.Size);
+            } else {
+                strategy.Zoom = Zoom;
+            }
+
             strategy.QuickInfo = styleSource?.QuickInfo ?? string.Empty;
             strategy.ParentHeight = bounds.Height;
             if (items is { Count: > 0 }) { strategy.ListItems = items; }
@@ -1850,6 +1880,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             strategy.EndInit();
 
+            // Wert VOR der Größenberechnung setzen: Strategien wie die
+            // Tabellenansicht berechnen ihre benötigte Größe aus dem Inhalt.
+            strategy.Value = value;
+
             // Strategie-spezifische Größe berechnen.
             var size = strategy.CalculateRequiredSize(bounds.Width, bounds.Height);
 
@@ -1861,7 +1895,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             c.Location = bounds.Location;
             c.Size = size;
-            strategy.Value = value;
 
             _editCommit = commit;
 
@@ -3357,12 +3390,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         sortAnzeige.Sort = sortused;
         sortedItems.Add(sortAnzeige);
 
-        // Filterleiste
+        // Filterleiste — nur, wenn mindestens eine Spalte gefiltert werden
+        // kann oder bereits Filter aktiv sind.
         var columnFilter = GetOrCreateHeadItem(allItems, FilterBarTableElement.Identifier, arrangement, () => new FilterBarTableElement(arrangement));
-        columnFilter.Visible = arrangement.ShowHead;
-        columnFilter.FilterCombined = filterCombined;
-        columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
-        sortedItems.Add(columnFilter);
+        columnFilter.Visible = arrangement.ShowHead
+            && (filterCombined.Count > 0 || arrangement.RenderingItems.Any(c => c.AutoFilterSymbolPossible));
+
+        if (columnFilter.Visible) {
+            columnFilter.FilterCombined = filterCombined;
+            columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
+            sortedItems.Add(columnFilter);
+        }
 
         // Ansichtbearbeitung-Leiste
         if (Ansichtbearbeitung) {
@@ -4590,11 +4628,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
-        // Nur bei aktuellen ViewItems ist die Abfrage, ob die Row überhaupt
-        // angezeigt wurde, aussagekräftig. Bei pending Invalidate würde
-        // GetRow sonst einen unnötigen Voll-Aufbau erzwingen.
+        // Die Zeile ist zum Event-Zeitpunkt bereits disposed — eine Abfrage über
+        // GetRow scheitert immer. _rowLookup führt noch auf ihr Anzeige-Element
+        // und verrät, ob sie überhaupt sichtbar war.
         if (_mustDoAllViewItems) { return; }
-        if (GetRow(e.Row, null) is not null) {
+        if (_rowLookup.ContainsKey(e.Row)) {
             Invalidate_AllViewItems(false);
         }
     }

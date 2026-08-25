@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -105,6 +106,30 @@ public static partial class Extensions {
             if (!found) { return false; }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Entfernt alle unsichtbaren Zeichen: Steuer-, Format- (z. B. Zero-Width-Space, BOM),
+    /// Kombinierende Zeichen, Surrogate und andere Leerzeichen-Varianten.
+    /// Nur das normale Leerzeichen (U+0020) bleibt erhalten.
+    /// </summary>
+    public static string RemoveInvisibleChars(this string txt) {
+        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+
+        var sb = new StringBuilder(txt.Length);
+        foreach (var c in txt) {
+            if (c != ' '
+                && (char.IsControl(c) || char.IsWhiteSpace(c)
+                    || char.GetUnicodeCategory(c) is UnicodeCategory.Format
+                        or UnicodeCategory.Surrogate
+                        or UnicodeCategory.PrivateUse
+                        or UnicodeCategory.NonSpacingMark
+                        or UnicodeCategory.EnclosingMark
+                        or UnicodeCategory.OtherNotAssigned)) { continue; }
+
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     public static string ConvertFromHtmlToRich(this string txt) {

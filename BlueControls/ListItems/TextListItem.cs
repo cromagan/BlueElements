@@ -70,7 +70,7 @@ public class TextListItem : ListItem {
             Skin.Draw_Back(gr, tmpd, state, positionControl.ToRect(), null, false);
         }
         var align = itemdesign == Design.Item_MiniToolbar ? Alignment.Horizontal_Vertical_Center : Alignment.VerticalCenter_Left;
-        Skin.Draw_FormatedText(gr, Text, Symbol, align, positionControl.ToRect(), tmpd, state, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, align, positionControl.ToRect(), Skin.GetBlueFont(tmpd, state).Scale(zoom), translate);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, tmpd, state, positionControl.ToRect());
         }

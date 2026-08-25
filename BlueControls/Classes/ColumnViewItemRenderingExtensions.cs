@@ -97,9 +97,17 @@ public static class ColumnViewItemRenderingExtensions {
 
     public static Renderer.Renderer GetRenderer(this ColumnViewItem cvi, string style) {
         var data = GetRenderingData(cvi);
-        if (data.Renderer is not null) { return data.Renderer; }
+        var rendererName = cvi.Renderer;
+        var rendererSettings = cvi.RendererSettings;
 
-        data.Renderer = TableView.RendererOf(cvi.Renderer, cvi.RendererSettings, style);
+        if (data.Renderer is not null
+            && data.RendererName == rendererName
+            && data.RendererSettings == rendererSettings) { return data.Renderer; }
+
+        data.RendererName = rendererName;
+        data.RendererSettings = rendererSettings;
+        data.CanvasContentWidth = null; // Neuer Renderer kann andere Inhaltsbreite liefern
+        data.Renderer = TableView.RendererOf(rendererName, rendererSettings, style);
         return data.Renderer;
     }
 

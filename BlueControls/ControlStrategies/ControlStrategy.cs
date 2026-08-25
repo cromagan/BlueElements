@@ -12,6 +12,12 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     #region Fields
 
+    /// <summary>
+    /// Feste Höhe einzeiliger Eingabe-Controls (z. B. Combobox, Textbox),
+    /// unabhängig von der Zeilenhöhe der Zelle.
+    /// </summary>
+    public const int SingleLineHeight = 24;
+
     public static readonly AssemblyAwareCache<ControlStrategy> AllStrategies = new();
 
     /// <summary>
@@ -99,20 +105,21 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Schaltet eine GroupBox als Rahmen um das erstellte Control.
+    /// Rahmen-Stil um das erstellte Control. <see cref="GroupBoxStyle.Nothing" />
+    /// deaktiviert den Rahmen, jeder andere Stil legt eine GroupBox um das Control.
     /// <see cref="Control" /> gibt dann die GroupBox zurück.
     /// </summary>
-    public bool Border {
+    public GroupBoxStyle Border {
         get;
         set {
             if (IsDisposed || field == value) { return; }
             field = value;
 
-            ControlStrategyParameter.Set(_borderKey, value);
+            ControlStrategyParameter.Set(_borderKey, (int)value);
 
             if (!IsEventsSuppressed) { OnDoUpdateSideOptionMenu(); }
         }
-    }
+    } = GroupBoxStyle.Nothing;
 
     public CheckBehavior CheckBehavior {
         get;
@@ -124,20 +131,24 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Das anzuzeigende Control der Strategie. Bei aktivem <see cref="Border" />
-    /// wird das erzeugte Control in eine GroupBox gefasst und diese zurückgegeben.
+    /// Das anzuzeigende Control der Strategie. Bei Rahmen-Stil ungleich
+    /// <see cref="GroupBoxStyle.Nothing" /> wird das erzeugte Control in eine
+    /// GroupBox gefasst und diese zurückgegeben.
     /// Hat das Control bereits einen Parent, übernimmt die Box dessen Platz.
     /// </summary>
     public System.Windows.Forms.Control? Control {
         get {
             if (IsDisposed) { return null; }
 
-            if (!Border) {
+            if (Border == GroupBoxStyle.Nothing) {
                 if (_borderBox is { IsDisposed: false } oldBox) { RemoveBorderBox(oldBox); }
                 return ControlCore;
             }
 
-            if (_borderBox is { IsDisposed: false }) { return _borderBox; }
+            if (_borderBox is { IsDisposed: false } box) {
+                box.GroupBoxStyle = Border;
+                return box;
+            }
             if (ControlCore is not { IsDisposed: false } inner) { return null; }
 
             var parent = inner.Parent;
@@ -145,8 +156,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
             var anchor = inner.Anchor;
 
             _borderBox = new GroupBox {
-                GroupBoxStyle = GroupBoxStyle.DropdownMenu,
-                Text = string.Empty,
+                GroupBoxStyle = Border,
+                Text = "Bearbeiten",
                 Padding = new System.Windows.Forms.Padding(Skin.PaddingMedium)
             };
             inner.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -553,7 +564,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// konkreten Strategy-Typ noch das Control ab.
     /// </summary>
     public virtual Size CalculateRequiredSize(int minWidth, int minHeight) {
-        if (!Border || _borderBox is not { IsDisposed: false } box) { return new Size(minWidth, minHeight); }
+        if (Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box) { return new Size(minWidth, minHeight); }
 
         // Rahmen-Insets ausgleichen, damit das eingebettete Control voll sichtbar bleibt.
         var display = box.DisplayRectangle;
@@ -562,7 +573,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Erzeugt das Control der Strategie und gibt das anzuzeigende Control
-    /// zurück — bei aktivem <see cref="Border" /> die umgebende GroupBox.
+    /// zurück — bei aktivem Rahmen die umgebende GroupBox.
     /// Strategien ohne Control (None, DragDrop) geben null zurück.
     /// </summary>
     public System.Windows.Forms.Control? CreateControl() {
@@ -587,12 +598,12 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     public virtual string ErrorReason() => string.Empty;
 
     /// <summary>
-    /// Setzt den Fokus auf das werttragende Control — bei aktivem
-    /// <see cref="Border" /> auf das eingebettete Control statt die Rahmen-Box.
+    /// Setzt den Fokus auf das werttragende Control — bei aktivem Rahmen
+    /// (<see cref="Border" /> ungleich Nothing) auf das eingebettete Control statt die Rahmen-Box.
     /// </summary>
     public void Focus() {
         if (IsDisposed) { return; }
-        if (Border && ControlCore is { } core) {
+        if (Border != GroupBoxStyle.Nothing && ControlCore is { } core) {
             core.Focus();
             return;
         }
@@ -603,7 +614,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// Optionen der Strategie für den Property-Editor.
     /// Leer, wenn die Strategie keine konfigurierbaren Optionen hat.
     /// </summary>
-    public virtual List<GenericControl> GetProperties(int widthOfControl) => [new FlexiControlForProperty<bool>(() => Border, "Rahmen")];
+    public virtual List<GenericControl> GetProperties(int widthOfControl) => [new FlexiControlForProperty<GroupBoxStyle>(() => Border, "Rahmen", ItemsOf(typeof(GroupBoxStyle)))];
 
     public virtual void HandleCaptionClick() { }
 
@@ -702,7 +713,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// Übernimmt die eigenen Keys aus dem Json in die Properties. Unbekannte
     /// Keys werden ignoriert und damit verworfen.
     /// </summary>
-    protected virtual void ReadParameters(JsonObject json) => Border = json.GetBool(_borderKey, Border);
+    protected virtual void ReadParameters(JsonObject json) => Border = json.GetEnum(_borderKey, Border);
 
     protected abstract void SetValueToControlInternal(string value);
 

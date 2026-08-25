@@ -139,7 +139,7 @@ public class ReadableListItem : ListItem {
         var qi = string.IsNullOrEmpty(baseQuickInfo) ? _text.CreateHtmlCodes() : baseQuickInfo;
 
         if (item is ISimpleEditor { Description: { Length: > 0 } } se) {
-            qi += "<hr>" + se.Description.CreateHtmlCodes();
+            qi += "<br><hr><br>" + se.Description.CreateHtmlCodes();
         }
         return qi;
     }

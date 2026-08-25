@@ -101,7 +101,8 @@ public sealed class RowCaptionTableElement : TableElement {
             null,
             null,
             null,
-            null);
+            null,
+            Font_RowChapter);
         return true;
     }
 

@@ -26,6 +26,7 @@ public class CaptionTextRenderer : Renderer {
     public string CaptionStartSequence {
         get => _captionStartSequence;
         set {
+            value = value.RemoveInvisibleChars();
             if (_captionStartSequence == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _captionStartSequence = value;
@@ -34,7 +35,7 @@ public class CaptionTextRenderer : Renderer {
     }
 
     public override string Description =>
-        "Mehrzeiliger Text. Zeilen, die mit der Überschrift-Markierung beginnen, werden als Überschrift dargestellt. Die Tabulator-Sequenz springt zum nächsten Raster und zeichnet eine vertikale Trennlinie.";
+        "Mehrzeiliger Text. Zeilen, die mit der Überschrift-Markierung beginnen, werden als Überschrift dargestellt.<br>Die Tabulator-Sequenz springt zum nächsten Raster und zeichnet eine vertikale Trennlinie.";
 
     /// <summary>
     /// Sequenz, die im Zelltext durch einen Tabulator ersetzt wird.
@@ -44,6 +45,7 @@ public class CaptionTextRenderer : Renderer {
     public string TabSequence {
         get => _tabSequence;
         set {
+            value = value.RemoveInvisibleChars();
             if (_tabSequence == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _tabSequence = value;
@@ -91,11 +93,11 @@ public class CaptionTextRenderer : Renderer {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "captionstartsequence":
-                _captionStartSequence = value.FromNonCritical();
+                _captionStartSequence = value.FromNonCritical().RemoveInvisibleChars();
                 return true;
 
             case "tabsequence":
-                _tabSequence = value.FromNonCritical();
+                _tabSequence = value.FromNonCritical().RemoveInvisibleChars();
                 return true;
         }
         return base.ParseThis(key, value);
@@ -182,13 +184,13 @@ public class CaptionTextRenderer : Renderer {
                 var rest = line[_captionStartSequence.Length..];
 
                 if (hasTab) {
-                    rest = rest.Replace(_tabSequence, "<tab><vl>");
+                    rest = rest.Replace(_tabSequence, "<tab><vl> ");
                 }
 
                 sb.Append("<h1>").Append(rest).Append("</h1>");
             } else {
                 if (hasTab) {
-                    line = line.Replace(_tabSequence, "<tab><vl>");
+                    line = line.Replace(_tabSequence, "<tab><vl> ");
                 }
 
                 sb.Append(line);

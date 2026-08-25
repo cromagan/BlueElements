@@ -313,8 +313,8 @@ public partial class ComboBox : TextBox, ITranslateable {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.UntrimmedCanvasSize(Design.Item_DropdownMenu);
             i.CanvasPosition = new Rectangle(0, 0, r.Width, r.Height);
-            var ymod = (int)((DisplayRectangle.Height - r.Height) / 2.0);
-            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal, ymod, Design.ComboBox_TextBox, Design.ComboBox_TextBox, state, false, string.Empty, Translate, Design.Undefined, 1f);
+            var ymod = (int)((DisplayRectangle.Height - r.Height * Zoom) / 2.0);
+            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal, ymod, Design.ComboBox_TextBox, Design.ComboBox_TextBox, state, false, string.Empty, Translate, Design.Undefined, Zoom);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();

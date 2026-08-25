@@ -152,7 +152,8 @@ public sealed class CaptionBarListItemTableElement : TableElement {
             null,
             null,
             ItemsOf(suggestions),
-            null);
+            null,
+            Font_Head_Default);
         return true;
     }
 
