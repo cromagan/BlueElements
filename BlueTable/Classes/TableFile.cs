@@ -660,8 +660,6 @@ public class TableFile : Table {
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
         [".bdb"] = typeof(TableFile),
-        [".csv"] = typeof(TableCSV),
-        [".hbdb"] = typeof(TableCSV),
         [".mbdb"] = typeof(TableFragments),
         [".tblh"] = typeof(TableChunk),
         [".tblj"] = typeof(TableJsonFile),

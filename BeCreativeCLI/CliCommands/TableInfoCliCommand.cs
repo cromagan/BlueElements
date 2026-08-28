@@ -54,6 +54,9 @@ public class TableInfoCliCommand : CliCommand {
         }
     }
 
+    private static ColumnItem? ChapterColumnOfView1(Table tbl) =>
+                            tbl.ColumnArrangements.Count > 1 ? tbl.ColumnArrangements[1].ColumnForChapter : null;
+
     private static int WriteColumnDetails(Table tbl, CliArgs args) {
         var column = ColumnOfOption(tbl, args);
 
@@ -67,6 +70,7 @@ public class TableInfoCliCommand : CliCommand {
         Console.Out.WriteLine("Mehrzeilig: " + (column.MultiLine ? "ja" : "nein"));
         Console.Out.WriteLine("ErsteSpalte: " + (column.IsFirst ? "ja" : "nein"));
         Console.Out.WriteLine("Schluesselspalte: " + (column.IsKeyColumn ? "ja" : "nein"));
+        Console.Out.WriteLine("Kapitelspalte: " + (column == ChapterColumnOfView1(tbl) ? "ja" : "nein"));
         Console.Out.WriteLine("WirdGespeichert: " + (column.SaveContent ? "ja" : "nein"));
         Console.Out.WriteLine("AdminInfo: " + column.AdminInfo);
         Console.Out.WriteLine("QuickInfo: " + column.QuickInfo);
@@ -74,12 +78,18 @@ public class TableInfoCliCommand : CliCommand {
     }
 
     private static void WriteColumnNames(Table tbl) {
-        foreach (var column in tbl.Column.Where(c => c is { IsDisposed: false })) {
-            var z = string.Empty;
-            if (column.IsFirst) { z = " (Erstspalte)"; }
-            if (column.Value_for_Chunk != ChunkType.None) { z = " (Chunkspalte)"; }
+        var kapitelspalte = ChapterColumnOfView1(tbl);
 
-            Console.Out.WriteLine($"{column.KeyName}{z}");
+        foreach (var column in tbl.Column.Where(c => c is { IsDisposed: false })) {
+            List<string> funktionen = [];
+            if (column.IsFirst) { funktionen.Add("Erstspalte"); }
+            if (column.Value_for_Chunk != ChunkType.None) { funktionen.Add("Chunkspalte"); }
+            if (column == kapitelspalte) { funktionen.Add("Kapitelspalte"); }
+
+            var line = $"KeyName: {column.KeyName}, Beschriftung: \"{column.Caption.Replace("\r", " ")}\"";
+            if (funktionen.Count > 0) { line += $", Funktion: {string.Join(", ", funktionen)}"; }
+
+            Console.Out.WriteLine(line);
         }
     }
 

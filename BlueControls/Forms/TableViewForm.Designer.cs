@@ -840,13 +840,13 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.CSV;*.TBLH;*.TBLJ;*.MTBLJ)|*.BDB;*.MBDB;*.CSV;*.TBLH;*.TBLJ;*.MTBLJ|Alle Dateien (*.*)|*.*";
+            LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.TBLH;*.TBLJ;*.MTBLJ)|*.BDB;*.MBDB;*.TBLH;*.TBLJ;*.MTBLJ|Alle Dateien (*.*)|*.*";
             LoadTab.Title = "Bitte Tabelle laden!";
             LoadTab.FileOk += LoadTab_FileOk;
             // 
             // SaveTab
             // 
-            SaveTab.Filter = "*.BDB Single-User Tabellen|*.BDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH|*.TBLJ JSON Tabellen|*.TBLJ|*.MTBLJ JSON Fragment basierte Tabellen|*.MTBLJ|*.CSV Tabellen|*.CSV|*.* Alle Dateien|*";
+            SaveTab.Filter = "*.BDB Single-User Tabellen|*.BDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH|*.TBLJ JSON Tabellen|*.TBLJ|*.MTBLJ JSON Fragment basierte Tabellen|*.MTBLJ|*.* Alle Dateien|*";
             SaveTab.Title = "Bitte neuen Dateinamen der Tabelle wählen.";
             // 
             // grpAufräumen

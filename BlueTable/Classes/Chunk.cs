@@ -40,19 +40,8 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
             LiveInstances[Filename] = this;
         }
 
-        var suffix = Filename.FileSuffix().ToLowerInvariant();
-
-        if (suffix == "hbdb") {
-            // .hbdb ist eine Begleitdatei zur .csv-Datei im gleichen Verzeichnis
-            MainFileName = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".csv";
-        } else {
-            // .bdb/.mbdb/.tblh sind Hauptdateien — MainFileName ist die Datei selbst
-            MainFileName = Filename;
-        }
-
-        KeyName = string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)
-            ? TableFile.Chunk_MainData.ToLowerInvariant()
-            : Filename.FileNameWithoutSuffix().ToLowerInvariant();
+        MainFileName = Filename;
+        KeyName = TableFile.Chunk_MainData.ToLowerInvariant();
     }
 
     #endregion
@@ -77,9 +66,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
 
     /// <summary>
     /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
-    /// Für Hauptdateien (.bdb, .mbdb, .tblh) wird Chunk_MainData zurückgegeben,
-    /// für Begleit- und Chunk-Dateien (z. B. .hbdb, .tblc) der Dateiname ohne Suffix.
-    /// Wird im Konstruktor einmalig berechnet, da Filename und MainFileName unveränderlich sind.
+    /// Wird im Konstruktor einmalig berechnet, da Filename unveränderlich ist.
     /// </summary>
     public string KeyName { get; }
 
