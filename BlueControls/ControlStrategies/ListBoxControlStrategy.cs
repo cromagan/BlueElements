@@ -60,6 +60,15 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public override string ReadableText() => "Listbox";
 
+    /// <summary>
+    /// Setzt die Scroll-Position der Liste auf den Anfang zurück.
+    /// </summary>
+    public override void Reset() {
+        base.Reset();
+        if (_control is not { IsDisposed: false } c) { return; }
+        c.ResetScroll();
+    }
+
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
         _control?.RemoveClicked += ListBox_ItemRemoved;

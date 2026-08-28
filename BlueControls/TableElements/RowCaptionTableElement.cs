@@ -46,15 +46,15 @@ public sealed class RowCaptionTableElement : TableElement {
 
     /// <summary>
     /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Nur bei echten Kapiteln (nicht leer), mit vorhandener Kapitel-Spalte,
-    /// außerhalb von TableChunk und wenn die Benutzerrechte es erlauben.
+    /// Mit vorhandener Kapitel-Spalte, außerhalb von TableChunk und wenn die
+    /// Benutzerrechte es erlauben. Auch leere Kapitel (Anzeige "-") sind
+    /// bearbeitbar — dabei wird das Kapitel neu gesetzt statt umbenannt.
     /// </summary>
     internal bool CanEditChapter {
         get {
             if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
             if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
             if (tb is TableChunk) { return false; }
-            if (string.IsNullOrEmpty(ChapterText)) { return false; }
             return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
         }
     }
@@ -110,6 +110,7 @@ public sealed class RowCaptionTableElement : TableElement {
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         var displayText = ChapterText.ChapterPathLastName();
+        if (string.IsNullOrEmpty(displayText)) { displayText = "-"; }
         if (CanEditChapter) {
             return $"{displayText}\rDoppelklick zum Bearbeiten";
         }
@@ -154,7 +155,9 @@ public sealed class RowCaptionTableElement : TableElement {
         var fontScaled = Font_RowChapter.Scale(zoom);
         // Nur das letzte Pfad-Segment anzeigen — die Hierarchie wird über
         // Indent optisch dargestellt (analog zum Windows Datei-Explorer).
+        // Leere Kapitel (z. B. Zeilen ohne Kapitel bei Zeilennummern-Spalte) als "-".
         var tmp = ChapterText.ChapterPathLastName();
+        if (string.IsNullOrEmpty(tmp)) { tmp = "-"; }
 
         var p2 = 2.CanvasToControl(zoom);
         var p5 = 5.CanvasToControl(zoom);
@@ -190,8 +193,8 @@ public sealed class RowCaptionTableElement : TableElement {
     protected override string GetCompareKey() => ChapterText;
 
     /// <summary>
-    /// Übernimmt das Umbenennen oder Löschen dieses Kapitels. Es werden nur
-    /// die Zeilen des übergebenen Blocks aktualisiert (lokal, nicht global
+    /// Übernimmt das Setzen, Umbenennen oder Löschen dieses Kapitels. Es werden
+    /// nur die Zeilen des übergebenen Blocks aktualisiert (lokal, nicht global
     /// über alle Zeilen mit gleichem Namen). Unterpfade werden rekursiv
     /// mitgeführt, sodass die Hierarchie erhalten bleibt. Commit-Callback
     /// aus <see cref="HandleDoubleClick" />, der an
@@ -210,6 +213,20 @@ public sealed class RowCaptionTableElement : TableElement {
         var newChapter = string.IsNullOrEmpty(parentPath)
             ? newLastName
             : parentPath + Kapiteltrenner + newLastName;
+
+        if (string.IsNullOrEmpty(oldChapter)) {
+            // Bisher kapitellose Zeilen: neuen Kapitelnamen direkt setzen.
+            // Leere Eingabe lässt die Zeilen kapitellos — nichts zu tun.
+            if (string.IsNullOrEmpty(newLastName)) { return; }
+
+            foreach (var tableRow in blockRows) {
+                if (tableRow is not { IsDisposed: false }) { continue; }
+                if (!string.IsNullOrEmpty(tableRow.CellGetString(capCol))) { continue; }
+                tableRow.CellSet(capCol, newChapter, "Kapitel gesetzt: " + newChapter);
+            }
+            tableView.Invalidate_AllViewItems(true);
+            return;
+        }
 
         if (!string.IsNullOrEmpty(newLastName) && newChapter != oldChapter) {
             // Kapitel umbenennen. Auch Unterpfade aktualisieren, damit

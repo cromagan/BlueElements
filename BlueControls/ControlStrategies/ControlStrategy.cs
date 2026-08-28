@@ -637,6 +637,13 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public abstract string ReadableText();
 
+    /// <summary>
+    /// Stellt den Default-Zustand des Controls wieder her (z. B. Zeilen löschen,
+    /// Scroll-Position zurücksetzen). Wird vor jeder Anzeige aufgerufen, da
+    /// Strategien mitsamt Control wiederverwendet werden.
+    /// </summary>
+    public virtual void Reset() => ForceWriteBackValue();
+
     public abstract void SubscribeEvents();
 
     /// <summary>

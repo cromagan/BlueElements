@@ -223,7 +223,7 @@ public static class ColumnViewItemRenderingExtensions {
         var isEligible = new bool[items.Count];
 
         for (var i = 0; i < items.Count; i++) {
-            // Virtuelle Spalten (Pin, Nummer, Hinzufügen) und die SYS_ROWSORTINDEX-
+            // Virtuelle Spalten (Pin, Hinzufügen) und die SYS_ROWSORTINDEX-
             // Spalte behalten immer ihre feste Breite und werden nicht skaliert.
             isEligible[i] = items[i].FixedWidth == 0
                 && items[i].ControlColumnWidth() > widthThreshold

@@ -307,9 +307,32 @@ public static class Develop {
 
     public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
+    /// <summary>
+    /// Liefert Diagnose Daten in die Direktausgabe.
+    /// Der Stack kann mit 'Stack: {Develop.DiagStack()}' ergänzt werden.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="msg"></param>
     public static void Diagnose(string type, string msg) {
         if (!DiagFlag) { return; }
         Debug.WriteLine($"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+    }
+
+    /// <summary>
+    /// Kompakter Aufruf-Stack für Diagnose-Ausgaben: Methodennamen durch " <- " getrennt.
+    /// </summary>
+    public static string DiagStack(int skipFrames = 1, int maxFrames = 8) {
+        if (!DiagFlag) { return string.Empty; }
+
+        var frames = new StackTrace(skipFrames, false).GetFrames();
+        if (frames is null) { return string.Empty; }
+
+        var names = new List<string>();
+        foreach (var f in frames) {
+            if (names.Count >= maxFrames) { break; }
+            names.Add(f.GetMethod()?.Name ?? "?");
+        }
+        return string.Join(" <- ", names);
     }
 
     public static void DoEvents() => System.Windows.Forms.Application.DoEvents();

@@ -224,8 +224,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
         if (_dict.TryGetValue(key, out var existing)) { return existing; }
 
-        var value = factory(key);
-        if (value is null) { throw new InvalidOperationException("Factory returned null."); }
+        var value = factory(key) ?? throw new InvalidOperationException("Factory returned null.");
 
         while (true) {
             if (_dict.TryAdd(key, value)) { return value; }

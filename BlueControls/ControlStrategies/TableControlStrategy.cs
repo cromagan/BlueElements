@@ -12,8 +12,10 @@ namespace BlueControls.ControlStrategies;
 /// <see cref="Columns" /> enthält die Spaltenbeschriftungen; die internen
 /// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
-/// Beginnt eine Zeile (erste Spalte) mit "##", wird der Text als Überschrift in die
-/// Kapitel-Spalte geschrieben. Das Kontextmenü einer Zeile wird durch die Skripte
+/// Im Value markiert eine "## Text"-Zeile ein Kapitel: Beim Import wird der Text
+/// in die Kapitel-Spalte der folgenden Zeilen geschrieben, beim Export wird bei
+/// einem Wechsel der Kapitel-Spalte eine eigene "## Text"-Zeile ausgegeben.
+/// Das Kontextmenü einer Zeile wird durch die Skripte
 /// "Zeile löschen" und "Überschrift hinzufügen" ersetzt. Bei
 /// <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern über die
 /// Systemspalte SYS_ROWSORTINDEX eingeblendet.
@@ -23,16 +25,10 @@ public class TableControlStrategy : ControlStrategy {
     #region Fields
 
     private const string _addHeadingScriptKey = "Überschrift hinzufügen";
-
     private const string _chapterColumnKey = "Ueberschrift";
-
     private const string _columnsKey = "columns";
-
     private const string _deleteRowScriptKey = "Zeile löschen";
-
     private TableView? _control;
-
-    private bool _isConvertingHeadings;
 
     private bool _lastAutoSort = true;
 
@@ -130,6 +126,27 @@ public class TableControlStrategy : ControlStrategy {
 
     public override string ReadableText() => "Tabellenansicht";
 
+    /// <summary>
+    /// Entfernt alle Zeilen und setzt die Scroll-Position der Ansicht zurück.
+    /// </summary>
+    public override void Reset() {
+        base.Reset();
+        if (_control is { IsDisposed: false } tv) {
+            tv.OffsetX = 0;
+            tv.OffsetY = 0;
+        }
+
+        if (_table is not { IsDisposed: false } tb) { return; }
+
+        _suppressEvents = true;
+        try {
+            var existing = tb.Row.ToList();
+            if (existing.Count > 0) { _ = RowCollection.Remove(existing, "Reset"); }
+        } finally {
+            _suppressEvents = false;
+        }
+    }
+
     public override void SubscribeEvents() {
         if (_table is { IsDisposed: false } tb) {
             tb.CellValueChanged += Table_ContentChanged;
@@ -207,24 +224,41 @@ public class TableControlStrategy : ControlStrategy {
     }
 
     /// <summary>
-    /// Serialisiert die Tabelle als CSV. Zeilen mit Kapitel schreiben "## Kapitel"
-    /// in die erste Spalte; die Kapitel-Spalte selbst ist nicht Teil des Value.
+    /// Die Spalten, die den CSV-Feldern des Value entsprechen: die echten
+    /// Datenspalten in Speicherreihenfolge. Systemspalten (z. B. Zeilennummern)
+    /// und die Kapitel-Spalte gehören nicht in den Value. Der Schlüssel-Vergleich
+    /// muss Groß/Klein-ignorierend sein, KeyName liefert Großbuchstaben.
+    /// </summary>
+    private static List<ColumnItem> CsvColumns(Table tb) =>
+        tb.ColumnsInSaveOrder().Where(c => !c.IsSystemColumn() && !string.Equals(c.KeyName, _chapterColumnKey, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    /// <summary>
+    /// Serialisiert die Tabelle als CSV. Ändert sich die Kapitel-Spalte gegenüber
+    /// der vorherigen Zeile, wird vor der Zeile eine eigene "## Kapitel"-Zeile
+    /// ausgegeben; die Kapitel-Spalte selbst ist nicht Teil des Value.
     /// </summary>
     private static string ExportCurrentValue(Table tb) {
-        var columns = tb.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+        var columns = CsvColumns(tb);
         if (columns.Count == 0) { return string.Empty; }
 
         var chapter = tb.Column[_chapterColumnKey];
         var lines = new List<string>();
+        var lastChapter = string.Empty;
 
         foreach (var row in tb.RowsInSaveOrder()) {
             var heading = chapter is { IsDisposed: false } ch ? row.CellGetString(ch).Trim() : string.Empty;
 
+            if (heading != lastChapter) {
+                lastChapter = heading;
+                // Kapitel-Zeile roh ausgeben: CSV-Escaping würde die Zeile
+                // bei Sonderzeichen quoten und beim Import als Datenzeile
+                // gelesen werden.
+                if (heading is { Length: > 0 }) { lines.Add("## " + heading); }
+            }
+
             var fields = new List<string>();
-            for (var i = 0; i < columns.Count; i++) {
-                var cellValue = row.CellGetString(columns[i]);
-                if (i == 0 && heading.Length > 0) { cellValue = "## " + heading; }
-                fields.Add(CsvHelper.EscapeCSVField(cellValue, ';'));
+            foreach (var c in columns) {
+                fields.Add(CsvHelper.EscapeCSVField(row.CellGetString(c), ';'));
             }
             lines.Add(string.Join(';', fields));
         }
@@ -241,17 +275,25 @@ public class TableControlStrategy : ControlStrategy {
         var view = tcvc[1];
         view.RemoveAll();
         view.KeyName = "CSV-Ansicht";
-        view.Kontextmenu_Skripte = new[] { _deleteRowScriptKey, _addHeadingScriptKey }.AsReadOnly();
-        view.ColumnForChapter = tb.Column[_chapterColumnKey];
-        view.ScaleToFit = ScaleToFitMode.Aggressiv;
 
-        // Zeilennummern-Spalte nur, wenn SysRowSortIndex aktiv ist (!AutoSort).
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            view.Add(new NumberColumnItem());
+        if (AutoSort) {
+            view.ColumnForChapter = null;
+            view.Kontextmenu_Skripte = new[] { _deleteRowScriptKey }.AsReadOnly();
+        } else {
+            view.ColumnForChapter = tb.Column[_chapterColumnKey];
+            view.Kontextmenu_Skripte = new[] { _deleteRowScriptKey, _addHeadingScriptKey }.AsReadOnly();
+        }
+
+        view.ScaleToFit = ScaleToFitMode.Maximum;
+
+        // Zeilennummern bei !AutoSort über die echte Systemspalte SYS_ROWSORTINDEX
+        // anzeigen — nicht über die virtuelle NumberColumnItem.
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            view.Add(new ColumnViewItem(sortCol));
         }
 
         // Die Kapitel-Spalte erscheint nur als Überschriften-Zeile, niemals als Datenspalte.
-        view.ShowColumns(tb.Column.Where(c => !c.IsSystemColumn() && c.KeyName != _chapterColumnKey).Select(c => c.KeyName).ToArray());
+        view.ShowColumns(tb.Column.Where(c => !c.IsSystemColumn() && !string.Equals(c.KeyName, _chapterColumnKey, StringComparison.OrdinalIgnoreCase)).Select(c => c.KeyName).ToArray());
         if (tb.Column[_chapterColumnKey] is { } chapterCol && view[chapterCol] is { } chapterView) { view.Remove(chapterView); }
         view.Repair(1);
 
@@ -289,18 +331,17 @@ public class TableControlStrategy : ControlStrategy {
         firstColumn ??= _table.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
         if (firstColumn is { IsDisposed: false }) { firstColumn.IsFirst = true; }
 
-        // Kapitel-Spalte für ##-Überschriften. SaveContent = false: der Wert wird
-        // beim Export als "## "-Präfix der ersten Spalte serialisiert, nicht als eigenes Feld.
-        var chapterColumn = _table.Column.GenerateAndAdd(_chapterColumnKey, "Überschrift", TextOneLineColumnFormat.Instance);
-        if (chapterColumn is { IsDisposed: false }) { chapterColumn.SaveContent = false; }
+        // Kapitel-Spalte. SaveContent muss true bleiben, sonst gibt es für
+        // Skripte keine beschreibbare Variable (CellToVariable liefert bei
+        // !SaveContent null). Der Export schließt die Spalte über den
+        // Schlüssel aus, nicht über SaveContent.
+        _ = _table.Column.GenerateAndAdd(_chapterColumnKey, "Überschrift", TextOneLineColumnFormat.Instance);
 
         // Systemspalten für Zeilen-Skripte (rowdelete) bereitstellen.
         _table.Column.GenerateAndAddSystem(SystemColumnKeys.RowState, SystemColumnKeys.DateChanged);
 
         _table.RepairAfterParse();
 
-        // Sortiermodus: bei AutoSort alphabetisch nach erster Spalte,
-        // sonst Zeilennummern über SYS_ROWSORTINDEX.
         if (AutoSort) {
             _table.DisableCustomSort();
             if (_table.Column.First is { IsDisposed: false } first) {
@@ -341,34 +382,14 @@ public class TableControlStrategy : ControlStrategy {
     }
 
     private void Control_LostFocusDeferred() {
-        if (_control is { IsDisposed: false, ContainsFocus: false }) { OnLostFocus(); }
-    }
+        if (_control is not { IsDisposed: false } c) { return; }
+        if (c.ContainsFocus) { return; }
 
-    /// <summary>
-    /// Verschiebt Zeilen, deren erste Spalte mit ## beginnt, in die Kapitel-Spalte.
-    /// "##Text" und "## Text" werden gleichermaßen erkannt; die Überschrift ist
-    /// der restliche Text ohne führende Leerzeichen.
-    /// </summary>
-    private void ConvertHeadingRows() {
-        if (_table is not { IsDisposed: false } tb) { return; }
-        if (tb.Column.First is not { IsDisposed: false } first) { return; }
-        if (tb.Column[_chapterColumnKey] is not { IsDisposed: false } chapter) { return; }
+        // Fokusverlust an eine mit diesem Control verbundene FloatingForm (z. B.
+        // das Kontextmenü): kein echter Fokusverlust, das Edit bleibt geöffnet.
+        if (FloatingForm.IsShowing(c)) { return; }
 
-        _isConvertingHeadings = true;
-        try {
-            foreach (var row in tb.Row) {
-                if (row is not { IsDisposed: false }) { continue; }
-
-                var text = row.CellGetString(first).Trim();
-                if (!text.StartsWith("##", StringComparison.Ordinal)) { continue; }
-
-                var caption = text[2..].Trim();
-                row.CellSet(first, string.Empty, "Überschrift");
-                row.CellSet(chapter, caption, "Überschrift");
-            }
-        } finally {
-            _isConvertingHeadings = false;
-        }
+        OnLostFocus();
     }
 
     private void CreateEventScripts() {
@@ -390,32 +411,28 @@ public class TableControlStrategy : ControlStrategy {
             0,
             0);
 
-        // Macht aus der angeklickten Zeile eine Überschrift: weist der ersten
-        // Spalte "## <Text>" zu — ConvertHeadingRows verschiebt sie in die
-        // Kapitel-Spalte. Die Millisekunden machen den Text eindeutig.
-        TableScriptDescription? headingScript = null;
-        if (tb.Column.First is { IsDisposed: false } first) {
-            headingScript = new TableScriptDescription(
-                tb,
-                _addHeadingScriptKey,
-                first.KeyName + " = \"## Überschrift \"+datetimeutcnow(\"fff\");\r\n" +
-                "ShortSuccessMessage = \"Überschrift hinzugefügt\";",
-                "Textfeld|16",
-                "Macht aus der Zeile eine Überschrift.",
-                string.Empty,
-                new[] { Everybody }.AsReadOnly(),
-                ScriptEventTypes.Ohne_Auslöser,
-                true,
-                false,
-                string.Empty,
-                null,
-                0,
-                0);
-        }
+        // Macht aus der angeklickten Zeile den Anfang eines neuen Kapitels:
+        // die Kapitel-Spalte erhält einen eindeutigen Namen (Zeitstempel), damit
+        // er nicht mit einem bestehenden Kapitel zusammenfällt. Umbenennen per
+        // Doppelklick auf die Kapitel-Zeile.
+        var headingScript = new TableScriptDescription(
+            tb,
+            _addHeadingScriptKey,
+            _chapterColumnKey + " = \"Überschrift \"+datetimeutcnow(\"fff\");\r\n" +
+            "ShortSuccessMessage = \"Überschrift hinzugefügt\";",
+            "Textfeld|16",
+            "Macht aus der Zeile eine Überschrift.",
+            string.Empty,
+            new[] { Everybody }.AsReadOnly(),
+            ScriptEventTypes.Ohne_Auslöser,
+            true,
+            false,
+            string.Empty,
+            null,
+            0,
+            0);
 
-        tb.EventScript = headingScript is null
-            ? new[] { deleteScript }.AsReadOnly()
-            : new[] { deleteScript, headingScript }.AsReadOnly();
+        tb.EventScript = new[] { deleteScript, headingScript }.AsReadOnly();
     }
 
     private void LoadCsvIntoTable(string value) {
@@ -428,32 +445,42 @@ public class TableControlStrategy : ControlStrategy {
                 _ = RowCollection.Remove(existing, "CSV neu geladen");
             }
 
-            if (!string.IsNullOrEmpty(value)) {
-                // CsvHelper.ImportCsv erwartet einen Header mit Spaltennamen.
-                // Die Spaltenstruktur ist durch BuildTable() fest vorgegeben,
-                // daher wird der Header aus den Tabellenspalten synthetisiert.
-                var headerFields = tb.ColumnsInSaveOrder()
-                    .Where(c => c.SaveContent)
-                    .Select(c => CsvHelper.EscapeCSVField(c.KeyName, ';'));
-                var header = string.Join(';', headerFields);
-                _ = CsvHelper.ImportCsv(tb, header + "\r" + value, false, ';');
-            }
+            var no = 0;
+            var currentChapter = string.Empty;
+            var columns = CsvColumns(tb);
 
-            // Bei !AutoSort: fortlaufende Zeilennummern vergeben.
-            if (!AutoSort && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-                tb.RenumberRows(tb.Row, "CSV neu nummeriert");
-            }
+            if (value is { Length: > 0 }) {
+                foreach (var line in value.Replace("\r\n", "\r").SplitAndCutByCr()) {
+                    if (line.StartsWith("##", StringComparison.Ordinal) && _table.Column[_chapterColumnKey] is { }) {
+                        currentChapter = line[2..].Trim();
+                        continue;
+                    }
 
-            // "## "-Zeilen aus dem CSV in die Kapitel-Spalte übernehmen.
-            ConvertHeadingRows();
+                    var row = _table.Row.GenerateAndAdd("-", "CSV Import") ?? throw Develop.DebugError("Interner Fehler");
+                    no++;
+
+                    if (_table.Column.SysRowSortIndex is { } c) { row.CellSet(c, no, "CSV Import"); }
+                    if (_table.Column[_chapterColumnKey] is { } cx) { row.CellSet(cx, currentChapter, "CSV Import"); }
+
+                    // Felder in der Speicherreihenfolge der Spalten setzen. Mehr Felder
+                    // als Spalten: der Rest landet inklusive Semikolons in der letzten Spalte.
+                    var fields = CsvHelper.ParseCSVLine(line, ';').ToList();
+                    for (var i = 0; i < fields.Count && i < columns.Count; i++) {
+                        var field = i == columns.Count - 1 && fields.Count > columns.Count ? string.Join(';', fields.Skip(i)) : fields[i];
+                        row.CellSet(columns[i], field, "CSV Import");
+                    }
+                }
+            }
         } finally {
             _suppressEvents = false;
         }
     }
 
     private void Table_ContentChanged(object? sender, System.EventArgs e) {
-        // ##-Eingaben in die Kapitel-Spalte umleiten, dann den Value aktualisieren.
-        if (!_suppressEvents && !_isConvertingHeadings) { ConvertHeadingRows(); }
+        // Während des CSV-Imports keine Rückreaktion: ForceWriteBackValue würde
+        // einen verschachtelten LoadCsvIntoTable auslösen und die Zeilen entfernen,
+        // die der äußere Import gerade füllt.
+        if (_suppressEvents) { return; }
         ForceWriteBackValue();
     }
 

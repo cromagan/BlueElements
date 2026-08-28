@@ -215,6 +215,10 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             var handler = ItemClicked;
             Close();
             handler?.Invoke(this, e);
+
+            // Fokus an das verbundene Control zurückgeben: Mit dem Menü würde er
+            // sonst verloren gehen und z. B. ein offenes Inline-Edit über LostFocus schließen.
+            if (ConnectedControl is { IsDisposed: false, IsHandleCreated: true } cc && !cc.ContainsFocus) { cc.Focus(); }
         }
     }
 

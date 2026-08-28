@@ -567,7 +567,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             case 0:
                 if (string.IsNullOrEmpty(KeyName)) { KeyName = "Alle Spalten"; }
                 // Ansicht 0 zeigt ausschließlich alle echten Spalten.
-                // Virtuelle (persistente) Spalten — Pin, Nummer, Hinzufügen —
+                // Virtuelle (persistente) Spalten — Pin, Hinzufügen —
                 // sind hier nicht erlaubt und werden entfernt.
                 for (var z = _internal.Count - 1; z >= 0; z--) {
                     if (_internal[z] is { StorageKey: not null } v) { Remove(v); }

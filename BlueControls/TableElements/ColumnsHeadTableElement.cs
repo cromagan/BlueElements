@@ -122,7 +122,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
         #endregion
 
-        #region Virtuelle Spalten (Pin, Nummer, Hinzufügen)
+        #region Virtuelle Spalten (Pin, Hinzufügen)
 
         // In Ansicht 0 ("Alle Spalten") werden keine virtuellen Spalten
         // angeboten — sie sind dort nicht erlaubt (siehe ColumnViewCollection.Repair).
@@ -131,7 +131,6 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
             foreach (var (vKey, display, symbol) in new (string, string, ImageCode)[] {
                 ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel),
-                ("NUMBER", "Zeilennummer", ImageCode.Tabelle),
                 ("ADD", "Spalte zum Hinzufügen", ImageCode.PlusZeichen)
             }) {
                 if (ca.Any(x => x.StorageKey == "VIR_" + vKey)) { continue; }

@@ -28,6 +28,15 @@ public class SwapListBoxControlStrategy : ControlStrategy {
 
     public override string ReadableText() => "Listbox mit separaten Werten";
 
+    /// <summary>
+    /// Setzt die Scroll-Position beider Listen auf den Anfang zurück.
+    /// </summary>
+    public override void Reset() {
+        base.Reset();
+        if (_control is not { IsDisposed: false } c) { return; }
+        c.ResetScroll();
+    }
+
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;
         _control?.LostFocus += Control_LostFocus;

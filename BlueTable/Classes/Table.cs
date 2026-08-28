@@ -1300,7 +1300,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Entfernt die Systemspalte für die benutzerdefinierte Sortierung.
+    /// Entfernt die Systemspalte SysRowSortIndex für die benutzerdefinierte Sortierung.
     /// Die Tabellensortierung kehrt zum Standardverhalten zurück.
     /// </summary>
     public void DisableCustomSort() {
@@ -1317,7 +1317,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Erstellt die Systemspalte für die benutzerdefinierte Sortierung und nummeriert
+    /// Erstellt die Systemspalte SysRowSortIndex für die benutzerdefinierte Sortierung und nummeriert
     /// alle vorhandenen Zeilen fortlaufend. Die Tabellensortierung wird anschließend
     /// fixiert auf diese Spalte (aufsteigend) gesetzt.
     /// </summary>

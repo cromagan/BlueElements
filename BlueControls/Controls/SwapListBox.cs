@@ -75,6 +75,14 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         if (didChange) { OnItemCheckedChanged(); }
     }
 
+    /// <summary>
+    /// Setzt die Scroll-Position beider Listen auf den Anfang zurück.
+    /// </summary>
+    public void ResetScroll() {
+        Main.ResetScroll();
+        Suggest.ResetScroll();
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);

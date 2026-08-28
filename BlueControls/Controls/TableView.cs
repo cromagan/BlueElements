@@ -1264,7 +1264,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contextMenu.Add(ItemOf("Spalte", true));
 
                 if (viewItem?.StorageKey is not null) {
-                    // Virtuelle Spalten (Pin, Nummer, Hinzufügen) haben kein
+                    // Virtuelle Spalten (Pin, Hinzufügen) haben kein
                     // ColumnItem. Sie können nur aus der aktuellen Anordnung
                     // ausgeblendet werden; permanente Operationen, Eigenschaften,
                     // Kopieren, Statistik etc. sind nicht möglich.
@@ -1879,6 +1879,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
 
             strategy.EndInit();
+
+            // Defaultzustand der wiederverwendeten Strategie wiederherstellen,
+            // z. B. Scroll-Position oder Zeilen der vorherigen Anzeige.
+            strategy.Reset();
 
             // Wert VOR der Größenberechnung setzen: Strategien wie die
             // Tabellenansicht berechnen ihre benötigte Größe aus dem Inhalt.

@@ -31,9 +31,9 @@ public sealed class AddColumnItem : ColumnViewItem {
     public override string Caption => "Neue Spalte";
     public override int FixedWidth => Width;
 
-    public override string? Renderer => "Bool";
+    public override string? Renderer => "TextOneLine";
 
-    public override string RendererSettings => "{ClassId=\"Bool\", SymbolTrue=CheckBox_Checked, SymbolFalse=CheckBox}";
+    public override string RendererSettings => string.Empty;
 
     public override string? StorageKey => ClassId;
 

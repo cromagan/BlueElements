@@ -237,6 +237,11 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
         ScheduleAddAreaUpdate();
     }
 
+    /// <summary>
+    /// Setzt die Scroll-Position auf den Listenanfang zurück.
+    /// </summary>
+    public void ResetScroll() => lstBox.OffsetY = 0;
+
     public void Swap(int index1, int index2) {
         lstBox.Swap(index1, index2);
         ScheduleAddAreaUpdate();
