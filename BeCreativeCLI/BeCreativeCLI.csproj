@@ -47,6 +47,7 @@
   
   <ItemGroup>
 	<!-- Projekt-Referenzen -->
+    <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
   </ItemGroup>
 

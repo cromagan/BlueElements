@@ -193,6 +193,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
+    /// Gibt an, ob Spalten per Drag/Drop verschoben werden dürfen.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool ColumnMoveAllowed { get; set; } = true;
+
+    /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu angezeigt werden soll.
     /// </summary>
     [DefaultValue(true)]
@@ -1884,21 +1890,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // z. B. Scroll-Position oder Zeilen der vorherigen Anzeige.
             strategy.Reset();
 
-            // Wert VOR der Größenberechnung setzen: Strategien wie die
-            // Tabellenansicht berechnen ihre benötigte Größe aus dem Inhalt.
+            // Wert VOR der Bereichsberechnung setzen: Strategien wie die
+            // Tabellenansicht berechnen ihren benötigten Bereich aus dem Inhalt.
             strategy.Value = value;
 
-            // Strategie-spezifische Größe berechnen.
-            var size = strategy.CalculateRequiredSize(bounds.Width, bounds.Height);
+            // Strategie-spezifischer Bereich, ggf. über der Zelllinie beginnend.
+            var required = strategy.CalculateRequiredBounds(bounds);
 
             // TableView hat das letzte Wort: das Control darf nicht über den
-            // sichtbaren Bereich hinausragen.
+            // sichtbaren Bereich hinausragen — nie weiter oben als der
+            // sichtbare Bereich.
             var area = AvailableControlPaintArea;
-            size.Width = Math.Min(size.Width, Math.Max(area.Right - bounds.X, 1));
-            size.Height = Math.Min(size.Height, Math.Max(area.Bottom - bounds.Y, 1));
+            var top = Math.Max(area.Top, required.Y);
 
-            c.Location = bounds.Location;
-            c.Size = size;
+            c.Bounds = new Rectangle(required.X, top,
+                Math.Min(required.Width, Math.Max(area.Right - required.X, 1)),
+                Math.Min(required.Height, Math.Max(area.Bottom - top, 1)));
 
             _editCommit = commit;
 
@@ -3197,6 +3204,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var numberStyle = Table is { IsDisposed: false } tbNs && tbNs.Column.SysRowSortIndex is { IsDisposed: false };
 
+        // NumberStyle ohne einziges echtes Kapitel: gar keine Header anzeigen — auch nicht das leere, als "-" dargestellte.
+        if (numberStyle && sortedRows.TrueForAll(rli => string.IsNullOrEmpty(rli.AlignsToChapter))) {
+            numberStyle = false;
+        }
+
         // Angepinnte Zeilen ganz oben — ohne Kapitel-Header (MarkYellow + leer).
         foreach (var rli in sortedRows) {
             if (rli.MarkYellow && string.IsNullOrEmpty(rli.AlignsToChapter)) {
@@ -3955,6 +3967,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
         if (!tb.IsAdministrator()) { return; }
+        if (!ColumnMoveAllowed) { return; }
 
         var editable = ca.IsNowEditable();
         if (!string.IsNullOrEmpty(editable)) {
@@ -4599,7 +4612,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (GetDragSourceRows(blockHeader).Count > 0) {
                 _dragItem = blockHeader;
             }
-        } else if (mouseOverRow is TableElement { IgnoreYOffset: true } and not NewRowTableElement
+        } else if (ColumnMoveAllowed
+                   && mouseOverRow is TableElement { IgnoreYOffset: true } and not NewRowTableElement
                    && tb.IsAdministrator()) {
             _dragItem = dragCvi;
         }
@@ -4676,7 +4690,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// <summary>
     /// Y-Koordinate, an der der Zeilenbereich beginnt (Unterkante aller IgnoreYOffset-Elemente).
     /// </summary>
-    private int RowsAreaTop() {
+    internal int RowsAreaTop() {
         _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
 
         var maxBottom = 0;

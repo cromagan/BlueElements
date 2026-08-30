@@ -32,12 +32,13 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     /// <summary>
     /// Vergrößert die Breite um den Dropdown-Knopf, damit der Zell-Text
-    /// beim Edit nicht vom Knopf überdeckt wird. Einzeilig bleibt die Höhe
-    /// konstant, statt die ganze Zellhöhe einzunehmen.
+    /// beim Edit nicht vom Knopf überdeckt wird. Einzeilig bleibt die
+    /// Combobox auf Zeilenhöhe.
     /// </summary>
-    public override Size CalculateRequiredSize(int minWidth, int minHeight) =>
-        new(minWidth + (_control?.btnDropDown.Width ?? 0),
-            MultiLine ? minHeight : Math.Min(minHeight, SingleLineHeight.CanvasToControl(Zoom)));
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) =>
+        new(bounds.Location,
+            new Size(bounds.Width + (_control?.btnDropDown.Width ?? 0),
+                MultiLine ? bounds.Height : Math.Min(bounds.Height, SingleLineHeight.CanvasToControl(Zoom))));
 
     public override void HandleCaptionClick() {
         _control?.Focus();

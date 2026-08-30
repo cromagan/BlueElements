@@ -44,6 +44,14 @@ public class TablePasswordCliCommand : CliCommand {
         }
 
         tbl.Unlocked = true;
+
+        // Wie bei jedem Aufruf: Daten auf den aktuellen Stand bringen.
+        if (!tbl.BeSureToBeUpToDate(false)) {
+            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' konnte nach dem Entsperren nicht aktualisiert werden.");
+            tbl.Dispose();
+            return 1;
+        }
+
         Console.Out.WriteLine("Tabelle '" + tbl.KeyName + "' entsperrt und in der Session geladen.");
         return 0;
     }

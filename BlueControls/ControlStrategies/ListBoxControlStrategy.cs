@@ -27,14 +27,15 @@ public class ListBoxControlStrategy : ControlStrategy {
     #region Methods
 
     /// <summary>
-    /// Berechnet die benötigte Größe anhand der Items: Die Breite wird so
+    /// Berechnet den benötigten Bereich anhand der Items: Die Breite wird so
     /// bemessen, dass das breiteste Item vollständig dargestellt wird (inkl.
     /// Reserve für einen eventuellen Scrollbalken). Die Höhe summiert alle
-    /// sichtbaren Items, damit nichts abgeschnitten ist.
+    /// sichtbaren Items, damit nichts abgeschnitten ist — mindestens das
+    /// ganze Feld, höchstens bis zum 2,5-Fachen der Zeilenhöhe.
     /// </summary>
-    public override Size CalculateRequiredSize(int minWidth, int minHeight) {
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
         if (_control is not { } c || c.Items is not { Count: > 0 } items) {
-            return new Size(minWidth, minHeight);
+            return new Rectangle(bounds.Location, new Size(bounds.Width, Math.Min(bounds.Height, MaxSingleLineFillHeight)));
         }
 
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(c.ItemDesign);
@@ -42,8 +43,10 @@ public class ListBoxControlStrategy : ControlStrategy {
         if (c.AddAllowed != AddType.None) { heightAdded += 26; }
 
         heightAdded++; // Reserve, damit kein vertikaler Slider entsteht.
-        heightAdded = Math.Max(heightAdded, minHeight);
-        biggestItemX = Math.Max(biggestItemX, minWidth);
+        // Optik: das ganze Feld ausfüllen, auch wenn die Liste nur einzeilig
+        // ist — höchstens bis zum 2,5-Fachen der Zeilenhöhe.
+        heightAdded = Math.Max(heightAdded, Math.Min(bounds.Height, MaxSingleLineFillHeight));
+        biggestItemX = Math.Max(biggestItemX, bounds.Width);
 
         var primary = System.Windows.Forms.Screen.PrimaryScreen;
         var maxWi = (int)((primary?.Bounds.Width ?? 1920) * 0.7);
@@ -55,7 +58,7 @@ public class ListBoxControlStrategy : ControlStrategy {
             biggestItemX += 20; // Platz für den Scrollbalken.
         }
 
-        return new Size(biggestItemX, heightAdded);
+        return new Rectangle(bounds.Location, new Size(biggestItemX, heightAdded));
     }
 
     public override string ReadableText() => "Listbox";

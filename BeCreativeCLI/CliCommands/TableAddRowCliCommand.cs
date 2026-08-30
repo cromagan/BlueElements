@@ -30,6 +30,13 @@ public class TableAddRowCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
+            }
+
             // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
             var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
 

@@ -71,16 +71,19 @@ public class TableControlStrategy : ControlStrategy {
     #region Methods
 
     /// <summary>
-    /// Berechnet die benötigte Größe anhand der Tabelleninhalte: Die Tabelle
-    /// wird so groß, dass bevorzugt alle Zeilen (inkl. neuer Zeile) und alle
-    /// Spalten sichtbar sind. Die TableView begrenzt das Ergebnis auf den
-    /// verfügbaren Platz.
+    /// Berechnet den benötigten Bereich anhand der Tabelleninhalte: Die
+    /// Tabelle wird so groß, dass bevorzugt alle Zeilen (inkl. neuer Zeile)
+    /// und alle Spalten sichtbar sind — inklusive der Spaltenköpfe, sie sind
+    /// Teil der View-Items. Der Bereich beginnt um die Höhe der Kopfleisten
+    /// über der Zelllinie, damit die Spaltenköpfe über der Zelle liegen;
+    /// unterhalb der Linie wird mindestens die volle Zellhöhe aufgefüllt. Die
+    /// TableView begrenzt das Ergebnis auf den verfügbaren Platz.
     /// </summary>
-    public override Size CalculateRequiredSize(int minWidth, int minHeight) {
-        var size = base.CalculateRequiredSize(minWidth, minHeight);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        var required = base.CalculateRequiredBounds(bounds);
 
-        if (_control is not { IsDisposed: false } tv || _table is not { IsDisposed: false }) { return size; }
-        if (tv.CurrentArrangement is not { } ca) { return size; }
+        if (_control is not { IsDisposed: false } tv || _table is not { IsDisposed: false }) { return required; }
+        if (tv.CurrentArrangement is not { } ca) { return required; }
 
         // Breite: Spalten mit sehr großer verfügbarer Breite berechnen, damit
         // ScaleToFit nicht verkleinert und die natürlichen Inhaltsbreiten übrig
@@ -108,7 +111,11 @@ public class TableControlStrategy : ControlStrategy {
 
         var height = canvasBottom.CanvasToControl(tv.Zoom) + ZoomPad.SliderSize;
 
-        return new Size(Math.Max(size.Width, width), Math.Max(size.Height, height));
+        // Kopfleisten über die Zelllinie; unterhalb der Linie mindestens die
+        // volle Zellhöhe auffüllen.
+        var shift = tv.RowsAreaTop();
+        return new Rectangle(required.X, required.Y - shift,
+            Math.Max(required.Width, width), Math.Max(required.Height + shift, height));
     }
 
     /// <summary>
@@ -181,6 +188,8 @@ public class TableControlStrategy : ControlStrategy {
             _control.Table = _table;
             _control.Arrangement = string.Empty;
         }
+        // Die Spaltenreihenfolge ist durch die Strategie fest — kein Verschieben.
+        _control.ColumnMoveAllowed = false;
         _control.Zoom = Zoom;
 
         _control.QuickInfo = QuickInfo;
@@ -289,6 +298,10 @@ public class TableControlStrategy : ControlStrategy {
         // Zeilennummern bei !AutoSort über die echte Systemspalte SYS_ROWSORTINDEX
         // anzeigen — nicht über die virtuelle NumberColumnItem.
         if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            // Feste Spaltenbreite, gemessen am Text "888": unabhängig von der Zeilenzahl.
+            if (_control is { IsDisposed: false } tv) {
+                sortCol.FixedColumnWidth = TableView.RendererOf(sortCol, tv.SheetStyle).ContentSize("888", sortCol.DoOpticalTranslation).Width;
+            }
             view.Add(new ColumnViewItem(sortCol));
         }
 

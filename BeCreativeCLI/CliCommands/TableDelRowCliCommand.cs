@@ -32,6 +32,13 @@ public class TableDelRowCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
+            }
+
             // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
             // (#CLI muss also bei den Tabellen-Administratoren stehen).
             if (!tbl.IsAdministrator()) {

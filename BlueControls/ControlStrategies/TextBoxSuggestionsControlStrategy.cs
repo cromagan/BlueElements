@@ -79,11 +79,11 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     /// und nicht abgeschnitten wird; das umbrechende Verhalten nach unten
     /// bleibt unverändert.
     /// </summary>
-    public override Size CalculateRequiredSize(int minWidth, int minHeight) {
-        if (_control is not { } c) { return new Size(minWidth, minHeight); }
-        var width = Math.Max(minWidth, c.GetEstimatedWidth());
-        c.TextboxSize = new Size(width, minHeight);
-        return new Size(width, c.GetEstimatedHeight(width, minHeight));
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        if (_control is not { } c) { return bounds; }
+        var width = Math.Max(bounds.Width, c.GetEstimatedWidth());
+        c.TextboxSize = new Size(width, bounds.Height);
+        return new Rectangle(bounds.Location, new Size(width, c.GetEstimatedHeight(width, bounds.Height)));
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl)

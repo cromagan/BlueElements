@@ -28,6 +28,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     private GroupBox? _borderBox;
 
     private volatile int _isDisposedFlag;
+
     private int _suspendCount;
 
     #endregion
@@ -471,6 +472,12 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     protected abstract System.Windows.Forms.Control? ControlCore { get; }
 
+    /// <summary>
+    /// Maximale Höhe, bis zu der ein einzeiliges Control das ganze Feld
+    /// ausfüllt (der Optik wegen): das 2,5-Fache der einzeiligen Höhe.
+    /// </summary>
+    protected int MaxSingleLineFillHeight => (2.5f * SingleLineHeight).CanvasToControl(Zoom);
+
     #endregion
 
     #region Methods
@@ -556,19 +563,20 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Berechnet die für das Control benötigte Größe anhand der aktuell
+    /// Berechnet den benötigten Bereich des Controls anhand der aktuell
     /// gesetzten Eigenschaften (z. B. <see cref="ListItems" /> oder die
-    /// Chip-Fläche der Suggestions). Strategien, die keine besondere Größe
-    /// fordern, geben die übergebene Größe unverändert zurück. Die TableView
-    /// ruft diese Methode einheitlich auf und fragt dabei weder den
-    /// konkreten Strategy-Typ noch das Control ab.
+    /// Chip-Fläche der Suggestions). Strategien ohne besondere Anforderungen
+    /// geben den übergebenen Bereich unverändert zurück; Strategien mit
+    /// Überschriften (z. B. Tabellen) beginnen über der Zelllinie. Die
+    /// TableView begrenzt das Ergebnis auf den sichtbaren Bereich.
     /// </summary>
-    public virtual Size CalculateRequiredSize(int minWidth, int minHeight) {
-        if (Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box) { return new Size(minWidth, minHeight); }
+    public virtual Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        if (Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box) { return bounds; }
 
         // Rahmen-Insets ausgleichen, damit das eingebettete Control voll sichtbar bleibt.
         var display = box.DisplayRectangle;
-        return new Size(minWidth + box.Width - display.Width, minHeight + box.Height - display.Height);
+        return new Rectangle(bounds.Location,
+            new Size(bounds.Width + box.Width - display.Width, bounds.Height + box.Height - display.Height));
     }
 
     /// <summary>

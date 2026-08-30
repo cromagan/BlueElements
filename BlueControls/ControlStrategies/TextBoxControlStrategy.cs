@@ -127,8 +127,14 @@ public class TextBoxControlStrategy : ControlStrategy {
         }, cancellationToken);
     }
 
-    public override Size CalculateRequiredSize(int minWidth, int minHeight) =>
-        base.CalculateRequiredSize(minWidth, MultiLine ? minHeight : Math.Min(minHeight, SingleLineHeight.CanvasToControl(Zoom)));
+    /// <summary>
+    /// Begrenzt einzeilig die Höhe auf das 2,5-Fache der Zeilenhöhe, mehrzeilig
+    /// bleibt die Feldhöhe unverändert.
+    /// </summary>
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        if (!MultiLine) { bounds.Height = Math.Min(bounds.Height, MaxSingleLineFillHeight); }
+        return base.CalculateRequiredBounds(bounds);
+    }
 
     public override string ReadableText() => "Textfeld";
 

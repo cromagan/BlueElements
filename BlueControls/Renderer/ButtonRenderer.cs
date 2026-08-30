@@ -90,10 +90,12 @@ public class ButtonRenderer : Renderer {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        var padLeft = _padding.Left.CanvasToControl(zoom);
-        var padTop = _padding.Top.CanvasToControl(zoom);
-        var padRight = _padding.Right.CanvasToControl(zoom);
-        var padBottom = _padding.Bottom.CanvasToControl(zoom);
+        // Positive Paddings ignorieren — nur negative Werte wirken und
+        // vergrößern die Zeichenfläche über die Zelle hinaus.
+        var padLeft = Math.Min(0, _padding.Left).CanvasToControl(zoom);
+        var padTop = Math.Min(0, _padding.Top).CanvasToControl(zoom);
+        var padRight = Math.Min(0, _padding.Right).CanvasToControl(zoom);
+        var padBottom = Math.Min(0, _padding.Bottom).CanvasToControl(zoom);
 
         drawingAreaControl = new Rectangle(
             drawingAreaControl.X + padLeft,
@@ -152,7 +154,10 @@ public class ButtonRenderer : Renderer {
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
 
-        return GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);
+        // Mindesthöhe: 16 Pixel Button-Inhalt plus umgekehrtes vertikales Padding
+        // (nur negative Werte wirken, Positive werden ignoriert).
+        var minSize = Math.Max(1, 16 - Math.Min(0, _padding.Top) - Math.Min(0, _padding.Bottom));
+        return GetFont().FormatedText_NeededSize(replacedText, QImage(content), minSize);
     }
 
     /// <summary>

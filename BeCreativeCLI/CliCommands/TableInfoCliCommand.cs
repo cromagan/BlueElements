@@ -54,9 +54,6 @@ public class TableInfoCliCommand : CliCommand {
         }
     }
 
-    private static ColumnItem? ChapterColumnOfView1(Table tbl) =>
-                            tbl.ColumnArrangements.Count > 1 ? tbl.ColumnArrangements[1].ColumnForChapter : null;
-
     private static int WriteColumnDetails(Table tbl, CliArgs args) {
         var column = ColumnOfOption(tbl, args);
 

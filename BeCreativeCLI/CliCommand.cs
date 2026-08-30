@@ -53,6 +53,24 @@ public abstract class CliCommand : IHasKeyName {
     public abstract int DoIt(CliArgs args);
 
     /// <summary>
+    /// Liefert die Kapitelspalte der Ansicht 1 oder null, wenn keine definiert ist.
+    /// </summary>
+    protected static ColumnItem? ChapterColumnOfView1(Table tbl) =>
+                        tbl.ColumnArrangements.Count > 1 ? tbl.ColumnArrangements[1].ColumnForChapter : null;
+
+    /// <summary>
+    /// Prüft, ob die Tabelle außerhalb einer Shell-Session bearbeitet werden darf.
+    /// Fragment-Tabellen sind Multi-User-Formate: Nur in einer Session bleibt der
+    /// Fragment-Writer über alle Befehle hinweg offen — Einzelaufrufe sind gesperrt.
+    /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
+    /// </summary>
+    protected static string? FragmentEditProblem(Table tbl) {
+        if (SessionActive || tbl is not (TableFragments or TableJsonFragments)) { return null; }
+
+        return "Bearbeitungen an Fragment-Tabellen (Typ " + tbl.GetType().Name + ") sind nur in einer Shell-Session möglich: 'bcr shell' starten und den Befehl dort ausführen.";
+    }
+
+    /// <summary>
     /// Gibt eine geladene Tabelle frei. In einer Shell-Session bleibt die Instanz
     /// im Live-Cache erhalten, sonst wird sie disposet (Writer wird geschlossen).
     /// </summary>
@@ -130,6 +148,16 @@ public abstract class CliCommand : IHasKeyName {
 
         if (tbl is not { IsDisposed: false }) {
             Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
+            return null;
+        }
+
+        // Bei JEDEM Aufruf aktualisieren: lädt z. B. Fragmente nach, die andere
+        // Prozesse seit dem letzten Laden geschrieben haben. Gesperrte Tabellen
+        // überspringen die Aktualisierung — table-password holt sie nach dem
+        // Entsperren nach.
+        if (tbl.Unlocked && !tbl.BeSureToBeUpToDate(false)) {
+            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' konnte nicht auf den aktuellen Stand gebracht werden (Fragmentspeicher nicht lesbar).");
+            tbl.Dispose();
             return null;
         }
 

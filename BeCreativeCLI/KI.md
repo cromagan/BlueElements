@@ -5,10 +5,10 @@ Bei „BCR“, „ShellCommand bcr“ etc. ist IMMER diese Exe gemeint — direk
 
 ## Was ist das?
 
-Kommandozeilen-Werkzeug für BeCreative-Dateien. Aktuell werden nur Tabellen
-unterstützt (Datenbank-Formate wie `.bdb`, `.tblh`, `.mbdb`) — diese Befehle
-tragen das Präfix `table-`. Für Skripte, Automatisierung und schnelle
-Änderungen ohne GUI.
+Kommandozeilen-Werkzeug für BeCreative-Dateien. Tabellen (Datenbank-Formate
+wie `.bdb`, `.tblh`, `.mbdb`) tragen das Präfix `table-`; zusätzlich gibt es
+den Roundtrip-Test `roundtrip` für Layout- und Tabellendateien. Für Skripte,
+Automatisierung und schnelle Änderungen ohne GUI.
 
 ## Wichtig
 
@@ -20,7 +20,8 @@ tragen das Präfix `table-`. Für Skripte, Automatisierung und schnelle
 - Die CLI kann KEINE Spalten anlegen oder löschen — nur Zellwerte setzen, Zeilen anlegen/löschen. Fehlende Spalten müssen in der GUI erstellt werden.
 - Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (Rechte für `#CLI` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
-- Ist die Spalte SYS_ROWSORTINDEX vorhanden, ist nur EIN Kapitel möglich. Ansonsten kann eine Zeile mehreren Kapiteln zugeordner werden. Getrennt mit \r
+- Ist die Spalte SYS_ROWSORTINDEX vorhanden, ist nur EIN Kapitel möglich — `table-cellset` weist \r in der Kapitelspalte dann mit Fehler ab. Ansonsten kann eine Zeile mehreren Kapiteln zugeordnet werden. Getrennt mit \r
+- Fragment-Tabellen (`.mbdb`, `.mtblj`) sind außerhalb einer Shell-Session für Bearbeitungen gesperrt (Fehler). Nur in `bcr shell` sind `table-addrow`, `table-cellset`, `table-delrow` für sie erlaubt — Lesen (`table-info` etc.) geht überall.
 - Mehrdeutige Aufträge (z. B. „unter Kapitel X“ = nur Position oder auch Kapitelwert setzen?) niemals raten — vor der Ausführung kurz nachfragen. Betroffene Spalten/Werte explizit nennen lassen, wenn der Auftrag sie nicht nennt.
 
 ## Struktur erkunden — NUR table-info verwenden (kein export, kein help nötig)
@@ -53,6 +54,16 @@ Wichtige Stolperfalle:
 - `bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader]` — CSV auf stdout (nur für Exportzwecke, nicht zur Analyse nötig)
 
 Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>` (optional `--filtertype equals|exact|contains|startswith`).
+
+## Roundtrip-Test (roundtrip)
+
+`bcr roundtrip <datei> [--full]` — lädt eine Datei, speichert sie ins Gegenstück-Format (altes Format <-> JSON), lädt sie zurück, speichert sie wieder im Originalformat und vergleicht bit-genau mit dem Original. Unterstützt Layouts (`.cfo`, `.bcr`) und Tabellen (`.bdb`<->`.tblj`, `.mbdb`<->`.mtblj`).
+
+- Protokoll auf stdout; Exit-Code 0 = bit-genau identisch, 1 = Abweichung/Fehler, 2 = Benutzungsfehler.
+- Bei Abweichung: Diff-Analyse mit erster abweichender Byte-Position, Kontext davor/danach als Text (Steuerzeichen escaped: `\r`, `\n`, `\t`, `\0`) UND als Hex-Dump — damit die Ausgabe verlustfrei kopierbar ist.
+- `--full`: zusätzlich den kompletten Inhalt beider Dateien, zeilenweise (an CR getrennt) mit Byte-Offset und escapeden Steuerzeichen.
+- `.bdb`/`.mbdb` sind ZIP-Container: Deren Eintrags-Zeitstempel verhindern Bit-Identität — der Befehl vergleicht deshalb zusätzlich den entpackten Inhalt (Main.bin) separat und meldet, ob nur Container-Metadaten oder echter Inhalt abweichen.
+- Das Original wird nur gelesen; alle Zwischenschritte laufen auf temporären Kopien.
 
 ## Standard-Rezept für Aufgaben
 
