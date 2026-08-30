@@ -1245,6 +1245,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         target.PermissionGroupsChangeCell = PermissionGroupsChangeCell;
         target.ColumnTags = ColumnTags;
         target.AdminInfo = AdminInfo;
+        target.ColumnSystemInfo = ColumnSystemInfo;
         target.FilterOptions = FilterOptions;
         target.IgnoreAtRowFilter = IgnoreAtRowFilter;
         target.MaxCellLength = MaxCellLength;

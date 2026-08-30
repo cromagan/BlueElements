@@ -98,10 +98,9 @@ public class RoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Vergleicht Original und Roundtrip bit-genau. Liefert 0 bei Identität,
-    /// ansonsten 1 — inklusive Diff-Analyse und optional vollständigem Dump.
-    /// ZIP-Container (bdb/mbdb) werden zusätzlich entpackt verglichen, weil ihre
-    /// Eintrags-Zeitstempel eine Bit-Identität unmöglich machen.
+    /// Vergleicht Original und Roundtrip. Liefert 0 bei Identität, ansonsten 1.
+    /// ZIP-Container (bdb/mbdb) werden entpackt verglichen, da ihre Eintrags-
+    /// Zeitstempel und sonstigen ZIP-Metadaten keine Tabellendaten sind.
     /// </summary>
     private static int Compare(byte[] original, byte[] roundtrip, bool full) {
         if (original.SequenceEqual(roundtrip)) {
@@ -110,26 +109,30 @@ public class RoundtripCliCommand : CliCommand {
             return 0;
         }
 
-        Out(string.Empty);
-        Out("*** WARNUNG: Dateien unterscheiden sich! ***");
+        if (original.IsZipped() && roundtrip.IsZipped()
+            && original.UnzipIt() is { } origMain
+            && roundtrip.UnzipIt() is { } rtMain) {
 
-        if (original.IsZipped() && roundtrip.IsZipped()) {
-            var origMain = original.UnzipIt();
-            var rtMain = roundtrip.UnzipIt();
-
-            if (origMain is not null && rtMain is not null) {
-                if (origMain.SequenceEqual(rtMain)) {
-                    Out(string.Empty);
-                    Out("Hinweis: Beide Dateien sind ZIP-Container. Der entpackte Inhalt (Main.bin) ist IDENTISCH —");
-                    Out("die Abweichung liegt nur in den ZIP-Metadaten (z. B. Zeitstempel des Eintrags).");
-                } else {
-                    Out(string.Empty);
-                    Out("Hinweis: Beide Dateien sind ZIP-Container. Der entpackte Inhalt (Main.bin) UNTERSCHIEDET SICH:");
-                    GenerateDiffReport(origMain, rtMain);
-                }
+            if (origMain.SequenceEqual(rtMain)) {
+                Out(string.Empty);
+                Out("*** ERFOLG: Der entpackte Inhalt (Main.bin) ist identisch. ***");
+                Out("Die Dateien unterscheiden sich nur in den ZIP-Metadaten (z. B. Eintrags-Zeitstempel).");
+                return 0;
             }
+
+            Out(string.Empty);
+            Out("*** WARNUNG: Der entpackte Inhalt (Main.bin) UNTERSCHIEDET SICH: ***");
+            GenerateDiffReport(origMain, rtMain);
+
+            if (full) {
+                DumpFull("Original", original);
+                DumpFull("Roundtrip", roundtrip);
+            }
+            return 1;
         }
 
+        Out(string.Empty);
+        Out("*** WARNUNG: Dateien unterscheiden sich! ***");
         GenerateDiffReport(original, roundtrip);
 
         if (full) {
@@ -261,8 +264,11 @@ public class RoundtripCliCommand : CliCommand {
             case "MTBLJ":
                 return "mbdb";
 
+            case "TBLJ":
+                return "bdb";
+
             default:
-                return "tblj"; // BDB -> TBLJ, TBLJ -> BDB
+                return "tblj"; // BDB -> TBLJ
         }
     }
 
@@ -423,8 +429,12 @@ public class RoundtripCliCommand : CliCommand {
     /// </summary>
     private static int ProcessTableFile(string filename, string suffix, byte[] origBytes, bool full) {
         var jsonSuffix = JsonCounterpartOf(suffix);
-        var tempDir = Path.GetTempPath();
         var baseName = filename.FileNameWithoutSuffix();
+        // Windows-Temp, pro Lauf ein eigenes Unterverzeichnis: Der Tabellenname
+        // folgt dem Dateinamen — würde TempFile bei Kollision einen Counter an den
+        // Namen hängen, verfälscht das Key und Undo-Einträge (Schein-Diffs).
+        var tempDir = Path.Combine(Path.GetTempPath(), "Roundtrip",
+            DateTime.UtcNow.ToString("yyyyMMdd_HHmmssFF", CultureInfo.InvariantCulture));
 
         var tempJson = TempFile(tempDir, baseName + "_json", jsonSuffix);
         // Ausgabedatei mit dem ORIGINALNamen: Der Tabellenname folgt dem Dateinamen,
@@ -460,6 +470,8 @@ public class RoundtripCliCommand : CliCommand {
                 Out("--- Schritt 1: Original laden ---");
                 Out("Zeilen : " + origTable.Row.Count);
                 Out("Spalten: " + origTable.Column.Count);
+                Out("Spalten-Ordnung: " + string.Join(", ", origTable.Column.Select(c => c.KeyName)));
+                Out("Save-Ordnung   : " + string.Join(", ", origTable.ColumnsInSaveOrder().Select(c => c.KeyName)));
 
                 Out(string.Empty);
                 Out("--- Schritt 2: Als ." + jsonSuffix + " speichern ---");
@@ -472,6 +484,7 @@ public class RoundtripCliCommand : CliCommand {
                 }
 
                 using (jsonTable) {
+                    Out("Ziel-Ordnung   : " + string.Join(", ", jsonTable.Column.Select(c => c.KeyName)));
                     var saveResult = jsonTable.Save();
 
                     if (saveResult.IsFailed) {
@@ -505,6 +518,7 @@ public class RoundtripCliCommand : CliCommand {
                 Out("--- Schritt 3: ." + jsonSuffix + " laden ---");
                 Out("Geladene Zeilen : " + loadedTable.Row.Count);
                 Out("Geladene Spalten: " + loadedTable.Column.Count);
+                Out("Spalten-Ordnung: " + string.Join(", ", loadedTable.Column.Select(c => c.KeyName)));
 
                 Out(string.Empty);
                 Out("--- Schritt 4: Als ." + suffix.ToLowerInvariant() + " speichern ---");
@@ -545,12 +559,17 @@ public class RoundtripCliCommand : CliCommand {
             Out("Original : " + origBytes.Length + " Bytes");
             Out("Roundtrip: " + outBytes.Length + " Bytes");
 
-            return Compare(origBytes, outBytes, full);
+            var compareResult = Compare(origBytes, outBytes, full);
+
+            Out(string.Empty);
+            Out("Temp-Dateien (bleiben zur Analyse liegen):");
+            Out("  JSON : " + tempJson);
+            Out("  Roundtrip: " + tempOut);
+
+            return compareResult;
 
             #endregion
         } finally {
-            DeleteFile(tempJson, false);
-            DeleteFile(tempOut, false);
             DeleteFile(origCopy, false);
             DeleteFile(tempJsonCopy, false);
         }

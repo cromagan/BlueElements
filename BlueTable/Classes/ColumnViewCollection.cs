@@ -287,8 +287,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
         json.Set("quickinfo", QuickInfo);
         json.Set("columnheadermode", (int)ColumnHeaderMode);
-        json.SetArrayIfNotEmpty("columns", _internal.Where(c => c.StorageKey is not null).Cast<IJsonStringable>());
-        json.SetArrayIfNotEmpty("columnkeys", _internal.Where(c => c.StorageKey is null).Select(c => c.Column).OfType<ColumnItem>().Select(c => c.KeyName));
+        json.SetArrayIfNotEmpty("columns", _internal.Cast<IJsonStringable>());
         json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
         json.SetArrayIfNotEmpty("executeablescripts", Ausführbare_Skripte);
         json.SetArrayIfNotEmpty("columnsshowalwaysfilter", Filter_immer_Anzeigen);
@@ -343,9 +342,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                     if (colName is not { Length: > 0 }) { continue; }
 
                     // Virtuelle persistente Spalte (VIR_…) über ihren Typnamen
-                    // rekonstruieren — analog zu ColumnViewItem.Create.
+                    // rekonstruieren — analog zu ColumnViewItem.Create. ParseJson
+                    // übernimmt Permanent/FontHorizontal; die Column-Zuordnung
+                    // bleibt null, weil VIR_-Spalten nicht als ColumnItem existieren.
                     if (colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) {
-                        if (ParseableItem.NewByTypeName<ColumnViewItem>(colName) is { } v) { Add(v); }
+                        if (ParseableItem.NewByTypeName<ColumnViewItem>(colName) is { } v) {
+                            v.ParseJson(jo);
+                            Add(v);
+                        }
                         continue;
                     }
 

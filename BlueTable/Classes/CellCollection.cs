@@ -218,6 +218,9 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     public JsonObject ParseableJson() {
         var json = new JsonObject();
         JsonArray cells = [];
+        // ConcurrentDictionary iteriert nicht-deterministisch: Über den Cell-Key
+        // sortieren, damit identischer Inhalt immer identische Dateien erzeugt.
+        List<(string sortKey, JsonObject cell)> items = [];
         foreach (var kvp in _internal) {
             if (string.IsNullOrEmpty(kvp.Value.Value)) { continue; }
             if (kvp.Key.column.IsDisposed || kvp.Key.row.IsDisposed) { continue; }
@@ -225,8 +228,13 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
             cellJson.Set("column", kvp.Key.column.KeyName);
             cellJson.Set("row", kvp.Key.row.KeyName);
             cellJson.Set("value", kvp.Value.Value);
-            cells.Add(cellJson);
+            items.Add((KeyOfCell(kvp.Key.column.KeyName, kvp.Key.row.KeyName), cellJson));
         }
+
+        foreach (var item in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
+            cells.Add(item.cell);
+        }
+
         if (cells.Count > 0) { json.Set("cells", cells); }
         return json;
     }

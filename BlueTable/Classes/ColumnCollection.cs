@@ -330,7 +330,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public JsonObject ParseableJson() {
         var json = new JsonObject();
-        json.SetArrayIfNotEmpty("columns", _internal.Values.Cast<IJsonStringable>());
+        // SaveOrder statt Collection-Enumeration: Die Enumeration einer
+        // ConcurrentDictionary ist Hash-basiert (Kollisions-Ketten drehen sich
+        // je nach Einfüge-Reihenfolge) und damit über Lade-/Kopiervorgänge
+        // hinweg nicht stabil.
+        json.SetArrayIfNotEmpty("columns", (Table is { IsDisposed: false } tb
+            ? tb.ColumnsInSaveOrder()
+            : [.. _internal.Values]).Cast<IJsonStringable>());
         return json;
     }
 
@@ -443,7 +449,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             target.Remove(n, "CopyTo - Spalte zu viel");
         }
 
-        foreach (var sourceColumn in this) {
+        // SaveOrder statt Collection-Enumeration: Fügt das Ziel in derselben
+        // Reihenfolge ein wie ein Ladevorgang, damit die (Hash-basierte)
+        // Enumerationsordnung der ConcurrentDictionary identisch bleibt.
+        var sourceColumns = Table is { IsDisposed: false } st ? st.ColumnsInSaveOrder() : [.. this];
+
+        foreach (var sourceColumn in sourceColumns) {
             var l = target[sourceColumn.KeyName] ??
                 target.GenerateAndAdd(sourceColumn.KeyName, sourceColumn.Caption, null, sourceColumn.QuickInfo);
 

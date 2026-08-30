@@ -714,10 +714,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var sourceRow in this) {
             if (sourceRow is not { IsDisposed: false }) { continue; }
 
-            var key = tb.NextRowKey();
-            if (string.IsNullOrEmpty(key)) { continue; }
-
-            var targetRow = new RowItem(tb, key);
+            // Original-Key übernehmen: Die Ziel-Collection ist zuvor geleert worden,
+            // neue Timestamp-Keys würden die Row-Reihenfolge und die RowKey-Bezüge
+            // der Undo-History verfälschen.
+            var targetRow = new RowItem(tb, sourceRow.KeyName);
             if (!target._internal.TryAdd(targetRow.KeyName, targetRow)) { continue; }
 
             sourceRow.CopyTo(targetRow, tb.Column);

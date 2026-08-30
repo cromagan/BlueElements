@@ -57,7 +57,9 @@ public static partial class Constants {
                                                        "yyyy-MM-dd_HH-mm-ss",
                                                        "dd.MM.yyyy H:mm",
                                                        "d.M.yy",
-                                                       "d.M.yy HH:mm:ss"
+                                                       "d.M.yy HH:mm:ss",
+                                                       "yyyy-MM-ddTHH:mm:ss.fffffff",
+                                                       "yyyy-MM-ddTHH:mm:ss.fffffffZ"
         ];
 
     public static readonly float DefaultTolerance = 0.0001f;

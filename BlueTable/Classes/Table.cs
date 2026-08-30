@@ -1210,6 +1210,33 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         target.Variables = Variables;
 
         target.MainChunkLoadDone = true;
+
+        // Metadaten direkt per Feldzuweisung übernehmen - die öffentlichen Setter
+        // würden ChangeData auslösen. Muss NACH den Zuweisungen oben stehen, weil
+        // deren Setter-Aufrufe Undo-Einträge in target erzeugen, die hier komplett
+        // durch die Undo-History der Quelle ersetzt werden.
+        target._creator = _creator;
+        target._createDate = _createDate;
+        target._eventScriptVersion = _eventScriptVersion;
+        target._powerEditTime = _powerEditTime;
+        target._temporaryTableMasterUser = _temporaryTableMasterUser;
+        target._temporaryTableMasterTimeUtc = _temporaryTableMasterTimeUtc;
+        target._temporaryTableMasterApp = _temporaryTableMasterApp;
+        target._temporaryTableMasterMachine = _temporaryTableMasterMachine;
+        target._temporaryTableMasterId = _temporaryTableMasterId;
+
+        List<UndoItem> undoSnapshot;
+        lock (_undoLock) {
+            undoSnapshot = [.. Undo];
+        }
+
+        lock (target._undoLock) {
+            target.Undo.Clear();
+            foreach (var thisUndo in undoSnapshot) {
+                if (thisUndo is null) { continue; }
+                target.Undo.Add(new UndoItem(thisUndo.ParseableItems().FinishParseable()));
+            }
+        }
     }
 
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool tableHeadVariables, bool virtualcolumns, bool extendedVariable, IEnumerable<FilterItem>? filter) {
@@ -1895,10 +1922,22 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         json.Set("eventscriptversion", _eventScriptVersion);
         json.Set("poweredittime", _powerEditTime);
-        json.Set("lastchange", LastChange);
 
         if (_variables is { Count: > 0 }) {
             json.Set("variables", new VariableCollection(_variables.ToList(), false).ParseableJson());
+        }
+
+        // Undo-History in der Listen-Reihenfolge serialisieren - die Speicher-
+        // Reihenfolge (.bdb) sortiert selbst neu, hier darf nichts umsortiert werden.
+        lock (_undoLock) {
+            if (Undo.Count > 0) {
+                JsonArray undoJson = [];
+                foreach (var thisUndo in Undo) {
+                    if (thisUndo is null) { continue; }
+                    undoJson.Add(thisUndo.ParseableJson());
+                }
+                if (undoJson.Count > 0) { json.Set("undo", undoJson); }
+            }
         }
 
         // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert.
@@ -1997,6 +2036,22 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _variables.Clear();
             _variables.AddRange(vars.SortByKeyName());
             _variableTmp = _variables.ToString(true);
+        }
+
+        #endregion
+
+        #region Undo-History
+
+        if (json["undo"] is JsonArray undoArr) {
+            lock (_undoLock) {
+                Undo.Clear();
+                foreach (var item in undoArr) {
+                    if (item is not JsonObject ujo) { continue; }
+                    var undoItem = new UndoItem();
+                    undoItem.ParseJson(ujo);
+                    Undo.Add(undoItem);
+                }
+            }
         }
 
         #endregion
