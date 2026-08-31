@@ -464,7 +464,7 @@ public class TableControlStrategy : ControlStrategy {
 
             if (value is { Length: > 0 }) {
                 foreach (var line in value.Replace("\r\n", "\r").SplitAndCutByCr()) {
-                    if (line.StartsWith("##", StringComparison.Ordinal) && _table.Column[_chapterColumnKey] is { }) {
+                    if (line.StartsWith("##", StringComparison.Ordinal) && _table.Column[_chapterColumnKey] is not null) {
                         currentChapter = line[2..].Trim();
                         continue;
                     }

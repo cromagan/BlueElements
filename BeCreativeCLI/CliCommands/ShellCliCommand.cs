@@ -80,6 +80,13 @@ public class ShellCliCommand : CliCommand {
             SessionActive = false;
         }
 
+        // Datenüberprüfung aller geänderten Zeilen — vor dem Entladen der in der Session offenen Tabellen.
+        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+
+        foreach (var tbl in Table.AllInstances()) {
+            if (tbl is { IsDisposed: false } live) { live.Dispose(); }
+        }
+
         return exitCode;
     }
 

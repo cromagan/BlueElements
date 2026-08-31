@@ -1717,7 +1717,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         #endregion
 
-        if (contentHolderCellRow == null && string.IsNullOrEmpty(newValue)) {
+        if (contentHolderCellRow is null && string.IsNullOrEmpty(newValue)) {
             return "Abbruch";
         }
 
@@ -1866,7 +1866,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
 
-            if (displayFont is { }
+            if (displayFont is not null
                 && Skin.GetBlueFont(Design.TextBox, States.Standard) is { } editorFont
                 && editorFont.Size > 0) {
                 strategy.Zoom = Zoom * (displayFont.Size / editorFont.Size);

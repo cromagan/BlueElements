@@ -22,6 +22,7 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
 - Ist die Spalte SYS_ROWSORTINDEX vorhanden, ist nur EIN Kapitel möglich — `table-cellset` weist \r in der Kapitelspalte dann mit Fehler ab. Ansonsten kann eine Zeile mehreren Kapiteln zugeordnet werden. Getrennt mit \r
 - Fragment-Tabellen (`.mbdb`, `.mtblj`) sind außerhalb einer Shell-Session für Bearbeitungen gesperrt (Fehler). Nur in `bcr shell` sind `table-addrow`, `table-cellset`, `table-delrow` für sie erlaubt — Lesen (`table-info` etc.) geht überall.
+- Datenüberprüfung: Geänderte Zeilen werden invalidiert und beim Freigeben der Tabelle (Einzelbefehl) bzw. am Ende einer Shell-Session geprüft — vor dem Entladen, ohne Neuladen. Row-Skripte laufen dabei; Meldungen erscheinen über das normale Meldungswesen auf stderr.
 - Mehrdeutige Aufträge (z. B. „unter Kapitel X“ = nur Position oder auch Kapitelwert setzen?) niemals raten — vor der Ausführung kurz nachfragen. Betroffene Spalten/Werte explizit nennen lassen, wenn der Auftrag sie nicht nennt.
 
 ## Struktur erkunden — NUR table-info verwenden (kein export, kein help nötig)

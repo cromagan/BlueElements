@@ -32,16 +32,16 @@ public abstract class CliCommand : IHasKeyName {
     /// </summary>
     public virtual List<string> Flags => [];
 
+    string IHasKeyName.KeyName => Command.ToUpperInvariant();
+
+    public abstract string Syntax { get; }
+
     /// <summary>
     /// True, solange eine Shell-Session läuft. Geladene Tabellen werden dann
     /// nicht freigegeben, damit Folgebefehle dieselbe Instanz — und damit
     /// denselben Fragment-Writer — nutzen.
     /// </summary>
     protected static bool SessionActive { get; set; }
-
-    string IHasKeyName.KeyName => Command.ToUpperInvariant();
-
-    public abstract string Syntax { get; }
 
     #endregion
 
@@ -59,6 +59,11 @@ public abstract class CliCommand : IHasKeyName {
                         tbl.ColumnArrangements.Count > 1 ? tbl.ColumnArrangements[1].ColumnForChapter : null;
 
     /// <summary>
+    /// Löst eine Spalte über die Option --column auf.
+    /// </summary>
+    protected static ColumnItem? ColumnOfOption(Table tbl, CliArgs args) => tbl.Column[args.Option("column") ?? string.Empty];
+
+    /// <summary>
     /// Prüft, ob die Tabelle außerhalb einer Shell-Session bearbeitet werden darf.
     /// Fragment-Tabellen sind Multi-User-Formate: Nur in einer Session bleibt der
     /// Fragment-Writer über alle Befehle hinweg offen — Einzelaufrufe sind gesperrt.
@@ -69,19 +74,6 @@ public abstract class CliCommand : IHasKeyName {
 
         return "Bearbeitungen an Fragment-Tabellen (Typ " + tbl.GetType().Name + ") sind nur in einer Shell-Session möglich: 'bcr shell' starten und den Befehl dort ausführen.";
     }
-
-    /// <summary>
-    /// Gibt eine geladene Tabelle frei. In einer Shell-Session bleibt die Instanz
-    /// im Live-Cache erhalten, sonst wird sie disposet (Writer wird geschlossen).
-    /// </summary>
-    protected static void Release(Table tbl) {
-        if (!SessionActive) { tbl.Dispose(); }
-    }
-
-    /// <summary>
-    /// Löst eine Spalte über die Option --column auf.
-    /// </summary>
-    protected static ColumnItem? ColumnOfOption(Table tbl, CliArgs args) => tbl.Column[args.Option("column") ?? string.Empty];
 
     /// <summary>
     /// Liest den Vergleichstyp der Option --filtertype. Standard: equals (Groß-/Kleinschreibung egal).
@@ -162,6 +154,18 @@ public abstract class CliCommand : IHasKeyName {
         }
 
         return tbl;
+    }
+
+    /// <summary>
+    /// Gibt eine geladene Tabelle frei. Zuvor läuft die Datenüberprüfung.
+    /// In einer Shell-Session bleibt die Instanz im Live-Cache erhalten,
+    /// sonst wird sie disposet (Writer wird geschlossen).
+    /// </summary>
+    protected static void Release(Table tbl) {
+        if (!SessionActive) {
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+            tbl.Dispose();
+        }
     }
 
     /// <summary>
