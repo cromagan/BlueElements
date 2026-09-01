@@ -31,7 +31,7 @@ public class YesNoButtonControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Häkchen);
 
     public override void UnsubscribeEvents() {
         _control?.CheckedChanged -= YesNoButton_CheckedChanged;

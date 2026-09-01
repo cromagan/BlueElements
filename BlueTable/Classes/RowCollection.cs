@@ -61,6 +61,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Properties
 
     /// <summary>
+    /// True: Die Abarbeitung veralteter Zeilen bricht ab, sobald der Benutzer gerade aktiv ist (Schutz für die GUI).
+    /// Headless-Anwendungen (z. B. CLI) setzen dies auf false, da dort jede Eingabe eine Benutzeraktion ist.
+    /// </summary>
+    public static bool AbortOnUserIdle { get; set; } = true;
+
+    /// <summary>
     /// Wert in Minuten.
     /// Gibt an, wieviel Minuten maximal vergangen sein dürfen, um eine Zeile direkt zu INITIALISIEREN
     /// </summary>
@@ -173,7 +179,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             while (NextRowToCeck() is { IsDisposed: false } row) {
                 if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
-                if (tbl.ChangedScriptMayAffectUser) {
+                if (AbortOnUserIdle && tbl.ChangedScriptMayAffectUser) {
                     if (l.Count > 0 && row.Table == l[0]) {
                         if (Develop.GetUserIdleSeconds() < 1) { break; }
                     } else {
@@ -193,7 +199,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
                 row.UpdateRow(true, "Allgemeines Update (User Idle)");
-                if (Develop.GetUserIdleSeconds() < 1) { break; }
+                if (AbortOnUserIdle && Develop.GetUserIdleSeconds() < 1) { break; }
                 if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
             }
 
@@ -301,7 +307,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return OperationResult.SuccessFalse;
         }
 
-        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, UserName, DateTime.UtcNow, comment);
+        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand);
 
         return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
     }
@@ -624,7 +630,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
         if (rowsToRemove.Count > 0) {
             foreach (var row in rowsToRemove) {
-                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
+                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, ChangeFlags.IgnoreFreeze, null, null);
             }
 
             tb.Cell.RemoveOrphans();
@@ -724,7 +730,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    internal OperationResult ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
+    internal OperationResult ExecuteCommand(TableDataType type, string rowkey, ChangeFlags reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         if (type == TableDataType.Command_AddRow) {
@@ -736,11 +742,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (!_internal.TryAdd(row.KeyName, row)) { return OperationResult.Failed("Hinzufügen fehlgeschlagen."); }
 
-            if (reason.HasFlag(Reason.RaiseEvents)) {
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) {
                 OnRowAdded(new RowEventArgs(row));
             }
 
-            if (user is not null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
+            if (user is not null && datetimeutc is { } dt && reason.HasFlag(ChangeFlags.PostProcess)) {
                 if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user); }
                 if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5()); }
                 if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus()); }
@@ -748,9 +754,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey); }
             }
 
-            if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
-                Pause(0.001, false);
-            }
             return OperationResult.SuccessTrue;
         }
 
@@ -758,9 +761,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var row = GetByKey(rowkey);
             if (row is null) { return OperationResult.Failed("Zeile nicht gefunden!"); }
 
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
-            if (reason.HasFlag(Reason.DoRepair)) {
+            if (reason.HasFlag(ChangeFlags.PostProcess)) {
                 tb.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, row, null, true, false, 3);
             }
 
@@ -774,7 +777,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             row.Dispose();
 
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
             return OperationResult.SuccessTrue;
         }
 
@@ -854,7 +857,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var d = DateTime.UtcNow;
 
         // Fehlerbehandlung für Zeilen-Erstellung
-        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment);
+        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, ChangeFlags.UserCommand);
         if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
 
         if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }

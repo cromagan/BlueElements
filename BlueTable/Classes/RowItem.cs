@@ -276,43 +276,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="value"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public string CellSet(ColumnItem? column, string value, string comment) {
-        if (IsDisposed) { return "Zeile verworfen"; }
-        if (Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
-
-        if (tb.IsFreezed) { return "Tabelle eingefroren!"; }
-
-        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
-
-        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
-
-        if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
-
-            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
-            return string.Empty;
-        }
-
-        value = column.AutoCorrect(value, true);
-        var oldValue = CellGetStringCore(column);
-        if (value == oldValue) { return string.Empty; }
-
-        var uniqueError = CheckUniqueValueConstraint(column, value);
-        if (!string.IsNullOrEmpty(uniqueError)) { return uniqueError; }
-
-        column.UcaseNamesSortedByLength = null;
-
-        if (!column.SaveContent) {
-            return CellSetInMemory(column, value);
-        }
-
-        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, UserName, DateTime.UtcNow, comment) is { Length: > 0 } message) { return message; }
-
-        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
-
-        return string.Empty;
-    }
+    public string CellSet(ColumnItem? column, string value, string comment) => CellSet(column, value, comment, ChangeFlags.UserCommand);
 
     public RowPrepareFormulaEventArgs CheckRow() {
         if (_lastCheckedEventArgs is not null) {
@@ -413,13 +377,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
-    //    Develop.DebugError("Falscher Objecttyp!");
-    //    return 0;
-    //}
-    //public int CompareTo(object obj) {
-    //    if (obj is RowItem tobj) {
-    //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
-    //    }
     public string GetQuickInfo() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return string.Empty; }
         return ReplaceVariables(Table.RowQuickInfo, false, null);
@@ -432,23 +389,61 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         _lastCheckedEventArgs = null;
     }
 
-    public void InvalidateRowState(string comment) {
+    /// <summary>
+    /// Zentrale Invalidierung des Zeilenstatus. Mit ChangeFlags.LogUndo läuft der Schreibzugriff durch die
+    /// Änderungs-Pipeline, ansonsten wird nur im Speicher gesetzt (Automatik während laufender Zelländerungen).
+    /// SysRowChanger und SysRowChangeDate werden als Paar mit dem ausführenden Benutzer und dem Zeitstempel gesetzt.
+    /// Schlüsselspalten und zeilenweite Invalidierung erzwingen die Neuinitialisierung (leerer Status),
+    /// Änderungen in Skript-Spalten nur die Neuberechnung.
+    /// </summary>
+    /// <param name="sourceColumn">Spalte, die die Invalidierung auslöst; null bei zeilenweiter Invalidierung.</param>
+    /// <param name="comment">Grund der Invalidierung für Log/Meldungen.</param>
+    /// <param name="datetimeutc">Zeitstempel für die Änderungs-Spalte.</param>
+    /// <param name="changeFlags">LogUndo = geloggt über die Änderungs-Pipeline, ansonsten nur im Speicher.</param>
+    public void InvalidateRowState(ColumnItem? sourceColumn, string comment, DateTime datetimeutc, ChangeFlags changeFlags) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return; }
-        //if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
         if (tb.Column.SysRowChangeDate is not { IsDisposed: false } scd) { return; }
 
-        InvalidateCheckData();
-        RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
+        // Die Status-Spalte selbst löst keine eigene Invalidierung aus
+        if (sourceColumn == srs) { return; }
 
-        if (string.IsNullOrEmpty(CellGetStringCore(srs)) && IsMyRow(RowCollection.NewRowTolerance, false)) {
+        // Nur Änderungen in Skriptspalten erfordern eine Neuberechnung der Zeile
+        if (sourceColumn is { SaveContent: false } or { ScriptType: ScriptType.Nicht_vorhanden }) { return; }
+
+        if (tb.HasValueChangedScript) {
+            InvalidateCheckData();
+            RowCollection.WaitDelay = 0;
+            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
+        }
+
+        // Frisch erstellte, bereits invalidierte Zeile nicht erneut stempeln
+        var currentState = CellGetStringCore(srs);
+        if (string.IsNullOrEmpty(currentState)) {
             if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
             return;
         }
 
-        CellSet(srs, string.Empty, comment);
-        CellSet(scd, DateTime.UtcNow, comment);
+        // Neuinitialisierung (leerer Status) oder nur Neuberechnung (Status unter die Skript-Version setzen)
+        var newState = sourceColumn is null or { IsKeyColumn: true } ? string.Empty : "01.01.1900";
+
+        // Eine bereits komplett invalidierte Zeile nicht auf "nur Neuberechnung" herunterstufen
+        if (newState == currentState) {
+            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
+            return;
+        }
+
+        if (changeFlags.HasFlag(ChangeFlags.LogUndo)) {
+            var writeReason = ChangeFlags.UserCommand | ChangeFlags.IgnoreSystemColumns;
+            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSet(src, UserName, comment, writeReason); }
+            CellSet(srs, newState, comment, writeReason);
+            CellSet(scd, datetimeutc, comment, writeReason);
+        } else {
+            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, UserName); }
+            CellSetInMemory(srs, newState);
+            CellSetInMemory(scd, datetimeutc.ToString5());
+        }
 
         if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
     }
@@ -520,7 +515,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     //row.CellSet(column, targetRow.KeyName);
                     //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
+                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", ChangeFlags.UserCommand);
                     if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
                 }
             }
@@ -588,7 +583,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
 
-        var dts = CellGetString(srs);
+        var dts = CellGetStringCore(srs);
 
         return string.IsNullOrEmpty(dts) || dts == "0";
     }
@@ -603,7 +598,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
 
-        var dts = CellGetString(srs);
+        var dts = CellGetStringCore(srs);
         if (string.IsNullOrEmpty(dts)) { return true; }
 
         if (!DateTimeTryParse(dts, out var dt)) { return true; }
@@ -896,6 +891,46 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    internal string CellSet(ColumnItem column, DateTime value, string comment, ChangeFlags reason) => CellSet(column, value.ToString5(), comment, reason);
+
+    internal string CellSet(ColumnItem? column, string value, string comment, ChangeFlags reason) {
+        if (IsDisposed) { return "Zeile verworfen"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
+
+        if (tb.IsFreezed) { return "Tabelle eingefroren!"; }
+
+        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
+
+        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
+
+            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
+            return string.Empty;
+        }
+
+        value = column.AutoCorrect(value, true);
+        var oldValue = CellGetStringCore(column);
+        if (value == oldValue) { return string.Empty; }
+
+        var uniqueError = CheckUniqueValueConstraint(column, value);
+        if (!string.IsNullOrEmpty(uniqueError)) { return uniqueError; }
+
+        column.UcaseNamesSortedByLength = null;
+
+        if (!column.SaveContent) {
+            return CellSetInMemory(column, value);
+        }
+
+        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, UserName, DateTime.UtcNow, comment, reason) is { Length: > 0 } message) { return message; }
+
+        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
+
+        return string.Empty;
+    }
+
     /// <summary>
     /// Setzt den Wert direkt im Speicher, ohne Undo-Logging, Events oder Reparaturen.
     /// Orchestrierung (Events, SysRowState-Reset) erfolgt durch den Aufrufer (z.B. <see cref="Table.SetValueInternal"/>).
@@ -940,31 +975,22 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
-    internal void DoSystemColumns(ColumnItem column, string previousValue, string user, DateTime datetimeutc, Reason reason) {
-        if (!reason.HasFlag(Reason.DoRepair)) { return; }
+    /// <summary>
+    /// Pflegt nach einer Zelländerung die Systemspalten: Änderer/Änderungsdatum werden immer
+    /// gesetzt, der Zeilenstatus bei Neuberechnungs-spalten über <see cref="InvalidateRowState(ColumnItem?, string, DateTime, ChangeFlags)"/> invalidiert.
+    /// </summary>
+    internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, ChangeFlags reason) {
+        if (!reason.HasFlag(ChangeFlags.PostProcess)) { return; }
+        if (reason.HasFlag(ChangeFlags.IgnoreSystemColumns)) { return; }
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (IsDisposed || column?.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return; }
 
         if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
         if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
 
-        if (column.SaveContent && tb.Column.SysRowState is { IsDisposed: false } srs && srs != column) {
-            InvalidateCheckData();
-
-            if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
-                RowCollection.WaitDelay = 0;
-
-                if (!string.IsNullOrEmpty(previousValue)) {
-                    if (column.IsKeyColumn) {
-                        CellSetInMemory(srs, string.Empty);
-                    } else {
-                        CellSetInMemory(srs, "01.01.1900");
-                    }
-                }
-            }
-        }
+        InvalidateRowState(column, "Automatische Invalidierung nach Zelländerung", datetimeutc, ChangeFlags.None);
     }
 
     internal bool IsMyRow(double maxminutes, bool mastertoo) {

@@ -97,7 +97,7 @@ public class TableJsonFile : TableFile {
                     if (item is not JsonObject jo) { continue; }
                     if (jo.GetString("key", string.Empty) is not { Length: > 0 } key) { continue; }
                     if (Column[key] is { IsDisposed: false }) { continue; }
-                    var error = Column.ExecuteCommand(TableDataType.Command_AddColumnByName, key, Reason.NoUndo_NoInvalidate);
+                    var error = Column.ExecuteCommand(TableDataType.Command_AddColumnByName, key, ChangeFlags.IgnoreFreeze);
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("JSON-Ladefehler (Spalte): " + error);
                         return false;
@@ -110,7 +110,7 @@ public class TableJsonFile : TableFile {
                     if (item is not JsonObject jo) { continue; }
                     if (jo.GetString("key", string.Empty) is not { Length: > 0 } key) { continue; }
                     if (Row.GetByKey(key) is { IsDisposed: false }) { continue; }
-                    var result = Row.ExecuteCommand(TableDataType.Command_AddRow, key, Reason.NoUndo_NoInvalidate, null, null);
+                    var result = Row.ExecuteCommand(TableDataType.Command_AddRow, key, ChangeFlags.IgnoreFreeze, null, null);
                     if (result.IsFailed) {
                         Freeze("JSON-Ladefehler (Zeile): " + result.FailedReason);
                         return false;

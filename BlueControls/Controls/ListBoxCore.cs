@@ -611,8 +611,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         base.OnMouseUp(e);
-        if (!Enabled) { return; }
         var nd = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
+        if (!Enabled) { return; }
         if (nd is { Enabled: false }) { return; }
 
         if (e.Button == System.Windows.Forms.MouseButtons.Left) {
@@ -734,7 +734,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private void InvalidateItemOrder() { _maxNeededItemSize = Size.Empty; _sorted = false; Invalidate_MaxBounds(); }
 
-    private bool IsAppearanceClickable() => Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Listbox_Boxes or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.ButtonList;
+    private bool IsAppearanceClickable() => Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Listbox_Boxes or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.ButtonList or ListBoxAppearance.DropdownSelectbox;
 
     private bool IsChecked(ListItem item) => IsChecked(item.KeyName);
 

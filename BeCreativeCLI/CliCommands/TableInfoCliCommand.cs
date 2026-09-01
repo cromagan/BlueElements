@@ -54,6 +54,22 @@ public class TableInfoCliCommand : CliCommand {
         }
     }
 
+    /// <summary>
+    /// Liefert die externen Tabellen, die diese Spalte per Ext. Skript-'Set' befüllen, ohne Skriptname.
+    /// </summary>
+    private static List<string> SetByScriptTables(ColumnItem column) {
+        if (column.IsDisposed) { return []; }
+
+        List<string> t = [];
+
+        foreach (var v in column.ColumnSystemInfo.SplitAndCutByCr().TagGetAll("Edit with Script")) {
+            var i = v.LastIndexOf(" -> ", StringComparison.Ordinal);
+            t.Add(i > 0 ? v[..i] : v);
+        }
+
+        return t.SortedDistinctList();
+    }
+
     private static int WriteColumnDetails(Table tbl, CliArgs args) {
         var column = ColumnOfOption(tbl, args);
 
@@ -71,6 +87,9 @@ public class TableInfoCliCommand : CliCommand {
         Console.Out.WriteLine("WirdGespeichert: " + (column.SaveContent ? "ja" : "nein"));
         Console.Out.WriteLine("AdminInfo: " + column.AdminInfo);
         Console.Out.WriteLine("QuickInfo: " + column.QuickInfo);
+
+        var quellen = SetByScriptTables(column);
+        Console.Out.WriteLine("Befüllt durch externe Tabellen: " + (quellen.Count > 0 ? string.Join("; ", quellen) : "-"));
         return 0;
     }
 
@@ -184,6 +203,9 @@ public class TableInfoCliCommand : CliCommand {
         Console.Out.WriteLine("Datei: " + filename);
         Console.Out.WriteLine("Zeilen: " + rows.ToString1());
         Console.Out.WriteLine("Spalten: " + columns.ToString1());
+
+        var tags = tbl.Tags.Where(t => t is { Length: > 0 });
+        Console.Out.WriteLine("Tags: " + (tags.Any() ? string.Join("; ", tags) : "-"));
     }
 
     #endregion

@@ -59,7 +59,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
             if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
             var f = Table.IsCellEditable(srs, row, row.ChunkValue, false);
             if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
-            row.InvalidateRowState(coment);
+            row.InvalidateRowState(null, coment, DateTime.UtcNow, ChangeFlags.LogUndo);
             var sce = row.UpdateRow(true, coment);
 
             if (sce.Failed) { return DoItFeedback.Falsch(); }

@@ -57,7 +57,7 @@ public class ShellCliCommand : CliCommand {
                     continue;
                 }
 
-                var cmd = CliCommand.ByName(tokens[0]);
+                var cmd = ByName(tokens[0]);
 
                 if (cmd is null) {
                     Console.Error.WriteLine($"Unbekannter Befehl: '{tokens[0]}' — 'help' listet alle Befehle.");
@@ -81,6 +81,7 @@ public class ShellCliCommand : CliCommand {
         }
 
         // Datenüberprüfung aller geänderten Zeilen — vor dem Entladen der in der Session offenen Tabellen.
+        RowCollection.ExecuteValueChangedEvent();
         RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
         foreach (var tbl in Table.AllInstances()) {

@@ -16,14 +16,14 @@ public class HelpCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount == 0) {
-            foreach (var command in CliCommand.All) {
+            foreach (var command in All) {
                 Console.Out.WriteLine(command.Command + ": " + command.Description);
             }
 
             return 0;
         }
 
-        var cmd = CliCommand.ByName(args[0] ?? string.Empty);
+        var cmd = ByName(args[0] ?? string.Empty);
 
         if (cmd is null) {
             Console.Error.WriteLine("Unbekannter Befehl: " + args[0]);

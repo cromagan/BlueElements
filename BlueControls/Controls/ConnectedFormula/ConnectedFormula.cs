@@ -93,9 +93,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     public IReadOnlyList<CollectionPadItem> Pages {
         get {
-            if (!IsParsed) {
-                this.Parse(Win1252.GetString(Content));
-            }
+            EnsureParsed();
             return _pages.AsReadOnly();
         }
     }
@@ -205,7 +203,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     }
 
     public CollectionPadItem? GetPage(string keyOrCaption) {
-        if (!IsParsed) { this.Parse(Win1252.GetString(Content)); }
+        EnsureParsed();
 
         foreach (var icp in _pages) {
             if (icp is not { IsDisposed: false }) { continue; }
@@ -234,6 +232,19 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         ClearPages();
         IsParsed = false;
         base.Invalidate();
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass der Dateiinhalt verarbeitet ist.
+    /// Bei leerem oder nicht parsebarem Inhalt werden die Standard-Reparaturen
+    /// (Default-Head, RowEntryItem) über <see cref="ParseFinished"/> dennoch ausgeführt.
+    /// </summary>
+    private void EnsureParsed() {
+        if (IsParsed || IsDisposed) { return; }
+        var c = Win1252.GetString(Content);
+        if (!this.Parse(c)) {
+            ParseFinished(c);
+        }
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Tabellenname ohne Pfad = aktuelles Arbeitsverzeichnis. Shell also per workdir in den Tabellen-Ordner setzen.
 - Exit-Codes: 0 = Erfolg, 1 = Fehler, 2 = Benutzungsfehler (`$LASTEXITCODE` prüfen).
 - Daten auf stdout (CSV, UTF-8), Fehler auf stderr.
-- Die CLI läuft mit Benutzergruppe `#CLI` (nicht Administrator): Bearbeitungen brauchen `#CLI` als Recht (Spalten-Bearbeitung, Neue Zeilen, Tabellen-Admin für table-delrow).
+- Die CLI läuft mit Benutzergruppe `#CLI` (nicht Administrator): Bearbeitungen brauchen `#CLI` als Recht (Spalten-Bearbeitung, Neue Zeilen, Tabellen-Admin für table-delrow; table-swaprows braucht `#CLI` in den Bearbeitungsrechten der Spalte SYS_ROWSORTINDEX).
 - Tabellen mit Kennwort: außerhalb der Shell nicht benutzbar (sofortiger Fehler). In einer Shell-Session zuerst mit `table-password` entsperren, dann normal bearbeiten.
 - Die CLI kann KEINE Spalten anlegen oder löschen — nur Zellwerte setzen, Zeilen anlegen/löschen. Fehlende Spalten müssen in der GUI erstellt werden.
 - Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (Rechte für `#CLI` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
@@ -50,9 +50,11 @@ Wichtige Stolperfalle:
 - `bcr table-cellget <tabelle> --column <c>` + Zeilenadressierung — Zelle lesen (Zeile muss eindeutig adressiert sein)
 - `bcr table-cellset <tabelle> --column <c> --value <w>` + Zeilenadressierung — Zelle setzen (speichert)
 - `bcr table-delrow <tabelle>` + Zeilenadressierung — Zeilen löschen (speichert)
+- `bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>` — Positionen zweier Zeilen tauschen (nur wenn die benutzerdefinierte Sortierung aktiv ist; braucht `#CLI` in den Bearbeitungsrechten der Spalte SYS_ROWSORTINDEX; speichert)
 - `bcr table-search <tabelle> --value <w> [--column <c>]` — Suche (Groß-/Kleinschreibung egal); Ausgabe pro Treffer: `Spalte <c> Zeile <key>: <treffer>` — der Treffer erscheint mit bis zu drei Wörtern Kontext davor und danach (gekürzte Seiten als `...`); Key direkt als `--rowkey` verwendbar
 - `bcr table-columncontent <tabelle> --column <c> [--max <n>]` — alle Werte einer Spalte
 - `bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader]` — CSV auf stdout (nur für Exportzwecke, nicht zur Analyse nötig)
+- `bcr table-head <tabelle> tags <tags mit | getrennt>` — Tags des Tabellenkopfs setzen (leerer Wert entfernt alle; speichert). NUR als Tabellen-Administrator: Die Gruppe `#CLI` muss in den Tabellen-Admin-Gruppen stehen.
 
 Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>` (optional `--filtertype equals|exact|contains|startswith`).
 

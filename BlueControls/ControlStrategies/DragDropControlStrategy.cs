@@ -34,7 +34,7 @@ public class DragDropControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() { }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Pfeil_Unten);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Pfeil_Unten);
 
     public override void UnsubscribeEvents() { }
 

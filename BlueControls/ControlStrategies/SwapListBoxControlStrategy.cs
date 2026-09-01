@@ -42,7 +42,7 @@ public class SwapListBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.CheckBox);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.CheckBox);
 
     public override void UnsubscribeEvents() {
         _control?.ItemCheckedChanged -= SwapListBox_ItemCheckedChanged;

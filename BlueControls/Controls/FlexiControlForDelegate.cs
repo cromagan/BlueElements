@@ -15,7 +15,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
     #region Constructors
 
-    public FlexiControlForDelegate() : this(null, string.Empty, BlueBasics.Enums.ImageCode.Kreuz) { }
+    public FlexiControlForDelegate() : this(null, string.Empty, ImageCode.Kreuz) { }
 
     public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() => Init(doThis, text, QuickImage.Get(image, 22));
 
@@ -36,7 +36,7 @@ public class FlexiControlForDelegate : FlexiControl {
                 break;
 
             default:
-                Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(BlueBasics.Enums.ImageCode.Smiley, 22));
+                Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(ImageCode.Smiley, 22));
                 break;
         }
     }

@@ -1250,7 +1250,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             #region Zelle
 
             if (column is not null && row is not null) {
-                var editable = string.IsNullOrEmpty(TableView.IsCellEditable(column, row, row.ChunkValue));
+                var editable = string.IsNullOrEmpty(IsCellEditable(column, row, row.ChunkValue));
 
                 contextMenu.Add(ItemOf("Zelle", true));
 
@@ -2050,6 +2050,25 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         l.Show();
     }
 
+    /// <summary>
+    /// Y-Koordinate, an der der Zeilenbereich beginnt (Unterkante aller IgnoreYOffset-Elemente).
+    /// </summary>
+    internal int RowsAreaTop() {
+        _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
+
+        var maxBottom = 0;
+
+        if (_sortedViewItems is { Count: > 0 }) {
+            foreach (var thisItem in _sortedViewItems) {
+                if (thisItem.IgnoreYOffset) {
+                    maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
+                }
+            }
+        }
+
+        return maxBottom.CanvasToControl(Zoom);
+    }
+
     internal void SetPendingSmoothScroll() {
         _pendingSmoothScroll = true;
         _mustDoAllViewItems = true;
@@ -2756,7 +2775,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             ScriptEndedFeedback? fb;
             if (generic) {
-                rows[0].InvalidateRowState($"TableView, Kontextmenü, {info}");
+                rows[0].InvalidateRowState(null, $"TableView, Kontextmenü, {info}", DateTime.UtcNow, ChangeFlags.LogUndo);
                 fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
             } else {
                 fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
@@ -4371,7 +4390,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         foreach (var br in rows) {
             if (br is { IsDisposed: false }
                 && !PinnedRows.Contains(br)
-                && string.IsNullOrEmpty(TableView.IsCellEditable(sortCol, br, br.ChunkValue))) {
+                && string.IsNullOrEmpty(IsCellEditable(sortCol, br, br.ChunkValue))) {
                 result.Add(br);
             }
         }
@@ -4593,7 +4612,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             && dragRli.Row is { IsDisposed: false } dragRow
             && !PinnedRows.Contains(dragRow)
             && tb.Column.SysRowSortIndex is { IsDisposed: false }
-            && string.IsNullOrEmpty(TableView.IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
+            && string.IsNullOrEmpty(IsCellEditable(mc, dragRow, dragRow.ChunkValue))) {
             _dragItem = dragRow;
         } else if (mouseOverRow is RowCaptionTableElement dragRcli
                    && !dragRcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)
@@ -4685,25 +4704,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         // Reihenfolge ist wichtig, da die IgnoreYOffset-Elemente beim Zeichnen
         // über den normalen Zeilen liegen und Klicks deshalb abfangen müssen.
         return ItemAtPosition(controlY, true) ?? ItemAtPosition(controlY, false);
-    }
-
-    /// <summary>
-    /// Y-Koordinate, an der der Zeilenbereich beginnt (Unterkante aller IgnoreYOffset-Elemente).
-    /// </summary>
-    internal int RowsAreaTop() {
-        _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
-
-        var maxBottom = 0;
-
-        if (_sortedViewItems is { Count: > 0 }) {
-            foreach (var thisItem in _sortedViewItems) {
-                if (thisItem.IgnoreYOffset) {
-                    maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
-                }
-            }
-        }
-
-        return maxBottom.CanvasToControl(Zoom);
     }
 
     /// <summary>
@@ -4849,4 +4849,5 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     #endregion
+
 }

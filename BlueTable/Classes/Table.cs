@@ -29,13 +29,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     internal readonly object _undoLock = new();
 
+    private static List<string> _allavailableTables = [];
+
     ///// <summary>
     ///// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
     ///// </summary>
     //private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
-
-    private static List<string> _allavailableTables = [];
-
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private readonly List<string> _dictionaryWords = [];
@@ -53,33 +52,25 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private string _assetFolder;
 
     private string _caption = string.Empty;
-
     private bool? _changesRowColor;
-
     private Timer? _checker;
-
     private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
-
     private string _createDate;
-
     private string _creator;
-
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
-
     private DateTime _eventScriptVersion = DateTime.MinValue;
-
     private string _globalShowPass = string.Empty;
-
     private bool? _hasValueChangedScript;
-
     private volatile int _isDisposedFlag;
 
+    /// <summary>
+    /// Zuletzt vergebener Zeitstempel für Undo-Log-Einträge; garantiert eindeutigen Millisekunden-Abstand.
+    /// </summary>
+    private DateTime _lastChangeUtc = DateTime.MinValue;
+
     private bool? _mayAffectUser;
-
     private DateTime _powerEditTime = DateTime.MinValue;
-
     private string _rowQuickInfo = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -92,6 +83,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     private int _suppressEvents;
 
+    private string _symbolFolder = string.Empty;
     private string _temporaryTableMasterApp = string.Empty;
 
     private string _temporaryTableMasterId = string.Empty;
@@ -136,6 +128,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _createDate = DateTime.UtcNow.ToString9();
             LoadedVersion = TableVersion;
             _assetFolder = "Assets";
+            _symbolFolder = "Symbole";
             _variableTmp = string.Empty;
 
             // Muss vor dem Laden der Daten in LiveInstances eingetragen werden,
@@ -440,6 +433,17 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    [Description("In diesem Ordner suchen verschiedene Routinen (IconChar, <Imagecode=...>) nach eigenen Symbol-Dateien (PNG).")]
+    public string SymbolFolder {
+        get => _symbolFolder;
+        set {
+            if (_symbolFolder == value) { return; }
+            _symbolFolderTemp = null;
+            ChangeData(TableDataType.SymbolFolder, null, _symbolFolder, value);
+            Cell.InvalidateAllSizes();
+        }
+    }
+
     public ReadOnlyCollection<string> TableAdmin {
         get => new(_tableAdmin);
         set {
@@ -571,6 +575,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private static Stack<Table> LoadingOnThisThread => field ??= new Stack<Table>();
 
     private string? _assetFolderTemp { get; set; }
+
+    private string? _symbolFolderTemp { get; set; }
 
     #endregion
 
@@ -1060,11 +1066,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <returns></returns>
     public bool CanDoValueChangedScript(bool notExistingValue) => IsRowScriptPossible() && IsThisScriptOk(ScriptEventTypes.value_changed, notExistingValue);
 
-    public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty);
+    public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, ChangeFlags.UserCommand);
 
     /// <summary>
-    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
-    /// Der Wert wird intern fest verankert.
+    /// Setzt einen Wert dauerhaft (Speicher + Festplatte/Server) und führt Undo, Events und Systemspalten-Pflege aus.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>
@@ -1074,10 +1079,17 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
+    /// <param name="reason">Flags für Undo/Logging, Events und Systemspalten-Pflege.</param>
+    public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, ChangeFlags reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
+
+        // Logische Uhr: Einmalig vor der gesamten Pipeline (Speicher, Fragment, Undo) auf eindeutigen
+        // Abstand bringen, damit Fragment- und Undo-Eintrag denselben Zeitstempel erhalten.
+        if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
+            datetimeutc = EnsureLogTimeUtc(datetimeutc);
+        }
 
         if (row is not null) {
             var cv = row.ChunkValue;
@@ -1091,19 +1103,26 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         var colName = column?.KeyName ?? string.Empty;
 
+        // Bei Zellwerten die Events erst nach erfolgreichem Schreiben feuern,
+        // damit ein Rollback unsichtbar bleibt (kein Trigger - Rollback - Trigger).
+        var eventsAfterSuccess = type.IsCellValue() && reason.HasFlag(ChangeFlags.RaiseEvents);
+        var internalFlags = eventsAfterSuccess ? reason & ~ChangeFlags.RaiseEvents : reason;
+
         // ERST Speicher setzen
-        var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, internalFlags);
         if (!string.IsNullOrEmpty(error)) { return error; }
 
-        // DANN Festplatte schreiben (nur bei nicht ReadOnly)
-        if (!IsFreezed) {
-            var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, comment);
-            if (!string.IsNullOrEmpty(f2)) {
-                Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Rollback aufgrund eines Fehlers:\r\n{f2}", 0);
-                // Rollback: Vorherigen Wert im Speicher wiederherstellen
-                SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
-                return f2;
-            }
+        // DANN Festplatte schreiben
+        var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, comment);
+        if (!string.IsNullOrEmpty(f2)) {
+            Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Rollback aufgrund eines Fehlers:\r\n{f2}", 0);
+            // Rollback: Vorherigen Wert im Speicher wiederherstellen
+            SetValueInternal(type, column, row, previousValue, user, datetimeutc, ChangeFlags.IgnoreFreeze);
+            return f2;
+        }
+
+        if (eventsAfterSuccess && column is not null && row is not null) {
+            OnCellValueChanged(column, row, previousValue, changedTo);
         }
 
         // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
@@ -1111,7 +1130,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             UpdateColumnArrangementsAfterRename(column);
         }
 
-        if (LogUndo) {
+        if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
             AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]");
         }
 
@@ -1186,6 +1205,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         target.RowQuickInfo = RowQuickInfo;
         target.StandardFormulaFile = StandardFormulaFile;
         target.AssetFolder = AssetFolder;
+        target.SymbolFolder = SymbolFolder;
         target.Tags = Tags;
         target.DictionaryWords = DictionaryWords;
         target.PermissionGroupsNewRow = PermissionGroupsNewRow;
@@ -1647,10 +1667,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
-                                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                            CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
-                                CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
+                                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1819,7 +1839,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         parsedRowKeys?.Add(rowKey);
                         row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
-                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
+                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, ChangeFlags.IgnoreFreeze, null, null);
                             row = Row.GetByKey(rowKey);
                         }
 
@@ -1838,7 +1858,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         column = Column[columname];
                         if (command == TableDataType.ColumnKey) {
                             if (column is not { IsDisposed: false }) {
-                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
+                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, ChangeFlags.IgnoreFreeze);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
                                     Develop.DebugError("Spalte hinzufügen Fehler");
@@ -1868,7 +1888,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         break;
                     }
 
-                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
+                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, ChangeFlags.IgnoreFreeze);
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Tabellen-Ladefehler");
                         Develop.DebugPrint("Schwerer Tabellenfehler:<br>Version: " + TableVersion + "<br>Datei: " + KeyName + "<br>Meldung: " + error);
@@ -1883,7 +1903,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         if (isMain) {
-            Column.RemoveObsoleteColumns(Column, columnUsed, Reason.NoUndo_NoInvalidate);
+            Column.RemoveObsoleteColumns(Column, columnUsed, ChangeFlags.IgnoreFreeze);
             Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
         }
@@ -1901,6 +1921,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         json.Set("createdate", _createDate);
         json.Set("version", TableVersion);
         json.Set("assetfolder", _assetFolder);
+        json.Set("symbolfolder", _symbolFolder);
         json.Set("globalshowpass", _globalShowPass);
         json.Set("rowquickinfo", _rowQuickInfo);
         json.Set("standardformulafile", _standardFormulaFile);
@@ -1992,6 +2013,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _assetFolderTemp = null; // Cache verwerfen, da sich der Ordner geändert haben könnte
         }
 
+        if (json["symbolfolder"] is not null) {
+            _symbolFolder = json.GetString("symbolfolder", _symbolFolder);
+            _symbolFolderTemp = null; // Cache verwerfen, da sich der Ordner geändert haben könnte
+            RegisterSymbolFolder();
+        }
+
         if (json["poweredittime"] is JsonValue pe && pe.TryGetValue(out string? pes)) {
             var pdt = DateTimeParse(pes);
             if (pdt > DateTime.MinValue) { _powerEditTime = pdt; }
@@ -2052,6 +2079,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                     Undo.Add(undoItem);
                 }
             }
+            SeedLogTimeFromUndo();
         }
 
         #endregion
@@ -2132,6 +2160,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             Develop.DebugPrint("Fehler beim Rechte-Check", ex);
         }
         return false;
+    }
+
+    /// <summary>
+    /// Macht den Symbol-Ordner für QuickImage verfügbar, sodass <Imagecode=Name> eigene PNG-Dateien auflösen kann.
+    /// </summary>
+    public void RegisterSymbolFolder() {
+        var p = SymbolFolderWhole();
+        if (!string.IsNullOrEmpty(p)) { QuickImage.RegisterSearchPath(p); }
     }
 
     /// <summary>
@@ -2245,6 +2281,33 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         _suppressEvents++;
     }
 
+    /// <summary>
+    /// Der komplette Symbol-Ordner-Pfad mit abschließenden \
+    /// </summary>
+    /// <returns></returns>
+    public string SymbolFolderWhole() {
+        if (_symbolFolderTemp is not null) { return _symbolFolderTemp; }
+
+        if (!string.IsNullOrEmpty(_symbolFolder)) {
+            var t = _symbolFolder.NormalizePath();
+            if (t.IsValidFilePath()) {
+                _symbolFolderTemp = t;
+                return t;
+            }
+        }
+
+        if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename) && !string.IsNullOrEmpty(_symbolFolder)) {
+            var t = (tbf.Filename.FilePath() + _symbolFolder + "\\").NormalizePath();
+            if (t.IsValidFilePath()) {
+                _symbolFolderTemp = t;
+                return t;
+            }
+        }
+
+        _symbolFolderTemp = string.Empty;
+        return string.Empty;
+    }
+
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
 
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
@@ -2344,7 +2407,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         Develop.DebugPrint(t);
     }
 
-    internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue, Reason reason) {
+    internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
         if (column.Relationship_to_First) { rowItem.RepairRelationText(column, previewsValue); }
 
         if (column.Am_A_Key_For.Count > 0) {
@@ -2498,13 +2561,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="datetimeutc"></param>
-    /// <param name="reason"></param>
+    /// <param name="changeFlags"></param>
     /// <param name="user"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
+    protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, ChangeFlags changeFlags) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
 
-        if (!reason.HasFlag(Reason.IgnoreFreeze)) {
+        if (!changeFlags.HasFlag(ChangeFlags.IgnoreFreeze)) {
             var f = IsGenericEditable(false);
             if (!string.IsNullOrEmpty(f)) { return $"Tabelle eingefroren: {f}"; }
         }
@@ -2522,10 +2585,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
 
-            row.DoSystemColumns(column, previousValue, user, datetimeutc, reason);
+            row.DoSystemColumns(column, user, datetimeutc, changeFlags);
 
-            if (reason.HasFlag(Reason.RaiseEvents)) {
-                tb.OnCellValueChanged(column, row, previousValue, value, reason);
+            if (changeFlags.HasFlag(ChangeFlags.RaiseEvents)) {
+                tb.OnCellValueChanged(column, row, previousValue, value);
             }
             return string.Empty;
         }
@@ -2543,17 +2606,17 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             switch (type) {
                 case TableDataType.Command_RemoveColumn:
                     if (Column[value] is not { } c) { return string.Empty; }
-                    return Column.ExecuteCommand(type, c.KeyName, reason);
+                    return Column.ExecuteCommand(type, c.KeyName, changeFlags);
 
                 case TableDataType.Command_AddColumnByName:
-                    return Column.ExecuteCommand(type, value, reason);
+                    return Column.ExecuteCommand(type, value, changeFlags);
 
                 case TableDataType.Command_RemoveRow:
                     if (Row.GetByKey(value) is not { } r) { return string.Empty; }
-                    return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc).FailedReason;
+                    return Row.ExecuteCommand(type, r.KeyName, changeFlags, user, datetimeutc).FailedReason;
 
                 case TableDataType.Command_AddRow:
-                    return Row.ExecuteCommand(type, value, reason, user, datetimeutc).FailedReason;
+                    return Row.ExecuteCommand(type, value, changeFlags, user, datetimeutc).FailedReason;
 
                 case TableDataType.Command_NewStart:
                     return string.Empty;
@@ -2639,6 +2702,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.AssetFolder:
                 _assetFolder = value;
+                break;
+
+            case TableDataType.SymbolFolder:
+                _symbolFolder = value;
+                RegisterSymbolFolder();
                 break;
 
             case TableDataType.StandardFormulaFile:
@@ -2732,6 +2800,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         Undo.Add(tmpWork);
                     }
                 }
+                SeedLogTimeFromUndo();
                 break;
 
             case TableDataType.CheckPoint:
@@ -2890,6 +2959,19 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return string.Empty;
     }
 
+    /// <summary>
+    /// Liefert einen logischen Zeitstempel, der mindestens eine Millisekunde nach dem vorherigen liegt,
+    /// damit Undo-Log-Einträge eindeutig sortierbar bleiben.
+    /// </summary>
+    private DateTime EnsureLogTimeUtc(DateTime datetimeutc) {
+        lock (_undoLock) {
+            var t = datetimeutc;
+            if (t <= _lastChangeUtc) { t = _lastChangeUtc.AddMilliseconds(1); }
+            _lastChangeUtc = t;
+            return t;
+        }
+    }
+
     private string ExternalAbortScriptReason(bool extended) {
         var e = new CanDoScriptEventArgs(extended);
         OnCanDoScript(e);
@@ -2923,6 +3005,19 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Setzt die logische Uhr auf den neuesten geladenen Undo-Zeitstempel, damit neue Einträge
+    /// auch bei Uhrversatz (Multi-User) danach liegen.
+    /// </summary>
+    private void SeedLogTimeFromUndo() {
+        lock (_undoLock) {
+            foreach (var item in Undo) {
+                if (item is null) { continue; }
+                if (item.DateTimeUtc > _lastChangeUtc) { _lastChangeUtc = item.DateTimeUtc; }
+            }
+        }
     }
 
     private void UnregisterEvents() {

@@ -32,7 +32,7 @@ public class LineControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Linie);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie);
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 

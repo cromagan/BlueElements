@@ -390,14 +390,25 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         if (direction == NavigationDirection.Previous) {
-            index = index > 0 ? index - 1 : siblings.Count - 1;
+            if (index <= 0) { return; }
+            index--;
+        } else if (index < siblings.Count - 1) {
+            index++;
         } else {
-            index = index < siblings.Count - 1 ? index + 1 : 0;
+            // An den Rändern stoppen, kein Sprung zum jeweils anderen Ende.
+            return;
         }
 
         var target = siblings[index];
-        target.Focus();
+        target.FocusInput();
     }
+
+    /// <summary>
+    /// Setzt den Fokus auf das eigentliche Eingabe-Element des Controls.
+    /// Standard ist das Control selbst; Ableitungen reichen den Fokus an ein
+    /// eingebettetes Eingabe-Control weiter.
+    /// </summary>
+    protected virtual void FocusInput() => Focus();
 
     protected override void OnCreateControl() {
         base.OnCreateControl();

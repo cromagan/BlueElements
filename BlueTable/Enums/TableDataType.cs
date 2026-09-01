@@ -149,6 +149,8 @@ public enum TableDataType : byte {
 
     DictionaryWords = 83,
 
+    SymbolFolder = 84,
+
     ColumnKey = 100,
 
     ColumnCaption = 101,

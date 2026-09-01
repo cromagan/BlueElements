@@ -163,7 +163,7 @@ public class TableControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Tabelle);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Tabelle);
 
     public override void UnsubscribeEvents() {
         if (_table is { IsDisposed: false } tb) {

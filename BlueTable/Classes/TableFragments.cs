@@ -473,9 +473,9 @@ public class TableFragments : TableFile {
                         var error = string.Empty;
 
                         if (initialload) {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.IgnoreFreeze | Reason.DoRepair);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
                         } else {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents | Reason.IgnoreFreeze | Reason.DoRepair);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.RaiseEvents | ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
                         }
 
                         if (!string.IsNullOrEmpty(error)) {

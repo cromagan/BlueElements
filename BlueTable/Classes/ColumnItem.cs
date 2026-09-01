@@ -1804,7 +1804,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                _permissionGroupsChangeCell.Clear();
                 _maxTextLength = 19;
                 _maxCellLength = 19;
                 _sortType = SortierTyp.ZahlenwertInt;
@@ -1815,6 +1814,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 this.GetStyleFrom(Formats.LongOnlyPositiveFormat.Instance);
                 if (allDefaultValues) {
+                    _permissionGroupsChangeCell.Clear(); // Nur bei Neuanlage leeren — konfigurierte Rechte bleiben über Load/Repair erhalten
                     Align = AlignmentHorizontal.Rechts;
                     Caption = "Zeile";
                     DefaultRenderer = "Button";

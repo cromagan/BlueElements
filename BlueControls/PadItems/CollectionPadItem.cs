@@ -382,21 +382,18 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
         List<float> newH = [];
         foreach (var thisIt in its) {
 
-            #region  newY
+            #region  newY und newH
 
-            newY.Add(thisIt.CanvasUsedArea.Y.CanvasToControl(scaleY));
+            // Kanten statt Position und Breite separat skalieren: Bei bündigen Items
+            // (Bottom == Top bzw. Right == Left) wird derselbe float-Wert gerundet,
+            // dadurch bleiben die Kanten exakt gleich und keine Pseudo-Überlappung
+            // durch Rundungsfehler entsteht.
 
-            #endregion
+            var ny = thisIt.CanvasUsedArea.Y.CanvasToControl(scaleY);
+            var nb = thisIt.CanvasUsedArea.Bottom.CanvasToControl(scaleY);
+            newY.Add(ny);
 
-            #region  newX
-
-            newX.Add(thisIt.CanvasUsedArea.X.CanvasToControl(scaleX));
-
-            #endregion
-
-            #region  newH
-
-            var nh = thisIt.CanvasUsedArea.Height.CanvasToControl(scaleY);
+            var nh = nb - ny;
 
             if (thisIt.AutoSizeableHeight) {
                 if (!thisIt.CanChangeHeightTo(nh)) {
@@ -410,9 +407,12 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
 
             #endregion
 
-            #region  newW
+            #region  newX und newW
 
-            newW.Add(thisIt.CanvasUsedArea.Width.CanvasToControl(scaleX));
+            var nx = thisIt.CanvasUsedArea.X.CanvasToControl(scaleX);
+            var nr = thisIt.CanvasUsedArea.Right.CanvasToControl(scaleX);
+            newX.Add(nx);
+            newW.Add(nr - nx);
 
             #endregion
         }
@@ -795,7 +795,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
 
             if (ReferenceTable is { IsDisposed: false } tb) {
                 result.Add(new FlexiControlForDelegate(tb));
-                result.Add(new FlexiControlForDelegate(OpenReferenceTablePreview, "Vorschau mit Zeilen", ImageCode.Auge));
+                result.Add(new FlexiControlForDelegate(OpenReferenceTablePreview, "Vorschau anzeigen", ImageCode.Auge));
             }
         }
 

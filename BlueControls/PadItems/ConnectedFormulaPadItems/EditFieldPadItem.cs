@@ -255,7 +255,9 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
                 return true;
 
             case "edittypeparameter":
-                ControlStrategyParameter = value.ParseAsJsonObject();
+                // Der Wert ist beim Verschachteln einmal ToNonCritical-kodiert
+                // (Json enthält { } ") und muss vor dem Parsen dekodiert werden.
+                ControlStrategyParameter = value.FromNonCritical().ParseAsJsonObject();
                 return true;
 
             case "caption":

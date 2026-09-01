@@ -79,6 +79,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// Implementiert der Editor <see cref="INotifyPropertyChanged"/>, wird auf
     /// jede Änderung reagiert (Anzeige aktualisieren und das Form benachrichtigen).
     /// </summary>
+    [DefaultValue(null)]
     public IIsEditor? Editor {
         get;
         set {
@@ -88,7 +89,7 @@ public partial class EditorForIEnumerable : ListBox {
             AttachPropertyChanged(field);
             RefreshEditor();
         }
-    }
+    } = null;
 
     /// <summary>
     /// Die Datenquelle für die zu bearbeitende Collection. Ein beliebiges
@@ -103,6 +104,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// <see cref="InputItemsChanged"/> aus. Ein separater Aufruf ist nur nötig, wenn
     /// sich der Inhalt derselben Referenz geändert hat.
     /// </summary>
+    [DefaultValue(null)]
     public IEnumerable? InputItem {
         get;
         set {
@@ -118,7 +120,7 @@ public partial class EditorForIEnumerable : ListBox {
             UpdateList();
             PushSelectionToEditor();
         }
-    }
+    } = null;
 
     /// <summary>
     /// Die aktuelle Arbeitskopie der Elemente. Wird beim Setzen von

@@ -98,6 +98,23 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 }
                 break;
 
+            case GroupBoxStyle.NormalBoldBottom:
+                if (c.Height > 33) {
+                    Skin.Draw_Border(gr, Design.GroupBox_BoldBottom, state, r);
+                    if (!string.IsNullOrEmpty(caption)) {
+                        var bottomTxt = new Rectangle(Skin.Padding, -Skin.PaddingSmal, c.Width, c.Height);
+                        Skin.Draw_FormatedText(gr, caption, null, Alignment.Bottom_Left, bottomTxt, Design.GroupBox_BoldBottom, state, c, false, true);
+                    }
+                } else {
+                    var dBottom = Skin.DesignOf(Design.GroupBox_BoldBottom, state);
+                    gr.Clear(dBottom.BorderColor1);
+                    if (!string.IsNullOrEmpty(caption)) {
+                        var bottomTxt = new Rectangle(Skin.Padding, 0, c.Width, c.Height);
+                        Skin.Draw_FormatedText(gr, caption, null, Alignment.VerticalCenter_Left, bottomTxt, Design.GroupBox_BoldBottom, state, c, false, true);
+                    }
+                }
+                break;
+
             default:
                 Skin.Draw_Back_Transparent(gr, c.DisplayRectangle, c);
                 break;

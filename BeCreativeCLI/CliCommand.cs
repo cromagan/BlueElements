@@ -157,12 +157,14 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Gibt eine geladene Tabelle frei. Zuvor läuft die Datenüberprüfung.
+    /// Gibt eine geladene Tabelle frei. Zuvor laufen die Datenüberprüfung veralteter Zeilen
+    /// und die Verarbeitung explizit invalidierter Zeilen.
     /// In einer Shell-Session bleibt die Instanz im Live-Cache erhalten,
     /// sonst wird sie disposet (Writer wird geschlossen).
     /// </summary>
     protected static void Release(Table tbl) {
         if (!SessionActive) {
+            RowCollection.ExecuteValueChangedEvent();
             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
             tbl.Dispose();
         }

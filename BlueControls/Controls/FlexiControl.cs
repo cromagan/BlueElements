@@ -36,7 +36,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     /// <summary>
-    /// Erzeugt eine fette Caption (isCaption) oder einen hervorgehobenen Info-Text.
+    /// Erzeugt eine fette Caption (isCaption) oder einen normalen Info-Text.
     /// Der Text wird immer als Value an die Strategie übergeben.
     /// </summary>
     public FlexiControl(string captionText, int width, bool isCaption) : base(false, false, false) {
@@ -768,10 +768,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             PositionStrategyControl();
             Controls.Add(_strategyControl);
 
-            _strategy.Value = Value;
-
             Allinitialized = true;
             _strategy.EndInit();
+
+            // Wert erst nach EndInit zuweisen: ApplyStyle (u. a. TextFormatingAllowed)
+            // muss am Control ankommen, bevor der Text (HTML vs. Plain) geparst wird.
+            _strategy.Value = Value;
 
             // Value-Setter abonniert Events nur bei Wertänderung (Überspringt "" == "").
             // Daher hier sicherstellen, dass die Strategy-Events immer genau einmal abonniert sind.

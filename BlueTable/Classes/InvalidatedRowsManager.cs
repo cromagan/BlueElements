@@ -138,7 +138,7 @@ public class InvalidatedRowsManager {
                     break;
                 }
 
-                if (Develop.GetUserIdleSeconds() < 1) {
+                if (RowCollection.AbortOnUserIdle && Develop.GetUserIdleSeconds() < 1) {
                     Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
                     break;
                 }

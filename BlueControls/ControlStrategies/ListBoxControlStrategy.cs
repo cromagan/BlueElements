@@ -78,7 +78,7 @@ public class ListBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Pfeil_Unten_Scrollbar);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Pfeil_Unten_Scrollbar);
 
     public override void UnsubscribeEvents() {
         _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;

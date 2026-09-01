@@ -357,9 +357,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
-                                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment));
+                                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand));
 
-    public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
+    public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, ChangeFlags reason) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         var colsToRemove = posssibleObsoelte.Where(c => !c.IsDisposed && !stillUsed.Contains(c.KeyName)).ToList();
@@ -470,10 +470,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    internal string ExecuteCommand(TableDataType type, string name, Reason reason) {
+    internal string ExecuteCommand(TableDataType type, string name, ChangeFlags reason) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
-        if (!reason.HasFlag(Reason.IgnoreFreeze)) {
+        if (!reason.HasFlag(ChangeFlags.IgnoreFreeze)) {
             if (tb.IsValueEditable(type, string.Empty) is { Length: > 0 } f) { return f; }
         }
 
@@ -488,11 +488,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
             GetSystems();
 
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnAdded(new ColumnEventArgs(column)); }
-
-            if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
-                Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
-            }
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnAdded(new ColumnEventArgs(column)); }
 
             return string.Empty;
         }
@@ -501,9 +497,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var c = this[name];
             if (c is null) { return "Spalte nicht gefunden!"; }
 
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnRemoved(); }
+            if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoved(); }
 
             c.Dispose();
             GetSystems();

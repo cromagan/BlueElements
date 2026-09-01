@@ -42,19 +42,22 @@ namespace BlueControls.BlueTableDialogs {
             capInfo = new Caption();
             GlobalTab = new TabControl();
             tabAllgemein = new TabPage();
+            txbZeilenQuickInfo = new TextBoxSuggestions();
+            capZeilenQuickInfo = new Caption();
+            txbAssetFolder = new TextBox();
+            capSymbolFolder = new Caption();
+            txbSymbolFolder = new TextBox();
+            txbStandardFormulaFile = new TextBox();
+            btnFormularBearbeiten = new Button();
             btnLoadAll = new Button();
             btnMasterMe = new Button();
             btnUnMaster = new Button();
             btnTabellenAnsicht = new Button();
             btnSkripte = new Button();
-            txbZeilenQuickInfo = new TextBoxSuggestions();
             butSystemspaltenErstellen = new Button();
             btnOptimize = new Button();
-            txbStandardFormulaFile = new TextBox();
             capStandardFormulaFile = new Caption();
-            txbAssetFolder = new TextBox();
             capAdditional = new Caption();
-            capZeilenQuickInfo = new Caption();
             btnSpaltenuebersicht = new Button();
             tabRechte = new TabPage();
             tabSortierung = new TabPage();
@@ -99,7 +102,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpBenutzergruppen
             // 
             grpBenutzergruppen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            grpBenutzergruppen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            grpBenutzergruppen.BackColor = Color.FromArgb(255, 255, 255);
             grpBenutzergruppen.CausesValidation = false;
             grpBenutzergruppen.Controls.Add(btnDummyAdmin);
             grpBenutzergruppen.Controls.Add(PermissionGroups_NewRow);
@@ -180,7 +183,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpKennwort
             // 
             grpKennwort.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            grpKennwort.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            grpKennwort.BackColor = Color.FromArgb(255, 255, 255);
             grpKennwort.CausesValidation = false;
             grpKennwort.Controls.Add(capKennwort);
             grpKennwort.Controls.Add(txbKennwort);
@@ -259,7 +262,7 @@ namespace BlueControls.BlueTableDialogs {
             capInfo.CausesValidation = false;
             capInfo.Location = new Point(8, 56);
             capInfo.Name = "capInfo";
-            capInfo.Size = new Size(616, 144);
+            capInfo.Size = new Size(616, 136);
             // 
             // GlobalTab
             // 
@@ -283,20 +286,23 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabAllgemein
             // 
-            tabAllgemein.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabAllgemein.BackColor = Color.FromArgb(255, 255, 255);
+            tabAllgemein.Controls.Add(txbZeilenQuickInfo);
+            tabAllgemein.Controls.Add(txbSymbolFolder);
+            tabAllgemein.Controls.Add(capZeilenQuickInfo);
+            tabAllgemein.Controls.Add(txbAssetFolder);
+            tabAllgemein.Controls.Add(capSymbolFolder);
+            tabAllgemein.Controls.Add(txbStandardFormulaFile);
+            tabAllgemein.Controls.Add(btnFormularBearbeiten);
             tabAllgemein.Controls.Add(btnLoadAll);
             tabAllgemein.Controls.Add(btnMasterMe);
             tabAllgemein.Controls.Add(btnUnMaster);
             tabAllgemein.Controls.Add(btnTabellenAnsicht);
             tabAllgemein.Controls.Add(btnSkripte);
-            tabAllgemein.Controls.Add(txbZeilenQuickInfo);
             tabAllgemein.Controls.Add(butSystemspaltenErstellen);
             tabAllgemein.Controls.Add(btnOptimize);
-            tabAllgemein.Controls.Add(txbStandardFormulaFile);
             tabAllgemein.Controls.Add(capStandardFormulaFile);
-            tabAllgemein.Controls.Add(txbAssetFolder);
             tabAllgemein.Controls.Add(capAdditional);
-            tabAllgemein.Controls.Add(capZeilenQuickInfo);
             tabAllgemein.Controls.Add(txbTags);
             tabAllgemein.Controls.Add(btnSpaltenuebersicht);
             tabAllgemein.Controls.Add(capInfo);
@@ -309,6 +315,74 @@ namespace BlueControls.BlueTableDialogs {
             tabAllgemein.Size = new Size(1178, 678);
             tabAllgemein.TabIndex = 1;
             tabAllgemein.Text = "Allgemein";
+            // 
+            // txbZeilenQuickInfo
+            // 
+            txbZeilenQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            txbZeilenQuickInfo.Cursor = Cursors.IBeam;
+            txbZeilenQuickInfo.Location = new Point(8, 216);
+            txbZeilenQuickInfo.MultiLine = true;
+            txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
+            txbZeilenQuickInfo.Size = new Size(616, 152);
+            txbZeilenQuickInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capZeilenQuickInfo
+            // 
+            capZeilenQuickInfo.CausesValidation = false;
+            capZeilenQuickInfo.Location = new Point(8, 200);
+            capZeilenQuickInfo.Name = "capZeilenQuickInfo";
+            capZeilenQuickInfo.Size = new Size(152, 18);
+            capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
+            // 
+            // txbAssetFolder
+            // 
+            txbAssetFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbAssetFolder.Cursor = Cursors.IBeam;
+            txbAssetFolder.Location = new Point(8, 440);
+            txbAssetFolder.Name = "txbAssetFolder";
+            txbAssetFolder.Size = new Size(616, 24);
+            txbAssetFolder.TabIndex = 45;
+            txbAssetFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capSymbolFolder
+            // 
+            capSymbolFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            capSymbolFolder.CausesValidation = false;
+            capSymbolFolder.Location = new Point(8, 376);
+            capSymbolFolder.Name = "capSymbolFolder";
+            capSymbolFolder.Size = new Size(152, 18);
+            capSymbolFolder.Text = "Symbol-Ordner:";
+            // 
+            // txbSymbolFolder
+            // 
+            txbSymbolFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbSymbolFolder.Cursor = Cursors.IBeam;
+            txbSymbolFolder.Location = new Point(8, 392);
+            txbSymbolFolder.Name = "txbSymbolFolder";
+            txbSymbolFolder.Size = new Size(616, 24);
+            txbSymbolFolder.TabIndex = 46;
+            txbSymbolFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // txbStandardFormulaFile
+            // 
+            txbStandardFormulaFile.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbStandardFormulaFile.Cursor = Cursors.IBeam;
+            txbStandardFormulaFile.Location = new Point(8, 488);
+            txbStandardFormulaFile.Name = "txbStandardFormulaFile";
+            txbStandardFormulaFile.Size = new Size(520, 24);
+            txbStandardFormulaFile.TabIndex = 47;
+            txbStandardFormulaFile.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // btnFormularBearbeiten
+            // 
+            btnFormularBearbeiten.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnFormularBearbeiten.ImageCode = "Anwendung|16|||||||||Stift";
+            btnFormularBearbeiten.Location = new Point(536, 488);
+            btnFormularBearbeiten.Name = "btnFormularBearbeiten";
+            btnFormularBearbeiten.Size = new Size(88, 24);
+            btnFormularBearbeiten.TabIndex = 58;
+            btnFormularBearbeiten.Text = "bearbeiten";
+            btnFormularBearbeiten.Click += btnFormularBearbeiten_Click;
             // 
             // btnLoadAll
             // 
@@ -365,17 +439,6 @@ namespace BlueControls.BlueTableDialogs {
             btnSkripte.Text = "Skripte";
             btnSkripte.Click += btnSkripte_Click;
             // 
-            // txbZeilenQuickInfo
-            // 
-            txbZeilenQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            txbZeilenQuickInfo.Cursor = Cursors.IBeam;
-            txbZeilenQuickInfo.Location = new Point(8, 216);
-            txbZeilenQuickInfo.MultiLine = true;
-            txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            txbZeilenQuickInfo.Size = new Size(616, 190);
-            txbZeilenQuickInfo.TabIndex = 43;
-            txbZeilenQuickInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
             // butSystemspaltenErstellen
             // 
             butSystemspaltenErstellen.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
@@ -399,51 +462,23 @@ namespace BlueControls.BlueTableDialogs {
             btnOptimize.Text = "Tabelle optimieren";
             btnOptimize.Click += btnOptimize_Click;
             // 
-            // txbStandardFormulaFile
-            // 
-            txbStandardFormulaFile.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            txbStandardFormulaFile.Cursor = Cursors.IBeam;
-            txbStandardFormulaFile.Location = new Point(8, 486);
-            txbStandardFormulaFile.Name = "txbStandardFormulaFile";
-            txbStandardFormulaFile.Size = new Size(616, 24);
-            txbStandardFormulaFile.TabIndex = 47;
-            txbStandardFormulaFile.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
             // capStandardFormulaFile
             // 
             capStandardFormulaFile.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             capStandardFormulaFile.CausesValidation = false;
-            capStandardFormulaFile.Location = new Point(8, 470);
+            capStandardFormulaFile.Location = new Point(8, 472);
             capStandardFormulaFile.Name = "capStandardFormulaFile";
             capStandardFormulaFile.Size = new Size(152, 18);
             capStandardFormulaFile.Text = "Standard-Formular-Datei:";
-            // 
-            // txbAssetFolder
-            // 
-            txbAssetFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            txbAssetFolder.Cursor = Cursors.IBeam;
-            txbAssetFolder.Location = new Point(8, 438);
-            txbAssetFolder.Name = "txbAssetFolder";
-            txbAssetFolder.Size = new Size(616, 24);
-            txbAssetFolder.TabIndex = 45;
-            txbAssetFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capAdditional
             // 
             capAdditional.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             capAdditional.CausesValidation = false;
-            capAdditional.Location = new Point(8, 422);
+            capAdditional.Location = new Point(8, 424);
             capAdditional.Name = "capAdditional";
             capAdditional.Size = new Size(152, 18);
             capAdditional.Text = "Zugehörige-Dateien-Pfad:";
-            // 
-            // capZeilenQuickInfo
-            // 
-            capZeilenQuickInfo.CausesValidation = false;
-            capZeilenQuickInfo.Location = new Point(8, 200);
-            capZeilenQuickInfo.Name = "capZeilenQuickInfo";
-            capZeilenQuickInfo.Size = new Size(152, 18);
-            capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
             // 
             // btnSpaltenuebersicht
             // 
@@ -458,7 +493,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabRechte
             // 
-            tabRechte.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabRechte.BackColor = Color.FromArgb(255, 255, 255);
             tabRechte.Controls.Add(grpKennwort);
             tabRechte.Controls.Add(grpBenutzergruppen);
             tabRechte.Location = new Point(4, 25);
@@ -470,7 +505,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabSortierung
             // 
-            tabSortierung.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabSortierung.BackColor = Color.FromArgb(255, 255, 255);
             tabSortierung.Controls.Add(rowSortDefinitionEditor);
             tabSortierung.Controls.Add(capCustomSortInfo);
             tabSortierung.Controls.Add(btnCustomSortEnable);
@@ -521,7 +556,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabUniqueValues
             // 
-            tabUniqueValues.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabUniqueValues.BackColor = Color.FromArgb(255, 255, 255);
             tabUniqueValues.Controls.Add(capUniqueInfo);
             tabUniqueValues.Controls.Add(uniqueValueDefinitionEditor);
             tabUniqueValues.Controls.Add(lstUniqueValues);
@@ -562,7 +597,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabVariablen
             // 
-            tabVariablen.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabVariablen.BackColor = Color.FromArgb(255, 255, 255);
             tabVariablen.Controls.Add(variableEditor);
             tabVariablen.Location = new Point(4, 25);
             tabVariablen.Name = "tabVariablen";
@@ -582,7 +617,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabDictionary
             // 
-            tabDictionary.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabDictionary.BackColor = Color.FromArgb(255, 255, 255);
             tabDictionary.Controls.Add(btnExtractWords);
             tabDictionary.Controls.Add(txbDictionary);
             tabDictionary.Controls.Add(capDictionary);
@@ -624,7 +659,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tabUndo
             // 
-            tabUndo.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            tabUndo.BackColor = Color.FromArgb(255, 255, 255);
             tabUndo.Controls.Add(tblUndo);
             tabUndo.Location = new Point(4, 25);
             tabUndo.Name = "tabUndo";
@@ -696,6 +731,8 @@ namespace BlueControls.BlueTableDialogs {
         private TextBoxSuggestions txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private TextBox txbAssetFolder;
+        private Caption capSymbolFolder;
+        private TextBox txbSymbolFolder;
         private Caption capAdditional;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
@@ -721,5 +758,6 @@ namespace BlueControls.BlueTableDialogs {
         private TextBox txbDictionary;
         private Caption capDictionary;
         private Button btnExtractWords;
+        private Button btnFormularBearbeiten;
     }
 }

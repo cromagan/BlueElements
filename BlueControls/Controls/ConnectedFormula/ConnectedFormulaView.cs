@@ -3,7 +3,6 @@
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueControls.Editoren;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.ScriptVariables;
 
@@ -493,13 +492,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     private void btnAufklappen_Click(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
-        if (RowSingleOrNull() is not { } row) { return; }
-
-        row.Edit(typeof(RowEditor), true);
-
-        _generated = false;
-        btnDetach.Visible = Detachable;
-        InvalidateView();
+        ConnectedFormulaViewFloatingForm.ShowFor(this);
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {

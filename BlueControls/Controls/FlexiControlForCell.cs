@@ -353,6 +353,17 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (AutoNext) { NextControl(e.Direction); }
     }
 
+    /// <summary>
+    /// Reicht den Fokus an das werttragende Control der Strategie weiter.
+    /// </summary>
+    protected override void FocusInput() {
+        if (f.Strategy.Control is { CanFocus: true }) {
+            f.Strategy.Focus();
+            return;
+        }
+        base.FocusInput();
+    }
+
     private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();
 
     private void F_VisibleChanged(object? sender, System.EventArgs e) {

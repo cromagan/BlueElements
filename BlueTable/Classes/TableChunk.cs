@@ -235,6 +235,7 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin.SortedDistinctList()));
 
         SaveToByteList(result, TableDataType.AssetFolder, tb.AssetFolder);
+        SaveToByteList(result, TableDataType.SymbolFolder, tb.SymbolFolder);
         SaveToByteList(result, TableDataType.RowQuickInfo, tb.RowQuickInfo);
         SaveToByteList(result, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 

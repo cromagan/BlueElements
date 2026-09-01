@@ -33,6 +33,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     private string _lastCheckedText = string.Empty;
 
+    private DateTime _lastMaxLengthNotification = DateTime.MinValue;
+
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
 
     private int _markEnd = -1;
@@ -542,17 +544,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
                 // Umbruchbreite in Canvas-Koordinaten angeben. Da der Text später mit
-                // Zoom gezeichnet wird, muss die Control-Breite durch Zoom geteilt werden,
+                // Zoom gezeichnet wird, muss die Breite durch Zoom geteilt werden,
                 // damit der Umbruch bei jedem Zoom-Faktor exakt in die sichtbare Breite passt.
                 //
-                // Bewusst auf Basis der vollen Size.Width — nicht der Slider-bereinigten
-                // effectWidth: Bei sehr schmalen TextBoxen flackert der Scrollbalken sonst
-                // (Slider erscheint → Breite schrumpft → Umbruchbreite ≤ 0 → Text fällt auf
-                // eine Zeile zusammen → Slider verschwindet → Breite kehrt zurück → von vorn).
-                // Size.Width ist unabhängig von der Slider-Sichtbarkeit, die Höhenmessung
-                // — und damit die Slider-Entscheidung — bleibt stabil. Text hinter dem
-                // Slider wird über AreaControl (effectWidth) abgeschnitten.
-                _eTxt.TextDimensions = new Size(Math.Max(1, (int)((Size.Width - (Skin.PaddingSmal * 2)) / Zoom)), -1);
+                // Basis ist die Slider-bereinigte effectWidth, damit Zeilen nicht hinter
+                // dem vertikalen Scrollbalken liegen. Math.Max(1, ...) verhindert bei sehr
+                // schmalen TextBoxen das Zusammenfallen auf eine Zeile (Umbruchbreite ≤ 0
+                // bedeutet in ComputeSubLayout "kein Umbruch") und damit das Flackern des
+                // Sliders. Überschießende Einzelzeichen schneidet AreaControl ab.
+                _eTxt.TextDimensions = new Size(Math.Max(1, (int)((effectWidth - (Skin.PaddingSmal * 2)) / Zoom)), -1);
                 _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, controlArea.Height);
                 break;
 
@@ -970,6 +970,10 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
         ];
 
+        foreach (var s in QuickImage.UserSymbols()) {
+            i.Add(ItemOf(s, s, QuickImage.Get(s, 20)));
+        }
+
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
         if (r is not { Count: 1 }) { return; }
 
@@ -1149,6 +1153,11 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new AsciiChar(_eTxt, pos, c), raiseEvent);
 
     private int Insert(int pos, Chars.Char chr, bool raiseEvent) {
+        if (_eTxt.Count >= MaxTextLength) {
+            ShowMaxLengthInfo();
+            return pos;
+        }
+
         if (_eTxt.Insert(pos, chr)) {
             ShiftZones(pos, 1);
             if (raiseEvent)
@@ -1182,8 +1191,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                 if (System.Windows.Forms.Clipboard.GetData(ExtCharFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     var parsedChars = _eTxt.ParseHtmlToChars(sd);
                     foreach (var extChar in parsedChars) {
-                        if (_eTxt.Count < MaxTextLength)
-                            pos = Insert(pos, extChar, false);
+                        pos = Insert(pos, extChar, false);
                     }
                     RaiseEventIfTextChanged(false);
                     return pos;
@@ -1207,7 +1215,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             _markEnd = _eTxt.Count;
             _cursorVisible = false;
         } else {
-            _markStart = -1;
+            _markStart = 0;
             _markEnd = -1;
         }
     }
@@ -1331,6 +1339,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (delta < 0) {
             _zones.RemoveAll(z => z.EndPos < 0 || z.EndPos < z.StartPos);
         }
+    }
+
+    /// <summary>
+    /// Zeigt eine Notify, wenn das Textfeld voll ist und kein Zeichen mehr aufgenommen werden kann.
+    /// </summary>
+    private void ShowMaxLengthInfo() {
+        if ((DateTime.UtcNow - _lastMaxLengthNotification).TotalSeconds < 2) { return; }
+        _lastMaxLengthNotification = DateTime.UtcNow;
+        QuickNote.Show(NoteSymbols.Warning, "Maximal " + MaxTextLength + " Zeichen");
     }
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {

@@ -156,8 +156,10 @@ public static class Animator {
     }
 
     private static void ApplyFrame(IntPtr hwnd, in AnimationFrame frame, bool layered) {
-        // Position — Win32 direkt, am UI-Thread vorbei.
-        SetWindowPos(hwnd, IntPtr.Zero, frame.X, frame.Y, 0, 0, SwpPosFlags);
+        // Position und — wenn im Frame angegeben — auch Größe, Win32 direkt,
+        // am UI-Thread vorbei. Ohne Größenangabe bleibt die Größe unverändert.
+        var flags = frame.Width > 0 && frame.Height > 0 ? SwpPosFlags & ~SwpNoSize : SwpPosFlags;
+        SetWindowPos(hwnd, IntPtr.Zero, frame.X, frame.Y, frame.Width, frame.Height, flags);
 
         // Opacity — nur bei Layered-Windows sinnvoll/anwendbar.
         if (layered) {
@@ -345,9 +347,10 @@ public static class Animator {
 }
 
 /// <summary>
-/// Bild eines Animations-Frame: Opacity (0..1) sowie die Bildschirmkoordinaten
-/// X/Y. Wenn <see cref="Finished" /> true ist, beendet die Engine die Animation
-/// und ruft den optionalen <c>onFinished</c>-Callback auf.
+/// Bild eines Animations-Frames: Opacity (0..1) sowie die Koordinaten X/Y.
+/// Ist Width und Height größer 0, wird zusätzlich die Größe gesetzt, sonst
+/// bleibt sie unverändert. Wenn <see cref="Finished" /> true ist, beendet die
+/// Engine die Animation und ruft den optionalen <c>onFinished</c>-Callback auf.
 /// </summary>
 public readonly struct AnimationFrame {
 
@@ -360,6 +363,10 @@ public readonly struct AnimationFrame {
     public int X { get; init; }
 
     public int Y { get; init; }
+
+    public int Width { get; init; }
+
+    public int Height { get; init; }
 
     #endregion
 }

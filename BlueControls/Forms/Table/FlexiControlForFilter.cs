@@ -212,6 +212,17 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => NextControl(e.Direction);
 
+    /// <summary>
+    /// Reicht den Fokus an das werttragende Control der Strategie weiter.
+    /// </summary>
+    protected override void FocusInput() {
+        if (f is not null && f.Strategy.Control is { CanFocus: true }) {
+            f.Strategy.Focus();
+            return;
+        }
+        base.FocusInput();
+    }
+
     private void F_ValueChanged(object sender, System.EventArgs e) {
         if (IsDisposed || f is null) { return; }
 

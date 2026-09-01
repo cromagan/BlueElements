@@ -32,5 +32,11 @@ public enum GroupBoxStyle {
     /// <summary>
     /// Rahmen im Stil eines geöffneten Dropdown-Menüs (Form_SelectBox_Dropdown).
     /// </summary>
-    DropdownMenu = 6
+    DropdownMenu = 6,
+
+    /// <summary>
+    /// Wie NormalBold, aber die dicke Kopfzeile sitzt unten
+    /// (z. B. als sichtbarer Tab eines eingefahrenen SlideOutPanels).
+    /// </summary>
+    NormalBoldBottom = 7
 }

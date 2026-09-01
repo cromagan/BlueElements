@@ -72,7 +72,7 @@ public class CommandButtonControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Schaltfläche);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Schaltfläche);
 
     public override void UnsubscribeEvents() {
         _control?.Click -= CommandButton_Click;

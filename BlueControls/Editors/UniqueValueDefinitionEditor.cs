@@ -36,7 +36,8 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotif
     /// Die Tabelle, deren Unique-Value-Regeln bearbeitet werden. Unabhängig vom
     /// selektierten Element — wird vom Host gesetzt.
     /// </summary>
-    public Table? Table { get; set; }
+    [DefaultValue(null)]
+    public Table? Table { get; set; } = null;
 
     #endregion
 

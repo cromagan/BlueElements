@@ -277,6 +277,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         txbCaption.Text = tb.Caption;
         txbAssetFolder.Text = tb.AssetFolder;
+        txbSymbolFolder.Text = tb.SymbolFolder;
         txbStandardFormulaFile.Text = tb.StandardFormulaFile;
         txbZeilenQuickInfo.Text = tb.RowQuickInfo.Replace("<br>", "\r");
         txbZeilenQuickInfo.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
@@ -388,6 +389,22 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         txbDictionary.Text = string.Join('\r', ExtractWordsFromTable(tb));
+    }
+
+    private void btnFormularBearbeiten_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (string.IsNullOrWhiteSpace(txbStandardFormulaFile.Text)) {
+            var newFormulaFile = IO.TempFile(tb.AssetFolderWhole(), tb.KeyName, "cfo");
+            IO.WriteAllText(newFormulaFile, string.Empty, Win1252, false);
+            txbStandardFormulaFile.Text = newFormulaFile;
+        }
+
+        using var x = new ConnectedFormulaEditor(txbStandardFormulaFile.Text, null);
+
+        if (x.IsClosed || x.IsDisposed) { return; }
+
+        x.ShowDialog();
     }
 
     private void btnLoadAll_Click(object sender, System.EventArgs e) {
@@ -517,6 +534,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         //    Table.GlobalScale = Math.Max(0.5f, Table.GlobalScale);
         //}
         Table.AssetFolder = txbAssetFolder.Text;
+        Table.SymbolFolder = txbSymbolFolder.Text;
         Table.StandardFormulaFile = txbStandardFormulaFile.Text;
         Table.RowQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 

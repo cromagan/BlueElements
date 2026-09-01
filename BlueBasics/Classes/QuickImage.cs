@@ -16,6 +16,14 @@ public sealed class QuickImage : IReadableText, IEditable {
     private static readonly object _picsLock = new object();
 
     private static readonly ConcurrentCache<string, QuickImage> Pics = new(StringComparer.OrdinalIgnoreCase, 1000);
+
+    /// <summary>
+    /// Zusätzliche Ordner, die Generate() nach Symbol-Dateien (Name.PNG) durchsucht. Z. B. Symbol-Pfade von Tabellen.
+    /// </summary>
+    private static readonly List<string> SearchPaths = [];
+
+    private static readonly object _searchPathsLock = new object();
+
     private readonly Bitmap _bitmap;
 
     #endregion
@@ -103,6 +111,29 @@ public sealed class QuickImage : IReadableText, IEditable {
     #region Methods
 
     public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && Pics.ContainsKey(imageCode);
+
+    /// <summary>
+    /// Registriert einen Ordner, den Generate() zusätzlich nach Symbol-Dateien (Name.PNG) durchsucht.
+    /// </summary>
+    public static void RegisterSearchPath(string path) {
+        if (string.IsNullOrWhiteSpace(path)) { return; }
+        var p = path.NormalizePath();
+        if (!p.IsValidFilePath()) { return; }
+        lock (_searchPathsLock) {
+            if (!SearchPaths.Contains(p)) { SearchPaths.Add(p); }
+        }
+    }
+
+    /// <summary>
+    /// Liefert die Namen aller PNG-Symboldateien aus den registrierten Suchpfaden (ohne Dateiendung).
+    /// </summary>
+    public static List<string> UserSymbols() {
+        lock (_searchPathsLock) {
+            return SearchPaths.SelectMany(p => IO.GetFiles(p, "*.png", System.IO.SearchOption.TopDirectoryOnly))
+                .Select(f => f.FileNameWithoutSuffix())
+                .SortedDistinctList();
+        }
+    }
 
     public static ImageCode FileTypeImage(FileFormat file) {
         switch (file) {
@@ -317,10 +348,28 @@ public sealed class QuickImage : IReadableText, IEditable {
             if (Pics.TryGetValue(Name, out var p) && p != this) {
                 if (p.IsError) { return (p._bitmap, true); }
                 bmpOri = p._bitmap;
-            } else if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
-                if (IO.FileExists(fullname)) {
-                    if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+            } else {
+                var dateiName = Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
+
+                if (!string.IsNullOrWhiteSpace(CachePfad)) {
+                    var fullname = CachePfad.NormalizePath() + dateiName;
+                    if (IO.FileExists(fullname)) {
+                        if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+                    }
+                }
+
+                if (bmpOri is null) {
+                    lock (_searchPathsLock) {
+                        foreach (var pfad in SearchPaths) {
+                            var fullname = pfad + dateiName;
+                            if (IO.FileExists(fullname)) {
+                                if (Image_FromFile(fullname) is Bitmap bmpZusatz) {
+                                    bmpOri = bmpZusatz;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -29,7 +29,7 @@ public class CaptionControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Groupbox);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Groupbox);
 
     public override void UnsubscribeEvents() => _control?.LostFocus -= Control_LostFocus;
 

@@ -1740,6 +1740,30 @@
       "Font": "{Name=Calibri, Size=10.15, Bold=true, Color=#9d9d9d}"
     }
   },
+  "GroupBox_BoldBottom": {
+    "Standard": {
+      "Contour": "Rectangle",
+      "X1": 9,
+      "Y1": 8,
+      "X2": 9,
+      "Y2": -10,
+      "Background": "None",
+      "Border": "Solid21Px",
+      "BOC1": "22C55E",
+      "Font": "{Name=Calibri, Size=10.15, Bold=true, Color=#ffffff, BackColor=#006cbe}"
+    },
+    "Standard_Disabled": {
+      "Contour": "Rectangle",
+      "X1": 9,
+      "Y1": 8,
+      "X2": 9,
+      "Y2": -10,
+      "Background": "None",
+      "Border": "Solid21Px",
+      "BOC1": "4A4A4A",
+      "Font": "{Name=Calibri, Size=10.15, Bold=true, Color=#9d9d9d}"
+    }
+  },
   "GroupBox_RoundRect": {
     "Standard": {
       "Contour": "RoundedRect",

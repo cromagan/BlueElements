@@ -128,6 +128,17 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => NextControl(e.Direction);
 
+    /// <summary>
+    /// Reicht den Fokus an das werttragende Control der Strategie weiter.
+    /// </summary>
+    protected override void FocusInput() {
+        if (f.Strategy.Control is { CanFocus: true }) {
+            f.Strategy.Focus();
+            return;
+        }
+        base.FocusInput();
+    }
+
     private void F_ValueChanged(object sender, System.EventArgs e) {
         var fh = FilterHash();
         var row = FilterInput?.Rows.GetByKey(f.Value);

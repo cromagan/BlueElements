@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Text.RegularExpressions;
+
 namespace BlueBasics.Interfaces;
 
 public interface IInputFormat : IHasQuickInfo {
@@ -66,8 +68,13 @@ public static class InputFormatExtensions {
     /// lesbare Begründung.
     /// </summary>
     public static string IsFormat(this string txt, IInputFormat formatToCheck, bool splitallowed) {
-        if (txt is { Length: > 0 } && splitallowed && formatToCheck.MultiLine && txt.Contains('\r')) {
-            return txt.SplitByCr().ToList().IsFormat(formatToCheck);
+        if (txt is { Length: > 0 } && splitallowed && formatToCheck.MultiLine) {
+            if (txt.Contains("<br>", StringComparison.OrdinalIgnoreCase)) {
+                txt = txt.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+            }
+            if (txt.Contains('\r')) {
+                return txt.SplitByCr().ToList().IsFormat(formatToCheck);
+            }
         }
 
         if ((txt?.Length ?? 0) < formatToCheck.MinTextLength) {

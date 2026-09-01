@@ -30,7 +30,7 @@ public class NoneControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() { }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreuz);
 
     public override void UnsubscribeEvents() { }
 

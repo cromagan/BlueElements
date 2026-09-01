@@ -148,7 +148,7 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.LostFocus += Control_LostFocus;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Textfeld);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBox;

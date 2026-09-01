@@ -20,7 +20,7 @@ public class TextControlStrategy : ControlStrategy {
 
     public static string ClassId => "Text";
 
-    public override string Description => "Zeigt den Wert als hervorgehobenen, nicht editierbaren Text.";
+    public override string Description => "Zeigt den Wert als nicht editierbaren Text.";
 
     /// <summary>
     /// Bildcode des Symbols vor dem Text.
@@ -78,10 +78,9 @@ public class TextControlStrategy : ControlStrategy {
     }
 
     protected override void SetValueToControlInternal(string value) {
-        var text = string.IsNullOrEmpty(value) ? string.Empty : $"<b><i>{value}</b>";
         var image = string.IsNullOrEmpty(ImageCode) ? string.Empty : $"<imagecode={ImageCode}>";
 
-        _control?.Text = $"{image}{text} {Suffix}";
+        _control?.Text = $"{image}{value} {Suffix}";
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();

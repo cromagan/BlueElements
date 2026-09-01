@@ -77,16 +77,19 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     #region Properties
 
+    [DefaultValue(AdditionalCheck.None)]
     public AdditionalCheck AdditionalFormatCheck {
         get => _textBox.AdditionalFormatCheck;
         set => _textBox.AdditionalFormatCheck = value;
     }
 
+    [DefaultValue("")]
     public string AllowedChars {
         get => _textBox.AllowedChars;
         set => _textBox.AllowedChars = value;
     }
 
+    [DefaultValue(true)]
     public bool ContextMenuDefault {
         get => _textBox.ContextMenuDefault;
         set => _textBox.ContextMenuDefault = value;
@@ -98,51 +101,61 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.CustomContextMenuItems = value;
     }
 
+    [DefaultValue(null)]
     public IReadOnlySet<string>? CustomVocabulary {
         get => _textBox.CustomVocabulary;
         set => _textBox.CustomVocabulary = value;
     }
 
+    [DefaultValue("")]
     public string ForbiddenChars {
         get => _textBox.ForbiddenChars;
         set => _textBox.ForbiddenChars = value;
     }
 
+    [DefaultValue(4000)]
     public int MaxTextLength {
         get => _textBox.MaxTextLength;
         set => _textBox.MaxTextLength = value;
     }
 
+    [DefaultValue(0)]
     public int MinTextLength {
         get => _textBox.MinTextLength;
         set => _textBox.MinTextLength = value;
     }
 
+    [DefaultValue(false)]
     public bool MultiLine {
         get => _textBox.MultiLine;
         set => _textBox.MultiLine = value;
     }
 
+    [Category("Darstellung"), DefaultValue("")]
     public override string QuickInfo {
         get => _textBox.QuickInfo;
         set => _textBox.QuickInfo = value;
     }
 
+    [DefaultValue(0)]
     public int RaiseChangeDelay {
         get => _textBox.RaiseChangeDelay;
         set => _textBox.RaiseChangeDelay = value;
     }
 
+    [DefaultValue("")]
     public string RegexCheck {
         get => _textBox.RegexCheck;
         set => _textBox.RegexCheck = value;
     }
 
+    [DefaultValue(false)]
     public bool SpellCheckingEnabled {
         get => _textBox.SpellCheckingEnabled;
         set => _textBox.SpellCheckingEnabled = value;
     }
 
+    [DefaultValue("")]
     public string Suffix {
         get => _textBox.Suffix;
         set => _textBox.Suffix = value;
@@ -212,6 +225,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
     } = Size.Empty;
 
+    [DefaultValue(false)]
     public bool TextFormatingAllowed {
         get => _textBox.TextFormatingAllowed;
         set => _textBox.TextFormatingAllowed = value;
@@ -223,6 +237,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.Verhalten = value;
     }
 
+    [DefaultValue(1f)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
