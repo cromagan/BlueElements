@@ -87,7 +87,10 @@ public class InvalidatedRowsManager {
     public bool AddInvalidatedRow(RowItem? rowItem) {
         if (rowItem?.Table is not { IsDisposed: false } tb) { return false; }
 
-        // Ansosten ist Endloschleife mit Monitor
+        // Ohne Skript gibt es nichts zu berechnen
+        if (!tb.HasValueChangedScript) { return false; }
+
+        // Ansosten ist Endloschleife mit Monitor; lehnt auch defekte/mehrere Skripte ab
         if (!tb.CanDoValueChangedScript(false)) { return false; }
 
         //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
@@ -130,6 +133,7 @@ public class InvalidatedRowsManager {
             var entriesBeforeProcessing = 0;
             var lastDelegateCall = DateTime.MinValue;
             var processingStart = Stopwatch.StartNew();
+            var deferredKeys = new HashSet<string>();
 
             // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
             do {
@@ -149,8 +153,8 @@ public class InvalidatedRowsManager {
                     lastDelegateCall = currentTime;
                 }
 
-                // Sammle alle aktuellen Schlüssel
-                var keysToProcess = _invalidatedRows.Keys.ToList();
+                // Sammle alle aktuellen Schlüssel; übersprungene erst beim nächsten Aufruf erneut versuchen
+                var keysToProcess = _invalidatedRows.Keys.Where(k => !deferredKeys.Contains(k)).ToList();
                 if (keysToProcess.Count == 0) {
                     if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
                         Develop.Message(ErrorType.DevelopInfo, mr, mrtb.Caption, ImageCode.Zeile, $"Alle Einträge abgearbeitet", 0);
@@ -181,10 +185,16 @@ public class InvalidatedRowsManager {
 
                     // Versuche, die Zeile zu entfernen und zu verarbeiten
                     if (_invalidatedRows.TryRemove(key, out var row) && row is not null) {
-                        // Verarbeite die Zeile
-                        ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
-                        totalProcessedCount++;
-                        OnRowChecked(new RowEventArgs(row));
+                        if (ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1)) {
+                            // Job verbraucht (verarbeitet oder gegenstandslos)
+                            totalProcessedCount++;
+                            OnRowChecked(new RowEventArgs(row));
+                        } else {
+                            // Noch nicht bearbeitbar (z.B. Initialisierung nötig): zurück in die
+                            // Warteschlange, dieser Durchlauf versucht es nicht erneut
+                            _ = _invalidatedRows.TryAdd(key, row);
+                            deferredKeys.Add(key);
+                        }
                     }
                     // KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
                     // Andere Threads können das Item bereits verarbeitet haben
@@ -224,21 +234,22 @@ public class InvalidatedRowsManager {
     /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
     /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
     /// <param name="currentIndex">Aktueller Index für Statusmeldungen</param>
-    private void ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
-        if (row.Table is not { IsDisposed: false } tb) { return; }
+    /// <returns>True wenn der Job verbraucht ist (verarbeitet oder gegenstandslos), false für Wiedervorlage.</returns>
+    private bool ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
+        if (row.Table is not { IsDisposed: false } tb) { return true; }
 
         if (!extendedAllowed && row.NeedsRowInitialization()) {
             if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
                 Develop.Message(ErrorType.Info, mr, mrtb.Caption, ImageCode.Zeile, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} abbruch, benötigt Initialisierung", 0);
             }
-            return;
+            return false;
         }
 
         if (!row.NeedsRowUpdate()) {
             if (masterRow is { IsDisposed: false } mr2 && mr2.Table is { IsDisposed: false } mrtb2 && mrtb2.DropMessages) {
                 Develop.Message(ErrorType.Info, mr2, mrtb2.Caption, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} bereits aktuell", 0);
             }
-            return;
+            return true;
         }
 
         if (masterRow is { IsDisposed: false } mr3 && mr3.Table is { IsDisposed: false } mrtb3 && mrtb3.DropMessages) {
@@ -246,6 +257,7 @@ public class InvalidatedRowsManager {
         }
 
         DoUpdateRow?.Invoke(masterRow, row, extendedAllowed);
+        return true;
     }
 
     #endregion

@@ -1508,6 +1508,26 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => _rowsVisibleUnique;
 
+    /// <summary>
+    /// Liefert das Bildschirm-Rechteck der Zelle, wenn Spalte und Zeile aktuell angezeigt werden, sonst null.
+    /// </summary>
+    public Rectangle? CellScreenRectangle(ColumnItem column, RowItem row) {
+        Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+        if (!Visible || IsDisposed || Table is not { IsDisposed: false } tb || row.Table != tb || column.Table != tb) { return null; }
+        if (CurrentArrangement is not { IsDisposed: false } ca) { return null; }
+
+        var vi = ca[column];
+        if (vi is not { IsDisposed: false }) { return null; }
+
+        if (GetRow(row, null) is not { Visible: true } rli) { return null; }
+
+        var rowPos = rli.ControlPosition(Zoom, OffsetX, OffsetY);
+        var cell = new Rectangle(vi.ControlColumnLeft(OffsetX), rowPos.Y, vi.ControlColumnWidth(), rowPos.Height);
+        if (!cell.IntersectsWith(ClientRectangle)) { return null; }
+
+        return RectangleToScreen(cell);
+    }
+
     public void SetView(JsonObject? view) {
         ResetView();
 

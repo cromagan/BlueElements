@@ -415,7 +415,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tb.HasValueChangedScript) {
             InvalidateCheckData();
             RowCollection.WaitDelay = 0;
-            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
         }
 
         // Frisch erstellte, bereits invalidierte Zeile nicht erneut stempeln
@@ -443,6 +442,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, UserName); }
             CellSetInMemory(srs, newState);
             CellSetInMemory(scd, datetimeutc.ToString5());
+        }
+
+        // Erst stempeln, dann einreihen — der Manager prüft den Status über NeedsRowUpdate()
+        if (tb.HasValueChangedScript) {
+            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
         }
 
         if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }

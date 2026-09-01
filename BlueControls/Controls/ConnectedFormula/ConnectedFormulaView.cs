@@ -16,10 +16,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     [ThreadStatic]
     private static int _createControlDepth;
 
+    private readonly System.Threading.Timer? _updater;
     private bool _generated;
     private bool _generating;
     private RowItem? _lastRow;
-    private readonly System.Threading.Timer? _updater;
 
     #endregion
 
@@ -56,6 +56,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public string FieldName => "Field_EntryRow";
 
+    [DefaultValue("")]
     public string FilenameForEditor {
         get;
         set {
@@ -434,23 +435,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     protected override void TableInput_ScriptChanged(object? sender, System.EventArgs e) => HandleTableStateChanged();
 
-    private void HandleTableStateChanged() {
-        if (Disposing || IsDisposed) { return; }
-
-        if (InvokeRequired) {
-            try {
-                Invoke(new Action(HandleTableStateChanged));
-                return;
-            } catch {
-                Develop.AbortAppIfStackOverflow();
-                HandleTableStateChanged();
-                return;
-            }
-        }
-
-        Invalidate_RowsInput();
-    }
-
     private static void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }
 
@@ -522,6 +506,23 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }
         Invalidate_FilterInput();
+    }
+
+    private void HandleTableStateChanged() {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                Invoke(new Action(HandleTableStateChanged));
+                return;
+            } catch {
+                Develop.AbortAppIfStackOverflow();
+                HandleTableStateChanged();
+                return;
+            }
+        }
+
+        Invalidate_RowsInput();
     }
 
     private void InvalidateAllChilds() {

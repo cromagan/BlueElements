@@ -232,12 +232,10 @@ IInputFormat um eine `TextCase`-Eigenschaft ergänzen (None/Upper/Lower/Title), 
 Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiControl`) müssen dies bei der Eingabe und beim `AfterEdit` berücksichtigen.
 
 ## Aufgabe
-Füge eine neue Berechtigungsgruppe hinzu: #CLI
-Diese soll immer und überall vorgeschlagen werden.
-Dann starte die CLI-Commands mit der Benutzergruppe #CLI
+Schau, wo DisableAllEditing du noch benutzen kannst.
 
 ## Aufgabe
-Schau, wo DisableAllEditing du noch benutzen kannst.
+übreprüfe, ob der FormManager Application.OpenForms benutzen kann.
 
 
 
