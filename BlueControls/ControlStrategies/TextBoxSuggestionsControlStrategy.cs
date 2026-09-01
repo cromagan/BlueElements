@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
@@ -80,10 +81,11 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     /// bleibt unverändert.
     /// </summary>
     public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        if (_control is not { } c) { return bounds; }
-        var width = Math.Max(bounds.Width, c.GetEstimatedWidth());
-        c.TextboxSize = new Size(width, bounds.Height);
-        return new Rectangle(bounds.Location, new Size(width, c.GetEstimatedHeight(width, bounds.Height)));
+        var required = base.CalculateRequiredBounds(bounds);
+        if (_control is not { } c) { return required; }
+        var width = Math.Max(required.Width, c.GetEstimatedWidth());
+        c.TextboxSize = new Size(width, required.Height);
+        return new Rectangle(required.Location, new Size(width, c.GetEstimatedHeight(width, required.Height)));
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl)
@@ -96,6 +98,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_TextBoxSuggestions;
+        _control?.NavigateToNext += Control_NavigateToNext;
         _control?.EnterKey += Control_EnterKey;
         _control?.EscKey += Control_EscKey;
         _control?.TabKey += Control_TabKey;
@@ -106,6 +109,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_TextBoxSuggestions;
+        _control?.NavigateToNext -= Control_NavigateToNext;
         _control?.EnterKey -= Control_EnterKey;
         _control?.EscKey -= Control_EscKey;
         _control?.TabKey -= Control_TabKey;
@@ -159,6 +163,8 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     private void Control_EscKey(object? sender, System.EventArgs e) => OnEscKey();
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    private void Control_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => OnNavigateToNext(e.Direction);
 
     private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 

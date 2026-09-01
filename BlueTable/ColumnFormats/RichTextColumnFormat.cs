@@ -14,7 +14,7 @@ public class RichTextColumnFormat : ColumnFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ControlStrategy = "Texbox";
+        ControlStrategy = "Textbox";
         ControlStrategyParameter.Set("spellcheckingenabled", true);
         ControlStrategyParameter.Set("textformatingallowed", true);
         EditableWithTextInput = true;

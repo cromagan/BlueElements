@@ -15,7 +15,7 @@ public class TextMultilineColumnFormat : ColumnFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ControlStrategy = "Texbox";
+        ControlStrategy = "Textbox";
         ControlStrategyParameter.Set("spellcheckingenabled", true);
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

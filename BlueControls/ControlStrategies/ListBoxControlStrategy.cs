@@ -146,7 +146,7 @@ public class ListBoxControlStrategy : ControlStrategy {
     }
 
     protected override void CreateControlCore() {
-        _control = new ListBox() { CheckBehavior = CheckBehavior.MultiSelection };
+        _control = new ListBox();
         _control.ItemClear();
     }
 

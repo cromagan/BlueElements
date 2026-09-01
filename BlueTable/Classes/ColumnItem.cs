@@ -470,7 +470,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// ClassId der Bearbeitungs-Strategie der Spalte (z. B. "Texbox" oder "Combobox").
+    /// ClassId der Bearbeitungs-Strategie der Spalte (z. B. "Textbox" oder "Combobox").
     /// </summary>
     public string ControlStrategy {
         get => _controlStrategy;
@@ -1487,7 +1487,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _isKeyColumn = json.GetBool("iskeycolumn", _isKeyColumn);
         _relationship_to_First = json.GetBool("relationship_to_first", _relationship_to_First);
         _ignoreAtRowFilter = json.GetBool("ignoreatrowfilter", _ignoreAtRowFilter);
-        _controlStrategy = json.GetString("controlstrategy", "Texbox");
+        _controlStrategy = json.GetString("controlstrategy", "Textbox");
         _controlStrategyParameter = json.GetJson("controlstrategyparameter") is JsonObject jo ? (JsonObject)jo.DeepClone() : new JsonObject();
         SpellCheckingEnabled = _controlStrategyParameter.GetBool("spellcheckingenabled");
         TextFormatingAllowed = _controlStrategyParameter.GetBool("textformatingallowed");
@@ -2618,7 +2618,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         var hasItems = _dropDownItems.Count > 0 || _showValuesOfOtherCellsInDropdown;
 
         if (!_legacyDropdown) {
-            _controlStrategy = hasItems ? "TextBoxSuggestions" : "Texbox";
+            _controlStrategy = hasItems ? "TextBoxSuggestions" : "Textbox";
             return;
         }
 

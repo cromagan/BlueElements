@@ -129,7 +129,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
             field = value;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
-    }
+    } = CheckBehavior.MultiSelection;
 
     /// <summary>
     /// Das anzuzeigende Control der Strategie. Bei Rahmen-Stil ungleich

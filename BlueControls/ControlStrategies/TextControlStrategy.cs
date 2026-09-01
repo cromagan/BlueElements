@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
@@ -51,8 +49,6 @@ public class TextControlStrategy : ControlStrategy {
     public override List<GenericControl> GetProperties(int widthOfControl)
         => [.. base.GetProperties(widthOfControl),
             new FlexiControlForProperty<string>(() => ImageCode, "Bildcode")];
-
-    public override Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public override string ReadableText() => "Reine Textanzeige";
 

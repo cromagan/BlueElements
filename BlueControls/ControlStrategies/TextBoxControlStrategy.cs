@@ -28,7 +28,7 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     #region Properties
 
-    public static string ClassId => "Texbox";
+    public static string ClassId => "Textbox";
 
     public override string Description => "Einfaches Textfeld zur freien Eingabe von Text.";
     public override string KeyName => ClassId;
@@ -167,6 +167,7 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.Suffix = Suffix;
         _control?.SpellCheckingEnabled = SpellCheckingEnabled;
         _control?.TextFormatingAllowed = TextFormatingAllowed;
+        _control?.MultiLine = MultiLine;
         _control?.Verhalten = ParentHeight > 20.CanvasToControl(Zoom)
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;

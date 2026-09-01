@@ -409,7 +409,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // Die Status-Spalte selbst löst keine eigene Invalidierung aus
         if (sourceColumn == srs) { return; }
 
-        // Nur Änderungen in Skriptspalten erfordern eine Neuberechnung der Zeile
+        // Nur Änderungen in gespeicherten Skriptspalten erfordern eine Neuberechnung der Zeile:
+        // Spalten ohne Skript können keine anderen Spalten beeinflussen, weil sie nicht im Skript vorkommen.
+        // Nicht gespeicherte Spalten dürfen das Skript ebenfalls nicht beeinflussen, weil sie
+        // benutzerdefiniert immer anders sein können — das wäre inkonsistent.
         if (sourceColumn is { SaveContent: false } or { ScriptType: ScriptType.Nicht_vorhanden }) { return; }
 
         if (tb.HasValueChangedScript) {
@@ -807,9 +810,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})", 0); }
 
             if (extendedAllowed) {
+                // Immer entfernen, um endlos Berechungen zu verhindern
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
             }
-
             var ok = tb.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, this, null, true, mustBeExtended, 2);
 
             if (ok.Failed) { return ok; }

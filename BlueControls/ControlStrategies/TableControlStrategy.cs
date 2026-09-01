@@ -154,7 +154,13 @@ public class TableControlStrategy : ControlStrategy {
         }
     }
 
+    /// <summary>
+    /// Idempotent: laufende Abos werden zuerst abgemeldet, damit das erneute
+    /// Abonnieren nach einem BuildTable innerhalb des Value-Setters keine
+    /// Doppel-Subskription erzeugt.
+    /// </summary>
     public override void SubscribeEvents() {
+        UnsubscribeEvents();
         if (_table is { IsDisposed: false } tb) {
             tb.CellValueChanged += Table_ContentChanged;
             tb.Row.RowAdded += Table_ContentChanged;
@@ -377,11 +383,7 @@ public class TableControlStrategy : ControlStrategy {
         _lastColumns = [.. Columns];
         _lastAutoSort = AutoSort;
 
-        if (_table is { IsDisposed: false } newTb) {
-            newTb.CellValueChanged += Table_ContentChanged;
-            newTb.Row.RowAdded += Table_ContentChanged;
-            newTb.Row.RowRemoved += Table_ContentChanged;
-        }
+        SubscribeEvents();
     }
 
     private void Control_LostFocus(object? sender, System.EventArgs e) {

@@ -16,9 +16,11 @@ public class SwapListBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "SwapListBox";
 
-    public override string Description => "Zeigt eine Liste mit ankreuzbaren Einträgen; mehrere Werte sind gleichzeitig wählbar.";
+    public override string Description => "Zeigt zwei Listen: Gewählte Einträge und Vorschläge; ein Klick verschiebt den Eintrag in die jeweils andere Liste.";
 
     public override string KeyName => ClassId;
+
+    public override bool SupportsSuggestions => true;
 
     protected override System.Windows.Forms.Control? ControlCore => _control;
 

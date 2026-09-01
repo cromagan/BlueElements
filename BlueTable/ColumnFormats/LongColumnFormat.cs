@@ -14,7 +14,7 @@ public class LongColumnFormat : ColumnFormat {
         DoOpticalTranslation = TranslationType.Zahl;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.Numeral;
-        ControlStrategy = "Texbox";
+        ControlStrategy = "Textbox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;

@@ -237,6 +237,9 @@ Schau, wo DisableAllEditing du noch benutzen kannst.
 ## Aufgabe
 übreprüfe, ob der FormManager Application.OpenForms benutzen kann.
 
+## Aufgabe
+TableControlStrategy, SysRowSortIndex bei AutoSort = True NICHT anzeigen. Aktuell wird es immer eingebelndet
+
 
 
 

@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+
 namespace BlueControls.ControlStrategies;
 
 /// <summary>
@@ -29,6 +31,11 @@ public class DragDropControlStrategy : ControlStrategy {
     protected override void CreateControlCore() { }
 
     protected override void ForceWriteBackValue() { }
+
+    /// <summary>
+    /// Keine konfigurierbaren Optionen — auch der wirkungslose Rahmen wird ausgeschlossen.
+    /// </summary>
+    public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
     public override string ReadableText() => "Automatisch durch Verschieben";
 

@@ -14,7 +14,7 @@ public class DateTimeColumnFormat : ColumnFormat {
         DoOpticalTranslation = TranslationType.Datum;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ControlStrategy = "Texbox";
+        ControlStrategy = "Textbox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;

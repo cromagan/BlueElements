@@ -10,7 +10,6 @@ public class ComboBoxControlStrategy : ControlStrategy {
     #region Fields
 
     private ComboBox? _control;
-    private EventHandler<NavigationDirectionEventArgs>? _navigateHandler;
 
     #endregion
 
@@ -35,10 +34,12 @@ public class ComboBoxControlStrategy : ControlStrategy {
     /// beim Edit nicht vom Knopf überdeckt wird. Einzeilig bleibt die
     /// Combobox auf Zeilenhöhe.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) =>
-        new(bounds.Location,
-            new Size(bounds.Width + (_control?.btnDropDown.Width ?? 0),
-                MultiLine ? bounds.Height : Math.Min(bounds.Height, SingleLineHeight.CanvasToControl(Zoom))));
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        var required = base.CalculateRequiredBounds(bounds);
+        return new Rectangle(required.Location,
+            new Size(required.Width + (_control?.btnDropDown.Width ?? 0),
+                MultiLine ? required.Height : Math.Min(required.Height, SingleLineHeight.CanvasToControl(Zoom))));
+    }
 
     public override void HandleCaptionClick() {
         _control?.Focus();
@@ -49,8 +50,7 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_ComboBox;
-        _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
-        _control?.NavigateToNext += _navigateHandler;
+        _control?.NavigateToNext += Control_NavigateToNext;
         _control?.ItemRemoved += ComboBox_ItemRemoved;
         _control?.DropDownShowing += ComboBox_DropDownShowing;
         _control?.EnterKey += Control_EnterKey;
@@ -63,7 +63,7 @@ public class ComboBoxControlStrategy : ControlStrategy {
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_ComboBox;
-        if (_navigateHandler is not null && _control is not null) { _control.NavigateToNext -= _navigateHandler; }
+        _control?.NavigateToNext -= Control_NavigateToNext;
         _control?.ItemRemoved -= ComboBox_ItemRemoved;
         _control?.DropDownShowing -= ComboBox_DropDownShowing;
         _control?.EnterKey -= Control_EnterKey;
@@ -107,6 +107,8 @@ public class ComboBoxControlStrategy : ControlStrategy {
     private void Control_EscKey(object? sender, System.EventArgs e) => OnEscKey();
 
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
+
+    private void Control_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => OnNavigateToNext(e.Direction);
 
     private void Control_TabKey(object? sender, System.EventArgs e) => OnTabKey();
 
