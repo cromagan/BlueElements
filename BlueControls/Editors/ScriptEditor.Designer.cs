@@ -186,6 +186,7 @@ namespace BlueControls.BlueTableDialogs {
             grpVariablen.Dock = DockStyle.Fill;
             grpVariablen.GroupBoxStyle = GroupBoxStyle.NormalBold;
             grpVariablen.Location = new Point(0, 0);
+            grpVariablen.Mode = EditorMode.OnlyShow;
             grpVariablen.Name = "grpVariablen";
             grpVariablen.Size = new Size(360, 212);
             grpVariablen.TabIndex = 3;

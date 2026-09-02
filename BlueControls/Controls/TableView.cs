@@ -1885,6 +1885,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }
             strategy.TextInputAllowed = styleSource?.EditableWithTextInput ?? false;
+            strategy.AutoSort = styleSource?.AfterEditQuickSortRemoveDouble ?? false;
 
             if (displayFont is not null
                 && Skin.GetBlueFont(Design.TextBox, States.Standard) is { } editorFont
@@ -4858,6 +4859,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (tb.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false }) { return "Erste Spalte nicht sichtbar"; }
+
+        if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null, true)) {
+            return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
+        }
 
         string? chunkValue = null;
 
