@@ -321,6 +321,14 @@ public class TableControlStrategy : ControlStrategy {
 
     private void BuildTable() {
         if (_table is { IsDisposed: false } oldTb) {
+            // Tabelle vor dem Verwerfen von der Ansicht abmelden: Hält die
+            // TableView noch die alte Tabelle, disposen sich deren
+            // FilterCollections beim Disposed-Event selbst und könnten danach
+            // nie wieder eine neue Tabelle annehmen (leere Ansicht bis zum
+            // Neustart).
+            if (_control is { IsDisposed: false } tv && tv.Table == oldTb) {
+                tv.Table = null;
+            }
             oldTb.CellValueChanged -= Table_ContentChanged;
             oldTb.Row.RowAdded -= Table_ContentChanged;
             oldTb.Row.RowRemoved -= Table_ContentChanged;
