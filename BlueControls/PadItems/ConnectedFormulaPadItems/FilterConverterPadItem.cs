@@ -22,7 +22,7 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
 
     #region Properties
 
-    public static string ClassId => "FI-FilterConverterElementReciverSenderControlPadItem";
+    public static string ClassId => "FI-FilterConverterElement";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
