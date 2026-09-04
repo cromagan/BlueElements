@@ -46,7 +46,7 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
             if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true); }
 
             var rows = fc.Rows;
-            if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' liefert mehrere Ergebnisse.", false); }
+            if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' der Tabelle '{linkedTable.Caption}' liefert mehrere Ergebnisse.", false); }
 
             var v = RowItem.CellToVariable(targetColumn, null, true, false);
 
