@@ -65,6 +65,7 @@ public partial class GlobalMonitor : Form {
 
         tblLog.Table = tb;
         tblLog.Arrangement = string.Empty;
+        tblLog.ColumnMoveAllowed = false;
         tblLog.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 

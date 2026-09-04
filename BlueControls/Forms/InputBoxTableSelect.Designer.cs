@@ -36,6 +36,7 @@ namespace BlueControls.Forms {
             // _tableView
             // 
             _tableView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            _tableView.ColumnMoveAllowed = false;
             _tableView.Location = new Point(8, 24);
             _tableView.Name = "_tableView";
             _tableView.Size = new Size(680, 320);

@@ -1308,6 +1308,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             tblFilterliste.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tblFilterliste.Ansichtbearbeitung = false;
+            tblFilterliste.ColumnMoveAllowed = false;
             tblFilterliste.Location = new Point(8, 112);
             tblFilterliste.Name = "tblFilterliste";
             tblFilterliste.PowerEdit = false;

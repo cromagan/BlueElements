@@ -1,6 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.ControlStrategies;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
+using BlueTable.EventArgs;
 using System.Windows.Forms;
 
 namespace BlueControls.TableElements;
@@ -230,17 +233,30 @@ public sealed class RowTableElement : TableElement {
         ColumnOverlay(gr, viewItem, positionControl);
     }
 
-    public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (clickedColumn is PinColumnItem) {
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is PinColumnItem) {
             if (tableView.PinnedRows.Contains(Row)) {
                 tableView.PinRemove(Row);
             } else {
                 tableView.PinAdd(Row);
             }
-            return true;
+            tableView.Invalidate_CurrentArrangement();
+            return;
         }
 
-        return false;
+        if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
+            // Instant-Action-Strategien (z. B. Tabellen-Skript-Knopf) führen den
+            // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
+            if (ControlStrategy.InstantActionClicked(col, Row)) { return; }
+
+            tableView.OnCellClicked(new CellEventArgs(col, Row));
+            tableView.Invalidate();
+
+            // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
+            // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
+            // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
+            tableView.ShowMiniToolbarAt(mouseOverColumn, this, Row);
+        }
     }
 
     /// <summary>
@@ -330,41 +346,42 @@ public sealed class RowTableElement : TableElement {
         return drawHeight;
     }
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi is PinColumnItem) { return MarkYellow ? "Zeile nicht mehr anpinnen" : "Zeile anpinnen"; }
-
-        if (cvi.Column is not { IsDisposed: false } column) { return string.Empty; }
-        if (column.Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        if (IsAdministrator() && RowCollection.FailedRows.ContainsKey(Row)) {
-            return Row.LastFailedReason();
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
         }
 
-        var note = CellNoteHelper.GetNoteData(column, Row);
-        if (note.HasValue && note.Value.Text.Length > 0) {
-            return $"<u><imagecode={NoteEntry.ImageCodeFor(note.Value.Symbol)}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
-        }
+        var qt = string.Empty;
 
-        if (column.RelationType == RelationType.CellValues) {
-            if (column.LinkedTable is null) { return "Verknüpfung zur Ziel-Tabelle fehlerhaft."; }
+        if (cvi is PinColumnItem) {
+            qt = MarkYellow ? "Zeile nicht mehr anpinnen" : "Zeile anpinnen";
+        } else if (cvi.Column is { IsDisposed: false } column && column.Table is { IsDisposed: false } tb) {
+            if (IsAdministrator() && RowCollection.FailedRows.ContainsKey(Row)) {
+                qt = Row.LastFailedReason();
+            } else {
+                var note = CellNoteHelper.GetNoteData(column, Row);
+                if (note.HasValue && note.Value.Text.Length > 0) {
+                    qt = $"<u><imagecode={NoteEntry.ImageCodeFor(note.Value.Symbol)}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
+                } else if (column.RelationType == RelationType.CellValues) {
+                    if (column.LinkedTable is null) {
+                        qt = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
+                    } else {
+                        var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false);
+                        if (lcolumn is { } lc) { qt = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
 
-            var t = string.Empty;
-            var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false);
-            if (lcolumn is { } lc) { t = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
-
-            if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
-                if (string.IsNullOrEmpty(t)) { t += "\r\n"; }
-                t = t + "Verlinkungs-Status: " + info;
+                        if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
+                            if (string.IsNullOrEmpty(qt)) { qt += "\r\n"; }
+                            qt += "Verlinkungs-Status: " + info;
+                        }
+                    }
+                } else if (tb.IsAdministrator()) {
+                    qt = UndoText(column, Row);
+                }
             }
-
-            return t;
         }
 
-        if (tb.IsAdministrator()) {
-            return UndoText(column, Row);
-        }
-
-        return string.Empty;
+        tableView.QuickInfo = qt;
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {

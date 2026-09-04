@@ -2,6 +2,7 @@
 
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
+using BlueControls.EventArgs;
 using BlueTable.ColumnFormats;
 
 namespace BlueControls.TableElements;
@@ -106,16 +107,31 @@ public sealed class RowCaptionTableElement : TableElement {
         return true;
     }
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
-
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        var displayText = ChapterText.ChapterPathLastName();
-        if (string.IsNullOrEmpty(displayText)) { displayText = "-"; }
-        if (CanEditChapter) {
-            return $"{displayText}\rDoppelklick zum Bearbeiten";
+    /// <summary>
+    /// Klappt das Kapitel auf/zu, wenn der Pfeil-Button angeklickt wurde.
+    /// Klick auf das Wort startet stattdessen Drag/Drop und wird hier ignoriert.
+    /// </summary>
+    public override void HandleMouseDown(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (IsArrowButtonHit(e.ControlX, e.ControlY, tableView.Zoom, tableView.OffsetX, tableView.OffsetY)) {
+            tableView.CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
+            tableView.ToggleChapterExpanded(this);
+            tableView.Invalidate_AllViewItems(false);
         }
 
-        return displayText;
+        base.HandleMouseDown(mouseOverColumn, tableView, e);
+    }
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
+
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } || e.Button != System.Windows.Forms.MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        var displayText = ChapterText.ChapterPathLastName();
+        if (string.IsNullOrEmpty(displayText)) { displayText = "-"; }
+        tableView.QuickInfo = CanEditChapter ? $"{displayText}\rDoppelklick zum Bearbeiten" : displayText;
     }
 
     /// <summary>

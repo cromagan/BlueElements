@@ -218,6 +218,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
 
+    private void _strategyOptions_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _strategyOptions.DoForm(StrategyEditor);
+
     private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
         if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
         _writeAccessLost = true;
@@ -339,14 +341,17 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (InputItem is ColumnItem { IsDisposed: false } c) {
             _strategyOptions = ControlStrategy.CreateNew(cbxControlStrategy.Text);
             _strategyOptions.ControlStrategyParameter = c.ControlStrategyParameter;
+
+            // Strategien mit Spalten-Kontext brauchen die Spalte für ihre Optionen (z. B. Skript-Auswahl).
+            if (_strategyOptions is { IsDisposed: false } && _strategyOptions is IHasColumn ihc) {
+                ihc.Column = c;
+            }
         }
 
-        _strategyOptions.DoForm(StrategyEditor);
+        _strategyOptions?.DoForm(StrategyEditor);
 
         _strategyOptions?.DoUpdateSideOptionMenu += _strategyOptions_DoUpdateSideOptionMenu;
     }
-
-    private void _strategyOptions_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _strategyOptions.DoForm(StrategyEditor);
 
     private void cbxLinkedTable_TextChanged(object sender, System.EventArgs e) {
         if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
@@ -671,6 +676,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler == MultilineButCrForbidden) {
             solutions.Add(CreateSolution("\\r aus verbotenen Zeichen entfernen", () => txbAutoRemove.Text = txbAutoRemove.Text.DecodeControlChars().Replace("\r", string.Empty).EncodeControlChars(), txbAutoRemove));
+        }
+
+        if (fehler is MultilineButCrForbidden or NoMultilineAllowed) {
             solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 

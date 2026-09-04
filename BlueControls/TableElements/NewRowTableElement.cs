@@ -4,6 +4,8 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.EventArgs;
+using System.Windows.Forms;
 
 namespace BlueControls.TableElements;
 
@@ -105,9 +107,15 @@ public sealed class NewRowTableElement : TableElement {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi.Column is not { IsDisposed: false }) { return string.Empty; }
-        return cvi.Column.IsFirst ? "Neue Zeile anlegen" : RowTableElement.QuickInfoText(cvi.Column, "Neue Zeile");
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        tableView.QuickInfo = cvi.Column is not { IsDisposed: false }
+            ? string.Empty
+            : cvi.Column.IsFirst ? "Neue Zeile anlegen" : RowTableElement.QuickInfoText(cvi.Column, "Neue Zeile");
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18, 18);

@@ -2,7 +2,9 @@
 
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
+using BlueControls.EventArgs;
 using BlueTable.ColumnFormats;
+using System.Windows.Forms;
 
 namespace BlueControls.TableElements;
 
@@ -189,14 +191,21 @@ public sealed class CaptionBarListItemTableElement : TableElement {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
         var group = cvi.Column?.CaptionGroup(Caption) ?? string.Empty;
         if (Arrangement?.Ansichtbearbeitung ?? false) {
-            return string.IsNullOrEmpty(group)
+            tableView.QuickInfo = string.IsNullOrEmpty(group)
                 ? $"Überschrift Ebene {Caption + 1}: leer (Doppelklick zum Bearbeiten)"
                 : $"Überschrift Ebene {Caption + 1}: {group}\rDoppelklick zum Bearbeiten";
+            return;
         }
-        return string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
+
+        tableView.QuickInfo = string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);

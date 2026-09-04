@@ -3,7 +3,9 @@
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
+using BlueControls.EventArgs;
 using BlueTable.ColumnFormats;
+using System.Windows.Forms;
 
 namespace BlueControls.TableElements;
 
@@ -238,29 +240,31 @@ public sealed class ColumnsHeadTableElement : TableElement {
         }
     }
 
-    public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (!ca.Table?.IsAdministrator() ?? true) { return false; }
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } clickedColumn) { return; }
+        if (Arrangement is not { IsDisposed: false } ca) { return; }
+        if (!ca.Table?.IsAdministrator() ?? true) { return; }
 
         if (clickedColumn is AddColumnItem) {
             ShowDummyColumnDropDown(ca, tableView, null);
-            return true;
+            tableView.Invalidate_CurrentArrangement();
+            return;
         }
 
-        if (clickedColumn?.Column is { IsDisposed: false } col) {
+        if (clickedColumn.Column is { IsDisposed: false } col) {
             if (!string.IsNullOrEmpty(col.ErrorReason())) {
-                var bs = HeadButtonSize.CanvasToControl(zoom);
+                var bs = HeadButtonSize.CanvasToControl(tableView.Zoom);
                 var btnX = (int)((clickedColumn.ControlColumnWidth() - bs) / 2.0);
-                if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
+                var mouseInColumn = MousePositionInColumn(clickedColumn, tableView, e);
+                if (mouseInColumn.X >= btnX && mouseInColumn.X <= btnX + bs && mouseInColumn.Y >= 2 && mouseInColumn.Y <= 2 + bs) {
                     col.Repair();
                     using var editor = new ColumnEditor(col, tableView);
                     editor.ShowDialog();
                     col.Repair();
-                    return true;
+                    tableView.Invalidate_CurrentArrangement();
                 }
             }
         }
-
-        return false;
     }
 
     /// <summary>
@@ -293,18 +297,28 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi.Column is not { IsDisposed: false } col) { return string.Empty; }
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        if (cvi.Column is not { IsDisposed: false } col) {
+            tableView.QuickInfo = string.Empty;
+            return;
+        }
 
         if (!string.IsNullOrEmpty(col.ErrorReason()) && Arrangement?.Table is { IsDisposed: false } table && table.IsAdministrator()) {
-            var bs = HeadButtonSize.CanvasToControl(scale);
+            var bs = HeadButtonSize.CanvasToControl(tableView.Zoom);
             var btnX = (int)((cvi.ControlColumnWidth() - bs) / 2.0);
-            if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
-                return "Spalte bearbeiten\rFehler: " + col.ErrorReason();
+            var mouseInColumn = MousePositionInColumn(cvi, tableView, e);
+            if (mouseInColumn.X >= btnX && mouseInColumn.X <= btnX + bs && mouseInColumn.Y >= 2 && mouseInColumn.Y <= 2 + bs) {
+                tableView.QuickInfo = "Spalte bearbeiten\rFehler: " + col.ErrorReason();
+                return;
             }
         }
 
-        return RowTableElement.QuickInfoText(col, string.Empty);
+        tableView.QuickInfo = RowTableElement.QuickInfoText(col, string.Empty);
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {

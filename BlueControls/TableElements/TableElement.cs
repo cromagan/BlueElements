@@ -309,8 +309,6 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
     public virtual bool FilterMatch(string filterText) => KeyName.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
-    public virtual bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) => false;
-
     /// <summary>
     /// Wird bei einem Doppelklick auf die Zeile aufgerufen. Die konkrete
     /// Zeilen-Implementierung übernimmt alle Prüfungen (Berechtigung,
@@ -332,13 +330,42 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     /// </summary>
     public virtual void HandleKeyDown(ColumnViewItem? cursorColumn, TableView tableView, KeyEventArgs e) { }
 
+    /// <summary>
+    /// Wird bei MouseDown auf die Zeile aufgerufen. Die Basis setzt die
+    /// Zelle als Cursor-Position und scrollt sie sichtbar. Überschreibungen
+    /// ergänzen ihre eigenen Aktionen und rufen dabei — analog zu
+    /// <see cref="HandleDoubleClick" /> — Routinen der
+    /// <paramref name="tableView" /> direkt auf.
+    /// </summary>
+    public virtual void HandleMouseDown(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        tableView.EnsureVisible(mouseOverColumn, this);
+        tableView.CursorPos_Set(mouseOverColumn, this, false);
+    }
+
+    /// <summary>
+    /// Wird bei MouseMove ausgeführt, während diese Zeile unter dem Cursor
+    /// liegt. Die Basis leert die QuickInfo; konkrete Elemente überschreiben
+    /// sie und setzen ihre QuickInfo direkt auf <c>tableView.QuickInfo</c>
+    /// (Zell-Koordinaten bei Bedarf über <see cref="MousePositionInColumn" />).
+    /// </summary>
+    public virtual void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        tableView.QuickInfo = string.Empty;
+    }
+
+    /// <summary>
+    /// Wird bei einem Mausklick (MouseUp, linke Taste) auf die Zeile
+    /// aufgerufen und ist das Gegenstück zu <see cref="HandleDoubleClick" />.
+    /// Die konkrete Implementierung übernimmt alle Prüfungen und Aktionen —
+    /// inklusive Event und Invalidierung — selbst und ruft dafür Routinen
+    /// der <paramref name="tableView" /> direkt auf.
+    /// </summary>
+    public virtual void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) { }
+
     public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => true;
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
-
-    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
 
     public Size UntrimmedCanvasSize(Design itemdesign) {
         if (_untrimmedCanvasSize.IsEmpty) {
@@ -348,6 +375,17 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     }
 
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
+
+    /// <summary>
+    /// Mausposition relativ zur linken oberen Ecke der Zelle
+    /// (Spaltenstart, Indent bereits abgezogen).
+    /// </summary>
+    protected Point MousePositionInColumn(ColumnViewItem viewItem, TableView tableView, CanvasMouseEventArgs e) {
+        var indentOffset = IndentWidth.CanvasToControl(tableView.Zoom) * Indent;
+        return new Point(
+            e.ControlX - viewItem.ControlColumnLeft(tableView.OffsetX) - indentOffset,
+            e.ControlY - ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY).Top);
+    }
 
     /// <summary>
     /// Gemeinsame Logik für den Start einer Zell-Editierung direkt über
@@ -397,6 +435,10 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
         var dia = contentHolderCellColumn.ControlStrategy;
         var strategy = ControlStrategy.Cached(dia);
+
+        // Instant-Action-Strategien zeigen nichts an und reagieren nur auf den
+        // einfachen Klick; ein Edit (Doppelklick, F2) bleibt wirkungslos.
+        if (strategy.IsInstantAction) { return true; }
 
         if (strategy.NotEditableReason is { Length: > 0 } strategyReason) {
             TableView.NotEditableInfo(strategyReason);

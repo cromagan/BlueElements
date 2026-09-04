@@ -1,5 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+using BlueControls.EventArgs;
+using System.Windows.Forms;
+
 namespace BlueControls.TableElements;
 
 public sealed class SortBarTableElement : TableElement {
@@ -54,11 +58,15 @@ public sealed class SortBarTableElement : TableElement {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (Sort is not null && Sort.UsedForRowSort(cvi.Column)) {
-            return "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend");
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
         }
-        return string.Empty;
+
+        tableView.QuickInfo = Sort is not null && Sort.UsedForRowSort(cvi.Column)
+            ? "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend")
+            : string.Empty;
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(14, 14);

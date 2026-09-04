@@ -9,13 +9,7 @@ public class ButtonRenderer : Renderer {
 
     #region Fields
 
-    private bool _bild_anzeigen;
-
-    private bool _checkstatus_anzeigen;
-
     private Padding _padding = new(Skin.PaddingSmal);
-
-    private bool _text_anzeigen;
 
     #endregion
 
@@ -23,27 +17,85 @@ public class ButtonRenderer : Renderer {
 
     public static string ClassId => "Button";
 
-    public bool Bild_anzeigen {
-        get => _bild_anzeigen;
+    public override string Description => "Stellt den Zelleninhalt als Schaltfläche dar.\r\nIst ShowCellValue aktiv, wird der Zelltext unverändert angezeigt. Sonst wird der Inhalt als Ja/Nein-Wert (+, Wahr, True) interpretiert.";
+
+    /// <summary>
+    /// Zeigt den Zellinhalt unverändert als Text ohne Bild und ungecheckt an.
+    /// </summary>
+    public bool ShowCellValue {
+        get;
         set {
-            if (_bild_anzeigen == value) { return; }
+            if (field == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _bild_anzeigen = value;
+            field = value;
             OnPropertyChanged();
         }
     }
 
-    public bool CheckStatus_anzeigen {
-        get => _checkstatus_anzeigen;
+    /// <summary>
+    /// Bildcode, der angezeigt wird, wenn der Zelleninhalt als TRUE interpretiert werden kann.
+    /// </summary>
+    public string PictureTrue {
+        get;
         set {
-            if (_checkstatus_anzeigen == value) { return; }
+            if (field == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _checkstatus_anzeigen = value;
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Text, der angezeigt wird, wenn der Zelleninhalt als TRUE interpretiert werden kann.
+    /// </summary>
+    public string TextTrue {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Bildcode, der angezeigt wird, wenn der Zelleninhalt nicht als TRUE interpretiert werden kann.
+    /// </summary>
+    public string PictureFalse {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Text, der angezeigt wird, wenn der Zelleninhalt nicht als TRUE interpretiert werden kann.
+    /// </summary>
+    public string TextFalse {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Zeigt bei leerer Zelle die Schaltfläche im FALSE-Zustand, statt nichts zu zeichnen.
+    /// </summary>
+    public bool NoValuesShowFalse {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
             OnPropertyChanged();
         }
     }
-
-    public override string Description => "Stellt den Inhalt als Schaltfläche dar.\r\nFormat: checked(+/-);BildCode;Text";
 
     /// <summary>
     /// Innenabstand des Buttons zur Zelle. Negative Werte vergrößern die Zeichenfläche
@@ -59,33 +111,19 @@ public class ButtonRenderer : Renderer {
         }
     }
 
-    public bool Text_anzeigen {
-        get => _text_anzeigen;
-        set {
-            if (_text_anzeigen == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _text_anzeigen = value;
-            OnPropertyChanged();
-        }
-    }
-
     #endregion
 
     #region Methods
 
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
-        if (string.IsNullOrEmpty(content)) { return; }
+        if (string.IsNullOrEmpty(content)) {
+            if (ShowCellValue || !NoValuesShowFalse) { return; }
 
-        var s = States.Standard;
-
-        if (_checkstatus_anzeigen) {
-            var t = (content + ";").SplitBy(";");
-            if (_bild_anzeigen && t[1].FromPlusMinus()) {
-                s |= States.Checked;
-            } else if (!_bild_anzeigen && t[0].FromPlusMinus()) {
-                s |= States.Checked;
-            }
+            // Leere Zelle als FALSE-Wert behandeln
+            content = "-";
         }
+
+        var s = !ShowCellValue && IsTrueValue(content) ? States.Checked : States.Standard;
 
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
@@ -107,37 +145,57 @@ public class ButtonRenderer : Renderer {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =
-        [   new FlexiControlForProperty<bool>(() => Bild_anzeigen),
-            new FlexiControlForProperty<bool>(() => CheckStatus_anzeigen),
-                new FlexiControlForProperty<bool>(() => Text_anzeigen),
-            new FlexiControlForProperty<Padding>(() => Padding)
-        ];
+        List<GenericControl> result = [new FlexiControlForProperty<bool>(() => ShowCellValue)];
+
+        if (!ShowCellValue) {
+            result.Add(new FlexiControlForProperty<string>(() => PictureTrue));
+            result.Add(new FlexiControlForProperty<string>(() => TextTrue));
+            result.Add(new FlexiControlForProperty<string>(() => PictureFalse));
+            result.Add(new FlexiControlForProperty<string>(() => TextFalse));
+            result.Add(new FlexiControlForProperty<bool>(() => NoValuesShowFalse));
+        }
+
+        result.Add(new FlexiControlForProperty<Padding>(() => Padding));
         return result;
     }
 
     public override List<string> ParseableItems() {
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ShowPic", _bild_anzeigen);
-        result.ParseableAdd("ShowText", _text_anzeigen);
-        result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
+        result.ParseableAdd("ShowCellValue", ShowCellValue);
+        result.ParseableAdd("PictureTrue", PictureTrue);
+        result.ParseableAdd("TextTrue", TextTrue);
+        result.ParseableAdd("PictureFalse", PictureFalse);
+        result.ParseableAdd("TextFalse", TextFalse);
+        result.ParseableAdd("NoValuesShowFalse", NoValuesShowFalse);
         result.ParseableAdd("Padding", _padding);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
-            case "showpic":
-                _bild_anzeigen = value.FromPlusMinus();
+            case "showcellvalue":
+                ShowCellValue = value.FromPlusMinus();
                 return true;
 
-            case "showtext":
-                _text_anzeigen = value.FromPlusMinus();
+            case "picturetrue":
+                PictureTrue = value.FromNonCritical();
                 return true;
 
-            case "showcheckstate":
-                _checkstatus_anzeigen = value.FromPlusMinus();
+            case "texttrue":
+                TextTrue = value.FromNonCritical();
+                return true;
+
+            case "picturefalse":
+                PictureFalse = value.FromNonCritical();
+                return true;
+
+            case "textfalse":
+                TextFalse = value.FromNonCritical();
+                return true;
+
+            case "novaluesshowfalse":
+                NoValuesShowFalse = value.FromPlusMinus();
                 return true;
 
             case "padding":
@@ -152,6 +210,8 @@ public class ButtonRenderer : Renderer {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Schaltfläche);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        if (!ShowCellValue && NoValuesShowFalse && string.IsNullOrEmpty(content)) { content = "-"; }
+
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
 
         // Mindesthöhe: 16 Pixel Button-Inhalt plus umgekehrtes vertikales Padding
@@ -160,38 +220,27 @@ public class ButtonRenderer : Renderer {
         return GetFont().FormatedText_NeededSize(replacedText, QImage(content), minSize);
     }
 
-    /// <summary>
-    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="style"></param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <returns></returns>
     protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
-        if (!_text_anzeigen) { return string.Empty; }
-
-        content = content.Replace("\r\n", "; ");
-        content = content.Replace("\r", "; ");
-
-        var t = (content + ";;").SplitBy(";");
-
-        string r;
-
-        if (_bild_anzeigen && _checkstatus_anzeigen) {
-            r = t[2];
-        } else if (!_bild_anzeigen && !_checkstatus_anzeigen) {
-            r = t[0];
-        } else {
-            r = t[1];
+        if (ShowCellValue) {
+            var v = content.Replace("\r\n", "; ").Replace("\r", "; ");
+            return LanguageTool.PrepaireText(v, style, string.Empty, string.Empty, doOpticalTranslation, null);
         }
 
+        var r = IsTrueValue(content) ? TextTrue : TextFalse;
         return LanguageTool.PrepaireText(r, style, string.Empty, string.Empty, doOpticalTranslation, null);
     }
 
-    private QuickImage? QImage(string content) {
-        var t = (content + ";;;").SplitBy(";");
+    /// <summary>
+    /// Liefert true, wenn der Zelleninhalt als TRUE interpretiert werden kann.
+    /// </summary>
+    private static bool IsTrueValue(string content) => content.ToLowerInvariant() is "+" or "wahr" or "true";
 
-        return _bild_anzeigen ? QuickImage.Get(t[0]) : null;
+    private QuickImage? QImage(string content) {
+        if (ShowCellValue) { return null; }
+
+        var code = IsTrueValue(content) ? PictureTrue : PictureFalse;
+
+        return code is { Length: > 0 } ? QuickImage.Get(code) : null;
     }
 
     #endregion

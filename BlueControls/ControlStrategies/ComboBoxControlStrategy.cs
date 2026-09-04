@@ -2,10 +2,11 @@
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
-public class ComboBoxControlStrategy : ControlStrategy {
+public class ComboBoxControlStrategy : ControlStrategy, IHasColumn {
 
     #region Fields
 
@@ -16,6 +17,8 @@ public class ComboBoxControlStrategy : ControlStrategy {
     #region Properties
 
     public static string ClassId => "Combobox";
+
+    public ColumnItem? Column { get; set; }
 
     public override string Description => "Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.";
     public override string KeyName => ClassId;
@@ -44,6 +47,16 @@ public class ComboBoxControlStrategy : ControlStrategy {
     public override void HandleCaptionClick() {
         _control?.Focus();
         _control?.ShowMenu(this, new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0));
+    }
+
+    /// <summary>
+    /// Die Spalte braucht auswählbare Werte: Dropdown-Items, die Werte der
+    /// anderen Zellen oder eine Beziehung mit Dropdown-Werten.
+    /// </summary>
+    public override string ErrorReason() {
+        if (Column is not { IsDisposed: false } column) { return string.Empty; }
+        if (column.MayHaveDropDown()) { return string.Empty; }
+        return ColumnErrorConstants.NoDropdownItems;
     }
 
     public override string ReadableText() => "Textfeld mit Auswahlknopf";

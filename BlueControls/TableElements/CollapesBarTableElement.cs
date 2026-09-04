@@ -1,5 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+using BlueControls.EventArgs;
+using System.Windows.Forms;
+
 namespace BlueControls.TableElements;
 
 public sealed class CollapesBarTableElement : TableElement {
@@ -51,9 +55,27 @@ public sealed class CollapesBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
+    /// <summary>
+    /// Klappt die angeklickte Spalte auf/zu, sofern sie klappbar ist.
+    /// </summary>
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false, Column.IsDisposed: false } viewItem) { return; }
+        if (!viewItem.CollapsableEnabled(SheetStyle)) { return; }
+
+        viewItem.IsExpanded = !viewItem.IsExpanded;
+        tableView.Invalidate_AllViewItems(false);
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CollapseButtonSize;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => cvi.CollapsableEnabled(SheetStyle) ? "Spalte auf-/zuklappen" : string.Empty;
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        tableView.QuickInfo = cvi.CollapsableEnabled(SheetStyle) ? "Spalte auf-/zuklappen" : string.Empty;
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CollapseButtonSize, CollapseButtonSize);
 

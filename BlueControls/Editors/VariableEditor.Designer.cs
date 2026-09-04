@@ -38,6 +38,7 @@ namespace BlueControls {
             // 
             tableVariablen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableVariablen.Ansichtbearbeitung = false;
+            tableVariablen.ColumnMoveAllowed = false;
             tableVariablen.Location = new Point(8, 24);
             tableVariablen.Name = "tableVariablen";
             tableVariablen.PowerEdit = false;

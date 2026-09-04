@@ -102,6 +102,15 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public bool AutoPin { get; set; }
 
     /// <summary>
+    /// Gibt an, ob Spalten per Drag/Drop verschoben werden dürfen.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool ColumnMoveAllowed {
+        get => TableInternal.ColumnMoveAllowed;
+        set => TableInternal.ColumnMoveAllowed = value;
+    }
+
+    /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
     /// </summary>
     [DefaultValue(true)]

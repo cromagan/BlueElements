@@ -27,9 +27,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
 
         if (_choose is { IsDisposed: false }) {
             var btn = new ButtonRenderer {
-                Text_anzeigen = false,
-                Bild_anzeigen = true,
-                CheckStatus_anzeigen = false
+                PictureFalse = "Pfeil_Rechts_Scrollbar|16"
             };
             _choose.FixedColumnWidth = 32;
             _choose.DefaultRenderer = ButtonRenderer.ClassId;
@@ -37,7 +35,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
         }
 
         foreach (var thisRow in tb.Row) {
-            thisRow.CellSet(_choose, "Pfeil_Rechts_Scrollbar|16;+;Wählen", string.Empty);
+            thisRow.CellSet(_choose, "-", string.Empty);
         }
 
         tb.RepairAfterParse();

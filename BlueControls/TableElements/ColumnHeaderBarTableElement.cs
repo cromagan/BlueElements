@@ -3,6 +3,8 @@
 
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueControls.Renderer;
 
 namespace BlueControls.TableElements;
@@ -68,9 +70,7 @@ public sealed class ColumnHeaderBarTableElement : TableElement {
 
         // Button-Renderer verwenden für die Optik
         var renderer = new ButtonRenderer {
-            Text_anzeigen = true,
-            Bild_anzeigen = false,
-            CheckStatus_anzeigen = false,
+            ShowCellValue = true,
             Padding = new System.Windows.Forms.Padding(0)
         };
         renderer.Draw(gr, text, null, positionControl.ToRect(), translate, Alignment.Horizontal_Vertical_Center, scale, Design.Item_ListBox, state);
@@ -80,9 +80,14 @@ public sealed class ColumnHeaderBarTableElement : TableElement {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => HeaderHeight;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != System.Windows.Forms.MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
         var text = HeaderText(cvi);
-        return string.IsNullOrEmpty(text) ? string.Empty : "Spalte " + text;
+        tableView.QuickInfo = string.IsNullOrEmpty(text) ? string.Empty : "Spalte " + text;
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(100, HeaderHeight);

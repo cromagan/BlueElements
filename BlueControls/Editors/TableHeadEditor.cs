@@ -236,6 +236,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         tblUndo.Table = tb;
         tblUndo.Arrangement = string.Empty;
+        tblUndo.ColumnMoveAllowed = false;
         tblUndo.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 

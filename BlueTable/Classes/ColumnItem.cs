@@ -24,6 +24,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private const string TmpNewDummy = "TMPNEWDUMMY";
 
+    /// <summary>
+    /// Strategien mit spaltenabhängiger Gültigkeits-Prüfung, keyed nach Strategy-Key (siehe <see cref="IHasColumn" />).
+    /// </summary>
+    private static readonly AssemblyAwareCache<IHasColumn> _columnChecks = new();
+
     private readonly List<string> _afterEditAutoReplace = [];
 
     private readonly List<string> _dropDownItems = [];
@@ -1818,7 +1823,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     Align = AlignmentHorizontal.Rechts;
                     Caption = "Zeile";
                     DefaultRenderer = "Button";
-                    RendererSettings = "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding={-4, -2}}";
+                    RendererSettings = "{ClassId=\"Button\", ShowCellValue=+, Padding={-4, -2}}";
                     ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
                     BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
                 }
@@ -2377,10 +2382,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
         }
 
-        if (_controlStrategy == "Combobox") {
-            if (_relationType != RelationType.DropDownValues) {
-                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
-            }
+        // Strategie-spezifische Prüfungen zur Spalte liegen bei den Strategien selbst.
+        if (_columnChecks[_controlStrategy] is { } check) {
+            check.Column = this;
+            if (check.ErrorReason() is { Length: > 0 } reason) { return reason; }
         }
 
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }

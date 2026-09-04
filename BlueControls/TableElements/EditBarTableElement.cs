@@ -1,8 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
-
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 
 namespace BlueControls.TableElements;
 
@@ -87,13 +86,17 @@ public sealed class EditBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
-    public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (tableView.Table is not { IsDisposed: false }) { return false; }
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } clickedColumn) { return; }
+        if (tableView.Table is not { IsDisposed: false }) { return; }
 
-        if (!tableView.Table.IsAdministrator()) { return false; }
+        if (!tableView.Table.IsAdministrator()) { return; }
 
-        var btnType = GetButtonType(clickedColumn, mouseXinColumn, zoom);
-        if (btnType == EditButtonType.None) { return false; }
+        var mouseInColumn = MousePositionInColumn(clickedColumn, tableView, e);
+        var btnType = GetButtonType(clickedColumn, mouseInColumn.X, tableView.Zoom);
+        if (btnType == EditButtonType.None) { return; }
+
+        if (Arrangement is not { IsDisposed: false } ca) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(tableView.Table);
         var currentIdx = -1;
@@ -103,43 +106,50 @@ public sealed class EditBarTableElement : TableElement {
                 break;
             }
         }
-        if (currentIdx < 0) { return false; }
+        if (currentIdx < 0) { return; }
 
         var parsed = tcvc[currentIdx];
         var parsedViewItem = parsed[clickedColumn.Column];
-        if (parsedViewItem is null) { return false; }
+        if (parsedViewItem is null) { return; }
 
         switch (btnType) {
             case EditButtonType.Hide:
                 if (currentIdx == 0 && clickedColumn.Column is { IsDisposed: false } deletedColumn) {
-                    if (MessageBox.Show($"Spalte <b>{deletedColumn.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return false; }
+                    if (MessageBox.Show($"Spalte <b>{deletedColumn.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return; }
                     tableView.Table.Column.Remove(deletedColumn, "PowerEdit: Spalte gelöscht");
                     foreach (var arr in tcvc) {
                         if (arr[deletedColumn] is { } vi) { arr.Remove(vi); }
                     }
                     tableView.Table.ColumnArrangements = tcvc.AsReadOnly();
-                    return true;
+                    tableView.Invalidate_CurrentArrangement();
+                    return;
                 }
                 parsed.Remove(parsedViewItem);
                 break;
 
             case EditButtonType.Permanent:
-                if (!CanTogglePermanent(parsedViewItem, parsed)) { return false; }
+                if (!CanTogglePermanent(parsedViewItem, parsed)) { return; }
                 parsedViewItem.Permanent = !parsedViewItem.Permanent;
                 break;
         }
 
         tableView.Table.ColumnArrangements = tcvc.AsReadOnly();
-        return true;
+        tableView.Invalidate_CurrentArrangement();
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => ButtonSize + 4;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        var bt = GetButtonType(cvi, mouseXinColumn, scale);
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != System.Windows.Forms.MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        var mouseInColumn = MousePositionInColumn(cvi, tableView, e);
+        var bt = GetButtonType(cvi, mouseInColumn.X, tableView.Zoom);
         var isView0 = IsView0(cvi);
 
-        return bt switch {
+        tableView.QuickInfo = bt switch {
             EditButtonType.Hide => isView0 ? "Spalte PERMANENT löschen" : "Spalte ausblenden",
             EditButtonType.Permanent => CanTogglePermanent(cvi)
                 ? cvi.Permanent ? "Spalte nicht mehr fixieren" : "Spalte fixieren"

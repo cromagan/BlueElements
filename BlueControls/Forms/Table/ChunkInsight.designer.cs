@@ -39,6 +39,7 @@ namespace BlueControls.BlueTableDialogs {
             // tblChunk
             // 
             tblChunk.Ansichtbearbeitung = false;
+            tblChunk.ColumnMoveAllowed = false;
             tblChunk.Dock = DockStyle.Fill;
             tblChunk.Location = new Point(0, 31);
             tblChunk.Name = "tblChunk";

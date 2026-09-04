@@ -2,6 +2,7 @@
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -248,6 +249,13 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <see cref="EndInit" />). Property-Setter lösen dann kein ApplyStyle aus.
     /// </summary>
     public bool IsEventsSuppressed => _suspendCount > 0;
+
+    /// <summary>
+    /// True, wenn die Strategie nichts anzeigt, aber ein einfacher Klick
+    /// sofort eine Aktion auslöst. Es wird kein Edit-Control geöffnet und
+    /// ein Doppelklick bleibt wirkungslos.
+    /// </summary>
+    public virtual bool IsInstantAction => false;
 
     /// <summary>
     /// True für Strategien, die im ColumnEditor nicht wählbar sind, weil sie
@@ -557,6 +565,32 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         return new TextBoxControlStrategy();
     }
 
+    /// <summary>
+    /// Führt bei Instant-Action-Strategien (<see cref="IsInstantAction" />) den
+    /// einfachen Klick auf eine Zelle aus — die Rechte der Spalte werden geprüft.
+    /// Liefert True, wenn der Klick verarbeitet wurde.
+    /// </summary>
+    public static bool InstantActionClicked(ColumnItem? column, RowItem? row) {
+        if (column is not { IsDisposed: false } col || row is not { IsDisposed: false }) { return false; }
+        if (col.Table is not { IsDisposed: false } tb) { return false; }
+
+        // Fähigkeitsabfrage über den Prototyp; die konfigurierte Instanz wird frisch erzeugt.
+        if (!Cached(col.ControlStrategy).IsInstantAction) { return false; }
+
+        var strategy = CreateNew(col.ControlStrategy);
+        strategy.ControlStrategyParameter = col.ControlStrategyParameter;
+
+        if (strategy is IHasColumn hasColumn) { hasColumn.Column = col; }
+
+        if (!tb.PermissionCheck(col.PermissionGroupsChangeCell, row, true)) {
+            TableView.NotEditableInfo("Sie haben nicht die nötigen Rechte, um diese Aktion auszuführen.");
+            return true;
+        }
+
+        strategy.ExecuteInstantAction(col, row);
+        return true;
+    }
+
     public void BeginInit() {
         if (IsDisposed) { return; }
         _suspendCount++;
@@ -619,10 +653,14 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Optionen der Strategie für den Property-Editor.
-    /// Leer, wenn die Strategie keine konfigurierbaren Optionen hat.
+    /// Optionen der Strategie für den Property-Editor. Instant-Action-Strategien
+    /// zeigen nichts an und bieten daher auch keinen Rahmen an. Leer, wenn die
+    /// Strategie keine konfigurierbaren Optionen hat.
     /// </summary>
-    public virtual List<GenericControl> GetProperties(int widthOfControl) => [new FlexiControlForProperty<GroupBoxStyle>(() => Border, "Rahmen", ItemsOf(typeof(GroupBoxStyle)))];
+    public virtual List<GenericControl> GetProperties(int widthOfControl) {
+        if (IsInstantAction) { return []; }
+        return [new FlexiControlForProperty<GroupBoxStyle>(() => Border, "Rahmen", ItemsOf(typeof(GroupBoxStyle)))];
+    }
 
     public virtual void HandleCaptionClick() { }
 
@@ -697,6 +735,12 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
             }
         }
     }
+
+    /// <summary>
+    /// Führt die eigentliche Aktion des Klicks aus; nur das Ausführen wird an
+    /// die Aufruf-Ebene (z. B. TableView.DoScript) übergeben.
+    /// </summary>
+    protected virtual void ExecuteInstantAction(ColumnItem column, RowItem row) { }
 
     /// <summary>
     /// Holt den aktuellen Wert vom Control und schreibt ihn über den

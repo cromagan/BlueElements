@@ -62,6 +62,7 @@ public static class ColumnErrorConstants {
     public const string NoAutoFilterRemoveJoker = "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen";
     public const string NoDropdownItems = "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt.";
     public const string NoLinkedFilterDefined = "Keine Filter für verknüpfte Tabelle definiert.";
+    public const string NoMultilineAllowed = "Diese Bearbeitungsmethode ist bei mehrzeiligen Spalten nicht möglich.";
     public const string RelationMustSaveContent = "Bei Spalten mit Beziehungen Inhalt gespeichert werden.";
     public const string RelationNoAutoEdit = "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
     public const string RelationNotAllowedOnFirstColumn = "Diese Funktion ist bei der ersten Spalte nicht erlaubt.";

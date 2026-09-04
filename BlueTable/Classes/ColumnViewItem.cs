@@ -122,7 +122,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     /// <summary>
     /// Serialisierte Renderer-Einstellungen (z. B.
-    /// <c>{ClassId="Button",ShowPic=+}</c>). Echte Spalten liefern die
+    /// <c>{ClassId="Button",ShowCellValue=+}</c>). Echte Spalten liefern die
     /// Einstellungen ihres <see cref="ColumnItem.RendererSettings" />;
     /// virtuelle Spalten überschreiben dies mit ihren festen Einstellungen.
     /// </summary>

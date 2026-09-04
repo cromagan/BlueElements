@@ -1,5 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+using BlueControls.EventArgs;
+using System.Windows.Forms;
+
 namespace BlueControls.TableElements;
 
 public sealed class FilterBarTableElement : TableElement {
@@ -115,12 +119,29 @@ public sealed class FilterBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
+    /// <summary>
+    /// Öffnet den AutoFilter der angeklickten Spalte; die TableView
+    /// prüft die Voraussetzungen und positioniert das Filter-Fenster.
+    /// </summary>
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn?.Column is not { IsDisposed: false }) { return; }
+        if (Arrangement is not { IsDisposed: false } ca) { return; }
+
+        var screenX = Cursor.Position.X - e.ControlX;
+        var screenY = Cursor.Position.Y - e.ControlY;
+        tableView.AutoFilter_Show(ca, mouseOverColumn, screenX, screenY, ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY).Bottom);
+    }
+
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (!cvi.AutoFilterSymbolPossible) { return string.Empty; }
-        if (FilterCombined?[cvi.Column] is not null) { return "Aktiver Filter – Klicken zum Ändern"; }
-        return "Klicken, um Auto-Filter zu öffnen";
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        if (!cvi.AutoFilterSymbolPossible) { tableView.QuickInfo = string.Empty; return; }
+        tableView.QuickInfo = FilterCombined?[cvi.Column] is not null ? "Aktiver Filter – Klicken zum Ändern" : "Klicken, um Auto-Filter zu öffnen";
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(AutoFilterSize, AutoFilterSize + 2);

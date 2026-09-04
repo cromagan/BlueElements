@@ -1009,6 +1009,26 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return (ColumnOnCoordinate(CurrentArrangement, MouseDownData, row), row);
     }
 
+    /// <summary>
+    /// Liefert das Bildschirm-Rechteck der Zelle, wenn Spalte und Zeile aktuell angezeigt werden, sonst null.
+    /// </summary>
+    public Rectangle? CellScreenRectangle(ColumnItem column, RowItem row) {
+        Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+        if (!Visible || IsDisposed || Table is not { IsDisposed: false } tb || row.Table != tb || column.Table != tb) { return null; }
+        if (CurrentArrangement is not { IsDisposed: false } ca) { return null; }
+
+        var vi = ca[column];
+        if (vi is not { IsDisposed: false }) { return null; }
+
+        if (GetRow(row, null) is not { Visible: true } rli) { return null; }
+
+        var rowPos = rli.ControlPosition(Zoom, OffsetX, OffsetY);
+        var cell = new Rectangle(vi.ControlColumnLeft(OffsetX), rowPos.Y, vi.ControlColumnWidth(), rowPos.Height);
+        if (!cell.IntersectsWith(ClientRectangle)) { return null; }
+
+        return RectangleToScreen(cell);
+    }
+
     public void CheckView() {
         var tb = Table;
         if (CursorPosColumn?.Column?.Table != tb) { CursorPosColumn = null; }
@@ -1508,26 +1528,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => _rowsVisibleUnique;
 
-    /// <summary>
-    /// Liefert das Bildschirm-Rechteck der Zelle, wenn Spalte und Zeile aktuell angezeigt werden, sonst null.
-    /// </summary>
-    public Rectangle? CellScreenRectangle(ColumnItem column, RowItem row) {
-        Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        if (!Visible || IsDisposed || Table is not { IsDisposed: false } tb || row.Table != tb || column.Table != tb) { return null; }
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return null; }
-
-        var vi = ca[column];
-        if (vi is not { IsDisposed: false }) { return null; }
-
-        if (GetRow(row, null) is not { Visible: true } rli) { return null; }
-
-        var rowPos = rli.ControlPosition(Zoom, OffsetX, OffsetY);
-        var cell = new Rectangle(vi.ControlColumnLeft(OffsetX), rowPos.Y, vi.ControlColumnWidth(), rowPos.Height);
-        if (!cell.IntersectsWith(ClientRectangle)) { return null; }
-
-        return RectangleToScreen(cell);
-    }
-
     public void SetView(JsonObject? view) {
         ResetView();
 
@@ -1705,6 +1705,136 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return result;
     }
 
+    /// <summary>
+    /// Führt ein Zeilenskript für die übergebenen Zeilen aus und meldet Erfolg bzw. Fehler.
+    /// </summary>
+    internal static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
+        var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
+
+        if (rows.Count == 0) {
+            Forms.MessageBox.Show($"{info2}Keine Zeilen zum Abarbeiten vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        if (rows[0]?.Table is not { IsDisposed: false } tb) {
+            Forms.MessageBox.Show($"{info2}Tabelle verworfen", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) {
+            Forms.MessageBox.Show($"{info2}{f}", ImageCode.Kreuz, "OK");
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+            return;
+        }
+
+        if (!generic && sc is null) {
+            Forms.MessageBox.Show($"{info2}Interner Programmfehler,\r\nkein Skript angekommen.", ImageCode.Kreuz, "OK");
+            return;
+        }
+        foreach (var row in rows) {
+            if (row.Table != tb) {
+                Forms.MessageBox.Show($"{info2}Interner Programmfehler\r\nZeilen aus unterschiedlichen Datenbanken.", ImageCode.Kreuz, "OK");
+                return;
+            }
+        }
+
+        if (rows.Count > 1) {
+            var t = string.Empty;
+
+            var tmpsc = sc;
+
+            if (generic) {
+                var l = tb.EventScript.Get(ScriptEventTypes.value_changed);
+
+                if (l.Count == 1) { tmpsc = l[0]; }
+            }
+
+            if (tmpsc is not null && tmpsc.StoppedTimeCount > 20) {
+                var tm = Math.Round(tmpsc.AverageRunTime / 1000f * rows.Count / 60f, 1);
+                t = $"\r\n<i>(geschätzte Dauer: {tm} Minuten)<i>";
+            }
+
+            if (Forms.MessageBox.Show($"<b>{info}</b>\r\nfür {rows.Count} Zeilen ausführen?{t}", ImageCode.Information, "Ja", "Nein") != 0) {
+                //Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
+                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
+        }
+
+        var fehler = new List<ScriptEndedFeedback>();
+        ScriptEndedFeedback? erfolg = null;
+        Progressbar? _pg = null;
+
+        if (rows.Count > 3) {
+            _pg = Progressbar.Show(info, rows.Count);
+            _pg.CancelSupported = true;
+        }
+
+        var firstRow = rows[0];
+        var all = rows.Count;
+        var c = 0;
+        while (rows.Count > 0) {
+            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].ReadableText()}", 0);
+
+            _pg?.Update(c++);
+            Develop.DoEvents();
+
+            if (_pg is { IsCancelRequested: true }) {
+                _pg.Close();
+                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
+
+            if (!tb.CanDoValueChangedScript(true)) {
+                _pg?.Close();
+                Forms.MessageBox.Show($"{info2}Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
+
+            rows[0].InvalidateCheckData();
+
+            ScriptEndedFeedback? fb;
+            if (generic) {
+                rows[0].InvalidateRowState(null, $"TableView, Kontextmenü, {info}", DateTime.UtcNow, ChangeFlags.LogUndo);
+                fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
+            } else {
+                fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
+            }
+
+            if (fb?.Failed == true) {
+                fehler.Add(fb);
+            } else {
+                erfolg = fb;
+            }
+
+            rows.RemoveAt(0);
+        }
+
+        _pg?.Close();
+
+        if (all == 1) {
+            if (fehler.Count == 1) {
+                Forms.MessageBox.Show($"{info2}<b>Es ist ein Skript-Fehler aufgetreten.</b>\r\n\r\n{fehler[0].ProtocolText}", ImageCode.Warnung, "Ok");
+            } else {
+                if (generic) {
+                    Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
+                } else {
+                    SuccessMessage(erfolg);
+                }
+            }
+        } else {
+            if (fehler.Count > 0) {
+                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen abgearbeitet.\r\nEs sind in {fehler.Count} Zeile(n) Skript-Fehler aufgetreten", ImageCode.Warnung, "OK");
+            } else {
+                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen erfolgreich abgearbeitet.", ImageCode.HäkchenDoppelt, "OK");
+            }
+        }
+    }
+
     internal static void NotEditableInfo(string reason) {
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
@@ -1833,6 +1963,53 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         return string.Empty;
+    }
+
+    internal void AutoFilter_Show(ColumnViewCollection ca, ColumnViewItem columnviewitem, int screenx, int screeny, int bottom) {
+        if (columnviewitem.Column is null) { return; }
+        if (!ca.ShowHead) { return; }
+        if (!columnviewitem.AutoFilterSymbolPossible) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        if (FilterCombined.HasAlwaysFalse()) {
+            Forms.MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
+            return;
+        }
+
+        var sb = new StringBuilder();
+        foreach (var thisFilter in Filter) {
+            if (thisFilter is not null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
+                sb.AppendLine(thisFilter.Origin);
+            }
+        }
+
+        if (FilterFix is { IsDisposed: false }) {
+            foreach (var thisFilter in FilterFix) {
+                if (thisFilter is not null && thisFilter.Column == columnviewitem.Column) {
+                    var o = thisFilter.Origin;
+                    if (string.IsNullOrEmpty(o)) { o = "Ein fix gesetzer Filter"; }
+                    sb.AppendLine(o);
+                }
+            }
+        }
+
+        var t = sb.ToString();
+
+        if (!string.IsNullOrEmpty(t)) {
+            Forms.MessageBox.Show($"<b>Dieser Filter wurde automatisch gesetzt:</b>\r\n{t}", ImageCode.Information, "OK");
+            return;
+        }
+
+        var headX = columnviewitem.ControlColumnLeft(OffsetX);
+        //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
+
+        // Altes AutoFilter schließen (verhindert Event-Subscription-Leak).
+        AutoFilter_Close();
+
+        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(SheetStyle), columnviewitem.GetRenderer(SheetStyle));
+        _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
+        _autoFilter.Show();
+        _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
 
     /// <summary>
@@ -1965,6 +2142,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
+    internal void CursorPos_Reset() => CursorPos_Set(null, null, false);
+
     internal void EnsureVisibleX(int controlX) {
         if (CurrentArrangement is not { } ca) { return; }
 
@@ -2065,6 +2244,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 
+    internal void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
+
     internal void RowCleanUp() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         var l = new RowCleanUp(this);
@@ -2094,6 +2275,25 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _pendingSmoothScroll = true;
         _mustDoAllViewItems = true;
     }
+
+    /// <summary>
+    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an.
+    /// </summary>
+    internal void ShowMiniToolbarAt(ColumnViewItem column, TableElement? rowItem, RowItem row) {
+        if (column.Column is not { IsDisposed: false }) { return; }
+
+        var screenOrigin = PointToScreen(Point.Empty);
+        var posX = screenOrigin.X + column.ControlColumnLeft(OffsetX);
+        var posY = screenOrigin.Y + (rowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? 0) + 2;
+
+        this.MiniToolbarShow(new Point(posX, posY),
+             ContextMenuItemGenerate(this, column, column.Column, row, RowsVisibleUnique()));
+    }
+
+    /// <summary>
+    /// Schaltet den Auf-/Zuklapp-Zustand eines Kapitel-Headers um.
+    /// </summary>
+    internal void ToggleChapterExpanded(RowCaptionTableElement rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
 
     protected override RectangleF CalculateCanvasMaxBounds() {
         var x = AvailableControlPaintArea.Width;
@@ -2393,16 +2593,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             _isinMouseDown = true;
             try {
                 var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
-                // Auf-/Zuklappen nur über den Pfeil-Button, Klick auf das Wort startet Drag/Drop.
-                if (_mouseOverRow is RowCaptionTableElement rcli
-                    && rcli.IsArrowButtonHit(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY)) {
-                    CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
-                    ToggleChapterExpanded(rcli);
-                    Invalidate_AllViewItems(false);
-                }
-                EnsureVisible(_mouseOverColumn, _mouseOverRow);
-                CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
+                // Item-Aktionen (inkl. Cursor-Setzen/Sichtbarkeit) laufen — analog
+                // zum Doppelklick — im Element; nur das Drag/Drop (übergreifend) bleibt hier.
+                _mouseOverRow?.HandleMouseDown(_mouseOverColumn, this, e);
 
                 PrepareDragItem(ca, e, _mouseOverColumn, _mouseOverRow);
             } finally {
@@ -2452,13 +2646,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                 var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
 
-                if (_mouseOverColumn is { IsDisposed: false } &&
-                    _mouseOverRowItem is TableElement { } rbi &&
-                    e.Button == MouseButtons.None) {
-                    var indentOffset = TableElement.IndentWidth.CanvasToControl(Zoom) * rbi.Indent;
-                    var mxInCol = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX) - indentOffset;
-                    var myInCol = e.ControlY - rbi.ControlPosition(Zoom, OffsetX, OffsetY).Top;
-                    QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn, mxInCol, myInCol, Zoom);
+                // Hover-Aktionen (z. B. QuickInfo) laufen — analog zum Doppelklick —
+                // im Element selbst; dort lässt sich gezielt ausbauen.
+                if (_mouseOverRowItem is { } mouseOverItem) {
+                    mouseOverItem.HandleMouseMove(_mouseOverColumn, this, e);
                 } else {
                     QuickInfo = string.Empty;
                 }
@@ -2502,43 +2693,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             if (_mouseOverColumn is not { IsDisposed: false }) { return; }
 
-            var isRealColumn = _mouseOverColumn.Column is { IsDisposed: false };
-
             if (e.Button == MouseButtons.Left) {
-                if (isRealColumn && _mouseOverRowItem is FilterBarTableElement cfli) {
-                    var screenX = Cursor.Position.X - e.ControlX;
-                    var screenY = Cursor.Position.Y - e.ControlY;
-                    AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.ControlPosition(Zoom, OffsetX, OffsetY).Bottom);
-                    return;
-                }
-
-                if (isRealColumn && _mouseOverRowItem is CollapesBarTableElement && _mouseOverColumn.CollapsableEnabled(SheetStyle)) {
-                    _mouseOverColumn.IsExpanded = !_mouseOverColumn.IsExpanded;
-                    Invalidate_AllViewItems(false);
-                    return;
-                }
-
-                if (_mouseOverRowItem is TableElement rbli) {
-                    var indentOffset = TableElement.IndentWidth.CanvasToControl(Zoom) * rbli.Indent;
-                    var mouseXinColumn = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX) - indentOffset;
-                    var mouseYinColumn = e.ControlY - rbli.ControlPosition(Zoom, OffsetX, OffsetY).Top;
-                    if (rbli.HandleClick(ca, _mouseOverColumn, mouseXinColumn, mouseYinColumn, Zoom, this)) {
-                        Invalidate_CurrentArrangement();
-                        return;
-                    }
-                }
-
-                if (_mouseOverColumn.Column is { IsDisposed: false } col && _mouseOverRow?.Row is { IsDisposed: false } r) {
-                    OnCellClicked(new CellEventArgs(col, r));
-                    Invalidate();
-
-                    // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
-                    // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
-                    // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
-                    ShowMiniToolbarAt(_mouseOverColumn, _mouseOverRowItem, r);
-                }
+                // Item-Klick-Aktionen — inkl. CellClicked-Event, Invalidate und
+                // Mini-Toolbar — werden im Element selbst ausgelöst.
+                _mouseOverRowItem?.HandleMouseUp(_mouseOverColumn, this, e);
             }
 
+            // Das Kontextmenü ist elementübergreifend und bleibt deshalb hier.
             if (e.Button == MouseButtons.Right) {
                 ((IContextMenu)this).ContextMenuShow(ContextMenuItemGenerate(this, _mouseOverColumn, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
             }
@@ -2704,133 +2865,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Erzeugt die Strategie zum übergebenen Strategy-Key (ClassId).
     /// </summary>
     private static ControlStrategy CreateControlStrategy(string editStrategyKey) => ControlStrategy.CreateNew(editStrategyKey);
-
-    private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
-        var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
-
-        if (rows.Count == 0) {
-            Forms.MessageBox.Show($"{info2}Keine Zeilen zum Abarbeiten vorhanden.", ImageCode.Kreuz, "OK");
-            return;
-        }
-
-        if (rows[0]?.Table is not { IsDisposed: false } tb) {
-            Forms.MessageBox.Show($"{info2}Tabelle verworfen", ImageCode.Kreuz, "OK");
-            return;
-        }
-
-        var f = tb.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) {
-            Forms.MessageBox.Show($"{info2}{f}", ImageCode.Kreuz, "OK");
-            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-            return;
-        }
-
-        if (!generic && sc is null) {
-            Forms.MessageBox.Show($"{info2}Interner Programmfehler,\r\nkein Skript angekommen.", ImageCode.Kreuz, "OK");
-            return;
-        }
-        foreach (var row in rows) {
-            if (row.Table != tb) {
-                Forms.MessageBox.Show($"{info2}Interner Programmfehler\r\nZeilen aus unterschiedlichen Datenbanken.", ImageCode.Kreuz, "OK");
-                return;
-            }
-        }
-
-        if (rows.Count > 1) {
-            var t = string.Empty;
-
-            var tmpsc = sc;
-
-            if (generic) {
-                var l = tb.EventScript.Get(ScriptEventTypes.value_changed);
-
-                if (l.Count == 1) { tmpsc = l[0]; }
-            }
-
-            if (tmpsc is not null && tmpsc.StoppedTimeCount > 20) {
-                var tm = Math.Round(tmpsc.AverageRunTime / 1000f * rows.Count / 60f, 1);
-                t = $"\r\n<i>(geschätzte Dauer: {tm} Minuten)<i>";
-            }
-
-            if (Forms.MessageBox.Show($"<b>{info}</b>\r\nfür {rows.Count} Zeilen ausführen?{t}", ImageCode.Information, "Ja", "Nein") != 0) {
-                //Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
-                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
-                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                return;
-            }
-        }
-
-        var fehler = new List<ScriptEndedFeedback>();
-        ScriptEndedFeedback? erfolg = null;
-        Progressbar? _pg = null;
-
-        if (rows.Count > 3) {
-            _pg = Progressbar.Show(info, rows.Count);
-            _pg.CancelSupported = true;
-        }
-
-        var firstRow = rows[0];
-        var all = rows.Count;
-        var c = 0;
-        while (rows.Count > 0) {
-            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].ReadableText()}", 0);
-
-            _pg?.Update(c++);
-            Develop.DoEvents();
-
-            if (_pg is { IsCancelRequested: true }) {
-                _pg.Close();
-                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
-                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                return;
-            }
-
-            if (!tb.CanDoValueChangedScript(true)) {
-                _pg?.Close();
-                Forms.MessageBox.Show($"{info2}Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
-                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                return;
-            }
-
-            rows[0].InvalidateCheckData();
-
-            ScriptEndedFeedback? fb;
-            if (generic) {
-                rows[0].InvalidateRowState(null, $"TableView, Kontextmenü, {info}", DateTime.UtcNow, ChangeFlags.LogUndo);
-                fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
-            } else {
-                fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
-            }
-
-            if (fb?.Failed == true) {
-                fehler.Add(fb);
-            } else {
-                erfolg = fb;
-            }
-
-            rows.RemoveAt(0);
-        }
-
-        _pg?.Close();
-
-        if (all == 1) {
-            if (fehler.Count == 1) {
-                Forms.MessageBox.Show($"{info2}<b>Es ist ein Skript-Fehler aufgetreten.</b>\r\n\r\n{fehler[0].ProtocolText}", ImageCode.Warnung, "Ok");
-            } else {
-                if (generic) {
-                    Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
-                } else {
-                    SuccessMessage(erfolg);
-                }
-            }
-        } else {
-            if (fehler.Count > 0) {
-                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen abgearbeitet.\r\nEs sind in {fehler.Count} Zeile(n) Skript-Fehler aufgetreten", ImageCode.Warnung, "OK");
-            } else {
-                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen erfolgreich abgearbeitet.", ImageCode.HäkchenDoppelt, "OK");
-            }
-        }
-    }
 
     /// <summary>
     /// Zeichnet ein halbtransparentes Rechteck als Drag/Drop-Einfüge-Indikator.
@@ -3097,53 +3131,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         OnAutoFilterClicked(new FilterEventArgs(e.Filter));
-    }
-
-    private void AutoFilter_Show(ColumnViewCollection ca, ColumnViewItem columnviewitem, int screenx, int screeny, int bottom) {
-        if (columnviewitem.Column is null) { return; }
-        if (!ca.ShowHead) { return; }
-        if (!columnviewitem.AutoFilterSymbolPossible) { return; }
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        if (FilterCombined.HasAlwaysFalse()) {
-            Forms.MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
-            return;
-        }
-
-        var sb = new StringBuilder();
-        foreach (var thisFilter in Filter) {
-            if (thisFilter is not null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
-                sb.AppendLine(thisFilter.Origin);
-            }
-        }
-
-        if (FilterFix is { IsDisposed: false }) {
-            foreach (var thisFilter in FilterFix) {
-                if (thisFilter is not null && thisFilter.Column == columnviewitem.Column) {
-                    var o = thisFilter.Origin;
-                    if (string.IsNullOrEmpty(o)) { o = "Ein fix gesetzer Filter"; }
-                    sb.AppendLine(o);
-                }
-            }
-        }
-
-        var t = sb.ToString();
-
-        if (!string.IsNullOrEmpty(t)) {
-            Forms.MessageBox.Show($"<b>Dieser Filter wurde automatisch gesetzt:</b>\r\n{t}", ImageCode.Information, "OK");
-            return;
-        }
-
-        var headX = columnviewitem.ControlColumnLeft(OffsetX);
-        //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
-
-        // Altes AutoFilter schließen (verhindert Event-Subscription-Leak).
-        AutoFilter_Close();
-
-        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(SheetStyle), columnviewitem.GetRenderer(SheetStyle));
-        _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
-        _autoFilter.Show();
-        _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
 
     private void AutoScrollDuringDrag(int? controlX, int? controlY) {
@@ -4001,8 +3988,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         HideMiniToolbar();
     }
 
-    private void CursorPos_Reset() => CursorPos_Set(null, null, false);
-
     private void DoColumnSortReorder(ColumnViewItem sourceCvi, int insertIndex) {
         if (Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
@@ -4272,6 +4257,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             EndEdit();
             return;
         }
+
+        // Das Verstecken in EndEdit löst synchron LostFocus aus und damit rekursiv Edit_Close.
+        // Deshalb die Commit-Referenz vorher abziehen, damit genau einmal committet wird.
+        _editCommit = null;
 
         // EndEdit versteckt das Edit → ForceWriteBackValue → ValueChanged → _editValue.
         EndEdit();
@@ -4583,9 +4572,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 
-    //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
-    private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
-
     private void OnFilterCombinedChanged() =>
                                         // Bestehenden Code belassen
                                         FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
@@ -4751,20 +4737,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
-    /// <summary>
-    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an.
-    /// </summary>
-    private void ShowMiniToolbarAt(ColumnViewItem column, TableElement? rowItem, RowItem row) {
-        if (column.Column is not { IsDisposed: false }) { return; }
-
-        var screenOrigin = PointToScreen(Point.Empty);
-        var posX = screenOrigin.X + column.ControlColumnLeft(OffsetX);
-        var posY = screenOrigin.Y + (rowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? 0) + 2;
-
-        this.MiniToolbarShow(new Point(posX, posY),
-             ContextMenuItemGenerate(this, column, column.Column, row, RowsVisibleUnique()));
-    }
-
     private RowSortDefinition? SortUsed() {
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
             return new RowSortDefinition(tb, sortCol, false);
@@ -4804,11 +4776,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (IsDisposed) { return; }
         Invalidate();
     }
-
-    /// <summary>
-    /// Schaltet den Auf-/Zuklapp-Zustand eines Kapitel-Headers um.
-    /// </summary>
-    private void ToggleChapterExpanded(RowCaptionTableElement rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
 
     /// <summary>
     /// Aktualisiert das Kapitel der verschobenen Zeile anhand des Ziel-Kapitels oberhalb der Mausposition.
@@ -4874,5 +4841,4 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     #endregion
-
 }
