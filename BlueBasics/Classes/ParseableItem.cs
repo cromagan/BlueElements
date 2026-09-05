@@ -15,11 +15,11 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     private volatile int _isDisposedFlag;
 
     /// <summary>
-    /// Verschachtelungssicherer Zhler fr <see cref="BeginInit" /> / <see cref="EndInit" />.
-    /// Bei Werten &gt; 0 werden <see cref="OnPropertyChanged(string)" /> und
-    /// <see cref="OnPropertyChangedExt" /> unterdrckt - typischerweise whrend
+    /// Verschachtelungssicherer Zhler fr BeginInit / EndInit.
+    /// Bei Werten &gt; 0 werden OnPropertyChanged(string) und
+    /// OnPropertyChangedExt unterdrckt - typischerweise whrend
     /// des Parsens / Initialisierens, damit Property-Setter keine Change-Events
-    /// auf halb initialisierte Objekte feuern. Das <see cref="Disposed" />-Event
+    /// auf halb initialisierte Objekte feuern. Das Disposed-Event
     /// wird bewusst NIEMALS supprimiert (safety-relevant).
     /// </summary>
     private int _suspendCount;
@@ -42,10 +42,10 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     /// <summary>
     /// <c>true</c>, whrend sich das Objekt in einer Initialisierungs- oder
-    /// Parse-Phase befindet (zwischen <see cref="BeginInit" /> und
-    /// <see cref="EndInit" />). Consumer und Subklassen drfen darauf prfen,
+    /// Parse-Phase befindet (zwischen BeginInit und
+    /// EndInit). Consumer und Subklassen drfen darauf prfen,
     /// um reaktive Logik zu verzgern. Change-Events werden in diesem Zustand
-    /// nicht gefeuert - mit Ausnahme des <see cref="Disposed" />-Events.
+    /// nicht gefeuert - mit Ausnahme des Disposed-Events.
     /// </summary>
     public bool IsEventsSuppressed => _suspendCount > 0;
 
@@ -118,12 +118,12 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// JSON-Pendant zu <see cref="NewByParsing{T}" />. Erzeugt anhand des
+    /// JSON-Pendant zu NewByParsing{T}. Erzeugt anhand des
     /// <c>type</c>- bzw. <c>classid</c>-Feldes im JSON-Objekt über die
     /// <c>ClassId</c>-Registry die passende Instanz und parst anschließend das Objekt.
     /// Gibt <c>null</c> zurück, wenn der Typ nicht ermittelt werden konnte.
     /// Es werden sowohl <c>ParseJson</c> als auch abschließend
-    /// <c>ParseFinishedJson</c> aufgerufen - analog zum <see cref="NewByParsing{T}" />-Pendant,
+    /// <c>ParseFinishedJson</c> aufgerufen - analog zum NewByParsing{T}-Pendant,
     /// das über die <c>Parse</c>-Erweiterung ebenfalls <c>ParseFinished</c> auslöst.
     /// </summary>
     public static T? NewByParsingJson<T>(JsonObject element, params object[] args) where T : ParseableItem, IJsonParseable {
@@ -157,8 +157,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     /// Erstellt eine neue Instanz anhand des Typnamens. Gesucht wird über
     /// die statische <c>ClassId</c>-Property des Zieltyps; <typeparamref name="T" />
     /// muss daher nur ein Referenztyp mit einer solchen Property sein (ein
-    /// Bezug zu <see cref="ParseableItem" /> ist nicht erforderlich).
-    /// Die Typsuche ist über <see cref="GetTypeByClassId{T}" /> gecacht,
+    /// Bezug zu ParseableItem ist nicht erforderlich).
+    /// Die Typsuche ist über GetTypeByClassId{T} gecacht,
     /// sodass der Reflection-Zugriff auf <c>ClassId</c> nur einmal pro Target-Typ
     /// und Assembly-Generation erfolgt.
     /// </summary>
@@ -173,12 +173,12 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Implementiert <see cref="ISupportInitialize" />. Erhht den
-    /// <see cref="_suspendCount" />-Zhler; alle nachfolgenden
-    /// <see cref="OnPropertyChanged(string)" />- und
-    /// <see cref="OnPropertyChangedExt" />-Aufrufe werden unterdrckt,
-    /// bis entsprechend oft <see cref="EndInit" /> aufgerufen wurde.
-    /// Verschachtelungssicher. Siehe auch <see cref="IsEventsSuppressed" />.
+    /// Implementiert ISupportInitialize. Erhht den
+    /// _suspendCount-Zhler; alle nachfolgenden
+    /// OnPropertyChanged(string)- und
+    /// OnPropertyChangedExt-Aufrufe werden unterdrckt,
+    /// bis entsprechend oft EndInit aufgerufen wurde.
+    /// Verschachtelungssicher. Siehe auch IsEventsSuppressed.
     /// </summary>
     public void BeginInit() {
         if (IsDisposed) { return; }
@@ -208,8 +208,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Implementiert <see cref="ISupportInitialize" />. Dekrementiert den
-    /// <see cref="_suspendCount" />-Zhler. Sobald der Zhler wieder 0
+    /// Implementiert ISupportInitialize. Dekrementiert den
+    /// _suspendCount-Zhler. Sobald der Zhler wieder 0
     /// erreicht, feuern die On-Methoden wieder normal.
     /// </summary>
     public void EndInit() {
@@ -223,13 +223,13 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     public virtual IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
 
     /// <summary>
-    /// Löst das <see cref="PropertyChangedExt" />-Event aus. Wird von Property-Settern
+    /// Löst das PropertyChangedExt-Event aus. Wird von Property-Settern
     /// in Subklassen aufgerufen, um eine inkrementelle Speicherung auszulösen.
     /// EventArgs-Erzeugung delegiert an
-    /// <see cref="JsonParseableExtension.BuildPartialJson" />, nur der SourceKey
+    /// JsonParseableExtension.BuildPartialJson, nur der SourceKey
     /// wird hier individuell aufgebaut (ParseableItem ist formal nicht
     /// IJsonParseable, deshalb kein direkter Aufruf der Extension).
-    /// Whrend <see cref="IsEventsSuppressed" /> (z. B. beim Parsen) ist die
+    /// Whrend IsEventsSuppressed (z. B. beim Parsen) ist die
     /// Methode eine No-Op.
     /// </summary>
     public void OnPropertyChangedExt(string relativePath, object? value) {
@@ -263,8 +263,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Lst das <see cref="PropertyChanged" />-Event aus. Whrend
-    /// <see cref="IsEventsSuppressed" /> (z. B. beim Parsen / Initialisieren)
+    /// Lst das PropertyChanged-Event aus. Whrend
+    /// IsEventsSuppressed (z. B. beim Parsen / Initialisieren)
     /// ist die Methode eine No-Op. Subklassen, die zustzliche Logik in
     /// ihrem Override brauchen (z. B. Cache-Invalidierung), mssen dafr
     /// SORGEN, dass diese zustzliche Logik UNABHNGIG vom Suppress-Modus

@@ -107,7 +107,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// <summary>
     /// Liefert einen stabilen Snapshot aller lebenden
     /// ConnectedFormula-Instanzen. Überschreibt (per Method-Hiding) die geerbte
-    /// <see cref="LiveInstanceCache{T}.AllInstances"/> (T = BlockableFile), die
+    /// LiveInstanceCache{T}.AllInstances (T = BlockableFile), die
     /// alle BlockableFile-Instanzen zurückgibt — hier wird auf den konkreten
     /// Typ ConnectedFormula gefiltert und bereits disposed Instanzen
     /// herausgefiltert (das geerbte Register wird nur asynchron bereinigt).
@@ -121,7 +121,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     }
 
     /// <summary>
-    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
+    /// Factory für LiveInstanceCache{T}.GetOrCreate{TDerived}.
     /// Erzeugt eine neue ConnectedFormula-Instanz für den angegebenen Dateipfad.
     /// </summary>
     public static ConnectedFormula Create(string key) => new(key);
@@ -129,7 +129,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// <summary>
     /// Holt eine bestehende oder erzeugt eine neue ConnectedFormula-Instanz für
     /// den angegebenen Dateipfad. Race-Safe über das geerbte
-    /// <see cref="LiveInstanceCache{T}.GetOrCreate"/> (T = BlockableFile).
+    /// LiveInstanceCache{T}.GetOrCreate (T = BlockableFile).
     /// </summary>
     public static ConnectedFormula? Get(string filename) => GetOrCreate<ConnectedFormula>(filename);
 
@@ -216,7 +216,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     /// <summary>
     /// ConnectedFormula ist die Wurzel des Baums. Pfad-Abstiege über
-    /// <see cref="JsonParseableExtension.ApplyPartialJson" /> erreichen diese Methode
+    /// JsonParseableExtension.ApplyPartialJson erreichen diese Methode
     /// nicht, weil nach oben kein Partial-Json gepusht wird. Einzige Ausnahme ist der
     /// Container <c>pages</c>, über den eine einzelne Page anhand ihres KeyNames
     /// aufgelöst wird.
@@ -237,7 +237,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// <summary>
     /// Stellt sicher, dass der Dateiinhalt verarbeitet ist.
     /// Bei leerem oder nicht parsebarem Inhalt werden die Standard-Reparaturen
-    /// (Default-Head, RowEntryItem) über <see cref="ParseFinished"/> dennoch ausgeführt.
+    /// (Default-Head, RowEntryItem) über ParseFinished dennoch ausgeführt.
     /// </summary>
     private void EnsureParsed() {
         if (IsParsed || IsDisposed) { return; }
@@ -248,10 +248,10 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     }
 
     /// <summary>
-    /// Löst das <see cref="PropertyChangedExt" />-Event aus. ConnectedFormula ist
-    /// die Wurzel des Baums; Sub-Item-Änderungen aus dem <see cref="Pages" />-Baum
-    /// werden über <see cref="Pages_PropertyChangedExt" /> hierher durchgereicht
-    /// und zusammen mit <see cref="OnPropertyChanged" /> (das <see cref="BlockableFile" />
+    /// Löst das PropertyChangedExt-Event aus. ConnectedFormula ist
+    /// die Wurzel des Baums; Sub-Item-Änderungen aus dem Pages-Baum
+    /// werden über Pages_PropertyChangedExt hierher durchgereicht
+    /// und zusammen mit OnPropertyChanged (das BlockableFile
     /// via <c>MarkDirty</c> als ungespeichert markiert) weitergegeben.
     /// </summary>
     public void OnPropertyChangedExt(string relativePath, object? value) {
@@ -283,8 +283,8 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     }
 
     /// <summary>
-    /// Neue JSON-basierte Serialisierung. Implementiert <see cref="IJsonStringable.ParseableJson" />
-    /// und löst das alte <see cref="ParseableItems" /> langfristig ab.
+    /// Neue JSON-basierte Serialisierung. Implementiert IJsonStringable.ParseableJson
+    /// und löst das alte ParseableItems langfristig ab.
     /// Schema-Vereinheitlichung gegenüber dem alten Format:
     /// <list type="bullet">
     ///   <item><description><c>CreateName</c> → <c>creator</c></description></item>
@@ -309,7 +309,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
 
     /// <summary>
     /// Wird aufgerufen, wenn die Analyse abgeschlossen ist. Die Pages wurden
-    /// bereits in <see cref="ParseThis" /> oder <see cref="ParseJson" /> direkt
+    /// bereits in ParseThis oder ParseJson direkt
     /// in <c>_pages</c> eingetragen. Hier erfolgen nur noch Standard-Sicherungen
     /// (Default-Head, RowEntryItem, GridShow/GridSnap) und die Receiver-Reparatur.
     /// </summary>
@@ -530,8 +530,8 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// <summary>
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
     /// Der Inhalt wird NICHT sofort neu serialisiert, sondern erst beim nächsten
-    /// Speichern über <see cref="BuildContent"/>.
-    /// Ist die Datei durch einen anderen Prozess gesperrt (<see cref="BlockerMessage"/>),
+    /// Speichern über BuildContent.
+    /// Ist die Datei durch einen anderen Prozess gesperrt (BlockerMessage),
     /// werden die Änderungen im Speicher übernommen, aber NICHT als Dirty markiert
     /// und kein Schreibzugriff versucht. Standard-Reparaturen (z.B. ShowAlways im
     /// Editor) sind nicht speicherrelevant.

@@ -940,7 +940,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Setzt den Wert direkt im Speicher, ohne Undo-Logging, Events oder Reparaturen.
-    /// Orchestrierung (Events, SysRowState-Reset) erfolgt durch den Aufrufer (z.B. <see cref="Table.SetValueInternal"/>).
+    /// Orchestrierung (Events, SysRowState-Reset) erfolgt durch den Aufrufer (z.B. Table.SetValueInternal).
     /// </summary>
     /// <param name="column"></param>
     /// <param name="value"></param>
@@ -984,7 +984,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Pflegt nach einer Zelländerung die Systemspalten: Änderer/Änderungsdatum werden immer
-    /// gesetzt, der Zeilenstatus bei Neuberechnungs-spalten über <see cref="InvalidateRowState(ColumnItem?, string, DateTime, ChangeFlags)"/> invalidiert.
+    /// gesetzt, der Zeilenstatus bei Neuberechnungs-spalten über InvalidateRowState(ColumnItem?, string, DateTime, ChangeFlags) invalidiert.
     /// </summary>
     internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, ChangeFlags reason) {
         if (!reason.HasFlag(ChangeFlags.PostProcess)) { return; }

@@ -20,6 +20,9 @@ public class ColorRenderer : Renderer {
 
     public override string Description => "Kann Hex-Farbcode (RGB oder ARGB) anzeigen (z.B. #ff0000) ";
 
+    /// <summary>
+    /// Wenn gewählt, wird die Farbe zusätzlich als Zahlenwert angezeigt, z. B. #ff0000.
+    /// </summary>
     public bool ShowHex {
         get => _showHex;
         set {
@@ -30,6 +33,9 @@ public class ColorRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird zusätzlich der Name der Farbe angezeigt, z. B. Rot.
+    /// </summary>
     public bool ShowName {
         get => _showName;
         set {
@@ -40,6 +46,9 @@ public class ColorRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird ein kleines farbiges Kästchen in der Zellfarbe angezeigt.
+    /// </summary>
     public bool ShowSymbol {
         get => _showSymbol;
         set {

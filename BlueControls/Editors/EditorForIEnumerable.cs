@@ -7,46 +7,46 @@ using System.Collections;
 namespace BlueControls.Editoren;
 
 /// <summary>
-/// Spezialisierte <see cref="ListBox"/>, die eine Collection vom Typ
-/// <see cref="IEnumerable{T}"/> verwaltet und ein verknüpftes Editor-Control
+/// Spezialisierte ListBox, die eine Collection vom Typ
+/// IEnumerable{T} verwaltet und ein verknüpftes Editor-Control
 /// für das jeweils ausgewählte Element anzeigt.
 /// <para />
 /// Der Editor ist ein reines Anzeige-Tool: er implementiert
-/// <see cref="INotifyPropertyChanged"/> und meldet Änderungen ausschließlich
-/// über <see cref="INotifyPropertyChanged.PropertyChanged"/>. Diese ListBox
+/// INotifyPropertyChanged und meldet Änderungen ausschließlich
+/// über INotifyPropertyChanged.PropertyChanged. Diese ListBox
 /// fängt dieses Event ab, aktualisiert ihre eigene Anzeige und übernimmt die
-/// geänderte Instanz in ihre Arbeitskopie (<see cref="OutputItem"/>). Das
+/// geänderte Instanz in ihre Arbeitskopie (OutputItem). Das
 /// hostende Form übernimmt die gesamte Backend-Arbeit — es liest
-/// <see cref="OutputItem"/> beispielsweise beim Schließen aus und schreibt die
+/// OutputItem beispielsweise beim Schließen aus und schreibt die
 /// Collection ans Backend zurück. Wie der Editor verändert, steuert
-/// <see cref="IIsEditor.Mode"/> bzw. <see cref="IIsEditor.SupportedModes"/>:
+/// IIsEditor.Mode bzw. IIsEditor.SupportedModes:
 /// <list type="bullet">
 /// <item><b>EditItem</b>: der Editor verändert das Element in-place. Die
 /// Arbeitskopie enthält die Änderung über die gemeinsame Referenz bereits —
 /// die ListBox aktualisiert nur ihre Anzeige.</item>
-/// <item><b>EditCopy</b>: der Editor erzeugt über <see cref="IIsEditor.OutputItem"/>
+/// <item><b>EditCopy</b>: der Editor erzeugt über IIsEditor.OutputItem
 /// eine neue Instanz. Die ListBox ersetzt das alte Element in ihrer Arbeitskopie
 /// durch diese neue Instanz.</item>
 /// </list>
 /// <para />
 /// Das Hinzufügen neuer Elemente wird nicht durch den Editor erzeugt,
-/// sondern über <see cref="ListBox.AddClicked"/> an das Form durchgereicht.
+/// sondern über ListBox.AddClicked an das Form durchgereicht.
 /// Das Form erzeugt lediglich das neue Element und übergibt es über
-/// <see cref="Add"/> an diesen Editor; dieser übernimmt es dann automatisch in
-/// seine Arbeitskopie (<see cref="OutputItem"/>), aktualisiert die Anzeige und selektiert es. Das Entfernen übernimmt diese
+/// Add an diesen Editor; dieser übernimmt es dann automatisch in
+/// seine Arbeitskopie (OutputItem), aktualisiert die Anzeige und selektiert es. Das Entfernen übernimmt diese
 /// ListBox ebenfalls auf ihrer Arbeitskopie. Es wird kein Änderungs-Event
-/// gefeuert — der Host liest <see cref="OutputItem"/> aus, wenn er die
+/// gefeuert — der Host liest OutputItem aus, wenn er die
 /// Arbeitskopie braucht (üblicherweise beim Schließen oder vor einer Aktion
 /// wie dem Skript-Test).
 /// <para />
 /// Ist der Editor puffernd (hält Eingaben in UI-Controls vor, statt sie
 /// sofort in das backing Item zu schreiben), wird vor jedem Selektionswechsel,
-/// Hinzufügen und Entfernen das aktuelle <see cref="IIsEditor.OutputItem"/>
-/// vom Editor angefordert (<see cref="SelectionChanging"/>), damit keine
+/// Hinzufügen und Entfernen das aktuelle IIsEditor.OutputItem
+/// vom Editor angefordert (SelectionChanging), damit keine
 /// gepufferten Eingaben verloren gehen.
 /// <para />
 /// Die ListBox wird vom Host über Änderungen der Quell-Collection informiert:
-/// dieser setzt <see cref="InputItem"/> neu, woraufhin die Arbeitskopie neu
+/// dieser setzt InputItem neu, woraufhin die Arbeitskopie neu
 /// aufgebaut und die Anzeige aktualisiert wird (Tabellenwechsel, Backend-Update,
 /// Undo/Redo).
 /// </summary>
@@ -55,7 +55,7 @@ public partial class EditorForIEnumerable : ListBox {
     #region Events
 
     /// <summary>
-    /// Wird nach jedem Neuaufbau der Liste durch <see cref="UpdateList"/> gefeuert.
+    /// Wird nach jedem Neuaufbau der Liste durch UpdateList gefeuert.
     /// Erlaubt dem Aufrufer, gruppenbildende Items, benutzerdefinierte
     /// Sortierschlüssel oder weitere Nachbearbeitungen anzubringen.
     /// </summary>
@@ -64,7 +64,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// <summary>
     /// Wird gefeuert, bevor die Selektion wechselt, ein Element hinzugefügt oder
     /// entfernt wird. unmittelbar danach fordert die ListBox das aktuelle
-    /// <see cref="IIsEditor.OutputItem"/> vom Editor an.
+    /// IIsEditor.OutputItem vom Editor an.
     /// </summary>
     public event EventHandler? SelectionChanging;
 
@@ -74,9 +74,9 @@ public partial class EditorForIEnumerable : ListBox {
 
     /// <summary>
     /// Der Detail-Editor, der das aktuell ausgewählte Element anzeigt.
-    /// Der zu bearbeitende Element-Typ wird über <see cref="IIsEditor.EditorFor"/>
+    /// Der zu bearbeitende Element-Typ wird über IIsEditor.EditorFor
     /// dieses Editors bestimmt. Der Editor wird vom Aufrufer visuell platziert.
-    /// Implementiert der Editor <see cref="INotifyPropertyChanged"/>, wird auf
+    /// Implementiert der Editor INotifyPropertyChanged, wird auf
     /// jede Änderung reagiert (Anzeige aktualisieren und das Form benachrichtigen).
     /// </summary>
     [DefaultValue(null)]
@@ -96,12 +96,12 @@ public partial class EditorForIEnumerable : ListBox {
     /// <c>IEnumerable</c> — typischerweise die Backend-Collection selbst
     /// (z.B. <c>Table.EventScript</c>). Beim Setzen wird die ListBox neu aufgebaut,
     /// wobei eine bestehende Auswahl über Referenzidentität bzw. den KeyName
-    /// (<see cref="IHasKeyName"/>) erhalten bleibt.
+    /// (IHasKeyName) erhalten bleibt.
     /// <para />
     /// Da das Backend die Collection-Referenz bei jeder Änderung austauscht, muss
-    /// der Host <see cref="InputItem"/> nach jeder Backend-Änderung neu auf die
+    /// der Host InputItem nach jeder Backend-Änderung neu auf die
     /// aktuelle Collection setzen — das Setzen löst intern bereits
-    /// <see cref="InputItemsChanged"/> aus. Ein separater Aufruf ist nur nötig, wenn
+    /// InputItemsChanged aus. Ein separater Aufruf ist nur nötig, wenn
     /// sich der Inhalt derselben Referenz geändert hat.
     /// </summary>
     [DefaultValue(null)]
@@ -124,7 +124,7 @@ public partial class EditorForIEnumerable : ListBox {
 
     /// <summary>
     /// Die aktuelle Arbeitskopie der Elemente. Wird beim Setzen von
-    /// <see cref="InputItem"/> neu aus der Quelle aufgebaut. Modifikationen über
+    /// InputItem neu aus der Quelle aufgebaut. Modifikationen über
     /// Hinzufügen/Entfernen/Ersetzen aktualisieren diese Kopie. Es wird kein
     /// Änderungs-Event gefeuert — der Host liest diese Eigenschaft aus, wenn er
     /// die Arbeitskopie braucht (üblicherweise beim Schließen oder vor einer
@@ -138,7 +138,7 @@ public partial class EditorForIEnumerable : ListBox {
     /// bestehende visuelle Selection wird dabei aufgehoben (auch bei
     /// <c>null</c> oder wenn das Element (noch) nicht in der Anzeige steht).
     /// Die Übernahme in den verknüpften Editor erfolgt bewusst NICHT hier,
-    /// sondern explizit über <see cref="PushSelectionToEditor"/> an den
+    /// sondern explizit über PushSelectionToEditor an den
     /// Stellen, die eine Auswahl initiieren. Überwiegend für das hostende Form
     /// gedacht, das z.B. Backend-Aktionen für das gewählte Element ausführen
     /// muss (Verlauf anzeigen, Element löschen).
@@ -170,9 +170,9 @@ public partial class EditorForIEnumerable : ListBox {
     #region Methods
 
     /// <summary>
-    /// Fügt der Arbeitskopie (<see cref="OutputItem"/>) ein neues Element hinzu,
+    /// Fügt der Arbeitskopie (OutputItem) ein neues Element hinzu,
     /// aktualisiert die Anzeige und selektiert das Element. Typischerweise aus
-    /// dem <see cref="ListBox.AddClicked"/>-Handler des hostenden
+    /// dem ListBox.AddClicked-Handler des hostenden
     /// Forms aufzurufen — der <paramref name="newItem"/> wird dabei als
     /// <c>sender</c> übergeben (das ist die Instanz dieses Editors).
     /// </summary>
@@ -360,9 +360,9 @@ public partial class EditorForIEnumerable : ListBox {
     /// Übernimmt das aktuell selektierte Element in den verknüpften Editor.
     /// Der bewusste Aufruf erfolgt nur an Stellen, die eine Auswahl explizit
     /// initiieren (Nutzer-Klick, Add/SelectByKey, Backend-Update). Das
-    /// <see cref="ListBox.ItemCheckedChanged"/>-Event pusht die Auswahl
+    /// ListBox.ItemCheckedChanged-Event pusht die Auswahl
     /// absichtlich NICHT mehr — es feuert auch beim programmatischen
-    /// Wiederherstellen der Selektion innerhalb von <see cref="UpdateList"/>
+    /// Wiederherstellen der Selektion innerhalb von UpdateList
     /// und würde sonst gepufferte Eingaben (z.B. den Text-Cursor im
     /// Skript-Editor) zerstören.
     /// </summary>
@@ -386,9 +386,9 @@ public partial class EditorForIEnumerable : ListBox {
     }
 
     /// <summary>
-    /// Baut die Liste aus <see cref="InputItem"/> neu auf. Bestehende Selektion
+    /// Baut die Liste aus InputItem neu auf. Bestehende Selektion
     /// wird bevorzugt über Referenzidentität, als Fallback über den KeyName
-    /// (<see cref="IHasKeyName"/>) wiederhergestellt. So bleibt die visuelle
+    /// (IHasKeyName) wiederhergestellt. So bleibt die visuelle
     /// Auswahl auch erhalten, wenn das Backend nach einer Änderung neue
     /// Objekt-Instanzen mit gleichem Schlüssel erzeugt (z.B. <c>TableScriptDescription</c>).
     /// </summary>

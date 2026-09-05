@@ -96,10 +96,19 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
 
     public BlueFont? Font { get; set; }
 
+    /// <summary>
+    /// Die gemessene Länge in Millimetern.
+    /// </summary>
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, CollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
+    /// <summary>
+    /// Anzahl der angezeigten Stellen hinter dem Komma.
+    /// </summary>
     public int Nachkommastellen { get; set; }
 
+    /// <summary>
+    /// Text, der vor der Maßzahl angezeigt wird.
+    /// </summary>
     public string Präfix {
         get;
         set {
@@ -111,6 +120,9 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
+    /// <summary>
+    /// Schriftart für die Beschriftung der Maßlinie.
+    /// </summary>
     public PadStyles Style {
         get;
         set {
@@ -121,6 +133,9 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         }
     } = PadStyles.Standard;
 
+    /// <summary>
+    /// Text, der hinter der Maßzahl angezeigt wird, z. B. eine Maßeinheit.
+    /// </summary>
     public string Suffix {
         get;
         set {
@@ -130,6 +145,9 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Text oberhalb der Maßlinie.
+    /// </summary>
     public string Text_Oben {
         get;
         set {
@@ -141,6 +159,9 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Text unterhalb der Maßlinie.
+    /// </summary>
     public string Text_Unten {
         get;
         set {
@@ -151,6 +172,9 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Die Größe der Beschriftung.
+    /// </summary>
     public float TextScale {
         get;
         set {

@@ -1,19 +1,22 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueScript.Classes;
 using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
 /// <summary>
-/// Zeigt nichts an: Ein einfacher Klick in die Zelle führt das gewählte
-/// Zeilenskript der Tabelle sofort aus. Ein Doppelklick bleibt wirkungslos.
+/// Zeigt nichts an: Ein einfacher Klick in die Zelle führt das direkt
+/// hinterlegte Skript sofort aus. Ein Doppelklick bleibt wirkungslos.
 /// </summary>
 public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
 
     #region Fields
 
     private const string _scriptKey = "script";
+
+    private FlexiControlForDelegate? _button;
 
     #endregion
 
@@ -22,26 +25,21 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     public static string ClassId => "scriptexecute";
 
     /// <summary>
-    /// Die Spalte, deren Tabelle die Zeilenskripte zur Auswahl stellt.
+    /// Die Spalte, deren Tabelle als Skript-Kontext dient.
     /// Wird vom Spalten-Editor bzw. beim Klick gesetzt.
     /// </summary>
     public ColumnItem? Column { get; set; }
 
-    public override string Description => "Zeigt nichts an: Ein Klick in die Zelle führt sofort das gewählte Zeilenskript aus.";
+    public override string Description => "Zeigt nichts an: Ein Klick in die Zelle führt sofort das hinterlegte Skript aus.";
 
     public override bool IsInstantAction => true;
 
     public override string KeyName => ClassId;
 
     /// <summary>
-    /// Die Tabelle der Spalte; null, wenn keine gültige Spalte gesetzt ist.
+    /// Das Skript, das beim Anklicken der Zelle ausgeführt wird.
     /// </summary>
-    public Table? Table => Column is { IsDisposed: false } column ? column.Table : null;
-
-    /// <summary>
-    /// Das bei Klick auszuführende Zeilenskript (KeyName).
-    /// </summary>
-    public string ScriptName {
+    public string Script {
         get;
         set {
             if (IsDisposed || field == value) { return; }
@@ -51,6 +49,11 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Die Tabelle der Spalte; null, wenn keine gültige Spalte gesetzt ist.
+    /// </summary>
+    public Table? Table => Column is { IsDisposed: false } column ? column.Table : null;
+
     protected override System.Windows.Forms.Control? ControlCore => null;
 
     #endregion
@@ -58,18 +61,23 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     #region Methods
 
     /// <summary>
-    /// Meldung, warum die Konfiguration ungültig ist — insbesondere, wenn
-    /// das gewählte Skript in der Tabelle nicht vorhanden ist.
+    /// Meldung, warum die Konfiguration ungültig ist — insbesondere, wenn kein Skript hinterlegt ist.
     /// </summary>
     public override string ErrorReason() {
-        if (Table is not { IsDisposed: false } tb) { return string.Empty; }
-        if (ScriptName is not { Length: > 0 }) { return "Kein Skript ausgewählt."; }
-        if (tb.EventScript.GetByKey(ScriptName, StringComparison.OrdinalIgnoreCase) is null) { return $"Das Skript '{ScriptName}' ist in der Tabelle nicht vorhanden."; }
+        if (Table is not { IsDisposed: false }) { return string.Empty; }
+        if (Script is not { Length: > 0 }) { return "Kein Skript angegeben."; }
         return string.Empty;
     }
 
-    public override List<GenericControl> GetProperties(int widthOfControl)
-        => [new FlexiControlForProperty<string>(() => ScriptName, "Skript", ScriptItems())];
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
+
+        _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
+        result.Add(_button);
+        result.Add(new FlexiControlForProperty<string>(() => Script, 3));
+
+        return result;
+    }
 
     public override string ReadableText() => "Tabellen-Skript-Knopf";
 
@@ -84,44 +92,64 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     protected override void CreateControlCore() { }
 
     /// <summary>
-    /// Führt das gewählte Zeilenskript für die angeklickte Zeile aus.
+    /// Führt das hinterlegte Skript für die angeklickte Zeile aus und schreibt die Variablen zurück.
     /// </summary>
     protected override void ExecuteInstantAction(ColumnItem column, RowItem row) {
         if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        if (ScriptName is not { Length: > 0 } scriptName) {
-            TableView.NotEditableInfo("Kein Skript ausgewählt.");
+        if (Script is not { Length: > 0 }) {
+            TableView.NotEditableInfo("Kein Skript angegeben.");
             return;
         }
 
-        var sc = tb.EventScript.GetByKey(scriptName, StringComparison.OrdinalIgnoreCase);
-        if (sc is null || sc.Table is not { IsDisposed: false }) {
-            TableView.NotEditableInfo($"Das Skript '{scriptName}' ist in der Tabelle nicht vorhanden.");
-            return;
-        }
+        var rowstamp = row.RowStamp();
 
-        TableView.DoScript([row], false, sc, sc.KeyName);
+        var t = ScriptButtonPadItem.ExecuteScript(Script, "Standard", true, null, row, tb, null, null);
+
+        var errorreason = string.Empty;
+
+        if (row.RowStamp() != rowstamp) { errorreason = "Die Zeile wurde während des Ausführens verändert."; }
+        if (t.Failed) { errorreason = t.ProtocolText; }
+
+        if (string.IsNullOrEmpty(errorreason) && t.Variables is { } vars) {
+            tb.WriteBackVariables(row, vars, false, true, "Tabellen-Skript-Knopf", !t.Failed);
+        } else {
+            Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", ImageCode.Kritisch, "Ok");
+        }
     }
 
     protected override void ForceWriteBackValue() { }
 
-    protected override void ReadParameters(JsonObject json) => ScriptName = json.GetString(_scriptKey, ScriptName);
+    protected override void ReadParameters(JsonObject json) => Script = json.GetString(_scriptKey, Script);
 
     protected override void SetValueToControlInternal(string value) { }
 
     /// <summary>
-    /// Alle Zeilenskripte der Tabelle als Auswahl für die Combobox.
+    /// Öffnet den Skript-Editor für das hinterlegte Skript.
     /// </summary>
-    private List<ListItem> ScriptItems() {
-        var items = new List<ListItem>();
-        if (Table is not { IsDisposed: false } tb) { return items; }
+    public void OpenScriptEditor() {
+        var f = _button?.ParentForm;
 
-        foreach (var script in tb.EventScript) {
-            if (script is { IsDisposed: false, NeedRow: true }) { items.Add(ItemOf(script)); }
+        f?.Opacity = 0f;
+
+        try {
+            var sd = new ScriptDescription(KeyName, Script);
+
+            sd.ExecuteScript = ExecuteScriptTest;
+
+            if (InputBoxEditor.Edit(sd)) {
+                Script = sd.Script;
+            }
+        } finally {
+            f?.Opacity = 1f;
         }
-
-        return items;
     }
+
+    /// <summary>
+    /// Führt das Skript für den Testmodus im Editor mit dem Tabellenkontext der Spalte aus.
+    /// </summary>
+    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) =>
+        ScriptButtonPadItem.ExecuteScript(script, "Testmodus", !testmode, null, null, Table, null, null);
 
     #endregion
 }

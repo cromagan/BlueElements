@@ -25,7 +25,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private const string TmpNewDummy = "TMPNEWDUMMY";
 
     /// <summary>
-    /// Strategien mit spaltenabhängiger Gültigkeits-Prüfung, keyed nach Strategy-Key (siehe <see cref="IHasColumn" />).
+    /// Strategien mit spaltenabhängiger Gültigkeits-Prüfung, keyed nach Strategy-Key (siehe IHasColumn).
     /// </summary>
     private static readonly AssemblyAwareCache<IHasColumn> _columnChecks = new();
 
@@ -242,7 +242,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    [Description("Ein Information für Administratoren. Freier Text.\r\nWird als Quickinfo angezeigt, wenn der Admininstror\r\n mit der Maus über den Spaltenkopf fährt.")]
+    /// <summary>
+    /// Ein Information für Administratoren. Freier Text.
+    /// Wird als Quickinfo angezeigt, wenn der Admininstror
+    /// mit der Maus über den Spaltenkopf fährt.
+    /// </summary>
     public string AdminInfo {
         get => _adminInfo;
         set {
@@ -1351,7 +1355,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     /// <summary>
     /// Gibt an, ob diese Spalte in mindestens einer Spaltenanordnung als Kapitel-Spalte
-    /// (<see cref="ColumnViewCollection.ColumnForChapter"/>) verwendet wird.
+    /// (ColumnViewCollection.ColumnForChapter) verwendet wird.
     /// </summary>
     public bool IsChapterColumn() {
         if (Table is not { IsDisposed: false } tb) { return false; }

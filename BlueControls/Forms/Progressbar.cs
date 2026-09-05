@@ -30,7 +30,7 @@ public partial class Progressbar : FloatingForm {
 
     /// <summary>
     /// Wenn true, wird ein Abbrechen-Button angezeigt. Der Aufrufer muss
-    /// <see cref="IsCancelRequested" /> zyklisch prüfen und die Progressbar schließen.
+    /// IsCancelRequested zyklisch prüfen und die Progressbar schließen.
     /// </summary>
     public bool CancelSupported {
         get;

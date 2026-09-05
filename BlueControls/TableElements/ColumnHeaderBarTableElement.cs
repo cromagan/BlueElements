@@ -13,7 +13,7 @@ namespace BlueControls.TableElements;
 /// Zeigt eine Spaltenkopf-Leiste mit Excel-ähnlichen Spaltenbuchstaben (A, B, C, ...)
 /// oder fortlaufenden Zahlen. Höhe ist 16 Pixel (zoomabhängig). Verwendet den Button-Renderer
 /// für die Optik. Dient als Drag/Drop-Quelle für die Spalten-Sortierung.
-/// Die Beschriftung wird über <see cref="ColumnHeaderMode"/> gesteuert.
+/// Die Beschriftung wird über ColumnHeaderMode gesteuert.
 /// </summary>
 ///
 public sealed class ColumnHeaderBarTableElement : TableElement {
@@ -94,7 +94,7 @@ public sealed class ColumnHeaderBarTableElement : TableElement {
 
     /// <summary>
     /// Liefert die Ansicht, die als Referenz für die Nummerierung genutzt wird.
-    /// Bei "nach erster Ansicht" ist das <see cref="Table.ColumnArrangements"/>[1]
+    /// Bei "nach erster Ansicht" ist das Table.ColumnArrangements[1]
     /// (die Standard-Ansicht). Ist diese nicht vorhanden, wird null zurückgegeben.
     /// </summary>
     private ColumnViewCollection? FirstArrangement() {
@@ -106,7 +106,7 @@ public sealed class ColumnHeaderBarTableElement : TableElement {
 
     /// <summary>
     /// Berechnet den anzuzeigenden Text für die Spalte <paramref name="viewItem"/>
-    /// abhängig von <see cref="Mode"/>. Die SYS_ROWSORTINDEX-Spalte wird dabei
+    /// abhängig von Mode. Die SYS_ROWSORTINDEX-Spalte wird dabei
     /// immer als nicht existent betrachtet und mit leerem Text angezeigt.
     /// </summary>
     private string HeaderText(ColumnViewItem viewItem) {

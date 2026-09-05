@@ -946,7 +946,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     /// <summary>
     /// Baut die Items der Strategy-ComboBox anhand der aktuellen Editier-Einstellungen
-    /// per <see cref="ControlStrategy.IsAllowed" /> neu. Der aktuelle Text bleibt erhalten.
+    /// per ControlStrategy.IsAllowed neu. Der aktuelle Text bleibt erhalten.
     /// </summary>
     private void RefillControlStrategyItems() {
         cbxControlStrategy.ItemClear();

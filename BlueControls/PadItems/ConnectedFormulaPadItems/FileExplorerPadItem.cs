@@ -22,7 +22,9 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    [Description("Ob das Verzeichnis bei Bedarf erzeugt werden soll.")]
+    /// <summary>
+    /// Wenn gewählt, wird der Ordner automatisch angelegt, wenn er noch nicht vorhanden ist.
+    /// </summary>
     public bool Bei_Bedarf_erzeugen {
         get;
 
@@ -36,6 +38,9 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
 
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
+    /// <summary>
+    /// Beschränkt die Anzeige auf bestimmte Dateitypen, z. B. alle Bilder.
+    /// </summary>
     public string Filter {
         get;
 
@@ -49,7 +54,9 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
 
     public override bool InputMustBeOneRow => true;
 
-    [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
+    /// <summary>
+    /// Wenn gewählt, wird der Ordner automatisch entfernt, sobald er leer ist.
+    /// </summary>
     public bool Leere_Ordner_löschen {
         get;
 
@@ -61,7 +68,10 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
         }
     }
 
-    [Description("Bis zu diesem Pfad kann maximal zurück gegangen werden.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
+    /// <summary>
+    /// Der oberste Ordner, bis zu dem zurückgewechselt werden darf.
+    /// Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
+    /// </summary>
     public string Mindest_Pfad {
         get;
 
@@ -75,7 +85,10 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
 
     public override bool MustBeInDrawingArea => true;
 
-    [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
+    /// <summary>
+    /// Der Ordner, dessen Dateien angezeigt werden.
+    /// Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
+    /// </summary>
     public string Pfad {
         get;
 

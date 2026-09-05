@@ -18,6 +18,9 @@ public class ComboBoxControlStrategy : ControlStrategy, IHasColumn {
 
     public static string ClassId => "Combobox";
 
+    /// <summary>
+    /// Die Spalte, zu der das Control gehört.
+    /// </summary>
     public ColumnItem? Column { get; set; }
 
     public override string Description => "Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.";

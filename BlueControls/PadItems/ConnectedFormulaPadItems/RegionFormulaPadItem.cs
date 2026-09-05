@@ -31,6 +31,9 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
     public static string ClassId => "FI-RegionFormula";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
 
+    /// <summary>
+    /// Wenn gewählt, kann der Benutzer den Bereich ein- und ausklappen.
+    /// </summary>
     [DefaultValue(false)]
     public bool Ausklappbar {
         get;
@@ -44,6 +47,9 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
 
     public bool AutoSizeableHeight => true;
 
+    /// <summary>
+    /// Das untergeordnete Formular, das in diesem Bereich angezeigt wird.
+    /// </summary>
     public string Child {
         get;
         set {
@@ -58,6 +64,9 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
 
+    /// <summary>
+    /// Aussehen des Rahmens um den Bereich.
+    /// </summary>
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {
         get;

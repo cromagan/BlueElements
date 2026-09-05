@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 namespace BlueBasics.Interfaces;
 
 /// <summary>
-/// EventArgs für das <see cref="LiveInstanceCache{T}.Added" />-Event. Hält die
+/// EventArgs für das LiveInstanceCache{T}.Added-Event. Hält die
 /// neu erzeugte Live-Instanz bereit.
 /// </summary>
 public sealed class LiveInstanceEventArgs<T> : System.EventArgs {
@@ -18,7 +18,9 @@ public sealed class LiveInstanceEventArgs<T> : System.EventArgs {
 
     #region Properties
 
-    /// <summary>Die neu erzeugte und registrierte Live-Instanz.</summary>
+    /// <summary>
+    /// Die neu erzeugte und registrierte Live-Instanz.
+    /// </summary>
     public T Instance { get; }
 
     #endregion
@@ -28,9 +30,9 @@ public sealed class LiveInstanceEventArgs<T> : System.EventArgs {
 /// Abstrakte Basisklasse für Objekte mit eigenem Register lebender Instanzen
 /// (z. B. <c>Chunk</c>, <c>ConnectedFormula</c>, <c>Table</c>). Stellt pro Typ
 /// das statische LiveInstances-Register (protected), das moderne
-/// <see cref="Added" />-Event, einen Snapshot-Zugriff über <see cref="AllInstances" />,
-/// das Sync-Root <see cref="AllFilesLocker" /> sowie die Race-Safe-Factory
-/// <see cref="GetOrCreate" /> bereit.
+/// Added-Event, einen Snapshot-Zugriff über AllInstances,
+/// das Sync-Root AllFilesLocker sowie die Race-Safe-Factory
+/// GetOrCreate bereit.
 /// </summary>
 /// <remarks>
 /// Da statisch abstrakte Member nur in Interfaces, nicht aber in Klassen
@@ -39,11 +41,11 @@ public sealed class LiveInstanceEventArgs<T> : System.EventArgs {
 /// <c>LiveInstanceCache&lt;T&gt;</c> untergebracht — jedes <c>T</c> erhält
 /// dadurch seine eigenen statischen Felder. Die konkrete Klasse implementiert
 /// ihre eigene <c>Get(string key)</c>-Methode und ruft darin
-/// <see cref="GetOrCreate" /> mit ihrer typspezifischen Factory auf.
+/// GetOrCreate mit ihrer typspezifischen Factory auf.
 /// </remarks>
 /// <typeparam name="T">Der konkrete Live-Typ. Muss selbst
-/// <see cref="LiveInstanceCache{T}" /> erben (CRTP) und zusätzlich
-/// <see cref="IDisposableExtended" /> sowie <see cref="IHasKeyName" />
+/// LiveInstanceCache{T} erben (CRTP) und zusätzlich
+/// IDisposableExtended sowie IHasKeyName
 /// implementieren. Bei Vererbungshierarchien (z. B.
 /// <c>BlockableFile</c> → <c>ConnectedFormula</c>) gibt der ableitende
 /// Basistyp den Typ-Parameter vor.</typeparam>
@@ -78,8 +80,8 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// eingetragen wurde. Ersetzt bei früheren ObservableCollection-basierten
     /// Implementierungen das <c>CollectionChanged</c>-Event. Moderne
     /// EventHandler-Signatur — der Sender ist <c>null</c>, die Instanz steckt
-    /// in <see cref="LiveInstanceEventArgs{T}.Instance" />. Ausgelöst wird es
-    /// über <see cref="OnAdded" /> aus <see cref="GetOrCreate" /> nach der
+    /// in LiveInstanceEventArgs{T}.Instance. Ausgelöst wird es
+    /// über OnAdded aus GetOrCreate nach der
     /// erfolgreichen Konstruktion und Registrierung.
     /// <para>
     /// <b>Achtung — Subscriber-Leak:</b> Da es sich um ein statisches Event
@@ -98,7 +100,7 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
 
     /// <summary>
     /// Stresstest-Schalter: ist er <c>true</c>, wird für jeden Aufruf von
-    /// <see cref="GetOrCreate" /> eine neue Instanz erzeugt und nicht im
+    /// GetOrCreate eine neue Instanz erzeugt und nicht im
     /// Register gehalten. Default: <c>false</c>.
     /// </summary>
     public static bool AllowDuplicates { get; set; }
@@ -106,8 +108,8 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// <summary>
     /// Eigenes Register aller lebenden Instanzen dieses Typs, geordnet nach
     /// KeyName. Schlüsselseitig Case-Insensitive
-    /// (<see cref="StringComparer.OrdinalIgnoreCase" />). Protected —
-    /// externe Aufrufer nutzen <see cref="AllInstances" />.
+    /// (StringComparer.OrdinalIgnoreCase). Protected —
+    /// externe Aufrufer nutzen AllInstances.
     /// </summary>
     protected static ConcurrentDictionary<string, T> LiveInstances { get; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -119,7 +121,7 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// Liefert einen Snapshot-Iterator über alle im Register eingetragenen
     /// Instanzen dieses Typs. HINWEIS: Das Register wird nur asynchron
     /// bereinigt (z. B. über das <c>BlockableFile</c>-Polling oder beim
-    /// nächsten <see cref="GetOrCreate" />-Aufruf für denselben Key),
+    /// nächsten GetOrCreate-Aufruf für denselben Key),
     /// daher können zwischenzeitlich bereits disposed Instanzen enthalten
     /// sein. Aufrufer müssen <c>IDisposableExtended.IsDisposed</c> prüfen,
     /// bevor sie auf die Instanz zugreifen.
@@ -140,7 +142,7 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// <param name="factory">Erzeugt aus dem Key eine neue Instanz. Der
     /// Konstruktor muss sich selbst in LiveInstances eintragen.
     /// Wird nur bei Cache-Miss aufgerufen. Nach erfolgreicher Konstruktion wird
-    /// <see cref="OnAdded" /> ausgelöst.</param>
+    /// OnAdded ausgelöst.</param>
     protected static T? GetOrCreate(string key, Func<string, T> factory) {
         if (string.IsNullOrEmpty(key)) { return null; }
 
@@ -268,22 +270,22 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// Holt eine bestehende oder erzeugt eine neue Live-Instanz für den
     /// angegebenen Key, ohne dass der Aufrufer eine Factory übergeben muss —
     /// die Konstruktion erfolgt über den statisch abstrakten Member
-    /// <see cref="ICreateByKey{T}.Create" /> von <typeparamref name="TDerived" />.
+    /// ICreateByKey{T}.Create von <typeparamref name="TDerived" />.
     /// </summary>
     /// <remarks>
     /// Gedacht für Vererbungshierarchien (z. B.
     /// <c>BlockableFile</c> → <c>ConnectedFormula</c>), bei denen der
-    /// Typparameter von <see cref="LiveInstanceCache{T}" /> nicht der
+    /// Typparameter von LiveInstanceCache{T} nicht der
     /// konkrete zu erzeugende Typ ist: <typeparamref name="TDerived" /> ist
     /// der Subtyp, <typeparamref name="T" /> der vom Cache verwaltete Basistyp.
     /// Die eigentliche Race-Safe-Logik übernimmt
-    /// <see cref="GetOrCreate(string, Func{string, T})" />; diese Überladung
+    /// GetOrCreate(string, Func{string, T}); diese Überladung
     /// reicht <c><typeparamref name="TDerived" />.Create</c> als Factory durch
     /// und wandelt das Ergebnis typsicher zurück.
     /// </remarks>
     /// <typeparam name="TDerived">Der konkret zu erzeugende Typ. Muss von
     /// <typeparamref name="T" /> abgeleitet sein und
-    /// <see cref="ICreateByKey{TDerived}" /> implementieren, damit die
+    /// ICreateByKey{TDerived} implementieren, damit die
     /// Factory statisch aufgerufen werden kann.</typeparam>
     /// <param name="key">KeyName bzw. Dateiname der zu holenden Instanz.</param>
     /// <returns>Die bestehende oder neu erzeugte Instanz vom Typ
@@ -293,11 +295,11 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
         => GetOrCreate(key, TDerived.Create) as TDerived;
 
     /// <summary>
-    /// Löst das <see cref="Added" />-Event aus. Wird aus <see cref="GetOrCreate" />
+    /// Löst das Added-Event aus. Wird aus GetOrCreate
     /// nach der erfolgreichen Registrierung aufgerufen — nicht mehr aus dem
     /// Konstruktor der konkreten Klasse. Aufrufer, die eine Instanz direkt per
-    /// <c>new</c> erzeugen (außerhalb von <see cref="GetOrCreate" />), müssen
-    /// <see cref="OnAdded" /> selbst auslösen.
+    /// <c>new</c> erzeugen (außerhalb von GetOrCreate), müssen
+    /// OnAdded selbst auslösen.
     /// </summary>
     protected static void OnAdded(T instance) => Added?.Invoke(null, new LiveInstanceEventArgs<T>(instance));
 

@@ -159,6 +159,9 @@ $styleIsNotBrace = 0
 $styleIsBrace = 0
 $styleDispNot = 0
 $styleDisp = 0
+$styleSummaryOpen = 0
+$styleSummaryClose = 0
+$styleDocIndent = 0
 $styleTotal = 0
 
 $keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
@@ -171,7 +174,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = [System.IO.File]::ReadAllText($file)
     $original = $content
 
-    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7a = $false; $c7b = $false; $c7 = $false; $c8 = $false
+    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7a = $false; $c7b = $false; $c7 = $false; $c8 = $false; $c9a = $false; $c9b = $false; $c10 = $false
 
     # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
     $prev = $content
@@ -230,6 +233,39 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = $content -creplace 'is\s*\{\s*\}(?=\s*[)&|])', 'is not null'
     $c8 = ($content -ne $prev)
 
+    # 9a. /// <summary> mit Text -> Tag in eigene Zeile
+    $prev = $content
+    $content = [regex]::Replace($content, '(?m)^([ \t]*)///[ \t]*<summary>[ \t]*(.*?)[ \t]*(</summary>)?[ \t]*(?=\r?\n)', {
+        param($m)
+        $indent = $m.Groups[1].Value
+        $text = $m.Groups[2].Value
+        if ($text.Length -eq 0) { return $m.Value }
+        if ($m.Groups[3].Success) {
+            return "$indent/// <summary>`r`n$indent/// $text`r`n$indent/// </summary>"
+        }
+        return "$indent/// <summary>`r`n$indent/// $text"
+    })
+    $c9a = ($content -ne $prev)
+
+    # 9b. Text + </summary> am Zeilenende -> Tag in eigene Zeile
+    $prev = $content
+    $content = [regex]::Replace($content, '(?m)^([ \t]*)///[ \t]*(.*?\S)[ \t]*</summary>[ \t]*(?=\r?\n)', {
+        param($m)
+        return "$($m.Groups[1].Value)/// $($m.Groups[2].Value)`r`n$($m.Groups[1].Value)/// </summary>"
+    })
+    $c9b = ($content -ne $prev)
+
+    # 10. Einheitliche Einrueckung von /// -Bloecken (an der Folgezeile ausgerichtet)
+    $prev = $content
+    $content = [regex]::Replace($content, '(?m)^[ \t]*///[^\r\n]*(?:\r?\n[ \t]*///[^\r\n]*)*(?=\r?\n([ \t]*)\S)', {
+        param($m)
+        $indent = $m.Groups[1].Value
+        $lines = $m.Value -split "\r?\n"
+        $fixed = $lines | ForEach-Object { $indent + ($_ -replace '^[ \t]+', '') }
+        return ($fixed -join "`r`n")
+    })
+    $c10 = ($content -ne $prev)
+
     if ($c1) { $script:styleBraces++ }
     if ($c3) { $script:styleReturn++ }
     if ($c4) { $script:styleParenSpace++ }
@@ -239,6 +275,9 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     if ($c8) { $script:styleIsBrace++ }
     if ($c7a) { $script:styleDispNot++ }
     if ($c7b) { $script:styleDisp++ }
+    if ($c9a) { $script:styleSummaryOpen++ }
+    if ($c9b) { $script:styleSummaryClose++ }
+    if ($c10) { $script:styleDocIndent++ }
 
     if ($content -ne $original) {
         $utf8Bom = New-Object System.Text.UTF8Encoding $true
@@ -254,6 +293,9 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         if ($c8) { $changes += "IsBrace" }
         if ($c7a) { $changes += "DispNot" }
         if ($c7b) { $changes += "Disp" }
+        if ($c9a) { $changes += "SummaryOpen" }
+        if ($c9b) { $changes += "SummaryClose" }
+        if ($c10) { $changes += "DocIndent" }
         Write-Host "[Style: $($changes -join ', ')] $file" -ForegroundColor Yellow
     }
 }
@@ -269,4 +311,7 @@ Write-Host "is not { } -> is null:     $styleIsNotBrace" -ForegroundColor Green
 Write-Host "is { } -> is not null:     $styleIsBrace" -ForegroundColor Green
 Write-Host "Disposable is not { } -> IsDisposed: $styleDispNot" -ForegroundColor Green
 Write-Host "Disposable is { } -> IsDisposed:     $styleDisp" -ForegroundColor Green
+Write-Host "Summary open tag split:     $styleSummaryOpen" -ForegroundColor Green
+Write-Host "Summary close tag split:    $styleSummaryClose" -ForegroundColor Green
+Write-Host "Doc comment indent fixed:   $styleDocIndent" -ForegroundColor Green
 Write-Host "Total files modified:       $styleTotal" -ForegroundColor Yellow

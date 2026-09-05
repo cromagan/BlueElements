@@ -9,7 +9,7 @@ namespace BlueControls.Controls;
 
 /// <summary>
 /// Eine modernisierte ListBox-Komponente zur Darstellung und Verwaltung von ListItems.
-/// Hostet ein <see cref="ListBoxCore"/>-Control für die Kern-Logik und stellt die
+/// Hostet ein ListBoxCore-Control für die Kern-Logik und stellt die
 /// zusätzlichen Steuerelemente (Hinzu, Löschen, Verschieben, Bearbeiten) bereit.
 /// </summary>
 [Designer(typeof(BasicDesigner))]
@@ -23,7 +23,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     /// <summary>
     /// <c>true</c>, während OnGotFocus den Fokus absichtlich ans innere lstBox
     /// weiterreicht. Das dabei ausgelöste LostFocus der äußeren ListBox wird
-    /// in <see cref="OnLostFocus" /> unterdrückt, damit das Control nicht
+    /// in OnLostFocus unterdrückt, damit das Control nicht
     /// vorzeitig geschlossen wird.
     /// </summary>
     private bool _focusingChild;
@@ -43,7 +43,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
 
     /// <summary>
     /// Wird beim Klick auf den Hinzufügen-Button ausgelöst, sobald der Text
-    /// feststeht. Der Handler kann <see cref="AddItemEventArgs.Cancel"/> setzen,
+    /// feststeht. Der Handler kann AddItemEventArgs.Cancel setzen,
     /// um die automatische Item-Erstellung zu unterbinden und selbst zu reagieren.
     /// Wird nicht gecancelt, wird das Item automatisch hinzugefügt.
     /// </summary>
@@ -260,9 +260,9 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     /// <summary>
     /// Verdrahtet das LostFocus jedes Kind-Controls (inkl. lstBox). Der Fokus
     /// liegt dabei immer auf einem Kind, nie auf der äußeren ListBox (siehe
-    /// <see cref="OnGotFocus" />) — Item-Klicks verändern den Fokus nicht und
+    /// OnGotFocus) — Item-Klicks verändern den Fokus nicht und
     /// lösen kein vorzeitiges LostFocus aus. Erst wenn ein Kind den Fokus an
-    /// die Außenwelt abgibt, feuert <see cref="OnLostFocus" /> wirklich.
+    /// die Außenwelt abgibt, feuert OnLostFocus wirklich.
     /// </summary>
     protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
         base.OnControlAdded(e);
@@ -283,8 +283,8 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     /// Reicht den Fokus an das innere lstBox weiter. So liegt der Fokus immer
     /// auf dem Kind; Item-Klicks verändern den Fokus nicht und lösen kein
     /// vorzeitiges LostFocus der äußeren ListBox aus. Das beim Weiterreichen
-    /// entstehende LostFocus wird über <see cref="_focusingChild" /> in
-    /// <see cref="OnLostFocus" /> unterdrückt.
+    /// entstehende LostFocus wird über _focusingChild in
+    /// OnLostFocus unterdrückt.
     /// </summary>
     protected override void OnGotFocus(System.EventArgs e) {
         base.OnGotFocus(e);
@@ -297,7 +297,7 @@ public partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBa
     protected virtual void OnItemAddedByClick(ListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     /// <summary>
-    /// Löst das <see cref="ItemCheckedChanged"/>-Event aus. Abgeleitete Klassen
+    /// Löst das ItemCheckedChanged-Event aus. Abgeleitete Klassen
     /// können dies überschreiben, um auf Prüfzustandsänderungen zu reagieren.
     /// </summary>
     protected virtual void OnItemCheckedChanged(System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);

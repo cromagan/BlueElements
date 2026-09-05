@@ -7,7 +7,7 @@ namespace BlueControls.Forms;
 /// <summary>
 /// Definiert die Seiteneinstellungen eines Arbeitsbereichs oder Druckerdokuments
 /// ausschließlich in Millimetern. Über diese Klasse werden Eingaben im
-/// <see cref="PageSetupDialog"/> ohne den Genauigkeitsverlust der Druck-API
+/// PageSetupDialog ohne den Genauigkeitsverlust der Druck-API
 /// (1/100 Zoll) ausgetauscht.
 /// </summary>
 public sealed class PageSetupData : IEditable {
@@ -45,7 +45,7 @@ public sealed class PageSetupData : IEditable {
     #region Methods
 
     /// <summary>
-    /// Erzeugt eine <see cref="PageSetupData"/> aus einem <see cref="PrintDocument"/>.
+    /// Erzeugt eine PageSetupData aus einem PrintDocument.
     /// Die verfügbaren Papierformate werden aus den Druckereinstellungen übernommen.
     /// </summary>
     public static PageSetupData FromPrintDocument(PrintDocument doc) {
@@ -67,7 +67,7 @@ public sealed class PageSetupData : IEditable {
     }
 
     /// <summary>
-    /// Schreibt die Werte zurück in ein <see cref="PrintDocument"/>.
+    /// Schreibt die Werte zurück in ein PrintDocument.
     /// Die Druck-API arbeitet in 1/100 Zoll, daher wird hier auf ganze
     /// 1/100-Zoll-Schritte gerundet (ca. 0,25 mm Auflösung).
     /// </summary>

@@ -1,20 +1,27 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.ComponentModel;
+using LoxSmoke.DocXml;
 
 namespace BlueBasics.Classes;
 
 /// <summary>
 /// Pro Accessor einmalig berechnete Reflection-Metadaten. Kapselt Lese- und
-/// Schreibzugriff auf ein Property oder Feld über <see cref="PropertyInfo" />
-/// bzw. <see cref="FieldInfo" />.
+/// Schreibzugriff auf ein Property oder Feld über PropertyInfo
+/// bzw. FieldInfo.
 /// </summary>
 internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
 
     #region Fields
 
-    /// <summary>Platzhalter für den Fall, dass kein Member aufgelöst werden konnte.</summary>
+    /// <summary>
+    /// Platzhalter für den Fall, dass kein Member aufgelöst werden konnte.
+    /// </summary>
     public static readonly AccessorMemberEntry<T> Unknown = new();
+
+    /// <summary>
+    /// Liest die <c>&lt;summary&gt;</c>-Texte aus den XML-Dokumentationsdateien der Assemblys.
+    /// </summary>
+    private static readonly DocXmlReader XmlReader = new();
 
     private readonly FieldInfo? _field;
     private readonly PropertyInfo? _property;
@@ -31,7 +38,7 @@ internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
                 Name = prop.Name;
                 CanRead = prop.CanRead;
                 CanWrite = prop.CanWrite;
-                QuickInfo = prop.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+                QuickInfo = ReadSummary(prop);
                 _property = prop;
                 break;
 
@@ -39,7 +46,7 @@ internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
                 Name = field.Name;
                 CanRead = true;
                 CanWrite = !field.IsInitOnly;
-                QuickInfo = field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+                QuickInfo = ReadSummary(field);
                 _field = field;
                 break;
         }
@@ -91,6 +98,16 @@ internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Liest den Summary-Text des Members aus der XML-Dokumentation.
+    /// Ohne Dokumentation wird ein leerer String geliefert.
+    /// </summary>
+    private static string ReadSummary(MemberInfo member) {
+        lock (XmlReader) {
+            return XmlReader.GetMemberComment(member) ?? string.Empty;
+        }
     }
 
     #endregion

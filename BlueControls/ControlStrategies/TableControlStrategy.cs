@@ -8,8 +8,8 @@ using BlueTable.ColumnFormats;
 namespace BlueControls.ControlStrategies;
 
 /// <summary>
-/// Strategy, die eine <see cref="TableView" /> mit bearbeitbaren CSV-Daten anzeigt.
-/// <see cref="Columns" /> enthält die Spaltenbeschriftungen; die internen
+/// Strategy, die eine TableView mit bearbeitbaren CSV-Daten anzeigt.
+/// Columns enthält die Spaltenbeschriftungen; die internen
 /// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
 /// Im Value markiert eine "## Text"-Zeile ein Kapitel: Beim Import wird der Text
@@ -17,7 +17,7 @@ namespace BlueControls.ControlStrategies;
 /// einem Wechsel der Kapitel-Spalte eine eigene "## Text"-Zeile ausgegeben.
 /// Das Kontextmenü einer Zeile wird durch die Skripte
 /// "Zeile löschen" und "Überschrift hinzufügen" ersetzt. Bei
-/// <see cref="ControlStrategy.AutoSort" /> == false werden Zeilennummern über die
+/// ControlStrategy.AutoSort == false werden Zeilennummern über die
 /// Systemspalte SYS_ROWSORTINDEX eingeblendet.
 /// </summary>
 public class TableControlStrategy : ControlStrategy {
@@ -45,7 +45,7 @@ public class TableControlStrategy : ControlStrategy {
     public static string ClassId => "Table";
 
     /// <summary>
-    /// Die Spaltenbeschriftungen der eingebetteten Tabelle.
+    /// Die Überschriften der Spalten der eingebetteten Tabelle.
     /// </summary>
     public List<string> Columns {
         get;

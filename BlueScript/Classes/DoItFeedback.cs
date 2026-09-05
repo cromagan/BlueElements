@@ -11,7 +11,7 @@ public class DoItFeedback {
 
     /// <summary>
     /// Vollständiger Konstruktor. Wird auch von Subklassen
-    /// (<see cref="ScriptEndedFeedback" />, <see cref="DoItWithEndedPosFeedback" />)
+    /// (ScriptEndedFeedback, DoItWithEndedPosFeedback)
     /// genutzt.
     /// </summary>
     public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) {
@@ -58,8 +58,8 @@ public class DoItFeedback {
 
     /// <summary>
     /// Zeilennummer des Fehlers. 0 bedeutet "keine spezifische Zeile bekannt".
-    /// Wird von <see cref="ScriptEndedFeedback"/> gesetzt und beim Wrappen in
-    /// <see cref="DoItWithEndedPosFeedback"/> durchgereicht, damit verschachtelte
+    /// Wird von ScriptEndedFeedback gesetzt und beim Wrappen in
+    /// DoItWithEndedPosFeedback durchgereicht, damit verschachtelte
     /// Skript-Blöcke (if/foreach/do) die korrekte innere Zeile melden.
     /// </summary>
     public virtual int Line => 0;

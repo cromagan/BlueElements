@@ -140,7 +140,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     /// <summary>
     /// Schreibt den Layout-Inhalt auf die Festplatte und invalidiert den
-    /// zugehörigen <see cref="ConnectedFormula" />-Cache-Eintrag. Ohne
+    /// zugehörigen ConnectedFormula-Cache-Eintrag. Ohne
     /// Invalidierung würde ein sofortiges Wiederöffnen des Editors die
     /// veralteten gecachten Bytes liefern (Stale-Cache-Bug).
     /// </summary>

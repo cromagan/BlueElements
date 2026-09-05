@@ -43,7 +43,11 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
+    /// <summary>
+    /// Eine Spalte in der Ziel-Tabelle.
+    /// In diese wird eine Zusatzinfo gespeichert.
+    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// </summary>
     public string AdditionalInfoColumnKey {
         get;
         set {
@@ -68,7 +72,6 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     /// Dadurch können verschiedene Datensätze gespeichert werden.
     /// Beispiele: Rezeptname, Personenname, Beleg-Nummer
     /// </summary>
-    [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
     public string EntityID {
         get;
         set {
@@ -132,7 +135,6 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
-    [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnKey {
         get;
         set {
@@ -144,7 +146,9 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
         }
     } = string.Empty;
 
-    [Description("Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.")]
+    /// <summary>
+    /// Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.
+    /// </summary>
     public string Script {
         get;
 

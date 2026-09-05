@@ -33,8 +33,10 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
+    /// <summary>
+    /// Wenn gewählt, springt der Cursor zum nächsten Eingabefeld, wenn am Ende des Textes die Nach-rechts-Taste gedrückt wird.
+    /// </summary>
     [DefaultValue(false)]
-    [Description("Wenn aktiv, springt der Fokus automatisch zum nächsten Steuerelement, wenn am Ende des Textes die Rechts-Taste gedrückt wird.")]
     public bool AutoNext {
         get;
         set {
@@ -59,8 +61,10 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, werden alle Felder einer Zeile an der längsten Beschriftung ausgerichtet.
+    /// </summary>
     [DefaultValue(true)]
-    [Description("Richtet die Eingabefelder aller Steuerelemente auf gleicher horizontaler Ebene automatisch an der breitesten Beschriftung aus.")]
     public bool AutoX {
         get;
         set {
@@ -71,6 +75,9 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     } = true;
 
+    /// <summary>
+    /// Position der Beschriftung: neben oder über dem Feld.
+    /// </summary>
     public CaptionPosition CaptionPosition {
         get;
         set {
@@ -88,6 +95,9 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     }
 
+    /// <summary>
+    /// Die Spalte der Tabelle, die in diesem Feld bearbeitet wird.
+    /// </summary>
     public string ColumnKey {
         get;
         set {
@@ -100,7 +110,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     } = string.Empty;
 
     /// <summary>
-    /// ClassId der ControlStrategie, mit der die Zelle im Formular bearbeitet wird.
+    /// Die Art des Eingabefeldes.
     /// </summary>
     public string ControlStrategy {
         get;

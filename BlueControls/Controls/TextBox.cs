@@ -270,9 +270,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     /// <summary>
     /// Hook für externe Erweiterungen des Kontextmenüs.
-    /// Wird zu Beginn von <see cref="GetContextMenuItems"/> aufgerufen;
+    /// Wird zu Beginn von GetContextMenuItems aufgerufen;
     /// die gelieferten Einträge werden vor den Standard-Einträgen eingefügt.
-    /// Wird z.B. von <see cref="TextBoxSuggestions"/> genutzt, um die Vorschläge
+    /// Wird z.B. von TextBoxSuggestions genutzt, um die Vorschläge
     /// in das Kontextmenü der internen TextBox zu transferieren.
     /// </summary>
     [Browsable(false)]
@@ -295,8 +295,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     /// <summary>
     /// Horizontaler Slider wird von der TextBox nicht genutzt.
     /// Horizontales Scrollen (Cursor-Verfolgung im Singleline-Modus) erfolgt
-    /// durch direktes Setzen von <see cref="ZoomPad.OffsetX"/>, siehe
-    /// <see cref="EnsureCursorVisible"/>.
+    /// durch direktes Setzen von ZoomPad.OffsetX, siehe
+    /// EnsureCursorVisible.
     /// </summary>
     protected override bool ShowSliderX => false;
 
@@ -503,7 +503,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     /// <summary>
     /// Liefert die Canvas-Grenze, die ZoomPad für die Slider-Berechnung verwendet.
-    /// Beim Verhalten <see cref="SteuerelementVerhalten.Steuerelement_Anpassen"/>
+    /// Beim Verhalten SteuerelementVerhalten.Steuerelement_Anpassen
     /// wächst das Control statt zu scrollen - dort wird eine leere Grenze geliefert.
     /// In allen anderen Fällen entspricht die Grenze der zuletzt gemessenen
     /// Textgröße (Canvas-Koordinaten).

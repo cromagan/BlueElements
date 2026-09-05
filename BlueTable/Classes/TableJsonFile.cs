@@ -6,12 +6,12 @@ using System.Text;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// JSON-basierte Variante von <see cref="TableFile" />. Lädt und speichert das
-/// Hauptfile komplett als JSON über <see cref="Table.ParseableJson()" /> bzw.
-/// <see cref="Table.ParseJson(JsonObject)" />. Im Gegensatz zu <see cref="TableFile" />
+/// JSON-basierte Variante von TableFile. Lädt und speichert das
+/// Hauptfile komplett als JSON über Table.ParseableJson() bzw.
+/// Table.ParseJson(JsonObject). Im Gegensatz zu TableFile
 /// wird KEIN binäres Chunk-Format verwendet, dementsprechend ist auch kein
-/// Multi-User-Zugriff möglich (<see cref="TableFile.MultiUserPossible" /> = false).
-/// Für Multi-User-Betrieb <see cref="TableJsonFragments" /> verwenden.
+/// Multi-User-Zugriff möglich (TableFile.MultiUserPossible = false).
+/// Für Multi-User-Betrieb TableJsonFragments verwenden.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableJsonFile : TableFile {
@@ -51,18 +51,18 @@ public class TableJsonFile : TableFile {
 
     /// <summary>
     /// Lädt die Hauptdatei als JSON und übernimmt den Zustand über
-    /// <see cref="Table.ParseJson(JsonObject)" />. Vor dem ersten Speichern
-    /// (<see cref="TableFile.InitialSavePending" />) oder bei fehlender Datei
+    /// Table.ParseJson(JsonObject). Vor dem ersten Speichern
+    /// (TableFile.InitialSavePending) oder bei fehlender Datei
     /// wird kein Ladeversuch unternommen.
     /// </summary>
     /// <remarks>
     /// Die Collection-Implementierungen von <c>ParseJson</c>
-    /// (<see cref="ColumnCollection.ParseJson(JsonObject)" /> bzw.
-    /// <see cref="RowCollection.ParseJson(JsonObject)" />) legen bewusst KEINE
+    /// (ColumnCollection.ParseJson(JsonObject) bzw.
+    /// RowCollection.ParseJson(JsonObject)) legen bewusst KEINE
     /// neuen Spalten oder Zeilen an — sie sind für Partial-Updates gedacht und
     /// aktualisieren nur bereits existierende Elemente. Beim Laden einer
     /// kompletten Datei müssen die Strukturen deshalb zuerst explizit erzeugt
-    /// werden (analog zum binären <see cref="TableFile.LoadMainData" />, der
+    /// werden (analog zum binären TableFile.LoadMainData, der
     /// Spalten/Zeilen über ExecuteCommand anlegt). Erst danach darf
     /// <c>ParseJson</c> die Eigenschaften, Zellwerte und Sub-Bäume übernehmen.
     /// </remarks>
@@ -133,8 +133,8 @@ public class TableJsonFile : TableFile {
 
     /// <summary>
     /// Speichert die komplette Tabelle als formatiertes JSON. Verwendet
-    /// <see cref="IO.SaveExtended" /> für Backup-Rotation (analog zu
-    /// <see cref="TableFile.SaveFullFile" />, aber ohne Zip/EOF-Marker).
+    /// IO.SaveExtended für Backup-Rotation (analog zu
+    /// TableFile.SaveFullFile, aber ohne Zip/EOF-Marker).
     /// </summary>
     protected override string SaveInternal() {
         var f = IsGenericEditable(false);

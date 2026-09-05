@@ -31,7 +31,9 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
-    [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
+    /// <summary>
+    /// Wie die Auswahlzeilen angezeigt werden. Spaltennamen können in der Form ~Spaltenname~ eingefügt werden.
+    /// </summary>
     public string Anzeige {
         get;
         set {
@@ -44,6 +46,9 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
 
     public bool AutoSizeableHeight => false;
 
+    /// <summary>
+    /// Beschriftung, die neben bzw. über dem Auswahlfeld steht.
+    /// </summary>
     public string Caption {
         get;
         set {
@@ -54,6 +59,9 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Position der Beschriftung: neben oder über dem Feld.
+    /// </summary>
     public CaptionPosition CaptionPosition {
         get;
         set {

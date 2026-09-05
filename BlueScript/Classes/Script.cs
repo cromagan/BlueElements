@@ -211,9 +211,9 @@ public class Script {
     }
 
     /// <summary>
-    /// Normalisiert den übergebenen Skript-Text. Das <see cref="OperationResult.Value"/>
+    /// Normalisiert den übergebenen Skript-Text. Das OperationResult.Value
     /// enthält bei Erfolg den normalisierten Text, andernfalls wird in
-    /// <see cref="OperationResult.FailedReason"/> der Grund angegeben.
+    /// OperationResult.FailedReason der Grund angegeben.
     /// </summary>
     public static OperationResult NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 

@@ -88,6 +88,9 @@ public class ComicCompPadItem : PadItem {
     /// </summary>
     public PointM P2 { get; }
 
+    /// <summary>
+    /// Dicke des Comic-Streifens.
+    /// </summary>
     public int Width {
         get => _width;
         set {

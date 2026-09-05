@@ -19,7 +19,7 @@ public sealed class RowCaptionTableElement : TableElement {
     /// <summary>
     /// Trennzeichen für Kapitel-Pfade. Kapitel werden NUR noch mit diesem
     /// Zeichen getrennt und ausgewertet. Kanonische Quelle für alle
-    /// Chapter-Pfad-Routinen (<see cref="Extensions"/>).
+    /// Chapter-Pfad-Routinen (Extensions).
     /// </summary>
     public const char Kapiteltrenner = '\\';
 
@@ -76,11 +76,11 @@ public sealed class RowCaptionTableElement : TableElement {
 
     /// <summary>
     /// Übernimmt die gesamte Doppelklick-Logik für ein Kapitel: prüft
-    /// <see cref="CanEditChapter" /> und stellt sicher, dass der Klick nicht
+    /// CanEditChapter und stellt sicher, dass der Klick nicht
     /// auf dem Pfeil-Button (Ein-/Ausklappen) lag. Startet anschließend die
-    /// Kapitel-Editierung über <see cref="TableView.BeginEdit" />. Die Ermittlung
+    /// Kapitel-Editierung über TableView.BeginEdit. Die Ermittlung
     /// der zum Block gehörenden Zeilen erfolgt über
-    /// <see cref="TableView.GetChapterBlockRows" /> in der TableView, da sie
+    /// TableView.GetChapterBlockRows in der TableView, da sie
     /// auf deren sortierter Item-Liste basiert.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
@@ -213,8 +213,8 @@ public sealed class RowCaptionTableElement : TableElement {
     /// nur die Zeilen des übergebenen Blocks aktualisiert (lokal, nicht global
     /// über alle Zeilen mit gleichem Namen). Unterpfade werden rekursiv
     /// mitgeführt, sodass die Hierarchie erhalten bleibt. Commit-Callback
-    /// aus <see cref="HandleDoubleClick" />, der an
-    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// aus HandleDoubleClick, der an
+    /// TableView.BeginEdit übergeben wird.
     /// </summary>
     private void ApplyChapter(TableView tableView, List<RowItem> blockRows, string value) {
         if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return; }

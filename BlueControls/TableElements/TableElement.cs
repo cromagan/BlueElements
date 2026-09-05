@@ -10,10 +10,10 @@ using System.Windows.Forms;
 namespace BlueControls.TableElements;
 
 /// <summary>
-/// Basisklasse aller Zeilen-Elemente einer <see cref="TableView"/>. Diese Klasse ist
-/// bewusst KEINE Ableitung von <see cref="ListItem"/> mehr — sie kapselt die
+/// Basisklasse aller Zeilen-Elemente einer TableView. Diese Klasse ist
+/// bewusst KEINE Ableitung von ListItem mehr — sie kapselt die
 /// gesamte für TableView nötige Item-Plumbing (Positionierung, Zeichnen, Sortierung,
-/// Disposing) selbst. Alle konkreten Zeilen-Typen leiten von <see cref="TableElement"/> ab.
+/// Disposing) selbst. Alle konkreten Zeilen-Typen leiten von TableElement ab.
 /// </summary>
 public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQuickInfo, INotifyPropertyChanged, IDisposableExtended {
 
@@ -323,9 +323,9 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     /// Wird bei einem Tastendruck aufgerufen, während diese Zeile unter dem
     /// Cursor liegt. Die konkrete Zeilen-Implementierung übernimmt die
     /// Zell-Aktionen (Ausschneiden, Kopieren, Einfügen, Editieren via F2,
-    /// Löschen) — analog zu <see cref="HandleDoubleClick" />, das von der
-    /// <see cref="TableView" /> bei einem Doppelklick dispatcht wird.
-    /// Die <see cref="TableView" /> behält dagegen die reinen Navigations-
+    /// Löschen) — analog zu HandleDoubleClick, das von der
+    /// TableView bei einem Doppelklick dispatcht wird.
+    /// Die TableView behält dagegen die reinen Navigations-
     /// Tasten (Pfeile, Bild-Auf/Ab, Strg+F) selbst.
     /// </summary>
     public virtual void HandleKeyDown(ColumnViewItem? cursorColumn, TableView tableView, KeyEventArgs e) { }
@@ -334,7 +334,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     /// Wird bei MouseDown auf die Zeile aufgerufen. Die Basis setzt die
     /// Zelle als Cursor-Position und scrollt sie sichtbar. Überschreibungen
     /// ergänzen ihre eigenen Aktionen und rufen dabei — analog zu
-    /// <see cref="HandleDoubleClick" /> — Routinen der
+    /// HandleDoubleClick — Routinen der
     /// <paramref name="tableView" /> direkt auf.
     /// </summary>
     public virtual void HandleMouseDown(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
@@ -346,7 +346,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     /// Wird bei MouseMove ausgeführt, während diese Zeile unter dem Cursor
     /// liegt. Die Basis leert die QuickInfo; konkrete Elemente überschreiben
     /// sie und setzen ihre QuickInfo direkt auf <c>tableView.QuickInfo</c>
-    /// (Zell-Koordinaten bei Bedarf über <see cref="MousePositionInColumn" />).
+    /// (Zell-Koordinaten bei Bedarf über MousePositionInColumn).
     /// </summary>
     public virtual void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
         tableView.QuickInfo = string.Empty;
@@ -354,7 +354,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
     /// <summary>
     /// Wird bei einem Mausklick (MouseUp, linke Taste) auf die Zeile
-    /// aufgerufen und ist das Gegenstück zu <see cref="HandleDoubleClick" />.
+    /// aufgerufen und ist das Gegenstück zu HandleDoubleClick.
     /// Die konkrete Implementierung übernimmt alle Prüfungen und Aktionen —
     /// inklusive Event und Invalidierung — selbst und ruft dafür Routinen
     /// der <paramref name="tableView" /> direkt auf.
@@ -389,13 +389,13 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
     /// <summary>
     /// Gemeinsame Logik für den Start einer Zell-Editierung direkt über
-    /// <see cref="TableView.BeginEdit" />. Wird von <see cref="RowTableElement" />
-    /// (mit echter Row) und <see cref="NewRowTableElement" /> (mit <c>null</c>)
-    /// aus ihrem <see cref="HandleDoubleClick" /> aufgerufen.
+    /// TableView.BeginEdit. Wird von RowTableElement
+    /// (mit echter Row) und NewRowTableElement (mit <c>null</c>)
+    /// aus ihrem HandleDoubleClick aufgerufen.
     /// Übernimmt Editability-Prüfung, LinkedCell-Auflösung, Bestimmung des
     /// Edit-Typs, Positions-/Größen-Berechnung und startet das Edit über
-    /// <see cref="TableView.BeginEdit" />. Die Auswahllisten-Ermittlung für
-    /// Strategien mit NeedsSuggestions übernimmt die <see cref="TableView" />
+    /// TableView.BeginEdit. Die Auswahllisten-Ermittlung für
+    /// Strategien mit NeedsSuggestions übernimmt die TableView
     /// dort einheitlich.
     /// </summary>
     /// <param name="tableView"></param>
@@ -626,9 +626,9 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
     /// <summary>
     /// Schreibt den übergebenen Wert als neuen Zellinhalt — inkl. Formatprüfung
-    /// und Rückmeldung bei Fehler (über <see cref="TableView.UserEdited" />).
-    /// Commit-Callback aus <see cref="BeginCellEdit" />, der an
-    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// und Rückmeldung bei Fehler (über TableView.UserEdited).
+    /// Commit-Callback aus BeginCellEdit, der an
+    /// TableView.BeginEdit übergeben wird.
     /// </summary>
     private void ApplyCellValue(TableView tableView, ColumnViewItem? column, RowTableElement? row, string value) => TableView.NotEditableInfo(TableView.UserEdited(tableView, value, column, row, true));
 

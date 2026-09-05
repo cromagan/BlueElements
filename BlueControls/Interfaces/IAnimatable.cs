@@ -3,12 +3,12 @@
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Vertrag für Objekte (Forms wie <see cref="FloatingForm" /> bzw. künftig
-/// auch Controls), die von der <see cref="Animator" />-Engine animiert werden.
-/// Der Animations-Thread ruft pro Frame <see cref="Animate" /> auf und wendet das
-/// gelieferte <see cref="AnimationFrame" /> via Win32 an. Sobald
-/// <see cref="AnimationFrame.Finished" /> true ist, wird
-/// <see cref="OnAnimationFinished" /> aufgerufen.
+/// Vertrag für Objekte (Forms wie FloatingForm bzw. künftig
+/// auch Controls), die von der Animator-Engine animiert werden.
+/// Der Animations-Thread ruft pro Frame Animate auf und wendet das
+/// gelieferte AnimationFrame via Win32 an. Sobald
+/// AnimationFrame.Finished true ist, wird
+/// OnAnimationFinished aufgerufen.
 /// Alle Member werden aus dem Animations-Thread aufgerufen und müssen thread-safe
 /// sein — insbesondere dürfen keine WinForms-Properties anderer Controls gelesen
 /// werden.
@@ -35,11 +35,11 @@ public interface IAnimatable : IDisposableExtended {
     /// Berechnet das Frame der Animation aus der seit Start der Animation
     /// verstrichenen Zeit. Wird auf dem Animations-Thread aufgerufen und muss
     /// thread-safe sein — keine WinForms-Properties anderer Controls lesen,
-    /// stattdessen die Helper-Methoden von <see cref="Animator" /> nutzen
-    /// (z.B. <see cref="Animator.GetWindowY" />,
-    /// <see cref="Animator.IsHwndVisible" />). Wenn
-    /// <see cref="AnimationFrame.Finished" /> true ist, beendet die Engine die
-    /// Animation und ruft <see cref="OnAnimationFinished" /> auf.
+    /// stattdessen die Helper-Methoden von Animator nutzen
+    /// (z.B. Animator.GetWindowY,
+    /// Animator.IsHwndVisible). Wenn
+    /// AnimationFrame.Finished true ist, beendet die Engine die
+    /// Animation und ruft OnAnimationFinished auf.
     /// </summary>
     AnimationFrame Animate(TimeSpan elapsed);
 
@@ -47,7 +47,7 @@ public interface IAnimatable : IDisposableExtended {
 
     /// <summary>
     /// Wird aus dem Animations-Thread aufgerufen, sobald die Animation beendet
-    /// ist (<see cref="AnimationFrame.Finished" /> war true). UI-Aufrufe darin
+    /// ist (AnimationFrame.Finished war true). UI-Aufrufe darin
     /// müssen selbst via BeginInvoke gemarshalled werden. Typische
     /// Implementierung schließt bzw. versteckt das Objekt.
     /// </summary>

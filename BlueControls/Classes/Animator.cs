@@ -93,21 +93,21 @@ public static class Animator {
     /// Startet eine Animation für das Fenster <paramref name="hwnd" />.
     /// Der Delegate <paramref name="compute" /> wird im Animations-Thread
     /// aufgerufen und muss thread-safe sein (keine UI-Properties lesen,
-    /// stattdessen <see cref="GetWindowY" /> / <see cref="IsHwndVisible" /> nutzen).
+    /// stattdessen GetWindowY / IsHwndVisible nutzen).
     /// <paramref name="onFinished" /> wird im Animations-Thread aufgerufen,
-    /// sobald <see cref="AnimationFrame.Finished" /> true ist — UI-Aufrufe
+    /// sobald AnimationFrame.Finished true ist — UI-Aufrufe
     /// darin müssen selbst via BeginInvoke gemarshalled werden.
     /// Standardmäßig wird das Fenster als Layered-Window markiert, damit
-    /// <see cref="AnimationFrame.Opacity" /> greift (Top-Level-Fenster).
+    /// AnimationFrame.Opacity greift (Top-Level-Fenster).
     /// </summary>
     public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) => Start(hwnd, compute, onFinished, true);
 
     /// <summary>
     /// Startet eine Animation für das Fenster <paramref name="hwnd" />.
     /// Wenn <paramref name="layered" /> false ist, wird das Fenster NICHT als
-    /// Layered-Window markiert und <see cref="AnimationFrame.Opacity" /> wird
+    /// Layered-Window markiert und AnimationFrame.Opacity wird
     /// ignoriert. Das ist für Child-Controls gedacht, die nur ihre Position
-    /// ändern (z.B. <see cref="Controls.SlideOutPanel" />) und weder
+    /// ändern (z.B. Controls.SlideOutPanel) und weder
     /// Transparenz noch das WS_EX_LAYERED-Flag benötigen.
     /// </summary>
     public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, bool layered) {
@@ -123,10 +123,10 @@ public static class Animator {
 
     /// <summary>
     /// Startet eine Animation für <paramref name="target" />. Bequemlichkeits-
-    /// Überladung, die <see cref="IAnimatable.Handle" />,
-    /// <see cref="IAnimatable.Animate" /> und
-    /// <see cref="IAnimatable.OnAnimationFinished" /> an die IntPtr-Überladung
-    /// delegiert. Damit ist <see cref="Animator" /> typsicher nutzbar,
+    /// Überladung, die IAnimatable.Handle,
+    /// IAnimatable.Animate und
+    /// IAnimatable.OnAnimationFinished an die IntPtr-Überladung
+    /// delegiert. Damit ist Animator typsicher nutzbar,
     /// ohne dass der Aufrufer Handle und Delegates selbst zusammenbauen muss.
     /// </summary>
     public static void Start(IAnimatable target) {
@@ -137,7 +137,7 @@ public static class Animator {
     /// <summary>
     /// Startet eine Animation für <paramref name="target" /> mit expliziter
     /// Wahl, ob das Fenster als Layered-Window markiert wird. Child-Controls
-    /// (z.B. <see cref="Controls.SlideOutPanel" />) übergeben hier false,
+    /// (z.B. Controls.SlideOutPanel) übergeben hier false,
     /// da sie nur ihre Position animieren und kein WS_EX_LAYERED benötigen.
     /// </summary>
     public static void Start(IAnimatable target, bool layered) {
@@ -295,7 +295,7 @@ public static class Animator {
 
     /// <summary>
     /// Erzeugt den Animations-Thread, startet ihn und liefert die Referenz
-    /// zurück. Als Initializer für <see cref="_thread" /> aufgerufen, damit
+    /// zurück. Als Initializer für _thread aufgerufen, damit
     /// die CLR das Feld vor dem ersten Zugriff anderer Static-Member hochfährt.
     /// </summary>
     private static Thread StartAnimationThread() {
@@ -349,7 +349,7 @@ public static class Animator {
 /// <summary>
 /// Bild eines Animations-Frames: Opacity (0..1) sowie die Koordinaten X/Y.
 /// Ist Width und Height größer 0, wird zusätzlich die Größe gesetzt, sonst
-/// bleibt sie unverändert. Wenn <see cref="Finished" /> true ist, beendet die
+/// bleibt sie unverändert. Wenn Finished true ist, beendet die
 /// Engine die Animation und ruft den optionalen <c>onFinished</c>-Callback auf.
 /// </summary>
 public readonly struct AnimationFrame {

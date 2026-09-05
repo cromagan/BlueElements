@@ -35,6 +35,10 @@ public class ImageAndTextRenderer : Renderer {
 
     public static string ClassId => "ImageAndText";
 
+    /// <summary>
+    /// Wenn gewählt, wird zu jeder Zeile des Zellinhalts ein Bild angezeigt, dessen Name sich aus dem Zellinhalt ergibt.
+    /// Beispiel: Steht in der Zelle „Häkchen", wird das Bild „Häkchen" gesucht.
+    /// </summary>
     public bool Bild_anzeigen {
         get => _bild_anzeigen;
         set {
@@ -46,6 +50,11 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Eigene Regeln für die Bildnamen, eine Regel pro Zeile im Format Zellinhalt|Bildname.<br />
+    /// Beispiel: „Rot|Kreis_Rot" zeigt für den Zellinhalt „Rot" das Bild „Kreis_Rot".<br />
+    /// Wird nicht benutzt, wenn ein Bild-Präfix angegeben ist.
+    /// </summary>
     public string Bild_ersetzen {
         get => string.Join('\r', _imagereplacement);
         set {
@@ -61,6 +70,11 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Vorderer Teil des Bildnamens; der Zellinhalt ergänzt ihn zum vollständigen Bildnamen.<br />
+    /// Beispiel: Präfix „Kreis_" mit Zellinhalt „Rot" zeigt das Bild „Kreis_Rot".<br />
+    /// Wird nicht benutzt, wenn Bild-Ersetzungen angegeben sind.
+    /// </summary>
     public string Bild_Präfix {
         get => _imgpräfix;
         set {
@@ -78,8 +92,11 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
-    public override string Description => "Kann Bilder mit einem Bild davor anzeigen.";
+    public override string Description => "Zeigt den Zellinhalt als Text und/oder Bild an.";
 
+    /// <summary>
+    /// Die einheitliche Breite aller Bilder, zwischen 16 und 128.
+    /// </summary>
     public int Konstante_Breite_von_Bildern {
         get => _constantWidth;
         set {
@@ -92,6 +109,9 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Die einheitliche Höhe aller Bilder, zwischen 16 und 128.
+    /// </summary>
     public int Konstante_Höhe_von_Bildern {
         get => _constantHeight;
         set {
@@ -104,6 +124,9 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Bild, das angezeigt wird, wenn für den Zellinhalt kein passendes Bild gefunden wird.
+    /// </summary>
     public string Standard_Bild {
         get => _defaultImage;
         set {
@@ -114,6 +137,10 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird der Zellinhalt als Text angezeigt.
+    /// Wenn nicht gewählt, erscheint nur noch das Bild.
+    /// </summary>
     public bool Text_anzeigen {
         get => _text_anzeigen;
         set {
@@ -124,6 +151,11 @@ public class ImageAndTextRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Eigene Ersetzungen nur für die Anzeige, eine Regel pro Zeile im Format alt|neu.<br />
+    /// Beispiel: „Privatkunde|PK" zeigt statt „Privatkunde" nur „PK" an.<br />
+    /// Der gespeicherte Wert bleibt dabei unverändert.
+    /// </summary>
     public string Text_ersetzen {
         get => string.Join('\r', _opticalReplace);
         set {

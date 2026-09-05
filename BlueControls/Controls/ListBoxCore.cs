@@ -10,7 +10,7 @@ namespace BlueControls.Controls;
 
 /// <summary>
 /// Kern-Listbox: enthält ausschließlich die Listbox-Logik und den Slider.
-/// Wird von <see cref="ListBox"/> als untergeordnetes Control gehostet.
+/// Wird von ListBox als untergeordnetes Control gehostet.
 /// </summary>
 [DefaultEvent(nameof(ItemClicked))]
 public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable {
@@ -61,7 +61,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// <summary>
     /// Wird ausgelöst, wenn sich die Anordnung oder Größe der Items geändert hat
     /// (z.B. Höhe eines Items durch eine Fehler-Statusänderung). Ermöglicht dem
-    /// äußeren <see cref="ListBox"/>-Control, abhängige UI-Elemente wie den
+    /// äußeren ListBox-Control, abhängige UI-Elemente wie den
     /// Hinzufügen-Button neu zu positionieren.
     /// </summary>
     internal event EventHandler? ItemLayoutChanged;
@@ -153,9 +153,9 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     /// <summary>
     /// Zusätzlicher Abstand (in Pixeln) zwischen den Items — wird in
-    /// <see cref="CalculateItemPosition"/> zwischen aufeinanderfolgende
+    /// CalculateItemPosition zwischen aufeinanderfolgende
     /// Items eingefügt. Wirkt sich auf alle Appearance-Modi aus, nicht
-    /// nur auf <see cref="ListBoxAppearance.MiniToolbar"/>. Default ist 0
+    /// nur auf ListBoxAppearance.MiniToolbar. Default ist 0
     /// (Items liegen bündig aneinander, wie bisher).
     /// </summary>
     [DefaultValue(0)]
@@ -204,8 +204,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     public bool Translate { get; set; } = true;
 
     /// <summary>
-    /// Wenn <c>true</c>, reserviert <see cref="CalculateCanvasMaxBounds"/> zusätzlichen Platz
-    /// am unteren Rand für den Add-Bereich des äußeren <see cref="ListBox"/>-Controls.
+    /// Wenn <c>true</c>, reserviert CalculateCanvasMaxBounds zusätzlichen Platz
+    /// am unteren Rand für den Add-Bereich des äußeren ListBox-Controls.
     /// </summary>
     internal bool AddAreaVisible {
         get;
@@ -223,7 +223,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     internal object? HotItemForClick { get; set; }
 
     /// <summary>
-    /// Das aktuelle MouseOver-Item. Wird vom äußeren <see cref="ListBox"/> benötigt,
+    /// Das aktuelle MouseOver-Item. Wird vom äußeren ListBox benötigt,
     /// um die Zusatz-Buttons (Minus, Up, Down, Edit) zu positionieren.
     /// </summary>
     internal ListItem? MouseOverItem { get; private set; }

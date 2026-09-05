@@ -17,11 +17,11 @@ namespace BlueControls.BlueTableDialogs;
 
 /// <summary>
 /// Basis-UserControl für alle Skript-Editoren. Stellt den Code-Editor, die Variablen-Anzeige,
-/// den Befehls-Assistenten sowie Speichern/Laden-Logik bereit. Erbt von <see cref="EditorEasy"/>,
-/// kann also über den Default-Aufruf (<see cref="InputBoxEditor"/>) in einem Dialog gehostet werden.
-/// Ist zudem direkt als Editor für <see cref="ScriptDescription"/> einsetzbar. Abgeleitete Klassen
-/// überschreiben <see cref="Clear"/>, <see cref="SetValuesToFormula"/>,
-/// <see cref="InitializeComponentDefaultValues"/> und <see cref="ExecuteScript"/>.
+/// den Befehls-Assistenten sowie Speichern/Laden-Logik bereit. Erbt von EditorEasy,
+/// kann also über den Default-Aufruf (InputBoxEditor) in einem Dialog gehostet werden.
+/// Ist zudem direkt als Editor für ScriptDescription einsetzbar. Abgeleitete Klassen
+/// überschreiben Clear, SetValuesToFormula,
+/// InitializeComponentDefaultValues und ExecuteScript.
 /// </summary>
 public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyChanged {
 
@@ -51,8 +51,8 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     /// <summary>
     /// Wird unmittelbar vor der Ausführung eines Skripts gefeuert (aus
-    /// <see cref="TesteScript"/>). Ein hostendes Form kann hier die Arbeitskopie
-    /// (z.B. <see cref="EditorForIEnumerable.OutputItem"/>) ins Backend
+    /// TesteScript). Ein hostendes Form kann hier die Arbeitskopie
+    /// (z.B. EditorForIEnumerable.OutputItem) ins Backend
     /// durchstellen, bevor das Skript läuft — etwa damit der Test gegen den
     /// committeten Stand erfolgt und <c>_item</c> auf die frische Backend-Instanz
     /// aktualisiert wird.
@@ -61,11 +61,11 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     /// <summary>
     /// Wird gefeuert, wenn sich eine für das Host relevante Eigenschaft ändert.
-    /// Abgeleitete Editoren lösen <see cref="OnPropertyChanged"/> typischerweise
-    /// mit <c>nameof(<see cref="IIsEditor.OutputItem"/>)</c> aus, sobald die
+    /// Abgeleitete Editoren lösen OnPropertyChanged typischerweise
+    /// mit <c>nameof(IIsEditor.OutputItem)</c> aus, sobald die
     /// Oberfläche eine neue Edit-Kopie liefern soll. Ein hostendes
-    /// <see cref="EditorForIEnumerable"/> fragt daraufhin
-    /// <see cref="IIsEditor.OutputItem"/> ab.
+    /// EditorForIEnumerable fragt daraufhin
+    /// IIsEditor.OutputItem ab.
     /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -83,8 +83,8 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     /// <summary>
     /// Delegate für die Test-Ausführung des Skripts. Wird beim Laden einer
-    /// <see cref="ScriptDescription"/>-Items aus dessen
-    /// <see cref="ScriptDescription.ExecuteScript"/> übernommen.
+    /// ScriptDescription-Items aus dessen
+    /// ScriptDescription.ExecuteScript übernommen.
     /// Parameter: Skripttext, Testmodus.
     /// </summary>
     public ExecuteScriptDelegate? ExecuteScript { get; set; }
@@ -124,7 +124,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Schlüssel, unter dem Variablen-Sets in <see cref="EditorVariablesManager"/> abgelegt werden.
+    /// Schlüssel, unter dem Variablen-Sets in EditorVariablesManager abgelegt werden.
     /// Sub-Controls mit eigenem Tabellen- oder Form-Bezug überschreiben dies.
     /// Bei <c>null</c> oder leerem String ist der Speichern-Knopf deaktiviert.
     /// </summary>
@@ -136,7 +136,9 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     #region Methods
 
-    /// <summary>Setzt die Oberfläche zurück. Abgeleitete Editoren überschreiben dies und base aufrufen.</summary>
+    /// <summary>
+    /// Setzt die Oberfläche zurück. Abgeleitete Editoren überschreiben dies und base aufrufen.
+    /// </summary>
     public override void Clear() {
         tbcScriptEigenschaften.Enabled = false;
         Script = string.Empty;
@@ -153,9 +155,9 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Liest die Werte aller FlexiControls aus <see cref="grpInjectVariables"/>,
+    /// Liest die Werte aller FlexiControls aus grpInjectVariables,
     /// deren Tag mit "Attribut" beginnt (z.B. "Attribut0", "Attribut1", ...).
-    /// Liefert eine Liste für den args-Parameter von <see cref="Script.Parse"/>,
+    /// Liefert eine Liste für den args-Parameter von Script.Parse,
     /// oder <c>null</c>, wenn keine Attribut-Felder vorhanden sind.
     /// </summary>
     public List<string>? GetParseArgs() {
@@ -261,20 +263,22 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         return vc;
     }
 
-    /// <summary>Basis-Default: tut nichts. Abgeleitete Editoren füllen hier einmalig Dropdowns etc.</summary>
+    /// <summary>
+    /// Basis-Default: tut nichts. Abgeleitete Editoren füllen hier einmalig Dropdowns etc.
+    /// </summary>
     protected override void InitializeComponentDefaultValues() { }
 
     protected virtual void OnExecuting(System.EventArgs e) => Executing?.Invoke(this, e);
 
     /// <summary>
-    /// Löst <see cref="PropertyChanged"/> aus. Wird von abgeleiteten Editoren
-    /// genutzt, um Änderungen — meist <c>nameof(<see cref="IIsEditor.OutputItem"/>)</c> —
-    /// an ein hostendes <see cref="EditorForIEnumerable"/> zu melden.
+    /// Löst PropertyChanged aus. Wird von abgeleiteten Editoren
+    /// genutzt, um Änderungen — meist <c>nameof(IIsEditor.OutputItem)</c> —
+    /// an ein hostendes EditorForIEnumerable zu melden.
     /// </summary>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
-    /// Lädt das übergebene <see cref="ScriptDescription"/>-Item in die Oberfläche.
+    /// Lädt das übergebene ScriptDescription-Item in die Oberfläche.
     /// Abgeleitete Skript-Editoren überschreiben dies, um zusätzliche UI-Felder zu befüllen.
     /// </summary>
     protected override bool SetValuesToFormula(object? toEdit) {
@@ -309,7 +313,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     /// <summary>
     /// Übernimmt die gespeicherten Feldwerte in die Injektions-Felder
-    /// (<see cref="grpInjectVariables"/>). Ist <paramref name="clearMissing"/> true,
+    /// (grpInjectVariables). Ist <paramref name="clearMissing"/> true,
     /// werden Felder, deren Wert in <paramref name="data"/> fehlt, geleert
     /// (z.B. beim Laden eines Variablen-Sets). Bei false bleiben sie unverändert
     /// (z.B. beim Wiederherstellen eines Fehler-Snapshots).

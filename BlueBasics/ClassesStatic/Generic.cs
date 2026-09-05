@@ -16,12 +16,12 @@ public static class Generic {
     #region Fields
 
     /// <summary>
-    /// Cache für <see cref="GetTypeByClassId{T}" />: pro Target-Typ eine Map
+    /// Cache für GetTypeByClassId{T}: pro Target-Typ eine Map
     /// ClassId → Type. Der Eintrag gilt nur für die zugehörige Generation
-    /// (<see cref="_allTypesAssemblyCount" />); bei Assembly-Reload wird der
+    /// (_allTypesAssemblyCount); bei Assembly-Reload wird der
     /// Eintrag verworfen und neu aufgebaut. Vermeidet den mehrfachen Reflection-
     /// Zugriff auf die statische <c>ClassId</c>-Property bei jedem Aufruf von
-    /// <see cref="Classes.ParseableItem.NewByTypeName{T}" />.
+    /// Classes.ParseableItem.NewByTypeName{T}.
     /// </summary>
     private static readonly ConcurrentDictionary<Type, (int Generation, Dictionary<string, Type> Map)> _classIdByTargetType = new();
 
@@ -238,10 +238,10 @@ public static class Generic {
     /// Liefert den konkreten, instanziierbaren Typ, dessen statische
     /// <c>ClassId</c>-Property mit <paramref name="classId" /> übereinstimmt —
     /// gecacht pro Target-Typ <typeparamref name="T" />. Entspricht funktional
-    /// einer Suche über <see cref="GetEnumerableOfType{T}" /> inkl. Abruf der
+    /// einer Suche über GetEnumerableOfType{T} inkl. Abruf der
     /// <c>ClassId</c>-Property, vermeidet aber den wiederholten Reflection-
     /// Zugriff pro Aufruf. Die Cache-Gültigkeit ist an
-    /// <see cref="AllTypes" /> gekoppelt: Sobald sich die Anzahl geladener
+    /// AllTypes gekoppelt: Sobald sich die Anzahl geladener
     /// Assemblies ändert, gilt der Cache als veraltet und wird beim nächsten
     /// Zugriff neu aufgebaut.
     /// </summary>
@@ -414,7 +414,7 @@ public static class Generic {
     }
 
     /// <summary>
-    /// Meldet ein zuvor über <see cref="RegisterCacheTrim" /> registriertes
+    /// Meldet ein zuvor über RegisterCacheTrim registriertes
     /// Trim-Delegate wieder ab. Verhindert, dass weggeworfene Cache-Instanzen
     /// über die Trim-Liste unbegrenzt am Leben gehalten werden.
     /// </summary>

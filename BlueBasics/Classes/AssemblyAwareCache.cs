@@ -8,8 +8,8 @@ namespace BlueBasics.Classes;
 /// und über einen parameterlosen Konstruktor verfügen.
 /// <para>
 /// Der Typ-Bestand wird neu aufgebaut, sobald sich die Anzahl der geladenen Assemblies
-/// im <see cref="AppDomain" /> ändert. Instanzen werden lazy erzeugt und können über
-/// <see cref="IHasKeyName.KeyName" /> oder den vollen Typnamen abgerufen werden.
+/// im AppDomain ändert. Instanzen werden lazy erzeugt und können über
+/// IHasKeyName.KeyName oder den vollen Typnamen abgerufen werden.
 /// </para>
 /// </summary>
 public class AssemblyAwareCache<T> {
@@ -22,24 +22,24 @@ public class AssemblyAwareCache<T> {
     private readonly object _lock = new();
 
     /// <summary>
-    /// Anzahl der Assemblies, die beim letzten Aufbau von <see cref="_types" /> geladen waren.
+    /// Anzahl der Assemblies, die beim letzten Aufbau von _types geladen waren.
     /// Dient der Erkennung, ob der Cache erneuert werden muss.
     /// <c>volatile</c>, damit der Lesezugriff außerhalb des Locks immer den aktuellen Wert sieht.
     /// </summary>
     private volatile int _assemblyCount;
 
     /// <summary>
-    /// Instanz-Cache, schlüsselweise nach <see cref="IHasKeyName.KeyName" />
-    /// oder vollem Typnamen. Wird lazy über <see cref="Instances" /> befüllt und bei einer
+    /// Instanz-Cache, schlüsselweise nach IHasKeyName.KeyName
+    /// oder vollem Typnamen. Wird lazy über Instances befüllt und bei einer
     /// Änderung des Assembly-Bestands verworfen (<c>null</c>).
-    /// <c>volatile</c> sichert das Double-Checked-Locking in <see cref="Instances" />.
+    /// <c>volatile</c> sichert das Double-Checked-Locking in Instances.
     /// </summary>
     private volatile Dictionary<string, T>? _instances;
 
     /// <summary>
-    /// Typ-Cache, schlüsselweise nach vollem Typnamen. Wird lazy über <see cref="Types" />
+    /// Typ-Cache, schlüsselweise nach vollem Typnamen. Wird lazy über Types
     /// befüllt und beim Erkennen neu geladener Assemblies erneuert.
-    /// <c>volatile</c> sichert das Double-Checked-Locking in <see cref="Types" />.
+    /// <c>volatile</c> sichert das Double-Checked-Locking in Types.
     /// </summary>
     private volatile Dictionary<string, Type>? _types;
 
@@ -49,7 +49,7 @@ public class AssemblyAwareCache<T> {
 
     /// <summary>
     /// Erstellt einen neuen Cache. Assemblies und Typen werden lazy beim ersten
-    /// Zugriff geladen (siehe <see cref="Types" /> und <see cref="Instances" />),
+    /// Zugriff geladen (siehe Types und Instances),
     /// damit der Konstruktor keine statischen Initialisierungen fremder Assemblies
     /// anstößt, die rekursiv wieder auf diesen Cache zugreifen würden.
     /// </summary>
@@ -195,7 +195,7 @@ public class AssemblyAwareCache<T> {
 
     /// <summary>
     /// Ruft die Instanz mit dem angegebenen <paramref name="keyName" /> ab
-    /// (<see cref="IHasKeyName.KeyName" /> oder voller Typname).
+    /// (IHasKeyName.KeyName oder voller Typname).
     /// Gibt <c>default</c> zurück, wenn kein passender Schlüssel vorhanden ist oder
     /// <paramref name="keyName" /> leer/<c>null</c> ist.
     /// </summary>

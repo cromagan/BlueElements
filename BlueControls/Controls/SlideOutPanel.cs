@@ -7,24 +7,24 @@ namespace BlueControls.Controls;
 
 /// <summary>
 /// Herausfahrendes Panel, das schnurgerade von einer Parent-Kante in den
-/// Parent hineinslidet (Richtung siehe <see cref="SlideFrom" />). Die Kante,
+/// Parent hineinslidet (Richtung siehe SlideFrom). Die Kante,
 /// von der es erscheint, gibt die Grenze vor: Erscheint es von unten, steht
 /// es im ausgefahrenen Zustand an der im Designer entworfenen Oberkante und
 /// berührt mit der Unterkante den Parent; von oben entsprechend umgekehrt.
 /// Ein- und ausgefahren wird ausschließlich über die Position gesteuert, und
-/// zwar von der <see cref="Animator" />-Engine über das
-/// <see cref="IAnimatable" />-Interface.
-/// Im eingefahrenen Zustand ragen nur <see cref="TabSize" /> Pixel an der
+/// zwar von der Animator-Engine über das
+/// IAnimatable-Interface.
+/// Im eingefahrenen Zustand ragen nur TabSize Pixel an der
 /// Einfahr-Kante in den sichtbaren Bereich des Parents. Fährt die Maus über
 /// das Control, wird das Panel smooth herausgefahren (200 ms,
 /// Smoothstep-Easing). Verlässt die Maus das Control, fährt es wieder ein.
-/// Über <see cref="SlideFrom" /> wird auch der GroupBox-Stil festgelegt:
+/// Über SlideFrom wird auch der GroupBox-Stil festgelegt:
 /// Top (Stil NormalBoldBottom, die dicke Kopfzeile unten bleibt als Tab
 /// sichtbar) oder Bottom (Stil NormalBold, die Kopfzeile oben bleibt
 /// sichtbar).
-/// Die Zeichenroutine stammt vollständig von der Basisklasse <see cref="GroupBox" />
+/// Die Zeichenroutine stammt vollständig von der Basisklasse GroupBox
 /// — es gibt kein eigenes OnPaint, GroupBox zeichnet Rahmen und Caption
-/// (<see cref="Control.Text" />) wie gewohnt.
+/// (Control.Text) wie gewohnt.
 /// </summary>
 [DefaultEvent(nameof(ExpandedChanged))]
 public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
@@ -79,7 +79,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     #region Properties
 
     /// <summary>
-    /// Wird über <see cref="SlideFrom" /> festgelegt und ist nicht frei wählbar.
+    /// Wird über SlideFrom festgelegt und ist nicht frei wählbar.
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -196,7 +196,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     /// <summary>
     /// Animation beendet — Panel bleibt an der Zielposition, wird NICHT
     /// geschlossen (anders als bei FloatingForms). Überschreibt den
-    /// Default von <see cref="IAnimatable.OnAnimationFinished" />, der das
+    /// Default von IAnimatable.OnAnimationFinished, der das
     /// Objekt schließen würde.
     /// </summary>
     void IAnimatable.OnAnimationFinished() {
@@ -210,10 +210,10 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     }
 
     /// <summary>
-    /// Startet die Animation über den <see cref="Animator" /> — ohne
+    /// Startet die Animation über den Animator — ohne
     /// Layered-Window, da SlideOutPanel ein Child-Control ist, das nur seine
     /// Position ändert. Überschreibt den Default von
-    /// <see cref="IAnimatable.StartAnimation" />, der WS_EX_LAYERED setzen würde.
+    /// IAnimatable.StartAnimation, der WS_EX_LAYERED setzen würde.
     /// </summary>
     void IAnimatable.StartAnimation() {
         if (!IsHandleCreated) {
@@ -279,7 +279,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
 
     /// <summary>
     /// Geometrie im eingefahrenen Zustand: unveränderte Größe, um
-    /// <see cref="TabSize" /> an der Einfahr-Kante in den Parent verschoben —
+    /// TabSize an der Einfahr-Kante in den Parent verschoben —
     /// nur der Tab bleibt sichtbar, der Rest wird vom Parent abgeschnitten.
     /// </summary>
     private Rectangle ComputeCollapsedBounds() {
@@ -301,7 +301,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     private void OnExpandedChanged() => ExpandedChanged?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Legt den GroupBox-Stil passend zu <see cref="SlideFrom" /> fest —
+    /// Legt den GroupBox-Stil passend zu SlideFrom fest —
     /// die Kopfzeile bleibt im eingefahrenen Zustand als Tab sichtbar.
     /// </summary>
     private void SetSlideStyle() => base.GroupBoxStyle = SlideFrom == SlideFrom.Top ? GroupBoxStyle.NormalBoldBottom : GroupBoxStyle.NormalBold;
@@ -333,7 +333,7 @@ public sealed class SlideOutPanel : GroupBox, IAnimatable, ITranslateable {
     /// <summary>
     /// Positioniert das Panel auf die Zielgeometrie: ausgefahren von der
     /// Einfahr-Kante bis zur entworfenen Gegenkante, eingefahren nur
-    /// <see cref="TabSize" /> Pixel an der Kante sichtbar.
+    /// TabSize Pixel an der Kante sichtbar.
     /// Wird während der Animation nicht aufgerufen — dann steuert der
     /// Animator Position und Größe via SetWindowPos.
     /// </summary>

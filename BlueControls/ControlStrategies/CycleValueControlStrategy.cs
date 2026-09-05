@@ -17,6 +17,9 @@ public class CycleValueControlStrategy : ControlStrategy, IHasColumn {
 
     public static string ClassId => "CycleValue";
 
+    /// <summary>
+    /// Die Spalte, zu der das Control gehört.
+    /// </summary>
     public ColumnItem? Column { get; set; }
 
     public override string Description => "Zeigt nichts an: Ein Klick in die Zelle setzt den nächsten der auswählbaren Werte ein.";

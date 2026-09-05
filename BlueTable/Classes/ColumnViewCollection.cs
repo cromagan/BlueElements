@@ -77,8 +77,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     /// <summary>
     /// Alle für die Darstellung relevante Spalten: die persistenten
-    /// (<see cref="_internal" />) in ihrer gespeicherten Reihenfolge plus die
-    /// on-demand virtuellen (<see cref="_onDemand" />) an ihrer Standardposition
+    /// (_internal) in ihrer gespeicherten Reihenfolge plus die
+    /// on-demand virtuellen (_onDemand) an ihrer Standardposition
     /// (Pin vorne, Hinzufügen hinten). Editier-Operationen
     /// (Move/Remove/IndexOf) und die Serialisierung arbeiten weiterhin
     /// ausschließlich auf den persistenten Spalten.
@@ -470,9 +470,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <summary>
     /// Stellt die on-demand virtuellen Spalten (Pin, Hinzufügen) gemäß den
     /// übergebenen Bedingungen sicherhaft ein. Persistente virtuelle Spalten
-    /// (über ihren VIR_-Schlüssel in <see cref="_internal" />) werden NICHT
+    /// (über ihren VIR_-Schlüssel in _internal) werden NICHT
     /// angerührt — sie bleiben unabhängig vom Bedarf erhalten. On-demand-
-    /// Spalten landen in <see cref="_onDemand" /> und werden nicht
+    /// Spalten landen in _onDemand und werden nicht
     /// serialisiert. Die Number-Spalte hat keinen on-demand-Trigger und
     /// erscheint ausschließlich als VIR_NUMBER.
     /// </summary>

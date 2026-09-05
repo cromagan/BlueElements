@@ -27,7 +27,7 @@ public static class IO {
     /// Read-Cache für kleine Dateien. Key = normalisierter Dateipfad.
     /// Value = (Dateilänge, UTC-LastWriteTime, rohe Bytes).
     /// Treffer-Prüfung: Länge UND LastWriteTime müssen übereinstimmen.
-    /// Automatisches Trimmen läuft global über <see cref="ConcurrentCache{TKey, TValue}"/>.
+    /// Automatisches Trimmen läuft global über ConcurrentCache{TKey, TValue}.
     /// </summary>
     private static readonly ConcurrentCache<string, (long Length, DateTime LastWriteTimeUtc, byte[] Content)> _readCache = new(StringComparer.OrdinalIgnoreCase, 500);
 
@@ -143,7 +143,7 @@ public static class IO {
 
     /// <summary>
     /// Versucht die Datei zu löschen. Bei <paramref name="confirmResult"/> = false
-    /// wird nach <see cref="File.Delete"/> nicht auf die tatsächliche Löschung gewartet
+    /// wird nach File.Delete nicht auf die tatsächliche Löschung gewartet
     /// — geeignet für nicht-kritische Aufräumarbeiten ohne Wartezeit.
     /// </summary>
     public static bool DeleteFile(string filename, float tryForSeconds, bool confirmResult) {
@@ -529,7 +529,7 @@ public static class IO {
     /// Liest den gesamten Text aus einer Datei mit dem angegebenen Encoding.
     /// Das Encoding ist verbindlich. Ein vorhandenes BOM wird nur als Offset
     /// verwendet (also übersprungen), nicht um das Encoding zu wechseln.
-    /// Für Auto-Detection statt dessen <see cref="ReadAllText(string)"/> verwenden.
+    /// Für Auto-Detection statt dessen ReadAllText(string) verwenden.
     /// </summary>
     /// <param name="filename">Der Pfad zur zu lesenden Datei</param>
     /// <param name="encoding">Die verbindlich zu verwendende Kodierung.</param>
@@ -801,7 +801,7 @@ public static class IO {
     /// </summary>
     /// <param name="affectingFiles">Liste mit dem zu prüfenden Verzeichnis.</param>
     /// <param name="args">Keine.</param>
-    /// <returns>OperationResult mit <see cref="DateTime"/> (UTC) als Value bei Erfolg.</returns>
+    /// <returns>OperationResult mit DateTime (UTC) als Value bei Erfolg.</returns>
     public static OperationResult TryGetFolderWriteTimeUtc(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
 
@@ -871,7 +871,7 @@ public static class IO {
     /// <summary>
     /// Nimmt eine Datei in den Read-Cache auf, sofern sie klein genug ist.
     /// Dateigröße und LastWriteTimeUtc werden aus dem Dateisystem ermittelt,
-    /// damit nachfolgende Lesezugriffe per <see cref="TryGetFromReadCache"/>
+    /// damit nachfolgende Lesezugriffe per TryGetFromReadCache
     /// auf Aktualität geprüft werden können.
     /// </summary>
     private static void AddToReadCache(string filename, byte[] content) {

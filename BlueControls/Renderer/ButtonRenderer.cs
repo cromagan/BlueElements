@@ -20,7 +20,8 @@ public class ButtonRenderer : Renderer {
     public override string Description => "Stellt den Zelleninhalt als Schaltfläche dar.\r\nIst ShowCellValue aktiv, wird der Zelltext unverändert angezeigt. Sonst wird der Inhalt als Ja/Nein-Wert (+, Wahr, True) interpretiert.";
 
     /// <summary>
-    /// Zeigt den Zellinhalt unverändert als Text ohne Bild und ungecheckt an.
+    /// Wenn gewählt, wird der Inhalt der Zelle unverändert als Text angezeigt.
+    /// Wenn nicht gewählt, wird der Inhalt als Ja/Nein-Angabe dargestellt.
     /// </summary>
     public bool ShowCellValue {
         get;
@@ -33,7 +34,7 @@ public class ButtonRenderer : Renderer {
     }
 
     /// <summary>
-    /// Bildcode, der angezeigt wird, wenn der Zelleninhalt als TRUE interpretiert werden kann.
+    /// Bild auf dem Knopf, wenn der Wert „Ja" ist.
     /// </summary>
     public string PictureTrue {
         get;
@@ -46,7 +47,7 @@ public class ButtonRenderer : Renderer {
     } = string.Empty;
 
     /// <summary>
-    /// Text, der angezeigt wird, wenn der Zelleninhalt als TRUE interpretiert werden kann.
+    /// Aufschrift des Knopfes, wenn der Wert „Ja" ist.
     /// </summary>
     public string TextTrue {
         get;
@@ -59,7 +60,7 @@ public class ButtonRenderer : Renderer {
     } = string.Empty;
 
     /// <summary>
-    /// Bildcode, der angezeigt wird, wenn der Zelleninhalt nicht als TRUE interpretiert werden kann.
+    /// Bild auf dem Knopf, wenn der Wert „Nein" ist.
     /// </summary>
     public string PictureFalse {
         get;
@@ -72,7 +73,7 @@ public class ButtonRenderer : Renderer {
     } = string.Empty;
 
     /// <summary>
-    /// Text, der angezeigt wird, wenn der Zelleninhalt nicht als TRUE interpretiert werden kann.
+    /// Aufschrift des Knopfes, wenn der Wert „Nein" ist.
     /// </summary>
     public string TextFalse {
         get;
@@ -85,7 +86,7 @@ public class ButtonRenderer : Renderer {
     } = string.Empty;
 
     /// <summary>
-    /// Zeigt bei leerer Zelle die Schaltfläche im FALSE-Zustand, statt nichts zu zeichnen.
+    /// Wenn gewählt, wird bei einer leeren Zelle der Knopf im Zustand „Nein" angezeigt.
     /// </summary>
     public bool NoValuesShowFalse {
         get;
@@ -98,8 +99,8 @@ public class ButtonRenderer : Renderer {
     }
 
     /// <summary>
-    /// Innenabstand des Buttons zur Zelle. Negative Werte vergrößern die Zeichenfläche
-    /// über die Zelle hinaus, z. B. um das Zeilen-Padding {4, 2} zu negieren: {-4, -2}.
+    /// Abstand zwischen dem Knopf und dem Zellenrand.
+    /// Negative Werte lassen den Knopf über den Zellenrand hinausragen.
     /// </summary>
     public Padding Padding {
         get => _padding;

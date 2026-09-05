@@ -29,6 +29,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
+    /// <summary>
+    /// Position der Beschriftung: neben oder über dem Feld.
+    /// </summary>
     public CaptionPosition CaptionPosition {
         get;
         set {
@@ -46,6 +49,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         }
     }
 
+    /// <summary>
+    /// Die Spalte, die dieser Filter einschränkt.
+    /// </summary>
     public string ColumnKey {
         get;
         set {
@@ -59,6 +65,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
 
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.\r\nWerte können mit 'Skript-Knöpfen' abgefragt und manipuluert werden.";
 
+    /// <summary>
+    /// Wenn gewählt, wird das Textfeld zu einem Knopf, sobald ein konkreter Wert gewählt ist.
+    /// </summary>
     public bool Einschnappen {
         get;
         set {
@@ -76,6 +85,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         }
     }
 
+    /// <summary>
+    /// Wie ein eingegebener Text mit den Werten verglichen wird.
+    /// </summary>
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
         get;
         set {
@@ -89,6 +101,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
 
+    /// <summary>
+    /// Legt fest, was angezeigt wird, solange keine Eingabe gemacht wurde.
+    /// </summary>
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get;
         set {

@@ -155,7 +155,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     }
 
     /// <summary>
-    /// JSON-Pendant zu <see cref="ParseableItems" />. Schreibt die gemeinsamen
+    /// JSON-Pendant zu ParseableItems. Schreibt die gemeinsamen
     /// Metadaten aller Variablen (Typ, Schlüssel, Kommentar, Schreibschutz).
     /// Subklassen überschreiben diese Methode, rufen <c>base.ParseableJson()</c>
     /// auf und ergänzen ihren Wert.
@@ -172,7 +172,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     public virtual void ParseFinishedJson(JsonObject parsed) { }
 
     /// <summary>
-    /// JSON-Pendant zu <see cref="ParseThis" />. Liest die gemeinsamen Metadaten.
+    /// JSON-Pendant zu ParseThis. Liest die gemeinsamen Metadaten.
     /// Subklassen überschreiben diese Methode, lesen ihren eigenen Wert aus
     /// <paramref name="json" /> und rufen am Ende <c>base.ParseJson(json)</c> auf.
     /// Nicht vorhandene Keys werden übersprungen, sodass auch Partial-Updates funktionieren.

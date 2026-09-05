@@ -31,10 +31,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private static List<string> _allavailableTables = [];
 
-    ///// <summary>
-    ///// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
-    ///// </summary>
-    //private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private readonly List<string> _dictionaryWords = [];
@@ -179,11 +175,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     /// <summary>
     /// Eigenes Register aller lebenden TableScriptCommand-Instanzen, geordnet nach
-    /// <see cref="KeyName" />. Schlüsselseitig Case-Insensitive.
+    /// KeyName. Schlüsselseitig Case-Insensitive.
     /// </summary>
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
 
-    [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
+    /// <summary>
+    /// In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.
+    /// </summary>
     public string AssetFolder {
         get => _assetFolder;
         set {
@@ -194,7 +192,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    [Description("Der Name der Tabelle.")]
+    /// <summary>
+    /// Der Name der Tabelle.
+    /// </summary>
     public string Caption {
         get => _caption;
         set {
@@ -424,7 +424,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
-    [Description("Das standardmäßige Formular - dessen Dateiname -, das angezeigt werden soll.")]
     public string StandardFormulaFile {
         get => _standardFormulaFile;
         set {
@@ -433,7 +432,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    [Description("In diesem Ordner suchen verschiedene Routinen (IconChar, <Imagecode=...>) nach eigenen Symbol-Dateien (PNG).")]
+    /// <summary>
+    /// In diesem Ordner suchen verschiedene Routinen (IconChar, &lt;Imagecode=...&gt;) nach eigenen Symbol-Dateien (PNG).
+    /// </summary>
     public string SymbolFolder {
         get => _symbolFolder;
         set {
@@ -563,8 +564,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     protected string LoadedVersion { get; private set; }
 
     /// <summary>
-    /// Thread-static: zusätzliche Suchpfade, die von <see cref="Get(string)" /> befüllt
-    /// und von <see cref="CreateInstance" /> ausgewertet
+    /// Thread-static: zusätzliche Suchpfade, die von Get(string) befüllt
+    /// und von CreateInstance ausgewertet
     /// werden. Ermöglicht die Übergabe des expliziten Pfads aus dem Aufrufer-
     /// Kontext an die Factory ohne Interface-Parameter.
     /// </summary>
@@ -619,16 +620,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
-    /// Sucht in den konfigurierten Suchpfaden (vom Aufrufer über <see cref="Get(string)" />,
+    /// Factory für LiveInstanceCache{T}.GetOrCreate{TDerived}.
+    /// Sucht in den konfigurierten Suchpfaden (vom Aufrufer über Get(string),
     /// plus die Pfade bereits geladener Tabellen) nach einer passenden Datei,
-    /// erzeugt über <see cref="Activator" /> die passende TableFile-Subtyp-Instanz
+    /// erzeugt über Activator die passende TableFile-Subtyp-Instanz
     /// und lädt den Inhalt ohne Passwort-Abfrage. Der Konstruktor trägt die
-    /// Instanz selbst in <see cref="LiveInstanceCache{T}.LiveInstances" /> ein;
-    /// das <see cref="LiveInstanceCache{T}.Added" />-Event wird von
-    /// <see cref="LiveInstanceCache{T}.GetOrCreate" /> nach erfolgreicher
-    /// Konstruktion gefeuert. Wirft <see cref="FileNotFoundException" />, wenn
-    /// kein passendes File existiert — <see cref="Get(string)" /> fängt das
+    /// Instanz selbst in LiveInstanceCache{T}.LiveInstances ein;
+    /// das LiveInstanceCache{T}.Added-Event wird von
+    /// LiveInstanceCache{T}.GetOrCreate nach erfolgreicher
+    /// Konstruktion gefeuert. Wirft FileNotFoundException, wenn
+    /// kein passendes File existiert — Get(string) fängt das
     /// und gibt null zurück.
     /// </summary>
     public static Table Create(string key) => CreateInstance(key);
@@ -2173,10 +2174,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <summary>
     /// Nummeriert die übergebenen Zeilen in der übergebenen Reihenfolge fortlaufend
     /// (1, 2, 3, ...) und schreibt die Werte in die Systemspalte für die
-    /// benutzerdefinierte Sortierung (<see cref="ColumnCollection.SysRowSortIndex"/>).
+    /// benutzerdefinierte Sortierung (ColumnCollection.SysRowSortIndex).
     /// Dispose-Zustände werden übersprungen. Ist keine Sortierspalte aktiv, ist die
     /// Methode eine No-Op. Event-Suppression muss der Aufrufer übernehmen — bei
-    /// vielen Zeilen löst jedes <see cref="RowItem.CellSet"/> synchron teure
+    /// vielen Zeilen löst jedes RowItem.CellSet synchron teure
     /// Layout-Aktualisierungen aus.
     /// </summary>
     public void RenumberRows(IEnumerable<RowItem> rowsInOrder, string reason) {
@@ -2257,9 +2258,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     /// <summary>
     /// Liefert die nicht-disposed Zeilen dieser Tabelle in der Reihenfolge,
-    /// in der sie gespeichert werden sollen. Ist eine <see cref="SortDefinition" />
+    /// in der sie gespeichert werden sollen. Ist eine SortDefinition
     /// vorhanden, wird diese angewendet. Andernfalls wird aufsteigend nach
-    /// <see cref="RowItem.KeyName" /> sortiert (OrdinalIgnoreCase).
+    /// RowItem.KeyName sortiert (OrdinalIgnoreCase).
     /// </summary>
     /// <returns>Eine neue, sortierte Liste aller nicht-disposed Zeilen.</returns>
     public List<RowItem> RowsInSaveOrder() {
@@ -2545,8 +2546,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <summary>
     /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
     /// laden und Edit-Lock prüfen). Wird ausschließlich bei akuter Bearbeitungsabsicht
-    /// — in <see cref="ChangeData"/> — aufgerufen, nicht bei reinen UI-Abfragen über
-    /// <see cref="IsValueEditable"/>. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
+    /// — in ChangeData — aufgerufen, nicht bei reinen UI-Abfragen über
+    /// IsValueEditable. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
     /// </summary>
     protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
 

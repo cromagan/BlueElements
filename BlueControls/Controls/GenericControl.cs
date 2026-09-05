@@ -112,8 +112,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtended,
 
     /// <summary>
     /// Gibt an, ob aktuell eine Maustaste über diesem Control gedrückt gehalten wird.
-    /// Wird in <see cref="OnMouseDown"/> gesetzt und in <see cref="OnMouseUp"/> sowie
-    /// <see cref="OnMouseMove"/> (bei keiner gedrückten Taste) zurückgesetzt.
+    /// Wird in OnMouseDown gesetzt und in OnMouseUp sowie
+    /// OnMouseMove (bei keiner gedrückten Taste) zurückgesetzt.
     /// </summary>
     protected bool MousePressing { get; private set; }
 

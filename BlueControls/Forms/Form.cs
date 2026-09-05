@@ -23,7 +23,8 @@ public partial class Form : System.Windows.Forms.Form {
 
     ///// <summary>
     ///// Die Dicke des oberen Balken einer Form in Pixel
-    ///// </summary>
+    /// //
+    /// </summary>
     //public static readonly int BorderTop = 31;
 
     #region Constructors

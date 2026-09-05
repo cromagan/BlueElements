@@ -11,10 +11,10 @@ namespace BlueBasics.Classes;
 
 /// <summary>
 /// Abstrakte Basisklasse für gecachte Dateien, die zusätzlich per
-/// <see cref="BlockFile"/> gegen parallele Bearbeitung durch andere Benutzer
+/// BlockFile gegen parallele Bearbeitung durch andere Benutzer
 /// gesperrt werden können. Erbt das Live-Instanz-Register von
-/// <see cref="LiveInstanceCache{T}"/> (als <see cref="LiveInstanceCache{T}"/>
-/// mit T = <see cref="BlockableFile"/>), sodass konkrete Ableitungen wie
+/// LiveInstanceCache{T} (als LiveInstanceCache{T}
+/// mit T = BlockableFile), sodass konkrete Ableitungen wie
 /// <c>ConnectedFormula</c> das Register indirekt über diese Basisklasse
 /// mitbekommen.
 /// </summary>
@@ -22,31 +22,35 @@ namespace BlueBasics.Classes;
 /// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading,
 /// Versionierung und Thread-sicherheit (Double-Checked-Locking mit Semaphoren).
 /// Zusätzlich wird ein statischer Polling-Timer betrieben, der alle
-/// <see cref="PollingIntervalMinutes"/> Minuten prüft, ob sich die Datei auf der
-/// Festplatte geändert hat, und ggf. <see cref="Invalidate"/> aufruft.
+/// PollingIntervalMinutes Minuten prüft, ob sich die Datei auf der
+/// Festplatte geändert hat, und ggf. Invalidate aufruft.
 /// Dateien mit aktivem Schreibzugriff werden beim Polling übersprungen.
 /// <para>
-/// Das zentrale Lifecycle-Management (<see cref="SaveAll(bool, IEnumerable{BlockableFile})"/>
-/// und <see cref="DisposeAll(IEnumerable{BlockableFile})"/>) greift direkt auf
-/// das geerbte <see cref="LiveInstanceCache{T}.LiveInstances"/>-Register zu.
+/// Das zentrale Lifecycle-Management (SaveAll(bool, IEnumerable{BlockableFile})
+/// und DisposeAll(IEnumerable{BlockableFile})) greift direkt auf
+/// das geerbte LiveInstanceCache{T}.LiveInstances-Register zu.
 /// </para>
 /// </remarks>
 public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
 
-    /// <summary>Timeout (ms) für <see cref="WaitDiskOperationFinished"/>.</summary>
+    /// <summary>
+    /// Timeout (ms) für WaitDiskOperationFinished.
+    /// </summary>
     private const int DiskOperationTimeoutMs = 30000;
 
-    /// <summary>Prüfintervall des Polling-Timers in Minuten.</summary>
+    /// <summary>
+    /// Prüfintervall des Polling-Timers in Minuten.
+    /// </summary>
     private const int PollingIntervalMinutes = 5;
 
     private static readonly object _timerLock = new();
 
     /// <summary>
     /// Registry aller Instanzen, die aktuell erfolgreich Schreibrechte erworben haben.
-    /// Schlüssel ist der Dateipfad (<see cref="Filename"/>).
-    /// Wird genutzt, um <see cref="RevokeWriteAccessAll"/> beim Shutdown ohne Kenntnis
+    /// Schlüssel ist der Dateipfad (Filename).
+    /// Wird genutzt, um RevokeWriteAccessAll beim Shutdown ohne Kenntnis
     /// des Caching-Systems auszuführen.
     /// </summary>
     private static readonly ConcurrentDictionary<string, BlockableFile> _writeAccessHolders = new(StringComparer.OrdinalIgnoreCase);
@@ -99,7 +103,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     private volatile bool _hasWriteAccess;
 
     /// <summary>
-    /// Reentrancy-Guard für <see cref="RevokeWriteAccess"/>. Bei parallelen
+    /// Reentrancy-Guard für RevokeWriteAccess. Bei parallelen
     /// Aufrufen (z. B. Form.Dispose parallel zu RevokeWriteAccessAll beim
     /// Shutdown) wird nur der erste Aufruf aktiv; alle weiteren returnen
     /// sofort. Verhindert ein doppeltes Save über OnReleasingWriteAccess.
@@ -108,9 +112,9 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
-    /// verändert wurde. <see cref="OnPropertyChanged"/> setzt dieses Flag
-    /// über <see cref="MarkDirty"/>; der eigentliche Content wird erst beim
-    /// nächsten Speichern über <see cref="BuildContent"/> neu generiert.
+    /// verändert wurde. OnPropertyChanged setzt dieses Flag
+    /// über MarkDirty; der eigentliche Content wird erst beim
+    /// nächsten Speichern über BuildContent neu generiert.
     /// </summary>
     private bool _isDirty;
 
@@ -118,7 +122,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Zuletzt festgestellte Blocker-Meldung. Dient dem Polling dazu, Änderungen
-    /// des Sperrstatus zu erkennen und <see cref="BlockStatusChanged"/> zu werfen.
+    /// des Sperrstatus zu erkennen und BlockStatusChanged zu werfen.
     /// </summary>
     private string _lastBlockerMessage = string.Empty;
 
@@ -128,10 +132,10 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Erstellt eine neue BlockableFile-Instanz für den angegebenen Dateipfad,
-    /// registriert sie im geerbten <see cref="LiveInstanceCache{T}.LiveInstances"/>-Register
+    /// registriert sie im geerbten LiveInstanceCache{T}.LiveInstances-Register
     /// und startet bei Bedarf den statischen Polling-Timer. Das
-    /// <see cref="LiveInstanceCache{T}.Added"/>-Event wird nicht mehr aus dem
-    /// Konstruktor gefeuert — das übernimmt <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
+    /// LiveInstanceCache{T}.Added-Event wird nicht mehr aus dem
+    /// Konstruktor gefeuert — das übernimmt LiveInstanceCache{T}.GetOrCreate.
     /// </summary>
     /// <param name="filename">Vollständiger Dateipfad.</param>
     protected BlockableFile(string filename) {
@@ -151,7 +155,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// Ereignis, das ausgelöst wird, wenn sich der Multi-User-Sperrstatus
     /// (Blockdatei) geändert hat - etwa weil ein anderer Benutzer die Sperre
     /// übernommen oder freigegeben hat. Abonnenten ermitteln den aktuellen
-    /// Status über <see cref="BlockerMessage"/> bzw. <see cref="AcquireWriteAccess"/>.
+    /// Status über BlockerMessage bzw. AcquireWriteAccess.
     /// </summary>
     public event EventHandler? BlockStatusChanged;
 
@@ -180,7 +184,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
-    /// Beim Setzen gilt der Inhalt als nicht gespeichert (<see cref="IsSaved"/> ist false).
+    /// Beim Setzen gilt der Inhalt als nicht gespeichert (IsSaved ist false).
     /// Erwirbt _loadSemaphore während des Ladevorgangs, sodass IsLoading korrekt true liefert.
     /// Nach einem Frisch-Ladevorgang wird OnLoaded() automatisch aufgerufen.
     /// </summary>
@@ -279,7 +283,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Gibt an, ob der aktuelle Inhalt gespeichert ist.
-    /// Ist <c>false</c>, sobald <see cref="MarkDirty"/> aufgerufen wurde
+    /// Ist <c>false</c>, sobald MarkDirty aufgerufen wurde
     /// (also das abgeleitete Objekt seit dem letzten Laden/Speichern verändert wurde).
     /// </summary>
     public bool IsSaved {
@@ -431,7 +435,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// Erwirbt den Schreibzugriff für diese Datei.
     /// Prüft die Blockdatei, erstellt sie bei Bedarf und merkt sich den Zustand.
     /// Gibt eine Fehlermeldung zurück, wenn ein anderer Benutzer die Datei sperrt;
-    /// <see cref="string.Empty"/> bei Erfolg.
+    /// string.Empty bei Erfolg.
     /// </summary>
     public string AcquireWriteAccess() {
         if (AllReadOnly) { return string.Empty; }
@@ -451,7 +455,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Liefert eine Blocker-Meldung, falls ein anderer Benutzer die Datei sperrt;
-    /// <see cref="string.Empty"/> wenn frei.
+    /// string.Empty wenn frei.
     /// </summary>
     public string BlockerMessage() => BlockFile.BlockerMessage(Filename, MyId);
 
@@ -517,7 +521,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Invalidiert den gecachten Inhalt, damit er beim nächsten Zugriff neu geladen wird.
     /// Setzt IsParsed auf false — die Ableitung muss ihre Daten neu verarbeiten.
-    /// Lokale Änderungen gelten als verworfen (<see cref="IsSaved"/> ist danach true).
+    /// Lokale Änderungen gelten als verworfen (IsSaved ist danach true).
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
@@ -628,10 +632,10 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Gibt den Schreibzugriff frei. Speichert ungespeicherte Änderungen
-    /// über <see cref="OnReleasingWriteAccess"/>, BEVOR die Blockdatei
+    /// über OnReleasingWriteAccess, BEVOR die Blockdatei
     /// entfernt wird — sonst könnte ein anderer Benutzer zwischen Löschen
     /// der Sperre und Speichern die Datei laden und veraltete Daten vorfinden.
-    /// Reentrancy-safe über <see cref="_revokingWriteAccess"/>: Bei parallelen
+    /// Reentrancy-safe über _revokingWriteAccess: Bei parallelen
     /// Aufrufen (z. B. Dispose + expliziter Aufruf aus dem Form) läuft das
     /// Save nur einmal, um duplizierte Schreibvorgänge zu vermeiden.
     /// </summary>
@@ -772,7 +776,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     public override string ToString() => $"{GetType().Name}: {Filename}";
 
     /// <summary>
-    /// Wird von <see cref="EnsureContentCurrent"/> aufgerufen, wenn der gecachte
+    /// Wird von EnsureContentCurrent aufgerufen, wenn der gecachte
     /// Inhalt veraltet ist (<c>_isDirty</c>). Ableitungen serialisieren hier ihr
     /// aktuelles Objektmodell in Bytes. <c>null</c> bedeutet: keine Neugenerierung
     /// möglich (z. B. weil noch nicht geparst); der gecachte Inhalt bleibt.
@@ -782,11 +786,11 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Synchronisiert die Hashes mit dem aktuell gecachten <c>_content</c>,
     /// ohne diesen neu zu erzeugen oder zu überschreiben. Im Gegensatz zu
-    /// <see cref="SetLoadedContent"/> wird <c>_content</c> nicht ausgetauscht
+    /// SetLoadedContent wird <c>_content</c> nicht ausgetauscht
     /// und insbesondere kein Serialisierungs-Aufruf benötigt.
     /// </summary>
     /// <remarks>
-    /// Geeignet für Ableitungen, die in <see cref="IParseable.ParseFinished"/>
+    /// Geeignet für Ableitungen, die in IParseable.ParseFinished
     /// eine Re-Serialisierung (zur Normalisierung des Inhalts) vermeiden wollen,
     /// weil diese unerwünschte Seiteneffekte hätte — etwa das Lazy-Loaden
     /// abhängiger Dateien. Voraussetzung: <c>_content</c> ist bereits gefüllt
@@ -804,9 +808,9 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Markiert den Inhalt als verändert (<c>_isDirty = true</c>).
-    /// <see cref="IsSaved"/> liefert danach false. Der eigentliche Content wird
+    /// IsSaved liefert danach false. Der eigentliche Content wird
     /// NICHT sofort neu generiert — das passiert erst, wenn er gebraucht wird
-    /// (in <see cref="Save"/> über <see cref="EnsureContentCurrent"/>).
+    /// (in Save über EnsureContentCurrent).
     /// </summary>
     protected void MarkDirty() {
         lock (_lock) {
@@ -834,7 +838,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
     /// <c>_content</c>, <c>_contentHash</c> und <c>_contentOnDiskHash</c> werden
-    /// auf den übergebenen Wert synchronisiert, <see cref="IsSaved"/> ist danach
+    /// auf den übergebenen Wert synchronisiert, IsSaved ist danach
     /// true. Wird von Ableitungen nach der Verarbeitung der Rohdaten aufgerufen
     /// — z. B. nachdem die geladenen Bytes geparst und normalisiert wurden —,
     /// damit der gecachte Inhalt den tatsächlich geladenen Stand abbildet.
@@ -860,7 +864,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     }
 
     /// <summary>
-    /// Wird vom Polling-Timer alle <see cref="PollingIntervalMinutes"/> Minuten aufgerufen.
+    /// Wird vom Polling-Timer alle PollingIntervalMinutes Minuten aufgerufen.
     /// Prüft alle registrierten Dateien auf externe Änderungen und invalidiert
     /// veraltete Instanzen. Dateien mit aktivem Schreibzugriff werden beim
     /// Invalidieren übersprungen, der Sperrstatus wird dennoch geprüft.
@@ -903,7 +907,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     }
 
     /// <summary>
-    /// Ermittelt den aktuellen Sperrstatus und wirft <see cref="BlockStatusChanged"/>,
+    /// Ermittelt den aktuellen Sperrstatus und wirft BlockStatusChanged,
     /// wenn er sich seit der letzten Prüfung geändert hat.
     /// </summary>
     private void CheckBlockStatus() {
@@ -915,7 +919,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Stellt sicher, dass <c>_content</c> den aktuellen Objektzustand abbildet.
-    /// Falls <c>_isDirty</c>, wird <see cref="BuildContent"/> aufgerufen und das
+    /// Falls <c>_isDirty</c>, wird BuildContent aufgerufen und das
     /// Ergebnis übernimmt. Wird vor jedem Speichern ausgeführt.
     /// </summary>
     private void EnsureContentCurrent() {
@@ -933,7 +937,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.
-    /// Aufrufer (Content-Getter) muss bereits <see cref="_loadSemaphore"/> halten
+    /// Aufrufer (Content-Getter) muss bereits _loadSemaphore halten
     /// und NeedsLoading vor dem Aufruf geprüft haben.
     /// </summary>
     private byte[] GetContentInternal() {
@@ -1000,8 +1004,8 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Schreibt den Content auf die Festplatte und aktualisiert danach die
-    /// Instanz-Zustände (Hashes, FileInfo) sowie löst <see cref="OnSaved"/> aus.
-    /// Für <see cref="ExtendedSave"/> = true wird <see cref="SaveExtended"/>
+    /// Instanz-Zustände (Hashes, FileInfo) sowie löst OnSaved aus.
+    /// Für ExtendedSave = true wird SaveExtended
     /// (Backup-Rotation, atomares Ersetzen) genutzt, sonst ein direkter Schreibvorgang.
     /// </summary>
     private OperationResult SaveToDisk(byte[] contentToWrite, string savedContentHash) {

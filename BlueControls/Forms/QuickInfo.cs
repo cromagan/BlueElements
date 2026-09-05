@@ -105,8 +105,8 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
     /// Berechnet das Frame der Animation. QuickInfo hängt am Mauszeiger und
     /// durchläuft: Intro-Delay (unsichtbar) -&gt; Stable (sofort voll
     /// sichtbar). Auslöser für sofortiges Schließen: externes
-    /// <see cref="Close(bool)" />, Vordergrundfenster wechselt oder
-    /// <see cref="MaxVisibleMs" /> abgelaufen. Fade-In/Fade-Out ist bewusst
+    /// Close(bool), Vordergrundfenster wechselt oder
+    /// MaxVisibleMs abgelaufen. Fade-In/Fade-Out ist bewusst
     /// entfernt — die QuickInfo erscheint und verschwindet sofort.
     /// </summary>
     public AnimationFrame Animate(TimeSpan elapsed) {

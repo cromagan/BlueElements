@@ -8,7 +8,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
-public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IErrorCheckable {
+public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable, IErrorCheckable {
 
     #region Fields
 
@@ -20,9 +20,9 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
 
     #region Constructors
 
-    public ScriptButton() : this(string.Empty, null) { }
+    public ScriptButtonPadItem() : this(string.Empty, null) { }
 
-    public ScriptButton(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
+    public ScriptButtonPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 
@@ -34,7 +34,9 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
 
     public bool AutoSizeableHeight => false;
 
-    [Description("Die Beschriftung der Schaltfläche.")]
+    /// <summary>
+    /// Die Beschriftung der Schaltfläche.
+    /// </summary>
     public string Beschriftung {
         get;
         set {
@@ -45,7 +47,9 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
         }
     } = string.Empty;
 
-    [Description("Ein Bild für die Schaltfläche. Beispiel: PlusZeichen|16")]
+    /// <summary>
+    /// Ein Bild für die Schaltfläche. Beispiel: PlusZeichen|16
+    /// </summary>
     public string Bild {
         get;
         set {
@@ -56,7 +60,10 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
         }
     } = string.Empty;
 
-    [Description("Eine Information, die dem Benutzer angezeigt wird,\r\nwenn er den Mauszeiger über die Schaltfläche bewegt.")]
+    /// <summary>
+    /// Eine Information, die dem Benutzer angezeigt wird,
+    /// wenn er den Mauszeiger über die Schaltfläche bewegt.
+    /// </summary>
     public string ButtonQuickInfo {
         get;
         set {
@@ -69,7 +76,9 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
 
     public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und dann ein Skript gestartet wird.";
 
-    [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
+    /// <summary>
+    /// Legt fest, wann der Knopf benutzt werden kann.
+    /// </summary>
     public ButtonArgs Drückbar_wenn {
         get;
         set {
@@ -85,6 +94,9 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
 
     public override bool MustBeInDrawingArea => true;
 
+    /// <summary>
+    /// Das Skript, das beim Anklicken des Knopfes ausgeführt wird.
+    /// </summary>
     public string Script {
         get;
 
@@ -114,7 +126,7 @@ public class ScriptButton : ReciverPadItem, IItemToControl, IAutosizable, IError
     /// werden die übergebenen (ggf. Dummy-) <paramref name="filterItems"/> genutzt.
     /// </para>
     /// Die erzeugte Collection wird im zurückgegebenen
-    /// <see cref="ScriptEndedFeedback"/>.Variables bereitgestellt.
+    /// ScriptEndedFeedback.Variables bereitgestellt.
     /// </summary>
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, List<string>? args,
                                                     RowItem? row, Table? table, IEnumerable<FilterItem>? filterItems,

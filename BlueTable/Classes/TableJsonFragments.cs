@@ -9,11 +9,11 @@ namespace BlueTable.Classes;
 
 /// <summary>
 /// Verwaltet Tabellenfragmente für Multi-User-Umgebungen, um gleichzeitiges
-/// Schreiben zu ermöglichen - das JSON-Pendant zu <see cref="TableFragments" />.
+/// Schreiben zu ermöglichen - das JSON-Pendant zu TableFragments.
 /// Hauptdatei UND Fragmentdateien werden komplett als JSON gespeichert.
 /// Fragmentdateien verwenden NDJSON (Newline Delimited JSON): Jede Zeile ist ein
 /// eigenständiges JSON-Objekt. Steuerzeilen (Header/EOF) tragen den Key
-/// "_meta", UndoItems werden über <see cref="UndoItem.ParseableJson" /> serialisiert.
+/// "_meta", UndoItems werden über UndoItem.ParseableJson serialisiert.
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -73,13 +73,13 @@ public class TableJsonFragments : TableJsonFile {
     #region Constructors
 
     /// <summary>
-    /// Initialisiert eine neue Instanz der <see cref="TableJsonFragments" /> Klasse.
+    /// Initialisiert eine neue Instanz der TableJsonFragments Klasse.
     /// </summary>
     /// <param name="tablename">Name der Tabelle.</param>
     public TableJsonFragments(string tablename) : base(tablename) { }
 
     /// <summary>
-    /// Initialisiert eine neue Instanz der <see cref="TableJsonFragments" /> Klasse als Kopie einer bestehenden Tabelle.
+    /// Initialisiert eine neue Instanz der TableJsonFragments Klasse als Kopie einer bestehenden Tabelle.
     /// </summary>
     /// <param name="filename">Dateiname der neuen Tabelle.</param>
     /// <param name="source">Quelltabelle, deren Daten kopiert werden.</param>
@@ -225,7 +225,7 @@ public class TableJsonFragments : TableJsonFile {
 
     /// <summary>
     /// Interner Speicheraufruf (Flush des Writers). Das eigentliche JSON-Save
-    /// der Hauptdatei übernimmt <see cref="TableJsonFile.SaveInternal" />.
+    /// der Hauptdatei übernimmt TableJsonFile.SaveInternal.
     /// </summary>
     protected override string SaveInternal() {
         if (InitialSavePending) { return base.SaveInternal(); }

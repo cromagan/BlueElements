@@ -68,13 +68,13 @@ public class TableFragments : TableFile {
     #region Constructors
 
     /// <summary>
-    /// Initialisiert eine neue Instanz der <see cref="TableFragments"/> Klasse.
+    /// Initialisiert eine neue Instanz der TableFragments Klasse.
     /// </summary>
     /// <param name="tablename">Name der Tabelle.</param>
     public TableFragments(string tablename) : base(tablename) { }
 
     /// <summary>
-    /// Initialisiert eine neue Instanz der <see cref="TableFragments"/> Klasse als Kopie einer bestehenden Tabelle.
+    /// Initialisiert eine neue Instanz der TableFragments Klasse als Kopie einer bestehenden Tabelle.
     /// </summary>
     /// <param name="filename">Dateiname der neuen Tabelle.</param>
     /// <param name="source">Quelltabelle, deren Daten kopiert werden.</param>

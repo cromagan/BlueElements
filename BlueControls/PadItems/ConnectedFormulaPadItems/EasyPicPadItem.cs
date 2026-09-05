@@ -23,6 +23,9 @@ public class EasyPicPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
+    /// <summary>
+    /// Wenn gewählt, kann der Benutzer das Bild später ändern.
+    /// </summary>
     public bool Bearbeitbar {
         get;
 
@@ -34,7 +37,9 @@ public class EasyPicPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     }
 
-    [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
+    /// <summary>
+    /// Das anzuzeigende Bild. Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
+    /// </summary>
     public string Bild_Dateiname {
         get;
 

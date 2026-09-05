@@ -35,7 +35,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     /// <summary>
     /// Ungleich leer: Das Pad ist schreibgeschützt und der Text wird als
-    /// Hinweis über allen Items im <see cref="CreativePad"/> eingeblendet.
+    /// Hinweis über allen Items im CreativePad eingeblendet.
     /// Jegliche Bearbeitung wird unterbunden. Zoom und Verschieben bleiben möglich.
     /// </summary>
     public string NotEditableReason {
@@ -54,7 +54,7 @@ public partial class PadEditor : FormWithStatusBar {
     #region Methods
 
     /// <summary>
-    /// Wird aufgerufen, nachdem sich <see cref="NotEditableReason"/> geändert hat.
+    /// Wird aufgerufen, nachdem sich NotEditableReason geändert hat.
     /// Ableitungen können hier z.B. Bearbeitungs-Buttons (de)aktivieren.
     /// </summary>
     protected virtual void OnNotEditableReasonChanged() { }

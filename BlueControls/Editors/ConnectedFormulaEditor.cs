@@ -22,7 +22,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnFeldHinzu, new EditFieldPadItem());
 
-        GenQuickInfo(btnButton, new ScriptButton());
+        GenQuickInfo(btnButton, new ScriptButtonPadItem());
 
         GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem());
 
@@ -240,7 +240,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnButton_Click(object sender, System.EventArgs e) {
-        var x = new ScriptButton();
+        var x = new ScriptButtonPadItem();
         AddCentered(x);
     }
 
@@ -424,7 +424,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     /// <summary>
-    /// Reagiert auf <see cref="BlockableFile.BlockStatusChanged"/> (Polling-Thread):
+    /// Reagiert auf BlockableFile.BlockStatusChanged (Polling-Thread):
     /// Status auf dem UI-Thread neu auswerten und Lock ggf. übernehmen.
     /// </summary>
     private void Formula_BlockStatusChanged(object? sender, System.EventArgs e) {
@@ -432,7 +432,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     /// <summary>
-    /// Reagiert auf <see cref="BlockableFile.Invalidated"/> (Polling-Thread):
+    /// Reagiert auf BlockableFile.Invalidated (Polling-Thread):
     /// Im schreibgeschützten Modus die Datei neu anzeigen, damit Änderungen
     /// anderer Benutzer sichtbar werden.
     /// </summary>

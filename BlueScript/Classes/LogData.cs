@@ -4,8 +4,8 @@ namespace BlueScript.Classes;
 
 /// <summary>
 ///  Hält den aktuellen Skript-Kontext (Sub-Name und Zeilennummer), der während
-///  des Parsens durchgereicht und über <see cref="LineAdd" /> fortgeschrieben wird.
-///  Wird ausschließlich von der Parsing-Engine (<see cref="Script" />) und den
+/// des Parsens durchgereicht und über LineAdd fortgeschrieben wird.
+/// Wird ausschließlich von der Parsing-Engine (Script) und den
 ///  Schleifen-/Bedingungs-Befehlen genutzt, um Fehlermeldungen mit Positionen
 ///  anreichern zu können.
 /// </summary>

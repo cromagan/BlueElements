@@ -33,6 +33,9 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
 
     public BlueFont? Font { get; set; }
 
+    /// <summary>
+    /// Farbe der Fläche hinter dem Symbol.
+    /// </summary>
     public Color Hintergrundfarbe {
         get;
         set {
@@ -42,6 +45,9 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
         }
     }
 
+    /// <summary>
+    /// Stärke des Randes.
+    /// </summary>
     public float Randdicke {
         get;
         set {
@@ -51,6 +57,9 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
         }
     }
 
+    /// <summary>
+    /// Farbe des Randes.
+    /// </summary>
     public Color Randfarbe {
         get;
         set {
@@ -62,6 +71,9 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
+    /// <summary>
+    /// Aussehen des Rahmens um das Symbol.
+    /// </summary>
     public PadStyles Style {
         get;
         set {
@@ -72,6 +84,9 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
         }
     } = PadStyles.Standard;
 
+    /// <summary>
+    /// Die Form des Symbols.
+    /// </summary>
     public Contour Symbol {
         get;
         set {

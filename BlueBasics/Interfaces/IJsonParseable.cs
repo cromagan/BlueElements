@@ -5,10 +5,10 @@ using System.ComponentModel;
 namespace BlueBasics.Interfaces;
 
 /// <summary>
-/// Pendant zu <see cref="IParseable" /> für die neuen JSON-basierten Serialisierungs-Routinen.
-/// Wird parallel zu <see cref="IParseable" /> implementiert - beide Schnittstellen können
+/// Pendant zu IParseable für die neuen JSON-basierten Serialisierungs-Routinen.
+/// Wird parallel zu IParseable implementiert - beide Schnittstellen können
 /// koexistieren, ohne sich gegenseitig zu beeinflussen. Die klassischen Routinen
-/// (<see cref="IParseable.ParseThis" /> usw.) bleiben unangetastet.
+/// (IParseable.ParseThis usw.) bleiben unangetastet.
 /// </summary>
 public interface IJsonParseable : IJsonStringable {
 
@@ -24,36 +24,36 @@ public interface IJsonParseable : IJsonStringable {
     /// Sucht ein direktes Sub-Item anhand des Container-Namens und des KeyNames.
     /// Container-Namen sind z.B. <c>Items</c>, <c>Points</c>, <c>JointPoints</c>.
     /// Gibt <c>null</c> zurück, wenn kein passendes Sub-Item gefunden wurde.
-    /// Wird von <see cref="JsonParseableExtension.ApplyPartialJson" /> für den
+    /// Wird von JsonParseableExtension.ApplyPartialJson für den
     /// Pfadabstieg genutzt.
     /// </summary>
     IJsonParseable? GetSubItemByKey(string containerName, string key);
 
     /// <summary>
-    /// Löst das <see cref="PropertyChangedExt" />-Event aus. Wird von Property-Settern
+    /// Löst das PropertyChangedExt-Event aus. Wird von Property-Settern
     /// in Implementierern aufgerufen, um eine inkrementelle Speicherung auszulösen.
     /// Implementierer delegieren typischerweise an
-    /// <see cref="JsonParseableExtension.BuildSubItemEventArgs" />.
+    /// JsonParseableExtension.BuildSubItemEventArgs.
     /// </summary>
     /// <param name="relativePath">Pfad relativ zu diesem Objekt, z.B.
     /// <c>Rotation</c> oder <c>Items[btnSubmit].Rotation</c>.</param>
     /// <param name="value">Der neue Wert. Entweder ein primitives Objekt
     /// (int, string, bool, ...), das unter dem letzten Pfad-Segment als Key
-    /// eingetragen wird — oder ein bestehendes <see cref="JsonObject" />
+    /// eingetragen wird — oder ein bestehendes JsonObject
     /// (für Bubbling aus Sub-Containern).</param>
     void OnPropertyChangedExt(string relativePath, object? value);
 
     /// <summary>
     /// Wird nach dem Parsen aller Keys aufgerufen und ermöglicht
     /// abschließende Validierungen und Reparaturen. Pendant zu
-    /// <see cref="IParseable.ParseFinished" />.
+    /// IParseable.ParseFinished.
     /// </summary>
     /// <param name="parsed">Das komplette JSON-Objekt, das ursprünglich übergeben wurde.</param>
     void ParseFinishedJson(JsonObject parsed);
 
     /// <summary>
     /// Übernimmt den Zustand aus dem übergebenen <paramref name="json" />.
-    /// Pendant zu <see cref="IJsonStringable.ParseableJson" /> — selbe Spiegel-Richtung:
+    /// Pendant zu IJsonStringable.ParseableJson — selbe Spiegel-Richtung:
     /// die Implementierung liest ihre eigenen Keys direkt (z.B.
     /// <c>Drehwinkel = json.GetInt("rotation");</c>) und reicht das gleiche
     /// <paramref name="json" /> anschließend an <c>base.ParseJson(json)</c> weiter.
@@ -67,8 +67,8 @@ public interface IJsonParseable : IJsonStringable {
 }
 
 /// <summary>
-/// Statische Erweiterungsmethoden für <see cref="IJsonParseable" />.
-/// Pendant zur <see cref="ParseableExtension" /> für die klassische
+/// Statische Erweiterungsmethoden für IJsonParseable.
+/// Pendant zur ParseableExtension für die klassische
 /// String-basierte Serialisierung.
 /// </summary>
 public static class JsonParseableExtension {
@@ -78,11 +78,11 @@ public static class JsonParseableExtension {
     /// <summary>
     /// Löst einen key-basierten Pfad wie <c>Items[btnSubmit].Rotation</c> ausgehend von
     /// <paramref name="root" /> auf und wendet <paramref name="value" /> über
-    /// <see cref="IJsonParseable.ParseJson" /> auf das Blatt an.
+    /// IJsonParseable.ParseJson auf das Blatt an.
     /// Pfad-Segmente: Container-Name, optionaler [<c>KeyName</c>], Punkt als Trenner.
     /// Am Blatt (kein weiterer Punkt im Pfad) wird der letzte Token als Property-Name
-    /// zusammen mit dem Wert in ein <see cref="JsonObject" /> verpackt und an
-    /// <see cref="IJsonParseable.ParseJson" /> übergeben.
+    /// zusammen mit dem Wert in ein JsonObject verpackt und an
+    /// IJsonParseable.ParseJson übergeben.
     /// </summary>
     public static void ApplyPartialJson(this IJsonParseable root, string path, JsonElement value) {
         if (string.IsNullOrEmpty(path)) { return; }
@@ -117,9 +117,9 @@ public static class JsonParseableExtension {
     }
 
     /// <summary>
-    /// Wandelt einen beliebigen Wert in einen <see cref="JsonNode" /> um.
+    /// Wandelt einen beliebigen Wert in einen JsonNode um.
     /// Primitive Typen werden direkt konvertiert, alles andere über
-    /// <see cref="JsonSerializer" /> serialisiert.
+    /// JsonSerializer serialisiert.
     /// </summary>
     public static JsonNode? AsJsonNode(object? value) => value switch {
         null => null,
@@ -135,18 +135,18 @@ public static class JsonParseableExtension {
     };
 
     /// <summary>
-    /// Erzeugt die <see cref="JsonPathChangedEventArgs" /> für einen
-    /// <see cref="IJsonParseable.OnPropertyChangedExt" />-Aufruf. Die Logik ist
+    /// Erzeugt die JsonPathChangedEventArgs für einen
+    /// IJsonParseable.OnPropertyChangedExt-Aufruf. Die Logik ist
     /// in der Extension zentralisiert, sodass Implementierer von
-    /// <see cref="IJsonParseable" /> nur noch ein Einzeiler bleiben.
+    /// IJsonParseable nur noch ein Einzeiler bleiben.
     /// <para>
     /// Wert-Regel:
     /// </para>
     /// <list type="bullet">
-    ///   <item><description>Ist <paramref name="value" /> bereits ein <see cref="JsonObject" />
+    /// <item><description>Ist <paramref name="value" /> bereits ein JsonObject
     ///     (Bubbling aus einem Sub-Container), wird es unverändert übernommen.</description></item>
     ///   <item><description>Sonst wird der letzte Pfad-Abschnitt als Key verwendet und der Wert
-    ///     als <see cref="JsonNode" /> eingetragen, z.B. <c>"rotation"</c> + <c>45</c>
+    /// als JsonNode eingetragen, z.B. <c>"rotation"</c> + <c>45</c>
     ///     ergibt <c>{"rotation": 45}</c>.</description></item>
     /// </list>
     /// </summary>
@@ -156,11 +156,11 @@ public static class JsonParseableExtension {
     }
 
     /// <summary>
-    /// Deserialisiert das übergebene <see cref="JsonElement" /> in das Zielobjekt,
-    /// indem es in ein <see cref="JsonObject" /> konvertiert (Keys auf
+    /// Deserialisiert das übergebene JsonElement in das Zielobjekt,
+    /// indem es in ein JsonObject konvertiert (Keys auf
     /// Kleinschreibung normalisiert) und einmalig an
-    /// <see cref="IJsonParseable.ParseJson" /> übergeben wird.
-    /// Am Ende wird <see cref="IJsonParseable.ParseFinishedJson" /> aufgerufen.
+    /// IJsonParseable.ParseJson übergeben wird.
+    /// Am Ende wird IJsonParseable.ParseFinishedJson aufgerufen.
     /// </summary>
     public static void ParseJson(this IJsonParseable parsable, JsonElement toParse) {
         if (toParse.ValueKind != JsonValueKind.Object) { return; }
@@ -175,10 +175,10 @@ public static class JsonParseableExtension {
     }
 
     /// <summary>
-    /// Pendant zu <see cref="ParseJson(IJsonParseable, JsonElement)" /> für
-    /// Aufrufer, die bereits ein <see cref="JsonObject" /> haben. Ruft
-    /// <see cref="IJsonParseable.ParseJson" /> direkt auf und reicht das
-    /// gleiche Objekt an <see cref="IJsonParseable.ParseFinishedJson" /> weiter.
+    /// Pendant zu ParseJson(IJsonParseable, JsonElement) für
+    /// Aufrufer, die bereits ein JsonObject haben. Ruft
+    /// IJsonParseable.ParseJson direkt auf und reicht das
+    /// gleiche Objekt an IJsonParseable.ParseFinishedJson weiter.
     /// </summary>
     public static void ParseJson(this IJsonParseable parsable, JsonObject toParse) {
         if (parsable is ISupportInitialize pi) { pi.BeginInit(); }
@@ -191,10 +191,10 @@ public static class JsonParseableExtension {
     }
 
     /// <summary>
-    /// Pendant zu <see cref="ParseJson(IJsonParseable, JsonObject)" /> für
+    /// Pendant zu ParseJson(IJsonParseable, JsonObject) für
     /// Aufrufer, die den JSON-Text als String haben. Ungültige oder leere
     /// Eingaben (auch Alt-Format) werden stillschweigend ignoriert.
-    /// Implementierer von <see cref="ISupportInitialize" /> werden während
+    /// Implementierer von ISupportInitialize werden während
     /// des Parsens gekapselt.
     /// </summary>
     public static void ParseJson(this IJsonParseable parsable, string toParse) {
@@ -205,12 +205,12 @@ public static class JsonParseableExtension {
     }
 
     /// <summary>
-    /// Verpackt <paramref name="value" /> in ein <see cref="JsonObject" />:
+    /// Verpackt <paramref name="value" /> in ein JsonObject:
     /// bereits bestehende JsonObjects (Bubbling) werden 1:1 übernommen,
     /// alle anderen Werte unter dem letzten Segment von
     /// <paramref name="relativePath" /> als Key eingetragen.
     /// <para>
-    /// Internal statt Extension auf <see cref="IJsonParseable" />, weil auch
+    /// Internal statt Extension auf IJsonParseable, weil auch
     /// <c>ParseableItem</c> (das formal nicht IJsonParseable implementiert)
     /// die gleiche Logik nutzen soll.
     /// </para>
@@ -231,7 +231,7 @@ public static class JsonParseableExtension {
 }
 
 /// <summary>
-/// Event-Argumente für <see cref="IJsonParseable.PropertyChangedExt" />.
+/// Event-Argumente für IJsonParseable.PropertyChangedExt.
 /// Beschreibt eine einzelne Property-Änderung im Sub-Baum.
 /// </summary>
 public class JsonPathChangedEventArgs(string relativePath, JsonObject partial, string sourceKey) : System.EventArgs {

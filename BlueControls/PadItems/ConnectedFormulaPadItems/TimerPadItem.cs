@@ -30,6 +30,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
 
     public bool AutoSizeableHeight => false;
 
+    /// <summary>
+    /// Wenn gewählt, kann der Benutzer den Zeitgeber ein- und ausschalten.
+    /// </summary>
     public bool Deaktivierbar {
         get;
         set {
@@ -42,6 +45,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
 
     public override string Description => "Ein Timer, der in regelmäßigen Abständen ein Skript ausführt. Optional nur bei Benutzer-Inaktivität.";
 
+    /// <summary>
+    /// Führt das Skript nur aus, wenn der Benutzer diese Zeit nichts gemacht hat. Angabe in Sekunden.
+    /// </summary>
     public int MindestInaktivitaet {
         get;
         set {
@@ -54,6 +60,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         }
     }
 
+    /// <summary>
+    /// Das Skript, das in regelmäßigen Abständen ausgeführt wird.
+    /// </summary>
     public string Script {
         get;
         set {
@@ -64,6 +73,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Abstand zwischen den Ausführungen des Skripts in Sekunden.
+    /// </summary>
     public int Sekunden {
         get;
         set {
@@ -76,6 +88,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         }
     } = 5;
 
+    /// <summary>
+    /// Wenn gewählt, ist der Zeitgeber beim Öffnen des Formulars eingeschaltet.
+    /// </summary>
     public bool StandardAktiviert {
         get;
         set {
@@ -86,6 +101,9 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         }
     } = true;
 
+    /// <summary>
+    /// Beschriftung des Ein- und Ausschalters für den Zeitgeber.
+    /// </summary>
     public string Text {
         get;
         set {

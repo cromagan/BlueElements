@@ -287,7 +287,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Inverse zu <see cref="DecodeControlChars"/>: Wandelt tatsächliche
+    /// Inverse zu DecodeControlChars: Wandelt tatsächliche
     /// Steuerzeichen (\r, \n, \t, \0) in ihre Escape-Sequenz-Darstellung um.
     /// </summary>
     public static string EncodeControlChars(this string s) {
@@ -684,9 +684,9 @@ public static partial class Extensions {
 
     /// <summary>
     /// Normalisiert den Text: entfernt Kommentare, normalisiert Whitespace und ersetzt Zeilenumbrüche.
-    /// Gibt ein <see cref="OperationResult"/> zurück, dessen <see cref="OperationResult.Value"/>
+    /// Gibt ein OperationResult zurück, dessen OperationResult.Value
     /// bei Erfolg den normalisierten Text enthält. Schlägt die Normalisierung fehl (z. B. wegen
-    /// fehlerhafter Anführungszeichen), ist das Ergebnis fehlerhaft und <see cref="OperationResult.FailedReason"/>
+    /// fehlerhafter Anführungszeichen), ist das Ergebnis fehlerhaft und OperationResult.FailedReason
     /// beschreibt den Grund.
     /// </summary>
     public static OperationResult NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, bool removesallpace, char lineBreakReplacement) {

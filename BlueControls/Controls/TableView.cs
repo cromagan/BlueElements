@@ -77,7 +77,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private Action<string>? _editCommit;
 
     /// <summary>
-    /// Letzter über <see cref="ControlStrategy.ValueChanged" /> gemeldeter Wert des aktiven Edits —
+    /// Letzter über ControlStrategy.ValueChanged gemeldeter Wert des aktiven Edits —
     /// ValueChanged ist der einzige Rückschreib-Weg (feuert bei Eingaben, Dispose und Visible = false).
     /// </summary>
     private string _editValue = string.Empty;
@@ -176,8 +176,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
+    /// <summary>
+    /// Welche Spaltenanordnung angezeigt werden soll
+    /// </summary>
     [DefaultValue("")]
-    [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
         get => _arrangement;
         set {

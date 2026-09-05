@@ -93,7 +93,7 @@ public sealed class NewRowTableElement : TableElement {
     /// übergeben (neue Zeile wird später erzeugt); sonst der aktuelle
     /// FilterChunkValue, damit die neue Zeile im aktuellen Chunk landet.
     /// Die eigentliche Edit-Logik liegt in
-    /// <see cref="TableElement.BeginCellEdit" />.
+    /// TableElement.BeginCellEdit.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
         if (mouseOverColumn is null) { return false; }

@@ -36,7 +36,7 @@ public class CommandButtonControlStrategy : ControlStrategy {
     } = string.Empty;
 
     /// <summary>
-    /// Bildcode des Symbols auf dem Knopf.
+    /// Symbol, das auf dem Knopf angezeigt wird.
     /// </summary>
     public string ButtonImageCode {
         get;

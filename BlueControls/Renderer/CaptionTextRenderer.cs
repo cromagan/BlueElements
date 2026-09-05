@@ -161,8 +161,8 @@ public class CaptionTextRenderer : Renderer {
 
     /// <summary>
     /// Wandelt den Zellinhalt in ExtText-HTML um. Zeilen, die mit
-    /// <see cref="CaptionStartSequence"/> beginnen, werden zu &lt;h1&gt;-Überschriften.
-    /// Die <see cref="TabSequence"/> wird durch &lt;tab&gt;&lt;vl&gt; ersetzt.
+    /// CaptionStartSequence beginnen, werden zu &lt;h1&gt;-Überschriften.
+    /// Die TabSequence wird durch &lt;tab&gt;&lt;vl&gt; ersetzt.
     /// </summary>
     private string BuildHtml(string content) {
         if (string.IsNullOrEmpty(content)) { return string.Empty; }

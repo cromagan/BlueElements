@@ -21,7 +21,7 @@ public class TextControlStrategy : ControlStrategy {
     public override string Description => "Zeigt den Wert als nicht editierbaren Text.";
 
     /// <summary>
-    /// Bildcode des Symbols vor dem Text.
+    /// Symbol, das vor dem Text angezeigt wird.
     /// </summary>
     public string ImageCode {
         get;

@@ -25,7 +25,7 @@ namespace BlueTable.Classes;
 /// Geladene Chunks werden nach dem Parsen sofort verworfen — nur der Dateiname
 /// wird für Aktualitätsprüfungen gemerkt. Jeder Chunk ist ein Einweg (write-once):
 /// eine einmal gespeicherte Datei wird nie wieder überschrieben. Vor dem Parsen
-/// wird <see cref="TableFile.HasValidEofMarker"/> geprüft, damit nur komplett
+/// wird TableFile.HasValidEofMarker geprüft, damit nur komplett
 /// gespeicherte Chunks eingelesen werden.
 /// </para>
 /// </summary>
@@ -93,7 +93,7 @@ public class TableChunk : TableFile {
     private readonly ConcurrentDictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Reentrancy-Sperre für <see cref="BeSureToBeUpToDate"/>: 0 = frei, 1 = läuft.
+    /// Reentrancy-Sperre für BeSureToBeUpToDate: 0 = frei, 1 = läuft.
     /// Der statische <c>_tableUpdateTimer</c> (alle 5 Min.) sowie UI-Aktionen können
     /// die Methode zeitgleich aufrufen. Ohne Sperre überlappen sich die Aufrufe,
     /// erzeugen doppelte "Lade Chunk..."-Meldungen (Statusleiste friert ein,
@@ -103,8 +103,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// UTC-Zeitpunkt des letzten Master-Prüfung. Die Prüfung (lädt den Master-Chunk)
-    /// wird nur noch alle <see cref="MasterCheckIntervalMinutes"/> Minuten durchgeführt,
-    /// da sie auf langsamen Netzwerken teuer ist. Siehe <see cref="BeSureToBeUpToDate"/>.
+    /// wird nur noch alle MasterCheckIntervalMinutes Minuten durchgeführt,
+    /// da sie auf langsamen Netzwerken teuer ist. Siehe BeSureToBeUpToDate.
     /// </summary>
     private DateTime _lastMasterAttemptUtc = DateTime.MinValue;
 
@@ -112,9 +112,9 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Wird beim Init einmalig verifiziert, ob alle System-Chunks ladbar sind.
-    /// <see cref="IsGenericEditable"/> gibt dieses Ergebnis zurück, ohne bei jedem
+    /// IsGenericEditable gibt dieses Ergebnis zurück, ohne bei jedem
     /// Aufruf die Chunks neu zu laden — das würde bei jedem SetValue/Checker-Tick
-    /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
+    /// ewig dauern. Siehe VerifySystemChunksEditable.
     /// </summary>
     private bool _systemChunksVerified;
 
@@ -141,9 +141,9 @@ public class TableChunk : TableFile {
     /// TableChunk verwaltet seine eigenen Chunk-Zugriffszeiten über
     /// <c>_lastUsed</c> und nicht über Chunk-LiveInstances.
     /// Die Tabelle gilt als "recently used", wenn mindestens ein Chunk
-    /// in den letzten <see cref="SkipIfUnusedMinutes"/> verwendet wurde.
+    /// in den letzten SkipIfUnusedMinutes verwendet wurde.
     /// Ohne diese Überschreibung würde der periodische TableUpdater die Tabelle
-    /// immer überspringen, da <see cref="IsChunkRecentlyUsed"/> für
+    /// immer überspringen, da IsChunkRecentlyUsed für
     /// .tblh-Dateien niemals eine Chunk-LiveInstance findet.
     /// </summary>
     public override bool IsRecentlyUsed {
@@ -180,7 +180,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
-    /// Wird von <see cref="GetChunkId"/> genutzt.
+    /// Wird von GetChunkId genutzt.
     /// </summary>
     public static string ChunkValueToId(ChunkType chunkType, string chunkvalue) {
         if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
@@ -360,8 +360,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID (maindata, _master, 1e3, etc.) LOWERCASE für den angegebenen Typ und Wert.
-    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="ChunkValueToId"/>
-    /// und <see cref="RowsOfChunk(TableFile, string)"/> genutzt.
+    /// Standard-Implementierung mit System-Chunks. Wird von ChunkValueToId
+    /// und RowsOfChunk(TableFile, string) genutzt.
     /// </summary>
     public static string GetChunkId(Table tb, TableDataType type, string chunkvalue) {
         if (tb.IsDisposed) { return string.Empty; }
@@ -392,8 +392,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID
-    /// dem <see cref="Chunk.KeyName"/> von <paramref name="chunk"/> entspricht.
-    /// Siehe <see cref="RowsOfChunk(TableFile, string)"/> für Details.
+    /// dem Chunk.KeyName von <paramref name="chunk"/> entspricht.
+    /// Siehe RowsOfChunk(TableFile, string) für Details.
     /// </summary>
     public static List<RowItem> RowsOfChunk(TableFile tb, Chunk chunk) {
         if (chunk is null || chunk.IsDisposed) { return []; }
@@ -402,11 +402,11 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID
-    /// (ermittelt über <see cref="GetChunkId"/> für Cell-Daten) <paramref name="chunkId"/>
+    /// (ermittelt über GetChunkId für Cell-Daten) <paramref name="chunkId"/>
     /// entspricht. Vergleich ordinal-ignore-case, da beide Seiten laut Konvention
     /// lowercase sind, die Normalisierung aber nicht erzwungen ist.
     /// Für die Lite-Hauptdatei (.tblh) ist das Ergebnis immer leer —
-    /// <see cref="GetChunkId"/> liefert niemals <see cref="Chunk_MainDataLite"/>,
+    /// GetChunkId liefert niemals Chunk_MainDataLite,
     /// und die Lite-Datei enthält per Definition keine Row-Daten.
     /// </summary>
     public static List<RowItem> RowsOfChunk(TableFile tb, string chunkId) {
@@ -556,7 +556,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
+    /// Überschrieben, da die Basisklasse TableFile.IsValueEditable
     /// auf <c>Chunk.Get(Filename)</c> zurückgreift, was für .tblh-Dateien
     /// nicht funktioniert (Suffix wird nicht von Chunk unterstützt).
     /// </summary>
@@ -618,8 +618,8 @@ public class TableChunk : TableFile {
     /// nicht erlaubt. Eine vorhandene Systemspalte wird während des Repars zu
     /// einer normalen Spalte (ROWSORTINDEX) herabgestuft, damit sie nicht mehr
     /// als Systemspalte erkannt wird. Die Umbenennung muss VOR
-    /// <see cref="Table.RepairAfterParse"/> erfolgen, damit
-    /// <see cref="ColumnCollection.GetSystems"/> die Spalte nicht registriert.
+    /// Table.RepairAfterParse erfolgen, damit
+    /// ColumnCollection.GetSystems die Spalte nicht registriert.
     /// </summary>
     public override void RepairAfterParse() {
         if (string.IsNullOrEmpty(IsGenericEditable(false))) {
@@ -661,7 +661,7 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Tiefenprüfung auf Dateiebene: lädt den Chunk vom Laufwerk und prüft den
     /// Edit-Lock. Wird nur bei akuter Bearbeitungsabsicht aus
-    /// <see cref="Table.ChangeData"/> aufgerufen.
+    /// Table.ChangeData aufgerufen.
     /// </summary>
     protected override string PrepareForEdit(TableDataType type, string? chunkValue) {
         if (InitialSavePending) { return string.Empty; }
@@ -692,14 +692,14 @@ public class TableChunk : TableFile {
     /// geschrieben (write-once), da sie keine Nutzdaten enthält.
     /// <para>
     /// Die Editierbarkeit wird PRO CHUNK geprüft: Chunks, die von einem anderen
-    /// Benutzer aktiv gesperrt sind (s. <see cref="CheckEditLock"/>), werden
+    /// Benutzer aktiv gesperrt sind (s. CheckEditLock), werden
     /// übersprungen und ihre Änderungen verworfen. Alle bearbeitbaren Chunks
     /// werden normal gespeichert.
     /// </para>
     /// <para>
     /// Ausnahme (sehr selten): Taucht zwischen der Per-Chunk-Prüfung und dem
     /// eigentlichen Schreiben eine neue fremde Claim-Datei auf (Re-Check via
-    /// <see cref="CheckEditLock"/>), wird die gesamte Tabelle eingefroren —
+    /// CheckEditLock), wird die gesamte Tabelle eingefroren —
     /// sonst würde die fremde Änderung überdeckt.
     /// </para>
     /// </summary>
@@ -1089,7 +1089,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Lädt einen Chunk direkt von der Festplatte.
-    /// Vor dem Parsen wird <see cref="TableFile.HasValidEofMarker"/> geprüft,
+    /// Vor dem Parsen wird TableFile.HasValidEofMarker geprüft,
     /// damit nur komplett gespeicherte Chunks eingelesen werden. Nach dem
     /// Parsen wird der Chunk-Inhalt verworfen — nur der Dateiname wird
     /// für Aktualitätsprüfungen gemerkt.
@@ -1218,7 +1218,7 @@ public class TableChunk : TableFile {
     /// Datei im Ordner existiert und lädt diese ggf. neu.
     /// Entdeckt außerdem neue Row-Chunk-Ordner, die andere Benutzer seit dem
     /// letzten Refresh angelegt haben (z.B. Zeilen in einem neuen Chunk-Wert).
-    /// Chunks, die länger als <see cref="SkipIfUnusedMinutes"/> nicht verwendet wurden,
+    /// Chunks, die länger als SkipIfUnusedMinutes nicht verwendet wurden,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).
     /// </summary>
@@ -1270,8 +1270,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Lädt die System-Chunks einmalig und prüft auf Fehler.
-    /// Das Ergebnis wird in <see cref="_systemChunksError"/>/<see cref="_systemChunksVerified"/>
-    /// gecacht, damit <see cref="IsGenericEditable"/> bei jedem Aufruf ohne
+    /// Das Ergebnis wird in _systemChunksError/_systemChunksVerified
+    /// gecacht, damit IsGenericEditable bei jedem Aufruf ohne
     /// Festplattenzugriff reagieren kann.
     /// </summary>
     private string VerifySystemChunksEditable() {

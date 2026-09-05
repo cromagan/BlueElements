@@ -41,8 +41,8 @@ public class ScriptEndedFeedback : DoItFeedback {
     public bool GiveItAnotherTry { get; }
 
     /// <summary>
-    /// Überschreibt die virtuale <see cref="DoItFeedback.Line"/>. Wird beim
-    /// Konstruieren aus dem übergebenen <see cref="LogData"/> gesetzt.
+    /// Überschreibt die virtuale DoItFeedback.Line. Wird beim
+    /// Konstruieren aus dem übergebenen LogData gesetzt.
     /// </summary>
     public override int Line { get; }
 

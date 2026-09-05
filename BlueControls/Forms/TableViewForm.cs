@@ -19,7 +19,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private bool _firstOne = true;
 
-    /// <summary>Lfd. Nummer für die vom Stresstest erzeugten Zeilen.</summary>
+    /// <summary>
+    /// Lfd. Nummer für die vom Stresstest erzeugten Zeilen.
+    /// </summary>
     private int _stressTestCounter;
 
     /// <summary>

@@ -12,18 +12,18 @@ public enum AddType {
 
     /// <summary>
     /// Hinzu-Button wird mit Texteingabefeld angezeigt.
-    /// Der Text wird beim Klick an <see cref="Controls.ListBox.AddClicked"/> übergeben.
+    /// Der Text wird beim Klick an Controls.ListBox.AddClicked übergeben.
     /// </summary>
     Text = 1,
 
     /// <summary>
     /// Hinzu-Button wird angezeigt und öffnet ein Dropdown mit Vorschlägen.
-    /// Ist <see cref="Text"/> ebenfalls gesetzt, wird eine ComboBox verwendet.
+    /// Ist Text ebenfalls gesetzt, wird eine ComboBox verwendet.
     /// </summary>
     Suggestions = 2,
 
     /// <summary>
-    /// Kombination aus <see cref="Text"/> und <see cref="Suggestions"/>.
+    /// Kombination aus Text und Suggestions.
     /// </summary>
     TextAndSuggestions = Text | Suggestions
 }

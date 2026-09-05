@@ -8,7 +8,7 @@ namespace BlueBasics.Classes;
 
 /// <summary>
 /// Generisches JSON-Append-Log für inkrementelle Speicherung von
-/// <see cref="IJsonParseable" />-Objekten. Orientiert sich am Append-Log-Pattern
+/// IJsonParseable-Objekten. Orientiert sich am Append-Log-Pattern
 /// von <c>TableFragments</c>: pro Session eine persönliche Log-Datei im
 /// Append-Modus, thread-safe über eine Semaphore.
 /// </summary>
@@ -26,8 +26,8 @@ public sealed class JsonAppendLog : IDisposableExtended {
 
     /// <summary>
     /// Erstellt ein neues Append-Log für die angegebene Datei.
-    /// Der StreamWriter wird beim ersten <see cref="Append" /> im Append-Modus
-    /// geöffnet (<see cref="FileShare.Read" />).
+    /// Der StreamWriter wird beim ersten Append im Append-Modus
+    /// geöffnet (FileShare.Read).
     /// </summary>
     public JsonAppendLog(string filename) => _filename = filename;
 

@@ -9,10 +9,10 @@ namespace BlueControls.BlueTableDialogs;
 
 /// <summary>
 /// Dialog, der die Tabellen-Skript-Verwaltung hostet. Enthält genau zwei Controls:
-/// die Liste der Skripte (<see cref="EditorForIEnumerable"/>) und den
-/// <see cref="TableScriptEditor"/> zur Bearbeitung des jeweils gewählten Skripts.
+/// die Liste der Skripte (EditorForIEnumerable) und den
+/// TableScriptEditor zur Bearbeitung des jeweils gewählten Skripts.
 /// Wird systemweit eindeutig pro Tabelle geöffnet
-/// (<see cref="IUniqueWindowExtension.ShowOrCreate{T}"/>).
+/// (IUniqueWindowExtension.ShowOrCreate{T}).
 /// </summary>
 public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
 
@@ -40,7 +40,7 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
 
     /// <summary>
     /// Die Tabelle, deren Skripte bearbeitet werden. Wird von
-    /// <see cref="IUniqueWindowExtension.ShowOrCreate{T}"/> gesetzt.
+    /// IUniqueWindowExtension.ShowOrCreate{T} gesetzt.
     /// </summary>
     public object? Object {
         get => IsDisposed ? null : _table;
@@ -195,10 +195,10 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
     private void TableScriptEditor_Executing(object? sender, System.EventArgs e) => WriteBackEventScripts();
 
     /// <summary>
-    /// Schreibt die Arbeitskopie (<see cref="EditorForIEnumerable.OutputItem"/>)
-    /// in das Backend (<see cref="Table.EventScript"/>) zurück. Wird beim
+    /// Schreibt die Arbeitskopie (EditorForIEnumerable.OutputItem)
+    /// in das Backend (Table.EventScript) zurück. Wird beim
     /// Schließen des Formulars sowie vor jedem Test/Ausführen (über das
-    /// <see cref="ScriptEditor.Executing"/>-Event) aufgerufen.
+    /// ScriptEditor.Executing-Event) aufgerufen.
     /// </summary>
     private void WriteBackEventScripts() {
         if (_table is not { IsDisposed: false } tb) { return; }

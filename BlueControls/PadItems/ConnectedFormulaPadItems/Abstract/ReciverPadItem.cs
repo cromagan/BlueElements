@@ -67,6 +67,9 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ConnectedFormula? ParentFormula { get; set; }
 
+    /// <summary>
+    /// Die Elemente, deren Werte dieses Element als Eingabe verwendet.
+    /// </summary>
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -110,6 +113,9 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Version { get; set; }
 
+    /// <summary>
+    /// Ansichten, in denen dieses Element zu sehen ist.
+    /// </summary>
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -129,6 +135,9 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
         }
     } = new([]);
 
+    /// <summary>
+    /// Die waagerechte Lage des Elements.
+    /// </summary>
     public XPosition X_Position {
         get;
 

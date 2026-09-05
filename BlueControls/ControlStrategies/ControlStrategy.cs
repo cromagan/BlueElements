@@ -22,7 +22,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     public static readonly AssemblyAwareCache<ControlStrategy> AllStrategies = new();
 
     /// <summary>
-    /// Json-Key für <see cref="Border" /> innerhalb von <see cref="ControlStrategyParameter" />.
+    /// Json-Key für Border innerhalb von ControlStrategyParameter.
     /// </summary>
     private const string _borderKey = "border";
 
@@ -62,6 +62,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     #region Properties
 
+    /// <summary>
+    /// Legt fest, ob neue Listeneinträge hinzugefügt werden dürfen.
+    /// </summary>
     public AddType AddAllowed {
         get;
         set {
@@ -71,6 +74,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Zusätzliche Prüfung, ob der Wert zum Spaltenformat passt.
+    /// </summary>
     public AdditionalCheck AdditionalFormatCheck {
         get;
         set {
@@ -80,6 +86,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Nur diese Zeichen dürfen eingegeben werden. Leer = alle erlaubt.
+    /// </summary>
     public string AllowedChars {
         get;
         set {
@@ -89,6 +98,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Verankerung des Controls in seinem Container.
+    /// </summary>
     public System.Windows.Forms.AnchorStyles Anchor {
         get => Control?.Anchor ?? default;
         set {
@@ -97,6 +109,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Sortiert die Einträge der Liste automatisch alphabetisch.
+    /// </summary>
     public bool AutoSort {
         get;
         set {
@@ -107,9 +122,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Rahmen-Stil um das erstellte Control. <see cref="GroupBoxStyle.Nothing" />
-    /// deaktiviert den Rahmen, jeder andere Stil legt eine GroupBox um das Control.
-    /// <see cref="Control" /> gibt dann die GroupBox zurück.
+    /// Zeichnet einen Rahmen mit Überschrift um das Feld.
+    /// Bei „Kein Rahmen" bleibt nur das Feld selbst sichtbar.
     /// </summary>
     public GroupBoxStyle Border {
         get;
@@ -123,6 +137,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = GroupBoxStyle.Nothing;
 
+    /// <summary>
+    /// Legt fest, ob mehrere Einträge gleichzeitig gewählt werden können.
+    /// </summary>
     public CheckBehavior CheckBehavior {
         get;
         set {
@@ -134,7 +151,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Das anzuzeigende Control der Strategie. Bei Rahmen-Stil ungleich
-    /// <see cref="GroupBoxStyle.Nothing" /> wird das erzeugte Control in eine
+    /// GroupBoxStyle.Nothing wird das erzeugte Control in eine
     /// GroupBox gefasst und diese zurückgegeben.
     /// Hat das Control bereits einen Parent, übernimmt die Box dessen Platz.
     /// </summary>
@@ -176,7 +193,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Parameter der Strategie als Json. Jede Strategie liest daraus nur ihre
-    /// eigenen Keys in ihre Properties (siehe <see cref="ReadParameters" />);
+    /// eigenen Keys in ihre Properties (siehe ReadParameters);
     /// unbekannte Keys werden verworfen. Ändert eine Property ihren Wert,
     /// schreibt sie den zugehörigen Key zurück, sodass das Json immer den
     /// aktuellen Zustand abbildet.
@@ -195,6 +212,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = new();
 
+    /// <summary>
+    /// Eigene zusätzliche Einträge für das Kontextmenü.
+    /// </summary>
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems {
         get;
         set {
@@ -204,6 +224,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Eigene Wörter, die die Rechtschreibprüfung nicht bemängelt.
+    /// </summary>
     public IReadOnlySet<string>? CustomVocabulary {
         get;
         set {
@@ -218,6 +241,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public virtual string Description => string.Empty;
 
+    /// <summary>
+    /// Diese Zeichen dürfen nicht eingegeben werden.
+    /// </summary>
     public string ForbiddenChars {
         get;
         set {
@@ -227,6 +253,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Höhe des Controls in Pixel.
+    /// </summary>
     public int Height {
         get => Control?.Height ?? 0;
         set {
@@ -241,12 +270,15 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public virtual bool IsCommandButton => false;
 
+    /// <summary>
+    /// True, wenn die Strategie bereits freigegeben wurde.
+    /// </summary>
     public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
     /// True, während sich die Strategie in einer Initialisierungs- oder
-    /// Parse-Phase befindet (zwischen <see cref="BeginInit" /> und
-    /// <see cref="EndInit" />). Property-Setter lösen dann kein ApplyStyle aus.
+    /// Parse-Phase befindet (zwischen BeginInit und
+    /// EndInit). Property-Setter lösen dann kein ApplyStyle aus.
     /// </summary>
     public bool IsEventsSuppressed => _suspendCount > 0;
 
@@ -270,6 +302,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public virtual string KeyName => GetType().Name;
 
+    /// <summary>
+    /// Abstand des Controls vom linken Rand in Pixel.
+    /// </summary>
     public int Left {
         get => Control?.Left ?? 0;
         set {
@@ -278,6 +313,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Die zur Auswahl angebotenen Einträge.
+    /// </summary>
     public List<ListItem>? ListItems {
         get;
         set {
@@ -287,6 +325,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Maximale Zeichenanzahl der Eingabe. 0 = unbegrenzt.
+    /// </summary>
     public int MaxTextLength {
         get;
         set {
@@ -296,6 +337,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Minimale Zeichenanzahl der Eingabe. 0 = keine Prüfung.
+    /// </summary>
     public int MinTextLength {
         get;
         set {
@@ -305,6 +349,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Erlaubt das Verschieben von Listeneinträgen.
+    /// </summary>
     public bool MoveAllowed {
         get;
         set {
@@ -314,6 +361,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Erlaubt mehrzeilige Eingaben im Textfeld.
+    /// </summary>
     public bool MultiLine {
         get;
         set {
@@ -329,6 +379,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public virtual string NotEditableReason => string.Empty;
 
+    /// <summary>
+    /// Höhe des umgebenden Bereichs, z. B. der Tabellenzelle.
+    /// </summary>
     public int ParentHeight {
         get;
         set {
@@ -338,6 +391,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Hilfetext, der beim Zeigen auf das Control angezeigt wird.
+    /// </summary>
     public string QuickInfo {
         get;
         set {
@@ -347,6 +403,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Verzögerung, bevor eine Wertänderung gemeldet wird.
+    /// </summary>
     public int RaiseChangeDelay {
         get;
         set {
@@ -356,6 +415,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = 1;
 
+    /// <summary>
+    /// Regulärer Ausdruck, dem die Eingabe entsprechen muss.
+    /// </summary>
     public string RegexCheck {
         get;
         set {
@@ -365,6 +427,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Erlaubt das Entfernen von Listeneinträgen.
+    /// </summary>
     public bool RemoveAllowed {
         get;
         set {
@@ -374,6 +439,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Text, der hinter dem Wert angezeigt wird.
+    /// </summary>
     public string Suffix {
         get;
         set {
@@ -385,9 +453,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Gibt an, ob diese Strategie eine Auswahlliste (Vorschläge) handhaben kann.
-    /// Ist <c>true</c>, ermittelt die <see cref="TableView" /> beim Start des
+    /// Ist <c>true</c>, ermittelt die TableView beim Start des
     /// Edits die Items zur content-Spalte/-Zeile und weist sie
-    /// <see cref="ListItems" /> zu — einheitlich, unabhängig vom konkreten
+    /// ListItems zu — einheitlich, unabhängig vom konkreten
     /// Strategie-Typ. Hat der Aufrufer bereits Items übergeben, werden diese
     /// übernommen. Default <c>false</c>.
     /// </summary>
@@ -410,6 +478,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// </summary>
     public virtual bool SupportsWordHighlighting => false;
 
+    /// <summary>
+    /// Erlaubt die direkte Texteingabe ins Control.
+    /// </summary>
     public bool TextInputAllowed {
         get;
         set {
@@ -419,6 +490,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Abstand des Controls vom oberen Rand in Pixel.
+    /// </summary>
     public int Top {
         get => Control?.Top ?? 0;
         set {
@@ -428,8 +502,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Setzt den Wert im Control und löst <see cref="ValueChanged" /> aus.
-    /// Prüft bewusst nicht IsDisposed: <see cref="ForceWriteBackValue" /> läuft
+    /// Setzt den Wert im Control und löst ValueChanged aus.
+    /// Prüft bewusst nicht IsDisposed: ForceWriteBackValue läuft
     /// während des Dispose und muss den Wert noch propagieren können.
     /// </summary>
     public string Value {
@@ -447,6 +521,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Legt fest, ob das Control sichtbar ist.
+    /// </summary>
     public bool Visible {
         get => Control is { Visible: true, IsDisposed: false };
         set {
@@ -457,6 +534,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Breite des Controls in Pixel.
+    /// </summary>
     public int Width {
         get => Control?.Width ?? 0;
         set {
@@ -465,6 +545,9 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         }
     }
 
+    /// <summary>
+    /// Skalierung des Controls. 1 = normale Größe.
+    /// </summary>
     [DefaultValue(1f)]
     public float Zoom {
         get;
@@ -492,7 +575,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Liefert die dauerhaft gecachte Prototyp-Instanz zur Strategy (KeyName).
-    /// Unbekannte Schlüssel fallen wie bei <see cref="CreateNew" /> auf die
+    /// Unbekannte Schlüssel fallen wie bei CreateNew auf die
     /// Textfeld-Strategie zurück. Nur für Fähigkeitsabfragen nutzen — die
     /// Instanz erzeugt keine Controls und darf weder konfiguriert noch
     /// verworfen werden.
@@ -566,7 +649,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Führt bei Instant-Action-Strategien (<see cref="IsInstantAction" />) den
+    /// Führt bei Instant-Action-Strategien (IsInstantAction) den
     /// einfachen Klick auf eine Zelle aus — die Rechte der Spalte werden geprüft.
     /// Liefert True, wenn der Klick verarbeitet wurde.
     /// </summary>
@@ -598,7 +681,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Berechnet den benötigten Bereich des Controls anhand der aktuell
-    /// gesetzten Eigenschaften (z. B. <see cref="ListItems" /> oder die
+    /// gesetzten Eigenschaften (z. B. ListItems oder die
     /// Chip-Fläche der Suggestions). Strategien ohne besondere Anforderungen
     /// geben den übergebenen Bereich unverändert zurück; Strategien mit
     /// Überschriften (z. B. Tabellen) beginnen über der Zelllinie. Die
@@ -641,7 +724,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Setzt den Fokus auf das werttragende Control — bei aktivem Rahmen
-    /// (<see cref="Border" /> ungleich Nothing) auf das eingebettete Control statt die Rahmen-Box.
+    /// (Border ungleich Nothing) auf das eingebettete Control statt die Rahmen-Box.
     /// </summary>
     public void Focus() {
         if (IsDisposed) { return; }
@@ -669,7 +752,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Prüft, ob die Strategie zu einer Spalte mit den übergebenen
     /// Bearbeitungs-Fähigkeiten passt. Basis-Implementierung vergleicht
-    /// gegen <see cref="SupportsTextEdit" /> und <see cref="SupportsSuggestions" />.
+    /// gegen SupportsTextEdit und SupportsSuggestions.
     /// </summary>
     public bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) {
         if (SupportsTextEdit && SupportsSuggestions) { return textEditable || mayHaveDropdownItems; }
@@ -744,7 +827,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Holt den aktuellen Wert vom Control und schreibt ihn über den
-    /// Value-Setter zurück, sodass <see cref="ValueChanged" /> ausgelöst wird.
+    /// Value-Setter zurück, sodass ValueChanged ausgelöst wird.
     /// Wird beim Dispose, beim Unsichtbarmachen und von den
     /// ValueChanged-Routinen der Strategien aufgerufen.
     /// </summary>

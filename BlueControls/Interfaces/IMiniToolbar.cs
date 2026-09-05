@@ -7,9 +7,9 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Interface, das zur Generierung von Mini-Toolbars benötigt wird.
 /// Die ganze Erstellung und Handling übernimmt dabei
-/// <see cref="IMiniToolbar.MiniToolbarShow(Point, object?)"/>.
+/// IMiniToolbar.MiniToolbarShow(Point, object?).
 /// Dabei werden die hier angegebenen Routinen und Properties abgefragt.
-/// Im Gegensatz zu <see cref="IContextMenu"/> erscheint die Mini-Toolbar
+/// Im Gegensatz zu IContextMenu erscheint die Mini-Toolbar
 /// nicht an der Cursor-Position, sondern an der übergebenen Position
 /// (z. B. neben einer angeklickten Zelle).
 /// </summary>
@@ -56,7 +56,7 @@ public static class MiniToolbarExtension {
     /// <summary>
     /// Schließt eine eventuell sichtbare Mini-Toolbar. Das letzte HotItem
     /// bleibt dabei gespeichert — ein erneuter Aufruf von
-    /// <see cref="IMiniToolbar.MiniToolbarShow"/> mit demselben HotItem zeigt
+    /// IMiniToolbar.MiniToolbarShow mit demselben HotItem zeigt
     /// die Toolbar nicht noch einmal an (gewünschtes „Ausgeschaltet-bleiben“
     /// bei wiederholten Klicks auf dieselbe Zelle).
     /// </summary>
@@ -76,7 +76,7 @@ public static class MiniToolbarExtension {
     /// </para>
     /// <para>
     /// Zum Ausblenden der Toolbar (z. B. bei Mausbewegung oder Tastatur-Navigation)
-    /// <see cref="HideMiniToolbar"/> verwenden. Das schließt
+    /// HideMiniToolbar verwenden. Das schließt
     /// nur das Fenster, merkt sich aber das letzte HotItem — so führt ein erneuter
     /// Klick auf dieselbe Zelle nicht zu einem erneuten Einblenden.
     /// </para>

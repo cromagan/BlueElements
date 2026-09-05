@@ -33,6 +33,9 @@ public class TextBoxControlStrategy : ControlStrategy {
     public override string Description => "Einfaches Textfeld zur freien Eingabe von Text.";
     public override string KeyName => ClassId;
 
+    /// <summary>
+    /// Wenn gewählt, wird der Text auf Schreibfehler geprüft und gefundene Stellen werden unterstreicht.
+    /// </summary>
     public bool SpellCheckingEnabled {
         get;
         set {
@@ -48,6 +51,9 @@ public class TextBoxControlStrategy : ControlStrategy {
     public override bool SupportsTextEdit => true;
     public override bool SupportsWordHighlighting => true;
 
+    /// <summary>
+    /// Wenn gewählt, kann der Benutzer den Text gestalten, z. B. fett, kursiv oder farbig.
+    /// </summary>
     public bool TextFormatingAllowed {
         get;
         set {

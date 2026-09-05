@@ -79,19 +79,19 @@ public abstract class ScriptCommand : IReadableTextWithKey {
 
     /// <summary>
     /// Prüft die Attribut-Anzahl eines Methodenaufrufs gegen die
-    /// Deklaration (<see cref="Args"/> und <see cref="LastArgMinCount"/>).
+    /// Deklaration (Args und LastArgMinCount).
     /// Gibt bei Fehler die Meldung zurück, sonst <c>null</c>.
-    /// Wird sowohl von <see cref="SplitAttributeToVars"/> als auch
-    /// vom <see cref="ScriptPreCheck"/> genutzt.
+    /// Wird sowohl von SplitAttributeToVars als auch
+    /// vom ScriptPreCheck genutzt.
     /// </summary>
     /// <param name="command"></param>
-    /// <param name="attributes">Die bereits via <see cref="SplitAttributeToString"/>
+    /// <param name="attributes">Die bereits via SplitAttributeToString
     /// gesplitteten Attribute oder <c>null</c>, wenn der Text leer war.</param>
     /// <param name="argCount"></param>
     /// <param name="lastArgMinCount"></param>
     /// <remarks>
     /// Die für die Fehlermeldung benötigte Syntax wird erst beim Auftreten
-    /// eines Fehlers über <see cref="AllMethods"/> anhand des Befehlsnamens ermittelt.
+    /// eines Fehlers über AllMethods anhand des Befehlsnamens ermittelt.
     /// </remarks>
     public static string? CheckArgumentCount(string command, List<string>? attributes, int argCount, LastArgMinCountTypeScriptCommand lastArgMinCount) {
         string GetSyntax() => AllMethods.Instances.FirstOrDefault(m => m.Command.Equals(command, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
@@ -142,7 +142,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     /// </summary>
     /// <param name="scriptText"></param>
     /// <param name="start"></param>
-    /// <returns>Ein <see cref="OperationResult"/>, dessen <see cref="OperationResult.Value"/> bei Erfolg den Codeblock enthält.</returns>
+    /// <returns>Ein OperationResult, dessen OperationResult.Value bei Erfolg den Codeblock enthält.</returns>
     public static OperationResult GetCodeBlockText(string scriptText, int start) {
         var maxl = scriptText.Length;
 

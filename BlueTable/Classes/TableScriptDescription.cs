@@ -441,9 +441,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
 
     /// <summary>
     /// Übernimmt alle Werte von <paramref name="other"/> (Basis + Skript-spezifisch).
-    /// Wird beim Recycling in <see cref="Table.SetValueInternal"/> (case EventScript)
+    /// Wird beim Recycling in Table.SetValueInternal (case EventScript)
     /// verwendet: Existierende Instanzen behalten ihre Identität, nur die Felder
-    /// werden aktualisiert. Der <see cref="MayAffectUser"/>-Cache wird invalidiert.
+    /// werden aktualisiert. Der MayAffectUser-Cache wird invalidiert.
     /// </summary>
     internal void UpdateFrom(TableScriptDescription other) {
         UpdateBaseFrom(other);

@@ -21,7 +21,8 @@ public enum CheckBehavior {
 
     ///// <summary>
     ///// Es muss genau ein Eintrag gewählt sein. Sozusagen -kein- Cancel erlaubt.
-    ///// </summary>
+    /// //
+    /// </summary>
     //AlwaysSingleSelection = 3,
 
     /// <summary>

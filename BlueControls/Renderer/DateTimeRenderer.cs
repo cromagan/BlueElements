@@ -22,6 +22,9 @@ public class DateTimeRenderer : Renderer {
 
     public override string Description => "Kann Uhrzeit/Datumsangaben verändert anzeigen.";
 
+    /// <summary>
+    /// Legt fest, wie Datum und Uhrzeit angezeigt werden.
+    /// </summary>
     public string Format {
         get => _format;
         set {
@@ -32,6 +35,9 @@ public class DateTimeRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird ein kleines Symbol neben der Zeitangabe angezeigt.
+    /// </summary>
     public bool ShowSymbol {
         get => _showSymbol;
         set {
@@ -42,6 +48,9 @@ public class DateTimeRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird die Zeit als Weltzeit interpretiert und automatisch in die Ortszeit des Computers umgerechnet.
+    /// </summary>
     public bool UTCToLocal {
         get => _utcToLocal;
         set {

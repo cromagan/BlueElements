@@ -71,7 +71,9 @@ public abstract class FixedRectanglePadItem : PadItem {
 
     #region Properties
 
-    [Description("Die Breite des Objekts in mm.")]
+    /// <summary>
+    /// Die Breite des Objekts in mm.
+    /// </summary>
     public float Breite {
         get => (float)Math.Round(PixelToMm(_canvassize.Width, CollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
@@ -95,7 +97,9 @@ public abstract class FixedRectanglePadItem : PadItem {
         }
     }
 
-    [Description("Die Höhe des Objekts in mm.")]
+    /// <summary>
+    /// Die Höhe des Objekts in mm.
+    /// </summary>
     public float Höhe {
         get => (float)Math.Round(PixelToMm(_canvassize.Height, CollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {

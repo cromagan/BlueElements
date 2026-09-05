@@ -12,21 +12,21 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueControls.BlueTableDialogs;
 
 /// <summary>
-/// Editor für genau ein Tabellen-Skript (<see cref="TableScriptDescription"/>).
-/// Erbt die Skript-Bearbeitung von <see cref="ScriptEditor"/> und wird zusammen mit einem
-/// <see cref="EditorForIEnumerable"/> im <see cref="TableScriptEditorForm"/> gehostet.
+/// Editor für genau ein Tabellen-Skript (TableScriptDescription).
+/// Erbt die Skript-Bearbeitung von ScriptEditor und wird zusammen mit einem
+/// EditorForIEnumerable im TableScriptEditorForm gehostet.
 /// <para />
 /// Der Editor ist ein reines Anzeige-Tool: er hält das aktuell gewählte
-/// <see cref="TableScriptDescription"/> in seiner Oberfläche. Sobald der Nutzer eine
-/// Eingabe tätigt, feuert er <see cref="INotifyPropertyChanged.PropertyChanged"/>
-/// (jeweils für <c>OutputItem</c>). Das <see cref="EditorForIEnumerable"/>
-/// holt sich daraufhin über <see cref="IIsEditor.OutputItem"/> eine frische, vom
+/// TableScriptDescription in seiner Oberfläche. Sobald der Nutzer eine
+/// Eingabe tätigt, feuert er INotifyPropertyChanged.PropertyChanged
+/// (jeweils für <c>OutputItem</c>). Das EditorForIEnumerable
+/// holt sich daraufhin über IIsEditor.OutputItem eine frische, vom
 /// Editor aus der aktuellen Oberfläche erzeugte Instanz (EditCopy-Modus), ersetzt
 /// das Element in seiner Arbeitskopie und benachrichtigt das hostende
-/// <see cref="TableScriptEditorForm"/>. Das Form schreibt die Collection ans Backend
+/// TableScriptEditorForm. Das Form schreibt die Collection ans Backend
 /// zurück — so entstehen saubere Undo-Einträge (old≠new). Die anzuzeigenden Elemente
-/// liefert die Backend-Collection <see cref="Table.EventScript"/> direkt als
-/// <see cref="EditorForIEnumerable.InputItem"/>.
+/// liefert die Backend-Collection Table.EventScript direkt als
+/// EditorForIEnumerable.InputItem.
 /// Die Tabellen-Verwaltung (Lebenszyklus, Schreibrechte) übernimmt das hostende Form.
 /// </summary>
 public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
@@ -92,8 +92,8 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// <summary>
     /// Erzeugt eine Liste von Chunk-Werten für das Dropdown-Menü.
     /// Chunk-IDs (Hash-Ordnernamen) können nicht verwendet werden, da
-    /// <see cref="TableChunk.BeSureRowIsLoaded(string)"/> und
-    /// <see cref="TableChunk.GetChunkId"/> einen Chunk-<b>Wert</b> erwarten
+    /// TableChunk.BeSureRowIsLoaded(string) und
+    /// TableChunk.GetChunkId einen Chunk-<b>Wert</b> erwarten
     /// und diesen erneut hashen würden.
     /// </summary>
     public static List<ListItem> BuildChunkDropdownItems(Table? table) {
@@ -120,7 +120,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
     /// <summary>
     /// Erzeugt eine Liste von Zeilen für das Dropdown-Menü, gefiltert nach dem Chunk-Wert.
-    /// Bei einer <see cref="TableChunk"/> werden nur die Zeilen des angegebenen Chunks geladen.
+    /// Bei einer TableChunk werden nur die Zeilen des angegebenen Chunks geladen.
     /// </summary>
     public static List<ListItem> BuildRowDropdownItems(Table? table, string chunkValue) {
         if (table is not { IsDisposed: false }) { return []; }
@@ -196,11 +196,11 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     }
 
     /// <summary>
-    /// Erzeugt aus dem aktuellen UI-Zustand eine neue <see cref="TableScriptDescription"/>.
-    /// Wird vom <see cref="EditorForIEnumerable"/> über
-    /// <see cref="IIsEditor.OutputItem"/> abgefragt, sobald der Editor
+    /// Erzeugt aus dem aktuellen UI-Zustand eine neue TableScriptDescription.
+    /// Wird vom EditorForIEnumerable über
+    /// IIsEditor.OutputItem abgefragt, sobald der Editor
     /// <c>OutputItem</c>-Änderung signalisiert. Nicht editierte Backend-Werte
-    /// (AdminInfo, AverageRunTime, Table) werden vom geladenen <see cref="_item"/>
+    /// (AdminInfo, AverageRunTime, Table) werden vom geladenen _item
     /// übernommen.
     /// </summary>
     public override object? CreateNewItem() {
@@ -238,7 +238,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     }
 
     /// <summary>
-    /// Befüllt die UI aus dem übergebenen <see cref="TableScriptDescription"/>-Skript.
+    /// Befüllt die UI aus dem übergebenen TableScriptDescription-Skript.
     /// </summary>
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not TableScriptDescription value) { return true; }

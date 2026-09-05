@@ -28,7 +28,9 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
 
     public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
-    [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
+    /// <summary>
+    /// Hinweistext, der erscheint, wenn keine Filterbedingung erzeugt werden kann.
+    /// </summary>
     [DefaultValue("")]
     public string Fehler_Text {
         get;
@@ -40,7 +42,6 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
         }
     } = string.Empty;
 
-    //[Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
     //[DefaultValue("")]
     //public string Eingangs_Wert_Spalte {
     //    get => _eingangsWertSpalte;
@@ -52,7 +53,9 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
     //        OnPropertyChanged(string propertyname);
     //    }
     //}
-    [Description("Dieser Filter-Typ wird angewendet.")]
+    /// <summary>
+    /// Die Art des Vergleichs.
+    /// </summary>
     [DefaultValue(FilterTypeRowInputItem.Ist_schreibungsneutral)]
     public FilterTypeRowInputItem Filter {
         get;
@@ -64,7 +67,9 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
         }
     } = FilterTypeRowInputItem.Ist_schreibungsneutral;
 
-    [Description("Auf diese Spalte wird der Filter angewendet.")]
+    /// <summary>
+    /// Die Spalte, nach der gefiltert wird.
+    /// </summary>
     [DefaultValue("")]
     public string Filter_Spalte {
         get;
@@ -76,7 +81,9 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
         }
     } = string.Empty;
 
-    [Description("Nach diesem Wert wird gefiltert. Es können Variablen der eingehenden Zeile benutzt werden.")]
+    /// <summary>
+    /// Der Wert, mit dem verglichen wird. Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
+    /// </summary>
     [DefaultValue("")]
     public string Filter_Wert {
         get;

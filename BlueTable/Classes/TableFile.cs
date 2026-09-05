@@ -55,7 +55,7 @@ public class TableFile : Table {
     /// <summary>
     /// Mapping von Datei-Suffix auf die zugehörige TableFile-Ableitung.
     /// Wird einmalig beim ersten Zugriff aus der hardcoded Tabelle in
-    /// <see cref="BuildSuffixTypeMap"/> erzeugt. Neue TableFile-Ableitungen
+    /// BuildSuffixTypeMap erzeugt. Neue TableFile-Ableitungen
     /// müssen dort eingetragen werden.
     /// </summary>
     internal static readonly Lazy<Dictionary<string, Type>> LoadableFileTypes = new(BuildSuffixTypeMap);
@@ -68,7 +68,9 @@ public class TableFile : Table {
     /// </summary>
     private static Timer? _tableUpdateTimer;
 
-    /// <summary>Semaphore zum Synchronisieren von Speichervorgängen.</summary>
+    /// <summary>
+    /// Semaphore zum Synchronisieren von Speichervorgängen.
+    /// </summary>
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     private int _checkerTickCount = -5;
@@ -108,9 +110,9 @@ public class TableFile : Table {
 
     /// <summary>
     /// Gibt an, ob die Tabelle vor kurzem aktiv verwendet wurde und daher
-    /// in die periodische Aktualisierung (<see cref="TableUpdater"/>) einbezogen
+    /// in die periodische Aktualisierung (TableUpdater) einbezogen
     /// werden soll. Die Basisklasse prüft dies über die zugehörige Chunk-LiveInstance.
-    /// Unterklassen mit eigener Chunk-Verwaltung (z.B. <see cref="TableChunk"/>)
+    /// Unterklassen mit eigener Chunk-Verwaltung (z.B. TableChunk)
     /// überschreiben dies, da sie keine Chunk-LiveInstances verwenden.
     /// </summary>
     public virtual bool IsRecentlyUsed => Chunk.IsChunkRecentlyUsed(Filename);

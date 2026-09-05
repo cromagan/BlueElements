@@ -219,9 +219,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     } = Padding.Empty;
 
     /// <summary>
-    /// Optionale Tabelle, deren Export-Skript-Variablen als Vorschläge
-    /// (Suggestions) in den TextPadItem- und BitmapPadItem-Eigenschaften
-    /// angeboten werden. Wird nur in der obersten Collection ausgewertet.
+    /// Stammtabelle, deren Platzhalter in den Formularelementen zur Verfügung stehen.
+    /// Nur die oberste Sammlung berücksichtigt diese Angabe.
     /// </summary>
     public Table? ReferenceTable {
         get {
@@ -694,7 +693,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
 
     /// <summary>
     /// Erstellt ein Vorschaubitmap der Seite, das die Items (UsedAreaOfItems)
-    /// vollständig und randlos ausfüllt. Im Gegensatz zu <see cref="DrawExplicit"/>
+    /// vollständig und randlos ausfüllt. Im Gegensatz zu DrawExplicit
     /// wird AutoZoomFit ignoriert, damit die Vorschau nicht vom Seiteneffekt des
     /// CreativePad (der AutoZoomFit auf false setzt) abhängt.
     /// </summary>
@@ -725,7 +724,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
     /// <summary>
-    /// Führt das Export-Skript der <see cref="ReferenceTable"/> aus und liefert
+    /// Führt das Export-Skript der ReferenceTable aus und liefert
     /// die dabei erzeugten Variablen. Das Ergebnis wird pro Tabelle gecacht:
     /// Bei derselben Tabelle wird der Cache zurückgegeben, bei einer anderen
     /// Tabelle (oder wenn keine gültige ReferenceTable gesetzt ist) wird neu
@@ -880,7 +879,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
 
     /// <summary>
     /// Öffnet einen modalen Vorschau-Dialog, der alle Zeilen der
-    /// <see cref="ReferenceTable" /> auflistet und für jede Zeile eine
+    /// ReferenceTable auflistet und für jede Zeile eine
     /// Live-Vorschau des Formulars inklusive der berechneten Variablen zeigt.
     /// </summary>
     public void OpenReferenceTablePreview() {

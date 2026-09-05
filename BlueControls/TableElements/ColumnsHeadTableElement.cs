@@ -270,7 +270,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
     /// <summary>
     /// Übernimmt die gesamte Doppelklick-Logik für den Spaltenkopf: prüft
     /// Spalten- und Tabellen-Zustand sowie Admin-Berechtigung und startet
-    /// die Caption-Editierung über <see cref="TableView.BeginEdit" />.
+    /// die Caption-Editierung über TableView.BeginEdit.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
         if (mouseOverColumn is not { IsDisposed: false } cvi) { return false; }
@@ -410,8 +410,8 @@ public sealed class ColumnsHeadTableElement : TableElement {
     /// Übernimmt die neue Spalten-Überschrift. Wenn Caption und KeyName
     /// bisher identisch waren, wird der KeyName aus der neuen Caption
     /// abgeleitet (sofern das ein gültiger Schlüssel ist). Commit-Callback
-    /// aus <see cref="HandleDoubleClick" />, der an
-    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// aus HandleDoubleClick, der an
+    /// TableView.BeginEdit übergeben wird.
     /// </summary>
     private void ApplyCaption(TableView tableView, ColumnViewItem? column, string value) {
         if (column?.Column is not { IsDisposed: false } col) { return; }

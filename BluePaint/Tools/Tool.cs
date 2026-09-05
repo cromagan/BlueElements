@@ -79,7 +79,7 @@ public abstract partial class Tool : GroupBox, IDrawsOverlay {
 
     /// <summary>
     /// Zeichnet einen Pinsel-Vorschau-Kreis pixelgenau nach. Es wird exakt dieselbe
-    /// Pixel-Bedingung wie bei <see cref="Extensions.FillCircle"/> verwendet, sodass
+    /// Pixel-Bedingung wie bei Extensions.FillCircle verwendet, sodass
     /// die Vorschau deckungsgleich mit den tatsächlich gemalten Pixeln ist.
     /// </summary>
     protected static void DrawPixelExactCircle(Graphics gr, float zoom, int offsetX, int offsetY, int centerX, int centerY, int radius, Brush brush) {

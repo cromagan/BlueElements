@@ -12,6 +12,9 @@ public class BoolRenderer : Renderer {
 
     public override string Description => "Stellt boolesche Werte (+, -, o/O) als Symbol und/oder Text dar.";
 
+    /// <summary>
+    /// Symbol für den Zustand „Nein" (Standard: Kreuz).
+    /// </summary>
     public string Symbol_False {
         get;
         set {
@@ -22,6 +25,9 @@ public class BoolRenderer : Renderer {
         }
     } = "Kreuz";
 
+    /// <summary>
+    /// Symbol für eine leere oder unentschiedene Angabe (Standard: Kreis).
+    /// </summary>
     public string Symbol_neutral {
         get;
         set {
@@ -32,6 +38,9 @@ public class BoolRenderer : Renderer {
         }
     } = "Kreis2";
 
+    /// <summary>
+    /// Symbol für den Zustand „Ja" (Standard: Häkchen).
+    /// </summary>
     public string Symbol_True {
         get;
         set {
@@ -42,6 +51,9 @@ public class BoolRenderer : Renderer {
         }
     } = "Häkchen";
 
+    /// <summary>
+    /// Text, der beim Zustand „Nein" zusätzlich zum Symbol angezeigt wird.
+    /// </summary>
     public string Text_False {
         get;
         set {
@@ -52,6 +64,9 @@ public class BoolRenderer : Renderer {
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Text, der bei leerer oder unentschiedener Angabe zusätzlich angezeigt wird.
+    /// </summary>
     public string Text_neutral {
         get;
         set {
@@ -62,6 +77,9 @@ public class BoolRenderer : Renderer {
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Text, der beim Zustand „Ja" zusätzlich zum Symbol angezeigt wird.
+    /// </summary>
     public string Text_True {
         get;
         set {

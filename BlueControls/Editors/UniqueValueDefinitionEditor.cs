@@ -6,12 +6,12 @@ using BlueTable.Interfaces;
 namespace BlueControls.Forms;
 
 /// <summary>
-/// Editor für eine einzelne <see cref="UniqueValueDefinition"/> (EditCopy). Die
+/// Editor für eine einzelne UniqueValueDefinition (EditCopy). Die
 /// anzuzeigenden Elemente liefert die Backend-Collection
-/// <see cref="Table.UniqueValues"/> direkt als
-/// <see cref="EditorForIEnumerable.InputItem"/>. Neue Definitionen
+/// Table.UniqueValues direkt als
+/// EditorForIEnumerable.InputItem. Neue Definitionen
 /// erzeugt das hostende Form über das AddClicked-Event des
-/// <see cref="EditorForIEnumerable"/>.
+/// EditorForIEnumerable.
 /// </summary>
 public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable, INotifyPropertyChanged {
 

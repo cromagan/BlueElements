@@ -46,7 +46,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     /// <summary>
     /// Horizontale Ausrichtung des Zellinhalts. Echte Spalten liefern die
-    /// Ausrichtung ihres <see cref="ColumnItem" />; virtuelle Spalten
+    /// Ausrichtung ihres ColumnItem; virtuelle Spalten
     /// standardmäßig links. Renderer wie <c>Button</c> ignorieren die
     /// Ausrichtung (sie zentrieren selbst).
     /// </summary>
@@ -114,7 +114,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// <summary>
     /// Name des Renderers (ClassId, z. B. "Button" oder "TextOneLine").
     /// Echte Spalten liefern den Namen ihres
-    /// <see cref="ColumnItem.DefaultRenderer" />; virtuelle Spalten
+    /// ColumnItem.DefaultRenderer; virtuelle Spalten
     /// überschreiben dies mit ihrem festen Renderer-Namen. Wird für die
     /// Serialisierung standardisiert gespeichert.
     /// </summary>
@@ -123,7 +123,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// <summary>
     /// Serialisierte Renderer-Einstellungen (z. B.
     /// <c>{ClassId="Button",ShowCellValue=+}</c>). Echte Spalten liefern die
-    /// Einstellungen ihres <see cref="ColumnItem.RendererSettings" />;
+    /// Einstellungen ihres ColumnItem.RendererSettings;
     /// virtuelle Spalten überschreiben dies mit ihren festen Einstellungen.
     /// </summary>
     public virtual string RendererSettings => Column?.RendererSettings ?? string.Empty;
@@ -147,12 +147,12 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     #region Methods
 
     /// <summary>
-    /// Erzeugt ein <see cref="ColumnViewItem" /> aus serialisierten Daten.
+    /// Erzeugt ein ColumnViewItem aus serialisierten Daten.
     /// Virtuelle Spalten (ColumnName = VIR_…) werden über ihren ClassId-Namen
     /// als echter Subtyp rekonstruiert — ohne Parse, da Renderer, Caption,
     /// FixedWidth usw. im Subtyp fest codiert sind und die serialisierten
     /// Werte (Permanent, FontHorizontal) den Konstruktor-Defaults entsprechen.
-    /// Echte Spalten werden als Basis-<see cref="ColumnViewItem" /> geparst.
+    /// Echte Spalten werden als Basis-ColumnViewItem geparst.
     /// </summary>
     public static ColumnViewItem? Create(Table? table, string toParse) {
         if (toParse.GetAllTags() is not { } x) { return null; }
@@ -166,7 +166,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     /// <summary>
     /// Liefert den darzustellenden Wert dieser Spalte für die angegebene
-    /// Zeile. Echte Spalten delegieren an <see cref="RowItem.CellGetString(ColumnItem)" />;
+    /// Zeile. Echte Spalten delegieren an RowItem.CellGetString(ColumnItem);
     /// virtuelle Spalten überschreiben dies, um ihren Wert zu berechnen
     /// (z. B. Pin-Bildcode, Zeilennummer). Beim Zeichnen ist dies der
     /// einzige Unterschied zwischen echten und virtuellen Spalten.

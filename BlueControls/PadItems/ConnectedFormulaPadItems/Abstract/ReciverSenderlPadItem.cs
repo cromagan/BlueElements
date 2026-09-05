@@ -49,6 +49,9 @@ public abstract class ReciverSenderPadItem : ReciverPadItem {
         }
     } = -1;
 
+    /// <summary>
+    /// Die Tabelle, in die dieses Element seine Werte schreibt.
+    /// </summary>
     public Table? TableOutput {
         get {
             if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false }) { return TableInput; }

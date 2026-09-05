@@ -56,12 +56,12 @@ public static class CsvHelper {
 
     /// <summary>
     /// Serialisiert die Tabelle zu einem CSV-String. Spalten- und Zeilenauswahl
-    /// erfolgen einheitlich über <see cref="Table.ColumnsInSaveOrder" /> bzw.
-    /// <see cref="Table.RowsInSaveOrder" />; Spalten mit
-    /// <see cref="ColumnItem.SaveContent" /> == false werden ausgelassen.
+    /// erfolgen einheitlich über Table.ColumnsInSaveOrder bzw.
+    /// Table.RowsInSaveOrder; Spalten mit
+    /// ColumnItem.SaveContent == false werden ausgelassen.
     /// Felder werden escapet (in Anführungszeichen gesetzt, wenn sie Separator,
     /// ", \r oder \n enthalten), sodass der Round-Trip mit
-    /// <see cref="ParseCSVLine" /> verlustfrei ist.
+    /// ParseCSVLine verlustfrei ist.
     /// Zeilentrenner ist Environment.NewLine.
     /// </summary>
     /// <param name="firstLineIsHeader">Wenn true, wird als erste Zeile ein Header

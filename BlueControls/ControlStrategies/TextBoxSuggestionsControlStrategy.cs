@@ -23,6 +23,9 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     public override string Description => "Textfeld, das zusätzlich auswählbare Vorschläge als Chips anbietet.";
     public override string KeyName => ClassId;
 
+    /// <summary>
+    /// Wenn gewählt, wird der Text auf Schreibfehler geprüft und gefundene Stellen werden unterstreicht.
+    /// </summary>
     public bool SpellCheckingEnabled {
         get;
         set {
@@ -37,6 +40,9 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
         }
     }
 
+    /// <summary>
+    /// Legt fest, wo die Vorschlagsliste erscheint.
+    /// </summary>
     public SuggestionPosition SuggestionPosition {
         get;
         set {
@@ -54,6 +60,9 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     public override bool SupportsSuggestions => true;
     public override bool SupportsTextEdit => true;
 
+    /// <summary>
+    /// Wenn gewählt, kann der Benutzer den Text gestalten, z. B. fett, kursiv oder farbig.
+    /// </summary>
     public bool TextFormatingAllowed {
         get;
         set {
@@ -75,7 +84,7 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     /// <summary>
     /// Übernimmt die TextBox-Größe am Control und ermittelt die zusätzlich
     /// benötigte Gesamthöhe (Textbox + Chip-Fläche der Suggestions) über
-    /// <see cref="TextBoxSuggestions.GetEstimatedHeight" />. Die Breite wird
+    /// TextBoxSuggestions.GetEstimatedHeight. Die Breite wird
     /// dabei so vergrößert, dass der breiteste Chip vollständig Platz findet
     /// und nicht abgeschnitten wird; das umbrechende Verhalten nach unten
     /// bleibt unverändert.

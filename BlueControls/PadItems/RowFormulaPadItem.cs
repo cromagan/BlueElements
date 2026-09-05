@@ -44,7 +44,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public override string Description => string.Empty;
 
     /// <summary>
-    /// Namen so lassen, wegen Kontextmenu
+    /// Layout, das für die Anzeige dieser Zeile benutzt wird.
     /// </summary>
     public string Layout_Dateiname {
         get;

@@ -17,7 +17,7 @@ public static class HasVersionExtensions {
 
     public static string DefaultItemToControlName(this IHasVersion item, string? parentName) {
         if (parentName is null) {
-            return item.KeyName + "-" + item.Version + "-[UNKNOW]";
+            return item.KeyName + "-" + item.Version + "-[UNKNOWN]";
         }
 
         return item.KeyName + "-" + item.Version + "-" + parentName.GetMD5Hash();
@@ -25,7 +25,7 @@ public static class HasVersionExtensions {
 
     /// <summary>
     /// Erhoeht die Version, damit verknuepfte Controls ihr Layout neu aufbauen.
-    /// Waehrend des Parsens / Initialisierens (<see cref="ParseableItem.IsEventsSuppressed" />)
+    /// Waehrend des Parsens / Initialisierens (ParseableItem.IsEventsSuppressed)
     /// ist die Methode eine No-Op: Die Version kommt gerade aus dem Speicher und
     /// ein Hochzaehlen wuerde einen Roundtrip (z.B. JSON-Serialisierung) verfaelschen.
     /// </summary>

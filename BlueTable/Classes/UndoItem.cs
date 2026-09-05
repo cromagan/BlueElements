@@ -66,8 +66,8 @@ public class UndoItem : IParseable, IJsonParseable {
 
     /// <summary>
     /// Berechnet einen deterministischen Hash zur Dedup-Erkennung in TableFragments.
-    /// Enthält nur die identitätsstiftenden Werte (ohne <see cref="PreviousValue"/>,
-    /// <see cref="Comment"/> und <see cref="Container"/>), weil diese zwischen Fragment-
+    /// Enthält nur die identitätsstiftenden Werte (ohne PreviousValue,
+    /// Comment und Container), weil diese zwischen Fragment-
     /// und Undo-Schreibweg inkonsistent sein können. Damit ist der Hash unabhängig vom
     /// Serialisationsformat und vom Schreibweg (Fragment vs. lokales Undo vs. Hauptfile).
     /// </summary>

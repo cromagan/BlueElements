@@ -121,7 +121,7 @@ public partial class Notification : FloatingForm, IAnimatable {
     /// Anker). Wird dieser später entfernt, rutscht diese Notification
     /// automatisch auf den nächsten lebenden Stacking-Kandidaten nach.
     /// Aus dem Animations-Thread heraus nur über die gesicherten Handles
-    /// zugreifen (siehe <see cref="_belowCandidates" />).
+    /// zugreifen (siehe _belowCandidates).
     /// </summary>
     public Notification? NoteBelow { get; }
 

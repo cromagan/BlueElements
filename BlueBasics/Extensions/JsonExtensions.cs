@@ -9,7 +9,7 @@ public static partial class Extensions {
     #region Methods
 
     /// <summary>
-    /// Liest ein von <see cref="Set" /> geschriebenes Base64-PNG unter
+    /// Liest ein von Set geschriebenes Base64-PNG unter
     /// <paramref name="key" />. Fehlt der Key, ist er kein String oder leer, wird
     /// <paramref name="defaultValue" /> geliefert - so bleiben Partial-Updates
     /// möglich, ohne bestehende Bilder zu überschreiben.
@@ -28,7 +28,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Liest einen ARGB-Farbwert (als int) unter <paramref name="key" /> und
-    /// konvertiert ihn in ein <see cref="Color" />. Negative Werte gelten als
+    /// konvertiert ihn in ein Color. Negative Werte gelten als
     /// "nicht gesetzt" (Sentinel). Fehlt der Key, ist er keine Zahl oder ist der
     /// Wert negativ, wird <paramref name="defaultValue" /> geliefert - so bleiben
     /// Partial-Updates möglich, ohne bestehende Farben zu überschreiben.
@@ -50,7 +50,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Liest einen Enum-Wert unter <paramref name="key" />. Akzeptiert sowohl den
-    /// numerischen Wert (<see cref="JsonValueKind.Number" />) als auch die
+    /// numerischen Wert (JsonValueKind.Number) als auch die
     /// String-Repräsentation. Bei fehlendem oder ungültigem Key wird
     /// <c>default(T)</c> geliefert.
     /// </summary>
@@ -58,7 +58,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Liest einen Enum-Wert unter <paramref name="key" />. Akzeptiert sowohl den
-    /// numerischen Wert (<see cref="JsonValueKind.Number" />) als auch die
+    /// numerischen Wert (JsonValueKind.Number) als auch die
     /// String-Repräsentation. Bei fehlendem oder ungültigem Key wird
     /// <paramref name="defaultValue" /> geliefert - so bleiben Partial-Updates
     /// möglich, ohne bestehende Felder zu überschreiben.
@@ -101,9 +101,9 @@ public static partial class Extensions {
     public static JsonNode? GetJson(this JsonObject json, string key) => json[key];
 
     /// <summary>
-    /// Liest ein JSON-Array von <see cref="IJsonParseable" />-Objekten unter dem
+    /// Liest ein JSON-Array von IJsonParseable-Objekten unter dem
     /// angegebenen <paramref name="key" /> und erzeugt über
-    /// <see cref="ParseableItem.NewByParsingJson{T}" /> die passenden Instanzen.
+    /// ParseableItem.NewByParsingJson{T} die passenden Instanzen.
     /// Elemente, die kein JSON-Objekt sind oder nicht geparsed werden konnten,
     /// werden übersprungen. Fehlt der Key oder ist er kein Array, wird eine leere
     /// Liste geliefert. Bei <paramref name="sort" /> = <c>true</c> wird die
@@ -131,7 +131,7 @@ public static partial class Extensions {
         json[key] is JsonArray arr ? arr.ToStringList() : defaultValue ?? [];
 
     /// <summary>
-    /// Liest ein vom <see cref="Set" /> geschriebenes verschachteltes Objekt
+    /// Liest ein vom Set geschriebenes verschachteltes Objekt
     /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
     /// <paramref name="defaultValue" /> geliefert.
     /// </summary>
@@ -141,7 +141,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Liest ein vom <see cref="Set" /> geschriebenes verschachteltes Objekt
+    /// Liest ein vom Set geschriebenes verschachteltes Objekt
     /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
     /// <paramref name="defaultValue" /> geliefert.
     /// </summary>
@@ -189,7 +189,7 @@ public static partial class Extensions {
     public static void Set(this JsonObject json, string key, JsonNode? value) => json[key] = value;
 
     /// <summary>
-    /// Serialisiert ein <see cref="Bitmap" /> unter <paramref name="key" /> als
+    /// Serialisiert ein Bitmap unter <paramref name="key" /> als
     /// Base64-kodiertes PNG. Bei <c>null</c> wird der Key nicht gesetzt, sodass
     /// das Ziel-JSON unverändert bleibt (kein <c>null</c>-Eintrag).
     /// </summary>
@@ -199,16 +199,16 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Serialisiert ein <see cref="DateTime" /> unter <paramref name="key" /> als
+    /// Serialisiert ein DateTime unter <paramref name="key" /> als
     /// ISO-8601-Roundtrip-Format (<c>"o"</c>), sodass der Wert verlustfrei
     /// zurückgelesen werden kann - kompatibel zu den Get-Routen, die
-    /// <see cref="JsonNode.GetValue{T}" /> bzw.
-    /// <see cref="DateTimeParse(string)" /> verwenden.
+    /// JsonNode.GetValue{T} bzw.
+    /// DateTimeParse(string) verwenden.
     /// </summary>
     public static void Set(this JsonObject json, string key, DateTime value) => json[key] = value.ToString("o", CultureInfo.InvariantCulture);
 
     /// <summary>
-    /// Serialisiert ein <see cref="System.Windows.Forms.Padding" /> unter <paramref name="key" /> als
+    /// Serialisiert ein System.Windows.Forms.Padding unter <paramref name="key" /> als
     /// verschachteltes Objekt mit den Feldern <c>left</c>, <c>top</c>, <c>right</c>, <c>bottom</c>.
     /// </summary>
     public static void Set(this JsonObject json, string key, System.Windows.Forms.Padding padding) {
@@ -221,7 +221,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Serialisiert ein <see cref="SizeF" /> unter <paramref name="key" /> als
+    /// Serialisiert ein SizeF unter <paramref name="key" /> als
     /// verschachteltes Objekt mit den Feldern <c>width</c> und <c>height</c>.
     /// </summary>
     public static void Set(this JsonObject json, string key, SizeF size) {
@@ -241,8 +241,8 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Erzeugt aus einer Sequenz von <see cref="IJsonStringable" />-Objekten ein
-    /// <see cref="JsonArray" /> (jedes Element via <see cref="IJsonStringable.ParseableJson" />)
+    /// Erzeugt aus einer Sequenz von IJsonStringable-Objekten ein
+    /// JsonArray (jedes Element via IJsonStringable.ParseableJson)
     /// und weist es unter <paramref name="key" /> zu. Bei leerer Quelle erfolgt keine
     /// Zuweisung, das <paramref name="json" />-Objekt bleibt unverändert.
     /// </summary>
@@ -255,7 +255,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Erzeugt aus einer Sequenz von Strings ein <see cref="JsonArray" /> und weist
+    /// Erzeugt aus einer Sequenz von Strings ein JsonArray und weist
     /// es unter <paramref name="key" /> zu. Bei leerer Quelle erfolgt keine Zuweisung,
     /// das <paramref name="json" />-Objekt bleibt unverändert.
     /// </summary>
@@ -268,19 +268,19 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Konvertiert ein <see cref="JsonElement" /> (z. B. aus <see cref="JsonDocument" />
-    /// oder <see cref="JsonElement.Clone" />) in einen <see cref="JsonNode" />,
-    /// sodass es direkt in ein übergeordnetes <see cref="JsonObject" /> / <see cref="JsonArray" />
+    /// Konvertiert ein JsonElement (z. B. aus JsonDocument
+    /// oder JsonElement.Clone) in einen JsonNode,
+    /// sodass es direkt in ein übergeordnetes JsonObject / JsonArray
     /// eingebettet werden kann.
-    /// Ein <see cref="JsonValueKind.Undefined" />- oder <see cref="JsonValueKind.Null" />-Element
-    /// liefert <c>null</c>, da <see cref="JsonElement.GetRawText" /> bei Undefined werfen würde.
+    /// Ein JsonValueKind.Undefined- oder JsonValueKind.Null-Element
+    /// liefert <c>null</c>, da JsonElement.GetRawText bei Undefined werfen würde.
     /// </summary>
     public static JsonNode? ToJsonNode(this JsonElement element) =>
         element.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null ? null : JsonNode.Parse(element.GetRawText());
 
     /// <summary>
-    /// Konvertiert ein <see cref="JsonArray" /> in eine Liste von Strings.
-    /// Elemente, die keine String-<see cref="JsonValue" /> sind, werden als
+    /// Konvertiert ein JsonArray in eine Liste von Strings.
+    /// Elemente, die keine String-JsonValue sind, werden als
     /// leerer String interpretiert.
     /// </summary>
     public static List<string> ToStringList(this JsonArray arr) {

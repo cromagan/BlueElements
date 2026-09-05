@@ -5,9 +5,9 @@ namespace BlueTable.Classes;
 /// <summary>
 /// Virtuelle Spalte „Hinzufügen". Ein Klick auf den Kopf öffnet das
 /// Dropdown zum Einblenden/Anlegen echter Spalten. Hat kein
-/// <see cref="ColumnItem" /> und kann vom Benutzer frei innerhalb der
+/// ColumnItem und kann vom Benutzer frei innerhalb der
 /// Anordnung verschoben werden. Standardmäßig erscheint sie am Ende.
-/// (als <see cref="StorageKey"/> VIR_ADD in der Collection gespeichert)
+/// (als StorageKey VIR_ADD in der Collection gespeichert)
 /// oder on-demand während der Ansichtbearbeitung.
 /// </summary>
 public sealed class AddColumnItem : ColumnViewItem {

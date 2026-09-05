@@ -161,7 +161,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     /// <summary>
     /// Übernimmt alle Werte von <paramref name="other"/>. Wird beim Recycling in
-    /// <see cref="Table.SetValueInternal"/> (case UniqueValues) verwendet:
+    /// Table.SetValueInternal (case UniqueValues) verwendet:
     /// Existierende Instanzen behalten ihre Identität, nur die Spalten und der
     /// KeyName werden aktualisiert.
     /// </summary>
@@ -177,7 +177,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     /// <summary>
     /// Sortiert die Spalten in der Reihenfolge, in der sie auch gespeichert werden
-    /// (Ansicht 1 / Index 1, danach alphabetisch). Siehe <see cref="Table.ColumnsInSaveOrder" />.
+    /// (Ansicht 1 / Index 1, danach alphabetisch). Siehe Table.ColumnsInSaveOrder.
     /// </summary>
     private void SortColumnsBySaveOrder() {
         if (Table is not { IsDisposed: false }) { return; }

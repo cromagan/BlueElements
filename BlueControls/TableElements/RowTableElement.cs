@@ -262,7 +262,7 @@ public sealed class RowTableElement : TableElement {
     /// <summary>
     /// Startet die Inline-Editierung der angeklickten Zelle. Die gesamte
     /// Logik (Editability, LinkedCell-Auflösung, ControlStrategy, Position) liegt in
-    /// der Basisklasse <see cref="TableElement.BeginCellEdit" />.
+    /// der Basisklasse TableElement.BeginCellEdit.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
         if (mouseOverColumn is null) { return false; }
@@ -272,7 +272,7 @@ public sealed class RowTableElement : TableElement {
 
     /// <summary>
     /// Setzt die Tastatur-Aktionen auf der Cursor-Zelle um (Ctrl+X/C/V, F2,
-    /// Delete). Aufgerufen aus <see cref="TableView.OnKeyDown" />, sobald die
+    /// Delete). Aufgerufen aus TableView.OnKeyDown, sobald die
     /// dort behandelten Navigations-Tasten verarbeitet wurden.
     /// </summary>
     public override void HandleKeyDown(ColumnViewItem? cursorColumn, TableView tableView, KeyEventArgs e) {

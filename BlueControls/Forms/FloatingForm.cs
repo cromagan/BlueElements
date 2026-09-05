@@ -197,8 +197,8 @@ public partial class FloatingForm : Form {
 
     /// <summary>
     /// Schließt alle aktuell sichtbaren FloatingForms mit
-    /// <see cref="DismissMode.OnOutsideClick"/> (z.B. AutoFilter, MiniToolbar,
-    /// Dropdowns). Forms mit <see cref="DismissMode.ManualOnly"/> (QuickInfo,
+    /// DismissMode.OnOutsideClick (z.B. AutoFilter, MiniToolbar,
+    /// Dropdowns). Forms mit DismissMode.ManualOnly (QuickInfo,
     /// Notification, Progressbar) bleiben geöffnet.
     /// Aufgerufen wird dies, wenn das übergeordnete Fenster den Fokus verliert
     /// (z.B. Aktivieren eines anderen Fensters über die Taskleiste), damit die

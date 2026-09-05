@@ -34,8 +34,7 @@ public class TableViewPadItem : ReciverSenderPadItem, IItemToControl, IAutosizab
     public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
 
     /// <summary>
-    /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
-    /// ausgeführt wird, anstatt die Bearbeitung zu öffnen.
+    /// Ein Skript, das beim Doppelklick auf eine Zelle ausgeführt wird, statt die Bearbeitung zu öffnen.
     /// </summary>
     [DefaultValue("")]
     public string Doppelklick_Skript {
@@ -52,6 +51,9 @@ public class TableViewPadItem : ReciverSenderPadItem, IItemToControl, IAutosizab
 
     public override bool MustBeInDrawingArea => true;
 
+    /// <summary>
+    /// Aussehen des Rahmens um die Tabelle.
+    /// </summary>
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {
         get;
@@ -63,6 +65,9 @@ public class TableViewPadItem : ReciverSenderPadItem, IItemToControl, IAutosizab
         }
     } = GroupBoxStyle.Nothing;
 
+    /// <summary>
+    /// Die Spaltenanordnung, die beim Öffnen der Tabelle verwendet wird.
+    /// </summary>
     [DefaultValue("")]
     public string Standard_Ansicht {
         get;

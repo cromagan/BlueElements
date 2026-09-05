@@ -20,6 +20,9 @@ public class TextOneLineRenderer : Renderer {
 
     public override string Description => "Schnelle Darstellung eines einzeiligen Textes.";
 
+    /// <summary>
+    /// Text, der vor dem Zellinhalt angezeigt wird.
+    /// </summary>
     public string Präfix {
         get => _präfix;
         set {
@@ -30,6 +33,9 @@ public class TextOneLineRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Text, der hinter dem Zellinhalt angezeigt wird.
+    /// </summary>
     public string Suffix {
         get => _suffix;
         set {

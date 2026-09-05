@@ -7,10 +7,10 @@ using System.Collections.ObjectModel;
 namespace BlueControls.BlueTableDialogs;
 
 /// <summary>
-/// Einfacher Editor (<see cref="ISimpleEditor" />) für die Kopf-Eigenschaften
-/// einer <see cref="ColumnViewCollection" />. Liefert die Eigenschaften über
-/// <see cref="GetProperties" /> als generische Steuerelemente; die Anzeige
-/// übernimmt der generische Dialog (<see cref="InputBoxEditor" />).
+/// Einfacher Editor (ISimpleEditor) für die Kopf-Eigenschaften
+/// einer ColumnViewCollection. Liefert die Eigenschaften über
+/// GetProperties als generische Steuerelemente; die Anzeige
+/// übernimmt der generische Dialog (InputBoxEditor).
 /// </summary>
 public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuickInfo {
 
@@ -38,16 +38,25 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
 
     #region Properties
 
+    /// <summary>
+    /// Skripte, die der Benutzer über diese Ansicht starten darf.
+    /// </summary>
     public ReadOnlyCollection<string> Ausführbare_Skripte {
         get => _cvc?.Ausführbare_Skripte ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.Ausführbare_Skripte = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Spalte, nach der die Tabelle in Abschnitte mit Überschriften gegliedert wird.
+    /// </summary>
     public string ChapterColumn {
         get => _cvc?.ColumnForChapter?.KeyName ?? "#ohne";
         set { if (_cvc is { } cvc) { cvc.ColumnForChapter = value == "#ohne" ? null : cvc.Table?.Column[value]; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Legt fest, ob und wie die Spaltenüberschriften angezeigt werden.
+    /// </summary>
     public ColumnHeaderMode ColumnHeaderMode {
         get => _cvc?.ColumnHeaderMode ?? default;
         set { if (_cvc is { } cvc) { cvc.ColumnHeaderMode = value; WriteBack(); } }
@@ -57,11 +66,17 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
 
     public Type? EditorFor => typeof(ColumnViewCollection);
 
+    /// <summary>
+    /// Spalten, deren Filterzeile immer sichtbar ist.
+    /// </summary>
     public ReadOnlyCollection<string> Filter_immer_Anzeigen {
         get => _cvc?.Filter_immer_Anzeigen ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.Filter_immer_Anzeigen = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Anzahl der zusätzlichen Zeilen, in denen gefiltert werden kann.
+    /// </summary>
     public int FilterRows {
         get => _cvc?.FilterRows ?? 0;
         set { if (_cvc is { } cvc) { cvc.FilterRows = value; WriteBack(); } }
@@ -74,6 +89,9 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
         }
     }
 
+    /// <summary>
+    /// Ersetzt das Rechtsklick-Menü der Tabelle durch die gewählten Skripte.
+    /// </summary>
     public ReadOnlyCollection<string> Kontextmenu_Skripte {
         get => _cvc?.Kontextmenu_Skripte ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.Kontextmenu_Skripte = value; WriteBack(); } }
@@ -81,26 +99,41 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
 
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
 
+    /// <summary>
+    /// Gruppen, die diese Ansicht sehen dürfen.
+    /// </summary>
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => _cvc?.PermissionGroups_Show ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.PermissionGroups_Show = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Hilfetext, der beim Berühren mit dem Mauszeiger erscheint.
+    /// </summary>
     public string QuickInfo {
         get => _cvc?.QuickInfo ?? string.Empty;
         set { if (_cvc is { } cvc) { cvc.QuickInfo = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Passt die Tabelle automatisch an den verfügbaren Platz an.
+    /// </summary>
     public ScaleToFitMode ScaleToFit {
         get => _cvc?.ScaleToFit ?? ScaleToFitMode.Normal;
         set { if (_cvc is { } cvc) { cvc.ScaleToFit = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Wenn gewählt, werden die Spaltenüberschriften der Tabelle angezeigt.
+    /// </summary>
     public bool ShowHead {
         get => _cvc?.ShowHead ?? false;
         set { if (_cvc is { } cvc) { cvc.ShowHead = value; WriteBack(); } }
     }
 
+    /// <summary>
+    /// Wenn gewählt, sind die Gruppen der Ansicht beim Öffnen zugeklappt.
+    /// </summary>
     public bool StartCollapsed {
         get => _cvc?.StartCollapsed ?? false;
         set { if (_cvc is { } cvc) { cvc.StartCollapsed = value; WriteBack(); } }
@@ -175,9 +208,9 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
     }
 
     /// <summary>
-    /// Schreibt die bearbeitete Ansicht in <see cref="Table.ColumnArrangements" />
+    /// Schreibt die bearbeitete Ansicht in Table.ColumnArrangements
     /// zurück. Ansichten werden als serialisierte Daten verwaltet und beim
-    /// Editieren über <see cref="ColumnViewCollection.ParseAll" /> als Arbeitskopie
+    /// Editieren über ColumnViewCollection.ParseAll als Arbeitskopie
     /// erzeugt. Ohne diesen Rückgriff wären alle Änderungen verloren.
     /// </summary>
     private void WriteBack() {

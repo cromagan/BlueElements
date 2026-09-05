@@ -27,6 +27,9 @@ public class NumberRenderer : Renderer {
 
     public override string Description => "Kann Zahlenwerte formatiert anzeigen.";
 
+    /// <summary>
+    /// Anzahl der angezeigten Stellen hinter dem Komma.
+    /// </summary>
     public int Nachkommastellen {
         get => _nachkommastellen;
         set {
@@ -39,6 +42,9 @@ public class NumberRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Text, der vor der Zahl angezeigt wird, z. B. ein Währungszeichen.
+    /// </summary>
     public string Präfix {
         get => _präfix;
         set {
@@ -49,6 +55,9 @@ public class NumberRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Text, der hinter der Zahl angezeigt wird, z. B. eine Maßeinheit.
+    /// </summary>
     public string Suffix {
         get => _suffix;
         set {
@@ -59,6 +68,9 @@ public class NumberRenderer : Renderer {
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, werden große Zahlen in Tausenderschritten gruppiert, z. B. 1.000.000.
+    /// </summary>
     public bool Tausender_Trennzeichen {
         get => _tausender_Trennzeichen;
         set {

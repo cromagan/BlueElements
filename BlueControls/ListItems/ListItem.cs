@@ -90,7 +90,7 @@ public static class ListItemExtension {
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
     /// </summary>
-    /// <typeparam name="T">Der Typ des gesuchten Elements, muss von <see cref="ListItem"/> erben.</typeparam>
+    /// <typeparam name="T">Der Typ des gesuchten Elements, muss von ListItem erben.</typeparam>
     /// <param name="list">Die Liste, in der gesucht werden soll.</param>
     /// <returns>
     /// Das erste sichtbare Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,

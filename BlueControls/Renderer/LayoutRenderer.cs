@@ -19,6 +19,9 @@ public class LayoutRenderer : Renderer {
 
     public override string Description => "Langsame, aber schöne Anzeige eines Layoutes";
 
+    /// <summary>
+    /// Die Layout-Datei, die als Vorlage für die Anzeige dient.
+    /// </summary>
     public string File {
         get => _file;
         set {

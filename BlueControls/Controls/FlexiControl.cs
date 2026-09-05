@@ -328,8 +328,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.
+    /// </summary>
     [DefaultValue("")]
-    [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
     public string InfoText {
         get;
         set {

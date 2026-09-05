@@ -7,7 +7,7 @@ namespace BeCreativeCLI;
 /// <summary>
 /// Basisklasse aller CLI-Befehle. Ein Befehl entspricht einer Datei im
 /// Ordner CliCommands und wird über den Typ-Cache automatisch
-/// gefunden. <see cref="DoIt" /> liefert den Exit-Code:
+/// gefunden. DoIt liefert den Exit-Code:
 /// 0 = Erfolg, 1 = Fehler, 2 = Benutzungsfehler.
 /// </summary>
 public abstract class CliCommand : IHasKeyName {
@@ -121,7 +121,7 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Lädt die Tabelle wie <see cref="LoadTable" />, akzeptiert aber auch gesperrte
+    /// Lädt die Tabelle wie LoadTable, akzeptiert aber auch gesperrte
     /// Tabellen. Benötigt für 'table-password', das vor der Prüfung entsperren muss.
     /// </summary>
     protected static Table? LoadTableIgnoreLock(CliArgs args) {
@@ -183,7 +183,7 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Ermittelt die adressierten Zeilen. Vorausgesetzt wird eine zuvor mit
-    /// <see cref="RowAddressingProblem" /> geprüfte Zeilenadressierung.
+    /// RowAddressingProblem geprüfte Zeilenadressierung.
     /// Liefert null als Fehler, wenn keine Zeilen gefunden wurden.
     /// </summary>
     protected static (List<RowItem> Rows, string? Error) ResolveRows(Table tbl, CliArgs args) {

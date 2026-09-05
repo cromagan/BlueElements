@@ -63,7 +63,9 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
 
     #region Properties
 
-    [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
+    /// <summary>
+    /// Wenn gewählt, ist dieses Element beim Ausdrucken oder Exportieren sichtbar.
+    /// </summary>
     public bool Bei_Export_sichtbar {
         get;
         set {
@@ -94,7 +96,9 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
 
     public abstract string Description { get; }
 
-    [Description("Gibt an, ob das Element interaktiv ist (auswählbar, verschiebbar, Kontextmenü).")]
+    /// <summary>
+    /// Gibt an, ob das Element interaktiv ist (auswählbar, verschiebbar, Kontextmenü).
+    /// </summary>
     public bool Enabled {
         get;
         set {
@@ -343,7 +347,7 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Implementiert <see cref="IJsonStringable.ParseableJson" />. Subklassen
+    /// Implementiert IJsonStringable.ParseableJson. Subklassen
     /// überschreiben diese Methode, rufen <c>base.ParseableJson()</c> auf und
     /// ergänzen ihre eigenen Keys.
     /// </summary>
@@ -365,10 +369,10 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     public virtual void ParseFinishedJson(JsonObject parsed) { }
 
     /// <summary>
-    /// Default-Implementation für <see cref="IJsonParseable" />. Subklassen
+    /// Default-Implementation für IJsonParseable. Subklassen
     /// überschreiben diese Methode, lesen ihre eigenen Keys aus
     /// <paramref name="json" /> und rufen am Ende <c>base.ParseJson(json)</c>
-    /// auf. So bleibt die Leseschicht spiegelbildlich zu <see cref="ParseableJson" />.
+    /// auf. So bleibt die Leseschicht spiegelbildlich zu ParseableJson.
     /// </summary>
     public virtual void ParseJson(JsonObject json) {
         BeginInit();
@@ -576,7 +580,7 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     /// <summary>
     /// Invalidiert CanvasUsedArea und löst das Ereignis Changed aus.
     /// Die Cache-Invalidierung passiert UNABHNGIG vom Suppress-Modus (siehe
-    /// <see cref="ParseableItem.IsEventsSuppressed" />), damit nach einem Parse
+    /// ParseableItem.IsEventsSuppressed), damit nach einem Parse
     /// kein veralteter Cache steht. Das eigentliche Event wird dagegen im
     /// Suppress-Modus (z. B. whrend des Parsens) nicht gefeuert.
     /// </summary>

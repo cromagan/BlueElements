@@ -26,7 +26,7 @@ public static class Develop {
 
     /// <summary>
     /// Statische Referenz auf den Shutdown-Timer. Ohne diese Wurzelreferenz würde der
-    /// <see cref="Timer"/> vom GC eingesammelt werden, da er intern nur
+    /// Timer vom GC eingesammelt werden, da er intern nur
     /// schwach referenziert wird – der 12-Stunden-Shutdown würde dann nicht mehr feuern.
     /// </summary>
     private static Timer? _shutdownTimer;
@@ -58,16 +58,16 @@ public static class Develop {
 
     /// <summary>
     /// Aktiviert detaillierte Log-Ausgaben während des Beenden-Vorgangs (SaveEnd-Pfad).
-    /// Nur wenn TRUE, werden Meldungen über <see cref="EndLog"/> in das Trace-Log geschrieben.
+    /// Nur wenn TRUE, werden Meldungen über EndLog in das Trace-Log geschrieben.
     /// </summary>
     public static bool ExtendedEndLog { get; set; }
 
     public static string MonitorMessage { get; set; } = "Monitor-Message";
 
     /// <summary>
-    /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in <see cref="StartService"/>.
-    /// Bleibt unveraendert (insb. mit Tausendertrennzeichen "."), waehrend <see cref="CultureInfo.CurrentCulture"/>
-    /// nach dem Override ein leeres <see cref="NumberFormatInfo.NumberGroupSeparator"/> hat.
+    /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in StartService.
+    /// Bleibt unveraendert (insb. mit Tausendertrennzeichen "."), waehrend CultureInfo.CurrentCulture
+    /// nach dem Override ein leeres NumberFormatInfo.NumberGroupSeparator hat.
     /// </summary>
     public static CultureInfo OriginCultureInfo { get; private set; } = new CultureInfo("de-DE");
 
@@ -339,7 +339,7 @@ public static class Develop {
 
     /// <summary>
     /// Schreibt eine detaillierte Log-Meldung in das Trace-Log, ABER nur wenn
-    /// <see cref="ExtendedEndLog"/> aktiviert ist. Gedacht für Diagnose des Beenden-Pfads.
+    /// ExtendedEndLog aktiviert ist. Gedacht für Diagnose des Beenden-Pfads.
     /// </summary>
     public static void EndLog(string message) {
         if (!ExtendedEndLog) { return; }

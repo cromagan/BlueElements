@@ -51,6 +51,9 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
 
     public static string ClassId => "TEXT";
 
+    /// <summary>
+    /// Ausrichtung des Textes: linksbündig, mittig oder rechtsbündig.
+    /// </summary>
     public Alignment Ausrichtung {
         get;
         set {
@@ -68,6 +71,9 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
+    /// <summary>
+    /// Aussehen des Rahmens hinter dem Text.
+    /// </summary>
     public PadStyles Style {
         get;
         set {
@@ -78,6 +84,9 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
         }
     } = PadStyles.Standard;
 
+    /// <summary>
+    /// Die Größe des Textes.
+    /// </summary>
     public float TextScale {
         get;
         set {
@@ -89,7 +98,9 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
         }
     } = 3.07f;
 
-    [Description("Text der angezeigt werden soll.<br>Alternativ kann ein (oder mehrere) Variablenname im Format ~Name~ angegeben werden.")]
+    /// <summary>
+    /// Der anzuzeigende Text. Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
+    /// </summary>
     public string TextValue {
         get;
         set {

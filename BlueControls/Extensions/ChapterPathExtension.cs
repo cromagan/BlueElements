@@ -6,7 +6,7 @@ namespace BlueControls;
 
 /// <content>
 /// Chapter-Pfad-Hilfsroutinen für Tabellen (Chapter-Spalten). Als
-/// Trennzeichen wird ausschließlich <see cref="RowCaptionTableElement.Kapiteltrenner"/>
+/// Trennzeichen wird ausschließlich RowCaptionTableElement.Kapiteltrenner
 /// ('\') verwendet.
 /// </content>
 public static partial class Extensions {
@@ -66,9 +66,9 @@ public static partial class Extensions {
     /// <summary>
     /// Erzeugt eine sortierfähige Repräsentation des Kapitel-Pfads, bei der
     /// die Hierarchie-Reihenfolge korrekt abgebildet wird. Der
-    /// <see cref="RowCaptionTableElement.Kapiteltrenner"/> ('\') wird durch
+    /// RowCaptionTableElement.Kapiteltrenner ('\') wird durch
     /// '/' (ASCII 47) ersetzt — ein Zeichen, das zwischen
-    /// <see cref="FirstSortChar"/> ('+', 43) und '0' (48) liegt.
+    /// FirstSortChar ('+', 43) und '0' (48) liegt.
     /// Dadurch sortieren Kind-Kapitel direkt nach ihrem Eltern-Kapitel und
     /// vor Präfix-Geschwistern (z. B. "Aktionen" &lt; "Aktionen\1" &lt; "AktionenGrundlagen").
     /// </summary>

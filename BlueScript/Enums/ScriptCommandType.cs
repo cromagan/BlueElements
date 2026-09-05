@@ -9,9 +9,9 @@ public enum ScriptCommandType {
     /// </summary>
     Standard = 0,
 
-    ///// <summary>
-    ///// Methoden, die längere Laufzeiten haben können. Evtl. Dateizugriffe. Aber autonome Abläufe, ohne den Bentzer zu stören.
-    ///// </summary>
+    /// <summary>
+    /// Methoden, die längere Laufzeiten haben können. Evtl. Dateizugriffe. Aber autonome Abläufe, ohne den Bentzer zu stören.
+    /// </summary>
     LongTime = 1,
 
     /// <summary>

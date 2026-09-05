@@ -28,7 +28,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     /// <summary>
     /// <c>true</c>, während OnGotFocus den Fokus absichtlich ans innere
     /// <c>_textBox</c> weiterreicht. Das dabei ausgelöste LostFocus wird in
-    /// <see cref="OnLostFocus" /> unterdrückt — sonst würde (z. B. beim
+    /// OnLostFocus unterdrückt — sonst würde (z. B. beim
     /// Übergang vom Dropdown in das Textfeld) die äußere TextBoxSuggestions
     /// vorzeitig ein LostFocus feuern und das gerade geöffnete Textfeld über
     /// die LostFocus-Kaskade sofort wieder verstecken.
@@ -491,8 +491,8 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     /// <summary>
     /// Erstellt die Menü-Einträge für die Vorschläge.
     /// Liefert null, wenn keine Vorschläge vorhanden sind oder diese als Chips angezeigt werden.
-    /// Bei <see cref="SuggestionPosition.ContextMenuOnly"/> werden die Einträge vom Kontextmenü der internen TextBox eingebunden.
-    /// Wird über den Hook <see cref="TextBox.AdditionalContextMenuItems"/> in das Kontextmenü der TextBox transferiert.
+    /// Bei SuggestionPosition.ContextMenuOnly werden die Einträge vom Kontextmenü der internen TextBox eingebunden.
+    /// Wird über den Hook TextBox.AdditionalContextMenuItems in das Kontextmenü der TextBox transferiert.
     /// </summary>
     private List<ListItem>? BuildSuggestionMenu(object? hotItem) {
         _ = hotItem;

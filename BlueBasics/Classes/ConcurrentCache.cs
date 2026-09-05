@@ -7,12 +7,12 @@ using System.Threading;
 namespace BlueBasics.Classes;
 
 /// <summary>
-/// Thread-sicherer Cache auf Basis einer <see cref="ConcurrentDictionary{TKey, TValue}" />,
+/// Thread-sicherer Cache auf Basis einer ConcurrentDictionary{TKey, TValue},
 /// der die Anzahl der Einträge auf ein konfigurierbares Maximum begrenzt.
 /// <para>
-/// Beim Entfernen oder Leeren von Einträgen werden Werte, die <see cref="IDisposable" />
+/// Beim Entfernen oder Leeren von Einträgen werden Werte, die IDisposable
 /// implementieren, automatisch verworfen. Jede Instanz registriert sich zusätzlich bei
-/// <see cref="RegisterCacheTrim" />, sodass globaler Memory-Druck zum
+/// RegisterCacheTrim, sodass globaler Memory-Druck zum
 /// automatischen Verkleinern des Caches führt.
 /// </para>
 /// </summary>
@@ -26,18 +26,18 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     private readonly ConcurrentDictionary<TKey, TValue> _dict;
 
     /// <summary>
-    /// Maximale Anzahl von Einträgen, ab der <see cref="Trim" /> Einträge entfernt.
+    /// Maximale Anzahl von Einträgen, ab der Trim Einträge entfernt.
     /// Wird zur Laufzeit nicht verändert.
     /// </summary>
     private readonly int _maxCacheSize;
 
     /// <summary>
-    /// Trim-Delegate, das bei <see cref="RegisterCacheTrim" /> angemeldet
-    /// wurde. In einem Feld gehalten, damit <see cref="Dispose" /> die exakt
+    /// Trim-Delegate, das bei RegisterCacheTrim angemeldet
+    /// wurde. In einem Feld gehalten, damit Dispose die exakt
     /// gleiche Instanz wieder abmelden kann (Method-Group-Erzeugung liefert
-    /// sonst jedes Mal ein neues Delegate). Zeigt auf <see cref="TrimToMax" />,
-    /// damit <see cref="TrimAllCaches" /> niemals eine
-    /// <see cref="ObjectDisposedException" /> auslöst, wenn ein Cache während
+    /// sonst jedes Mal ein neues Delegate). Zeigt auf TrimToMax,
+    /// damit TrimAllCaches niemals eine
+    /// ObjectDisposedException auslöst, wenn ein Cache während
     /// des Trimmens freigegeben wird.
     /// </summary>
     private readonly Action _trimAction;
@@ -60,7 +60,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     }
 
     /// <summary>
-    /// Erstellt einen neuen Cache mit dem angegebenen <see cref="IEqualityComparer{T}" />
+    /// Erstellt einen neuen Cache mit dem angegebenen IEqualityComparer{T}
     /// für <typeparamref name="TKey" />.
     /// </summary>
     /// <param name="comparer">Gleichheitsvergleich für die Schlüssel.</param>
@@ -82,7 +82,9 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
     #region Properties
 
-    /// <summary>Aktuelle Anzahl der Einträge im Cache.</summary>
+    /// <summary>
+    /// Aktuelle Anzahl der Einträge im Cache.
+    /// </summary>
     public int Count {
         get {
             ThrowIfDisposed();
@@ -91,14 +93,16 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     }
 
     /// <summary>
-    /// Gibt an, ob der Cache bereits über <see cref="Dispose" /> freigegeben wurde.
+    /// Gibt an, ob der Cache bereits über Dispose freigegeben wurde.
     /// Erlaubt sichere Lesezugriffe aus Consumern, die ihr eigenes Lifetime-Ende
     /// nicht synchron kontrollieren können — typischerweise <c>null</c>-Rückgaben
-    /// in Such-Properties statt <see cref="ObjectDisposedException" />.
+    /// in Such-Properties statt ObjectDisposedException.
     /// </summary>
     public bool IsDisposed => _isDisposedFlag != 0;
 
-    /// <summary>Sammlung aller aktuell im Cache enthaltenen Schlüssel.</summary>
+    /// <summary>
+    /// Sammlung aller aktuell im Cache enthaltenen Schlüssel.
+    /// </summary>
     public ICollection<TKey> Keys {
         get {
             ThrowIfDisposed();
@@ -106,7 +110,9 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
         }
     }
 
-    /// <summary>Sammlung aller aktuell im Cache enthaltenen Werte.</summary>
+    /// <summary>
+    /// Sammlung aller aktuell im Cache enthaltenen Werte.
+    /// </summary>
     public ICollection<TValue> Values {
         get {
             ThrowIfDisposed();
@@ -121,15 +127,15 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// <summary>
     /// Ruft den Wert zum angegebenen <paramref name="key" /> ab oder legt ihn fest.
     /// Beim Lesen eines nicht vorhandenen Schlüssels wird eine
-    /// <see cref="KeyNotFoundException" /> geworfen — für nulltoleranten Zugriff
-    /// <see cref="TryGetValue" /> verwenden.
+    /// KeyNotFoundException geworfen — für nulltoleranten Zugriff
+    /// TryGetValue verwenden.
     /// <para>
     /// Sowohl beim Lesen als auch beim Setzen wird <c>null</c> als Schlüssel
     /// abgelehnt; beim Setzen zusätzlich <c>null</c> als Wert
-    /// (<see cref="ArgumentNullException" />). Beim Überschreiben eines
+    /// (ArgumentNullException). Beim Überschreiben eines
     /// vorhandenen Eintrags wird der bisherige Wert — sofern er
-    /// <see cref="IDisposable" /> implementiert — verworfen. Die dafür genutzte
-    /// <see cref="ConcurrentDictionary{TKey, TValue}.TryUpdate" />-Schleife
+    /// IDisposable implementiert — verworfen. Die dafür genutzte
+    /// ConcurrentDictionary{TKey, TValue}.TryUpdate-Schleife
     /// garantiert, dass jeder Wert maximal einmal disposet wird (kein
     /// Doppel-Dispose bei konkurrierendem Schreiben).
     /// </para>
@@ -163,10 +169,10 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
     /// <summary>
     /// Entfernt alle aktuell vorhandenen Einträge. Werte, die
-    /// <see cref="IDisposable" /> implementieren, werden dabei verworfen.
+    /// IDisposable implementieren, werden dabei verworfen.
     /// </summary>
     /// <remarks>
-    /// Über <see cref="ConcurrentDictionary{TKey, TValue}.TryRemove(TKey, out TValue)" /> wird
+    /// Über ConcurrentDictionary{TKey, TValue}.TryRemove(TKey, out TValue) wird
     /// jeder Wert nur dann disposet, wenn er tatsächlich aus dem Cache entfernt
     /// wurde — so ist <c>Clear</c> sicher gegen konkurrierendes
     /// <c>TryRemove</c>/<c>Trim</c> auf anderen Threads (kein Doppel-Dispose).
@@ -176,7 +182,9 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
         ClearCore();
     }
 
-    /// <summary>Bestimmt, ob der angegebene Schlüssel im Cache enthalten ist.</summary>
+    /// <summary>
+    /// Bestimmt, ob der angegebene Schlüssel im Cache enthalten ist.
+    /// </summary>
     public bool ContainsKey(TKey key) {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(key);
@@ -186,7 +194,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// <summary>
     /// Gibt den Cache frei: Alle Einträge werden entfernt, disposable Werte
     /// werden verworfen und das Trim-Delegate wird bei
-    /// <see cref="UnregisterCacheTrim" /> abgemeldet. Mehrfaches Aufrufen
+    /// UnregisterCacheTrim abgemeldet. Mehrfaches Aufrufen
     /// ist sicher und hat ab dem zweiten Mal keinen Effekt.
     /// </summary>
     public void Dispose() {
@@ -202,18 +210,18 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// wird er über <paramref name="factory" /> erzeugt und gespeichert.
     /// <para>
     /// Die Factory darf nicht <c>null</c> zurückgeben — die Null-Toleranz wird
-    /// hier genauso durchgesetzt wie bei <see cref="TryAdd" /> und dem
-    /// <see cref="this[TKey]" />-Setter, sodass der Cache niemals null-Werte
+    /// hier genauso durchgesetzt wie bei TryAdd und dem
+    /// this[TKey]-Setter, sodass der Cache niemals null-Werte
     /// enthält.
     /// </para>
     /// <para>
     /// Melden zwei Threads gleichzeitig denselben Schlüssel an, kann die
     /// <paramref name="factory" /> auf mehreren Threads ausgeführt werden.
-    /// <see cref="ConcurrentDictionary{TKey, TValue}.GetOrAdd(TKey, Func{TKey, TValue})" />
+    /// ConcurrentDictionary{TKey, TValue}.GetOrAdd(TKey, Func{TKey, TValue})
     /// lieferte früher den "Verlierer"-Wert stillschweigend an den Aufrufer
     /// zurück, wodurch GDI-Resources (Pen/Brush/Font/Bitmap/GraphicsPath)
     /// geleakt sind. Diese Implementierung disposet den verworfenen Wert,
-    /// sofern er <see cref="IDisposable" /> ist, und liefert stattdessen den
+    /// sofern er IDisposable ist, und liefert stattdessen den
     /// im Cache gespeicherten Wert an alle Aufrufer zurück.
     /// </para>
     /// </summary>
@@ -238,7 +246,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     /// <summary>
     /// Verkleinert den Cache auf höchstens <paramref name="maxItems" /> Einträge.
     /// Überzählige Einträge werden entfernt; ihre Werte werden bei Bedarf verworfen
-    /// (<see cref="IDisposable" />).
+    /// (IDisposable).
     /// </summary>
     public void Trim(int maxItems) {
         ThrowIfDisposed();
@@ -247,7 +255,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
     /// <summary>
     /// Versucht, den Schlüssel/Wert hinzuzufügen. <c>null</c> als Wert oder
-    /// Schlüssel ist unzulässig (<see cref="ArgumentNullException" />).
+    /// Schlüssel ist unzulässig (ArgumentNullException).
     /// </summary>
     /// <returns><c>true</c>, wenn der Eintrag hinzugefügt wurde; <c>false</c>, wenn der Schlüssel bereits existiert.</returns>
     public bool TryAdd(TKey key, TValue value) {
@@ -257,7 +265,9 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
         return _dict.TryAdd(key, value);
     }
 
-    /// <summary>Versucht, den Wert zum angegebenen Schlüssel abzurufen.</summary>
+    /// <summary>
+    /// Versucht, den Wert zum angegebenen Schlüssel abzurufen.
+    /// </summary>
     public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value) {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(key);
@@ -266,7 +276,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
     /// <summary>
     /// Versucht, den Eintrag zu entfernen. Der Wert wird bei Erfolg zurückgegeben
-    /// und bei Bedarf verworfen (<see cref="IDisposable" />).
+    /// und bei Bedarf verworfen (IDisposable).
     /// </summary>
     public bool TryRemove(TKey key, [MaybeNullWhen(false)] out TValue value) {
         ThrowIfDisposed();
@@ -275,7 +285,7 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     }
 
     /// <summary>
-    /// Internes Clear ohne Dispose-Prüfung. Darf auch aus <see cref="Dispose" />
+    /// Internes Clear ohne Dispose-Prüfung. Darf auch aus Dispose
     /// heraus aufgerufen werden, nachdem das Dispose-Flag bereits gesetzt wurde.
     /// </summary>
     private void ClearCore() {
@@ -287,8 +297,8 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Wirft eine <see cref="ObjectDisposedException" />, wenn die Instanz bereits
-    /// über <see cref="Dispose" /> freigegeben wurde. Schutz vor
+    /// Wirft eine ObjectDisposedException, wenn die Instanz bereits
+    /// über Dispose freigegeben wurde. Schutz vor
     /// Use-After-Dispose — insbesondere vor dem stillen Hinzufügen von Einträgen,
     /// die nie wieder disposet würden (Memory-Leak).
     /// </summary>
@@ -296,12 +306,12 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
 
     /// <summary>
     /// Internes Trim ohne Dispose-Prüfung. Wird vom registrierten
-    /// <see cref="_trimAction" />-Delegate aus aufgerufen und muss daher auch
-    /// während eines konkurrierenden <see cref="Dispose" /> sicher bleiben —
-    /// eine <see cref="ObjectDisposedException" /> würde sonst die Iteration in
-    /// <see cref="TrimAllCaches" /> abbrechen und alle anderen Caches
+    /// _trimAction-Delegate aus aufgerufen und muss daher auch
+    /// während eines konkurrierenden Dispose sicher bleiben —
+    /// eine ObjectDisposedException würde sonst die Iteration in
+    /// TrimAllCaches abbrechen und alle anderen Caches
     /// ungetrimmt lassen. Doppel-Dispose ist ausgeschlossen, weil
-    /// <see cref="ConcurrentDictionary{TKey, TValue}.TryRemove(TKey, out TValue)" /> atomar ist.
+    /// ConcurrentDictionary{TKey, TValue}.TryRemove(TKey, out TValue) atomar ist.
     /// </summary>
     private void TrimCore(int maxItems) {
         var excess = _dict.Count - maxItems;
@@ -322,10 +332,10 @@ public sealed class ConcurrentCache<TKey, TValue> : IDisposableExtended where TK
     }
 
     /// <summary>
-    /// Trim-Einstiegspunkt für <see cref="TrimAllCaches" />. Ruft
-    /// <see cref="TrimCore" /> mit der konfigurierten <see cref="_maxCacheSize" />
-    /// auf. Bewusst ohne <see cref="ThrowIfDisposed" /> — siehe Dokumentation
-    /// von <see cref="TrimCore" />.
+    /// Trim-Einstiegspunkt für TrimAllCaches. Ruft
+    /// TrimCore mit der konfigurierten _maxCacheSize
+    /// auf. Bewusst ohne ThrowIfDisposed — siehe Dokumentation
+    /// von TrimCore.
     /// </summary>
     private void TrimToMax() => TrimCore(_maxCacheSize);
 

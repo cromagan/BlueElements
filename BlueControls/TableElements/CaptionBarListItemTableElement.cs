@@ -120,7 +120,7 @@ public sealed class CaptionBarListItemTableElement : TableElement {
     /// prüft Ansichtbearbeitung und Admin-Berechtigung, wählt die
     /// Anker-Spalte (geklickt oder Fallback erstes Arrangement-Element),
     /// sammelt Suggestions aus allen Ebenen und startet die Editierung
-    /// der Gruppen-Überschrift über <see cref="TableView.BeginEdit" />.
+    /// der Gruppen-Überschrift über TableView.BeginEdit.
     /// </summary>
     public override bool HandleDoubleClick(ColumnViewItem? mouseOverColumn, TableView tableView) {
         if (!(Arrangement?.Ansichtbearbeitung ?? false)) { return false; }
@@ -161,9 +161,9 @@ public sealed class CaptionBarListItemTableElement : TableElement {
 
     /// <summary>
     /// Übernimmt die neue Überschrift der Caption-Gruppe (Ebene
-    /// <see cref="Caption" />). Commit-Callback aus
-    /// <see cref="HandleDoubleClick" />, der an
-    /// <see cref="TableView.BeginEdit" /> übergeben wird.
+    /// Caption). Commit-Callback aus
+    /// HandleDoubleClick, der an
+    /// TableView.BeginEdit übergeben wird.
     /// </summary>
     private void ApplyCaptionGroup(TableView tableView, ColumnViewItem? column, string value) {
         if (column?.Column is not { IsDisposed: false } col) { return; }

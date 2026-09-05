@@ -107,7 +107,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     public virtual object? CreateNewItem() => null;
 
     /// <summary>
-    /// Wenn true, öffnet der Host-Dialog (z.B. <see cref="InputBoxEditor"/>)
+    /// Wenn true, öffnet der Host-Dialog (z.B. InputBoxEditor)
     /// das Fenster maximiert als normales Fenster. Große Editoren wie der
     /// Skript-Editor überschreiben dies mit true.
     /// </summary>

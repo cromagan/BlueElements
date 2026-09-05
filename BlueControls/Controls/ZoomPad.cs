@@ -170,10 +170,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     /// <summary>
-    /// Wenn <c>true</c>, kann <see cref="OffsetX"/> auch dann frei gesetzt werden,
-    /// wenn <see cref="ShowSliderX"/> <c>false</c> ist und der horizontale Slider
+    /// Wenn <c>true</c>, kann OffsetX auch dann frei gesetzt werden,
+    /// wenn ShowSliderX <c>false</c> ist und der horizontale Slider
     /// damit unsichtbar bleibt. Die Begrenzungen (SliderX.Minimum/Maximum) werden
-    /// in <see cref="UpdateSliderBounds"/> trotzdem berechnet, sodass der Offset
+    /// in UpdateSliderBounds trotzdem berechnet, sodass der Offset
     /// sauber geclampt wird. Wird z.B. von der TextBox für die Cursor-Verfolgung
     /// im Singleline-Modus genutzt.
     /// </summary>
@@ -459,10 +459,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     /// <summary>
     /// Wird aufgerufen, wenn sich die Sichtbarkeit eines Sliders (X oder Y)
-    /// während <see cref="UpdateSliderBounds"/> geändert hat. Abgeleitete
+    /// während UpdateSliderBounds geändert hat. Abgeleitete
     /// Klassen können hier abhängige Größen (z. B. View-Item-Caches)
     /// invalidieren, damit beim unmittelbar folgenden Neuaufbau von
-    /// <see cref="CanvasMaxBounds"/> die korrekte Zeichenbreite verwendet wird.
+    /// CanvasMaxBounds die korrekte Zeichenbreite verwendet wird.
     /// </summary>
     protected virtual void OnSliderVisibilityChanged() { }
 

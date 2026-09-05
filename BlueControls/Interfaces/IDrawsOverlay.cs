@@ -5,7 +5,7 @@ using BlueControls.EventArgs;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Implementiert zeichnende Overlays auf einem <see cref="Controls.ZoomPic" />.
+/// Implementiert zeichnende Overlays auf einem Controls.ZoomPic.
 /// </summary>
 public interface IDrawsOverlay {
 

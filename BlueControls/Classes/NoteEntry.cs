@@ -24,6 +24,9 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
 
     public string Description => "Notiz bearbeiten";
 
+    /// <summary>
+    /// Der Inhalt der Notiz.
+    /// </summary>
     public string Note {
         get;
         set {
@@ -34,6 +37,9 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Die Art der Notiz.
+    /// </summary>
     public NoteSymbols Symbol {
         get;
         set {

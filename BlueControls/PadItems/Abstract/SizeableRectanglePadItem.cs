@@ -46,7 +46,9 @@ public abstract class SizeableRectanglePadItem : PadItem {
 
     #region Properties
 
-    [Description("Die Breite des Objekts in mm.")]
+    /// <summary>
+    /// Die Breite des Objekts in mm.
+    /// </summary>
     public virtual float Breite {
         get => (float)Math.Round(PixelToMm(CanvasUsedArea.Width, CollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
@@ -57,6 +59,9 @@ public abstract class SizeableRectanglePadItem : PadItem {
         }
     }
 
+    /// <summary>
+    /// Dreht das Objekt. Die Angabe erfolgt in Grad.
+    /// </summary>
     public int Drehwinkel {
         get;
         set {
@@ -68,7 +73,9 @@ public abstract class SizeableRectanglePadItem : PadItem {
         }
     }
 
-    [Description("Die Höhe des Objekts in mm.")]
+    /// <summary>
+    /// Die Höhe des Objekts in mm.
+    /// </summary>
     public virtual float Höhe {
         get => (float)Math.Round(PixelToMm(CanvasUsedArea.Height, CollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {

@@ -60,6 +60,9 @@ public class LinePadItem : PadItem, IStyleableOne {
 
     public BlueFont? Font { get; set; }
 
+    /// <summary>
+    /// Der Verlauf der Linie.
+    /// </summary>
     public ConnectorStyle Linien_Verhalten {
         get;
         set {
@@ -71,6 +74,9 @@ public class LinePadItem : PadItem, IStyleableOne {
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
+    /// <summary>
+    /// Aussehen der Linie, z. B. Strichstärke und Muster.
+    /// </summary>
     public PadStyles Style {
         get;
         set {

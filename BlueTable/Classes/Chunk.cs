@@ -18,7 +18,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     /// </summary>
     public const int SkipIfUnusedMinutes = 5;
 
-    /// <summary>Synchronisierungsobjekt für thread-sichere Zugriffe auf FileInfo und LoadFailed.</summary>
+    /// <summary>
+    /// Synchronisierungsobjekt für thread-sichere Zugriffe auf FileInfo und LoadFailed.
+    /// </summary>
     private readonly object _lock = new();
 
     private volatile int _isDisposedFlag;
@@ -29,9 +31,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
 
     /// <summary>
     /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung
-    /// über <see cref="Get"/>. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// über Get. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// Das Added-Event wird nicht mehr aus dem Konstruktor gefeuert — das übernimmt
-    /// <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
+    /// LiveInstanceCache{T}.GetOrCreate.
     /// </summary>
     public Chunk(string fullPath) {
         Filename = string.IsNullOrEmpty(fullPath) ? string.Empty : fullPath.NormalizeFile();
@@ -59,7 +61,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         private set;
     }
 
-    /// <summary>Der vollständige Dateipfad dieser Chunk-Datei.</summary>
+    /// <summary>
+    /// Der vollständige Dateipfad dieser Chunk-Datei.
+    /// </summary>
     public string Filename { get; } = string.Empty;
 
     public bool IsDisposed => _isDisposedFlag == 1;
@@ -71,7 +75,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public string KeyName { get; }
 
     /// <summary>
-    /// UTC-Zeitpunkt der Konstruktion dieser Instanz. Wird von <see cref="IsChunkRecentlyUsed"/>
+    /// UTC-Zeitpunkt der Konstruktion dieser Instanz. Wird von IsChunkRecentlyUsed
     /// ausgewertet, um kürzlich erzeugte Chunks beim Update zu bevorzugen.
     /// </summary>
     public DateTime LastUsed { get; set; } = DateTime.UtcNow;
@@ -87,7 +91,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     /// <summary>
     /// Mindestgröße des Inhalts in Bytes.
     /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
-    /// Wird nach erfolgreichem Laden über <see cref="SetMinLen"/> gesetzt.
+    /// Wird nach erfolgreichem Laden über SetMinLen gesetzt.
     /// </summary>
     public int MinimumBytes { get; private set; }
 
@@ -96,7 +100,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     #region Methods
 
     /// <summary>
-    /// Factory für <see cref="LiveInstanceCache{T}.GetOrCreate{TDerived}" />.
+    /// Factory für LiveInstanceCache{T}.GetOrCreate{TDerived}.
     /// Erzeugt eine neue Chunk-Instanz für den angegebenen Dateipfad.
     /// </summary>
     public static Chunk Create(string key) => new(key);
@@ -112,7 +116,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
 
     /// <summary>
     /// Holt eine bestehende oder erzeugt eine neue Chunk-Instanz für den
-    /// angegebenen Dateipfad. Race-Safe über <see cref="LiveInstanceCache{T}.GetOrCreate"/>.
+    /// angegebenen Dateipfad. Race-Safe über LiveInstanceCache{T}.GetOrCreate.
     /// </summary>
     public static Chunk? Get(string fullPath) => GetOrCreate<Chunk>(fullPath);
 
@@ -131,7 +135,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     }
 
     /// <summary>
-    /// Prüft, ob der Chunk mit der angegebenen Datei innerhalb von <see cref="SkipIfUnusedMinutes"/>
+    /// Prüft, ob der Chunk mit der angegebenen Datei innerhalb von SkipIfUnusedMinutes
     /// erzeugt wurde. Wird in BeSureUpToDate aufgerufen, um Speicherzugriffe
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
@@ -209,7 +213,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         bytes.AddRange(b);
     }
 
-    /// <summary>Alle Spaltendaten außer Systeminfo</summary>
+    /// <summary>
+    /// Alle Spaltendaten außer Systeminfo
+    /// </summary>
     public static void SaveToByteList(List<byte> bytes, ColumnItem c) {
         var name = c.KeyName;
 
@@ -331,9 +337,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     /// <summary>
     /// Liest den logischen Dateiinhalt frisch vom Dateisystem (auf Disk gezippt,
     /// hier entpackt). Der Inhalt wird NICHT im Speicher gehalten.
-    /// Aktualisiert <see cref="LoadFailed"/>, <see cref="FileInfo"/> und
-    /// <see cref="MinimumBytes"/> als Seiteneffekt.
-    /// Schreiben erfolgt über <see cref="TableFile.Save(byte[])"/>.
+    /// Aktualisiert LoadFailed, FileInfo und
+    /// MinimumBytes als Seiteneffekt.
+    /// Schreiben erfolgt über TableFile.Save(byte[]).
     /// </summary>
     public byte[] LoadContent() {
         if (IsDisposed) { return []; }
@@ -387,7 +393,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     }
 
     /// <summary>
-    /// Disposed die Instanz und trägt sie aus dem <see cref="LiveInstances"/>-Register aus.
+    /// Disposed die Instanz und trägt sie aus dem LiveInstances-Register aus.
     /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
     /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
     /// </summary>

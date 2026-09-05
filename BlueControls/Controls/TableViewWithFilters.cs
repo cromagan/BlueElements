@@ -91,8 +91,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.Ansichtbearbeitung = value;
     }
 
+    /// <summary>
+    /// Welche Spaltenanordnung angezeigt werden soll
+    /// </summary>
     [DefaultValue("")]
-    [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
         get => TableInternal.Arrangement;
         set => TableInternal.Arrangement = value;

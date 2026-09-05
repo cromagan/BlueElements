@@ -3,9 +3,9 @@
 namespace BlueControls.Enums;
 
 /// <summary>
-/// Bestimmt das Verhalten des Dropdown-Bereichs einer <see cref="Controls.ComboBox"/>.
-/// Entspricht <see cref="System.Windows.Forms.ComboBoxStyle"/>, erweitert um
-/// <see cref="ClickableMenu"/> für reine Aktionsmenüs ohne Auswahlzustand.
+/// Bestimmt das Verhalten des Dropdown-Bereichs einer Controls.ComboBox.
+/// Entspricht System.Windows.Forms.ComboBoxStyle, erweitert um
+/// ClickableMenu für reine Aktionsmenüs ohne Auswahlzustand.
 /// </summary>
 public enum DropDownMode {
 
@@ -24,7 +24,7 @@ public enum DropDownMode {
     /// <summary>
     /// Die Dropdown-Liste verhält sich wie ein reines Aktionsmenü: Die Elemente
     /// sind klickbar, werden aber nie als ausgewählt markiert. In der Listbox
-    /// wird <see cref="CheckBehavior.NoSelection"/> verwendet.
+    /// wird CheckBehavior.NoSelection verwendet.
     /// </summary>
     ClickableMenu = 2
 }

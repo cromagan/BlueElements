@@ -51,20 +51,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? First { get; private set; }
 
-    ///// <summary>
-    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <returns></returns>
-    //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Table != Table) { Develop.DebugError("Parent-Tabellen unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugError("Spalte bereits vorhanden!"); }
-    //    base.GenerateAndAdd(column);
-    //}
-    //    /// <summary>
-    //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
-    //    /// </summary>
-    //    /// <returns></returns>
     public bool IsDisposed => _isDisposedFlag == 1;
 
     public ColumnItem? SysCellNote { get; private set; }

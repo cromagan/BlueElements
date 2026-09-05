@@ -78,7 +78,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     /// <summary>
     /// Optionaler Delegate für die Test-Ausführung des Skripts aus einem
-    /// Editor heraus. Wird vom Ersteller der <see cref="ScriptDescription"/>
+    /// Editor heraus. Wird vom Ersteller der ScriptDescription
     /// (z.B. einem PadItem) gesetzt, wenn das Skript mit spezifischen
     /// Eingangsvariablen und Methoden getestet werden soll.
     /// Parameter: Skripttext, Testmodus. Rückgabe: Feedback der Ausführung.

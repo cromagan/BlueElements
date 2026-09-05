@@ -16,13 +16,13 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     /// <summary>
     /// Base64-kodiertes PNG des aktuellen Bildes. Wird beim Setzen der
-    /// <see cref="BitmapValue" />-Property sofort erzeugt und beim Spiegeln
+    /// BitmapValue-Property sofort erzeugt und beim Spiegeln
     /// aktualisiert. Beim Parsen wird der Original-String unverändert
     /// übernommen, damit ein PNG-Roundtrip (decode → encode) keine
     /// anderen Bytes erzeugt — der GDI+-Encoder produziert nämlich nicht
     /// zwingend identische IDAT-Bytes. Ist das Feld leer, gibt es kein Bild.
-    /// Das eigentliche <see cref="_bitmap" /> wird erst bei Bedarf im
-    /// <see cref="BitmapValue" />-Getter dekodiert (Lazy Loading).
+    /// Das eigentliche _bitmap wird erst bei Bedarf im
+    /// BitmapValue-Getter dekodiert (Lazy Loading).
     /// </summary>
     private string _rawImageBase64 = string.Empty;
 
@@ -53,6 +53,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     public static string ClassId => "IMAGE";
 
+    /// <summary>
+    /// Legt fest, wie das Bild in den Rahmen passt.
+    /// </summary>
     public SizeModes Bild_Modus {
         get;
         set {
@@ -81,6 +84,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     public BlueFont? Font { get; set; }
 
+    /// <summary>
+    /// Wenn gewählt, wird der Hintergrund hinter dem Bild mit Weiß gefüllt, z. B. bei durchsichtigen Bildern.
+    /// </summary>
     public bool Hintergrund_Weiß_Füllen {
         get;
         set {
@@ -90,6 +96,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         }
     }
 
+    /// <summary>
+    /// Wenn gewählt, wird das Bild punkgenau und ohne Glättung angezeigt.
+    /// </summary>
     public bool PixelGenau {
         get;
         set {
@@ -99,7 +108,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         }
     }
 
-    [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
+    /// <summary>
+    /// Platzhalter für ein Bild, das beim Anzeigen automatisch eingesetzt wird. Beispiel: ~Bild~
+    /// </summary>
     public string Platzhalter_Für_Layout {
         get;
         set {
@@ -111,6 +122,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
+    /// <summary>
+    /// Aussehen des Rahmens um das Bild.
+    /// </summary>
     public PadStyles Style {
         get;
         set {
