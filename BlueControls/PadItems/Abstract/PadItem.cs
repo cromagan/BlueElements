@@ -8,6 +8,9 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.PadItems.Abstract;
 
+/// <summary>
+/// Basis für alle Elemente, die auf einer Seite platziert werden können.
+/// </summary>
 public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, IComparable, ISimpleEditor, IJsonParseable {
 
     #region Fields
@@ -21,14 +24,12 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     private RectangleF _canvasUsedArea;
 
     /// <summary>
-    /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
-    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// Fester Bezugspunkt, aus dem zusammen mit dem zweiten Punkt die Mitte des Objekts berechnet wird.
     /// </summary>
     private PointM? _jointReferenceFirst;
 
     /// <summary>
-    /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
-    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// Fester Bezugspunkt, aus dem zusammen mit dem ersten Punkt die Mitte des Objekts berechnet wird.
     /// </summary>
     private PointM? _jointReferenceSecond;
 
@@ -78,8 +79,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     } = true;
 
     /// <summary>
-    /// Gibt die aktuellen Koordinaten des Objektes zurück. Unabhängig von der aktuellen Ansicht.
-    /// Nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
+    /// Der Bereich, den das Objekt auf der Seite einnimmt, unabhängig von der aktuellen Ansicht.
+    /// Verbindungslinien zu anderen Objekten zählen nicht mit.
     /// </summary>
     /// <remarks></remarks>
     public RectangleF CanvasUsedArea {
@@ -93,8 +94,6 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
             return _canvasUsedArea;
         }
     }
-
-    public abstract string Description { get; }
 
     /// <summary>
     /// Gibt an, ob das Element interaktiv ist (auswählbar, verschiebbar, Kontextmenü).
@@ -111,8 +110,7 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     } = true;
 
     /// <summary>
-    /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
-    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// Die Mitte des Objekts, berechnet aus zwei festen Bezugspunkten.
     /// </summary>
     public PointM JointMiddle { get; }
 
@@ -127,8 +125,7 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Diese Punkte können vom Benutzer verschoben werden.
-    /// Zusätzlich werden diese Punkt auf Bewegungen getrackt und auch bei ToString gespeichert
+    /// Die verschiebbaren Punkte des Objekts. Ihre Position wird mitgespeichert.
     /// </summary>
     public ObservableCollection<PointM> MovablePoint { get; } = [];
 
@@ -212,8 +209,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Prüft, ob die angegebenen Koordinaten das Element berührt.
-    /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
+    /// Prüft, ob sich der angegebene Punkt auf dem Element befindet.
+    /// Der Zoomfaktor sorgt dafür, dass auch winzige Objekte wie Punkte oder Linien sicher getroffen werden.
     /// </summary>
     /// <remarks></remarks>
     public virtual bool CanvasContains(PointF value, float zoom) {
@@ -286,9 +283,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
-    /// Alle Elemente für dieses Menü müssen neu erzeugt werden
-    /// und werden bei nicht gebrauchen automatisch disposed
+    /// Liefert die Einstellungen des Elements für das Seitenmenü.
+    /// Alle Steuerlemente werden neu erzeugt und automatisch wieder freigegeben.
     /// </summary>
     /// <returns></returns>
     public virtual List<GenericControl> GetProperties(int widthOfControl) {
@@ -309,7 +305,7 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Wird für den Editor benötigt, um bei hinzufügen es für den Benutzer mittig zu Plazieren
+    /// Setzt die Startposition, damit ein neues Element mittig im Editor erscheint.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -347,9 +343,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Implementiert IJsonStringable.ParseableJson. Subklassen
-    /// überschreiben diese Methode, rufen <c>base.ParseableJson()</c> auf und
-    /// ergänzen ihre eigenen Keys.
+    /// Schreibt die Grunddaten des Elements zum Speichern.
+    /// Unterklassen rufen diese Methode auf und ergänzen ihre eigenen Daten.
     /// </summary>
     public virtual JsonObject ParseableJson() {
         var json = new JsonObject();
@@ -369,10 +364,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     public virtual void ParseFinishedJson(JsonObject parsed) { }
 
     /// <summary>
-    /// Default-Implementation für IJsonParseable. Subklassen
-    /// überschreiben diese Methode, lesen ihre eigenen Keys aus
-    /// <paramref name="json" /> und rufen am Ende <c>base.ParseJson(json)</c>
-    /// auf. So bleibt die Leseschicht spiegelbildlich zu ParseableJson.
+    /// Lädt die Grunddaten des Elements.
+    /// Unterklassen lesen zuerst ihre eigenen Daten und rufen am Ende diese Methode auf.
     /// </summary>
     public virtual void ParseJson(JsonObject json) {
         BeginInit();
@@ -578,11 +571,8 @@ public abstract class PadItem : ParseableItem, IReadableTextWithKey, IMoveable, 
     }
 
     /// <summary>
-    /// Invalidiert CanvasUsedArea und löst das Ereignis Changed aus.
-    /// Die Cache-Invalidierung passiert UNABHNGIG vom Suppress-Modus (siehe
-    /// ParseableItem.IsEventsSuppressed), damit nach einem Parse
-    /// kein veralteter Cache steht. Das eigentliche Event wird dagegen im
-    /// Suppress-Modus (z. B. whrend des Parsens) nicht gefeuert.
+    /// Setzt zwischengespeicherte Angaben zurück und meldet die Änderung.
+    /// Das Zurücksetzen passiert auch beim Laden, die Meldung dort jedoch nicht.
     /// </summary>
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _canvasUsedArea = default;

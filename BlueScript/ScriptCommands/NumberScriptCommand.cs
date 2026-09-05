@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.
+/// </summary>
 internal class NumberScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "number";
-    public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override string Syntax => "NumberScriptCommand(string, NaNValue)";

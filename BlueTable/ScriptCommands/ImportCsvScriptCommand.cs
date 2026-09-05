@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.
+/// </summary>
 internal class ImportCsvScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
-    public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "ImportCSV(CSVText, Separator);";
 

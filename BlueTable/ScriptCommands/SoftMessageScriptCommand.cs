@@ -4,6 +4,9 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.
+/// </summary>
 public class SoftMessageScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -11,8 +14,6 @@ public class SoftMessageScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [StringVal];
 
     public override string Command => "softmessage";
-
-    public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
 
     public override string Syntax => "SoftMessageScriptCommand(Text);";
 

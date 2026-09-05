@@ -2,6 +2,14 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Bei String:
+/// Sucht im ersten String nach dem zweiten String und gibt dessen Position zurück.
+/// Bei Listen:
+/// Sucht in der Liste den zweiten ScriptVariables.String.
+/// Allgemein:
+/// Wird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben.
+/// </summary>
 internal class IndexOfScriptCommand : ScriptCommand {
 
     #region Properties
@@ -9,8 +17,6 @@ internal class IndexOfScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable], BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
 
     public override string Command => "indexof";
-
-    public override string Description => "Bei String:\r\nSucht im ersten String nach dem zweiten String und gibt dessen Position zurück.\r\nBei Listen:\r\nSucht in der Liste den zweiten ScriptVariables.String.\r\nAllgemein:\r\nWird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

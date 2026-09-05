@@ -5,6 +5,13 @@ using System.Diagnostics;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Sucht eine Zeile mittels dem gegebenen FilterScriptCommand.
+/// Wird keine Zeile gefunden, wird eine neue Zeile erstellt.
+/// Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).
+/// Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.
+/// Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.
+/// </summary>
 public static class Row_Extension {
 
     #region Methods
@@ -25,12 +32,6 @@ public class RowScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [FloatVal, FilterVar];
 
     public override string Command => "row";
-
-    public override string Description => "Sucht eine Zeile mittels dem gegebenen FilterScriptCommand.\r\n" +
-                                              "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
-                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
-                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.\r\n" +
-        "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

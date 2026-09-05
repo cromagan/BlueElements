@@ -6,19 +6,20 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Öffnet ein Formular-Fenster.
+/// 1. Dateiname (StringScriptCommand) - Pfad zur Formular-Datei
+/// 2. Zeile (RowItem) - Darf Null sein (evtl. RowEmpty-Variable benutzen)
+/// 3. Modus
+/// 4. IsModal (Bool) - Ob das Fenster modal angezeigt werden soll
+/// 5. TopMost (Bool) - Ob das Fenster im Vordergrund bleiben soll
+/// </summary>
 public class ShowFormulaFormScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal, BoolVal, BoolVal];
     public override string Command => "showformulaform";
-
-    public override string Description => "Öffnet ein Formular-Fenster.\r\n" +
-        "  1. Dateiname (StringScriptCommand) - Pfad zur Formular-Datei\r\n" +
-        "  2. Zeile (RowItem) - Darf Null sein (evtl. RowEmpty-Variable benutzen)\r\n" +
-        "  3. Modus\r\n" +
-        "  4. IsModal (Bool) - Ob das Fenster modal angezeigt werden soll\r\n" +
-        "  5. TopMost (Bool) - Ob das Fenster im Vordergrund bleiben soll";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;

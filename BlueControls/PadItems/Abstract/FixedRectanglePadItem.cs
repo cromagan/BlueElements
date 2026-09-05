@@ -5,6 +5,9 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.PadItems.Abstract;
 
+/// <summary>
+/// Basis für Elemente mit fester Größe, die nur verschoben, nicht in der Größe verändert werden können.
+/// </summary>
 public abstract class FixedRectanglePadItem : PadItem {
 
     #region Fields
@@ -12,7 +15,7 @@ public abstract class FixedRectanglePadItem : PadItem {
     private readonly PointM _pl;
 
     /// <summary>
-    /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
+    /// Der Hauptpunkt links oben. Alle übrigen Punkte richten sich nach ihm.
     /// </summary>
     private readonly PointM _pLo;
 
@@ -29,7 +32,7 @@ public abstract class FixedRectanglePadItem : PadItem {
     private readonly PointM _pu;
 
     /// <summary>
-    /// Die fixe Größe in Pixel
+    /// Die feste Größe des Objekts.
     /// </summary>
     private SizeF _canvassize = SizeF.Empty;
 
@@ -85,7 +88,7 @@ public abstract class FixedRectanglePadItem : PadItem {
     }
 
     /// <summary>
-    /// Die fixe Größe in Pixel
+    /// Die feste Größe des Objekts in Pixeln.
     /// </summary>
     public SizeF CanvasSize {
         get => _canvassize;

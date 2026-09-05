@@ -7,6 +7,8 @@ namespace BlueControls.ControlStrategies;
 /// <summary>
 /// Strategie für Spalten, deren Werte sich automatisch durch Verschieben der
 /// Zeilen ergeben (z. B. SysRowSortIndex). Erzeugt kein Control.
+///
+/// Der Wert ergibt sich automatisch durch Verschieben der Zeilen, z. B. der Sortierindex.
 /// </summary>
 public class DragDropControlStrategy : ControlStrategy {
 
@@ -15,8 +17,6 @@ public class DragDropControlStrategy : ControlStrategy {
     public static string ClassId => "DragDrop";
 
     protected override System.Windows.Forms.Control? ControlCore => null;
-
-    public override string Description => "Der Wert ergibt sich automatisch durch Verschieben der Zeilen, z. B. der Sortierindex.";
 
     public override bool IsSpecial => true;
 

@@ -2,16 +2,17 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.
+/// Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.
+/// Beispiel: ExtractTags("Farbe: Blau", ":"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'
+/// </summary>
 internal class ExtractTagsScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], StringVal];
     public override string Command => "extracttags";
-
-    public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
-                                              "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
-                                          "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
 
     public override string Syntax => "ExtractTags(String, Delemiter);";
 

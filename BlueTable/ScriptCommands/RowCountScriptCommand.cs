@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Zählt die Zeilen, die mit dem gegebenen FilterScriptCommand gefunden werden.
+/// </summary>
 public class RowCountScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [FilterVar];
     public override string Command => "rowcount";
-    public override string Description => "Zählt die Zeilen, die mit dem gegebenen FilterScriptCommand gefunden werden.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

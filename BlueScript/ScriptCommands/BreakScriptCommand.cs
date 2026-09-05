@@ -2,6 +2,10 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Beendet eine Schleife oder Subroutine sofort.
+/// Kann auch nur innerhalb von diesen verwendet werden.
+/// </summary>
 public class BreakScriptCommand : ScriptCommand {
 
     #region Fields
@@ -13,7 +17,6 @@ public class BreakScriptCommand : ScriptCommand {
     #region Properties
 
     public override string Command => "break";
-    public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Special;
     public override string StartSequence => string.Empty;
 

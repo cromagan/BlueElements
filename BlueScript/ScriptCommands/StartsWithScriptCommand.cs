@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft, ob der StringScriptCommand mit einem der angegebenen Strings startet.
+/// </summary>
 internal class StartsWithScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public override string Command => "startswith";
-    public override string Description => "Prüft, ob der StringScriptCommand mit einem der angegebenen Strings startet.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;

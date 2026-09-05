@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Zeigt Informationen zur Tabelle an: Übersicht, Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Werte adressierter Zeilen.
+/// </summary>
 public class TableInfoCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-info";
-    public override string Description => "Tabellen: Zeigt Informationen zur Tabelle an: Übersicht, Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Werte adressierter Zeilen.";
     public override List<string> Flags => ["columnnames", "rowkeys", "row", "firstvalues", "rows"];
     public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--row + Zeilenadressierung [--max <anzahl>]]";
 

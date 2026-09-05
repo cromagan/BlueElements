@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Prüft, ob der Inhalt der Variable eine gültige Zahl ist.
+/// </summary>
 internal class IsNumeralScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, DoubleScriptVariable.ShortName_Plain]];
     public override string Command => "isnumeral";
-    public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override string Syntax => "isNumeral(Value)";

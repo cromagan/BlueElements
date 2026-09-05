@@ -5,6 +5,10 @@ using System.Diagnostics;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Ruft eine Subroutine auf.
+/// Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.
+/// </summary>
 internal class CallScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -12,9 +16,6 @@ internal class CallScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal];
 
     public override string Command => "call";
-
-    public override string Description => "Ruft eine Subroutine auf.\r\n" +
-        "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
 

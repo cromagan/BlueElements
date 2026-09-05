@@ -5,15 +5,16 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.
+/// Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.
+/// </summary>
 public class CallByFilenameScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "callbyfilename";
-
-    public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
-                                          "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
 

@@ -1,13 +1,17 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.ClassesStatic;
+
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Zeigt alle Befehle oder die Details eines Befehls an.
+/// </summary>
 public class HelpCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "help";
-    public override string Description => "Zeigt alle Befehle oder die Details eines Befehls an.";
     public override string Syntax => "bcr help [befehl]";
 
     #endregion
@@ -17,7 +21,7 @@ public class HelpCliCommand : CliCommand {
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount == 0) {
             foreach (var command in All) {
-                Console.Out.WriteLine(command.Command + ": " + command.Description);
+                Console.Out.WriteLine(command.Command + ": " + Generic.Summary(command.GetType()));
             }
 
             return 0;
@@ -32,7 +36,7 @@ public class HelpCliCommand : CliCommand {
 
         Console.Out.WriteLine("Befehl: " + cmd.Command);
         Console.Out.WriteLine("Syntax: " + cmd.Syntax);
-        Console.Out.WriteLine("Beschreibung: " + cmd.Description);
+        Console.Out.WriteLine("Beschreibung: " + Generic.Summary(cmd.GetType()));
 
         if (cmd.Flags.Count > 0) {
             Console.Out.WriteLine("Schalter: " + string.Join(", ", cmd.Flags.Select(f => "--" + f)));

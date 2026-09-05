@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Löscht alle adressierten Zeilen.
+/// </summary>
 public class TableDelRowCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-delrow";
-    public override string Description => "Tabellen: Löscht alle adressierten Zeilen.";
     public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion

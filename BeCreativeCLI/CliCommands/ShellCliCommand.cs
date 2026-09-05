@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Liest Befehle zeilenweise von der Konsole (oder einer Pipe). Geladene Dateien — aktuell Tabellen — bleiben in der Session offen: eine Fragment-Datei pro Tabelle statt pro Befehl.
+/// </summary>
 public class ShellCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "shell";
-    public override string Description => "Liest Befehle zeilenweise von der Konsole (oder einer Pipe). Geladene Dateien — aktuell Tabellen — bleiben in der Session offen: eine Fragment-Datei pro Tabelle statt pro Befehl.";
     public override string Syntax => "bcr shell";
 
     #endregion

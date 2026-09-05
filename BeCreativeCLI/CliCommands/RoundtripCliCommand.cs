@@ -13,7 +13,7 @@ namespace BeCreativeCLI.CliCommands;
 /// Roundtrip-Test: Lädt eine Datei, serialisiert sie in ihr Gegenstück-Format
 /// (altes Format &lt;-&gt; JSON), lädt das Ergebnis erneut und vergleicht die Bytes
 /// bit-genau mit dem Original. Die Ausgabe protokolliert jeden Schritt und
-/// codiert Steuerzeichen als Escapes — damit das Ergebnis verlustfrei kopierbar
+/// codiert Steuerzeichen als Escapes - damit das Ergebnis verlustfrei kopierbar
 /// ist und Abweichungen ohne GUI analysiert werden können.
 /// </summary>
 public class RoundtripCliCommand : CliCommand {
@@ -21,7 +21,6 @@ public class RoundtripCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "roundtrip";
-    public override string Description => "Roundtrip-Test: lädt eine Datei (Layout .cfo/.bcr oder Tabelle .bdb/.tblj/.mbdb/.mtblj), speichert sie ins Gegenstück-Format, lädt sie zurück und vergleicht bit-genau mit dem Original.";
     public override List<string> Flags => ["full"];
     public override string Syntax => "bcr roundtrip <datei> [--full]";
 

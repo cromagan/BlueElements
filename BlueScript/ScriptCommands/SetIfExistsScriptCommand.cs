@@ -3,13 +3,17 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.
+/// Dabei müssen die Datentypen übereinstimmen.
+/// Falls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.
+/// </summary>
 internal class SetIfExistsScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable, DoubleScriptVariable.ShortName_Variable, BoolScriptVariable.ShortName_Variable], [ScriptVariable.Any_Plain]];
     public override string Command => "setifexists";
-    public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "SetIfExistsScriptCommand(Variable, Werte, ...);";
 

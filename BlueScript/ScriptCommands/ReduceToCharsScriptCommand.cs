@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Entfernt aus dem Text alle Zeichen die nicht erlaubt sind
+/// </summary>
 internal class ReduceToCharsScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "reducetochars";
-    public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "ReduceToCharsScriptCommand(OriginalString, ErlaubteZeichenString)";

@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Zeigt die Werte einer Spalte an, optional begrenzt auf eine maximale Anzahl.
+/// </summary>
 public class TableColumnContentCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-columncontent";
-    public override string Description => "Tabellen: Zeigt die Werte einer Spalte an, optional begrenzt auf eine maximale Anzahl.";
     public override string Syntax => "bcr table-columncontent <tabelle> --column <spalte> [--max <anzahl>]";
 
     #endregion

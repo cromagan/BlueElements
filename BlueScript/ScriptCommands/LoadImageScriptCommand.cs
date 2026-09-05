@@ -2,13 +2,17 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt das angegebene Bild aus dem Dateisystem.
+/// Diese Routine wird keinen Fehler auslösen.
+/// Falls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.
+/// </summary>
 internal class LoadImageScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "loadimage";
-    public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;

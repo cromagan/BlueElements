@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Ersetzt einen ASCII-StringScriptCommand nach UTF8.
+/// </summary>
 internal class StringToUTF8ScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "stringtoutf8";
-    public override string Description => "Ersetzt einen ASCII-StringScriptCommand nach UTF8.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "StringToUTF8ScriptCommand(StringScriptCommand, IgnoreBRbool)";

@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Fügt am Ende jedes Listenobjekts einen Text hinzu.
+/// </summary>
 internal class AddSuffixScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addsuffix";
-    public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
     public override string Syntax => "AddSuffix(VariableListe, SuffixText)";
 
     #endregion

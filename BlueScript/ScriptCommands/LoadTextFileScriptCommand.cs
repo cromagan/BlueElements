@@ -6,6 +6,9 @@ using System.Text;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt die angegebene Textdatei aus dem Dateisystem.
+/// </summary>
 internal class LoadTextFileScriptCommand : ScriptCommand {
 
     #region Properties
@@ -13,7 +16,6 @@ internal class LoadTextFileScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "loadtextfile";
     public override List<string> Constants => ["UTF8", "WIN1252"];
-    public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

@@ -3,13 +3,22 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.
+/// 
+/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.
+/// 
+/// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
+/// Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.
+/// 
+/// Ähnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
+/// </summary>
 public class CellGetKeyScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
     public override string Command => "cellgetkey";
-    public override string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

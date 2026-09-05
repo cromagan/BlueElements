@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt den Wert als nicht editierbaren Text.
+/// </summary>
 public class TextControlStrategy : ControlStrategy {
 
     #region Fields
@@ -17,8 +20,6 @@ public class TextControlStrategy : ControlStrategy {
     #region Properties
 
     public static string ClassId => "Text";
-
-    public override string Description => "Zeigt den Wert als nicht editierbaren Text.";
 
     /// <summary>
     /// Symbol, das vor dem Text angezeigt wird.

@@ -4,6 +4,10 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Löscht die Zeile. Kann auch die eigene Zeile löschen, wenn das Skript ReadOnly ist.
+/// Gibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.
+/// </summary>
 public class RowDeleteScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -11,8 +15,6 @@ public class RowDeleteScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [RowVar];
 
     public override string Command => "rowdelete";
-
-    public override string Description => "Löscht die Zeile. Kann auch die eigene Zeile löschen, wenn das Skript ReadOnly ist.\r\nGibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

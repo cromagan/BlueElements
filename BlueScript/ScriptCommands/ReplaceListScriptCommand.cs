@@ -5,13 +5,15 @@ using System.Text.RegularExpressions;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.
+/// </summary>
 internal class ReplaceListScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public override string Command => "replacelist";
-    public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
     public override string Syntax => "ReplaceListScriptCommand(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
 
     #endregion

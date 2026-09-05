@@ -4,13 +4,14 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Stellt boolesche Werte (+, -, o/O) als Symbol und/oder Text dar.
+/// </summary>
 public class BoolRenderer : Renderer {
 
     #region Properties
 
     public static string ClassId => "Bool";
-
-    public override string Description => "Stellt boolesche Werte (+, -, o/O) als Symbol und/oder Text dar.";
 
     /// <summary>
     /// Symbol für den Zustand „Nein" (Standard: Kreuz).

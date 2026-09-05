@@ -2,6 +2,9 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt den absoluten Wert der Zahk zurück. Beispiel: abs(-20) ergibt 20. abs(20) ergibt ebenfalls 20.
+/// </summary>
 internal class AbsScriptCommand : ScriptCommand {
 
     #region Properties
@@ -9,8 +12,6 @@ internal class AbsScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [FloatVal];
 
     public override string Command => "abs";
-
-    public override string Description => "Gibt den absoluten Wert der Zahk zurück. Beispiel: abs(-20) ergibt 20. abs(20) ergibt ebenfalls 20.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

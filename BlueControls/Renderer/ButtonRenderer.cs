@@ -5,6 +5,10 @@ using Padding = System.Windows.Forms.Padding;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Stellt den Zelleninhalt als Schaltfläche dar.
+/// Ist ShowCellValue aktiv, wird der Zelltext unverändert angezeigt. Sonst wird der Inhalt als Ja/Nein-Wert (+, Wahr, True) interpretiert.
+/// </summary>
 public class ButtonRenderer : Renderer {
 
     #region Fields
@@ -16,8 +20,6 @@ public class ButtonRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "Button";
-
-    public override string Description => "Stellt den Zelleninhalt als Schaltfläche dar.\r\nIst ShowCellValue aktiv, wird der Zelltext unverändert angezeigt. Sonst wird der Inhalt als Ja/Nein-Wert (+, Wahr, True) interpretiert.";
 
     /// <summary>
     /// Wenn gewählt, wird der Inhalt der Zelle unverändert als Text angezeigt.

@@ -6,6 +6,9 @@ using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.
+/// </summary>
 public class ComboBoxControlStrategy : ControlStrategy, IHasColumn {
 
     #region Fields
@@ -23,7 +26,6 @@ public class ComboBoxControlStrategy : ControlStrategy, IHasColumn {
     /// </summary>
     public ColumnItem? Column { get; set; }
 
-    public override string Description => "Textfeld mit Dropdown-Knopf für feste Vorgaben und freie Eingabe.";
     public override string KeyName => ClassId;
 
     public override bool SupportsSuggestions => true;

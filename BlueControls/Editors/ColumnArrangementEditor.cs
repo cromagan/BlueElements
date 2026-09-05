@@ -62,8 +62,6 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
         set { if (_cvc is { } cvc) { cvc.ColumnHeaderMode = value; WriteBack(); } }
     }
 
-    public string Description => string.Empty;
-
     public Type? EditorFor => typeof(ColumnViewCollection);
 
     /// <summary>

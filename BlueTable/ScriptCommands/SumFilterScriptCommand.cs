@@ -4,13 +4,18 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt eine andere Tabelle (die mit den Filtern definiert wurde)
+/// und gibt aus der angegebenen Spalte alle Einträge summiert zurück.
+/// Dabei wird der FilterScriptCommand benutzt.
+/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// </summary>
 public class SumFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FilterVar];
     public override string Command => "sumfilter";
-    public override string Description => "Lädt eine andere Tabelle (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der FilterScriptCommand benutzt.\rEin FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

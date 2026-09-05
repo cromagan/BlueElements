@@ -2,15 +2,16 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.
+/// Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert
+/// </summary>
 internal class CompareScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [BoolVal, BoolVal, [StringScriptVariable.ShortName_Plain, DoubleScriptVariable.ShortName_Plain, BoolScriptVariable.ShortName_Plain]];
     public override string Command => "compare";
-
-    public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
-                                           "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinTwice;
     public override bool MustUseReturnValue => true;

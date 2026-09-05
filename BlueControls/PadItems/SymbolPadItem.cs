@@ -5,6 +5,9 @@ using BlueControls.PadItems.Abstract;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Ein Symbol in wählbarer Form und Farbe, zum Beispiel ein Pfeil.
+/// </summary>
 public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
 
     #region Constructors
@@ -28,8 +31,6 @@ public class SymbolPadItem : SizeableRectanglePadItem, IStyleableOne {
     #region Properties
 
     public static string ClassId => "Symbol";
-
-    public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 

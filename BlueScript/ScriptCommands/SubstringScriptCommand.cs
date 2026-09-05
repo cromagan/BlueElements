@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring("Hallo", 2,2) gibt ll zurück.
+/// </summary>
 internal class SubstringScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FloatVal, FloatVal];
     public override string Command => "substring";
-    public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "SubstringScriptCommand(StringScriptCommand, Start, Anzahl)";

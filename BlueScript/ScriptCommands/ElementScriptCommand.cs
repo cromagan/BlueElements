@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.
+/// </summary>
 internal class ElementScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar, FloatVal];
     public override string Command => "element";
-    public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "Element(VariableListe, Indexnummer)";

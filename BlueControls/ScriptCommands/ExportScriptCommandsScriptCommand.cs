@@ -8,6 +8,9 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Exportiert die Tabelle im angegeben Format.
+/// </summary>
 internal class ExportScriptCommandsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -17,7 +20,6 @@ internal class ExportScriptCommandsScriptCommand : TableGenericScriptCommand {
     public override string Command => "export";
 
     public override List<string> Constants => ["CSV"];
-    public override string Description => "Exportiert die Tabelle im angegeben Format.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

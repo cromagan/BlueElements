@@ -5,13 +5,16 @@ using System.Net.NetworkInformation;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.
+/// Tritt ein Fehler auf, für 9999 zurück gegeben.
+/// </summary>
 internal class PingScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "ping";
-    public override string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

@@ -4,13 +4,15 @@ using static BlueScript.ScriptVariables.AiScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Erzeugt aus einem Text-Prompt ein Bild über die KI und gibt es als Bitmap zurück. Nutzt den OpenAI-kompatiblen Image-Generation-Endpunkt (/images/generations). Das dritte Argument ist der Bild-Modellname (z. B. dall-e-3, dall-e-2 oder einen beim Anbieter verfügbaren Bild-Modell).
+/// </summary>
 internal class GenerateAiBmpScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [AiVal, StringVal, StringVal];
     public override string Command => "generateaibmp";
-    public override string Description => "Erzeugt aus einem Text-Prompt ein Bild über die KI und gibt es als Bitmap zurück. Nutzt den OpenAI-kompatiblen Image-Generation-Endpunkt (/images/generations). Das dritte Argument ist der Bild-Modellname (z. B. dall-e-3, dall-e-2 oder einen beim Anbieter verfügbaren Bild-Modell).";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;

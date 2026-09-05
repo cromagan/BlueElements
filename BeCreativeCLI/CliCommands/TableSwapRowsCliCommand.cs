@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Vertauscht die Positionen zweier Zeilen durch Tausch der Werte der Systemspalte SYS_ROWSORTINDEX (benutzerdefinierte Sortierung muss aktiv sein).
+/// </summary>
 public class TableSwapRowsCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-swaprows";
-    public override string Description => "Tabellen: Vertauscht die Positionen zweier Zeilen durch Tausch der Werte der Systemspalte SYS_ROWSORTINDEX (benutzerdefinierte Sortierung muss aktiv sein).";
     public override string Syntax => "bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>";
 
     #endregion

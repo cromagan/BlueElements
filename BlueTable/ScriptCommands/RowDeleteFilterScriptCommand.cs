@@ -4,6 +4,10 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Löscht die gefundenen Zeilen.
+/// Gibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.
+/// </summary>
 public class RowDeleteFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -11,8 +15,6 @@ public class RowDeleteFilterScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [FilterVar];
 
     public override string Command => "rowdeletefilter";
-
-    public override string Description => "Löscht die gefundenen Zeilen.\r\nGibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

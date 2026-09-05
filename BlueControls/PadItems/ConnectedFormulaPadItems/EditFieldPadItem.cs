@@ -8,8 +8,7 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeut ein FlexiControllForCell
-/// Standard-Bearbeitungs-Feld
+/// Ein Eingabefeld, in dem der Benutzer den Wert einer Zelle bearbeiten kann.
 /// </summary>
 public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
@@ -124,9 +123,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     } = TextBoxControlStrategy.ClassId;
 
     /// <summary>
-    /// Parameter der strategie-spezifischen Werte der ControlStrategie
-    /// (z. B. die Spaltenköpfe der Tabellen-Strategie und den Rahmen) als Json —
-    /// analog zu RendererSettings beim Renderer.
+    /// Weitere Einstellungen des Eingabefeldes.
     /// </summary>
     public JsonObject ControlStrategyParameter {
         get;
@@ -138,7 +135,6 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     } = new();
 
-    public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;
@@ -148,8 +144,7 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     #region Methods
 
     /// <summary>
-    /// Alle Strategien, die zur Spalten-Konfiguration (Text-Eingabe und/oder
-    /// Auswahlliste) passen.
+    /// Alle Eingabefeld-Arten, die zur gewählten Spalte passen — etwa Texteingabe oder Auswahlliste.
     /// </summary>
     public static List<ListItem> GetAllowedControlStrategys(bool textEditable, bool mayHaveDropdownItems) {
         var l = new List<ListItem>();
@@ -336,9 +331,8 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     }
 
     /// <summary>
-    /// Liefert die Instanz zur aktuellen ControlStrategie, deren Optionen im
-    /// Seitenmenü angezeigt werden. Änderungen an den Strategy-Werten werden
-    /// sofort übernommen.
+    /// Liefert die Einstellungen des aktuellen Eingabefeldes für das Seitenmenü.
+    /// Änderungen werden sofort übernommen.
     /// </summary>
     private ControlStrategies.ControlStrategy GetOrCreateStrategyOptions() {
         if (_strategyOptions is { IsDisposed: false } s && s.KeyName == ControlStrategy) { return _strategyOptions; }

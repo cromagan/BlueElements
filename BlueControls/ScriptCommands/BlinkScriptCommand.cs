@@ -8,6 +8,12 @@ using System.Windows.Forms;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lässt die Zelle (Spalte in Zeile) in allen sichtbaren Tabellen- und Formular-Ansichten dreimal in der Farbe aufblinken.
+/// Dient dazu, Änderungen eines Skriptes sichtbar zu machen.
+/// Die Tabelle wird aus der Zeile ermittelt.
+/// Farbe als Hex (#RRGGBB).
+/// </summary>
 public class BlinkScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -15,8 +21,6 @@ public class BlinkScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
 
     public override string Command => "blink";
-
-    public override string Description => "Lässt die Zelle (Spalte in Zeile) in allen sichtbaren Tabellen- und Formular-Ansichten dreimal in der Farbe aufblinken.\r\nDient dazu, Änderungen eines Skriptes sichtbar zu machen.\r\nDie Tabelle wird aus der Zeile ermittelt.\r\nFarbe als Hex (#RRGGBB).";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Standard;
 

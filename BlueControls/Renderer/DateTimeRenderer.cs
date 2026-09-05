@@ -5,6 +5,9 @@ using System.Globalization;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Kann Uhrzeit/Datumsangaben verändert anzeigen.
+/// </summary>
 public class DateTimeRenderer : Renderer {
 
     #region Fields
@@ -19,8 +22,6 @@ public class DateTimeRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "DateTime";
-
-    public override string Description => "Kann Uhrzeit/Datumsangaben verändert anzeigen.";
 
     /// <summary>
     /// Legt fest, wie Datum und Uhrzeit angezeigt werden.

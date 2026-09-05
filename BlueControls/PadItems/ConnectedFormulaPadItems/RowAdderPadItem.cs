@@ -10,7 +10,8 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeugt eine Liste mit Zeilen, die eine andere Tabelle befüllen können.
+/// Zeigt Zeilen einer zweiten Tabelle an, die zur empfangenen Zeile gehören.
+/// Neue Zeilen werden dort über Skripte angelegt und über eine Kennung dauerhaft mit der empfangenen Zeile verknüpft.
 /// </summary>
 public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable, ISimpleEditor {
 
@@ -62,11 +63,6 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
-                                          "<b>Aus der eingehenden Zeile (Referenz-Zeile)</b> wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangstabelle benutzt.\r\n" +
-                                            "Diese ID wird auch als Ausgangsfilter weitergegeben.\r\n" +
-                                            "<b>In die Ausgangs-Tabelle</b> werden durch Skripte gesteuert neue Zeilen angelegt.";
-
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
     /// Dadurch können verschiedene Datensätze gespeichert werden.
@@ -115,10 +111,7 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     public override bool MustBeInDrawingArea => true;
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Tabelle.
-    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
-    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
+    /// Die Spalte in der Zieltabelle, in der die automatisch erzeugte Kennung des gewählten Eintrags gespeichert wird.
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
@@ -130,9 +123,7 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     }
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Tabelle.
-    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
-    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// Der Name der Spalte in der Zieltabelle, in der die automatisch erzeugte Kennung des gewählten Eintrags gespeichert wird.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     public string OriginIDColumnKey {
@@ -147,7 +138,8 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     } = string.Empty;
 
     /// <summary>
-    /// Skript, das die Auswahlliste (Menü) erzeugt, die dem User angezeigt wird. Aus der eingehenden Zeile und Variablen werden Einträge generiert, die bei Auswahl neue Zeilen in der Zieltabelle anlegen.
+    /// Das Skript, das die Auswahlliste erzeugt.
+    /// Jeder Eintrag legt bei Auswahl eine neue Zeile in der Zieltabelle an.
     /// </summary>
     public string Script {
         get;
@@ -240,7 +232,7 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     }
 
     /// <summary>
-    /// Internes Skript
+    /// Öffnet den Skript-Editor zum Bearbeiten des Skripts.
     /// </summary>
     public void OpenScriptEditor() {
         var f = _button?.ParentForm;
@@ -370,9 +362,8 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     }
 
     /// <summary>
-    /// Führt das Skript für den Testmodus im Editor aus. Für den Test wird eine
-    /// Eingangs-Zeile benötigt, aus der die Entity-ID generiert werden kann.
-    /// RowAdder verlangt zwingend genau eine Eingangs-Zeile (InputMustBeOneRow).
+    /// Führt das Skript für den Testmodus im Editor aus.
+    /// Für den Test wird eine Eingangs-Zeile benötigt, aus der die Kennung erzeugt werden kann.
     /// </summary>
     private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
         var row = TableInput?.Row.FirstOrDefault();

@@ -7,6 +7,8 @@ namespace BlueControls.ControlStrategies;
 /// <summary>
 /// Strategie für „Spalte nicht benutzer-editierbar": erzeugt kein Control
 /// und kann weder Text noch Vorschläge.
+///
+/// Deaktiviert die Bearbeitung: Der Wert kann vom Benutzer nicht geändert werden.
 /// </summary>
 public class NoneControlStrategy : ControlStrategy {
 
@@ -14,7 +16,6 @@ public class NoneControlStrategy : ControlStrategy {
 
     public static string ClassId => "None";
 
-    public override string Description => "Deaktiviert die Bearbeitung: Der Wert kann vom Benutzer nicht geändert werden.";
     public override string KeyName => ClassId;
     public override string NotEditableReason => "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
     public override bool SupportsValueChange => false;

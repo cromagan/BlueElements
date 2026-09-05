@@ -6,6 +6,9 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Speichert den Text im Clipboard.
+/// </summary>
 internal class SetClipboardScriptCommand : ScriptCommand {
 
     #region Properties
@@ -13,7 +16,6 @@ internal class SetClipboardScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal];
 
     public override string Command => "setclipboard";
-    public override string Description => "Speichert den Text im Clipboard.";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
 

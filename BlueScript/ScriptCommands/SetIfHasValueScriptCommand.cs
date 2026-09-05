@@ -2,13 +2,19 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Diese Routine setzt den ersten Wert, der keinen Fehler verursacht und einen Wert enthält in die erste Variable.
+/// Dabei müssen die Datentypen übereinstimmen.
+/// Falls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.
+/// Als 'kein Wert' wird bei Zahlen ebenfalls 0 gewertet.
+/// Listen, die einen Eintrag haben (auch wenn dessen Wert leer ist), zählt nicht als kein Eintrag.
+/// </summary>
 internal class SetIfHasValueScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable, DoubleScriptVariable.ShortName_Variable, BoolScriptVariable.ShortName_Variable], [ScriptVariable.Any_Plain]];
     public override string Command => "setifhasvalue";
-    public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht und einen Wert enthält in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.\r\nAls 'kein Wert' wird bei Zahlen ebenfalls 0 gewertet.\r\nListen, die einen Eintrag haben (auch wenn dessen Wert leer ist), zählt nicht als kein Eintrag.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "SetIfHasValueScriptCommand(Variable, Werte, ...);";
 

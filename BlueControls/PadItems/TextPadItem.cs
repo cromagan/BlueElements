@@ -9,18 +9,20 @@ using System.Globalization;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Ein Text, der auf dem Formular angezeigt wird. Platzhalter wie ~Name~ werden beim Anzeigen mit Werten gefüllt.
+/// </summary>
 public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleableOne, ISupportsTextScale {
 
     #region Fields
 
     /// <summary>
-    /// Kopie von _text_original - aber mit evtl. ersetzten Variablen
+    /// Der Text mit den bereits eingesetzten Werten der Platzhalter.
     /// </summary>
     private string _textReplaced;
 
     /// <summary>
-    /// Dieses Element ist nur temporär und ist der tatsächlich angezeigte Text - mit Bildern, verschieden Größen, etc.
-    /// Wird immer von _text_replaced abgeleitet.
+    /// Der fertig aufbereitete Text, wie er tatsächlich angezeigt wird — wird bei jeder Änderung neu erzeugt.
     /// </summary>
     private ExtText? _txt;
 
@@ -64,8 +66,6 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
             OnPropertyChanged();
         }
     } = Alignment.Top_Left;
-
-    public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 
@@ -228,7 +228,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
     public override string ReadableText() => "Text";
 
     /// <summary>
-    /// Löst die angegebene Variable in _text_replaced auf, falls diese (noch) vorhanden ist.
+    /// Setzt den aktuellen Wert der Variablen in den Text ein, sofern er dort vorkommt.
     /// </summary>
     /// <param name="variable"></param>
     /// <returns></returns>

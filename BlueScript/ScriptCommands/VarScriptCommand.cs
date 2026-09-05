@@ -2,6 +2,9 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Erstellt eine neue Variable, der Typ wird automatisch bestimmt.
+/// </summary>
 internal class VarScriptCommand : ScriptCommand {
 
     #region Fields
@@ -14,7 +17,6 @@ internal class VarScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [[ScriptVariable.Any_Plain]];
     public override string Command => "var";
-    public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
     public override string StartSequence => string.Empty;
     public override string Syntax => "var VariablenName = Wert;";
 

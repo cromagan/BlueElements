@@ -3,13 +3,16 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt den Wert einer Zelle zurück
+/// Ähnlicher Befehl: Lookup
+/// </summary>
 public class CellGetRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
-    public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

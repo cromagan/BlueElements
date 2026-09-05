@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Verschlüsselt einen Text.
+/// </summary>
 internal class EncryptScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "encrypt";
-    public override string Description => "Verschlüsselt einen Text.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "Encrypt(OriginalString, Schlüssel)";

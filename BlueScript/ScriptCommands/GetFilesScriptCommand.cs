@@ -4,13 +4,15 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt alle Dateien im angegebenen Verzeichnis zurück - ohne die Unterverzeichnisse. Komplett, mit Pfad und Suffix. Pfad muss mit \ enden. Suffix im Format *.png
+/// </summary>
 internal class GetFilesScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "getfiles";
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück - ohne die Unterverzeichnisse. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;

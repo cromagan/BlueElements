@@ -5,11 +5,9 @@ using BlueControls.Controls;
 namespace BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 
 /// <summary>
-/// Standard für Objekte, die einen Tabellen/Zeilenbezug haben.
-/// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
-/// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
+/// Basis für Formularelemente, die Daten von anderen Elementen empfangen und an diese weitergeben.
+/// Nur Registerkarten mit einem solchen Element werden angezeigt.
 /// </summary>
-
 public abstract class ReciverSenderPadItem : ReciverPadItem {
 
     #region Fields
@@ -273,11 +271,8 @@ public abstract class ReciverSenderPadItem : ReciverPadItem {
     }
 
     /// <summary>
-    /// Ereignisgesteuerter Retry: Wurde die Ausgangstabelle beim ersten
-    /// Zugriff nicht gefunden (z. B. weil sie noch nicht geladen war),
-    /// wird hier auf neu hinzugefügte Tabellen reagiert. Stimmt KeyName
-    /// oder Dateipfad überein, wird die Property invalidiert und beim
-    /// nächsten Zugriff neu geladen.
+    /// Wird ausgelöst, wenn eine neue Tabelle hinzugefügt wurde.
+    /// Passt Name oder Dateipfad zur gesuchten Ausgangstabelle, wird der Zugriff erneut versucht.
     /// </summary>
     private void Table_Added(object? sender, LiveInstanceEventArgs<Table> e) {
         if (IsDisposed) { return; }

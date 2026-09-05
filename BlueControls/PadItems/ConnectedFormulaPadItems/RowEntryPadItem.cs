@@ -6,9 +6,8 @@ using BlueScript.ScriptVariables;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Dieses Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.
-/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
-/// Unsichtbares Element, wird nicht angezeigt.
+/// Unsichtbares Hilfselement, das in jedem Formular vorhanden ist und die aktuelle Zeile aufnimmt.
+/// Es wird nur vom System befüllt.
 /// </summary>
 public class RowEntryPadItem : ReciverSenderPadItem, IReadableText, IHasFieldVariable {
 
@@ -25,8 +24,6 @@ public class RowEntryPadItem : ReciverSenderPadItem, IReadableText, IHasFieldVar
     public static string ClassId => "FI-RowEntryElement";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None;
-
-    public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
 
     public string FieldName => "Field_EntryRow";
 

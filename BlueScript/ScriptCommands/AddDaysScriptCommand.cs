@@ -4,6 +4,12 @@ using System.Globalization;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Fügt dem Datum die angegeben Anzahl Tage hinzu.
+/// Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.
+/// Der Rückgabwert als String und wird mit 'Format' festgelegt.
+/// Beispiel: dd.MM.yyyy HH:mm:ss.fff
+/// </summary>
 internal class AddDaysScriptCommand : ScriptCommand {
 
     #region Properties
@@ -11,7 +17,6 @@ internal class AddDaysScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, FloatVal, StringVal];
     public override string Command => "adddays";
     public override List<string> Constants => [.. DateTimeFormats];
-    public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu.\r\nDabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.\r\nDer Rückgabwert als String und wird mit 'Format' festgelegt.\r\nBeispiel: dd.MM.yyyy HH:mm:ss.fff";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Variable;
     public override string Syntax => "AddDays(DateTimeString, Days, Format)";

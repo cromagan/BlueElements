@@ -5,6 +5,9 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.PadItems.Abstract;
 
+/// <summary>
+/// Basis für Elemente, die in der Größe verändert und gedreht werden können.
+/// </summary>
 public abstract class SizeableRectanglePadItem : PadItem {
 
     #region Constructors

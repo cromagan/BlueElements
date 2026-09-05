@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt den Wert als fette Beschriftung in einem Gruppen-Rahmen ohne Bearbeitung.
+/// </summary>
 public class CaptionControlStrategy : ControlStrategy {
 
     #region Fields
@@ -16,7 +19,6 @@ public class CaptionControlStrategy : ControlStrategy {
 
     public static string ClassId => "Caption";
 
-    public override string Description => "Zeigt den Wert als fette Beschriftung in einem Gruppen-Rahmen ohne Bearbeitung.";
     public override bool IsSpecial => true;
     public override string KeyName => ClassId;
     protected override System.Windows.Forms.Control? ControlCore => _control;

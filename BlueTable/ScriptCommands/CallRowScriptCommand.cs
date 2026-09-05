@@ -3,17 +3,18 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Führt das Skript bei der angegebenen Zeile aus.
+/// Wenn die Zeile Null ist, wird kein Fehler ausgegeben.
+/// Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.
+/// Kein Zugriff auf auf Tabellen-Variablen!
+/// </summary>
 public class CallRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
     public override string Command => "callrow";
-
-    public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
-            "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
-        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-        "Kein Zugriff auf auf Tabellen-Variablen!";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
 

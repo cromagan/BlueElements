@@ -8,7 +8,7 @@ namespace BlueControls.ControlStrategies;
 /// <summary>
 /// Zeigt nichts an: Ein einfacher Klick in die Zelle setzt den nächsten der
 /// auswählbaren Werte der Spalte ein (Dropdown-Items und ggf. die Werte der
-/// anderen Zellen). Nach dem letzten Wert folgt wieder der erste — bei
+/// anderen Zellen). Nach dem letzten Wert folgt wieder der erste - bei
 /// MinTextLength 0 dazwischen ein Leerwert.
 /// </summary>
 public class CycleValueControlStrategy : ControlStrategy, IHasColumn {
@@ -21,8 +21,6 @@ public class CycleValueControlStrategy : ControlStrategy, IHasColumn {
     /// Die Spalte, zu der das Control gehört.
     /// </summary>
     public ColumnItem? Column { get; set; }
-
-    public override string Description => "Zeigt nichts an: Ein Klick in die Zelle setzt den nächsten der auswählbaren Werte ein.";
 
     public override bool IsInstantAction => true;
 

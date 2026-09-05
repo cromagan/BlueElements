@@ -6,13 +6,15 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Öffent einen neuen Tab in allen TableViews.
+/// </summary>
 internal class OpenTabScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar];
     public override string Command => "opentab";
-    public override string Description => "Öffent einen neuen Tab in allen TableViews.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
     public override string Syntax => "OpenTabScriptCommand(Table);";
 

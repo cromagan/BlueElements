@@ -2,12 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.
+/// Die Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.
+/// </summary>
 internal class DoScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override string Command => "do";
-    public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Do { Break; }";

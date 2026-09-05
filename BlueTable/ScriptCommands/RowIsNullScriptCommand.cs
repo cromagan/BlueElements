@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft, ob die übergebene Zeile NULL ist.
+/// </summary>
 public class RowIsNullScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [RowVar];
     public override string Command => "rowisnull";
-    public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override string Syntax => "RowIsNullScriptCommand(Row)";

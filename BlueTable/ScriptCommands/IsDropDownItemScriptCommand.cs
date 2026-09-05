@@ -4,13 +4,17 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.
+/// Es werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.
+/// Es wird streng auf die Groß/Kleinschreibung geachtet.
+/// </summary>
 internal class IsDropDownItemScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], [ScriptVariable.Any_Variable]];
     public override string Command => "isdropdownitem";
-    public override string Description => "Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.\r\nEs werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.\r\nEs wird streng auf die Groß/Kleinschreibung geachtet.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override string Syntax => "IsDropDownItemScriptCommand(Value, Column)";

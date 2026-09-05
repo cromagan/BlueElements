@@ -2,6 +2,10 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt die angegebene Webseite aus dem Internet.
+/// Gibt niemals einen Fehler zurück, eber evtl. string.empty
+/// </summary>
 internal class DownloadWebPageScriptCommand : ScriptCommand {
 
     #region Fields
@@ -14,7 +18,6 @@ internal class DownloadWebPageScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadwebpage";
-    public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

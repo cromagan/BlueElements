@@ -7,6 +7,9 @@ using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Eine Maßlinie mit Pfeilen und Beschriftung, die den Abstand zwischen zwei Punkten anzeigt.
+/// </summary>
 public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScale {
 
     #region Fields
@@ -91,8 +94,6 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
     #region Properties
 
     public static string ClassId => "DIMENSION";
-
-    public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 

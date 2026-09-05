@@ -8,7 +8,7 @@ using BlueTable.ColumnFormats;
 namespace BlueControls.ControlStrategies;
 
 /// <summary>
-/// Strategy, die eine TableView mit bearbeitbaren CSV-Daten anzeigt.
+/// Zeigt eine kleine Tabelle mit eigenen Spalten.
 /// Columns enthält die Spaltenbeschriftungen; die internen
 /// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
@@ -59,8 +59,6 @@ public class TableControlStrategy : ControlStrategy {
             ApplyStyle();
         }
     } = [];
-
-    public override string Description => "Zeigt eine kleine Tabelle mit eigenen Spalten. Die Spalten werden in einer Liste verwaltet, Zeilen lassen sich über das Kontextmenü löschen.";
 
     public override string KeyName => ClassId;
 

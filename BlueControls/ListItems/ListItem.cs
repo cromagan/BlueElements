@@ -1,6 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.EventArgs;
+using System.Globalization;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -203,6 +205,18 @@ public static class ListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, null, click, enabled, string.Empty);
 
+    /// <summary>
+    /// Erzeugt ein ListItem für einen Enum-Wert; Symbol und Anzeigetext kommen aus einem
+    /// etwaigen ImageAttribute, die QuickInfo aus dem XML-Summary.
+    /// </summary>
+    public static TextListItem ItemOf(Enum value) {
+        var type = value.GetType();
+        var field = type.GetField(value.ToString());
+        return field is { } f
+            ? EnumItemOf(type, f, ((IConvertible)value).ToInt64(CultureInfo.InvariantCulture).ToString1())
+            : ItemOf(value.ToString());
+    }
+
     public static List<ListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer.Renderer cellRenderer) {
         List<string> l = [];
 
@@ -301,42 +315,19 @@ public static class ListItemExtension {
     }
 
     /// <summary>
-    /// Fügt eine Enumeration hinzu.
+    /// Erzeugt aus den Membern einer Enumeration ListItems; die QuickInfo wird aus dem
+    /// <c>&lt;summary&gt;</c> der XML-Dokumentation befüllt, Symbol und Anzeigetext aus einem
+    /// etwaigen ImageAttribute am Member (oder am Enum-Typ als Standard).
     /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
     public static List<ListItem> ItemsOf(Type type) {
         var l = new List<ListItem>();
-        var underlyingType = Enum.GetUnderlyingType(type);
 
-        if (underlyingType == typeof(int)) {
-            foreach (int z1 in Enum.GetValues(type)) {
-                if (Enum.GetName(type, z1) is { } n) {
-                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
-                }
+        foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static)) {
+            if (field.GetRawConstantValue() is { } v) {
+                var item = EnumItemOf(type, field, ((IConvertible)v).ToInt64(CultureInfo.InvariantCulture).ToString1());
+                l.Add(item);
             }
-            return l;
         }
-
-        if (underlyingType == typeof(byte)) {
-            foreach (byte z1 in Enum.GetValues(type)) {
-                if (Enum.GetName(type, z1) is { } n) {
-                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
-                }
-            }
-            return l;
-        }
-
-        if (underlyingType == typeof(long)) {
-            foreach (long z1 in Enum.GetValues(type)) {
-                if (Enum.GetName(type, z1) is { } n) {
-                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
-                }
-            }
-            return l;
-        }
-
-        Develop.DebugError("Typ unbekannt");
         return l;
     }
 
@@ -352,6 +343,23 @@ public static class ListItemExtension {
     public static LineListItem Separator() => SeparatorWith(string.Empty);
 
     public static LineListItem SeparatorWith(string userDefCompareKey) => new(string.Empty, userDefCompareKey);
+
+    private static TextListItem EnumItemOf(Type enumType, FieldInfo field, string key) {
+        var img = field.GetCustomAttribute<ImageAttribute>() ?? enumType.GetCustomAttribute<ImageAttribute>();
+        var text = string.IsNullOrEmpty(img?.Text) ? field.Name.Replace('_', ' ') : img.Text;
+        TextListItem item;
+
+        if (img is not { } i) {
+            item = ItemOf(text, key);
+        } else if (i.Symbol is { } s) {
+            item = ItemOf(text, key, s);
+        } else {
+            item = ItemOf(text, key, QuickImage.Get(i.ImageName));
+        }
+
+        item.QuickInfo = Generic.Summary(field);
+        return item;
+    }
 
     #endregion
 }

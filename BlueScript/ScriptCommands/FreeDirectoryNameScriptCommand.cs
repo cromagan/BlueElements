@@ -4,13 +4,15 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.
+/// </summary>
 internal class FreeDirectoryNameScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "freedirectoryname";
-    public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

@@ -4,13 +4,19 @@ using BlueBasics.Enums;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Führt den Codeblock für jeden List-Eintrag aus.
+/// Der aktuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.
+/// Mit Break kann die Schleife vorab verlassen werden.
+/// Variablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.
+/// Die Variable INDEX zeigt an, bei welchem Eintrag der Zeiger sich gerade befindet.
+/// </summary>
 internal class ForEachScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
-    public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer aktuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchem Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "ForEach(NeueVariable, List) { }";
 

@@ -5,13 +5,17 @@ using System.Globalization;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.
+/// Leere Eingangswerte werden ignoriert.
+/// Beispiel für Format-StringScriptCommand: dd.MM.yyyy HH:mm:ss.fff
+/// </summary>
 internal class MaxDateScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, [ListOfStringsScriptVariable.ShortName_Plain, StringScriptVariable.ShortName_Plain]];
     public override string Command => "maxdate";
-    public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-StringScriptCommand: dd.MM.yyyy HH:mm:ss.fff";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinTwice;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

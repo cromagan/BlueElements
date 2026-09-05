@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt einen Knopf, mit dem eine Farbe gewählt werden kann.
+/// </summary>
 public class ColorButtonControlStrategy : ControlStrategy {
 
     #region Fields
@@ -16,7 +19,6 @@ public class ColorButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "ColorButton";
 
-    public override string Description => "Zeigt einen Knopf, mit dem eine Farbe gewählt werden kann.";
     public override string KeyName => ClassId;
     protected override System.Windows.Forms.Control? ControlCore => _control;
 

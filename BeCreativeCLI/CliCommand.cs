@@ -24,8 +24,6 @@ public abstract class CliCommand : IHasKeyName {
 
     public abstract string Command { get; }
 
-    public abstract string Description { get; }
-
     /// <summary>
     /// Schalter (Optionen ohne Wert), die dieser Befehl kennt.
     /// Alle übrigen "--"-Optionen erwarten einen Wert.

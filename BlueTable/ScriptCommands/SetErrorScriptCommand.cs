@@ -4,6 +4,12 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Kann nur im Skript "Formular vorbereiten" benutzt werden.
+/// Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.
+/// Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier
+/// angegebenen Nachricht. Die Nachricht darf keine Zeilenumbrüche und kein '|' enthalten.
+/// </summary>
 public class SetErrorScriptCommand : TableGenericScriptCommand {
 
     #region Fields
@@ -16,11 +22,6 @@ public class SetErrorScriptCommand : TableGenericScriptCommand {
 
     public override List<List<string>> Args => [StringVal, [ScriptVariable.Any_Variable]];
     public override string Command => "seterror";
-
-    public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
-                                          "Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.\r\n" +
-                                          "Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier\r\n" +
-                                          "angegebenen Nachricht. Die Nachricht darf keine Zeilenumbrüche und kein '|' enthalten.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Special;

@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Ersetzt in einem Text einen Text durch einen anderen Text
+/// </summary>
 internal class ReplaceScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "replace";
-    public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "ReplaceScriptCommand(OriginalString, SearchString, ReplaceString)";

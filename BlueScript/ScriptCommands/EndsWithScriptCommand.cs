@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft, ob der String mit einem der angegeben Strings endet.
+/// </summary>
 internal class EndsWithScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public override string Command => "endswith";
-    public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;

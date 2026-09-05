@@ -5,16 +5,17 @@ using System.Diagnostics;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Führt das Skript in der angegebenen Tabelle aus.
+/// Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.
+/// Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.
+/// </summary>
 public class CallTableScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar, StringVal, StringVal];
     public override string Command => "calltable";
-
-    public override string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
-            "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.\r\n" +
-        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override string Returns => StringScriptVariable.ShortName_Plain;

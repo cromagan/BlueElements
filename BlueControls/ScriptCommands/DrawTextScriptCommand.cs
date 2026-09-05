@@ -6,13 +6,15 @@ using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Schreibt einen Text auf das angegebene Bild.
+/// </summary>
 public class DrawTextScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [BmpVar, StringVal, FloatVal, FloatVal, StringVal, FloatVal];
     public override string Command => "drawtext";
-    public override string Description => "Schreibt einen Text auf das angegebene Bild.";
     public override string Syntax => "DrawTextScriptCommand(Bild, Text, x, y, Farbe, Schriftgröße);";
 
     #endregion

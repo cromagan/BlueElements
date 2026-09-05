@@ -3,13 +3,23 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.
+/// 
+/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.
+/// 
+/// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
+/// Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.
+/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// 
+/// Ähnlichr Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
+/// </summary>
 public class CellGetFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public override string Command => "cellgetfilter";
-    public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.\r\n\r\nÄhnlichr Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.
+/// </summary>
 internal class ReturnScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "return";
-    public override string Description => "Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.";
     public override string StartSequence => string.Empty;
 
     public override string Syntax => "ReturnScriptCommand \"ReturnValue\";";

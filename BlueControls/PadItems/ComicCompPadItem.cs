@@ -9,12 +9,15 @@ using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Ein Bildstreifen, der zwischen zwei Punkten aufgespannt und gedreht werden kann.
+/// </summary>
 public class ComicCompPadItem : PadItem {
 
     #region Fields
 
     /// <summary>
-    /// Diese Punkte bestimmen die gedrehten Eckpunkte des Bildes und werden von den Gelenkpunkten aus berechnet. Unskaliert und auch ohne Berücksichtigung der 'MoveAllItems' Koordinaten
+    /// Die gedrehten Eckpunkte des Bildes, berechnet aus den beiden Gelenkpunkten.
     /// </summary>
     private readonly PointM _ber_Lo = new();
 
@@ -68,28 +71,24 @@ public class ComicCompPadItem : PadItem {
         }
     }
 
-    public override string Description => string.Empty;
-
     /// <summary>
-    /// Diese Punkte sind Verbindungspunkte.
-    /// Sie können an sich verschoben werden, aber dessen CanvasPosition ist immer in Relation zum JointMiddle.
-    /// Deswegen verursacht ein Verschieben auch nur eine Relations-Änderung.
-    /// Zusätzlich werden diese Punkte auf Bewegungen getrackt und auch gespeichert.
+    /// Zusätzliche Verbindungspunkte am Bild.
+    /// Ihre Lage wird als Abstand und Winkel zur Bildmitte gespeichert.
     /// </summary>
     public ObservableCollection<PointM> JointPoints { get; } = [];
 
     /// <summary>
-    /// Haupt Gelenkpunkt 1
+    /// Der erste Endpunkt des Bildstreifens.
     /// </summary>
     public PointM P1 { get; }
 
     /// <summary>
-    /// Haupt Gelenkpunkt 2
+    /// Der zweite Endpunkt des Bildstreifens.
     /// </summary>
     public PointM P2 { get; }
 
     /// <summary>
-    /// Dicke des Comic-Streifens.
+    /// Die Breite des Bildstreifens.
     /// </summary>
     public int Width {
         get => _width;
@@ -336,8 +335,8 @@ public class ComicCompPadItem : PadItem {
     }
 
     /// <summary>
-    /// Wird aufgerufen, wenn sich die Auflistung der Verbindungspunkte ändert.
-    /// Sorgt dafür, dass neue Punkte auf Bewegungen getrackt werden.
+    /// Wird aufgerufen, wenn sich die Verbindungspunkte ändern.
+    /// Neue Punkte werden dadurch auf Bewegungen überwacht.
     /// </summary>
     private void JointPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems is not null) {

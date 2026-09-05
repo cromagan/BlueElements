@@ -4,12 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.
+/// Vorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.
+/// </summary>
 public class ImportLinkedScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override string Command => "importlinked";
-    public override string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "ImportLinkedScriptCommand();";
 

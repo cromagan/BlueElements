@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt die Zeilen der Tabelle in der Standard Sortierung zurück.
+/// </summary>
 public class SortedRowsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar];
     public override string Command => "sortedrows";
-    public override string Description => "Gibt die Zeilen der Tabelle in der Standard Sortierung zurück.";
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfRowsScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

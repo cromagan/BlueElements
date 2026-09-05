@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Kann Hex-Farbcode (RGB oder ARGB) anzeigen (z.B. #ff0000)
+/// </summary>
 public class ColorRenderer : Renderer {
 
     #region Fields
@@ -17,8 +20,6 @@ public class ColorRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "Color";
-
-    public override string Description => "Kann Hex-Farbcode (RGB oder ARGB) anzeigen (z.B. #ff0000) ";
 
     /// <summary>
     /// Wenn gewählt, wird die Farbe zusätzlich als Zahlenwert angezeigt, z. B. #ff0000.

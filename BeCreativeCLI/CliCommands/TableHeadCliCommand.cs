@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Bearbeitet den Tabellenkopf. Aktuell: Tags setzen (nur als Tabellen-Administrator); leerer Wert entfernt alle Tags.
+/// </summary>
 public class TableHeadCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-head";
-    public override string Description => "Tabellen: Bearbeitet den Tabellenkopf. Aktuell: Tags setzen (nur als Tabellen-Administrator); leerer Wert entfernt alle Tags.";
     public override string Syntax => "bcr table-head <tabelle> tags <tags, mit | getrennt>";
 
     #endregion

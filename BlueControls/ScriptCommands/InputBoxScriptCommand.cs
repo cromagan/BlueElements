@@ -7,13 +7,17 @@ using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Zeigt ein Eingabefenster an und wartet, bis der Nutzer einen Text eingibt und bestätigt.
+/// Der erste Parameter ist der Anzeigetext, der zweite der Vorgabewert.
+/// Alle weiteren Parameter werden als Vorschläge in einer Auswahlliste angeboten.
+/// </summary>
 public class InputBoxScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "inputbox";
-    public override string Description => "Zeigt ein Eingabefenster an und wartet, bis der Nutzer einen Text eingibt und bestätigt.\r\nDer erste Parameter ist der Anzeigetext, der zweite der Vorgabewert.\r\nAlle weiteren Parameter werden als Vorschläge in einer Auswahlliste angeboten.";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
     public override string Returns => StringScriptVariable.ShortName_Plain;

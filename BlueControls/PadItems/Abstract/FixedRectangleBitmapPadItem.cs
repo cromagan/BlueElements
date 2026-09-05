@@ -2,6 +2,9 @@
 
 namespace BlueControls.PadItems.Abstract;
 
+/// <summary>
+/// Basis für Elemente mit fester Größe, die ihr Bild selbst erzeugen.
+/// </summary>
 public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Fields

@@ -7,6 +7,9 @@ using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Eine Linie zwischen zwei Punkten.
+/// </summary>
 public class LinePadItem : PadItem, IStyleableOne {
 
     #region Fields
@@ -55,8 +58,6 @@ public class LinePadItem : PadItem, IStyleableOne {
     #region Properties
 
     public static string ClassId => "LINE";
-
-    public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 

@@ -5,6 +5,9 @@ using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.
+/// </summary>
 internal class BitmapToBase64ScriptCommand : ScriptCommand {
 
     #region Properties
@@ -12,7 +15,6 @@ internal class BitmapToBase64ScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [BmpVar, StringVal];
     public override string Command => "bitmaptobase64";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
-    public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

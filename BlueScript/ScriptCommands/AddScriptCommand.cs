@@ -2,13 +2,16 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Fügt einer Liste einen oder mehrere Werte hinzu.
+/// Zahlen werden in Text (max. 5 Nachkommastellen) umgewandelt
+/// </summary>
 internal class AddScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain, DoubleScriptVariable.ShortName_Plain]];
     public override string Command => "add";
-    public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.\r\nZahlen werden in Text (max. 5 Nachkommastellen) umgewandelt";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "Add(ListVariable, Value1, Value2, ...);";
 

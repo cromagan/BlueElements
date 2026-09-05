@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt eine waagerechte Trennlinie ohne Wert-Bearbeitung.
+/// </summary>
 public class LineControlStrategy : ControlStrategy {
 
     #region Fields
@@ -15,8 +18,6 @@ public class LineControlStrategy : ControlStrategy {
     #region Properties
 
     public static string ClassId => "Line";
-
-    public override string Description => "Zeigt eine waagerechte Trennlinie ohne Wert-Bearbeitung.";
 
     public override bool IsSpecial => true;
 

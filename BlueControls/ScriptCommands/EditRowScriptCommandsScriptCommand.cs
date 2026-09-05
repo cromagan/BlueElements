@@ -7,15 +7,16 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Öffnet den Bearbeiten-Dialog der Zeile.
+/// Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.
+/// </summary>
 public class EditRowScriptCommandsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [RowVar];
     public override string Command => "editrow";
-
-    public override string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
-            "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;

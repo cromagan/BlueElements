@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt einen Knopf, der anstelle einer Wert-Eingabe ein Kommando auslöst.
+/// </summary>
 public class CommandButtonControlStrategy : ControlStrategy {
 
     #region Fields
@@ -51,7 +54,6 @@ public class CommandButtonControlStrategy : ControlStrategy {
         }
     } = string.Empty;
 
-    public override string Description => "Zeigt einen Knopf, der anstelle einer Wert-Eingabe ein Kommando auslöst.";
     public override bool IsCommandButton => true;
     public override string KeyName => ClassId;
     protected override System.Windows.Forms.Control? ControlCore => _control;

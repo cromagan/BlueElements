@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Einfaches Textfeld zur freien Eingabe von Text.
+/// </summary>
 public class TextBoxControlStrategy : ControlStrategy {
 
     #region Fields
@@ -30,7 +33,6 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Textbox";
 
-    public override string Description => "Einfaches Textfeld zur freien Eingabe von Text.";
     public override string KeyName => ClassId;
 
     /// <summary>

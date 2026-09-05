@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt die Anzahl der Elemente der Liste zurück.
+/// </summary>
 internal class CountScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "count";
-    public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override string Syntax => "Count(ListVariable)";

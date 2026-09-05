@@ -8,7 +8,8 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeut ein Unter-Element von ConnectedFormulaView
+/// Ein Bereich, der ein weiteres Formular anzeigt.
+/// Optional kann der Benutzer ihn ein- und ausklappen.
 /// </summary>
 public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
@@ -60,7 +61,6 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
         }
     } = string.Empty;
 
-    public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
 

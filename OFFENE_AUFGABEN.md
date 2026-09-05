@@ -240,6 +240,12 @@ Schau, wo DisableAllEditing du noch benutzen kannst.
 ## Aufgabe
 TableControlStrategy, SysRowSortIndex bei AutoSort = True NICHT anzeigen. Aktuell wird es immer eingebelndet
 
+## Aufgabe
+Nutze bei allen Renderen, PadItems, Tools das neue ImageAttribute. Und alle Anzeigemöglichkeiten sollen auf das reagieren.
+
+## Aufgabe
+Entferne ALLES rund um BCS.
+
 
 
 

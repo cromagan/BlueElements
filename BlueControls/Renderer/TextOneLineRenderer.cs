@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Schnelle Darstellung eines einzeiligen Textes.
+/// </summary>
 public class TextOneLineRenderer : Renderer {
 
     #region Fields
@@ -17,8 +20,6 @@ public class TextOneLineRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "TextOneLine";
-
-    public override string Description => "Schnelle Darstellung eines einzeiligen Textes.";
 
     /// <summary>
     /// Text, der vor dem Zellinhalt angezeigt wird.

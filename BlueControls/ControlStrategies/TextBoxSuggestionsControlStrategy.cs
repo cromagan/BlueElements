@@ -6,6 +6,9 @@ using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Textfeld, das zusätzlich auswählbare Vorschläge als Chips anbietet.
+/// </summary>
 public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     #region Fields
@@ -20,7 +23,6 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
 
     public static string ClassId => "TextBoxSuggestions";
 
-    public override string Description => "Textfeld, das zusätzlich auswählbare Vorschläge als Chips anbietet.";
     public override string KeyName => ClassId;
 
     /// <summary>

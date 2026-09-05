@@ -7,6 +7,9 @@ using BlueScript.ScriptVariables;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.
+/// </summary>
 internal class MouseDownUpScriptCommand : ScriptCommand, ICommandBuilder {
 
     #region Properties
@@ -14,8 +17,6 @@ internal class MouseDownUpScriptCommand : ScriptCommand, ICommandBuilder {
     public override List<List<string>> Args => [FloatVal, FloatVal, FloatVal, FloatVal, FloatVal];
 
     public override string Command => "mousedownup";
-
-    public override string Description => "Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
     public override string Syntax => "MouseDownUpScriptCommand(DownX, DownY, TimeInSeconds, UpX, UpY)";

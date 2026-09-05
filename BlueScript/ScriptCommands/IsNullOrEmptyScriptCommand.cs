@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.
+/// </summary>
 internal class IsNullOrEmptyScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[ScriptVariable.Any_Variable]];
     public override string Command => "isnullorempty";
-    public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
 

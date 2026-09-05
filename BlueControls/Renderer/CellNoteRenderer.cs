@@ -4,6 +4,10 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Stellt alle Zellnotizen dieser Zeile dar.
+/// Jede Notiz erscheint als eigener Kasten mit Symbol, Spaltenname und Text.
+/// </summary>
 public class CellNoteRenderer : Renderer {
 
     #region Fields
@@ -26,8 +30,6 @@ public class CellNoteRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "CellNote";
-
-    public override string Description => "Stellt alle Zellnotizen dieser Zeile dar.\r\nJede Notiz erscheint als eigener Kasten mit Symbol, Spaltenname und Text.";
 
     #endregion
 

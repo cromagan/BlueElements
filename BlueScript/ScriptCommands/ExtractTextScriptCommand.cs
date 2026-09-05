@@ -2,15 +2,16 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.
+/// Beispiel: Extract("Ein guter Tag", "Ein * Tag"); erstellt liste mit dem Inhalt "guter"
+/// </summary>
 internal class ExtractTextScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "extracttext";
-
-    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
-                                              "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;

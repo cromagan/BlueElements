@@ -4,13 +4,15 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Verschiebt einen Ordner.
+/// </summary>
 internal class MoveDirectoryScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "movedirectory";
-    public override string Description => "Verschiebt einen Ordner.";
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

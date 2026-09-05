@@ -150,7 +150,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";
-        txt = txt + "<br>" + from.Description;
+        txt = txt + "<br>" + Generic.Summary(from.GetType());
 
         txt += "<br><br><b><u>Eigenschaften:</b></u>";
 

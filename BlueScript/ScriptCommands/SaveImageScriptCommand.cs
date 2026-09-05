@@ -7,6 +7,9 @@ using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Speichert das Bild auf die Festplatte
+/// </summary>
 internal class SaveImageScriptCommand : ScriptCommand {
 
     #region Properties
@@ -14,7 +17,6 @@ internal class SaveImageScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal, BmpVar];
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
-    public override string Description => "Speichert das Bild auf die Festplatte";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "SaveImageScriptCommand(Filename, PNG/JPG/BMP, Bild);";
 

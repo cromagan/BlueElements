@@ -3,17 +3,18 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.
+/// Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.
+/// Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.
+/// Kein Zugriff auf auf Tabellen-Variablen!
+/// </summary>
 public class CallFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
     public override string Command => "callfilter";
-
-    public override string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
-                                                "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
-                                            "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-                                            "Kein Zugriff auf auf Tabellen-Variablen!";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

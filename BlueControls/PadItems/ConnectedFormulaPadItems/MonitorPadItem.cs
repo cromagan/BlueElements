@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Zeigt laufende Meldungen und Aktionen der empfangenen Zeile an — wie ein Überwachungsfenster.
+/// </summary>
 public class MonitorPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -22,7 +25,6 @@ public class MonitorPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override string Description => "Zeigt Änderungen einer Zeile an.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;

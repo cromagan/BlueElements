@@ -5,6 +5,9 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt eine Liste, deren Einträge ausgewählt, verschoben und entfernt werden können.
+/// </summary>
 public class ListBoxControlStrategy : ControlStrategy {
 
     #region Fields
@@ -17,7 +20,6 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public static string ClassId => "Listbox";
 
-    public override string Description => "Zeigt eine Liste, deren Einträge ausgewählt, verschoben und entfernt werden können.";
     public override string KeyName => ClassId;
     public override bool SupportsSuggestions => true;
     protected override System.Windows.Forms.Control? ControlCore => _control;

@@ -6,13 +6,15 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Verändert die Größe des Bildes
+/// </summary>
 public class ResizeImageScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [BitmapScriptVariable.BmpVar, FloatVal, FloatVal];
     public override string Command => "resizeimage";
-    public override string Description => "Verändert die Größe des Bildes";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;

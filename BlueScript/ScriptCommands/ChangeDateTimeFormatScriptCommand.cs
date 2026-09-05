@@ -4,6 +4,11 @@ using System.Globalization;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.
+/// Beispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff
+/// Achtung: Groß-Kleinschreibung ist wichtig!
+/// </summary>
 internal class ChangeDateTimeFormatScriptCommand : ScriptCommand {
 
     #region Properties
@@ -11,7 +16,6 @@ internal class ChangeDateTimeFormatScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "changedatetimeformat";
     public override List<string> Constants => [.. DateTimeFormats];
-    public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";

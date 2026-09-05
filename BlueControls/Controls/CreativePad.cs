@@ -537,7 +537,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         var it = GetHotItem(e, false, true);
 
         if (e.Button == System.Windows.Forms.MouseButtons.None && it is PadItem bpi) {
-            QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<br><hr><br>" + bpi.Description : bpi.Description;
+            var summary = Generic.Summary(bpi.GetType());
+            QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<br><hr><br>" + summary : summary;
         } else {
             QuickInfo = string.Empty;
         }

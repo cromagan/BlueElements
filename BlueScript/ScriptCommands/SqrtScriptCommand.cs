@@ -3,6 +3,9 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Berechnet die Quadartwurzel.
+/// </summary>
 internal class SqrtScriptCommand : ScriptCommand {
 
     #region Properties
@@ -10,8 +13,6 @@ internal class SqrtScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [FloatVal];
 
     public override string Command => "sqrt";
-
-    public override string Description => "Berechnet die Quadartwurzel.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

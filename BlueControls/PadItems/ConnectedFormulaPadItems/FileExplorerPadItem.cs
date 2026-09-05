@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Ein Datei-Browser, in dem der Benutzer Ordner und Dateien durchsehen kann.
+/// </summary>
 public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -35,8 +38,6 @@ public class FileExplorerPadItem : ReciverPadItem, IItemToControl, IAutosizable 
             OnPropertyChanged();
         }
     }
-
-    public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
     /// <summary>
     /// Beschränkt die Anzeige auf bestimmte Dateitypen, z. B. alle Bilder.

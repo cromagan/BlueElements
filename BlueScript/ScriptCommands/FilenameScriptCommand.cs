@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt den Dateinamen ohne Pfad und ohne Suffix zurück
+/// </summary>
 internal class FilenameScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "filename";
-    public override string Description => "Gibt den Dateinamen ohne Pfad und ohne Suffix zurück";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "Filename(FilePathAndName)";

@@ -4,13 +4,15 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Verschiebt eine Datei.
+/// </summary>
 internal class MoveFileScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "movefile";
-    public override string Description => "Verschiebt eine Datei.";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
 

@@ -7,6 +7,10 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Ein Auswahlmenü, aus dem der Benutzer eine Zeile auswählen kann.
+/// Welche Zeilen zur Wahl stehen, bestimmen die empfangenen Filter.
+/// </summary>
 public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable {
 
     #region Fields
@@ -72,7 +76,6 @@ public class DropDownSelectRowPadItem : ReciverSenderPadItem, IItemToControl, IA
         }
     } = CaptionPosition.Über_dem_Feld;
 
-    public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => true;

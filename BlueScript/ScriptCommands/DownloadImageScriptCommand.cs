@@ -2,6 +2,11 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt das angegebene Bild aus dem Internet.
+/// Diese Routine wird keinen Fehler auslösen.
+/// Falls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.
+/// </summary>
 internal class DownloadImageScriptCommand : ScriptCommand {
 
     #region Fields
@@ -14,7 +19,6 @@ internal class DownloadImageScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadimage";
-    public override string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

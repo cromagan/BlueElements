@@ -4,13 +4,19 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Führt den Codeblock für jede gefundene Zeile aus.
+/// Der akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.
+/// Mit Break kann die Schleife vorab verlassen werden.
+/// Variablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.
+/// Die Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.
+/// </summary>
 internal class ForEachRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], FilterVar];
     public override string Command => "foreachrow";
-    public override string Description => "Führt den Codeblock für jede gefundene Zeile aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

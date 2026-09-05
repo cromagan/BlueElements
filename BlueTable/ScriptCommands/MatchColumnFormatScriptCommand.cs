@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Gibt bei Erfolg einen leeren Text zurück, andernfalls eine lesbare Begründung.
+/// </summary>
 internal class MatchColumnFormatScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], [ScriptVariable.Any_Variable]];
     public override string Command => "matchcolumnformat";
-    public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Gibt bei Erfolg einen leeren Text zurück, andernfalls eine lesbare Begründung.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "MatchColumnFormatScriptCommand(Value, Column)";

@@ -5,13 +5,15 @@ using System.Text.RegularExpressions;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Versucht den StringScriptCommand zu kürzen, indem Abkürzungen verwendet werden.
+/// </summary>
 internal class StringShortenWordScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
     public override string Command => "stringshortenword";
-    public override string Description => "Versucht den StringScriptCommand zu kürzen, indem Abkürzungen verwendet werden.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "StringShortenWordScriptCommand(StringScriptCommand)";

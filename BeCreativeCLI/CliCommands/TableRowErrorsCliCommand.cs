@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Prüft die adressierten Zeilen mit dem prepare_formula-Skript und gibt die Fehler aus. Exit-Code 1, wenn eine Zeile Fehler hat oder das Skript scheitert.
+/// </summary>
 public class TableRowErrorsCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-rowerrors";
-    public override string Description => "Tabellen: Prüft die adressierten Zeilen mit dem prepare_formula-Skript und gibt die Fehler aus. Exit-Code 1, wenn eine Zeile Fehler hat oder das Skript scheitert.";
     public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion

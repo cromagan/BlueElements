@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt TRUE zurück, wenn die Variable existiert.
+/// </summary>
 internal class ExistsScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[ScriptVariable.Any_Variable]];
     public override string Command => "exists";
-    public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
 

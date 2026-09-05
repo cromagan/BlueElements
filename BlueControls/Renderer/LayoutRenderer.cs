@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Langsame, aber schöne Anzeige eines Layoutes
+/// </summary>
 public class LayoutRenderer : Renderer {
 
     #region Fields
@@ -16,8 +19,6 @@ public class LayoutRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "Layout";
-
-    public override string Description => "Langsame, aber schöne Anzeige eines Layoutes";
 
     /// <summary>
     /// Die Layout-Datei, die als Vorlage für die Anzeige dient.

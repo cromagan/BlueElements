@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Exportiert die Tabelle als CSV auf die Standardausgabe.
+/// </summary>
 public class TableExportCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-export";
-    public override string Description => "Tabellen: Exportiert die Tabelle als CSV auf die Standardausgabe.";
     public override List<string> Flags => ["noheader"];
     public override string Syntax => "bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader]";
 

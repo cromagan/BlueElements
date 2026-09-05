@@ -37,8 +37,7 @@ public abstract class Renderer : ParseableItem, IReadableText, IHasQuickInfo, IS
 
     #region Properties
 
-    public abstract string Description { get; }
-    public string QuickInfo => Description;
+    public string QuickInfo => Generic.Summary(GetType());
     public bool ReadOnly { get; }
 
     public string SheetStyle {

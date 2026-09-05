@@ -2,16 +2,17 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.
+/// Wird kein Text gefunden, wird der Defaultwert zurück gegeben.
+/// Beispiel: Extract("Ein guter Tag", "Ein * Tag"); gibt den Text "guter" zurück.
+/// </summary>
 internal class ExtractFirstTextScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "extractfirsttext";
-
-    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
-                                              "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +
-                                          "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); gibt den Text \"guter\" zurück.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

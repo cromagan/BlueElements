@@ -6,6 +6,9 @@ using BlueTable.Interfaces;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Zeigt eine einzelne Zeile einer Tabelle als Bild an, gerendert mit einem eigenen Formular-Layout.
+/// </summary>
 public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStyleable {
 
     #region Fields
@@ -40,8 +43,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     #region Properties
 
     public static string ClassId => "ROW";
-
-    public override string Description => string.Empty;
 
     /// <summary>
     /// Layout, das für die Anzeige dieser Zeile benutzt wird.

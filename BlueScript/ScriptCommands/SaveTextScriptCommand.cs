@@ -5,6 +5,9 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Speichert den Text auf die Festplatte
+/// </summary>
 internal class SaveTextScriptCommand : ScriptCommand {
 
     #region Properties
@@ -12,7 +15,6 @@ internal class SaveTextScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "savetext";
     public override List<string> Constants => ["UTF8", "WIN1252"];
-    public override string Description => "Speichert den Text auf die Festplatte";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "SaveTextScriptCommand(Filename, UTF8/WIN1252, Text);";
 

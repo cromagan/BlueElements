@@ -3,6 +3,9 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.
+/// </summary>
 internal class IntScriptCommand : ScriptCommand {
 
     #region Properties
@@ -10,8 +13,6 @@ internal class IntScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [FloatVal];
 
     public override string Command => "int";
-
-    public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;

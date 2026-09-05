@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Lädt eine passwortgeschützte Tabelle in die Session und entsperrt sie mit dem Passwort. Nur innerhalb einer Shell-Session verfügbar.
+/// </summary>
 public class TablePasswordCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-password";
-    public override string Description => "Tabellen: Lädt eine passwortgeschützte Tabelle in die Session und entsperrt sie mit dem Passwort. Nur innerhalb einer Shell-Session verfügbar.";
     public override string Syntax => "bcr table-password <tabelle> --password <kennwort>";
 
     #endregion

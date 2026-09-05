@@ -2,13 +2,16 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.
+/// Ergebnis = Date1 - Date2
+/// </summary>
 internal class DateTimeDifferenceInDaysScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "datetimedifferenceindays";
-    public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";

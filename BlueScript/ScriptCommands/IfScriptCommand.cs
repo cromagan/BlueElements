@@ -2,6 +2,9 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Vorsicht zu verwenden - z.B. mit einem Exists-Befehl.
+/// </summary>
 public class IfScriptCommand : ScriptCommand {
 
     #region Fields
@@ -21,7 +24,6 @@ public class IfScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [BoolVal];
     public override string Command => "if";
-    public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Vorsicht zu verwenden - z.B. mit einem Exists-Befehl.";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "if (true) { Code zum Ausführen }";
 

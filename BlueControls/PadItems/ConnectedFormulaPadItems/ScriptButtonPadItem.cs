@@ -8,6 +8,9 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Ein Knopf, den der Benutzer drücken kann. Beim Drücken wird ein Skript ausgeführt.
+/// </summary>
 public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable, IErrorCheckable {
 
     #region Fields
@@ -74,8 +77,6 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
         }
     } = string.Empty;
 
-    public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und dann ein Skript gestartet wird.";
-
     /// <summary>
     /// Legt fest, wann der Knopf benutzt werden kann.
     /// </summary>
@@ -117,16 +118,8 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     #region Methods
 
     /// <summary>
-    /// Führt das übergebene Skript aus und erzeugt dabei alle benötigten Variablen
-    /// (Basis-, Tabellen-, Zeilen-, Filter- und Feld-Variablen) selbst.
-    /// <para>
-    /// Im Produktivmodus (<paramref name="produktiv"/> = true) werden virtuelle
-    /// Spalten (z.B. RowColor) erzeugt und die echten Filter verwendet. Im Testmodus
-    /// (<paramref name="produktiv"/> = false) entfallen virtuelle Spalten und es
-    /// werden die übergebenen (ggf. Dummy-) <paramref name="filterItems"/> genutzt.
-    /// </para>
-    /// Die erzeugte Collection wird im zurückgegebenen
-    /// ScriptEndedFeedback.Variables bereitgestellt.
+    /// Führt das Skript aus und stellt dabei alle benötigten Werte bereit.
+    /// Im Testmodus werden Platzhalter-Werte verwendet, im Produktivmodus die echten Daten.
     /// </summary>
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, List<string>? args,
                                                     RowItem? row, Table? table, IEnumerable<FilterItem>? filterItems,
@@ -228,7 +221,7 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     }
 
     /// <summary>
-    /// Internes Skript
+    /// Öffnet den Skript-Editor zum Bearbeiten des Skripts.
     /// </summary>
     public void OpenScriptEditor() {
         var f = _button?.ParentForm;
@@ -339,9 +332,8 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     }
 
     /// <summary>
-    /// Führt das Skript für den Testmodus im Editor aus. Stellt die Roh-Zutaten
-    /// bereit: Eingehende Zeile, Dummy-Filter (damit Filter-abhängige Variablen
-    /// erzeugt werden können) und die Field-Variablen-Quellen des Formulars.
+    /// Führt das Skript für den Testmodus im Editor aus.
+    /// Der Test läuft mit Beispiel-Werten statt mit echten Daten.
     /// </summary>
     private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
         var row = TableInput?.Row?.First();

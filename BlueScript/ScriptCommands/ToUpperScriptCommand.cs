@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt den Text in Großbuchstaben zurück
+/// </summary>
 internal class ToUpperScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "toupper";
-    public override string Description => "Gibt den Text in Großbuchstaben zurück";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "ToUpperScriptCommand(OriginalString)";

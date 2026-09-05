@@ -3,13 +3,16 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Entfernt aus dem Text &lt; &gt; Tags.
+/// #Hasttag: Klammern, HTML, XML
+/// </summary>
 internal class RemoveXmlTagsScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "removexmltags";
-    public override string Description => "Entfernt aus dem Text < > Tags.\r\n#Hasttag: Klammern, HTML, XML";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "RemoveXMLTags(text)";

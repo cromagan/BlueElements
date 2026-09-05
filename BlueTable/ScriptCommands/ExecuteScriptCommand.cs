@@ -3,6 +3,10 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Gibt den Befehl an Windows ab.
+/// Versucht das Beste daraus zu machen,
+/// </summary>
 internal class ExecuteScriptCommand : ScriptCommand {
 
     #region Properties
@@ -10,9 +14,6 @@ internal class ExecuteScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal, StringVal];
 
     public override string Command => "execute";
-
-    public override string Description => "Gibt den Befehl an Windows ab.\r\n" +
-                                                  "Versucht das Beste daraus zu machen,\r\n";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
 

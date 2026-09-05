@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Stellt eine Schriftart dar.
+/// </summary>
 public class FontRenderer : Renderer {
 
     #region Fields
@@ -15,8 +18,6 @@ public class FontRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "Font";
-
-    public override string Description => "Stellt eine Schriftart dar.";
 
     #endregion
 

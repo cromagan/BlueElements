@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Ein Timer, der regelmäßig ein Skript ausführt – optional nur, solange der Benutzer inaktiv ist.
+/// </summary>
 public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizable {
 
     #region Fields
@@ -42,8 +45,6 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
             OnPropertyChanged();
         }
     }
-
-    public override string Description => "Ein Timer, der in regelmäßigen Abständen ein Skript ausführt. Optional nur bei Benutzer-Inaktivität.";
 
     /// <summary>
     /// Führt das Skript nur aus, wenn der Benutzer diese Zeit nichts gemacht hat. Angabe in Sekunden.
@@ -193,7 +194,7 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
     public bool IsVisibleForMe(string mode, bool nowDrawing) => true;
 
     /// <summary>
-    /// Internes Skript
+    /// Öffnet den Skript-Editor zum Bearbeiten des Skripts.
     /// </summary>
     public void OpenScriptEditor() {
         var f = _button?.ParentForm;

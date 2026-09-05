@@ -2,13 +2,21 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Wandelt eine Liste in einen Text um.
+/// Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen.
+/// Sind leere Einträge am Ende der Liste, werden die Trennzeichen am Ende nicht abgeschnitten.
+/// Das letzte Trennzeichen wird allerdings immer abgeschnitten!
+/// 
+/// Beispiel: Eine Liste mit den Werten 'a' und 'b' wird beim Join mit Semikolon das zurück geben: 'a;b'
+/// Aber: Wird eine Liste mit ChangeType in String umgewandelt, wäre ein zusätzliches Trennzeichen am Ende.
+/// </summary>
 internal class JoinScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[ListOfStringsScriptVariable.ShortName_Plain], StringVal];
     public override string Command => "join";
-    public override string Description => "Wandelt eine Liste in einen Text um.\r\nEs verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen.\r\nSind leere Einträge am Ende der Liste, werden die Trennzeichen am Ende nicht abgeschnitten.\r\nDas letzte Trennzeichen wird allerdings immer abgeschnitten!\r\n\r\nBeispiel: Eine Liste mit den Werten 'a' und 'b' wird beim Join mit Semikolon das zurück geben: 'a;b'\r\nAber: Wird eine Liste mit ChangeType in String umgewandelt, wäre ein zusätzliches Trennzeichen am Ende.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "Join(VariableListe, Verbindungszeichen)";

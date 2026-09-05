@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Initialisiert eine KI-Verbindung. Funktioniert mit jedem OpenAI-kompatiblen API-Endpunkt (OpenAI, Mistral, Groq, OpenRouter, DeepSeek, Together AI, Ollama, LM Studio u. a.). Der API-Schlüssel wird als Bearer-Token gesendet.
+/// </summary>
 internal class ConnectAiScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "ai";
-    public override string Description => "Initialisiert eine KI-Verbindung. Funktioniert mit jedem OpenAI-kompatiblen API-Endpunkt (OpenAI, Mistral, Groq, OpenRouter, DeepSeek, Together AI, Ollama, LM Studio u. a.). Der API-Schlüssel wird als Bearer-Token gesendet.";
     public override bool MustUseReturnValue => true;
     public override string Returns => AiScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

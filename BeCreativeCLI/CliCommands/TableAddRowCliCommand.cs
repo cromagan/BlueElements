@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Legt eine neue Zeile an. Der Wert setzt die erste Spalte (Primärschlüssel) der Tabelle.
+/// </summary>
 public class TableAddRowCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-addrow";
-    public override string Description => "Tabellen: Legt eine neue Zeile an. Der Wert setzt die erste Spalte (Primärschlüssel) der Tabelle.";
     public override string Syntax => "bcr table-addrow <tabelle> [--firstvalue <wert>]";
 
     #endregion

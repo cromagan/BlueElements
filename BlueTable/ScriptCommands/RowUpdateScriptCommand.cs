@@ -4,6 +4,11 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.
+/// Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.
+/// Beispiel: RowUpdateScriptCommand(RowScriptCommand,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.
+/// </summary>
 public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -11,10 +16,6 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
     public override List<List<string>> Args => [RowVar, FloatVal, FloatVal];
 
     public override string Command => "rowupdate";
-
-    public override string Description => "Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.\r\n" +
-        "Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.\r\n" +
-        "Beispiel: RowUpdateScriptCommand(RowScriptCommand,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

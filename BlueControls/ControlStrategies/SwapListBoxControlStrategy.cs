@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt zwei Listen: Gewählte Einträge und Vorschläge; ein Klick verschiebt den Eintrag in die jeweils andere Liste.
+/// </summary>
 public class SwapListBoxControlStrategy : ControlStrategy {
 
     #region Fields
@@ -15,8 +18,6 @@ public class SwapListBoxControlStrategy : ControlStrategy {
     #region Properties
 
     public static string ClassId => "SwapListBox";
-
-    public override string Description => "Zeigt zwei Listen: Gewählte Einträge und Vorschläge; ein Klick verschiebt den Eintrag in die jeweils andere Liste.";
 
     public override string KeyName => ClassId;
 

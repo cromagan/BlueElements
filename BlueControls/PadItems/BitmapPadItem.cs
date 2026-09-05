@@ -8,6 +8,9 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Ein Bild auf dem Formular. Das Bild kann auch zur Laufzeit aus Platzhaltern wie ~Bild~ eingesetzt werden.
+/// </summary>
 public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleableOne {
 
     #region Fields
@@ -15,14 +18,8 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
     private Bitmap? _bitmap;
 
     /// <summary>
-    /// Base64-kodiertes PNG des aktuellen Bildes. Wird beim Setzen der
-    /// BitmapValue-Property sofort erzeugt und beim Spiegeln
-    /// aktualisiert. Beim Parsen wird der Original-String unverändert
-    /// übernommen, damit ein PNG-Roundtrip (decode → encode) keine
-    /// anderen Bytes erzeugt — der GDI+-Encoder produziert nämlich nicht
-    /// zwingend identische IDAT-Bytes. Ist das Feld leer, gibt es kein Bild.
-    /// Das eigentliche _bitmap wird erst bei Bedarf im
-    /// BitmapValue-Getter dekodiert (Lazy Loading).
+    /// Das Bild als Text gespeichert. Wird erst bei Bedarf in ein Bild umgewandelt,
+    /// damit Speichern und Laden ohne Veränderung gelingen.
     /// </summary>
     private string _rawImageBase64 = string.Empty;
 
@@ -79,8 +76,6 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
             OnPropertyChanged();
         }
     }
-
-    public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 
@@ -167,10 +162,9 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<ListItem> comms =
         [
-            ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString1(),
-                QuickImage.Get("BildmodusAbschneiden|32")),
-            ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString1(), QuickImage.Get("BildmodusVerzerren|32")),
-            ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString1(), QuickImage.Get("BildmodusEinpassen|32"))
+            ItemOf(SizeModes.BildAbschneiden),
+            ItemOf(SizeModes.Verzerren),
+            ItemOf(SizeModes.EmptySpace)
         ];
 
         var platzhalterFlex = new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2);

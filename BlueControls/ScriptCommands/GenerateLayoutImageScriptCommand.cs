@@ -6,13 +6,16 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Generiert ein Layout Bild.
+/// Es wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.
+/// </summary>
 public class GenerateLayoutImageScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
-    public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

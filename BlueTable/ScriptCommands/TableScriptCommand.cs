@@ -4,13 +4,15 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Versucht die Tabelle in den Speicher zu holen.
+/// </summary>
 internal class TableScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "table";
-    public override string Description => "Versucht die Tabelle in den Speicher zu holen.";
     public override bool MustUseReturnValue => true;
     public override string Returns => TableScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Kann Zahlenwerte formatiert anzeigen.
+/// </summary>
 public class NumberRenderer : Renderer {
 
     #region Fields
@@ -24,8 +27,6 @@ public class NumberRenderer : Renderer {
     #region Properties
 
     public static string ClassId => "Number";
-
-    public override string Description => "Kann Zahlenwerte formatiert anzeigen.";
 
     /// <summary>
     /// Anzahl der angezeigten Stellen hinter dem Komma.

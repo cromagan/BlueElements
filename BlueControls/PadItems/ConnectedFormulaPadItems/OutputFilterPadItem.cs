@@ -8,9 +8,10 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
+/// Ein Auswahlfeld, mit dem der Benutzer einen Filter selbst einstellt.
+/// Empfangene Filter können die zur Auswahl stehenden Werte einschränken.
+/// Die Auswahl wird an die folgenden Elemente weitergegeben.
 /// </summary>
-
 public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable, IHasFieldVariable {
 
     #region Constructors
@@ -62,8 +63,6 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
             OnDoUpdateSideOptionMenu();
         }
     } = string.Empty;
-
-    public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.\r\nWerte können mit 'Skript-Knöpfen' abgefragt und manipuluert werden.";
 
     /// <summary>
     /// Wenn gewählt, wird das Textfeld zu einem Knopf, sobald ein konkreter Wert gewählt ist.

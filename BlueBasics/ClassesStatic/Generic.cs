@@ -8,6 +8,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Windows.Forms;
+using LoxSmoke.DocXml;
 
 namespace BlueBasics.ClassesStatic;
 
@@ -27,9 +28,14 @@ public static class Generic {
 
     private static readonly List<Action> _trimActions = new();
     private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
+    private static readonly DocXmlReader Reader = new();
+
     private static int _allTypesAssemblyCount;
+
     private static bool _allTypesLoading;
+
     private static int _getUniqueKeyCount;
+
     private static string _getUniqueKeyLastTime = "InitialDummy";
 
     #endregion
@@ -395,6 +401,20 @@ public static class Generic {
             }
         }
         return 0;
+    }
+
+    /// <summary>
+    /// Liest den <c>&lt;summary&gt;</c>-Text des Members aus der XML-Dokumentation.
+    /// Auch Typen werden unterstützt.
+    /// Enthaltene Entities werden dekodiert. Ohne Dokumentation wird ein leerer String geliefert.
+    /// </summary>
+    public static string Summary(MemberInfo member) {
+        lock (Reader) {
+            var comment = member is Type type
+                ? Reader.GetTypeComments(type).Summary
+                : Reader.GetMemberComment(member);
+            return System.Net.WebUtility.HtmlDecode(comment ?? string.Empty);
+        }
     }
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);

@@ -7,10 +7,10 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen EINE zu wählen.
-/// Per Tabellenansicht
+/// Eine Tabelle, die der Benutzer ansehen, filtern und bearbeiten kann.
+/// Empfangene Filter begrenzen die angezeigten Zeilen.
+/// Wählt der Benutzer eine Zeile aus, wird diese an die folgenden Elemente weitergegeben.
 /// </summary>
-
 public class TableViewPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -30,8 +30,6 @@ public class TableViewPadItem : ReciverSenderPadItem, IItemToControl, IAutosizab
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
 
     public bool AutoSizeableHeight => true;
-
-    public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
 
     /// <summary>
     /// Ein Skript, das beim Doppelklick auf eine Zelle ausgeführt wird, statt die Bearbeitung zu öffnen.

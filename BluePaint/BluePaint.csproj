@@ -64,6 +64,7 @@
     <Using Include="System.Text.Json.Nodes" />
     <Using Include="BlueBasics.ClassesStatic" />
     <Using Include="BlueBasics" />
+    <Using Include="BlueBasics.Classes" />
     <Using Include="BlueBasics.Enums" />
     <Using Include="BlueBasics.Extensions" Static="true" />
     <Using Include="BlueControls.Controls" />

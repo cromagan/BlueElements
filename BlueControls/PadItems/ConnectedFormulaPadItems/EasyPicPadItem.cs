@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Ein Bild, das der Benutzer bei Bedarf selbst austauschen kann.
+/// </summary>
 public class EasyPicPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -51,7 +54,6 @@ public class EasyPicPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         }
     } = string.Empty;
 
-    public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;

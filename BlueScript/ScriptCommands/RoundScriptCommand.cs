@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Rundet den Zahlenwert mathematisch korrekt.
+/// </summary>
 internal class RoundScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [FloatVal, FloatVal];
     public override string Command => "round";
-    public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override string Syntax => "RoundScriptCommand(Value, Nachkommastellen)";

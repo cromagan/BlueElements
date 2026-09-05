@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Entschlüsselt einen Text.
+/// </summary>
 internal class DecryptScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "decrypt";
-    public override string Description => "Entschlüsselt einen Text.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "ScriptCommand(OriginalString, Schlüssel)";

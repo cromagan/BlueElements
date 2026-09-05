@@ -237,11 +237,6 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Kurze Beschreibung der Strategie für den Property-Editor.
-    /// </summary>
-    public virtual string Description => string.Empty;
-
-    /// <summary>
     /// Diese Zeichen dürfen nicht eingegeben werden.
     /// </summary>
     public string ForbiddenChars {

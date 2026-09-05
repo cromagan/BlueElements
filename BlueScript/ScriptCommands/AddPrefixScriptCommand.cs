@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Fügt am Anfang jedes Listenobjekts einen Text hinzu.
+/// </summary>
 internal class AddPrefixScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addprefix";
-    public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
     public override string Syntax => "AddPrefix(VariableListe, PrefixText)";
 
     #endregion

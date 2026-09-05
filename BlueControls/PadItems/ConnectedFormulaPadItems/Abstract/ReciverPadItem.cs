@@ -10,11 +10,9 @@ using System.Runtime.CompilerServices;
 namespace BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 
 /// <summary>
-/// Standard für Objekte, die einen Tabellen/Zeilenbezug haben.
-/// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
-/// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
+/// Basis für Formularelemente, die Daten von anderen Elementen empfangen.
+/// Nur Registerkarten mit einem solchen Element werden angezeigt.
 /// </summary>
-
 public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IErrorCheckable {
 
     #region Fields
@@ -95,7 +93,7 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
     }
 
     /// <summary>
-    /// Holt die Datebank aus dem erst Parent, anschließend aus dem Output
+    /// Die Tabelle, aus der dieses Element seine Werte bezieht.
     /// </summary>
     /// <returns></returns>
     public Table? TableInput {

@@ -4,13 +4,14 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Langsame, aber korrekte Anzeige mit Formatierungen.
+/// </summary>
 public class RichTextRenderer : Renderer {
 
     #region Properties
 
     public static string ClassId => "RichText";
-
-    public override string Description => "Langsame, aber korrekte Anzeige mit Formatierungen.";
 
     #endregion
 

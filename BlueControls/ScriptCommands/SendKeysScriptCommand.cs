@@ -6,6 +6,9 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Simuliert Tastatureingaben. Die Eingabe wird als StringScriptCommand übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.
+/// </summary>
 internal class SendKeysScriptCommand : ScriptCommand {
 
     #region Properties
@@ -13,8 +16,6 @@ internal class SendKeysScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal];
 
     public override string Command => "sendkeys";
-
-    public override string Description => "Simuliert Tastatureingaben. Die Eingabe wird als StringScriptCommand übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
 

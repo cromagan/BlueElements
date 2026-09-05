@@ -4,6 +4,12 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Erstellt einen FilterScriptCommand, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.
+/// Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.
+/// Bei diesem FilterScriptCommand wird die Groß/Kleinschreibung ignoriert.
+/// Bei Between müssen die Werte so Angegeben werden: 50|100
+/// </summary>
 public class FilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -12,11 +18,6 @@ public class FilterScriptCommand : TableGenericScriptCommand {
     public override string Command => "filter";
 
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
-
-    public override string Description => "Erstellt einen FilterScriptCommand, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                          "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
-                                          "Bei diesem FilterScriptCommand wird die Groß/Kleinschreibung ignoriert.\r\n" +
-                                          "Bei Between müssen die Werte so Angegeben werden: 50|100";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;

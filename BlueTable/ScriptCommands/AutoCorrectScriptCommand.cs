@@ -3,16 +3,17 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.
+/// Z.B: Autosort und Ersetzungen
+/// Es können nur Variablen benutzt werden, die auch zu einer Spalte gehören.
+/// </summary>
 internal class AutoCorrectScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[ScriptVariable.Any_Variable]];
     public override string Command => "autocorrect";
-
-    public override string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
-        "Z.B: Autosort und Ersetzungen\r\n" +
-        "Es können nur Variablen benutzt werden, die auch zu einer Spalte gehören.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 

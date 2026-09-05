@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Berechet die Formel im ScriptVariables.String. Falls die Berechung fehlschlägt, wird NaN-Value zurückgegeben.
+/// </summary>
 internal class CalculateScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "calculate";
-    public override string Description => "Berechet die Formel im ScriptVariables.String. Falls die Berechung fehlschlägt, wird NaN-Value zurückgegeben.";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override string Syntax => "Calculate(string, NaNValue)";

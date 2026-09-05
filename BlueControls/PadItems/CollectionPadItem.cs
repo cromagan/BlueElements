@@ -13,6 +13,9 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems;
 
+/// <summary>
+/// Eine Seite, auf der mehrere Elemente gemeinsam angeordnet werden — zum Beispiel ein Formular.
+/// </summary>
 public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<PadItem>, IReadableTextWithKey, IParseable, IJsonParseable, ICanHaveVariables, IStyleable {
 
     #region Fields
@@ -130,8 +133,6 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
         }
     } = string.Empty;
 
-    public override string Description => "Eine Sammlung von Anzeige-Objekten";
-
     public EditMode EditMode {
         get {
             if (Parent is CollectionPadItem { IsDisposed: false } icpi) {
@@ -158,7 +159,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// in mm
+    /// Abstand des Rasters in Millimetern.
     /// </summary>
     [DefaultValue(10.0)]
     public float GridShow {
@@ -172,7 +173,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     } = 10f;
 
     /// <summary>
-    /// in mm
+    /// Abstand, an dem Elemente am Raster einrasten, in Millimetern.
     /// </summary>
     [DefaultValue(10.0)]
     public float GridSnap {
@@ -186,8 +187,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     } = 10f;
 
     /// <summary>
-    /// Gibt zurück, ob die Collection Items enthält.
-    /// Die Collection "Head" gibt immer true zurück.
+    /// Zeigt an, ob die Seite Elemente enthält.
+    /// Eine Seite mit dem Namen "Head" gilt immer als gefüllt.
     /// </summary>
     public bool HasItems {
         get {
@@ -219,8 +220,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     } = Padding.Empty;
 
     /// <summary>
-    /// Stammtabelle, deren Platzhalter in den Formularelementen zur Verfügung stehen.
-    /// Nur die oberste Sammlung berücksichtigt diese Angabe.
+    /// Die Tabelle, deren Werte in den Formularelementen zur Verfügung stehen.
+    /// Nur die oberste Seite berücksichtigt diese Angabe.
     /// </summary>
     public Table? ReferenceTable {
         get {
@@ -353,7 +354,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
+    /// Berechnet den Abstand zum Rand, damit alle Elemente mittig im sichtbaren Bereich erscheinen.
     /// </summary>
     /// <param name="canvasUsedArea"></param>
     /// <param name="controlArea"></param>
@@ -692,10 +693,7 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// Erstellt ein Vorschaubitmap der Seite, das die Items (UsedAreaOfItems)
-    /// vollständig und randlos ausfüllt. Im Gegensatz zu DrawExplicit
-    /// wird AutoZoomFit ignoriert, damit die Vorschau nicht vom Seiteneffekt des
-    /// CreativePad (der AutoZoomFit auf false setzt) abhängt.
+    /// Erzeugt ein Vorschaubild der Seite, auf dem alle Elemente vollständig und randlos zu sehen sind.
     /// </summary>
     public Bitmap? GeneratePreviewBitmap(int maxSize) {
         var usedArea = UsedAreaOfItems();
@@ -724,11 +722,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
     /// <summary>
-    /// Führt das Export-Skript der ReferenceTable aus und liefert
-    /// die dabei erzeugten Variablen. Das Ergebnis wird pro Tabelle gecacht:
-    /// Bei derselben Tabelle wird der Cache zurückgegeben, bei einer anderen
-    /// Tabelle (oder wenn keine gültige ReferenceTable gesetzt ist) wird neu
-    /// gerechnet. Wird für die Suggestions in TextPadItem/BitmapPadItem verwendet.
+    /// Berechnet über das Export-Skript der Stammtabelle die dort erzeugten Variablen.
+    /// Das Ergebnis wird zwischengespeichert, bis eine andere Tabelle verwendet wird.
     /// </summary>
     public List<ScriptVariable> GetExportVariables() {
         if (ReferenceTable is not { IsDisposed: false } tb) {
@@ -751,10 +746,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// Liefert einen erklärenden Text, der den Status der Export-Variablen
-    /// beschreibt - woher die Werte kommen oder warum keine verfügbar sind.
-    /// Wird an die übergebene Basis-QuickInfo angehängt und für die
-    /// TextPadItem-/BitmapPadItem-Eingabefelder verwendet.
+    /// Erklärt in lesbarem Text, woher die Tabellen-Variablen kommen oder warum keine verfügbar sind.
+    /// Wird an die übergebene Basis-QuickInfo angehängt.
     /// </summary>
     /// <param name="baseQuickInfo">Die vorhandene QuickInfo (z. B. aus der Description des Properties).</param>
     /// <param name="applicableVariableCount">Anzahl der für das jeweilige Steuerelement verwendbaren Variablen.</param>
@@ -878,9 +871,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Öffnet einen modalen Vorschau-Dialog, der alle Zeilen der
-    /// ReferenceTable auflistet und für jede Zeile eine
-    /// Live-Vorschau des Formulars inklusive der berechneten Variablen zeigt.
+    /// Öffnet ein Vorschau-Fenster, das für jede Zeile der Stammtabelle
+    /// eine Live-Vorschau des Formulars samt berechneter Werte zeigt.
     /// </summary>
     public void OpenReferenceTablePreview() {
         if (ReferenceTable is not { IsDisposed: false } tb) { return; }
@@ -1215,10 +1207,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
 
     /// <inheritdoc />
     /// <remarks>
-    /// Rekursive Überschreibung: Vergibt nicht nur für dieses Collection-Item,
-    /// sondern auch für alle Kinder (und deren Kinder ...) neue eindeutige IDs.
-    /// Sonst würden z. B. beim Duplizieren oder beim Erzeugen mehrerer Layouts
-    /// aus derselben Vorlage Items mit identischem KeyName entstehen.
+    /// Vergibt für diese Seite und alle enthaltenen Elemente neue eindeutige Bezeichner.
+    /// So entstehen z. B. beim Duplizieren keine doppelten Namen.
     /// </remarks>
     internal override void GetNewIdsForEverything() {
         base.GetNewIdsForEverything();
@@ -1228,8 +1218,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// Prüft, ob das Formular sichtbare Elemente hat.
-    /// Zeilenselectionen werden dabei ignoriert.
+    /// Prüft, ob das Formular sichtbare Elemente enthält.
+    /// Zeilenauswahlfelder zählen nicht mit.
     /// </summary>
     /// <returns></returns>
     internal bool HasVisibleItemsForMe(string mode) {
@@ -1525,11 +1515,8 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
     }
 
     /// <summary>
-    /// Ereignisgesteuerter Retry: Wurde die ReferenzTabelle beim ersten
-    /// Zugriff nicht gefunden (z. B. weil sie noch nicht geladen war),
-    /// wird hier auf neu hinzugefügte Tabellen reagiert. Stimmt KeyName
-    /// oder Dateipfad überein, wird die Property invalidiert und beim
-    /// nächsten Zugriff neu geladen.
+    /// Wird ausgelöst, wenn eine neue Tabelle hinzugefügt wurde.
+    /// Passt Name oder Dateipfad zur gesuchten Stammtabelle, wird der Zugriff erneut versucht.
     /// </summary>
     private void ReferenceTable_Added(object? sender, LiveInstanceEventArgs<Table> e) {
         if (IsDisposed) { return; }

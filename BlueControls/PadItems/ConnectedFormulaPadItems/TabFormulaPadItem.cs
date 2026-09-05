@@ -8,7 +8,7 @@ using System.Windows.Forms;
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
+/// Eine Registerkarte, in der weitere Formulare angezeigt werden können.
 /// </summary>
 public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
@@ -34,7 +34,6 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;

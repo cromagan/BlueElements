@@ -7,17 +7,19 @@ using BlueScript.ScriptVariables;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Fügt eine neue Zeile zur Tabelle hinzu.
+/// Text ist die Überschrift, die dem Benutzer angezeigt wird.
+/// Suggestions ist eine Liste mit Vorschlägen für den Benutzer.
+/// Existiert die Zeile bereits, wird der trotzdem der Bearbeiten Dialog geöffnet
+/// Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist - wirft aber keinen Skriptfehler.
+/// </summary>
 public class AddRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar, StringVal, [ListOfStringsScriptVariable.ShortName_Plain]];
     public override string Command => "addrow";
-
-    public override string Description => "Fügt eine neue Zeile zur Tabelle hinzu.\r\n" +
-            "Text ist die Überschrift, die dem Benutzer angezeigt wird.\r\n" +
-            "Suggestions ist eine Liste mit Vorschlägen für den Benutzer.\r\nExistiert die Zeile bereits, wird der trotzdem der Bearbeiten Dialog geöffnet\r\n" +
-            "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist - wirft aber keinen Skriptfehler.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Returns => RowScriptVariable.ShortName_Variable;

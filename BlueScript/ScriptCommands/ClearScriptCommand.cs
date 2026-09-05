@@ -2,13 +2,15 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Entfernt alle Einträge einer Liste
+/// </summary>
 internal class ClearScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "clear";
-    public override string Description => "Entfernt alle Einträge einer Liste";
     public override string Syntax => "Clear(VariableListe);";
 
     #endregion

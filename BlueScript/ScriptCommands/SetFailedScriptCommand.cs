@@ -2,16 +2,17 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Markiert die Zeile als gescheitert, ohne sie als Fehlerhaft zu setzen.
+/// Dient dazu, temporäre Fehler, wie Netzwerkabbruche zu kompensieren.
+/// Beim nächsten Programmstart ist deser Fehlerspeicher wieder gelöscht.
+/// </summary>
 public class SetFailedScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "setfailed";
-
-    public override string Description => "Markiert die Zeile als gescheitert, ohne sie als Fehlerhaft zu setzen.\r\n" +
-                                            "Dient dazu, temporäre Fehler, wie Netzwerkabbruche zu kompensieren.\r\n" +
-                                                "Beim nächsten Programmstart ist deser Fehlerspeicher wieder gelöscht.";
 
     public override string Syntax => "SetFailedScriptCommand(Nachricht);";
 

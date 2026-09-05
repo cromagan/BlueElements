@@ -133,13 +133,16 @@ public class ReadableListItem : ListItem {
 
     /// <summary>
     /// Baut die QuickInfo: die übergebene Info (oder der encodierte Text) und bei
-    /// ISimpleEditor-Objekten deren Description unter einem Trennstrich.
+    /// ISimpleEditor-Objekten deren Klassen-Summary unter einem Trennstrich.
     /// </summary>
     private string BuildQuickInfo(IReadableText? item, string baseQuickInfo) {
         var qi = string.IsNullOrEmpty(baseQuickInfo) ? _text.CreateHtmlCodes() : baseQuickInfo;
 
-        if (item is ISimpleEditor { Description: { Length: > 0 } } se) {
-            qi += "<br><hr><br>" + se.Description.CreateHtmlCodes();
+        if (item is ISimpleEditor se) {
+            var summary = Generic.Summary(se.GetType());
+            if (summary is { Length: > 0 }) {
+                qi += "<br><hr><br>" + summary.CreateHtmlCodes();
+            }
         }
         return qi;
     }

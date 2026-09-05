@@ -3,13 +3,16 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.
+/// Kann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.
+/// </summary>
 internal class RemoveDoubleSpacesScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "removedoublespaces";
-    public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "RemoveDoubleSpacesScriptCommand(text)";

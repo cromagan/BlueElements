@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Zeigt den Zellinhalt als Text und/oder Bild an.
+/// </summary>
 public class ImageAndTextRenderer : Renderer {
 
     #region Fields
@@ -91,8 +94,6 @@ public class ImageAndTextRenderer : Renderer {
             }
         }
     }
-
-    public override string Description => "Zeigt den Zellinhalt als Text und/oder Bild an.";
 
     /// <summary>
     /// Die einheitliche Breite aller Bilder, zwischen 16 und 128.

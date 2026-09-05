@@ -37,7 +37,6 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     public virtual List<List<string>> Args => [];
     public abstract string Command { get; }
     public virtual List<string> Constants => [];
-    public abstract string Description { get; }
 
     public string EndSequence {
         get {
@@ -634,7 +633,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         co += "\r\n";
         co += "Beschreibung:\r\n";
         co += "~~~~~~~~~~~\r\n";
-        co = co + Description + "\r\n";
+        co = co + Generic.Summary(GetType()) + "\r\n";
 
         if (Constants.Count > 0) {
             co += "\r\n";

@@ -30,8 +30,6 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     /// </summary>
     public ColumnItem? Column { get; set; }
 
-    public override string Description => "Zeigt nichts an: Ein Klick in die Zelle führt sofort das hinterlegte Skript aus.";
-
     public override bool IsInstantAction => true;
 
     public override string KeyName => ClassId;

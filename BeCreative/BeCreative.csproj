@@ -60,6 +60,7 @@
     <Using Include="System.Reflection" />
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Nodes" />
+    <Using Include="BlueBasics.Classes" />
     <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
     <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
     <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />

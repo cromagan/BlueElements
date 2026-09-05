@@ -3,13 +3,24 @@ using BlueScript.Classes;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.
+/// 
+/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein.
+/// 
+/// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
+/// Ist der Wert mehrfach vorhanden, wird der nächstbeste zurückgegeben.
+/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// Es ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.
+/// Dann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.
+/// Ähnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
+/// </summary>
 public class FilterFirstValueScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
     public override string Command => "filterfirstvalue";
-    public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird der nächstbeste zurückgegeben.\r\nEin FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

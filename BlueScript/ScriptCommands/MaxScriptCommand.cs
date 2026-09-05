@@ -3,17 +3,18 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt von den angegebenen Werten den mit dem höchsten Wert zurück.
+/// Ein Text wird - wenn möglich - als Zahl interpretiert.
+/// Ist das nicht möglich, wird der Text ignoriert.
+/// Eine angegebene Liste muss mindestens einen Eintrag enthalten.
+/// </summary>
 internal class MaxScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [[DoubleScriptVariable.ShortName_Plain, StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
     public override string Command => "max";
-
-    public override string Description => "Gibt von den angegebenen Werten den mit dem höchsten Wert zurück.\r\n" +
-                                            "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
-                                            "Ist das nicht möglich, wird der Text ignoriert.\r\n" +
-                                            "Eine angegebene Liste muss mindestens einen Eintrag enthalten.";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;

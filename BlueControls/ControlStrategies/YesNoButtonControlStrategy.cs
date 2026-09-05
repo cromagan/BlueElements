@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.ControlStrategies;
 
+/// <summary>
+/// Zeigt einen Ja/Nein-Knopf, der zwischen den Werten + und - umschaltet.
+/// </summary>
 public class YesNoButtonControlStrategy : ControlStrategy {
 
     #region Fields
@@ -16,7 +19,6 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     public static string ClassId => "YesNoButton";
 
-    public override string Description => "Zeigt einen Ja/Nein-Knopf, der zwischen den Werten + und - umschaltet.";
     public override string KeyName => ClassId;
     protected override System.Windows.Forms.Control? ControlCore => _control;
 

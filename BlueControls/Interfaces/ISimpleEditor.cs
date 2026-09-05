@@ -18,12 +18,6 @@ public interface ISimpleEditor {
 
     #endregion
 
-    #region Properties
-
-    string Description { get; }
-
-    #endregion
-
     #region Methods
 
     List<GenericControl> GetProperties(int widthOfControl);
@@ -77,8 +71,9 @@ public static class SimpleEditorExtension {
             flexis.Insert(0, new FlexiControl("Achtung!", control.Width, true));
         }
 
-        if (element.Description is { Length: > 0 } desc) {
-            flexis.Insert(0, new FlexiControl(desc, control.Width, false));
+        var summary = Generic.Summary(element.GetType());
+        if (summary is { Length: > 0 }) {
+            flexis.Insert(0, new FlexiControl(summary, control.Width, false));
             flexis.Insert(0, new FlexiControl("Beschreibung:", control.Width, true));
         }
 

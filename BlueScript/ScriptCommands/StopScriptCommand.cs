@@ -2,12 +2,14 @@
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Beendet die Ausführung im Testmodus.
+/// </summary>
 public class StopScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override string Command => "stop";
-    public override string Description => "Beendet die Ausführung im Testmodus.";
     public override string StartSequence => string.Empty;
 
     public override string Syntax => "StopScriptCommand;";

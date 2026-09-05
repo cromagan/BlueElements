@@ -5,13 +5,18 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.
+/// Wird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.
+/// Wird dieser befüllt, wird eine laufende Nummer hinzugefügt
+/// Hashtag: #ID #einzigartig #filename
+/// </summary>
 internal class FreeFileNameScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "freefilename";
-    public override string Description => "Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\nWird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.\r\nWird dieser befüllt, wird eine laufende Nummer hinzugefügt\r\nHashtag: #ID #einzigartig #filename";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;

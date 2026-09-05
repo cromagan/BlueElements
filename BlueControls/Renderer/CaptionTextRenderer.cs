@@ -5,6 +5,9 @@ using System.Text;
 
 namespace BlueControls.Renderer;
 
+/// <summary>
+/// Mehrzeiliger Text. Zeilen, die mit der Überschrift-Markierung beginnen, werden als Überschrift dargestellt.<br />Die Tabulator-Sequenz springt zum nächsten Raster und zeichnet eine vertikale Trennlinie.
+/// </summary>
 public class CaptionTextRenderer : Renderer {
 
     #region Fields
@@ -33,9 +36,6 @@ public class CaptionTextRenderer : Renderer {
             OnPropertyChanged();
         }
     }
-
-    public override string Description =>
-        "Mehrzeiliger Text. Zeilen, die mit der Überschrift-Markierung beginnen, werden als Überschrift dargestellt.<br>Die Tabulator-Sequenz springt zum nächsten Raster und zeichnet eine vertikale Trennlinie.";
 
     /// <summary>
     /// Sequenz, die im Zelltext durch einen Tabulator ersetzt wird.

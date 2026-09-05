@@ -2,12 +2,14 @@
 
 namespace BeCreativeCLI.CliCommands;
 
+/// <summary>
+/// Tabellen: Durchsucht alle Spalten oder nur die mit --column gewählte Spalte. Pro Treffer eine Ausgabezeile: Spalte, Zeilen-Key und der Treffer mit je drei Wörtern Kontext davor und danach. Groß-/Kleinschreibung wird ignoriert.
+/// </summary>
 public class TableSearchCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-search";
-    public override string Description => "Tabellen: Durchsucht alle Spalten oder nur die mit --column gewählte Spalte. Pro Treffer eine Ausgabezeile: Spalte, Zeilen-Key und der Treffer mit je drei Wörtern Kontext davor und danach. Groß-/Kleinschreibung wird ignoriert.";
     public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>]";
 
     #endregion

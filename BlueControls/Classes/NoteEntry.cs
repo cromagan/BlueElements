@@ -4,6 +4,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Classes;
 
+/// <summary>
+/// Notiz bearbeiten.
+/// </summary>
 public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyChanged {
 
     #region Constructors
@@ -21,8 +24,6 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
     #endregion
 
     #region Properties
-
-    public string Description => "Notiz bearbeiten";
 
     /// <summary>
     /// Der Inhalt der Notiz.
@@ -70,19 +71,10 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyCha
         _ => ImageCode.Stift
     };
 
-    public List<GenericControl> GetProperties(int widthOfControl) {
-        var levels = new List<ListItem> {
-            new TextListItem("Neutral", ((int)NoteSymbols.Pencil).ToString1(), QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Ok", ((int)NoteSymbols.Ok).ToString1(), QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Warnung", ((int)NoteSymbols.Warning).ToString1(), QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Kritisch", ((int)NoteSymbols.Critical).ToString1(), QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
-        };
-
-        return [
-            new FlexiControlForProperty<NoteSymbols>(() => Symbol, levels),
-            new FlexiControlForProperty<string>(() => Note, 10)
-        ];
-    }
+    public List<GenericControl> GetProperties(int widthOfControl) => [
+        new FlexiControlForProperty<NoteSymbols>(() => Symbol, ItemsOf(typeof(NoteSymbols))),
+        new FlexiControlForProperty<string>(() => Note, 10)
+    ];
 
     public string ReadableText() => Note;
 

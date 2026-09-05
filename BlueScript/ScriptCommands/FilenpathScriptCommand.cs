@@ -3,13 +3,15 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \.
+/// </summary>
 internal class FilenpathScriptCommand : ScriptCommand {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "filepath";
-    public override string Description => "Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \\.";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override string Syntax => "Filepath(FilePathAndName)";

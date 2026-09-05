@@ -8,6 +8,9 @@ using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
+/// <summary>
+/// Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.
+/// </summary>
 internal class CheckBitmapScriptCommand : ScriptCommand, ICommandBuilder {
 
     #region Properties
@@ -15,8 +18,6 @@ internal class CheckBitmapScriptCommand : ScriptCommand, ICommandBuilder {
     public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, StringVal];
 
     public override string Command => "checkbitmap";
-
-    public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;

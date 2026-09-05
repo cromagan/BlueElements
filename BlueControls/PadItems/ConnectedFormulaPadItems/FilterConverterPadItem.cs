@@ -8,6 +8,10 @@ using System.Windows.Forms;
 
 namespace BlueControls.PadItems.FunktionsItems_Formular;
 
+/// <summary>
+/// Filtert Zeilen nach einer Bedingung, deren Wert aus den Variablen der eingehenden Zeile berechnet werden kann.
+/// Zur Kontrolle zeigt das Element an, mit welchem Wert gerade gefiltert wird.
+/// </summary>
 public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -25,8 +29,6 @@ public class FilterConverterPadItem : ReciverSenderPadItem, IItemToControl, IAut
     public static string ClassId => "FI-FilterConverterElement";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
-
-    public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
     /// <summary>
     /// Hinweistext, der erscheint, wenn keine Filterbedingung erzeugt werden kann.

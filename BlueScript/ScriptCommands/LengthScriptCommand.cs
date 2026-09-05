@@ -3,6 +3,9 @@
 namespace BlueScript.ScriptCommands;
 
 
+/// <summary>
+/// Gibt die Anzahl der Zeichen des Strings zurück
+/// </summary>
 internal class LengthScriptCommand : ScriptCommand {
 
     #region Properties
@@ -10,8 +13,6 @@ internal class LengthScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal];
 
     public override string Command => "length";
-
-    public override string Description => "Gibt die Anzahl der Zeichen des Strings zurück";
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
