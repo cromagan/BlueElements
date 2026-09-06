@@ -91,6 +91,10 @@ public partial class MirrorTool : Tool // System.Windows.Forms.UserControl //
         OnOverridePic(bmp, true);
     }
 
+    public override string ReadableText() => "Spiegeln";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.SpiegelnHorizontal, 16);
+
     private void btnAusrichten_Click(object sender, EventArgs e) {
         if (OnNeedCurrentPic() is null) { return; }
         _ausricht = true;

@@ -66,7 +66,7 @@ public partial class PageSetupDialog : EditorEasy {
             }
         }
         Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, FirstSortChar.ToString()));
-        Hochformat.Checked = !data.Querformat;
+        Hochformat.SetChecked(() => !data.Querformat);
         Querformat.Checked = !Hochformat.Checked;
         FillHöheBreite(data.BreiteMm, data.HöheMm);
         Oben.Text = data.RandObenMm.ToString1_2();

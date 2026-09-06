@@ -147,6 +147,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     } = string.Empty;
 
+    /// <summary>
+    /// Zeigt den Arbeitsbereich so an, wie er später gedruckt wird.
+    /// </summary>
     [DefaultValue(false)]
     public bool ShowInPrintMode {
         get;

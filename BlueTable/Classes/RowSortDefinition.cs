@@ -46,6 +46,10 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     #region Properties
 
     public string CaptionForEditor => "Sortierung";
+
+    /// <summary>
+    /// Es wird absteigend sortiert, der größte Wert kommt zuerst.
+    /// </summary>
     public bool Reverse { get; private set; }
     public Table Table { get; }
     public ReadOnlyCollection<ColumnItem> UsedColumns => _internal.AsReadOnly();

@@ -254,18 +254,18 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
         cbxPic.Text = value.Image;
 
-        chkZeile.Checked = value.NeedRow;
+        chkZeile.SetChecked(() => value.NeedRow);
         txbTestZeile.Enabled = value.NeedRow;
         grpRow.Enabled = value.NeedRow;
-        chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
+        chkReadOnly.SetChecked(() => value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes));
         chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
-        chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
-        chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+        chkAuslöser_newrow.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.InitialValues));
+        chkAuslöser_valuechanged.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.value_changed));
         chkExtendend.Enabled = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
-        chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
-        chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
-        chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
-        chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
+        chkAuslöser_valuechangedThread.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread));
+        chkAuslöser_prepaireformula.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula));
+        chkAuslöser_export.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.export));
+        chkAuslöser_deletingRow.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.row_deleting));
         Script = value.Script;
         LastFailedReason = value.FailedReason;
         LastVariables = value.SavedVariables;

@@ -268,19 +268,19 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // GlobalShowPass ist nur bei TableFile erlaubt (Persistierung im Main-Chunk).
         var isTableFile = tb is TableFile;
         txbKennwort.Enabled = isTableFile;
-        txbKennwort.Text = isTableFile ? tb.GlobalShowPass : string.Empty;
+        txbKennwort.Set(isTableFile ? tb.GlobalShowPass : string.Empty, () => tb.GlobalShowPass);
 
         rowSortDefinitionEditor.InputItem = tb.SortDefinition;
 
         UpdateCustomSortButtons();
 
-        txbTags.Text = string.Join('\r', tb.Tags);
+        txbTags.Set(string.Join('\r', tb.Tags), () => tb.Tags);
 
-        txbCaption.Text = tb.Caption;
-        txbAssetFolder.Text = tb.AssetFolder;
-        txbSymbolFolder.Text = tb.SymbolFolder;
-        txbStandardFormulaFile.Text = tb.StandardFormulaFile;
-        txbZeilenQuickInfo.Text = tb.RowQuickInfo.Replace("<br>", "\r");
+        txbCaption.Set(() => tb.Caption);
+        txbAssetFolder.Set(() => tb.AssetFolder);
+        txbSymbolFolder.Set(() => tb.SymbolFolder);
+        txbStandardFormulaFile.Set(() => tb.StandardFormulaFile);
+        txbZeilenQuickInfo.Set(tb.RowQuickInfo.Replace("<br>", "\r"), () => tb.RowQuickInfo);
         txbZeilenQuickInfo.SuggestionPosition = SuggestionPosition.ContextMenuOnly;
         txbZeilenQuickInfo.Suggestions = tb.Column.Where(c => !c.IsDisposed).Select(c => $"~{c.KeyName}~").ToList().AsReadOnly();
 
@@ -294,7 +294,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lstUniqueValues.Editor = uniqueValueDefinitionEditor;
         lstUniqueValues.InputItem = Table?.UniqueValues;
 
-        txbDictionary.Text = string.Join('\r', tb.DictionaryWords);
+        txbDictionary.Set(string.Join('\r', tb.DictionaryWords), () => tb.DictionaryWords);
 
         GenerateInfoText();
     }

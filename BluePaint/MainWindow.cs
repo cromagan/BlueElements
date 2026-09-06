@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls;
 using BlueControls.Classes;
 using BlueControls.EventArgs;
 using System.Drawing.Imaging;
@@ -28,6 +29,7 @@ public partial class MainWindow : FormWithStatusBar {
         Tab_Start.Enabled = loadSaveEnabled;
         btnOK.Visible = !loadSaveEnabled;
         tabRibbonbar.SelectedIndex = 1;
+        SetToolButtonImages();
     }
 
     public MainWindow() : this(true) { }
@@ -113,6 +115,21 @@ public partial class MainWindow : FormWithStatusBar {
     }
 
     private void Bruchlinie_Click(object sender, EventArgs e) => SetTool(new FaultLineTool());
+
+    /// <summary>
+    /// Ordnet jedem Werkzeug-Knopf das Symbol und die Kurzbeschreibung des Werkzeugs zu.
+    /// </summary>
+    private void SetToolButtonImages() {
+        btnZeichnen.SetAddButtonInfo<PenTool>();
+        btnRadiergummi.SetAddButtonInfo<EraserTool>();
+        btnClipping.SetAddButtonInfo<ClipTool>();
+        btnSpiegeln.SetAddButtonInfo<MirrorTool>();
+        btnBruchlinie.SetAddButtonInfo<FaultLineTool>();
+        btnKontrast.SetAddButtonInfo<ContrastTool>();
+        btnScreenshot.SetAddButtonInfo<ScreenshotTool>();
+        btnGrößeÄndern.SetAddButtonInfo<ResizeTool>();
+        btnDummy.SetAddButtonInfo<DummyGeneratorTool>();
+    }
 
     private void btn100_Click(object sender, EventArgs e) => P.Zoom = 1f;
 

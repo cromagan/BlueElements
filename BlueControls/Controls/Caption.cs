@@ -17,6 +17,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private ExtText? _eText;
 
+    private bool? _quickModePossible;
+
     #endregion
 
     #region Constructors
@@ -64,7 +66,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Methods
 
     public static Size RequiredTextSize(string text, Design design, bool translate, int maxwidth) {
-        if (QuickModePossible(text)) {
+        if (QuickModePossible(text, design, maxwidth)) {
             var s = Skin.GetBlueFont(design, States.Standard).MeasureString(text);
             return new Size((int)(s.Width + 1), (int)(s.Height + 1));
         }
@@ -115,7 +117,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             if (!string.IsNullOrEmpty(Text)) {
-                if (QuickModePossible(Text)) {
+                _quickModePossible ??= QuickModePossible(Text, _design, Width);
+                if (_quickModePossible.Value) {
                     Skin.Draw_FormatedText(gr, Text, null, Alignment.Top_Left, new Rectangle(), _design, state, null, false, Translate);
                 } else {
                     UseBackgroundBitmap = true;
@@ -134,6 +137,14 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
+        _quickModePossible = null;
+        _eText = null;
+        Invalidate();
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        _quickModePossible = null;
         _eText = null;
         Invalidate();
     }
@@ -143,7 +154,13 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         TextDimensions = new Size(maxwidth, -1),
     };
 
-    private static bool QuickModePossible(string text) => !text.Contains('<') && !text.Contains('\r') && !text.Contains('&');
+    /// <summary>
+    /// QuickMode nur für einfache Texte ohne Steuerzeichen, die in die verfügbare Breite passen. Längere Texte umbrechen.
+    /// </summary>
+    private static bool QuickModePossible(string text, Design design, int maxwidth) {
+        if (text.Contains('<') || text.Contains('\r') || text.Contains('&')) { return false; }
+        return Skin.GetBlueFont(design, States.Standard).MeasureString(text).Width <= maxwidth;
+    }
 
     private void GetDesign() {
         _design = Design.Undefined;

@@ -9,7 +9,6 @@ using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
@@ -20,25 +19,25 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     public ConnectedFormulaEditor(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         InitializeComponent();
 
-        GenQuickInfo(btnFeldHinzu, new EditFieldPadItem());
+        btnFeldHinzu.SetFormulaButtonInfo(new EditFieldPadItem());
 
-        GenQuickInfo(btnButton, new ScriptButtonPadItem());
+        btnButton.SetFormulaButtonInfo(new ScriptButtonPadItem());
 
-        GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem());
+        btnRegionAdd.SetFormulaButtonInfo(new RegionFormulaPadItem());
 
-        GenQuickInfo(btnFileExplorer, new FileExplorerPadItem());
+        btnFileExplorer.SetFormulaButtonInfo(new FileExplorerPadItem());
 
-        GenQuickInfo(btnBild, new EasyPicPadItem());
+        btnBild.SetFormulaButtonInfo(new EasyPicPadItem());
 
-        GenQuickInfo(btnTable, new TableViewPadItem());
+        btnTable.SetFormulaButtonInfo(new TableViewPadItem());
 
-        GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem());
+        btnDropdownmenu.SetFormulaButtonInfo(new DropDownSelectRowPadItem());
 
-        GenQuickInfo(btnFilterConverter, new FilterConverterPadItem());
+        btnFilterConverter.SetFormulaButtonInfo(new FilterConverterPadItem());
 
-        GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem());
+        btnTabControlAdd.SetFormulaButtonInfo(new TabFormulaPadItem());
 
-        GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem());
+        btnBenutzerFilterWahl.SetFormulaButtonInfo(new OutputFilterPadItem());
 
         FormulaSet(filename, notAllowedchilds);
 
@@ -96,7 +95,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
+
     public virtual EditorMode SupportedModes => EditorMode.EditItem;
+
+    /// <summary>
+    /// Im ConnectedFormulaEditor werden die Pad-Eigenschaften (insbesondere
+    /// die Referenztabelle) nicht in der Seitenleiste angeboten, da hier die
+    /// Formular-Logik über die ConnectedFormula läuft.
+    /// </summary>
+    protected override bool ShowPadPropertiesWhenNoItemSelected => false;
 
     #endregion
 
@@ -137,42 +144,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     protected override void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
         base.Pad_GotNewItemCollection(sender, e);
         DoPages();
-    }
-
-    /// <summary>
-    /// Im ConnectedFormulaEditor werden die Pad-Eigenschaften (insbesondere
-    /// die Referenztabelle) nicht in der Seitenleiste angeboten, da hier die
-    /// Formular-Logik über die ConnectedFormula läuft.
-    /// </summary>
-    protected override bool ShowPadPropertiesWhenNoItemSelected => false;
-
-    private static void GenQuickInfo(Button b, ReciverPadItem from) {
-        var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
-
-        txt += "<br><br><b><u>Beschreibung:</b></u>";
-        txt = txt + "<br>" + Generic.Summary(from.GetType());
-
-        txt += "<br><br><b><u>Eigenschaften:</b></u>";
-
-        if (from is { IsDisposed: false } ias) {
-            if (ias.InputMustBeOneRow) {
-                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
-                    "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Tabelle ergeben,<br>" +
-                    "   da die Werte der Zeile in dem Element benutzt werden können.";
-            } else {
-                txt += "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
-            }
-        }
-
-        if (from is ReciverSenderPadItem) {
-            txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
-        }
-
-        if (!from.MustBeInDrawingArea) {
-            txt += "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
-        }
-
-        b.QuickInfo = txt;
     }
 
     private void _cFormula_Editing(object? sender, EditingEventArgs e) {

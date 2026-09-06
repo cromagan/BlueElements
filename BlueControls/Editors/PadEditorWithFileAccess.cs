@@ -18,7 +18,16 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Constructors
 
-    public PadEditorWithFileAccess() : base() => InitializeComponent();
+    public PadEditorWithFileAccess() : base() {
+        InitializeComponent();
+
+        btnAddDimension.SetAddButtonInfo<DimensionPadItem>();
+        btnAddImage.SetAddButtonInfo<BitmapPadItem>();
+        btnAddLine.SetAddButtonInfo<LinePadItem>();
+        btnAddSymbol.SetAddButtonInfo<SymbolPadItem>();
+        btnAddText.SetAddButtonInfo<TextPadItem>();
+        btnAddUnterStufe.SetAddButtonInfo<CollectionPadItem>();
+    }
 
     #endregion
 

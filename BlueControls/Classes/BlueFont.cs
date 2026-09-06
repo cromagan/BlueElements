@@ -58,6 +58,9 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public bool BackColor => ColorBack.A > 0;
 
+    /// <summary>
+    /// Der Text wird fett dargestellt.
+    /// </summary>
     public bool Bold { get; private set; }
 
     public string CaptionForEditor => "Schriftart";
@@ -68,11 +71,17 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public Color ColorMain { get; private set; } = Color.Black;
 
+    /// <summary>
+    /// Farbe der Konturlinie um die Buchstaben.
+    /// </summary>
     public Color ColorOutline { get; private set; } = Color.Transparent;
 
     public string FontName { get; private set; } = "Arial";
 
     public bool IsDisposed => _isDisposedFlag == 1;
+    /// <summary>
+    /// Der Text wird kursiv dargestellt.
+    /// </summary>
     public bool Italic { get; private set; }
 
     public string KeyName { get; private set; } = string.Empty;
@@ -81,8 +90,14 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public float Size { get; private set; } = 9;
 
+    /// <summary>
+    /// Der Text wird durchgestrichen dargestellt.
+    /// </summary>
     public bool StrikeOut { get; private set; }
 
+    /// <summary>
+    /// Der Text wird unterstrichen dargestellt.
+    /// </summary>
     public bool Underline { get; private set; }
 
     #endregion

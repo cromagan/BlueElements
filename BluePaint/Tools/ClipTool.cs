@@ -56,6 +56,10 @@ public partial class ClipTool {
         ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
+    public override string ReadableText() => "Zuschneiden";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zuschneiden, 16);
+
     private void btnAutoZ_Click(object sender, EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();

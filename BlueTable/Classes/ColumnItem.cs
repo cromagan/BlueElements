@@ -231,6 +231,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     #region Properties
 
+    /// <summary>
+    /// Zusätzliche Prüfung, mit welcher anderen Spalte die Zellinhalte zusammenpassen müssen.
+    /// </summary>
     public AdditionalCheck AdditionalFormatCheck {
         get => _additionalFormatCheck;
         set {
@@ -243,9 +246,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Ein Information für Administratoren. Freier Text.
-    /// Wird als Quickinfo angezeigt, wenn der Admininstror
-    /// mit der Maus über den Spaltenkopf fährt.
+    /// Freier Informationstext für Administratoren; wird als QuickInfo am Spaltenkopf angezeigt.
     /// </summary>
     public string AdminInfo {
         get => _adminInfo;
@@ -258,6 +259,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Kleine Eingabefehler werden nach dem Eintragen automatisch verbessert.
+    /// </summary>
     public bool AfterEditAutoCorrect {
         get => _afterEditAutoCorrect;
         set {
@@ -269,6 +273,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Textersetzungen, die nach der Eingabe automatisch ausgeführt werden.
+    /// </summary>
     public ReadOnlyCollection<string> AfterEditAutoReplace {
         get => new(_afterEditAutoReplace);
         set {
@@ -280,6 +287,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Alle Buchstaben werden nach der Eingabe automatisch in Großbuchstaben umgewandelt.
+    /// </summary>
     public bool AfterEditDoUCase {
         get => _afterEditDoUCase;
         set {
@@ -291,6 +301,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Einträge werden nach der Eingabe automatisch sortiert; doppelte Einträge werden entfernt.
+    /// </summary>
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
         set {
@@ -302,6 +315,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Nachkommastellen, auf die nach der Eingabe gerundet wird (-1 = nicht runden).
+    /// </summary>
     public int AfterEditRound {
         get => _afterEditRound;
         set {
@@ -313,6 +329,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Horizontale Ausrichtung des Zellinhalts.
+    /// </summary>
     public AlignmentHorizontal Align {
         get => _align;
         set {
@@ -324,6 +343,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Zeichen, die bei Zelleingaben erlaubt sind.
+    /// </summary>
     public string AllowedChars {
         get => _allowedChars;
         set {
@@ -337,6 +359,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public List<string> Am_A_Key_For { get; } = [];
 
+    /// <summary>
+    /// Zusätzlicher fester Wert, den der Autofilter mit anbietet.
+    /// </summary>
     public string AutoFilterJoker {
         get => _autoFilterJoker;
         set {
@@ -359,6 +384,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Hintergrundstil der Zellen der Spalte.
+    /// </summary>
     public ColumnBackgroundStyle BackgroundStyle {
         get => _backgroundStyle;
         set {
@@ -370,6 +398,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Angezeigter Name der Spalte im Spaltenkopf.
+    /// </summary>
     public string Caption {
         get => _caption;
         set {
@@ -382,6 +413,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Bild, das im Spaltenkopf angezeigt wird.
+    /// </summary>
     public string CaptionBitmapCode {
         get => _captionBitmapCode;
         set {
@@ -396,6 +430,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public string CaptionForEditor => "Spalte";
 
+    /// <summary>
+    /// Erste Gruppierungs-Überschrift über dem Spaltenkopf.
+    /// </summary>
     public string CaptionGroup1 {
         get => _captionGroup1;
         set {
@@ -408,6 +445,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Zweite Gruppierungs-Überschrift über dem Spaltenkopf.
+    /// </summary>
     public string CaptionGroup2 {
         get => _captionGroup2;
         set {
@@ -420,6 +460,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Dritte Gruppierungs-Überschrift über dem Spaltenkopf.
+    /// </summary>
     public string CaptionGroup3 {
         get => _captionGroup3;
         set {
@@ -465,7 +508,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Was in Textfeldern oder Tabellezeilen für ein Suffix angezeigt werden soll. Beispiel: mm
+    /// Schlagwörter der Spalte, z. B. für Skripte und Ansichten.
     /// </summary>
     public string ColumnTags {
         get => _columnTags;
@@ -479,7 +522,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// ClassId der Bearbeitungs-Strategie der Spalte (z. B. "Textbox" oder "Combobox").
+    /// Wie der Inhalt der Zellen bearbeitet wird (z. B. als Textfeld oder Auswahlliste).
     /// </summary>
     public string ControlStrategy {
         get => _controlStrategy;
@@ -506,6 +549,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Wie der Zellinhalt dargestellt wird (z. B. als Text oder Bild).
+    /// </summary>
     public string DefaultRenderer {
         get => _defaultRenderer;
         set {
@@ -517,6 +563,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Ob Zellinhalte beim Anzeigen automatisch übersetzt werden.
+    /// </summary>
     public TranslationType DoOpticalTranslation {
         get => _doOpticalTranslation;
         set {
@@ -528,6 +577,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Vordefinierte Werte, die in den Zellen auswählbar sind.
+    /// </summary>
     public ReadOnlyCollection<string> DropDownItems {
         get => new(_dropDownItems);
         set {
@@ -539,6 +591,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Der Inhalt der Zellen kann direkt eingetippt werden.
+    /// </summary>
     public bool EditableWithTextInput {
         get => _editableWithTextInput;
         set {
@@ -550,6 +605,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Die Zellen bleiben bearbeitbar, obwohl die Tabelle gesperrt ist.
+    /// </summary>
     public bool EditAllowedDespiteLock {
         get => _editAllowedDespiteLock;
         set {
@@ -561,6 +619,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Welche Filtermöglichkeiten für diese Spalte angeboten werden.
+    /// </summary>
     public FilterOptions FilterOptions {
         get => _filterOptions;
         set {
@@ -572,6 +633,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Feste Spaltenbreite in Pixeln (0 = automatisch).
+    /// </summary>
     public int FixedColumnWidth {
         get => _fixedColumnWidth;
         set {
@@ -582,6 +646,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Zeichen, die in Zellinhalten nicht erlaubt sind.
+    /// </summary>
     public string ForbiddenChars {
         get => _forbiddenChars;
         set {
@@ -620,6 +687,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Diese Spalte wird beim Filtern der Zeilen nicht berücksichtigt.
+    /// </summary>
     public bool IgnoreAtRowFilter {
         get => _ignoreAtRowFilter;
         set {
@@ -633,6 +703,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
+    /// <summary>
+    /// Zeigt an, dass diese Spalte als erste Spalte der Tabelle verwendet wird.
+    /// </summary>
     public bool IsFirst {
         get => _isFirst;
         set {
@@ -645,6 +718,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Zeigt an, dass die Werte dieser Spalte jede Zeile eindeutig kennzeichnen.
+    /// </summary>
     public bool IsKeyColumn {
         get => _isKeyColumn;
         set {
@@ -657,6 +733,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Eindeutiger Name der Spalte.
+    /// </summary>
     public string KeyName {
         get => _keyName;
         set {
@@ -680,6 +759,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Linienstil an der linken Begrenzungslinie der Spalte.
+    /// </summary>
     public ColumnLineStyle LineStyleLeft {
         get => _lineStyleLeft;
         set {
@@ -699,6 +781,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     //        OnPropertyChanged(string propertyname);
     //    }
     //}
+    /// <summary>
+    /// Linienstil an der rechten Begrenzungslinie der Spalte.
+    /// </summary>
     public ColumnLineStyle LineStyleRight {
         get => _lineStyleRight;
         set {
@@ -753,6 +838,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Name der Tabelle, mit der die Spalte verknüpft ist (leer = keine Verknüpfung).
+    /// </summary>
     public string LinkedTableTableName {
         get => _linkedTableTableName;
         set {
@@ -765,6 +853,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Maximale Gesamtlänge aller Einträge einer Zelle.
+    /// </summary>
     public int MaxCellLength {
         get => _maxCellLength;
         set {
@@ -775,6 +866,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Maximale Länge eines einzelnen Eintrags in der Zelle.
+    /// </summary>
     public int MaxTextLength {
         get => _maxTextLength;
         set {
@@ -785,6 +879,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Minimal erforderliche Länge eines Zell-Eintrags.
+    /// </summary>
     public int MinTextLength {
         get => _minTextLength;
         set {
@@ -815,6 +912,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Zellen dieser Spalte können mehrere Zeilen Text enthalten.
+    /// </summary>
     public bool MultiLine {
         get => _multiLine;
         set {
@@ -843,6 +943,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Schnellinfo-Text der Spalte für den Benutzer.
+    /// </summary>
     public string QuickInfo {
         get => _quickInfo;
         set {
@@ -854,6 +957,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Eingaben werden anhand eines Suchmusters geprüft (Regex).
+    /// </summary>
     public string RegexCheck {
         get => _regexCheck;
         set {
@@ -865,6 +971,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Die Werte werden beim Bearbeiten mit der ersten Spalte der Tabelle abgeglichen.
+    /// </summary>
     public bool Relationship_to_First {
         get => _relationship_to_First;
         set {
@@ -877,6 +986,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Art der Beziehung zu einer verknüpften Tabelle.
+    /// </summary>
     public RelationType RelationType {
         get => _relationType;
         set {
@@ -901,6 +1013,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Der Inhalt der Zellen wird mit der Tabelle gespeichert.
+    /// </summary>
     public bool SaveContent {
         get => _saveContent;
         set {
@@ -911,6 +1026,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Datentyp der Spalte innerhalb von Skripten.
+    /// </summary>
     public ScriptType ScriptType {
         get => _scriptType;
         set {
@@ -928,6 +1046,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     string IHasSettings.SettingsManualFilename { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Die Auswahlliste zeigt zusätzlich die Werte an, die bereits in anderen Zellen stehen.
+    /// </summary>
     public bool ShowValuesOfOtherCellsInDropdown {
         get => _showValuesOfOtherCellsInDropdown;
         set {
@@ -939,6 +1060,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    /// <summary>
+    /// Art, wie die Spalte sortiert wird.
+    /// </summary>
     public SortierTyp SortType {
         get => _sortType;
         set {
@@ -977,6 +1101,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     bool IHasSettings.UsesSettings => _value_for_Chunk != ChunkType.None;
 
+    /// <summary>
+    /// Wie der Zellinhalt beim Aufteilen der Tabelle in Chunks berücksichtigt wird.
+    /// </summary>
     public ChunkType Value_for_Chunk {
         get => _value_for_Chunk;
         set {

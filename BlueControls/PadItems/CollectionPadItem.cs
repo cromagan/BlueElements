@@ -293,6 +293,9 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
         }
     }
 
+    /// <summary>
+    /// Elemente werden beim Verschieben am Raster ausgerichtet.
+    /// </summary>
     [DefaultValue(false)]
     public SnapMode SnapMode {
         get;

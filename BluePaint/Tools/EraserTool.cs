@@ -92,6 +92,10 @@ public partial class EraserTool : Tool {
         }
     }
 
+    public override string ReadableText() => "Radiergummi";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Radiergummi, 16);
+
     private void DrawBox_CheckedChanged(object sender, EventArgs e) => OnDoInvalidate();
 
     private void sldSize_ValueChanged(object sender, EventArgs e) {

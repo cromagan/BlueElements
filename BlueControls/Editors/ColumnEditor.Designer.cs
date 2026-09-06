@@ -238,7 +238,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbUeberschift1
             // 
             txbUeberschift1.Cursor = Cursors.IBeam;
-            txbUeberschift1.Location = new Point(104, 256);
+            txbUeberschift1.Location = new Point(104, 272);
             txbUeberschift1.Name = "txbUeberschift1";
             txbUeberschift1.RegexCheck = null;
             txbUeberschift1.Size = new Size(304, 24);
@@ -247,7 +247,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbUeberschift3
             // 
             txbUeberschift3.Cursor = Cursors.IBeam;
-            txbUeberschift3.Location = new Point(104, 319);
+            txbUeberschift3.Location = new Point(104, 320);
             txbUeberschift3.Name = "txbUeberschift3";
             txbUeberschift3.RegexCheck = null;
             txbUeberschift3.Size = new Size(304, 24);
@@ -291,7 +291,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbUeberschift2
             // 
             txbUeberschift2.Cursor = Cursors.IBeam;
-            txbUeberschift2.Location = new Point(104, 295);
+            txbUeberschift2.Location = new Point(104, 296);
             txbUeberschift2.Name = "txbUeberschift2";
             txbUeberschift2.RegexCheck = null;
             txbUeberschift2.Size = new Size(304, 24);
@@ -711,7 +711,6 @@ namespace BlueControls.BlueTableDialogs {
             capMaxCellLength.CausesValidation = false;
             capMaxCellLength.Location = new Point(16, 88);
             capMaxCellLength.Name = "capMaxCellLength";
-            capMaxCellLength.QuickInfo = "Falls mehrere Zeilen erlaubt sind, pro Zeile.\r\nAber es sind niemals mehr als 4000 Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
             capMaxCellLength.Size = new Size(160, 24);
             capMaxCellLength.Text = "Maximale Zellen-Kapazität:";
             // 

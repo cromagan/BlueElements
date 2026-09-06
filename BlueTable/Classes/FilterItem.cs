@@ -98,6 +98,9 @@ public sealed class FilterItem : IReadableText, IHasQuickInfo, IParseable, ICanB
         private set => field = value;
     }
 
+    /// <summary>
+    /// Wie die Werte beim Filtern verglichen werden.
+    /// </summary>
     public FilterType FilterType { get; private set; }
 
     public string Origin { get; private set; }

@@ -19,6 +19,10 @@ public partial class ScreenshotTool {
         OnZoomFit();
     }
 
+    public override string ReadableText() => "Screenshot";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kamera, 16);
+
     private void DoScreenShot() {
         OnHideMainWindow();
         Pause(1, true);

@@ -26,6 +26,9 @@ public sealed class PageSetupData : IEditable {
     /// </summary>
     public float HöheMm { get; set; }
 
+    /// <summary>
+    /// Das Papier wird quer statt hochkant verwendet.
+    /// </summary>
     public bool Querformat { get; set; }
 
     public float RandLinksMm { get; set; }

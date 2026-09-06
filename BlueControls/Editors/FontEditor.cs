@@ -124,11 +124,11 @@ public partial class FontEditor : EditorEasy {
         lstName.Check(bf.FontName);
         listSize.UncheckAll();
         listSize.Check(bf.Size.ToString1_2());
-        chkFett.Checked = bf.Bold;
-        chkKursiv.Checked = bf.Italic;
-        chkUnterstrichen.Checked = bf.Underline;
-        chkDurchgestrichen.Checked = bf.StrikeOut;
-        chkOutline.Checked = bf.ColorOutline.A > 0;
+        chkFett.SetChecked(() => bf.Bold);
+        chkKursiv.SetChecked(() => bf.Italic);
+        chkUnterstrichen.SetChecked(() => bf.Underline);
+        chkDurchgestrichen.SetChecked(() => bf.StrikeOut);
+        chkOutline.SetChecked(() => bf.ColorOutline.A > 0);
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).KeyName;
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).KeyName;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorBack).KeyName;

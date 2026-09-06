@@ -36,6 +36,10 @@ public partial class DummyGeneratorTool {
         return bmp;
     }
 
+    public override string ReadableText() => "Dummy-Bild";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16);
+
     private void CreateDummy() {
         var w = IntParse(MathFormulaParser.Ergebnis(X.Text));
         var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));

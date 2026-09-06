@@ -74,14 +74,14 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     protected virtual void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
-        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+        btnVorschauModus.SetChecked(() => Pad.ShowInPrintMode);
 
         ckbRaster.Enabled = Pad.Items is not null;
         txbRasterAnzeige.Enabled = Pad.Items is not null;
         txbRasterFangen.Enabled = Pad.Items is not null;
 
         if (Pad.Items is not null) {
-            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
+            ckbRaster.SetChecked(() => Pad.Items.SnapMode == SnapMode.SnapToGrid);
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToString1_2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToString1_2();
             PadDesign.Text = Pad.Items.SheetStyle;
@@ -168,7 +168,7 @@ public partial class PadEditor : FormWithStatusBar {
         LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
     }
 
-    private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
+    private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.SetChecked(() => Pad.ShowInPrintMode);
 
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }

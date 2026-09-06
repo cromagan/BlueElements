@@ -23,6 +23,10 @@ public partial class ResizeTool : Tool //BlueControls.Forms.Form //
         DoCapInfo();
     }
 
+    public override string ReadableText() => "Größe ändern";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.GrößeÄndern, 16);
+
     private void btnDoResize_Click(object sender, EventArgs? e) {
         var p = OnNeedCurrentPic();
         if (p is null) { return; }

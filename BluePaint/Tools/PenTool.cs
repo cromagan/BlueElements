@@ -44,6 +44,10 @@ public partial class PenTool {
         }
     }
 
+    public override string ReadableText() => "Zeichnen";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stift, 16);
+
     private void sldSize_ValueChanged(object sender, EventArgs e) {
         _brushSize = (int)Math.Round(sldSize.Value, MidpointRounding.AwayFromZero);
         capSize.Text = _brushSize.ToString1();

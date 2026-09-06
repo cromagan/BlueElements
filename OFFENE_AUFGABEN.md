@@ -246,6 +246,9 @@ Nutze bei allen Renderen, PadItems, Tools das neue ImageAttribute. Und alle Anze
 ## Aufgabe
 Entferne ALLES rund um BCS.
 
+## Aufgabe
+Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor ein
+
 
 
 

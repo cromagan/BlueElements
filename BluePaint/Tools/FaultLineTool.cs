@@ -19,6 +19,10 @@ public partial class FaultLineTool {
 
     #region Methods
 
+    public override string ReadableText() => "Bruchlinie";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bruchlinie, 16);
+
     private void Bruch_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }

@@ -70,7 +70,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
-    /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+    /// Die Formulardatei, die standardmäßig zu dieser Tabelle gehört.
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
@@ -180,7 +180,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
 
     /// <summary>
-    /// In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.
+    /// Ordner mit zusätzlichen Dateien zur Tabelle, z. B. Spaltenbilder und Layouts.
     /// </summary>
     public string AssetFolder {
         get => _assetFolder;
@@ -272,6 +272,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Zusätzliche Wörter für die Rechtschreibprüfung dieser Tabelle.
+    /// </summary>
     public ReadOnlyCollection<string> DictionaryWords {
         get => new(_dictionaryWords);
         set {
@@ -321,6 +324,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Globales Kennwort der Tabelle; ist es gesetzt, wird die Tabelle erst nach Passwort-Eingabe freigegeben.
+    /// </summary>
     public string GlobalShowPass {
         get => _globalShowPass;
         set {
@@ -399,6 +405,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public RowCollection Row { get; }
 
+    /// <summary>
+    /// Vorlage für die Schnellinfo einer Zeile; Platzhalter wie ~Spaltenname~ werden ersetzt.
+    /// </summary>
     public string RowQuickInfo {
         get => _rowQuickInfo;
         set {
@@ -422,7 +431,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+    /// Die Formulardatei, die standardmäßig zu dieser Tabelle gehört.
     /// </summary>
     public string StandardFormulaFile {
         get => _standardFormulaFile;
@@ -433,7 +442,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// In diesem Ordner suchen verschiedene Routinen (IconChar, &lt;Imagecode=...&gt;) nach eigenen Symbol-Dateien (PNG).
+    /// Ordner mit eigenen Symbolbildern (PNG) für diese Tabelle.
     /// </summary>
     public string SymbolFolder {
         get => _symbolFolder;
@@ -454,6 +463,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Schlagwörter der Tabelle, z. B. zur Kategorisierung.
+    /// </summary>
     public ReadOnlyCollection<string> Tags {
         get => new(_tags);
         set {

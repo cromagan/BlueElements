@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls;
 using BlueControls.Editoren;
 using BlueTable.Interfaces;
 
@@ -101,7 +102,7 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
             }
         }
 
-        chkIgnoreCase.Checked = fi.FilterType.HasFlag(FilterType.GroßKleinEgal);
+        chkIgnoreCase.SetChecked(() => fi.FilterType.HasFlag(FilterType.GroßKleinEgal));
 
         cmbMethod.Text = fi.FilterType.HasFlag(FilterType.Instr) ? "Instr" : "Istgleich";
 

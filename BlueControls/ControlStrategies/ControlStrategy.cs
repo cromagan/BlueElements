@@ -773,7 +773,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Symbol zur Darstellung der Strategie, z. B. in Auswahllisten.
     /// </summary>
-    public virtual QuickImage? SymbolForReadableText() => null;
+    public abstract QuickImage? SymbolForReadableText();
 
     public abstract void UnsubscribeEvents();
 

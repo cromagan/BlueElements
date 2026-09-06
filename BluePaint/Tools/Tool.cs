@@ -1,10 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 
 namespace BlueControls.Controls;
 
-public abstract partial class Tool : GroupBox, IDrawsOverlay {
+public abstract partial class Tool : GroupBox, IDrawsOverlay, IReadableText {
 
     #region Fields
 
@@ -74,6 +75,16 @@ public abstract partial class Tool : GroupBox, IDrawsOverlay {
     /// </summary>
     /// <returns></returns>
     public virtual void PictureChangedByMainWindow() { }
+
+    /// <summary>
+    /// Liefert den Namen des Werkzeugs für Knöpfe und Auswahllisten.
+    /// </summary>
+    public abstract string ReadableText();
+
+    /// <summary>
+    /// Liefert das Symbol des Werkzeugs für Knöpfe und Auswahllisten.
+    /// </summary>
+    public abstract QuickImage? SymbolForReadableText();
 
     public virtual void ToolFirstShown() { }
 

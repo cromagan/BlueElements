@@ -77,6 +77,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         }
     }
 
+    /// <summary>
+    /// Bei welchen Änderungen das Skript automatisch ausgeführt wird.
+    /// </summary>
     public ScriptEventTypes EventTypes {
         get;
         set {
@@ -113,6 +116,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         }
     }
 
+    /// <summary>
+    /// Das Skript arbeitet mit den Werten einer einzelnen Zeile.
+    /// </summary>
     public bool NeedRow {
         get;
         set {
@@ -148,6 +154,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         }
     }
 
+    /// <summary>
+    /// Das Skript kann Werte nur lesen, nicht ändern.
+    /// </summary>
     public bool ValuesReadOnly {
         get;
         set {

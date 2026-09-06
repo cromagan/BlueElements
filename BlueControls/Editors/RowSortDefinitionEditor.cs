@@ -54,7 +54,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not RowSortDefinition { } rsd) { return false; }
 
-        btnSortRichtung.Checked = rsd.Reverse;
+        btnSortRichtung.SetChecked(() => rsd.Reverse);
 
         foreach (var thisColumn in rsd.UsedColumns) {
             if (thisColumn is { IsDisposed: false }) {

@@ -31,6 +31,10 @@ public partial class ContrastTool : Tool //System.Windows.Forms.UserControl //
         gr.DrawImage(picPreview, ctrlRect.X, ctrlRect.Y, ctrlRect.Width, (float)ctrlRect.Height);
     }
 
+    public override string ReadableText() => "Kontrast";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kontrast, 16);
+
     private void btnAlleFarbenSchwarz_Click(object sender, EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }
