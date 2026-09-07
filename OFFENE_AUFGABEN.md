@@ -269,11 +269,37 @@ bei FreezedTabellen soll beim ColumnEditor zwar eine Meldung kommen, aber dann e
 
 ## Aufgabe
 Als Schaltfläche anzeigen - wenn ich ShowCellValue umschalte, ändert sich das Meenu nicht
-Un Padding: Es darf bei negativen Werten nicht über den Zellrand gezeichnet werden. Ergänze das, auch im Quickinfo. und zuätzlich, welche Werte akzeptiert werden.
+Und Padding: Es darf bei negativen Werten nicht über den Zellrand gezeichnet werden. Ergänze das, auch im Quickinfo. und zuätzlich, welche Werte akzeptiert werden.
 
+## Aufgabe
+Wird mit "Ansicht Bearb." gedrückt und eine Spalte ergänzt, wird "Neue Spalte" fest gespeichert.
 
+## Aufgabe
+Mache eine Ähnlich Suche,
+Rechtsklick auf eine Zeile, mit "Ähnlich"
+Dann werden alle Spalten verglichen.
+MultiLine die Einträge
+Zahlen den Abstand
+Einzeilige Texte die Levensteindistanz
+Daraus ein Score berechnet, als VIR_ Spalte eingeblendet und danach Sortiert.
+Die Eigene Zeile hat natürloch einen Score von 100, weil es ja Identisch ist.
 
+## Aufgabe
+Wenn sich eine Zelle verändert und deine Tabelle ist offen, die mittels Link darauf zugreifft, soll der Wert auch aktualisiert werden.
 
+## Aufgabe
+Manchmal verschwinden Spalten aus der Ansicht.
+Letzten, bei einer TextFilterung
+oder bei Suchen und Ersetzen einer Spalten
+
+## Aufgabe
+TableControlStrategy ist defekt. Die Bescheibung ist unleserlich für einen Benutzer
+Und es werden viel zu viele Zeilen nach einem Doppelklcok angezeigt. Kann es sein, dass die Tateblle nihct richtig resetted wird?
+Und die Breite wird falsch berechnete. Es wird leider zwingend auf die Spaltenbreite geachtet. Das Controll darf größer werden als die Ansicht, wenn nötigt
+
+## Aufgabe
+Textfeld mit Überschriftfetn muss umbenannt werden: TableRenderer
+Und wenn eine Zeile VOLL ist, KEINEN autmatischen umbruch
 
 
 
