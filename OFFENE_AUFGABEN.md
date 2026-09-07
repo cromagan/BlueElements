@@ -238,9 +238,6 @@ Schau, wo DisableAllEditing du noch benutzen kannst.
 übreprüfe, ob der FormManager Application.OpenForms benutzen kann.
 
 ## Aufgabe
-TableControlStrategy, SysRowSortIndex bei AutoSort = True NICHT anzeigen. Aktuell wird es immer eingebelndet
-
-## Aufgabe
 Nutze bei allen Renderen, PadItems, Tools das neue ImageAttribute. Und alle Anzeigemöglichkeiten sollen auf das reagieren.
 
 ## Aufgabe
@@ -248,6 +245,29 @@ Entferne ALLES rund um BCS.
 
 ## Aufgabe
 Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor ein
+
+## Aufgabe
+Wenn die FailedRows einer Taballe über 10 sind, setze einen Script Fehler.
+
+## Aufgabe
+TextScale in DimensionPadItem und TextPadItem.
+Setze den Wert auf 1. Beim Speichern speicher es unter einen andern Namen.
+Beim Laden des alten Wertes, teile es durch 3.07 und passe die Routinen an
+Prüfe Vorab, wo die 3.07 herkommen.
+Wichtig: Das neue Json Format ist noch nicht aktiv und benötigt das nicht!
+
+## Aufagbe
+mache weitere optimerungen des Buttons "Tabelle optimieren"
+
+## Aufgabe
+TableHeadEditor und ColumnEditor:
+Füge alle Buttons aussagenkräftige, einfach zu verstehende QuickInfos hinzu.
+Auch im TableViewForm 
+
+# Aufgabe
+bei FreezedTabellen soll beim ColumnEditor zwar eine Meldung kommen, aber dann einfach der Dialog beendet werden.
+
+
 
 
 
