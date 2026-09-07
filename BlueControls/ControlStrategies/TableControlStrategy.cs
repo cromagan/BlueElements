@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.TableElements;
@@ -75,7 +75,8 @@ public class TableControlStrategy : ControlStrategy {
     /// Teil der View-Items. Der Bereich beginnt um die Höhe der Kopfleisten
     /// über der Zelllinie, damit die Spaltenköpfe über der Zelle liegen;
     /// unterhalb der Linie wird mindestens die volle Zellhöhe aufgefüllt. Die
-    /// TableView begrenzt das Ergebnis auf den verfügbaren Platz.
+    /// TableView begrenzt das Ergebnis nicht auf den sichtbaren Bereich
+    /// (MayExceedVisibleWidth): Die Spalten behalten ihre Inhaltsbreiten.
     /// </summary>
     public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
         var required = base.CalculateRequiredBounds(bounds);
@@ -132,23 +133,29 @@ public class TableControlStrategy : ControlStrategy {
     public override string ReadableText() => "Tabellenansicht";
 
     /// <summary>
-    /// Entfernt alle Zeilen und setzt die Scroll-Position der Ansicht zurück.
+    /// Entfernt alle Zeilen, setzt die Scroll-Position der Ansicht zurück und
+    /// schreibt den geleerten Stand in den Value.
     /// </summary>
     public override void Reset() {
+        // Erst die Zeilen entfernen: Der Basis-Reset schreibt den Inhalt über
+        // ForceWriteBackValue in den Value — der muss den geleerten Stand
+        // sehen, sonst bleiben die entfernten Zeilen im Value erhalten und
+        // kehren bei der nächsten Anzeige zurück.
+        if (_table is { IsDisposed: false } tb) {
+            _suppressEvents = true;
+            try {
+                var existing = tb.Row.ToList();
+                if (existing.Count > 0) { _ = RowCollection.Remove(existing, "Reset"); }
+            } finally {
+                _suppressEvents = false;
+            }
+        }
+
         base.Reset();
+
         if (_control is { IsDisposed: false } tv) {
             tv.OffsetX = 0;
             tv.OffsetY = 0;
-        }
-
-        if (_table is not { IsDisposed: false } tb) { return; }
-
-        _suppressEvents = true;
-        try {
-            var existing = tb.Row.ToList();
-            if (existing.Count > 0) { _ = RowCollection.Remove(existing, "Reset"); }
-        } finally {
-            _suppressEvents = false;
         }
     }
 

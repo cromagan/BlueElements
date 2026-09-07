@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
@@ -124,16 +124,18 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
         #endregion
 
-        #region Virtuelle Spalten (Pin, Hinzufügen)
+        #region Virtuelle Spalten (Pin)
 
         // In Ansicht 0 ("Alle Spalten") werden keine virtuellen Spalten
         // angeboten — sie sind dort nicht erlaubt (siehe ColumnViewCollection.Repair).
+        // Die Hinzufügen-Spalte ("Neue Spalte") wird bewusst nicht angeboten:
+        // Sie erscheint in der Ansichtbearbeitung automatisch (on-demand) und
+        // würde hier fälschlich persistent in der Ansicht gespeichert.
         if (!tableView.IsAnsicht0(ca)) {
             var virtualAdded = false;
 
             foreach (var (vKey, display, symbol) in new (string, string, ImageCode)[] {
-                ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel),
-                ("ADD", "Spalte zum Hinzufügen", ImageCode.PlusZeichen)
+                ("PIN", "Pin-Spalte (Zeilen anpinnen)", ImageCode.Pinnadel)
             }) {
                 if (ca.Any(x => x.StorageKey == "VIR_" + vKey)) { continue; }
 

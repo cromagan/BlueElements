@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.Editoren;
@@ -216,6 +216,7 @@ namespace BlueControls.BlueTableDialogs {
             btnOk.ImageCode = "Häkchen|24";
             btnOk.Location = new Point(1089, 715);
             btnOk.Name = "btnOk";
+            btnOk.QuickInfo = "Schließt den Editor. Änderungen werden direkt in der Tabelle gespeichert.";
             btnOk.Size = new Size(88, 32);
             btnOk.TabIndex = 11;
             btnOk.Text = "OK";
@@ -379,6 +380,7 @@ namespace BlueControls.BlueTableDialogs {
             btnFormularBearbeiten.ImageCode = "Anwendung|16|||||||||Stift";
             btnFormularBearbeiten.Location = new Point(536, 488);
             btnFormularBearbeiten.Name = "btnFormularBearbeiten";
+            btnFormularBearbeiten.QuickInfo = "Öffnet die Standard-Formular-Datei im Formular-Editor.";
             btnFormularBearbeiten.Size = new Size(88, 24);
             btnFormularBearbeiten.TabIndex = 58;
             btnFormularBearbeiten.Text = "bearbeiten";
@@ -390,6 +392,7 @@ namespace BlueControls.BlueTableDialogs {
             btnLoadAll.ImageCode = "Ordner|16";
             btnLoadAll.Location = new Point(424, 632);
             btnLoadAll.Name = "btnLoadAll";
+            btnLoadAll.QuickInfo = "Lädt alle Zeilen der Tabelle vollständig nach.";
             btnLoadAll.Size = new Size(200, 32);
             btnLoadAll.TabIndex = 56;
             btnLoadAll.Text = "Alle Daten laden";
@@ -401,6 +404,7 @@ namespace BlueControls.BlueTableDialogs {
             btnMasterMe.ImageCode = "Stern|16|";
             btnMasterMe.Location = new Point(424, 552);
             btnMasterMe.Name = "btnMasterMe";
+            btnMasterMe.QuickInfo = "Übernimmt die temporäre Master-Rolle für diese Tabelle.";
             btnMasterMe.Size = new Size(200, 32);
             btnMasterMe.TabIndex = 55;
             btnMasterMe.Text = "Master me!";
@@ -412,6 +416,7 @@ namespace BlueControls.BlueTableDialogs {
             btnUnMaster.ImageCode = "Stern|16|||||||||Kreuz";
             btnUnMaster.Location = new Point(424, 592);
             btnUnMaster.Name = "btnUnMaster";
+            btnUnMaster.QuickInfo = "Gibt die temporäre Master-Rolle dieser Tabelle wieder ab.";
             btnUnMaster.Size = new Size(200, 32);
             btnUnMaster.TabIndex = 54;
             btnUnMaster.Text = "Unmaster me!";
@@ -423,6 +428,7 @@ namespace BlueControls.BlueTableDialogs {
             btnTabellenAnsicht.ImageCode = "Tabelle|16";
             btnTabellenAnsicht.Location = new Point(216, 552);
             btnTabellenAnsicht.Name = "btnTabellenAnsicht";
+            btnTabellenAnsicht.QuickInfo = "Zeigt die Tabelle im Ansichtsfenster an.";
             btnTabellenAnsicht.Size = new Size(200, 32);
             btnTabellenAnsicht.TabIndex = 53;
             btnTabellenAnsicht.Text = "Tabellenansicht";
@@ -434,6 +440,7 @@ namespace BlueControls.BlueTableDialogs {
             btnSkripte.ImageCode = "Skript|16";
             btnSkripte.Location = new Point(216, 632);
             btnSkripte.Name = "btnSkripte";
+            btnSkripte.QuickInfo = "Öffnet den Skript-Editor dieser Tabelle.";
             btnSkripte.Size = new Size(200, 32);
             btnSkripte.TabIndex = 52;
             btnSkripte.Text = "Skripte";
@@ -445,6 +452,7 @@ namespace BlueControls.BlueTableDialogs {
             butSystemspaltenErstellen.ImageCode = "Spalte|16";
             butSystemspaltenErstellen.Location = new Point(8, 632);
             butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
+            butSystemspaltenErstellen.QuickInfo = "Erstellt alle noch fehlenden Systemspalten.";
             butSystemspaltenErstellen.Size = new Size(200, 32);
             butSystemspaltenErstellen.TabIndex = 49;
             butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
@@ -456,7 +464,7 @@ namespace BlueControls.BlueTableDialogs {
             btnOptimize.ImageCode = "Blitz|16";
             btnOptimize.Location = new Point(8, 592);
             btnOptimize.Name = "btnOptimize";
-            btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
+            btnOptimize.QuickInfo = "Passt die Zellen-Kapazitäten an den tatsächlichen Bedarf an,\r\nentfernt unnötige Skript-Typen und leere Spalten.";
             btnOptimize.Size = new Size(200, 32);
             btnOptimize.TabIndex = 48;
             btnOptimize.Text = "Tabelle optimieren";
@@ -486,6 +494,7 @@ namespace BlueControls.BlueTableDialogs {
             btnSpaltenuebersicht.ImageCode = "Spalte|16";
             btnSpaltenuebersicht.Location = new Point(8, 552);
             btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
+            btnSpaltenuebersicht.QuickInfo = "Erzeugt eine Übersicht aller Spalten mit deren Einstellungen.";
             btnSpaltenuebersicht.Size = new Size(200, 32);
             btnSpaltenuebersicht.TabIndex = 35;
             btnSpaltenuebersicht.Text = "Spaltenübersicht";
@@ -539,6 +548,7 @@ namespace BlueControls.BlueTableDialogs {
             btnCustomSortEnable.ImageCode = "AZ|16";
             btnCustomSortEnable.Location = new Point(720, 104);
             btnCustomSortEnable.Name = "btnCustomSortEnable";
+            btnCustomSortEnable.QuickInfo = "Erstellt eine Systemspalte, über die die Zeilen per Nummer sortiert werden.";
             btnCustomSortEnable.Size = new Size(440, 32);
             btnCustomSortEnable.TabIndex = 1;
             btnCustomSortEnable.Text = "Benutzerdefinierte Sortierung aktivieren";
@@ -549,6 +559,7 @@ namespace BlueControls.BlueTableDialogs {
             btnCustomSortDisable.ImageCode = "ZA|16|||||||||Kreuz";
             btnCustomSortDisable.Location = new Point(720, 140);
             btnCustomSortDisable.Name = "btnCustomSortDisable";
+            btnCustomSortDisable.QuickInfo = "Entfernt die Systemspalte 'Sortierung'\r\nund stellt die Standardsortierung wieder her.";
             btnCustomSortDisable.Size = new Size(440, 32);
             btnCustomSortDisable.TabIndex = 2;
             btnCustomSortDisable.Text = "Benutzerdefinierte Sortierung löschen";

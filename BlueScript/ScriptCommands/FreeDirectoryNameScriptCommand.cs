@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using static BlueBasics.ClassesStatic.IO;
 

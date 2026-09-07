@@ -1,8 +1,7 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueBasics.Formats;
 using BlueTable.ColumnFormats;
-using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -826,9 +825,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             var newTable = Get(_linkedTableTableName);
 
             if (newTable is not null) {
-                // Event-Registrierung vor dem Lock
-                newTable.CellValueChanged += LinkedTable_CellValueChanged;
-                newTable.Disposed += LinkedTable_Disposed;
+                SubscribeLinkedTableEvents(newTable);
             }
 
             lock (_linkedTableLock) {
@@ -2698,29 +2695,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
         if (tableToCleanup is not null) {
             try {
-                tableToCleanup.CellValueChanged -= LinkedTable_CellValueChanged;
-            } catch { }
-
-            try {
                 tableToCleanup.Disposed -= LinkedTable_Disposed;
             } catch { }
-        }
-    }
-
-    private void LinkedTable_CellValueChanged(object? sender, CellEventArgs e) {
-        if (e.Column.KeyName != ColumnKeyOfLinkedTable) { return; }
-        if (_relationType != RelationType.CellValues) { return; }
-
-        var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);
-        var val = e.Row.CellGetString(e.Column);
-
-        if (fc is not null && string.IsNullOrWhiteSpace(info)) {
-            foreach (var thisRow in fc.Rows) {
-                if (thisRow.CellGetStringCore(this) != val) {
-                    thisRow.LinkedCellData(this, true, false);
-                }
-            }
-            fc.Dispose();
         }
     }
 
@@ -2778,23 +2754,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    private void SubscribeLinkedTableEvents(Table newTable) {
+        // Event-Registrierung vor dem Lock
+        newTable.Disposed += LinkedTable_Disposed;
+    }
+
     #endregion
-
-    //private void ManipulateRendererSettings(string settingname, string newvalue) {
-    //    if (string.IsNullOrEmpty(newvalue)) { return; }
-
-    //    string tmp2 = string.Empty;
-
-    //    if (!string.IsNullOrEmpty(_rendererSettings)) { tmp2 = ", "; }
-
-    //    tmp2 = tmp2 + settingname + "=" + newvalue.ToNonCriticalWithQuote();
-
-    //    var tmp = _rendererSettings;
-
-    //    if (string.IsNullOrEmpty(tmp)) { tmp = "{}"; }
-
-    //    tmp = tmp.Substring(0, tmp.Length - 1) + tmp2 + "}";
-
-    //    RendererSettings = tmp;
-    //}
 }

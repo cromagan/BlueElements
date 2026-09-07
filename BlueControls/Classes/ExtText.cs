@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Chars;
 using Char = BlueControls.Chars.Char;
@@ -179,6 +179,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             return _widthControl ?? 0;
         }
     }
+
+    /// <summary>
+    /// Automatischer Zeilenumbruch an TextDimensions.Width. FALSE: Es gibt
+    /// keine automatischen Umbrüche — volle Zeilen laufen weiter und müssen
+    /// extern gekürzt werden. Die Ausrichtung bleibt an TextDimensions orientiert.
+    /// </summary>
+    public bool WordWrap { get; set; } = true;
 
     public float Zeilenabstand {
         get => _zeilenabstand;
@@ -887,7 +894,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         var rows = new List<(int start, int end)>(Math.Max(1, _internal.Count / 50));
         var (_, _, maxRight, maxBottom) = ComputeSubLayout(
-            _internal, 0, 0, _textDimensions.Width, 0, _zeilenabstand, true, rows);
+            _internal, 0, 0, WordWrap ? _textDimensions.Width : -1, 0, _zeilenabstand, true, rows);
 
         _widthControl = (int)(maxRight + 0.5);
         _heightControl = (int)(maxBottom + 0.5);

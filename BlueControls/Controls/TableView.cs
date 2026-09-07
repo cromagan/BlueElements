@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.ControlStrategies;
@@ -59,6 +59,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private AutoFilter? _autoFilter;
 
     private List<RowTableElement> _cachedRowViewItems = [];
+
+    /// <summary>
+    /// Zeilen-Elemente, die im letzten Paint tatsächlich gezeichnet wurden (Basis für die verzögerte LinkedCell-Reparatur).
+    /// </summary>
+    private List<RowTableElement> _drawnRowViewItems = [];
 
     private bool _consumeNextMouseDown;
 
@@ -226,12 +231,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (ca is { IsDisposed: false }) {
                 ca.Ansichtbearbeitung = Ansichtbearbeitung;
 
-                // On-demand virtuelle Spalten: Hinzufügen bei Admins, Pin bei angepinnten Zeilen.
+                // On-demand virtuelle Spalten: Hinzufügen bei Admins, Pin bei angepinnten
+                // Zeilen, Ähnlichkeits-Spalte nur, wenn ein Vergleich Scores geliefert hat.
                 var needAdd = tb.IsAdministrator()
                     && (IsAnsicht0(ca) || Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
                 var needPin = PinnedRows.Count > 0;
 
-                ca.ReconcileVirtualColumns(needPin, needAdd);
+                ca.ReconcileVirtualColumns(needPin, needAdd, SimilarityColumnItem.HasScores(tb));
             } else if (ca is { IsDisposed: true }) {
                 field = null;
                 return null;
@@ -1320,6 +1326,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contextMenu.Add(ItemOf("Zeile", true));
 
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Zeile, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
+                if (SimilarityColumnItem.HasScores(tb)) {
+                    contextMenu.Add(ItemOf("Ähnliche Zeilen ausschalten", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_ResetSort, true, string.Empty));
+                } else {
+                    contextMenu.Add(ItemOf("Ähnliche Zeilen", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize), ContextMenu_SimilarRows, true, string.Empty));
+                }
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, IContextMenu.IconSize), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
@@ -1517,6 +1528,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         Invalidate_AllViewItems(true);
 
         QuickInfo = string.Empty;
+        SimilarityColumnItem.Reset();
         _sortDefinitionTemporary = null;
         CursorPosColumn = null;
         CursorPosRow = null;
@@ -2207,6 +2219,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         _mustDoAllViewItems = true;
         _sortedViewItems = [];
         _cachedRowViewItems = [];
+        _drawnRowViewItems = [];
         _rowLookup.Clear();
         if (andclear) {
             _allViewItems.Clear();
@@ -2450,6 +2463,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             // Haupt-Aufbau: Zeilen zeichnen, dann Kopfzeilen darüber. Lazy Where-Enumeratoren.
             var rowsTop = RowsAreaTop();
+            _drawnRowViewItems.Clear();
             DrawItems(_sortedViewItems.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, rowsTop);
             DrawItems(_sortedViewItems.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, 0);
 
@@ -2475,9 +2489,23 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (Table.AllowDuplicates) {
                 CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, $"ID: {tb.MyId}", States.Standard);
             }
+
+            // Verzögerte LinkedCell-Reparatur: gezeichnete Zeilen nach Ablauf der Frist reparieren
+            RepairVisibleRowsAfterDraw();
         } catch {
             _tableDrawError = DateTime.UtcNow;
             DrawWaitScreen(gr, string.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Repariert nach dem Zeichnen die LinkedCells der gezeichneten (bildschirmsichtbaren) Zeilen,
+    /// wenn ihre letzte Änderung die Frist überschritten hat.
+    /// </summary>
+    private void RepairVisibleRowsAfterDraw() {
+        foreach (var rowElement in _drawnRowViewItems) {
+            if (rowElement is not { IsDisposed: false, Visible: true }) { continue; }
+            CellCollection.RepairLinkedCellIfDue(rowElement.Row);
         }
     }
 
@@ -2878,7 +2906,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         gr.DrawRectangle(pen, rect);
     }
 
-    private static void DrawItems(IEnumerable<TableElement>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom, int clipTop) {
+    /// <summary>
+    /// Zeichnet die sichtbaren Elemente und sammelt gezeichnete Zeilen für RepairVisibleRowsAfterDraw.
+    /// </summary>
+    private void DrawItems(IEnumerable<TableElement>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom, int clipTop) {
         if (list is null) { return; }
 
         try {
@@ -2892,6 +2923,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
 
                 thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
+
+                if (thisItem is RowTableElement drawnRow) { _drawnRowViewItems.Add(drawnRow); }
             }
         } catch { }
     }
@@ -3540,10 +3573,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 }
                 rowListItem.Arrangement = arrangement;
 
-                var rowKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
-                rowListItem.UserDefCompareKey = numberStyle
-                    ? rowKey
-                    : thisCap.ChapterPathSortKey() + FirstSortChar + rowKey;
+                // Sortierschlüssel über die Spalten der SortDefinition —
+                // virtuelle Spalten liefern ihren Zellwert generisch über CellGetString.
+                var rowKey = rowListItem.Row.CompareKey(sortused.SortColumns);
+
+                // Kapitel-Gruppierung entfällt bei SysRowSortIndex und wenn die
+                // Sortierung virtuelle Spalten enthält — deren Werte sind nicht
+                // kapitelgebunden, der Sortierwert muss dominieren.
+                var chapterPrefix = !numberStyle && sortused.SortColumns.All(thisColumn => thisColumn.Column is not null);
+                rowListItem.UserDefCompareKey = chapterPrefix
+                    ? thisCap.ChapterPathSortKey() + FirstSortChar + rowKey
+                    : rowKey;
                 rowListItem.Visible = false;
                 rowListItem.MarkYellow = isPinned;
                 visibleRowListItems.Add(rowListItem);
@@ -3893,7 +3933,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         PinAdd(row);
     }
 
-    private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) => SortDefinitionTemporary = null;
+    private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) {
+        SimilarityColumnItem.Reset();
+        SortDefinitionTemporary = null;
+    }
 
     private void ContextMenu_RestorePreviousContent(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, _, _) = GetContextData(e.HotItem);
@@ -3905,6 +3948,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void ContextMenu_SearchAndReplace(object? sender, ContextMenuEventArgs e) {
         if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
+    }
+
+    /// <summary>
+    /// Ähnlichkeits-Suche: vergleicht alle Zeilen mit der angeklickten Zeile,
+    /// blendet die Score-Spalte ein und sortiert absteigend nach Score.
+    /// </summary>
+    private void ContextMenu_SimilarRows(object? sender, ContextMenuEventArgs e) {
+        var (_, row, _, _, _) = GetContextData(e.HotItem);
+        if (Table is not { IsDisposed: false } tb || row is null) { return; }
+
+        var scores = RowSimilarity.Scores(tb, row);
+        SimilarityColumnItem.SetScores(tb, scores);
+
+        // Die Score-Spalte wird wie eine normale Spalte sortiert.
+        if (CurrentArrangement?[SimilarityColumnItem.ClassId] is not { IsDisposed: false } scoreColumn) { return; }
+        SortDefinitionTemporary = new RowSortDefinition(tb, scoreColumn, true);
     }
 
     private void ContextMenu_SortAZ(object? sender, ContextMenuEventArgs e) {
@@ -4740,10 +4799,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     private RowSortDefinition? SortUsed() {
+        // Temporäre Sortierung (Spalten-Sortierung, Ähnliche Zeilen)
+        // hat Vorrang vor der manuellen Reihenfolge via SysRowSortIndex.
+        if (_sortDefinitionTemporary is not null) { return _sortDefinitionTemporary; }
         if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
             return new RowSortDefinition(tb, sortCol, false);
         }
-        return _sortDefinitionTemporary ?? Table?.SortDefinition;
+        return Table?.SortDefinition;
     }
 
     /// <summary>

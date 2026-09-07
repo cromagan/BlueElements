@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Collections.Concurrent;
 using System.Threading;
@@ -8,6 +8,11 @@ namespace BlueTable.Classes;
 public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParseable {
 
     #region Fields
+
+    /// <summary>
+    /// Frist, nach der eine verzögerte LinkedCell-Reparatur angezeigter Zeilen ausgeführt wird.
+    /// </summary>
+    public static readonly TimeSpan LinkedCellRepairDelay = TimeSpan.FromSeconds(30);
 
     private readonly ConcurrentDictionary<(ColumnItem column, RowItem row), CellItem> _internal = new();
     private volatile int _isDisposedFlag;
@@ -94,49 +99,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         return TryBuildLinkedCellFilterItems(linkedTable, inputColumn, inputRow, varcol);
     }
 
-    public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
-        if (linkedcolumn.Table is not { IsDisposed: false } ltb || linkedcolumn.IsDisposed) { return (null, "Tabelle verworfen."); }
-
-        if (mycolumn.RelationType != RelationType.CellValues) { return (null, "Falsches Format."); }
-
-        if (mycolumn.Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen."); }
-
-        var fc = new FilterCollection(tb, "cell get reverse filter");
-
-        foreach (var thisFi in mycolumn.LinkedCellFilter) {
-            if (!thisFi.Contains('|')) { return (null, "Veraltetes Filterformat"); }
-
-            var x = thisFi.SplitBy("|");
-            var c = ltb.Column[x[0]];
-            if (c is null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
-
-            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
-
-            var value = x[2].FromNonCritical().ToUpperInvariant();
-            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
-
-            foreach (var thisColumn in tb.Column) {
-                if (value.Contains($"~{thisColumn.KeyName}~", StringComparison.OrdinalIgnoreCase)) {
-                    var l = linkedrow.CellGetList(c);
-                    if (l.Count == 0) { l.Add(string.Empty); }
-                    fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, l));
-                }
-            }
-        }
-
-        var er = fc.ErrorReason();
-        if (!string.IsNullOrEmpty(er)) {
-            fc.Dispose();
-            return (null, er);
-        }
-
-        if (fc.Count == 0) {
-            fc.Add(new FilterItem(tb, "Reverse Filter"));
-        }
-
-        return (fc, string.Empty);
-    }
-
     /// <summary>
     /// Erstellt den String-Key für Serialisierung und Undo.
     /// </summary>
@@ -155,6 +117,21 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         if (column is not null) { return KeyOfCell(column.KeyName, string.Empty); }
 
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Berechnet die LinkedCells der Zeile neu, wenn ihre letzte Zelländerung länger als die Frist zurückliegt.
+    /// </summary>
+    public static void RepairLinkedCellIfDue(RowItem? row) {
+        if (row is not { IsDisposed: false } r) { return; }
+
+        var change = r.LastCellChangeUtc;
+        if (change == DateTime.MinValue || DateTime.UtcNow.Subtract(change) < LinkedCellRepairDelay) { return; }
+
+        // Zuerst zurücksetzen, damit ein erneuter Aufruf (z. B. beim nächsten Paint) nicht mehrfach repariert.
+        r.LastCellChangeUtc = DateTime.MinValue;
+
+        _ = r.RepairAllLinks();
     }
 
     /// <summary>
@@ -231,8 +208,8 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
             items.Add((KeyOfCell(kvp.Key.column.KeyName, kvp.Key.row.KeyName), cellJson));
         }
 
-        foreach (var item in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
-            cells.Add(item.cell);
+        foreach (var (sortKey, cell) in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
+            cells.Add(cell);
         }
 
         if (cells.Count > 0) { json.Set("cells", cells); }

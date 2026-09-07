@@ -1,14 +1,12 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 namespace BlueTable.Classes;
 
 /// <summary>
 /// Virtuelle Spalte „Hinzufügen". Ein Klick auf den Kopf öffnet das
-/// Dropdown zum Einblenden/Anlegen echter Spalten. Hat kein
-/// ColumnItem und kann vom Benutzer frei innerhalb der
-/// Anordnung verschoben werden. Standardmäßig erscheint sie am Ende.
-/// (als StorageKey VIR_ADD in der Collection gespeichert)
-/// oder on-demand während der Ansichtbearbeitung.
+/// Dropdown zum Einblenden/Anlegen echter Spalten. Hat kein ColumnItem
+/// und erscheint on-demand am Ende der Ansicht (Admin/Ansichtbearbeitung) —
+/// sie wird nicht serialisiert.
 /// </summary>
 public sealed class AddColumnItem : ColumnViewItem {
 

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
@@ -85,7 +85,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
     } = PadStyles.Standard;
 
     /// <summary>
-    /// Die Größe des Textes.
+    /// Die Größe des Textes. 1 = Standard.
     /// </summary>
     public float TextScale {
         get;
@@ -96,7 +96,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
             InvalidateText();
             OnPropertyChanged();
         }
-    } = 3.07f;
+    } = 1f;
 
     /// <summary>
     /// Der anzuzeigende Text. Platzhalter in der Form ~Name~ werden beim Anzeigen ersetzt.
@@ -162,7 +162,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("ReadableText", TextValue.EscapeUnicode());
         result.ParseableAdd("Alignment", Ausrichtung);
-        result.ParseableAdd("AdditionalScale", TextScale);
+        result.ParseableAdd("TextScale", TextScale);
         result.ParseableAdd("Style", Style);
         return result;
     }
@@ -213,7 +213,11 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
                 Style = (PadStyles)IntParse(value);
                 return true;
 
-            case "additionalscale":
+            case "additionalscale": // TODO: Alt, Wert war absolut (Standard 3,07)
+                TextScale = FloatParse(value.FromNonCritical()) / ISupportsTextScale.LegacyScale;
+                return true;
+
+            case "textscale":
                 TextScale = FloatParse(value.FromNonCritical());
                 return true;
         }
@@ -278,7 +282,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
 
                 _txt.AreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
-                    _txt.Draw(gr, zoom * TextScale, offsetX2, offsetY2);
+                    _txt.Draw(gr, zoom * TextScale * ISupportsTextScale.LegacyScale, offsetX2, offsetY2);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -321,7 +325,7 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
                 //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
                 //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-                TextDimensions = new Size((int)(CanvasUsedArea.Width / TextScale), -1),
+                TextDimensions = new Size((int)(CanvasUsedArea.Width / (TextScale * ISupportsTextScale.LegacyScale)), -1),
                 Ausrichtung = Ausrichtung
             };
         }

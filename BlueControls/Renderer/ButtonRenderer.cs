@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using Padding = System.Windows.Forms.Padding;
@@ -32,6 +32,7 @@ public class ButtonRenderer : Renderer {
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             field = value;
             OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
         }
     }
 
@@ -101,8 +102,10 @@ public class ButtonRenderer : Renderer {
     }
 
     /// <summary>
-    /// Abstand zwischen dem Knopf und dem Zellenrand.
-    /// Negative Werte lassen den Knopf über den Zellenrand hinausragen.
+    /// Abstand zwischen dem Knopf und dem Zellenrand in Pixel.<br />
+    /// Möglich sind 1 Wert (alle Seiten), 2 Werte (links/rechts, oben/unten) oder 4 Werte (links, oben, rechts, unten), z. B. {-4, -2}.<br />
+    /// Negative Werte vergrößern den Knopf, gezeichnet wird dabei jedoch nie über den Zellrand hinaus.<br />
+    /// Positive Werte haben keine Wirkung.
     /// </summary>
     public Padding Padding {
         get => _padding;
@@ -131,20 +134,23 @@ public class ButtonRenderer : Renderer {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        // Positive Paddings ignorieren — nur negative Werte wirken und
-        // vergrößern die Zeichenfläche über die Zelle hinaus.
+        // Positive Paddings ignorieren — nur negative Werte wirken und vergrößern die Knopffläche.
         var padLeft = Math.Min(0, _padding.Left).CanvasToControl(zoom);
         var padTop = Math.Min(0, _padding.Top).CanvasToControl(zoom);
         var padRight = Math.Min(0, _padding.Right).CanvasToControl(zoom);
         var padBottom = Math.Min(0, _padding.Bottom).CanvasToControl(zoom);
 
-        drawingAreaControl = new Rectangle(
+        var buttonArea = new Rectangle(
             drawingAreaControl.X + padLeft,
             drawingAreaControl.Y + padTop,
             drawingAreaControl.Width - padLeft - padRight,
             drawingAreaControl.Height - padTop - padBottom);
 
-        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawingAreaControl, true);
+        // Auch bei negativen Paddings niemals über den Zellrand zeichnen.
+        var clipState = gr.Save();
+        gr.SetClip(drawingAreaControl, CombineMode.Intersect);
+        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, buttonArea, true);
+        gr.Restore(clipState);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

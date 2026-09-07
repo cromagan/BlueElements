@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueScript.Classes;
 using BlueScript.EventArgs;
@@ -2364,6 +2364,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (row is not null && !string.IsNullOrEmpty(scf.FailedReason)) {
             RowCollection.FailedRows[row] = scf.FailedReason;
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
+
+            // Ab zu vielen Fehlerzeilen das Skript selbst als fehlerhaft markieren,
+            // damit nicht jede weitere Zeile denselben Fehler einzeln produziert.
+            if (!ignoreError && produktivphase && string.IsNullOrEmpty(failed)) {
+                var failedCount = RowCollection.FailedRows.Keys.Count(thisRow => thisRow.Table == this);
+                if (failedCount > 19) {
+                    failed = $"Zu viele Zeilen mit Skript-Fehlern ({failedCount}).";
+                    savedVariables = scf.Variables?.ToList();
+                }
+            }
         }
 
         var failedChanged = failed != script.FailedReason;
@@ -2441,6 +2451,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         column.UcaseNamesSortedByLength = null;
         if (_suppressEvents <= 0) {
+            // Reparatur passiert verzögert beim Anzeigen der Zeile in einer TableView (RepairLinkedCellIfDue).
+            rowItem.LastCellChangeUtc = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 5));
             CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
         }
     }

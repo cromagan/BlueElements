@@ -105,7 +105,7 @@ Write-Host "Total files checked:        $($counterOk + $counterAddedBom + $count
 Write-Host ""
 Write-Host "=== License Header ===" -ForegroundColor Cyan
 
-$licenseHeader = "// Licensed under AGPL-3.0; see License.md for disclaimer and details.`r`n"
+$licenseHeader = "// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.`r`n"
 $counterLicenseAdded = 0
 $counterLicenseOk = 0
 $counterLicenseStripped = 0

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
@@ -226,6 +226,7 @@ namespace BlueControls.Forms {
             btnLetzteDateien.ImageCode = "Ordner";
             btnLetzteDateien.Location = new Point(128, 2);
             btnLetzteDateien.Name = "btnLetzteDateien";
+            btnLetzteDateien.QuickInfo = "Zuletzt geöffnete Tabellen zum schnellen Wechseln.";
             btnLetzteDateien.RemoveAllowed = true;
             btnLetzteDateien.SettingsLoaded = false;
             btnLetzteDateien.Size = new Size(104, 66);
@@ -239,6 +240,7 @@ namespace BlueControls.Forms {
             btnOeffnen.ImageCode = "Ordner";
             btnOeffnen.Location = new Point(72, 2);
             btnOeffnen.Name = "btnOeffnen";
+            btnOeffnen.QuickInfo = "Vorhandene Tabellen-Datei öffnen.";
             btnOeffnen.Size = new Size(56, 66);
             btnOeffnen.TabIndex = 1;
             btnOeffnen.Text = "Öffnen";
@@ -250,6 +252,7 @@ namespace BlueControls.Forms {
             btnSaveAs.ImageCode = "Diskette";
             btnSaveAs.Location = new Point(232, 2);
             btnSaveAs.Name = "btnSaveAs";
+            btnSaveAs.QuickInfo = "Speichert die aktuelle Tabelle als neue Datei.";
             btnSaveAs.Size = new Size(64, 66);
             btnSaveAs.TabIndex = 4;
             btnSaveAs.Text = "Speichern unter";
@@ -261,6 +264,7 @@ namespace BlueControls.Forms {
             btnNeuDB.ImageCode = "Datei";
             btnNeuDB.Location = new Point(8, 2);
             btnNeuDB.Name = "btnNeuDB";
+            btnNeuDB.QuickInfo = "Erstellt eine neue, leere Tabellen-Datei.";
             btnNeuDB.Size = new Size(56, 66);
             btnNeuDB.TabIndex = 0;
             btnNeuDB.Text = "Neu";
@@ -330,6 +334,7 @@ namespace BlueControls.Forms {
             btnAnsichtZoom.ImageCode = "Lupe";
             btnAnsichtZoom.Location = new Point(216, 2);
             btnAnsichtZoom.Name = "btnAnsichtZoom";
+            btnAnsichtZoom.QuickInfo = "Zoom einstellen und Kapitel ein-/ausklappen.";
             btnAnsichtZoom.Size = new Size(48, 66);
             btnAnsichtZoom.TabIndex = 15;
             btnAnsichtZoom.Text = "Ansicht";
@@ -390,6 +395,7 @@ namespace BlueControls.Forms {
             btnEinstellungen.ImageCode = "Zahnrad";
             btnEinstellungen.Location = new Point(80, 2);
             btnEinstellungen.Name = "btnEinstellungen";
+            btnEinstellungen.QuickInfo = "Allgemeine Einstellungen, z. B. MiniToolbar und Zellen-Klick-Verhalten.";
             btnEinstellungen.Size = new Size(56, 66);
             btnEinstellungen.TabIndex = 13;
             btnEinstellungen.Text = "Einstell-ungen";
@@ -400,6 +406,7 @@ namespace BlueControls.Forms {
             btnSuchFenster.ImageCode = "Lupe";
             btnSuchFenster.Location = new Point(8, 2);
             btnSuchFenster.Name = "btnSuchFenster";
+            btnSuchFenster.QuickInfo = "Durchsucht alle Zellen nach einem Suchtext.";
             btnSuchFenster.Size = new Size(72, 66);
             btnSuchFenster.TabIndex = 11;
             btnSuchFenster.Text = "Suchfenster öffnen";
@@ -451,6 +458,7 @@ namespace BlueControls.Forms {
             btnSuchenUndErsetzen.ImageCode = "Fernglas";
             btnSuchenUndErsetzen.Location = new Point(8, 2);
             btnSuchenUndErsetzen.Name = "btnSuchenUndErsetzen";
+            btnSuchenUndErsetzen.QuickInfo = "Sucht Text in allen Zellen und ersetzt ihn bei Bedarf.";
             btnSuchenUndErsetzen.Size = new Size(80, 66);
             btnSuchenUndErsetzen.TabIndex = 44;
             btnSuchenUndErsetzen.Text = "Suchen und ersetzen";
@@ -494,7 +502,7 @@ namespace BlueControls.Forms {
             btnMonitoring.ImageCode = "Monitor|16";
             btnMonitoring.Location = new Point(296, 2);
             btnMonitoring.Name = "btnMonitoring";
-            btnMonitoring.QuickInfo = "A";
+            btnMonitoring.QuickInfo = "Zeigt alle Ereignisse des Programms in einem Überwachungsfenster an.";
             btnMonitoring.Size = new Size(72, 66);
             btnMonitoring.TabIndex = 45;
             btnMonitoring.Text = "Monitoring starten";
@@ -554,6 +562,7 @@ namespace BlueControls.Forms {
             btnSpaltenUebersicht.ImageCode = "Spalte||||||||||Information";
             btnSpaltenUebersicht.Location = new Point(8, 2);
             btnSpaltenUebersicht.Name = "btnSpaltenUebersicht";
+            btnSpaltenUebersicht.QuickInfo = "Erzeugt eine Übersicht aller Spalten mit deren Einstellungen.";
             btnSpaltenUebersicht.Size = new Size(64, 66);
             btnSpaltenUebersicht.TabIndex = 36;
             btnSpaltenUebersicht.Text = "Spalten-Übersicht";
@@ -595,6 +604,7 @@ namespace BlueControls.Forms {
             btnSuchInScript.ImageCode = "Skript||||||||||Lupe";
             btnSuchInScript.Location = new Point(240, 2);
             btnSuchInScript.Name = "btnSuchInScript";
+            btnSuchInScript.QuickInfo = "Durchsucht die Skripte der Tabelle und kann Treffer ersetzen.";
             btnSuchInScript.Size = new Size(64, 66);
             btnSuchInScript.TabIndex = 46;
             btnSuchInScript.Text = "in Skripten suchen";
@@ -606,6 +616,7 @@ namespace BlueControls.Forms {
             btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
             btnSkripteBearbeiten.Location = new Point(184, 2);
             btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
+            btnSkripteBearbeiten.QuickInfo = "Öffnet den Skript-Editor dieser Tabelle.";
             btnSkripteBearbeiten.Size = new Size(56, 66);
             btnSkripteBearbeiten.TabIndex = 45;
             btnSkripteBearbeiten.Text = "Skripte";
@@ -617,6 +628,7 @@ namespace BlueControls.Forms {
             btnFormular.ImageCode = "Anwendung||||||||||Stift";
             btnFormular.Location = new Point(64, 2);
             btnFormular.Name = "btnFormular";
+            btnFormular.QuickInfo = "Öffnet das Formular dieser Tabelle im Formular-Editor.";
             btnFormular.Size = new Size(56, 66);
             btnFormular.TabIndex = 44;
             btnFormular.Text = "Formular-Editor";
@@ -628,6 +640,7 @@ namespace BlueControls.Forms {
             btnTabelleKopf.ImageCode = "Tabelle||||||||||Stift";
             btnTabelleKopf.Location = new Point(0, 2);
             btnTabelleKopf.Name = "btnTabelleKopf";
+            btnTabelleKopf.QuickInfo = "Öffnet die Tabellen-Eigenschaften (Spalten, Rechte, Sortierung u. v. m.).";
             btnTabelleKopf.Size = new Size(64, 66);
             btnTabelleKopf.TabIndex = 37;
             btnTabelleKopf.Text = "Tabellen-Kopf";
@@ -639,6 +652,7 @@ namespace BlueControls.Forms {
             btnLayouts.ImageCode = "Layout||||||||||Stift";
             btnLayouts.Location = new Point(120, 2);
             btnLayouts.Name = "btnLayouts";
+            btnLayouts.QuickInfo = "Öffnet den Layout-Editor dieser Tabelle.";
             btnLayouts.Size = new Size(56, 66);
             btnLayouts.TabIndex = 41;
             btnLayouts.Text = "Layout-Editor";
@@ -679,6 +693,7 @@ namespace BlueControls.Forms {
             btnDrucken.ImageCode = "Drucker";
             btnDrucken.Location = new Point(136, 2);
             btnDrucken.Name = "btnDrucken";
+            btnDrucken.QuickInfo = "Tabelle drucken oder in eine Datei exportieren.";
             btnDrucken.Size = new Size(80, 66);
             btnDrucken.TabIndex = 13;
             btnDrucken.Text = "Drucken bzw. Export";
@@ -955,6 +970,8 @@ namespace BlueControls.Forms {
         protected GroupBox grpAufgaben;
         private ListBox lstAufgaben;
         private Button btnAufräumen;
+
+        // TODO: Unused
         private Button grpAufräumen;
         private Button btnUserInfo;
         private Button btnSuchInScript;

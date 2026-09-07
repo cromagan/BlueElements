@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -79,17 +79,20 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// Alle für die Darstellung relevante Spalten: die persistenten
     /// (_internal) in ihrer gespeicherten Reihenfolge plus die
     /// on-demand virtuellen (_onDemand) an ihrer Standardposition
-    /// (Pin vorne, Hinzufügen hinten). Editier-Operationen
-    /// (Move/Remove/IndexOf) und die Serialisierung arbeiten weiterhin
-    /// ausschließlich auf den persistenten Spalten.
+    /// (Pin vorne, Ähnlichkeits-Spalte direkt dahinter, Hinzufügen
+    /// hinten). Editier-Operationen (Move/Remove/IndexOf) und die
+    /// Serialisierung arbeiten weiterhin ausschließlich auf den
+    /// persistenten Spalten.
     /// </summary>
     public IEnumerable<ColumnViewItem> RenderingItems {
         get {
-            var pin = _onDemand.FirstOrDefault(v => v is PinColumnItem);
-            var add = _onDemand.FirstOrDefault(v => v is AddColumnItem);
+            var pin = _onDemand.OfType<PinColumnItem>().FirstOrDefault();
+            var add = _onDemand.OfType<AddColumnItem>().FirstOrDefault();
+            var similarity = _onDemand.OfType<SimilarityColumnItem>().FirstOrDefault();
 
             IEnumerable<ColumnViewItem> result = _internal;
             if (add is not null) { result = result.Append(add); }
+            if (similarity is not null) { result = result.Prepend(similarity); }
             if (pin is not null) { result = result.Prepend(pin); }
             return result;
         }
@@ -137,6 +140,20 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+    /// <summary>
+    /// Liefert die Spalte mit dem angegebenen Namen (Spaltenschlüssel bzw.
+    /// StorageKey virtueller Spalten), inklusive der on-demand Spalten.
+    /// </summary>
+    public ColumnViewItem? this[string? columnName] {
+        get {
+            if (string.IsNullOrEmpty(columnName)) { return null; }
+            foreach (var thisViewItem in _internal.Concat(_onDemand)) {
+                if (thisViewItem is not null && string.Equals(thisViewItem.ColumnName, columnName, StringComparison.OrdinalIgnoreCase)) { return thisViewItem; }
+            }
+            return null;
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -145,7 +162,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         var tcvc = new List<ColumnViewCollection>();
 
         foreach (var item in tb.ColumnArrangements) {
-            tcvc.Add(new ColumnViewCollection(tb, item.ParseableItems().FinishParseable()));
+            var c = new ColumnViewCollection(tb, item.ParseableItems().FinishParseable());
+            // Persistente Hinzufügen-Spalten auflösen — sie werden nur on-demand geführt.
+            foreach (var add in c.OfType<AddColumnItem>().ToList()) { c.Remove(add); }
+            tcvc.Add(c);
         }
 
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
@@ -468,15 +488,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string ReadableText() => KeyName;
 
     /// <summary>
-    /// Stellt die on-demand virtuellen Spalten (Pin, Hinzufügen) gemäß den
-    /// übergebenen Bedingungen sicherhaft ein. Persistente virtuelle Spalten
-    /// (über ihren VIR_-Schlüssel in _internal) werden NICHT
-    /// angerührt — sie bleiben unabhängig vom Bedarf erhalten. On-demand-
-    /// Spalten landen in _onDemand und werden nicht
-    /// serialisiert. Die Number-Spalte hat keinen on-demand-Trigger und
-    /// erscheint ausschließlich als VIR_NUMBER.
+    /// Stellt die on-demand virtuellen Spalten (Pin, Hinzufügen,
+    /// Ähnlichkeits-Suche) gemäß den übergebenen Bedingungen sicherhaft ein.
+    /// Die Hinzufügen-Spalte wird ausschließlich on-demand geführt —
+    /// persistente Einträge in _internal werden entfernt, sobald sie nicht
+    /// mehr benötigt werden. Die Pin-Spalte bleibt auch als persistenter
+    /// Eintrag erhalten. On-demand-Spalten landen in _onDemand und werden
+    /// nicht serialisiert. Die Number-Spalte hat keinen on-demand-Trigger
+    /// und erscheint ausschließlich als VIR_NUMBER.
     /// </summary>
-    public void ReconcileVirtualColumns(bool needPin, bool needAdd) {
+    public void ReconcileVirtualColumns(bool needPin, bool needAdd, bool needSimilarity) {
         var changed = false;
 
         for (var z = _onDemand.Count - 1; z >= 0; z--) {
@@ -485,6 +506,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             var want = v switch {
                 PinColumnItem => needPin,
                 AddColumnItem => needAdd,
+                SimilarityColumnItem => needSimilarity,
                 _ => false
             };
 
@@ -494,6 +516,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 _onDemand.RemoveAt(z);
                 changed = true;
             }
+        }
+
+        // Persistente Hinzufügen-Spalten ("Neue Spalte") auflösen — sie werden
+        // ausschließlich on-demand bereitgestellt und dürfen nicht in der
+        // Ansicht gespeichert werden.
+        foreach (var add in _internal.OfType<AddColumnItem>().ToList()) {
+            Remove(add);
+            changed = true;
         }
 
         if (needPin && !_internal.OfType<PinColumnItem>().Any() && !_onDemand.OfType<PinColumnItem>().Any()) {
@@ -511,6 +541,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             a.PropertyChanged += ColumnViewItem_PropertyChanged;
             a.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
             _onDemand.Add(a);
+            changed = true;
+        }
+
+        if (needSimilarity && !_internal.OfType<SimilarityColumnItem>().Any() && !_onDemand.OfType<SimilarityColumnItem>().Any()) {
+            var s = new SimilarityColumnItem();
+            s.PropertyChanged += ColumnViewItem_PropertyChanged;
+            s.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
+            _onDemand.Add(s);
             changed = true;
         }
 
@@ -555,11 +593,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < _internal.Count; z++) {
-            if (_internal[z]?.StorageKey is not null) { continue; }
-            if (_internal[z]?.Column is null || !tb.Column.Contains(_internal[z]?.Column)) {
-                _internal.Remove(_internal[z]);
+            var thisViewItem = _internal[z];
+            if (thisViewItem is null) {
+                _internal.RemoveAt(z);
                 z--;
+                continue;
             }
+            if (thisViewItem.StorageKey is not null) { continue; }
+            if (thisViewItem.Column is { IsDisposed: false } && tb.Column.Contains(thisViewItem.Column)) { continue; }
+
+            // Verwaisten Verweis zuerst neu auflösen: Ein kurzzeitig nicht
+            // auflösbarer Schlüssel (Reload, Umbenennung) darf die Spalte
+            // nicht dauerhaft aus der Ansicht entfernen.
+            if (thisViewItem.RepairColumnReference()) { continue; }
+
+            _internal.Remove(thisViewItem);
+            z--;
         }
 
         #endregion

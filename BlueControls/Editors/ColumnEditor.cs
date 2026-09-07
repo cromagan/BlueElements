@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
@@ -108,11 +108,14 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     public object? CreateNewItem() => null;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        var freezed = false;
+
         if (Table is { IsDisposed: false } closingTb) {
+            freezed = closingTb.IsFreezed;
             closingTb.WriteAccessChanged -= _table_WriteAccessChanged;
         }
         base.OnFormClosing(e);
-        if (_writeAccessLost) { return; }
+        if (_writeAccessLost || freezed) { return; }
         if (!AllOk()) {
             e.Cancel = true;
             return;

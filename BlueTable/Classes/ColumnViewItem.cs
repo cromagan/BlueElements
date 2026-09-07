@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueTable.EventArgs;
 using System.ComponentModel;
@@ -65,12 +65,13 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
             UnRegisterEvents();
             field = value;
+            ColumnName = null;
             RegisterEvents();
             OnPropertyChanged();
         }
     }
 
-    public string? ColumnName => Column?.KeyName ?? StorageKey;
+    public string? ColumnName { get => Column?.KeyName ?? StorageKey ?? field; private set; }
 
     /// <summary>
     /// Feste Canvas-Breite der Spalte. Echte Spalten (0) berechnen ihre Breite
@@ -137,6 +138,12 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// "sichtbar".
     /// </summary>
     public virtual string? StorageKey => null;
+
+    /// <summary>
+    /// Sortier-Typ der Spalte für den CompareKey. Echte Spalten liefern den
+    /// Typ ihres ColumnItem; virtuelle Spalten überschreiben ihn bei Bedarf.
+    /// </summary>
+    public virtual SortierTyp SortType => Column?.SortType ?? SortierTyp.Sprachneutral_String;
 
     public Table? Table { get; }
 
@@ -230,6 +237,10 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         var colName = json.GetString("columnname", string.Empty);
         if (colName is { Length: > 0 } && Table is { IsDisposed: false } tb) {
             Column = tb.Column[colName];
+            if (Column is null) {
+                // Schlüssel merken, damit Repair den Verweis später erneut auflösen kann.
+                ColumnName = colName;
+            }
         }
     }
 
@@ -243,6 +254,10 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
                 }
 
                 Column = tb.Column[value];
+                if (Column is null) {
+                    // Schlüssel merken, damit Repair den Verweis später erneut auflösen kann.
+                    ColumnName = value;
+                }
                 return true;
 
             case "columnkey":
@@ -286,6 +301,21 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    /// <summary>
+    /// Löst einen verwaisten Spaltenverweis über den gemerkten Schlüssel
+    /// erneut auf, damit ein kurzzeitig nicht auflösbarer Schlüssel die
+    /// Spalte nicht dauerhaft aus der Ansicht entfernt.
+    /// </summary>
+    internal bool RepairColumnReference() {
+        if (Column is { IsDisposed: false }) { return true; }
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (ColumnName is not { Length: > 0 } key) { return false; }
+        if (tb.Column[key] is not { IsDisposed: false } c) { return false; }
+
+        Column = c;
+        return true;
+    }
 
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }

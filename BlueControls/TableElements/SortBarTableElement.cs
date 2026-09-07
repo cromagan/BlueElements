@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -43,7 +43,7 @@ public sealed class SortBarTableElement : TableElement {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         gr.FillRectangle(TableHeadOverlayBrush, positionControl);
 
-        if (Sort is not null && Sort.UsedForRowSort(viewItem.Column)) {
+        if (Sort is not null && Sort.UsedForRowSort(viewItem)) {
             var p6 = 6.CanvasToControl(scale);
             var p12 = 12.CanvasToControl(scale);
             var im = Sort.Reverse ? QuickImage.Get("ZA|" + p12 + "|" + p6 + "||||50") : QuickImage.Get("AZ|" + p12 + "|" + p6 + "||||50");
@@ -64,7 +64,7 @@ public sealed class SortBarTableElement : TableElement {
             return;
         }
 
-        tableView.QuickInfo = Sort is not null && Sort.UsedForRowSort(cvi.Column)
+        tableView.QuickInfo = Sort is not null && Sort.UsedForRowSort(cvi)
             ? "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend")
             : string.Empty;
     }

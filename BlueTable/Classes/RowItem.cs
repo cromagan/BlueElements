@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueScript.Classes;
 using BlueTable.EventArgs;
@@ -62,6 +62,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool IsDisposed => _isDisposedFlag == 1;
 
     public string KeyName { get; private set; }
+
+    /// <summary>
+    /// Interner Zeitstempel der letzten Zelländerung der Zeile.
+    /// Wird nach der LinkedCell-Reparatur auf DateTime.MinValue gesetzt (nichts mehr zu reparieren).
+    /// </summary>
+    internal DateTime LastCellChangeUtc { get; set; }
 
     public Table? Table {
         get;
@@ -350,6 +356,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         foreach (var thisColumn in columns) {
             key.Append(CellGetCompareKey(thisColumn) + FirstSortChar);
+        }
+
+        key.Append(SecondSortChar + KeyName);
+        return key.ToString();
+    }
+
+    /// <summary>
+    /// Sortierschlüssel über die angegebenen Spalten. Echte und virtuelle
+    /// Spalten liefern ihren Zellwert einheitlich über CellGetString.
+    /// </summary>
+    public string CompareKey(ICollection<ColumnViewItem> columns) {
+        var key = new StringBuilder();
+
+        foreach (var thisColumn in columns) {
+            key.Append(thisColumn.CellGetString(this, false).CompareKey(thisColumn.SortType) + FirstSortChar);
         }
 
         key.Append(SecondSortChar + KeyName);

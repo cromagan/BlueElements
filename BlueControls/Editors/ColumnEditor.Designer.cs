@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -301,6 +301,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnTextColor.Location = new Point(280, 8);
             btnTextColor.Name = "btnTextColor";
+            btnTextColor.QuickInfo = "Textfarbe der Spalten-Überschrift wählen.";
             btnTextColor.Size = new Size(128, 32);
             btnTextColor.TabIndex = 4;
             btnTextColor.Text = "Textfarbe";
@@ -310,6 +311,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnBackColor.Location = new Point(280, 40);
             btnBackColor.Name = "btnBackColor";
+            btnBackColor.QuickInfo = "Hintergrundfarbe der Spalten-Überschrift wählen.";
             btnBackColor.Size = new Size(128, 32);
             btnBackColor.TabIndex = 3;
             btnBackColor.Text = "Hintergrundfarbe";
@@ -397,6 +399,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             btnStandard.Location = new Point(8, 8);
             btnStandard.Name = "btnStandard";
+            btnStandard.QuickInfo = "Setzt die Einstellungen dieser Systemspalte auf den Standard zurück.";
             btnStandard.Size = new Size(200, 48);
             btnStandard.TabIndex = 39;
             btnStandard.Text = "Standard herstellen";
@@ -910,6 +913,7 @@ namespace BlueControls.BlueTableDialogs {
             btnQI_Vorschau.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnQI_Vorschau.Location = new Point(992, 560);
             btnQI_Vorschau.Name = "btnQI_Vorschau";
+            btnQI_Vorschau.QuickInfo = "Zeigt QuickInfo und Administrator-Info als Vorschau an.";
             btnQI_Vorschau.Size = new Size(96, 24);
             btnQI_Vorschau.TabIndex = 1;
             btnQI_Vorschau.Text = "Vorschau";
@@ -1085,6 +1089,7 @@ namespace BlueControls.BlueTableDialogs {
             btnSystemInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnSystemInfo.Location = new Point(760, 88);
             btnSystemInfo.Name = "btnSystemInfo";
+            btnSystemInfo.QuickInfo = "Setzt die automatisch gesammelten Nutzungs-Infos aller Spalten zurück.";
             btnSystemInfo.Size = new Size(328, 24);
             btnSystemInfo.TabIndex = 4;
             btnSystemInfo.Text = "Alle gesammelten Infos zurücksetzen";
@@ -1096,6 +1101,7 @@ namespace BlueControls.BlueTableDialogs {
             btnOk.ImageCode = "Häkchen|16";
             btnOk.Location = new Point(1026, 765);
             btnOk.Name = "btnOk";
+            btnOk.QuickInfo = "Prüft alle Eingaben, übernimmt die Änderungen und schließt den Editor.";
             btnOk.Size = new Size(72, 24);
             btnOk.TabIndex = 6;
             btnOk.Text = "OK";
@@ -1349,6 +1355,7 @@ namespace BlueControls.BlueTableDialogs {
             butAktuellVor.ImageCode = "Pfeil_Rechts|16|||0000FF";
             butAktuellVor.Location = new Point(377, 765);
             butAktuellVor.Name = "butAktuellVor";
+            butAktuellVor.QuickInfo = "Zur nächsten sichtbaren Spalte der aktuellen Spaltenanordnung springen.";
             butAktuellVor.Size = new Size(72, 24);
             butAktuellVor.TabIndex = 19;
             butAktuellVor.Click += butAktuellVor_Click;
@@ -1359,6 +1366,7 @@ namespace BlueControls.BlueTableDialogs {
             butAktuellZurueck.ImageCode = "Pfeil_Links|16|||0000FF";
             butAktuellZurueck.Location = new Point(297, 765);
             butAktuellZurueck.Name = "butAktuellZurueck";
+            butAktuellZurueck.QuickInfo = "Zur vorherigen sichtbaren Spalte der aktuellen Spaltenanordnung springen.";
             butAktuellZurueck.Size = new Size(72, 24);
             butAktuellZurueck.TabIndex = 18;
             butAktuellZurueck.Click += butAktuellZurueck_Click;

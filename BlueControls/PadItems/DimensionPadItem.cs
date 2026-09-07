@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -174,7 +174,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
     } = string.Empty;
 
     /// <summary>
-    /// Die Größe der Beschriftung.
+    /// Die Größe der Beschriftung. 1 = Standard.
     /// </summary>
     public float TextScale {
         get;
@@ -184,7 +184,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
             field = value;
             OnPropertyChanged();
         }
-    } = 3.07f;
+    } = 1f;
 
     protected override int SaveOrder => 999;
 
@@ -261,7 +261,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         result.ParseableAdd("Decimal", Nachkommastellen);
         result.ParseableAdd("refix", Präfix);
         result.ParseableAdd("Suffix", Suffix);
-        result.ParseableAdd("AdditionalScale", TextScale);
+        result.ParseableAdd("TextScale", TextScale);
         result.ParseableAdd("Style", Style);
         return result;
     }
@@ -332,7 +332,11 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
                 Suffix = value.FromNonCritical();
                 return true;
 
-            case "additionalscale":
+            case "additionalscale": // TODO: Alt, Wert war absolut (Standard 3,07)
+                TextScale = FloatParse(value.FromNonCritical()) / ISupportsTextScale.LegacyScale;
+                return true;
+
+            case "textscale":
                 TextScale = FloatParse(value.FromNonCritical());
                 return true;
 
@@ -356,7 +360,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
 
     protected override RectangleF CalculateCanvasUsedArea() {
         if (Style == PadStyles.Undefined) { return new RectangleF(0, 0, 0, 0); }
-        var f2 = this.GetFont(TextScale);
+        var f2 = this.GetFont(TextScale * ISupportsTextScale.LegacyScale);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -378,7 +382,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (Style != PadStyles.Undefined) {
-            var geszoom = (float)Math.Round(TextScale * zoom, 2, MidpointRounding.AwayFromZero);
+            var geszoom = (float)Math.Round(TextScale * ISupportsTextScale.LegacyScale * zoom, 2, MidpointRounding.AwayFromZero);
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;
@@ -441,7 +445,7 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
 
     private void CalculateOtherPoints() {
         var tmppW = -90;
-        var mhlAb = MmToPixel(1.5f * TextScale / 3.07f, CollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+        var mhlAb = MmToPixel(1.5f * TextScale, CollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
         ComputeData();
 
         //Gegeben sind:

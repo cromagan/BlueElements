@@ -1,8 +1,17 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 namespace BlueControls.Chars;
 
 internal class TabChar : Char {
+
+    #region Fields
+
+    /// <summary>
+    /// Breite des Rasters, in das der Tabulator zum nächsten Sprung positioniert.
+    /// </summary>
+    internal const float Raster = 150;
+
+    #endregion
 
     #region Constructors
 
@@ -36,7 +45,7 @@ internal class TabChar : Char {
 
     protected override SizeF CalculateSizeCanvas() {
         var h = Font is null ? 16f : Font.CharHeight;
-        return new SizeF(150 - (PosCanvas.X % 150), h);
+        return new SizeF(Raster - (PosCanvas.X % Raster), h);
     }
 
     #endregion
