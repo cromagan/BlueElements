@@ -264,8 +264,12 @@ TableHeadEditor und ColumnEditor:
 Füge alle Buttons aussagenkräftige, einfach zu verstehende QuickInfos hinzu.
 Auch im TableViewForm 
 
-# Aufgabe
+## Aufgabe
 bei FreezedTabellen soll beim ColumnEditor zwar eine Meldung kommen, aber dann einfach der Dialog beendet werden.
+
+## Aufgabe
+Als Schaltfläche anzeigen - wenn ich ShowCellValue umschalte, ändert sich das Meenu nicht
+Un Padding: Es darf bei negativen Werten nicht über den Zellrand gezeichnet werden. Ergänze das, auch im Quickinfo. und zuätzlich, welche Werte akzeptiert werden.
 
 
 
