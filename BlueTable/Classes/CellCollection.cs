@@ -125,11 +125,11 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     public static void RepairLinkedCellIfDue(RowItem? row) {
         if (row is not { IsDisposed: false } r) { return; }
 
-        var change = r.LastCellChangeUtc;
-        if (change == DateTime.MinValue || DateTime.UtcNow.Subtract(change) < LinkedCellRepairDelay) { return; }
+        var change = r.LastLinkedCellCheck;
+        if (DateTime.UtcNow.Subtract(change) < LinkedCellRepairDelay) { return; }
 
         // Zuerst zurücksetzen, damit ein erneuter Aufruf (z. B. beim nächsten Paint) nicht mehrfach repariert.
-        r.LastCellChangeUtc = DateTime.MinValue;
+        r.LastLinkedCellCheck = DateTime.UtcNow;
 
         _ = r.RepairAllLinks();
     }

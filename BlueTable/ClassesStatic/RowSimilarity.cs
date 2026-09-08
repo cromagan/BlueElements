@@ -46,7 +46,9 @@ public static class RowSimilarity {
 
         List<ColumnItem> columns = [];
         foreach (var thisColumn in table.Column) {
-            if (thisColumn is { IsDisposed: false } && !thisColumn.IsSystemColumn()) { columns.Add(thisColumn); }
+            if (thisColumn is { IsDisposed: false } && 
+                !thisColumn.IsSystemColumn() &&
+                !thisColumn.IsFirst) { columns.Add(thisColumn); }
         }
 
         if (columns.Count == 0) {

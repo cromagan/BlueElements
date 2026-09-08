@@ -63,12 +63,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string KeyName { get; private set; }
 
-    /// <summary>
-    /// Interner Zeitstempel der letzten Zelländerung der Zeile.
-    /// Wird nach der LinkedCell-Reparatur auf DateTime.MinValue gesetzt (nichts mehr zu reparieren).
-    /// </summary>
-    internal DateTime LastCellChangeUtc { get; set; }
-
     public Table? Table {
         get;
         private set {
@@ -93,6 +87,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return long.MaxValue;
         }
     }
+
+    /// <summary>
+    /// Interner Zeitstempel der letzten Zelländerung der Zeile.
+    /// Wird nach der LinkedCell-Reparatur auf DateTime.MinValue gesetzt (nichts mehr zu reparieren).
+    /// </summary>
+    internal DateTime LastLinkedCellCheck { get; set; }
 
     #endregion
 

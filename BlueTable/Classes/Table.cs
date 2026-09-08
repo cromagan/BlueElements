@@ -2452,7 +2452,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         column.UcaseNamesSortedByLength = null;
         if (_suppressEvents <= 0) {
             // Reparatur passiert verzögert beim Anzeigen der Zeile in einer TableView (RepairLinkedCellIfDue).
-            rowItem.LastCellChangeUtc = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 5));
+            rowItem.LastLinkedCellCheck = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 5));
             CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
         }
     }
