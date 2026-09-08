@@ -6,7 +6,7 @@ namespace BlueTable.ClassesStatic;
 /// Berechnet Ähnlichkeits-Scores (0–100) aller Zeilen einer Tabelle bezogen
 /// auf eine Referenzzeile. Mehrzeilige Zellen werden über ihre Einträge,
 /// Zahlen über den Abstand, Datumsangaben über den Tagesabstand und
-/// einzeilige Texte über die Levenshtein-Distanz verglichen. Zahlen zählen
+/// einzeilige Texte über die gemeinsamen Zeichen verglichen. Zahlen zählen
 /// 5-fach, mehrzeilige Einträge 3-fach, Datumsangaben 2-fach und Texte
 /// einfach. Die Referenzzeile ist identisch mit sich selbst und erhält
 /// dadurch 100.
@@ -130,14 +130,37 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Ähnlichkeit zweier einzeiliger Texte: 1 - Levenshtein-Distanz / maximale Länge.
+    /// Ähnlichkeit zweier einzeiliger Texte: Anteil der gemeinsamen Zeichen
+    /// an der Gesamtlänge (Dice-Koeffizient), Groß-/Kleinschreibung ignoriert.
     /// </summary>
     private static double TextSimilarity(string valueReference, string value) {
         var upperReference = valueReference.ToUpperInvariant();
         var upperValue = value.ToUpperInvariant();
-        var maxLength = Math.Max(upperReference.Length, upperValue.Length);
-        if (maxLength == 0) { return 1.0; }
-        return 1.0 - (double)LevenshteinDistance(upperReference, upperValue) / maxLength;
+
+        if (upperReference.Length == 0 && upperValue.Length == 0) { return 1.0; }
+        if (upperReference.Length == 0 || upperValue.Length == 0) { return 0.0; }
+
+        var charsReference = upperReference.ToCharArray();
+        var charsValue = upperValue.ToCharArray();
+        Array.Sort(charsReference);
+        Array.Sort(charsValue);
+
+        var common = 0;
+        var i = 0;
+        var j = 0;
+        while (i < charsReference.Length && j < charsValue.Length) {
+            if (charsReference[i] == charsValue[j]) {
+                common++;
+                i++;
+                j++;
+            } else if (charsReference[i] < charsValue[j]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return 2.0 * common / (charsReference.Length + charsValue.Length);
     }
 
     /// <summary>
