@@ -3,20 +3,22 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.ScriptVariables;
+using System.Globalization;
 
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Öffent einen neuen Tab in allen TableViews.
+/// Öffnet die Tabelle in den TableViews — als neuer Reiter oder, bei Überschreiben=true, im aktuell angezeigten Reiter.
+/// Mit dem Attribut WindowID wird das Ziel-Fenster eingeschränkt; bei leerer Angabe werden alle TableViews bedient.
 /// </summary>
 internal class OpenTabScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar];
+    public override List<List<string>> Args => [TableVar, BoolVal, StringVal];
     public override string Command => "opentab";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
-    public override string Syntax => "OpenTabScriptCommand(Table);";
+    public override string Syntax => "OpenTabScriptCommand(Table, AktuellerTabÜberschreiben, WindowID);";
 
     #endregion
 
@@ -35,11 +37,19 @@ internal class OpenTabScriptCommand : ScriptCommand {
             return new DoItFeedback("Die Benennung der Tabelle fehlt.", true);
         }
 
-        foreach (var thisForm in FormManager.Forms) {
-            if (thisForm is TableViewForm tbf && tbf.TabExists(tb.Caption) is null) {
+        var aktuellerTabÜberschreiben = attvar.ValueBoolGet(1);
+        var fensterId = attvar.ValueStringGet(2);
 
+        foreach (var thisForm in FormManager.Forms) {
+            if (thisForm is not TableViewForm thisTbv) { continue; }
+            if (fensterId is { Length: > 0 } fid && thisTbv.Handle.ToString(CultureInfo.InvariantCulture) != fid) { continue; }
+
+            if (aktuellerTabÜberschreiben) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
-                tbf.AddTabPage(tb.Caption);
+                thisTbv.ReplaceCurrentTab(tb.Caption);
+            } else if (thisTbv.TabExists(tb.Caption) is null) {
+                if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
+                thisTbv.AddTabPage(tb.Caption);
             }
         }
 

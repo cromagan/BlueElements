@@ -215,6 +215,9 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
+
+        if (Draw_SimilarityResetButton(gr, viewItem, positionControl)) { return; }
+
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
         if (Arrangement?.Table is not { IsDisposed: false } table || !table.IsAdministrator()) { return; }
 
@@ -231,6 +234,22 @@ public sealed class ColumnsHeadTableElement : TableElement {
         gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Kritisch, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
     }
 
+    /// <summary>
+    /// Zeichnet den Ausschalter-Knopf im Kopf der Ähnlichkeits-Spalte;
+    /// false, wenn der Kopf nicht die Ähnlichkeits-Spalte ist.
+    /// </summary>
+    private bool Draw_SimilarityResetButton(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
+        if (viewItem is not SimilarityColumnItem || Arrangement?.Table is not { IsDisposed: false } scoredTable || !SimilarityColumnItem.HasScores(scoredTable)) { return false; }
+
+        var bs = HeadButtonSize;
+        var btnRect = new Rectangle((int)(positionControl.X + (positionControl.Width - bs) / 2.0), (int)positionControl.Top + 2, bs, bs);
+
+        Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
+        Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
+        gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Lupe, bs - 4, ImageCode.Kreuz), btnRect.Left + 2, btnRect.Top + 2);
+        return true;
+    }
+
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
     public BlueFont Font_Head_Colored(ColumnViewItem viewItem) {
@@ -245,6 +264,23 @@ public sealed class ColumnsHeadTableElement : TableElement {
     public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
         if (mouseOverColumn is not { IsDisposed: false } clickedColumn) { return; }
         if (Arrangement is not { IsDisposed: false } ca) { return; }
+
+        #region Ähnlichkeits-Sortierung ausschalten
+
+        if (clickedColumn is SimilarityColumnItem && SimilarityColumnItem.HasScores(ca.Table)) {
+            var bsSimilarity = HeadButtonSize.CanvasToControl(tableView.Zoom);
+            var btnXSimilarity = (int)((clickedColumn.ControlColumnWidth() - bsSimilarity) / 2.0);
+            var mouseInColumnSimilarity = MousePositionInColumn(clickedColumn, tableView, e);
+            if (mouseInColumnSimilarity.X >= btnXSimilarity && mouseInColumnSimilarity.X <= btnXSimilarity + bsSimilarity && mouseInColumnSimilarity.Y >= 2 && mouseInColumnSimilarity.Y <= 2 + bsSimilarity) {
+                SimilarityColumnItem.Reset();
+                tableView.SortDefinitionTemporary = null;
+                tableView.Invalidate_CurrentArrangement();
+            }
+            return;
+        }
+
+        #endregion
+
         if (!ca.Table?.IsAdministrator() ?? true) { return; }
 
         if (clickedColumn is AddColumnItem) {
@@ -302,6 +338,16 @@ public sealed class ColumnsHeadTableElement : TableElement {
     public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
         if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
             base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        if (cvi is SimilarityColumnItem && Arrangement?.Table is { IsDisposed: false } scoredTable && SimilarityColumnItem.HasScores(scoredTable)) {
+            var bsSimilarity = HeadButtonSize.CanvasToControl(tableView.Zoom);
+            var btnXSimilarity = (int)((cvi.ControlColumnWidth() - bsSimilarity) / 2.0);
+            var mouseInColumnSimilarity = MousePositionInColumn(cvi, tableView, e);
+            if (mouseInColumnSimilarity.X >= btnXSimilarity && mouseInColumnSimilarity.X <= btnXSimilarity + bsSimilarity && mouseInColumnSimilarity.Y >= 2 && mouseInColumnSimilarity.Y <= 2 + bsSimilarity) {
+                tableView.QuickInfo = "Ähnlichkeits-Sortierung ausschalten";
+            }
             return;
         }
 

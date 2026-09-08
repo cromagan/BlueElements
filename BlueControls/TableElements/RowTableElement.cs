@@ -1,8 +1,10 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueBasics.ClassesStatic;
 using BlueControls.ControlStrategies;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueTable.Classes;
 using BlueTable.EventArgs;
 using System.Windows.Forms;
 
@@ -180,7 +182,25 @@ public sealed class RowTableElement : TableElement {
 
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
+        } else if (viewItem.Column is { IsDisposed: false } column
+                   && column.Table is { IsDisposed: false } scoredTable
+                   && SimilarityColumnItem.HasScores(scoredTable)
+                   && SimilarityColumnItem.TryGetCellScore(Row, column, out var cellScore)) {
+            // Heat-Map-Overlay der Ähnlichkeits-Suche: Grün (identisch) bis Rot.
+            // Ignorierte Spalten und angepinnte Zeilen bleiben ohne Farbe.
+            var brush = BackgroundFill.GetBrush(ScoreOverlayColor(cellScore));
+            lock (brush) { gr.FillRectangle(brush, positionControl); }
         }
+    }
+
+    /// <summary>
+    /// Overlay-Farbe eines Zell-Scores: 100 (identisch) grün, 0 komplett unterschiedlich rot.
+    /// </summary>
+    private static Color ScoreOverlayColor(int score) {
+        var s = Math.Clamp(score, 0, 100);
+        var r = s <= 50 ? 255 : 255 - (s - 50) * 255 / 50;
+        var g = s <= 50 ? s * 255 / 50 : 255;
+        return Color.FromArgb(90, r, g, 0);
     }
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
@@ -247,7 +267,7 @@ public sealed class RowTableElement : TableElement {
         if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
             // Instant-Action-Strategien (z. B. Tabellen-Skript-Knopf) führen den
             // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
-            if (ControlStrategy.InstantActionClicked(col, Row)) { return; }
+            if (ControlStrategy.InstantActionClicked(tableView, col, Row)) { return; }
 
             tableView.OnCellClicked(new CellEventArgs(col, Row));
             tableView.Invalidate();

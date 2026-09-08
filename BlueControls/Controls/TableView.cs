@@ -60,11 +60,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private List<RowTableElement> _cachedRowViewItems = [];
 
-    /// <summary>
-    /// Zeilen-Elemente, die im letzten Paint tatsächlich gezeichnet wurden (Basis für die verzögerte LinkedCell-Reparatur).
-    /// </summary>
-    private List<RowTableElement> _drawnRowViewItems = [];
-
     private bool _consumeNextMouseDown;
 
     private int _dragInsertIndex = -1;
@@ -75,6 +70,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private object? _dragItem;
 
     private Point _dragMouseDown;
+
+    /// <summary>
+    /// Zeilen-Elemente, die im letzten Paint tatsächlich gezeichnet wurden (Basis für die verzögerte LinkedCell-Reparatur).
+    /// </summary>
+    private List<RowTableElement> _drawnRowViewItems = [];
 
     /// <summary>
     /// Commit-Callback des aktiven Inline-Edits; wird beim Schließen mit dem neuen Text aufgerufen, danach null.
@@ -1326,11 +1326,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contextMenu.Add(ItemOf("Zeile", true));
 
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Zeile, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
-                if (SimilarityColumnItem.HasScores(tb)) {
-                    contextMenu.Add(ItemOf("Ähnliche Zeilen ausschalten", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_ResetSort, true, string.Empty));
-                } else {
-                    contextMenu.Add(ItemOf("Ähnliche Zeilen", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize), ContextMenu_SimilarRows, true, string.Empty));
-                }
+                contextMenu.Add(ItemOf("Ähnliche Zeilen", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize), ContextMenu_SimilarRows, true, string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, IContextMenu.IconSize), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
@@ -2498,17 +2494,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
-    /// <summary>
-    /// Repariert nach dem Zeichnen die LinkedCells der gezeichneten (bildschirmsichtbaren) Zeilen,
-    /// wenn ihre letzte Änderung die Frist überschritten hat.
-    /// </summary>
-    private void RepairVisibleRowsAfterDraw() {
-        foreach (var rowElement in _drawnRowViewItems) {
-            if (rowElement is not { IsDisposed: false, Visible: true }) { continue; }
-            CellCollection.RepairLinkedCellIfDue(rowElement.Row);
-        }
-    }
-
     protected override bool IsInputKey(Keys keyData) {
         // Ganz wichtig diese Routine!
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
@@ -2904,29 +2889,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         gr.FillRectangle(brush, rect);
         using var pen = new Pen(Color.FromArgb(200, 0, 120, 215), 2);
         gr.DrawRectangle(pen, rect);
-    }
-
-    /// <summary>
-    /// Zeichnet die sichtbaren Elemente und sammelt gezeichnete Zeilen für RepairVisibleRowsAfterDraw.
-    /// </summary>
-    private void DrawItems(IEnumerable<TableElement>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom, int clipTop) {
-        if (list is null) { return; }
-
-        try {
-            foreach (var thisItem in list) {
-                if (!thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) { continue; }
-
-                if (clipTop > 0 && thisItem.ControlPosition(zoom, offsetX, offsetY).Bottom <= clipTop) { continue; }
-
-                var itemState = controlState;
-
-                if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
-
-                thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
-
-                if (thisItem is RowTableElement drawnRow) { _drawnRowViewItems.Add(drawnRow); }
-            }
-        } catch { }
     }
 
     /// <summary>
@@ -3958,11 +3920,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var (_, row, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb || row is null) { return; }
 
-        var scores = RowSimilarity.Scores(tb, row);
-        SimilarityColumnItem.SetScores(tb, scores);
+        var (scores, cellScores) = RowSimilarity.Scores(tb, row);
+        SimilarityColumnItem.SetScores(tb, scores, cellScores);
 
         // Die Score-Spalte wird wie eine normale Spalte sortiert.
         if (CurrentArrangement?[SimilarityColumnItem.ClassId] is not { IsDisposed: false } scoreColumn) { return; }
+
+        // Bei erneutem Aufruf bleibt die Sortierdefinition gleich, nur die Scores
+        // ändern sich — die alte Definition verwerfen, damit neu sortiert wird.
+        SortDefinitionTemporary = null;
         SortDefinitionTemporary = new RowSortDefinition(tb, scoreColumn, true);
     }
 
@@ -4262,6 +4228,29 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         DrawInsertIndicatorRect(gr, new Rectangle(indicatorX, area.Top, indicatorHalf * 2, area.Height));
+    }
+
+    /// <summary>
+    /// Zeichnet die sichtbaren Elemente und sammelt gezeichnete Zeilen für RepairVisibleRowsAfterDraw.
+    /// </summary>
+    private void DrawItems(IEnumerable<TableElement>? list, Graphics gr, Rectangle visControlArea, int offsetX, int offsetY, States controlState, Design controlDesign, Design itemDesign, float zoom, int clipTop) {
+        if (list is null) { return; }
+
+        try {
+            foreach (var thisItem in list) {
+                if (!thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) { continue; }
+
+                if (clipTop > 0 && thisItem.ControlPosition(zoom, offsetX, offsetY).Bottom <= clipTop) { continue; }
+
+                var itemState = controlState;
+
+                if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
+
+                thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
+
+                if (thisItem is RowTableElement drawnRow) { _drawnRowViewItems.Add(drawnRow); }
+            }
+        } catch { }
     }
 
     /// <summary>
@@ -4634,8 +4623,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-                                        // Bestehenden Code belassen
-                                        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                                            // Bestehenden Code belassen
+                                            FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
@@ -4720,6 +4709,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             _allViewItems.Remove(key);
         }
         Invalidate_AllViewItems(false);
+    }
+
+    /// <summary>
+    /// Repariert nach dem Zeichnen die LinkedCells der gezeichneten (bildschirmsichtbaren) Zeilen,
+    /// wenn ihre letzte Änderung die Frist überschritten hat.
+    /// </summary>
+    private void RepairVisibleRowsAfterDraw() {
+        foreach (var rowElement in _drawnRowViewItems) {
+            if (rowElement is not { IsDisposed: false, Visible: true }) { continue; }
+            CellCollection.RepairLinkedCellIfDue(rowElement.Row);
+        }
     }
 
     private void Row_RowAdded(object? sender, RowEventArgs e) {
