@@ -17,7 +17,7 @@ public class RowCountScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowCountScriptCommand(FilterScriptCommand, ...)";
+    public override string Syntax => "RowCount(FilterScriptCommand, ...)";
 
     #endregion
 

@@ -14,7 +14,7 @@ internal class StartsWithScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
-    public override string Syntax => "StartsWithScriptCommand(StringScriptCommand, CaseSensitive, Value1, Value2, ...)";
+    public override string Syntax => "StartsWith(StringScriptCommand, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 

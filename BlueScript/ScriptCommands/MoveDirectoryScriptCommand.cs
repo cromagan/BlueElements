@@ -16,7 +16,7 @@ internal class MoveDirectoryScriptCommand : ScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "MoveDirectoryScriptCommand(SourceCompleteName, DestinationCompleteName)";
+    public override string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 

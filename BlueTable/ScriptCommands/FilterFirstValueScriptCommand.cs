@@ -26,7 +26,7 @@ public class FilterFirstValueScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "FilterFirstValueScriptCommand(ReturnColumn, NothingFoundValue, FilterScriptCommand, ...)";
+    public override string Syntax => "FilterFirstValue(ReturnColumn, NothingFoundValue, FilterScriptCommand, ...)";
 
     #endregion
 

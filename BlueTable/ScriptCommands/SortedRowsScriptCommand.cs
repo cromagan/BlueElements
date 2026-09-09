@@ -16,7 +16,7 @@ public class SortedRowsScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfRowsScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "SortedRowsScriptCommand(table);";
+    public override string Syntax => "SortedRows(table);";
 
     #endregion
 

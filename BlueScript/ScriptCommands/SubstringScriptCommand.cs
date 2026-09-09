@@ -13,7 +13,7 @@ internal class SubstringScriptCommand : ScriptCommand {
     public override string Command => "substring";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "SubstringScriptCommand(StringScriptCommand, Start, Anzahl)";
+    public override string Syntax => "Substring(StringScriptCommand, Start, Anzahl)";
 
     #endregion
 

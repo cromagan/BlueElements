@@ -16,7 +16,7 @@ internal class SplitWordsScriptCommand : ScriptCommand {
     public override string Command => "splitwords";
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
-    public override string Syntax => "SplitWordsScriptCommand(StringScriptCommand)";
+    public override string Syntax => "SplitWords(StringScriptCommand)";
 
     #endregion
 

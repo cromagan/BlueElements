@@ -18,7 +18,7 @@ public class ScreenareaScriptCommand : ScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
-    public override string Syntax => "ScreenareaScriptCommand()";
+    public override string Syntax => "Screenarea()";
 
     #endregion
 

@@ -20,7 +20,7 @@ internal class ForEachRow2ScriptCommand : TableGenericScriptCommand {
     public override string Command => "foreachrow2";
     public override bool GetCodeBlockAfter => true;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "ForEachRow2ScriptCommand(NeueVariable, ListRow) { }";
+    public override string Syntax => "ForEachRow2(NeueVariable, ListRow) { }";
 
     #endregion
 

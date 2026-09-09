@@ -15,7 +15,7 @@ internal class MatchColumnFormatScriptCommand : TableGenericScriptCommand {
     public override string Command => "matchcolumnformat";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "MatchColumnFormatScriptCommand(Value, Column)";
+    public override string Syntax => "MatchColumnFormat(Value, Column)";
 
     #endregion
 

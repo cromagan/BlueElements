@@ -20,7 +20,7 @@ public class RowDeleteFilterScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowDeleteFilterScriptCommand(FilterScriptCommand, ...)";
+    public override string Syntax => "RowDeleteFilter(FilterScriptCommand, ...)";
 
     #endregion
 

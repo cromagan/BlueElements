@@ -14,7 +14,7 @@ internal class ReduceToCharsScriptCommand : ScriptCommand {
     public override string Command => "reducetochars";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ReduceToCharsScriptCommand(OriginalString, ErlaubteZeichenString)";
+    public override string Syntax => "ReduceToChars(OriginalString, ErlaubteZeichenString)";
 
     #endregion
 

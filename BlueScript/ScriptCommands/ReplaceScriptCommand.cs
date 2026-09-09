@@ -14,7 +14,7 @@ internal class ReplaceScriptCommand : ScriptCommand {
     public override string Command => "replace";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ReplaceScriptCommand(OriginalString, SearchString, ReplaceString)";
+    public override string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
 
     #endregion
 

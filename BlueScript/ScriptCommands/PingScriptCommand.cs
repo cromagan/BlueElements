@@ -18,7 +18,7 @@ internal class PingScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "PingScriptCommand(ServerAdresse)";
+    public override string Syntax => "Ping(ServerAdresse)";
 
     #endregion
 

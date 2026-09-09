@@ -16,7 +16,7 @@ internal class SqrtScriptCommand : ScriptCommand {
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "SqrtScriptCommand(NumberScriptCommand)";
+    public override string Syntax => "Sqrt(NumberScriptCommand)";
 
     #endregion
 

@@ -21,7 +21,7 @@ internal class DownloadWebPageScriptCommand : ScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "DownloadWebPageScriptCommand(Url)";
+    public override string Syntax => "DownloadWebPage(Url)";
 
     #endregion
 

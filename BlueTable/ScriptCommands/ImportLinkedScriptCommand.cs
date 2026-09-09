@@ -14,7 +14,7 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
 
     public override string Command => "importlinked";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "ImportLinkedScriptCommand();";
+    public override string Syntax => "ImportLinked();";
 
     #endregion
 

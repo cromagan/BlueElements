@@ -14,7 +14,7 @@ internal class ToLowerScriptCommand : ScriptCommand {
     public override string Command => "tolower";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ToLowerScriptCommand(OriginalString)";
+    public override string Syntax => "ToLower(OriginalString)";
 
     #endregion
 

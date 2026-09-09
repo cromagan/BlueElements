@@ -20,7 +20,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
     public override bool GetCodeBlockAfter => true;
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "ForEachRowScriptCommand(NeueVariable, Filter1, ...) { }";
+    public override string Syntax => "ForEachRow(NeueVariable, Filter1, ...) { }";
 
     #endregion
 

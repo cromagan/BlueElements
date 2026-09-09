@@ -16,7 +16,7 @@ internal class SetIfHasValueScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable, DoubleScriptVariable.ShortName_Variable, BoolScriptVariable.ShortName_Variable], [ScriptVariable.Any_Plain]];
     public override string Command => "setifhasvalue";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
-    public override string Syntax => "SetIfHasValueScriptCommand(Variable, Werte, ...);";
+    public override string Syntax => "SetIfHasValue(Variable, Werte, ...);";
 
     #endregion
 

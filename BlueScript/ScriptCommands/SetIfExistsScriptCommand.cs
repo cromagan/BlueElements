@@ -15,7 +15,7 @@ internal class SetIfExistsScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable, DoubleScriptVariable.ShortName_Variable, BoolScriptVariable.ShortName_Variable], [ScriptVariable.Any_Plain]];
     public override string Command => "setifexists";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
-    public override string Syntax => "SetIfExistsScriptCommand(Variable, Werte, ...);";
+    public override string Syntax => "SetIfExists(Variable, Werte, ...);";
 
     #endregion
 

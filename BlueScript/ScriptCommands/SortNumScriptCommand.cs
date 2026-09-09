@@ -13,7 +13,7 @@ internal class SortNumScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [ListStringVar, FloatVal];
     public override string Command => "sortnum";
 
-    public override string Syntax => "SortNumScriptCommand(ListVariable, Defaultwert);";
+    public override string Syntax => "SortNum(ListVariable, Defaultwert);";
 
     #endregion
 

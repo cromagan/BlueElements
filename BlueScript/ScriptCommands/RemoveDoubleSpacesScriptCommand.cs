@@ -15,7 +15,7 @@ internal class RemoveDoubleSpacesScriptCommand : ScriptCommand {
     public override string Command => "removedoublespaces";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "RemoveDoubleSpacesScriptCommand(text)";
+    public override string Syntax => "RemoveDoubleSpaces(text)";
 
     #endregion
 

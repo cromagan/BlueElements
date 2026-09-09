@@ -15,7 +15,7 @@ public class SoftMessageScriptCommand : TableGenericScriptCommand {
 
     public override string Command => "softmessage";
 
-    public override string Syntax => "SoftMessageScriptCommand(Text);";
+    public override string Syntax => "SoftMessage(Text);";
 
     #endregion
 

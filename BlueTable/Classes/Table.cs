@@ -898,7 +898,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             snapshot = [.. LiveInstances.Values];
         }
 
-        Develop.EndLog($"TableScriptCommand.SaveAll: Start mit {snapshot.Count} TableScriptCommand(n)");
+        Develop.EndLog($"TableScriptCommand.SaveAll: Start mit {snapshot.Count} Table(n)");
 
         var count = 0;
         Parallel.ForEach(snapshot, thisFile => {
@@ -911,7 +911,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
         });
 
-        Develop.EndLog($"TableScriptCommand.SaveAll: Ende, {count} TableScriptCommand(n) gespeichert");
+        Develop.EndLog($"TableScriptCommand.SaveAll: Ende, {count} Table(n) gespeichert");
 
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
     }

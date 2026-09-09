@@ -23,7 +23,7 @@ public class ShowFormulaFormScriptCommand : ScriptCommand {
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
-    public override string Syntax => "ShowFormulaFormScriptCommand(Dateiname, Zeile, Modus,  IsModal, TopMost);";
+    public override string Syntax => "ShowFormulaForm(Dateiname, Zeile, Modus,  IsModal, TopMost);";
 
     #endregion
 

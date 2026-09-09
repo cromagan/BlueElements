@@ -20,7 +20,7 @@ public class RowDeleteScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowDeleteScriptCommand(RowScriptCommand)";
+    public override string Syntax => "RowDelete(RowScriptCommand)";
 
     #endregion
 

@@ -18,7 +18,7 @@ internal class SaveImageScriptCommand : ScriptCommand {
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "SaveImageScriptCommand(Filename, PNG/JPG/BMP, Bild);";
+    public override string Syntax => "SaveImage(Filename, PNG/JPG/BMP, Bild);";
 
     #endregion
 

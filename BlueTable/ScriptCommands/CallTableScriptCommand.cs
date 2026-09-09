@@ -20,7 +20,7 @@ public class CallTableScriptCommand : TableGenericScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
-    public override string Syntax => "CallTableScriptCommand(Table, Scriptname, Attribut0, ...);";
+    public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 
     #endregion
 

@@ -17,7 +17,7 @@ public class CellSetRowScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
-    public override string Syntax => "CellSetRowScriptCommand(Value, Column, RowScriptCommand)";
+    public override string Syntax => "CellSetRow(Value, Column, RowScriptCommand)";
 
     #endregion
 

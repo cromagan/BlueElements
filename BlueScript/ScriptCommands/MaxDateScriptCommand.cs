@@ -19,7 +19,7 @@ internal class MaxDateScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinTwice;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "MaxDateScriptCommand(FormatString, Value1, Value2, ...)";
+    public override string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";
 
     #endregion
 

@@ -14,7 +14,7 @@ internal class RemoveScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [ListStringVar, BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
     public override string Command => "remove";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
-    public override string Syntax => "RemoveScriptCommand(ListVariable, CaseSensitive, Value1, Value2, ...);";
+    public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
 
     #endregion
 

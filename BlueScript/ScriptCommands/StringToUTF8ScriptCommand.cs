@@ -14,7 +14,7 @@ internal class StringToUTF8ScriptCommand : ScriptCommand {
     public override string Command => "stringtoutf8";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "StringToUTF8ScriptCommand(StringScriptCommand, IgnoreBRbool)";
+    public override string Syntax => "StringToUTF8(StringScriptCommand, IgnoreBRbool)";
 
     #endregion
 

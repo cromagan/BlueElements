@@ -19,7 +19,7 @@ internal class MinScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "MinScriptCommand(Value1, Value2, ...)";
+    public override string Syntax => "Min(Value1, Value2, ...)";
 
     #endregion
 

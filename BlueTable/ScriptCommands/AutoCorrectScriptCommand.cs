@@ -18,7 +18,7 @@ internal class AutoCorrectScriptCommand : TableGenericScriptCommand {
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 
-    public override string Syntax => "AutoCorrectScriptCommand(Column1, ...)";
+    public override string Syntax => "AutoCorrect(Column1, ...)";
 
     #endregion
 

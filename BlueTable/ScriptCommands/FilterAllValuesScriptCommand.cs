@@ -23,7 +23,7 @@ public class FilterAllValuesScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "FilterAllValuesScriptCommand(ReturnColumn, Sort, FilterScriptCommand, ...)";
+    public override string Syntax => "FilterAllValues(ReturnColumn, Sort, FilterScriptCommand, ...)";
 
     #endregion
 

@@ -16,7 +16,7 @@ internal class SaveTextScriptCommand : ScriptCommand {
     public override string Command => "savetext";
     public override List<string> Constants => ["UTF8", "WIN1252"];
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "SaveTextScriptCommand(Filename, UTF8/WIN1252, Text);";
+    public override string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
 
     #endregion
 

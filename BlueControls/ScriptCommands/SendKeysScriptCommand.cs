@@ -19,7 +19,7 @@ internal class SendKeysScriptCommand : ScriptCommand {
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
 
-    public override string Syntax => "SendKeysScriptCommand(KeySequence)";
+    public override string Syntax => "SendKeys(KeySequence)";
 
     #endregion
 

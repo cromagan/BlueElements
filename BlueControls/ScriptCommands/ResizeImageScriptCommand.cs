@@ -18,7 +18,7 @@ public class ResizeImageScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
-    public override string Syntax => "ResizeImageScriptCommand(Bild, MaxWidth, MaxHeight);";
+    public override string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
 
     #endregion
 

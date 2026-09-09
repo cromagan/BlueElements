@@ -284,17 +284,26 @@ Die Eigene Zeile hat natürloch einen Score von 100, weil es ja Identisch ist.
 Wenn sich eine Zelle verändert und deine Tabelle ist offen, die mittels Link darauf zugreifft, soll der Wert auch aktualisiert werden.
 
 ## Aufgabe
-Manchmal verschwinden Spalten aus der Ansicht.
-Letzten, bei einer TextFilterung
-oder bei Suchen und Ersetzen einer Spalten
-
-## Aufgabe
 TableControlStrategy ist defekt. Die Bescheibung ist unleserlich für einen Benutzer
 Und es werden viel zu viele Zeilen nach einem Doppelklcok angezeigt. Kann es sein, dass die Tateblle nihct richtig resetted wird?
 Und die Breite wird falsch berechnete. Es wird leider zwingend auf die Spaltenbreite geachtet. Das Controll darf größer werden als die Ansicht, wenn nötigt
 
+## Aufgabe
+Mache mir einen Befehl, der beim Skript ausführen nachrichten in das Message Fenster anzeigeb kann: DebugPrint
 
+## Aufgabe
+Manchmal verschwinden Spalten aus der Ansicht.
+Letztes bei einem Reload Intervall
 
+## Aufgabe
+Die Variabel Filter zeigt im VariablenEditor keine Werte an
 
+## Aufgabe
+Read Only im VariablenEditor anstelle das X ein Schloss machen
 
+## Aufgabe
+In der Spalteninfo fehlt, ob es für UniqueRows benutz wird
+
+## Aufgabe
+in Scripten Suchen darf das Öffnen nicht blockiert wersdn (MainData blockert) - das Ersetzen dann schon. Suchen soll immer möglich sein.
 

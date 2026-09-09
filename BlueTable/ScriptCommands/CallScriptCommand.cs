@@ -21,7 +21,7 @@ internal class CallScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => StringScriptVariable.ShortName_Plain;
 
-    public override string Syntax => "CallScriptCommand(SubName, Attribut0, ...);";
+    public override string Syntax => "Call(SubName, Attribut0, ...);";
 
     #endregion
 

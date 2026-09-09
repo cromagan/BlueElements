@@ -22,7 +22,7 @@ internal class CheckBitmapScriptCommand : ScriptCommand, ICommandBuilder {
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "CheckBitmapScriptCommand(BMP, X,Y, HasCode)";
+    public override string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
 
     #endregion
 
@@ -53,7 +53,7 @@ internal class CheckBitmapScriptCommand : ScriptCommand, ICommandBuilder {
         }
 
         using var bmpa = c.Screen.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
-        return $"var sc = ScreenshotScriptCommand();\r\nvar {n} = CheckBitmapScriptCommand(sc, {c.Point1.X}, {c.Point1.Y}, \"{BitmapToBase64(bmpa, ImageFormat.Bmp).GetSHA256HashString()}\");";
+        return $"var sc = Screenshot();\r\nvar {n} = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{BitmapToBase64(bmpa, ImageFormat.Bmp).GetSHA256HashString()}\");";
     }
 
     #endregion

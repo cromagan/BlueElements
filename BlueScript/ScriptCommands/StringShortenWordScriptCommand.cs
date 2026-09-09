@@ -16,7 +16,7 @@ internal class StringShortenWordScriptCommand : ScriptCommand {
     public override string Command => "stringshortenword";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "StringShortenWordScriptCommand(StringScriptCommand)";
+    public override string Syntax => "StringShortenWord(StringScriptCommand)";
 
     #endregion
 

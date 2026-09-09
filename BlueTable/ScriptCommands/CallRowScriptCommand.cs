@@ -21,7 +21,7 @@ public class CallRowScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
-    public override string Syntax => "CallRowScriptCommand(Scriptname, RowScriptCommand, Attribut0, ...);";
+    public override string Syntax => "CallRow(Scriptname, RowScriptCommand, Attribut0, ...);";
 
     #endregion
 

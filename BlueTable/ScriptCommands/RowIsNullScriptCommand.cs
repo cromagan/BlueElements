@@ -15,7 +15,7 @@ public class RowIsNullScriptCommand : ScriptCommand {
     public override string Command => "rowisnull";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
-    public override string Syntax => "RowIsNullScriptCommand(Row)";
+    public override string Syntax => "RowIsNull(Row)";
 
     #endregion
 

@@ -18,7 +18,7 @@ public class ScreenshotScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
-    public override string Syntax => "ScreenshotScriptCommand()";
+    public override string Syntax => "Screenshot()";
 
     #endregion
 

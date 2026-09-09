@@ -19,7 +19,7 @@ public class GenerateLayoutImageScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "GenerateLayoutImageScriptCommand(LayoutName, Skalierung);";
+    public override string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
 
     #endregion
 

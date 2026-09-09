@@ -16,7 +16,7 @@ internal class TableScriptCommand : ScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => TableScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "TableScriptCommand(Filename/Tablename)";
+    public override string Syntax => "Table(Filename/Tablename)";
 
     #endregion
 

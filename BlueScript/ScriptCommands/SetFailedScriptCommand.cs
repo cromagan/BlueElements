@@ -14,7 +14,7 @@ public class SetFailedScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "setfailed";
 
-    public override string Syntax => "SetFailedScriptCommand(Nachricht);";
+    public override string Syntax => "SetFailed(Nachricht);";
 
     #endregion
 

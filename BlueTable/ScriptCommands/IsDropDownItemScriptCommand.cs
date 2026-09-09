@@ -17,7 +17,7 @@ internal class IsDropDownItemScriptCommand : TableGenericScriptCommand {
     public override string Command => "isdropdownitem";
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
-    public override string Syntax => "IsDropDownItemScriptCommand(Value, Column)";
+    public override string Syntax => "IsDropDownItem(Value, Column)";
 
     #endregion
 

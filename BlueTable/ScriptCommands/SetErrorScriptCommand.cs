@@ -26,7 +26,7 @@ public class SetErrorScriptCommand : TableGenericScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Special;
 
-    public override string Syntax => "SetErrorScriptCommand(Nachricht, Column1, Colum2, ...);";
+    public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
     #endregion
 

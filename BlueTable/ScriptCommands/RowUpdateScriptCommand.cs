@@ -7,7 +7,7 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.
 /// Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.
-/// Beispiel: RowUpdateScriptCommand(RowScriptCommand,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.
+/// Beispiel: RowUpdate(RowScriptCommand,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.
 /// </summary>
 public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
@@ -21,7 +21,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowUpdateScriptCommand(RowScriptCommand, MinAgeInDays, MaxAgeInDays)";
+    public override string Syntax => "RowUpdate(RowScriptCommand, MinAgeInDays, MaxAgeInDays)";
 
     #endregion
 

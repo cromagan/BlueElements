@@ -22,7 +22,7 @@ public class FilterScriptCommand : TableGenericScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => FilterScriptVariable.ShortName_Variable;
-    public override string Syntax => "FilterScriptCommand(Table, Spalte, Filtertyp, Wert)";
+    public override string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
 
     #endregion
 

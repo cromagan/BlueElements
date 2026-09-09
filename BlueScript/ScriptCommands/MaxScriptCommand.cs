@@ -19,7 +19,7 @@ internal class MaxScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "MaxScriptCommand(Value1, Value2, ...)";
+    public override string Syntax => "Max(Value1, Value2, ...)";
 
     #endregion
 

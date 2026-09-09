@@ -14,7 +14,7 @@ internal class RandomIntScriptCommand : ScriptCommand {
     public override string Command => "randomint";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "RandomIntScriptCommand(maxValue)";
+    public override string Syntax => "RandomInt(maxValue)";
 
     #endregion
 

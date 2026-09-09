@@ -21,7 +21,7 @@ public class CallFilterScriptCommand : TableGenericScriptCommand {
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
 
-    public override string Syntax => "CallFilterScriptCommand(SubName, Attribut0, FilterScriptCommand, ...);";
+    public override string Syntax => "CallFilter(SubName, Attribut0, FilterScriptCommand, ...);";
 
     #endregion
 

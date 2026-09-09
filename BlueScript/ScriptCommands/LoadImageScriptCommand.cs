@@ -16,7 +16,7 @@ internal class LoadImageScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
-    public override string Syntax => "LoadImageScriptCommand(Filename)";
+    public override string Syntax => "LoadImage(Filename)";
 
     #endregion
 

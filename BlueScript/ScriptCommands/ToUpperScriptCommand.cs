@@ -14,7 +14,7 @@ internal class ToUpperScriptCommand : ScriptCommand {
     public override string Command => "toupper";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ToUpperScriptCommand(OriginalString)";
+    public override string Syntax => "ToUpper(OriginalString)";
 
     #endregion
 

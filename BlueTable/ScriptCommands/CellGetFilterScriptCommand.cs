@@ -25,7 +25,7 @@ public class CellGetFilterScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "CellGetFilterScriptCommand(ReturnColumn, NothingFoundValue, FoundToMuchValue, FilterScriptCommand, ...)";
+    public override string Syntax => "CellGetFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, FilterScriptCommand, ...)";
 
     #endregion
 

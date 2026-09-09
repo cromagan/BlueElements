@@ -40,7 +40,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
 
-    public override string Syntax => "RowScriptCommand(AgeInDays, FilterScriptCommand, ...)";
+    public override string Syntax => "Row(AgeInDays, FilterScriptCommand, ...)";
 
     #endregion
 

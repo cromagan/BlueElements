@@ -13,7 +13,7 @@ internal class DecryptScriptCommand : ScriptCommand {
     public override string Command => "decrypt";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ScriptCommand(OriginalString, Schlüssel)";
+    public override string Syntax => "Decrypt(OriginalString, Schlüssel)";
 
     #endregion
 

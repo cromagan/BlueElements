@@ -17,7 +17,7 @@ public class CellGetRowScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "CellGetRowScriptCommand(Column, RowScriptCommand)";
+    public override string Syntax => "CellGetRow(Column, RowScriptCommand)";
 
     #endregion
 

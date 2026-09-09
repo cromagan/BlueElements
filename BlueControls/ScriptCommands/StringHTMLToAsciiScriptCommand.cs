@@ -16,7 +16,7 @@ internal class StringHTMLToAsciiScriptCommand : ScriptCommand {
     public override string Command => "stringhtmltoascii";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "StringHTMLToAsciiScriptCommand(StringScriptCommand)";
+    public override string Syntax => "StringHTMLToAscii(StringScriptCommand)";
 
     #endregion
 

@@ -13,7 +13,7 @@ internal class NumberScriptCommand : ScriptCommand {
     public override string Command => "number";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "NumberScriptCommand(string, NaNValue)";
+    public override string Syntax => "Number(string, NaNValue)";
 
     #endregion
 

@@ -19,7 +19,7 @@ internal class LoadTextFileScriptCommand : ScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "LoadTextFileScriptCommand(Filename, UTF8/WIN1252)";
+    public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
 
     #endregion
 

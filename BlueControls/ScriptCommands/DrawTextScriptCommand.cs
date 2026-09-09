@@ -15,7 +15,7 @@ public class DrawTextScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [BmpVar, StringVal, FloatVal, FloatVal, StringVal, FloatVal];
     public override string Command => "drawtext";
-    public override string Syntax => "DrawTextScriptCommand(Bild, Text, x, y, Farbe, Schriftgröße);";
+    public override string Syntax => "DrawText(Bild, Text, x, y, Farbe, Schriftgröße);";
 
     #endregion
 

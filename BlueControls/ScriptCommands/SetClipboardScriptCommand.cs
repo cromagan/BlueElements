@@ -19,7 +19,7 @@ internal class SetClipboardScriptCommand : ScriptCommand {
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
 
-    public override string Syntax => "SetClipboardScriptCommand(Text);";
+    public override string Syntax => "SetClipboard(Text);";
 
     #endregion
 

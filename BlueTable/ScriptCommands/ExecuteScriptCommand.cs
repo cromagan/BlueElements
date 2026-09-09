@@ -18,7 +18,7 @@ internal class ExecuteScriptCommand : ScriptCommand {
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
 
-    public override string Syntax => "ExecuteScriptCommand(Command, Attribut);";
+    public override string Syntax => "Execute(Command, Attribut);";
 
     #endregion
 

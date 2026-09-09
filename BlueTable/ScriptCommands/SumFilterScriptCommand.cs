@@ -20,7 +20,7 @@ public class SumFilterScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "SumFilterScriptCommand(Colum, FilterScriptCommand, ...)";
+    public override string Syntax => "SumFilter(Colum, FilterScriptCommand, ...)";
 
     #endregion
 

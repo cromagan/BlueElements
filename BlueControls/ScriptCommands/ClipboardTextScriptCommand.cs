@@ -17,7 +17,7 @@ internal class ClipboardTextScriptCommand : ScriptCommand {
     public override string Command => "clipboardtext";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "ClipboardTextScriptCommand()";
+    public override string Syntax => "ClipboardText()";
 
     #endregion
 

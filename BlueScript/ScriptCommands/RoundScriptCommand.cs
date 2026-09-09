@@ -14,7 +14,7 @@ internal class RoundScriptCommand : ScriptCommand {
     public override string Command => "round";
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "RoundScriptCommand(Value, Nachkommastellen)";
+    public override string Syntax => "Round(Value, Nachkommastellen)";
 
     #endregion
 

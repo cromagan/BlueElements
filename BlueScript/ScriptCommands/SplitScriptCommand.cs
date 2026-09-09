@@ -15,7 +15,7 @@ internal class SplitScriptCommand : ScriptCommand {
     public override string Command => "split";
     public override bool MustUseReturnValue => true;
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
-    public override string Syntax => "SplitScriptCommand(StringScriptCommand, Trennzeichen)";
+    public override string Syntax => "Split(StringScriptCommand, Trennzeichen)";
 
     #endregion
 

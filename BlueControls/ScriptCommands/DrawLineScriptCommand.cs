@@ -15,7 +15,7 @@ public class DrawLineScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
     public override string Command => "drawline";
-    public override string Syntax => "DrawLineScriptCommand(Bild, x1, y1, x2, y2);";
+    public override string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
 
     #endregion
 

@@ -12,7 +12,7 @@ internal class SortScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [ListStringVar, BoolVal];
     public override string Command => "sort";
-    public override string Syntax => "SortScriptCommand(ListVariable, EliminateDupes);";
+    public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
     #endregion
 

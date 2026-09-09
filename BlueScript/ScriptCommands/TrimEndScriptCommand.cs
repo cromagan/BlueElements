@@ -15,7 +15,7 @@ internal class TrimEndScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "TrimEndScriptCommand(StringScriptCommand, TexttoTrim, ...)";
+    public override string Syntax => "TrimEnd(StringScriptCommand, TexttoTrim, ...)";
 
     #endregion
 

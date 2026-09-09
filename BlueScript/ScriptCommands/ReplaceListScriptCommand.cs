@@ -14,7 +14,7 @@ internal class ReplaceListScriptCommand : ScriptCommand {
 
     public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public override string Command => "replacelist";
-    public override string Syntax => "ReplaceListScriptCommand(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
+    public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
 
     #endregion
 

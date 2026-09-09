@@ -18,7 +18,7 @@ internal class MoveFileScriptCommand : ScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
 
-    public override string Syntax => "MoveFileScriptCommand(SourceCompleteName, DestinationCompleteName)";
+    public override string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 

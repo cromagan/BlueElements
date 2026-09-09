@@ -20,7 +20,7 @@ public class MsgBoxScriptCommand : ScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override string Returns => DoubleScriptVariable.ShortName_Variable;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
-    public override string Syntax => "MsgBoxScriptCommand(Text, Bild, Schaltflächenbeschriftung, ...);";
+    public override string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";
 
     #endregion
 
