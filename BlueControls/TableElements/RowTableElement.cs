@@ -336,7 +336,7 @@ public sealed class RowTableElement : TableElement {
             } else {
                 tableView.PinAdd(Row);
             }
-            tableView.Invalidate_CurrentArrangement();
+            tableView.InvalidateCurrentArrangement();
             return;
         }
 

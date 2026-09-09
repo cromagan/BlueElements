@@ -15,8 +15,8 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
 
     #region Fields
 
-    private static readonly ConditionalWeakTable<RowItem, StrongBox<int>> _scores = [];
     private static readonly ConditionalWeakTable<RowItem, Dictionary<ColumnItem, int>> _cellScores = [];
+    private static readonly ConditionalWeakTable<RowItem, StrongBox<int>> _scores = [];
     private static bool _hasScores;
     private static Table? _scoredTable;
 
@@ -34,6 +34,12 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
 
     public override AlignmentHorizontal Align => AlignmentHorizontal.Rechts;
 
+    /// <summary>
+    /// Liefert den Ausschalter-Button, solange Scores vorliegen.
+    /// </summary>
+    public override string? ButtonImage => _hasScores && _scoredTable is { IsDisposed: false } ? "Lupe|Kreuz" : null;
+
+    public override string ButtonQuickinfo => "Ähnlichkeits-Sortierung ausschalten";
     public override string Caption => "Score";
 
     public override int FixedWidth => 32;
@@ -99,6 +105,16 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
     public override string CellGetString(RowItem? row, bool isPinned) {
         if (row is not { IsDisposed: false } || _scoredTable != row.Table) { return string.Empty; }
         return _scores.TryGetValue(row, out var score) ? score.Value.ToString1() : string.Empty;
+    }
+
+    /// <summary>
+    /// Entfernt alle Scores und setzt die temporäre Sortierung zurück.
+    /// </summary>
+    public override void HeadButtonClick(Table? table, IColumnHeadButtonHost host) {
+        if (!HasScores(table)) { return; }
+        Reset();
+        host.ResetSortDefinition();
+        host.InvalidateCurrentArrangement();
     }
 
     #endregion

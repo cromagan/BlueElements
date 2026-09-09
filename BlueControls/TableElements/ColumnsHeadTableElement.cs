@@ -216,38 +216,24 @@ public sealed class ColumnsHeadTableElement : TableElement {
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
 
-        if (Draw_SimilarityResetButton(gr, viewItem, positionControl)) { return; }
-
-        if (viewItem.Column is not { IsDisposed: false } column) { return; }
-        if (Arrangement?.Table is not { IsDisposed: false } table || !table.IsAdministrator()) { return; }
-
-        var errorReason = column.ErrorReason();
-        if (string.IsNullOrEmpty(errorReason)) { return; }
-
-        var bs = HeadButtonSize;
-        var btnX = (int)(positionControl.X + (positionControl.Width - bs) / 2.0);
-        var btnY = (int)positionControl.Top + 2;
-        var btnRect = new Rectangle(btnX, btnY, bs, bs);
-
-        Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
-        Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
-        gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Kritisch, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
-    }
-
-    /// <summary>
-    /// Zeichnet den Ausschalter-Knopf im Kopf der Ähnlichkeits-Spalte;
-    /// false, wenn der Kopf nicht die Ähnlichkeits-Spalte ist.
-    /// </summary>
-    private bool Draw_SimilarityResetButton(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
-        if (viewItem is not SimilarityColumnItem || Arrangement?.Table is not { IsDisposed: false } scoredTable || !SimilarityColumnItem.HasScores(scoredTable)) { return false; }
+        if (viewItem.ButtonImage is not { } btnImage) { return; }
 
         var bs = HeadButtonSize;
         var btnRect = new Rectangle((int)(positionControl.X + (positionControl.Width - bs) / 2.0), (int)positionControl.Top + 2, bs, bs);
 
         Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
         Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
-        gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Lupe, bs - 4, ImageCode.Kreuz), btnRect.Left + 2, btnRect.Top + 2);
-        return true;
+        gr.DrawImageUnscaled(QuickImage.Get(btnImage, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
+    }
+
+    /// <summary>
+    /// True, wenn sich der Mauszeiger über den Kopf-Button der Spalte befindet.
+    /// </summary>
+    private bool IsMouseOverHeadButton(ColumnViewItem viewItem, TableView tableView, CanvasMouseEventArgs e) {
+        var bs = HeadButtonSize.CanvasToControl(tableView.Zoom);
+        var btnX = (int)((viewItem.ControlColumnWidth() - bs) / 2.0);
+        var p = MousePositionInColumn(viewItem, tableView, e);
+        return p.X >= btnX && p.X <= btnX + bs && p.Y >= 2 && p.Y <= 2 + bs;
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
@@ -265,16 +251,11 @@ public sealed class ColumnsHeadTableElement : TableElement {
         if (mouseOverColumn is not { IsDisposed: false } clickedColumn) { return; }
         if (Arrangement is not { IsDisposed: false } ca) { return; }
 
-        #region Ähnlichkeits-Sortierung ausschalten
+        #region Kopf-Button (Ähnlichkeits-Sortierung ausschalten, Spalte reparieren/bearbeiten)
 
-        if (clickedColumn is SimilarityColumnItem && SimilarityColumnItem.HasScores(ca.Table)) {
-            var bsSimilarity = HeadButtonSize.CanvasToControl(tableView.Zoom);
-            var btnXSimilarity = (int)((clickedColumn.ControlColumnWidth() - bsSimilarity) / 2.0);
-            var mouseInColumnSimilarity = MousePositionInColumn(clickedColumn, tableView, e);
-            if (mouseInColumnSimilarity.X >= btnXSimilarity && mouseInColumnSimilarity.X <= btnXSimilarity + bsSimilarity && mouseInColumnSimilarity.Y >= 2 && mouseInColumnSimilarity.Y <= 2 + bsSimilarity) {
-                SimilarityColumnItem.Reset();
-                tableView.SortDefinitionTemporary = null;
-                tableView.Invalidate_CurrentArrangement();
+        if (clickedColumn.ButtonImage is not null) {
+            if (IsMouseOverHeadButton(clickedColumn, tableView, e)) {
+                clickedColumn.HeadButtonClick(ca.Table, tableView);
             }
             return;
         }
@@ -286,22 +267,6 @@ public sealed class ColumnsHeadTableElement : TableElement {
         if (clickedColumn is AddColumnItem) {
             ShowDummyColumnDropDown(ca, tableView, null);
             tableView.Invalidate_CurrentArrangement();
-            return;
-        }
-
-        if (clickedColumn.Column is { IsDisposed: false } col) {
-            if (!string.IsNullOrEmpty(col.ErrorReason())) {
-                var bs = HeadButtonSize.CanvasToControl(tableView.Zoom);
-                var btnX = (int)((clickedColumn.ControlColumnWidth() - bs) / 2.0);
-                var mouseInColumn = MousePositionInColumn(clickedColumn, tableView, e);
-                if (mouseInColumn.X >= btnX && mouseInColumn.X <= btnX + bs && mouseInColumn.Y >= 2 && mouseInColumn.Y <= 2 + bs) {
-                    col.Repair();
-                    using var editor = new ColumnEditor(col, tableView);
-                    editor.ShowDialog();
-                    col.Repair();
-                    tableView.Invalidate_CurrentArrangement();
-                }
-            }
         }
     }
 
@@ -341,29 +306,20 @@ public sealed class ColumnsHeadTableElement : TableElement {
             return;
         }
 
-        if (cvi is SimilarityColumnItem && Arrangement?.Table is { IsDisposed: false } scoredTable && SimilarityColumnItem.HasScores(scoredTable)) {
-            var bsSimilarity = HeadButtonSize.CanvasToControl(tableView.Zoom);
-            var btnXSimilarity = (int)((cvi.ControlColumnWidth() - bsSimilarity) / 2.0);
-            var mouseInColumnSimilarity = MousePositionInColumn(cvi, tableView, e);
-            if (mouseInColumnSimilarity.X >= btnXSimilarity && mouseInColumnSimilarity.X <= btnXSimilarity + bsSimilarity && mouseInColumnSimilarity.Y >= 2 && mouseInColumnSimilarity.Y <= 2 + bsSimilarity) {
-                tableView.QuickInfo = "Ähnlichkeits-Sortierung ausschalten";
-            }
+        #region Kopf-Button
+
+        if (cvi.ButtonImage is not null) {
+            tableView.QuickInfo = IsMouseOverHeadButton(cvi, tableView, e)
+                ? cvi.ButtonQuickinfo
+                : cvi.Column is { IsDisposed: false } hCol ? RowTableElement.QuickInfoText(hCol, string.Empty) : string.Empty;
             return;
         }
+
+        #endregion
 
         if (cvi.Column is not { IsDisposed: false } col) {
             tableView.QuickInfo = string.Empty;
             return;
-        }
-
-        if (!string.IsNullOrEmpty(col.ErrorReason()) && Arrangement?.Table is { IsDisposed: false } table && table.IsAdministrator()) {
-            var bs = HeadButtonSize.CanvasToControl(tableView.Zoom);
-            var btnX = (int)((cvi.ControlColumnWidth() - bs) / 2.0);
-            var mouseInColumn = MousePositionInColumn(cvi, tableView, e);
-            if (mouseInColumn.X >= btnX && mouseInColumn.X <= btnX + bs && mouseInColumn.Y >= 2 && mouseInColumn.Y <= 2 + bs) {
-                tableView.QuickInfo = "Spalte bearbeiten\rFehler: " + col.ErrorReason();
-                return;
-            }
         }
 
         tableView.QuickInfo = RowTableElement.QuickInfoText(col, string.Empty);

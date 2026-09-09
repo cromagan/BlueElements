@@ -25,7 +25,7 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(SelectedRowChanged))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslateable, IHasTable, IStyleable {
+public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslateable, IHasTable, IStyleable, IColumnHeadButtonHost {
 
     #region Fields
 
@@ -177,7 +177,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         set {
             if (field == value) { return; }
             field = value;
-            Invalidate_CurrentArrangement();
+            InvalidateCurrentArrangement();
         }
     }
 
@@ -321,7 +321,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
-            Invalidate_CurrentArrangement();
+            InvalidateCurrentArrangement();
             Invalidate();
         }
     } = Win11;
@@ -389,7 +389,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             _storedView = null;
             _collapsedBlockFirstRowKeys.Clear();
             field = value;
-            Invalidate_CurrentArrangement();
+            InvalidateCurrentArrangement();
             Invalidate_AllViewItems(true);
             Filter.PropertyChanged -= Filter_PropertyChanged;
             FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
@@ -1123,6 +1123,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
+    /// <summary>
+    /// Repariert die Spalte und öffnet den Spalten-Editor.
+    /// </summary>
+    public void EditColumn(ColumnItem column) {
+        column.Repair();
+        using var editor = new ColumnEditor(column, this);
+        editor.ShowDialog();
+        column.Repair();
+        InvalidateCurrentArrangement();
+    }
+
     public bool EnsureVisible(ColumnViewItem? viewItem, TableElement? row) => EnsureVisible(viewItem) && EnsureVisible(row);
 
     public void ExpandAll() {
@@ -1420,6 +1431,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         ImportCsv(tb, csvtxt);
     }
 
+    public void InvalidateCurrentArrangement() {
+        CurrentArrangement = null;
+        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
+        Invalidate();
+    }
+
     /// <summary>
     /// Prüft die Editierbarkeit auf Tabellen-Ebene und zusätzlich, ob die Zelle
     /// in der aktuellen Ansicht liegt und sichtbar ist. Mit maychangeview wird
@@ -1511,6 +1528,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         Invalidate_AllViewItems(false);
         OnPinnedChanged();
     }
+
+    /// <summary>
+    /// Setzt die temporäre Sortierung zurück.
+    /// </summary>
+    public void ResetSortDefinition() => SortDefinitionTemporary = null;
 
     public void ResetView() {
         CancelSmoothScroll();
@@ -2128,7 +2150,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     internal void BeginSmoothScrollToColumn(int targetX, int targetY) {
         var savedOX = OffsetX;
         var savedOY = OffsetY;
-        Invalidate_CurrentArrangement();
+        InvalidateCurrentArrangement();
         UpdateSliderBounds();
         if (OffsetX != savedOX) { OffsetX = savedOX; }
         if (OffsetY != savedOY) { OffsetY = savedOY; }
@@ -2237,12 +2259,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
         }
         Invalidate_MaxBounds();
-        Invalidate();
-    }
-
-    internal void Invalidate_CurrentArrangement() {
-        CurrentArrangement = null;
-        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
         Invalidate();
     }
 
@@ -2743,7 +2759,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             _isinSizeChanged = true;
 
             try {
-                Invalidate_CurrentArrangement();
+                InvalidateCurrentArrangement();
             } finally {
                 _isinSizeChanged = false;
             }
@@ -2776,7 +2792,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     protected override void OnZoomChanged() {
-        Invalidate_CurrentArrangement();
+        InvalidateCurrentArrangement();
         base.OnZoomChanged();
     }
 
@@ -2995,7 +3011,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         //Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
-        Invalidate_CurrentArrangement(); // Spaltenbreite, Slider
+        InvalidateCurrentArrangement(); // Spaltenbreite, Slider
         CheckView();
     }
 
@@ -4629,7 +4645,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
         // sind — daher Anordnung (inkl. virtueller Spalten) neu aufbauen.
-        Invalidate_CurrentArrangement();
+        InvalidateCurrentArrangement();
         PinnedChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -4641,7 +4657,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void OnTableChanged() => TableChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnViewChanged() {
-        Invalidate_CurrentArrangement();
+        InvalidateCurrentArrangement();
         Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
         FilterCombined.Invalidate_FilteredRows();
         Invalidate_MaxBounds();
@@ -4729,7 +4745,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             return;
         }
         _pendingRowAddedRebuild = true;
-        Invalidate_CurrentArrangement();
+        InvalidateCurrentArrangement();
     }
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {

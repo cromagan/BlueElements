@@ -197,6 +197,32 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
 
+    /// <summary>
+    /// QuickImage-Code des Kopf-Buttons der Spalte oder null, wenn kein
+    /// Button angezeigt wird. Die Basis liefert den Fehler-Button für
+    /// kaputte Spalten (nur Administratoren).
+    /// </summary>
+    public virtual string? ButtonImage {
+        get {
+            if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return null; }
+            if (Column is not { IsDisposed: false } col || col.ErrorReason() is not { Length: > 0 }) { return null; }
+            return "Kritisch";
+        }
+    }
+
+    /// <summary>
+    /// QuickInfo des Kopf-Buttons der Spalte.
+    /// </summary>
+    public virtual string ButtonQuickinfo => Column is { IsDisposed: false } col ? "Spalte bearbeiten\rFehler: " + col.ErrorReason() : string.Empty;
+
+    /// <summary>
+    /// Führt die Aktion des Kopf-Buttons aus. Die Basis öffnet über den Host
+    /// den Spalten-Editor der zugeordneten Spalte.
+    /// </summary>
+    public virtual void HeadButtonClick(Table? table, IColumnHeadButtonHost host) {
+        if (Column is { IsDisposed: false }) { host.EditColumn(Column); }
+    }
+
     public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
 
     public void OnPropertyChangedExt(string relativePath, object? value) {
