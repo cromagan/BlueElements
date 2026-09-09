@@ -40,22 +40,28 @@ public static class RowSimilarity {
         }
     }
 
-    public static Dictionary<RowItem, int> Scores(Table table, RowItem referenceRow) {
-        var result = new Dictionary<RowItem, int>();
-        if (table.IsDisposed || referenceRow is not { IsDisposed: false }) { return result; }
+    /// <summary>
+    /// Gesamtscore (0–100) je Zeile sowie Zell-Score (0–100) je Zelle
+    /// der berücksichtigten Spalten. Spalten, die der Vergleich ignoriert
+    /// (System-Spalten, erste Spalte), erhalten keinen Zell-Score.
+    /// </summary>
+    public static (Dictionary<RowItem, int> Scores, Dictionary<RowItem, Dictionary<ColumnItem, int>> CellScores) Scores(Table table, RowItem referenceRow) {
+        var scores = new Dictionary<RowItem, int>();
+        var cellScores = new Dictionary<RowItem, Dictionary<ColumnItem, int>>();
+        if (table.IsDisposed || referenceRow is not { IsDisposed: false }) { return (scores, cellScores); }
 
         List<ColumnItem> columns = [];
         foreach (var thisColumn in table.Column) {
-            if (thisColumn is { IsDisposed: false } && 
+            if (thisColumn is { IsDisposed: false } &&
                 !thisColumn.IsSystemColumn() &&
                 !thisColumn.IsFirst) { columns.Add(thisColumn); }
         }
 
         if (columns.Count == 0) {
             foreach (var thisRow in table.Row) {
-                if (thisRow is { IsDisposed: false }) { result.Add(thisRow, thisRow == referenceRow ? 100 : 0); }
+                if (thisRow is { IsDisposed: false }) { scores.Add(thisRow, thisRow == referenceRow ? 100 : 0); }
             }
-            return result;
+            return (scores, cellScores);
         }
 
         var referenceValues = new Dictionary<ColumnItem, string>();
@@ -69,14 +75,18 @@ public static class RowSimilarity {
             if (thisRow is not { IsDisposed: false }) { continue; }
 
             var sum = 0.0;
+            Dictionary<ColumnItem, int> cells = new(columns.Count);
             foreach (var thisColumn in columns) {
-                sum += CellSimilarity(thisColumn, referenceValues[thisColumn], thisRow.CellGetString(thisColumn)) * Weight(thisColumn);
+                var sim = CellSimilarity(thisColumn, referenceValues[thisColumn], thisRow.CellGetString(thisColumn));
+                sum += sim * Weight(thisColumn);
+                cells.Add(thisColumn, (int)Math.Round(sim * 100.0));
             }
 
-            result.Add(thisRow, (int)Math.Round(100.0 * sum / weightSum));
+            scores.Add(thisRow, (int)Math.Round(100.0 * sum / weightSum));
+            cellScores.Add(thisRow, cells);
         }
 
-        return result;
+        return (scores, cellScores);
     }
 
     /// <summary>

@@ -190,50 +190,6 @@ public static partial class Extensions {
         }
     }
 
-    public static bool RemoveNull<T>(this IList<T>? l) {
-        if (l is not { Count: not 0 }) { return false; }
-        var did = false;
-        var z = 0;
-        while (z < l.Count) {
-            var x = l[z];
-            if (x is null || x.Equals(default(T))) {
-                l.RemoveAt(z);
-                did = true;
-            } else {
-                z++;
-            }
-        }
-        return did;
-    }
-
-    public static bool RemoveNullOrEmpty<T>(this IList<T>? l) where T : ICanBeEmpty {
-        if (l is not { Count: not 0 }) { return false; }
-        var did = false;
-        var z = 0;
-        while (z < l.Count) {
-            if (l[z] is null || l[z].IsNullOrEmpty()) {
-                l.RemoveAt(z);
-                did = true;
-            } else {
-                z++;
-            }
-        }
-        return did;
-    }
-
-    public static void RemoveNullOrEmpty(this IList<string?> l) {
-        if (l.Count == 0) { return; }
-
-        var z = 0;
-        while (z < l.Count) {
-            if (string.IsNullOrEmpty(l[z])) {
-                l.RemoveAt(z);
-            } else {
-                z++;
-            }
-        }
-    }
-
     public static void RemoveString(this IList<string>? l, string value, bool caseSensitive) {
         if (l is not { Count: not 0 }) { return; }
 

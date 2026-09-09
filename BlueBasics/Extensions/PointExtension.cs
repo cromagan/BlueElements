@@ -8,6 +8,7 @@ public static partial class Extensions {
 
     public static PointF ControlToCanvas(this Point p, float zoom, float offsetX, float offsetY) => new(p.X.ControlToCanvas(zoom, offsetX), p.Y.ControlToCanvas(zoom, offsetY));
 
+// TODO: Unused
     public static Point PointParse(this string? toParse) {
         if (string.IsNullOrEmpty(toParse)) { return Point.Empty; }
 

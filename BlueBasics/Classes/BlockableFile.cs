@@ -103,14 +103,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     private volatile bool _hasWriteAccess;
 
     /// <summary>
-    /// Reentrancy-Guard für RevokeWriteAccess. Bei parallelen
-    /// Aufrufen (z. B. Form.Dispose parallel zu RevokeWriteAccessAll beim
-    /// Shutdown) wird nur der erste Aufruf aktiv; alle weiteren returnen
-    /// sofort. Verhindert ein doppeltes Save über OnReleasingWriteAccess.
-    /// </summary>
-    private int _revokingWriteAccess;
-
-    /// <summary>
     /// true, wenn das abgeleitete Objekt seit dem letzten Laden/Speichern
     /// verändert wurde. OnPropertyChanged setzt dieses Flag
     /// über MarkDirty; der eigentliche Content wird erst beim
@@ -125,6 +117,14 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// des Sperrstatus zu erkennen und BlockStatusChanged zu werfen.
     /// </summary>
     private string _lastBlockerMessage = string.Empty;
+
+    /// <summary>
+    /// Reentrancy-Guard für RevokeWriteAccess. Bei parallelen
+    /// Aufrufen (z. B. Form.Dispose parallel zu RevokeWriteAccessAll beim
+    /// Shutdown) wird nur der erste Aufruf aktiv; alle weiteren returnen
+    /// sofort. Verhindert ein doppeltes Save über OnReleasingWriteAccess.
+    /// </summary>
+    private int _revokingWriteAccess;
 
     #endregion
 
@@ -241,11 +241,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             }
         }
     }
-
-    /// <summary>
-    /// Anzahl der aktuell verfügbaren Bytes (Länge des gecachten Contents).
-    /// </summary>
-    public long ContentLength => _content?.Length ?? 0;
 
     public abstract bool ExtendedSave { get; }
 
@@ -467,44 +462,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing) {
-        // Cleanup, das passieren muss, während IsDisposed noch false ist
-        // (RevokeWriteAccess kann über OnReleasingWriteAccess Save auslösen,
-        //  und Save prüft IsDisposed und bricht bei true ab).
-        if (!IsDisposed) {
-            LiveInstances.TryRemove(new KeyValuePair<string, BlockableFile>(Filename, this));
-            if (_hasWriteAccess) { RevokeWriteAccess(); }
-        }
-
-        // Ab hier thread-sicher und idempotent.
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        if (!disposing) { return; }
-
-        OnDisposed();
-
-        Loaded = null;
-        Saved = null;
-        Invalidated = null;
-        BlockStatusChanged = null;
-        Disposed = null;
-
-        Invalidate();
-
-        // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.
-        WaitDiskOperationFinished();
-
-        // Semaphoren erst nach einer kurzen Karenzzeit disposen oder wenn sicher ist, dass kein Thread mehr wartet.
-        // In hochfrequenten Systemen ist es oft sicherer, die Semaphoren dem GC zu überlassen,
-        // wenn ObjectDisposedExceptions in anderen Threads drohen.
-        try {
-            _loadSemaphore.Dispose();
-            _saveSemaphore.Dispose();
-        } catch {
-            // Ignorieren - Dispose-Fehler sind nicht kritisch
-        }
     }
 
     /// <summary>
@@ -783,6 +740,44 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// </summary>
     protected virtual byte[]? BuildContent() => null;
 
+    protected virtual void Dispose(bool disposing) {
+        // Cleanup, das passieren muss, während IsDisposed noch false ist
+        // (RevokeWriteAccess kann über OnReleasingWriteAccess Save auslösen,
+        //  und Save prüft IsDisposed und bricht bei true ab).
+        if (!IsDisposed) {
+            LiveInstances.TryRemove(new KeyValuePair<string, BlockableFile>(Filename, this));
+            if (_hasWriteAccess) { RevokeWriteAccess(); }
+        }
+
+        // Ab hier thread-sicher und idempotent.
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (!disposing) { return; }
+
+        OnDisposed();
+
+        Loaded = null;
+        Saved = null;
+        Invalidated = null;
+        BlockStatusChanged = null;
+        Disposed = null;
+
+        Invalidate();
+
+        // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.
+        WaitDiskOperationFinished();
+
+        // Semaphoren erst nach einer kurzen Karenzzeit disposen oder wenn sicher ist, dass kein Thread mehr wartet.
+        // In hochfrequenten Systemen ist es oft sicherer, die Semaphoren dem GC zu überlassen,
+        // wenn ObjectDisposedExceptions in anderen Threads drohen.
+        try {
+            _loadSemaphore.Dispose();
+            _saveSemaphore.Dispose();
+        } catch {
+            // Ignorieren - Dispose-Fehler sind nicht kritisch
+        }
+    }
+
     /// <summary>
     /// Synchronisiert die Hashes mit dem aktuell gecachten <c>_content</c>,
     /// ohne diesen neu zu erzeugen oder zu überschreiben. Im Gegensatz zu
@@ -818,6 +813,8 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
         }
     }
 
+    protected virtual void OnInvalidated() => Invalidated?.Invoke(this, System.EventArgs.Empty);
+
     /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
@@ -830,10 +827,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// Ableitungen können hier interne Zustände nach dem Speichern aktualisieren.
     /// </summary>
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnBlockStatusChanged() => BlockStatusChanged?.Invoke(this, System.EventArgs.Empty);
-
-    protected virtual void OnInvalidated() => Invalidated?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
@@ -977,6 +970,8 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
         if (!IsDisposed) { OnLoaded(); }
         return processedContent;
     }
+
+    private void OnBlockStatusChanged() => BlockStatusChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 

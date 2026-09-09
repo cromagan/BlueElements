@@ -648,7 +648,10 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// einfachen Klick auf eine Zelle aus — die Rechte der Spalte werden geprüft.
     /// Liefert True, wenn der Klick verarbeitet wurde.
     /// </summary>
-    public static bool InstantActionClicked(ColumnItem? column, RowItem? row) {
+    /// <param name="source">Das TableView-Control, in dem geklickt wurde.</param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    public static bool InstantActionClicked(TableView source, ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false } col || row is not { IsDisposed: false }) { return false; }
         if (col.Table is not { IsDisposed: false } tb) { return false; }
 
@@ -659,6 +662,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         strategy.ControlStrategyParameter = col.ControlStrategyParameter;
 
         if (strategy is IHasColumn hasColumn) { hasColumn.Column = col; }
+        if (strategy is ScriptExecuteControlStrategy scriptExecute) { scriptExecute.OwnerForm = source.FindForm(); }
 
         if (!tb.PermissionCheck(col.PermissionGroupsChangeCell, row, true)) {
             TableView.NotEditableInfo("Sie haben nicht die nötigen Rechte, um diese Aktion auszuführen.");

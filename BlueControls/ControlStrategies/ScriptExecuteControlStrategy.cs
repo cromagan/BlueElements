@@ -3,6 +3,7 @@
 using BlueControls.Controls;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
+using System.Globalization;
 
 namespace BlueControls.ControlStrategies;
 
@@ -23,6 +24,12 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     #region Properties
 
     public static string ClassId => "scriptexecute";
+
+    /// <summary>
+    /// Das Fenster, in dem die Zelle geklickt wurde; null im Testmodus.
+    /// Wird vom Klick-Kontext (ControlStrategy.InstantActionClicked) gesetzt.
+    /// </summary>
+    public System.Windows.Forms.Form? OwnerForm { get; set; }
 
     /// <summary>
     /// Die Spalte, deren Tabelle als Skript-Kontext dient.
@@ -102,7 +109,9 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
 
         var rowstamp = row.RowStamp();
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, "Standard", true, null, row, tb, null, null);
+        var fensterId = OwnerForm is { IsDisposed: false } owner ? owner.Handle.ToString(CultureInfo.InvariantCulture) : null;
+
+        var t = ScriptButtonPadItem.ExecuteScript(Script, "Standard", true, null, row, tb, null, null, fensterId);
 
         var errorreason = string.Empty;
 
@@ -147,7 +156,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     /// Führt das Skript für den Testmodus im Editor mit dem Tabellenkontext der Spalte aus.
     /// </summary>
     private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) =>
-        ScriptButtonPadItem.ExecuteScript(script, "Testmodus", !testmode, null, null, Table, null, null);
+        ScriptButtonPadItem.ExecuteScript(script, "Testmodus", !testmode, null, null, Table, null, null, null);
 
     #endregion
 }

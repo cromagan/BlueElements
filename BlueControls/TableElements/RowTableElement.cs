@@ -180,6 +180,14 @@ public sealed class RowTableElement : TableElement {
 
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
+        } else if (viewItem.Column is { IsDisposed: false } column
+                   && column.Table is { IsDisposed: false } scoredTable
+                   && SimilarityColumnItem.HasScores(scoredTable)
+                   && SimilarityColumnItem.TryGetCellScore(Row, column, out var cellScore)) {
+            // Heat-Map-Overlay der Ähnlichkeits-Suche: Grün (identisch) bis Rot.
+            // Ignorierte Spalten und angepinnte Zeilen bleiben ohne Farbe.
+            var brush = BackgroundFill.GetBrush(ScoreOverlayColor(cellScore));
+            lock (brush) { gr.FillRectangle(brush, positionControl); }
         }
     }
 
@@ -233,32 +241,6 @@ public sealed class RowTableElement : TableElement {
         ColumnOverlay(gr, viewItem, positionControl);
     }
 
-    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
-        if (mouseOverColumn is PinColumnItem) {
-            if (tableView.PinnedRows.Contains(Row)) {
-                tableView.PinRemove(Row);
-            } else {
-                tableView.PinAdd(Row);
-            }
-            tableView.Invalidate_CurrentArrangement();
-            return;
-        }
-
-        if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
-            // Instant-Action-Strategien (z. B. Tabellen-Skript-Knopf) führen den
-            // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
-            if (ControlStrategy.InstantActionClicked(col, Row)) { return; }
-
-            tableView.OnCellClicked(new CellEventArgs(col, Row));
-            tableView.Invalidate();
-
-            // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
-            // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
-            // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
-            tableView.ShowMiniToolbarAt(mouseOverColumn, this, Row);
-        }
-    }
-
     /// <summary>
     /// Startet die Inline-Editierung der angeklickten Zelle. Die gesamte
     /// Logik (Editability, LinkedCell-Auflösung, ControlStrategy, Position) liegt in
@@ -309,43 +291,6 @@ public sealed class RowTableElement : TableElement {
         }
     }
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
-        if (IsDisposed || Row.IsDisposed || Arrangement is null) { return 18; }
-
-        // columnWidth ist die Canvas-Gesamtbreite (von CalculateAllViewItems_CalculateYPosition
-        // als arrangement.ControlColumnsWidth().ControlToCanvas(Zoom) übergeben).
-        // ControlColumnsWidth() ist die Control-Gesamtbreite. Daraus lässt sich der
-        // Zoom ableiten, um Control-Pixel → Canvas-Pixel zu konvertieren.
-        var totalControlWidth = Arrangement.ControlColumnsWidth();
-        var zoom = columnWidth > 0 && totalControlWidth > 0
-            ? (float)totalControlWidth / columnWidth
-            : 1f;
-
-        // Cache-Schlüssel inkl. Zoom (bzw. canvas-Gesamtbreite), damit bei
-        // Zoom-Änderung neu berechnet wird — auch wenn die Control-Breiten gleich bleiben.
-        var key = BuildColumnWidthsKey(columnWidth);
-        if (key == _heightWidthKey) { return _heightWidthValue; }
-
-        var drawHeight = 18;
-
-        foreach (var thisViewItem in Arrangement) {
-            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
-                var renderer = thisViewItem.GetRenderer(SheetStyle);
-                // ControlColumnWidth() ist in Control-Pixeln → Canvas-Pixel: / zoom.
-                // 4 Canvas-Pixel Padding je Seite abziehen.
-                var contentWidth = Math.Max(1, (int)(thisViewItem.ControlColumnWidth() / zoom) - 8);
-                drawHeight = Math.Max(drawHeight, renderer.ContentSizeAtWidth(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation, contentWidth).Height);
-            }
-        }
-
-        drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight + 4, 18);
-
-        _heightWidthKey = key;
-        _heightWidthValue = drawHeight;
-        return drawHeight;
-    }
-
     public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
         if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
             base.HandleMouseMove(mouseOverColumn, tableView, e);
@@ -384,6 +329,69 @@ public sealed class RowTableElement : TableElement {
         tableView.QuickInfo = qt;
     }
 
+    public override void HandleMouseUp(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is PinColumnItem) {
+            if (tableView.PinnedRows.Contains(Row)) {
+                tableView.PinRemove(Row);
+            } else {
+                tableView.PinAdd(Row);
+            }
+            tableView.Invalidate_CurrentArrangement();
+            return;
+        }
+
+        if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
+            // Instant-Action-Strategien (z. B. Tabellen-Skript-Knopf) führen den
+            // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
+            if (ControlStrategy.InstantActionClicked(tableView, col, Row)) { return; }
+
+            tableView.OnCellClicked(new CellEventArgs(col, Row));
+            tableView.Invalidate();
+
+            // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
+            // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
+            // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
+            tableView.ShowMiniToolbarAt(mouseOverColumn, this, Row);
+        }
+    }
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        if (IsDisposed || Row.IsDisposed || Arrangement is null) { return 18; }
+
+        // columnWidth ist die Canvas-Gesamtbreite (von CalculateAllViewItems_CalculateYPosition
+        // als arrangement.ControlColumnsWidth().ControlToCanvas(Zoom) übergeben).
+        // ControlColumnsWidth() ist die Control-Gesamtbreite. Daraus lässt sich der
+        // Zoom ableiten, um Control-Pixel → Canvas-Pixel zu konvertieren.
+        var totalControlWidth = Arrangement.ControlColumnsWidth();
+        var zoom = columnWidth > 0 && totalControlWidth > 0
+            ? (float)totalControlWidth / columnWidth
+            : 1f;
+
+        // Cache-Schlüssel inkl. Zoom (bzw. canvas-Gesamtbreite), damit bei
+        // Zoom-Änderung neu berechnet wird — auch wenn die Control-Breiten gleich bleiben.
+        var key = BuildColumnWidthsKey(columnWidth);
+        if (key == _heightWidthKey) { return _heightWidthValue; }
+
+        var drawHeight = 18;
+
+        foreach (var thisViewItem in Arrangement) {
+            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
+                var renderer = thisViewItem.GetRenderer(SheetStyle);
+                // ControlColumnWidth() ist in Control-Pixeln → Canvas-Pixel: / zoom.
+                // 4 Canvas-Pixel Padding je Seite abziehen.
+                var contentWidth = Math.Max(1, (int)(thisViewItem.ControlColumnWidth() / zoom) - 8);
+                drawHeight = Math.Max(drawHeight, renderer.ContentSizeAtWidth(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation, contentWidth).Height);
+            }
+        }
+
+        drawHeight = Math.Min(drawHeight, 200);
+        drawHeight = Math.Max(drawHeight + 4, 18);
+
+        _heightWidthKey = key;
+        _heightWidthValue = drawHeight;
+        return drawHeight;
+    }
+
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return new(16, 16); }
 
@@ -404,6 +412,16 @@ public sealed class RowTableElement : TableElement {
         var _tmpCursorRect = positionControl.ToRect();
         var pen = BorderDraw.GetPen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180), 1);
         lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + indentOffset + 2, _tmpCursorRect.Height - 1)); }
+    }
+
+    /// <summary>
+    /// Overlay-Farbe eines Zell-Scores: 100 (identisch) grün, 0 komplett unterschiedlich rot.
+    /// </summary>
+    private static Color ScoreOverlayColor(int score) {
+        var s = Math.Clamp(score, 0, 100);
+        var r = s <= 50 ? 255 : 255 - (s - 50) * 255 / 50;
+        var g = s <= 50 ? s * 255 / 50 : 255;
+        return Color.FromArgb(90, r, g, 0);
     }
 
     private string BuildColumnWidthsKey(int canvasTotalWidth) {

@@ -199,6 +199,25 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         tbcTableSelector.Controls.Add(nTabPage);
     }
 
+    /// <summary>
+    /// Überschreibt den aktuell angezeigten Reiter mit der angegebenen Tabelle und lädt sie sofort.
+    /// Existiert kein Reiter, wird einer neu angelegt und angezeigt.
+    /// </summary>
+    public void ReplaceCurrentTab(string tablename) {
+        if (tablename.IsValidFilepathAndName()) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
+
+        if (tbcTableSelector.SelectedTab is not { } tp) {
+            AddTabPage(tablename);
+            SwitchTabToTable(tablename);
+            return;
+        }
+
+        ChangeTableInTab(tablename, tp, null);
+        ShowTab(tp);
+    }
+
     public object? CreateNewItem() => null;
 
     public OperationResult CreateTable(string targetPath, Table? source) {

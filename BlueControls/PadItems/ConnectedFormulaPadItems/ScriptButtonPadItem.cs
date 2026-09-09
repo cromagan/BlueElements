@@ -123,7 +123,7 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     /// </summary>
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, List<string>? args,
                                                     RowItem? row, Table? table, IEnumerable<FilterItem>? filterItems,
-                                                    IEnumerable<IHasFieldVariable>? fieldSources) {
+                                                    IEnumerable<IHasFieldVariable>? fieldSources, string? fensterId) {
         VariableCollection generatedVars =
         [
             new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
@@ -134,6 +134,10 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             new StringScriptVariable("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
+
+        if (!string.IsNullOrEmpty(fensterId)) {
+            generatedVars.Add(new StringScriptVariable("WindowID", fensterId, true, "Die ID des Fensters, aus dem das Skript gestartet wurde."));
+        }
 
         BlueScript.Classes.Script.AddAttributes(generatedVars, args ?? []);
 
@@ -354,7 +358,7 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             }
         }
 
-        return ExecuteScript(script, "Testmodus", !testmode, null, row, TableInput, fi, fieldSources);
+        return ExecuteScript(script, "Testmodus", !testmode, null, row, TableInput, fi, fieldSources, null);
     }
 
     #endregion
