@@ -607,6 +607,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             // nicht dauerhaft aus der Ansicht entfernen.
             if (thisViewItem.RepairColumnReference()) { continue; }
 
+            // Während eines Reloads sind gültige Schlüssel kurzzeitig nicht
+            // auflösbar, weil die Spalten nacheinander neu eingespielt werden.
+            // Der Eintrag bleibt erhalten und wird nach dem Reload bereinigt.
+            if (tb.IsDataReloading) { continue; }
+
             _internal.Remove(thisViewItem);
             z--;
         }

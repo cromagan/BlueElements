@@ -35,7 +35,7 @@ commercial licenses), and otherwise exploit your contribution, in
 whole or in part, for any purpose, including commercial purposes.
 
 You represent that you have the right to grant this license (i.e.,
-the contribution is your own original work, or you otherwise hold
+the contribution is your own original work, or you otherwise hold 
 the necessary rights to submit it under these terms), and that your
 contribution does not knowingly infringe the rights of any third
 party.

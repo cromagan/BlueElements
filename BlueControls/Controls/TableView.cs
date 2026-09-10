@@ -1492,7 +1492,8 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     public void OpenSearchAndReplaceInTbScripts() {
-        if (TableViewForm.EditableErrorMessage(Table, null)) { return; }
+        // Öffnen und Suchen immer erlauben; das Schreiben (Ersetzen/Fehler bereinigen)
+        // prüft die Editierbarkeit pro Tabelle im Dialog selbst.
         if (!IsAdministrator()) { return; }
 
         IUniqueWindowExtension.ShowOrCreate<SearchAndReplaceInTbScripts>(null);

@@ -478,36 +478,50 @@ public class TableChunk : TableFile {
             var loaded = false;
             var ok = true;
 
-            OnLoading();
+            // Während des Neuladens sind Spaltenschlüssel kurzzeitig nicht
+            // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
+            // endgültig entfernen (RepairColumnArrangements), sonst verschwinden
+            // Spalten dauerhaft aus der Ansicht.
+            PauseDataReload();
+            try {
+                OnLoading();
 
-            if (!firstTime) {
-                var result = LoadChunkWithChunkId(Chunk_MainData);
-                if (result.IsFailed) {
-                    Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}", 0);
-                    return false;
+                if (!firstTime) {
+                    var result = LoadChunkWithChunkId(Chunk_MainData);
+                    if (result.IsFailed) {
+                        Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}", 0);
+                        return false;
+                    }
+                    loaded = result.Value is true;
                 }
-                loaded = result.Value is true;
+
+                Column.GetSystems();
+
+                List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
+
+                foreach (var item in list) {
+                    // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
+                    // Es gibt kein automatisches Erkennen neu erscheinender Dateien.
+                    // Ohne diese Prüfung würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
+                    // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
+                    // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
+                    // (Already-Current-Check via Dateiname-Vergleich).
+                    var result = LoadChunkWithChunkId(item);
+                    loaded = loaded || result.Value is true;
+                    ok = ok && result.IsSuccessful;
+                }
+
+                loaded = loaded || RefreshLoadedChunks(firstTime);
+
+                if (loaded) { OnLoaded(firstTime, true); }
+            } finally {
+                ResumeDataReload();
             }
 
-            Column.GetSystems();
-
-            List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
-
-            foreach (var item in list) {
-                // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
-                // Es gibt kein automatisches Erkennen neu erscheinender Dateien.
-                // Ohne diese Prüfung würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
-                // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
-                // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
-                // (Already-Current-Check via Dateiname-Vergleich).
-                var result = LoadChunkWithChunkId(item);
-                loaded = loaded || result.Value is true;
-                ok = ok && result.IsSuccessful;
-            }
-
-            loaded = loaded || RefreshLoadedChunks(firstTime);
-
-            if (loaded) { OnLoaded(firstTime, true); }
+            // Nach dem Reload sind alle Spalten wieder vollständig. Einträge, die
+            // jetzt noch nicht auflösbar sind (echt gelöschte Spalten), werden
+            // hier endgültig aus den Ansichten entfernt.
+            if (!firstTime) { OnAdditionalRepair(); }
 
             // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
             // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.

@@ -1,6 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-namespace BlueControls.EventArgs;
+namespace BlueScript.EventArgs;
 
 public class TextEventArgs : System.EventArgs {
 

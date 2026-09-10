@@ -66,7 +66,11 @@ public partial class VariableEditor : EditorEasy {
         var na = tb.Column.GenerateAndAdd("Name", "N", SystemnameColumnFormat.Instance, "Variablenname");
         if (na is { IsDisposed: false }) { na.IsFirst = true; }
         tb.Column.GenerateAndAdd("Typ", "T", TextOneLineColumnFormat.Instance, "Variablentyp");
-        tb.Column.GenerateAndAdd("RO", "R", BitColumnFormat.Instance, "Readonly, Schreibgeschützt");
+        var ro = tb.Column.GenerateAndAdd("RO", "R", BitColumnFormat.Instance, "Readonly, Schreibgeschützt");
+        if (ro is { IsDisposed: false }) {
+            // Schloss statt Häkchen; ohne Read-Only bleibt die Zelle leer
+            ro.RendererSettings = "{ClassId=\"Bool\", SymbolTrue=\"Schloss\", SymbolFalse=\"\"}";
+        }
         var inh = tb.Column.GenerateAndAdd("Inhalt", "I", TextMultilineColumnFormat.Instance, "Inhalt");
         var kom = tb.Column.GenerateAndAdd("Kommentar", "K", TextMultilineColumnFormat.Instance, "Kommentar");
 

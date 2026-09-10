@@ -3,6 +3,7 @@
 using BlueControls.ControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
+using BlueScript.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading;

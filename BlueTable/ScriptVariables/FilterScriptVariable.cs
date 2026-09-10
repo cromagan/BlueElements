@@ -49,7 +49,12 @@ public class FilterScriptVariable : ScriptVariable {
         }
     }
 
-    public override string ValueForCell => string.Empty;
+    public override string ValueForCell {
+        get => ReadableText;
+        set {
+            // Filter sind nicht aus einem Zelltext wiederherstellbar - der Aufruf wird ignoriert.
+        }
+    }
 
     #endregion
 

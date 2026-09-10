@@ -63,7 +63,7 @@ internal class CallScriptCommand : TableGenericScriptCommand {
         var sw = Stopwatch.StartNew();
 
         var scx = CallByFilenameScriptCommand.CallSub(varCol, scp, f, 0, vs, null, a, vs);
-        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
+        myTb.UpdateScript(script, scx, scp.DebugOutput, sw, null, scx.Variables?.GetBoolean(KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true);

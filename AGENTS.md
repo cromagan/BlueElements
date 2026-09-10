@@ -160,11 +160,4 @@ Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden solle
 
 **Develop.DiagStack()**: Liefert einen kompakten Aufruf-Stack als String — Methodennamen der Aufrufkette, durch `" <- "` getrennt (max. 8 Frames). Gedacht zum Einbetten in `Develop.Diagnose()`-Meldungen, um zu sehen, woher ein Code-Pfad aufgerufen wurde: `Develop.Diagnose("Typ", $"Stack: {Develop.DiagStack()}")`. Ist `DiagFlag` false, wird ein leerer String geliefert — verursacht also im Normalbetrieb keine Kosten.
 
-## Sonstiges
-Erinnere mich im Oktober daran, diese Werte zu entfernen und  zu den obsoleten Werten hinzuzufügen.
-ValueRequired = 143 
-EditableWithDropdown=  142 und _legacyDropdown
-TextFormatingAllowed = 199 und _legacyTextFormating
-SpellCheckingEnabled = 156 und _legacySpellChecking
-
 

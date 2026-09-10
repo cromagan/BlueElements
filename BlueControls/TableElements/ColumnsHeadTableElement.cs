@@ -266,7 +266,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
         if (clickedColumn is AddColumnItem) {
             ShowDummyColumnDropDown(ca, tableView, null);
-            tableView.Invalidate_CurrentArrangement();
+            tableView.InvalidateCurrentArrangement();
         }
     }
 
@@ -431,7 +431,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
                 }
             }
         }
-        tableView.Invalidate_CurrentArrangement();
+        tableView.InvalidateCurrentArrangement();
     }
 
     #endregion

@@ -155,6 +155,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         t += GenQIText("In Zeilen-Quick-Info", ImageCode.Zeile, tb.RowQuickInfo.Contains(column.KeyName, StringComparison.OrdinalIgnoreCase));
         t += GenQIText("Schlüssel für", ImageCode.Schlüssel, column.Am_A_Key_For);
 
+        var uniqueDefs = tb.UniqueValues.Where(uv => uv.KeyColumns.Contains(column)).Select(uv => uv.ReadableText()).ToList();
+        t += GenQIText("Für Unique-Werte", ImageCode.Eins, uniqueDefs);
+
         if (column.SaveContent) {
             var l = column.Contents();
             t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, l.Count.ToString1());

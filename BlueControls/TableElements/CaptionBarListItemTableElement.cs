@@ -186,7 +186,7 @@ public sealed class CaptionBarListItemTableElement : TableElement {
                 Develop.DebugPrint("Ungültiger CaptionIndex: " + Caption);
                 break;
         }
-        tableView.Invalidate_CurrentArrangement();
+        tableView.InvalidateCurrentArrangement();
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;

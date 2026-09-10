@@ -53,6 +53,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
     private string _createDate;
     private string _creator;
+
+    /// <summary>
+    /// Zähler für PauseDataReload/ResumeDataReload. Bei &gt; 0 werden gerade Daten neu eingespielt.
+    /// </summary>
+    private int _dataReloadPaused;
+
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
     private DateTime _eventScriptVersion = DateTime.MinValue;
     private string _globalShowPass = string.Empty;
@@ -572,6 +578,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// kritischer Bereiche (z.B. SaveInternal) kein Reload angestoßen wird.
     /// </summary>
     internal bool IsTimerPaused => _timerPaused > 0;
+
+    /// <summary>
+    /// Gibt an, ob gerade Daten neu eingespielt werden (Chunk-Reload, Fragment-Merge).
+    /// Dabei sind Spaltenschlüssel kurzzeitig nicht auflösbar; Ansichten dürfen
+    /// in diesem Fenster keine Einträge endgültig entfernen.
+    /// </summary>
+    internal bool IsDataReloading => _dataReloadPaused > 0;
 
     protected string LoadedVersion { get; private set; }
 
@@ -1499,7 +1512,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             #region Fehlerprüfungen
 
-            UpdateScript(script, scf, timew, row, extended, produktivphase, ignoreError);
+            UpdateScript(script, scf, scp.DebugOutput, timew, row, extended, produktivphase, ignoreError);
 
             if (scf.Failed) { return scf; }
 
@@ -2323,7 +2336,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
 
-    public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
+    public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, List<string> debugOutput, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
         var failed = script.FailedReason;
         var savedVariables = script.SavedVariables;
         var runTimeCount = script.StoppedTimeCount;
@@ -2335,7 +2348,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             // da die gemessene Zeit bei einem Abbruch verfälscht ist.
             if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
                 if (string.IsNullOrEmpty(failed)) {
-                    failed = scf.ProtocolText;
+                    failed = scf.ProtocolText + DebugPrintSuffix(debugOutput);
                     savedVariables = scf.Variables?.ToList();
                 }
             }
@@ -2370,7 +2383,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (!ignoreError && produktivphase && string.IsNullOrEmpty(failed)) {
                 var failedCount = RowCollection.FailedRows.Keys.Count(thisRow => thisRow.Table == this);
                 if (failedCount > 19) {
-                    failed = $"Zu viele Zeilen mit Skript-Fehlern ({failedCount}).";
+                    failed = $"Zu viele Zeilen mit Skript-Fehlern ({failedCount})." + DebugPrintSuffix(debugOutput);
                     savedVariables = scf.Variables?.ToList();
                 }
             }
@@ -2390,6 +2403,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 averageruntime: avgRunTime);
         }
     }
+
+    /// <summary>
+    /// Die gesammelten DebugPrint-Ausgaben des Laufs als Anhang für die Fehlermeldung (oder leer).
+    /// </summary>
+    private static string DebugPrintSuffix(List<string> debugOutput) => debugOutput is { Count: > 0 } l ? "\r\n\r\nDebugPrint-Ausgaben:\r\n" + string.Join("\r\n", l) : string.Empty;
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
@@ -2568,6 +2586,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);
 
     /// <summary>
+    /// Markiert den Bereich, in dem Daten neu eingespielt werden. In diesem Fenster
+    /// löst RepairAfterParse keine endgültigen Entfernungen in den Ansichten aus.
+    /// </summary>
+    protected void PauseDataReload() => Interlocked.Increment(ref _dataReloadPaused);
+
+    /// <summary>
     /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
     /// laden und Edit-Lock prüfen). Wird ausschließlich bei akuter Bearbeitungsabsicht
     /// — in ChangeData — aufgerufen, nicht bei reinen UI-Abfragen über
@@ -2576,6 +2600,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
 
     protected void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
+
+    protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.

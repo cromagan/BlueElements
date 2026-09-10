@@ -5,6 +5,7 @@ using BlueControls.ControlStrategies;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
+using BlueScript.EventArgs;
 using BlueScript.ScriptVariables;
 using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
@@ -28,6 +29,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     #region Fields
 
     private static Befehlsreferenz? _befehlsReferenz;
+    private readonly List<string> _debugOutputLines = [];
     private bool _assistantDone;
 
     private string _lastVariableContent = string.Empty;
@@ -200,27 +202,40 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             return;
         }
 
-        var f = exec(Script, testmode);
+        _debugOutputLines.Clear();
+        DebugPrintScriptCommand.LineAdded += DebugPrint_LineAdded;
+        ScriptEndedFeedback f;
+        try {
+            f = exec(Script, testmode);
+        } finally {
+            DebugPrintScriptCommand.LineAdded -= DebugPrint_LineAdded;
+        }
 
         WriteCommandsToList();
+
+        string resultText;
 
         if (f.Failed) {
             var protocolPart = preCheck.Protocol.Count > 0
                 ? "\r\n\r\nZusätzliche Hinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
                 : string.Empty;
-            UpdateState(f.ProtocolText + protocolPart, f.Variables?.ToList(), false);
-            return;
+            resultText = f.ProtocolText + protocolPart;
+        } else if (!string.IsNullOrEmpty(f.FailedReason)) {
+            resultText = $"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}";
+        } else {
+            var protocolText = preCheck.Protocol.Count > 0
+                ? "\r\n\r\nHinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
+                : string.Empty;
+            resultText = "Erfolgreich geprüft." + protocolText;
         }
 
-        if (!string.IsNullOrEmpty(f.FailedReason)) {
-            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToList(), false);
-            return;
+        if (_debugOutputLines.Count > 0) {
+            // Live-Ausgabe steht bereits im Fenster — Ergebnis anhängen statt überschreiben.
+            txbErrorInfo.Text += "###################\r\n" + resultText;
+            grpVariablen.InputItem = f.Variables?.ToList() is { Count: > 0 } v ? new VariableCollection(v, true) : null;
+        } else {
+            UpdateState(resultText, f.Variables?.ToList(), false);
         }
-
-        var protocolText = preCheck.Protocol.Count > 0
-            ? "\r\n\r\nHinweise:\r\n" + string.Join("\r\n", preCheck.Protocol)
-            : string.Empty;
-        UpdateState("Erfolgreich geprüft." + protocolText, f.Variables?.ToList(), false);
     }
 
     public void UpdateState(string txt, List<ScriptVariable>? variables, bool updateSpecialFields) {
@@ -357,6 +372,22 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
+
+    /// <summary>
+    /// Hängt eine Live-Zeile aus dem Skript (je Zeile mit Zeitstempel) an das Ausgabe-Fenster an.
+    /// </summary>
+    private void DebugPrint_LineAdded(object? sender, TextEventArgs e) {
+        if (IsDisposed) { return; }
+
+        foreach (var t in e.Text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None)) {
+            var line = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + t;
+            _debugOutputLines.Add(line);
+            txbErrorInfo.Text += line + "\r\n";
+        }
+
+        // UI-Thread läuft synchron im Skript — Nachrichten verarbeiten, damit live sichtbar.
+        Develop.DoEvents();
+    }
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         CloseCommandList();

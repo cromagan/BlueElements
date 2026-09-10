@@ -204,7 +204,7 @@ namespace BlueControls.BlueTableDialogs {
             tabError.Size = new Size(410, 212);
             tabError.TabIndex = 4;
             tabError.TabStop = false;
-            tabError.Text = "Fehler";
+            tabError.Text = "Ausgabe";
             // 
             // btnAnzeigen
             // 

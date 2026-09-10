@@ -93,9 +93,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _isFirst;
     private bool _isKeyColumn;
     private string _keyName;
-    private bool _legacyDropdown;
-    private bool _legacySpellChecking;
-    private bool _legacyTextFormating;
     private ColumnLineStyle _lineStyleLeft;
     private ColumnLineStyle _lineStyleRight;
 
@@ -1698,7 +1695,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_isFirst) { _minTextLength = 1; }
 
-        MigrateLegacyControlStrategy();
+        RepairControlStrategy();
 
         ResetSystemToDefault(false);
 
@@ -2262,11 +2259,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _editableWithTextInput = value.FromPlusMinus();
                 break;
 
-            case TableDataType.EditableWithDropdown:
-                _legacyDropdown = value.FromPlusMinus();
-
-                break;
-
             case TableDataType.ControlStrategy:
                 _controlStrategy = value;
                 break;
@@ -2275,15 +2267,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _controlStrategyParameter = value.ParseAsJsonObject();
                 SpellCheckingEnabled = _controlStrategyParameter.GetBool("spellcheckingenabled");
                 TextFormatingAllowed = _controlStrategyParameter.GetBool("textformatingallowed");
-                break;
-
-            case TableDataType.SpellCheckingEnabled:
-                _legacySpellChecking = value.FromPlusMinus();
-                break;
-
-            case TableDataType.ValueRequired:
-                // Migration: altes bool → MinTextLength
-                _minTextLength = value.FromPlusMinus() ? 1 : 0;
                 break;
 
             case TableDataType.MinTextLength:
@@ -2362,10 +2345,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.EditAllowedDespiteLock:
                 _editAllowedDespiteLock = value.FromPlusMinus();
-                break;
-
-            case TableDataType.TextFormatingAllowed:
-                _legacyTextFormating = value.FromPlusMinus();
                 break;
 
             case TableDataType.ColumnKeyOfLinkedTable:
@@ -2703,51 +2682,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private void LinkedTable_Disposed(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
 
     /// <summary>
-    /// Rechnet die legacy-Flags (TableDataType 141/142/156/199) in die ControlStrategy um.
-    /// Läuft nur in Repair(), wenn alle Attribute geparst sind (Regeln 1–7 der Migrationstabelle).
+    /// Berechnet eine fehlende ControlStrategy aus den Spaltenattributen.
+    /// Läuft nur in Repair(), wenn alle Attribute geparst sind.
     /// </summary>
-    private void MigrateLegacyControlStrategy() {
+    private void RepairControlStrategy() {
         if (!string.IsNullOrEmpty(_controlStrategy)) { return; }
 
-        // Legacy-Flags 156/199 in die Strategy-Parameter übernehmen.
-        // Vor der Strategie-Berechnung, da diese TextFormatingAllowed auswertet.
-        _controlStrategyParameter.Set("spellcheckingenabled", _legacySpellChecking);
-        _controlStrategyParameter.Set("textformatingallowed", _legacyTextFormating);
-        SpellCheckingEnabled = _legacySpellChecking;
-        TextFormatingAllowed = _legacyTextFormating;
-
-        if (!_legacyDropdown && !_editableWithTextInput) {
+        if (!_editableWithTextInput) {
             DisableAllEditing();
             _controlStrategy = "None";
             return;
         }
 
-        if (_relationType == RelationType.DropDownValues) {
-            _controlStrategy = "Combobox";
-            return;
-        }
-
         var hasItems = _dropDownItems.Count > 0 || _showValuesOfOtherCellsInDropdown;
-
-        if (!_legacyDropdown) {
-            _controlStrategy = hasItems ? "TextBoxSuggestions" : "Textbox";
-            return;
-        }
-
-        if (_editableWithTextInput) {
-            if (hasItems && (TextFormatingAllowed || (_multiLine && !_afterEditQuickSortRemoveDouble))) {
-                _controlStrategy = "TextBoxSuggestions";
-                return;
-            }
-            if (_multiLine) {
-                _controlStrategy = "Listbox";
-                return;
-            }
-
-            _controlStrategy = "Combobox";
-            return;
-        }
-        _controlStrategy = "Combobox";
+        _controlStrategy = hasItems ? "TextBoxSuggestions" : "Textbox";
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);

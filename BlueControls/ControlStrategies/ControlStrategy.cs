@@ -2,6 +2,7 @@
 
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueScript.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading;

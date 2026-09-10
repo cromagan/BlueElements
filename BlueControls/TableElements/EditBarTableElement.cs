@@ -121,7 +121,7 @@ public sealed class EditBarTableElement : TableElement {
                         if (arr[deletedColumn] is { } vi) { arr.Remove(vi); }
                     }
                     tableView.Table.ColumnArrangements = tcvc.AsReadOnly();
-                    tableView.Invalidate_CurrentArrangement();
+                    tableView.InvalidateCurrentArrangement();
                     return;
                 }
                 parsed.Remove(parsedViewItem);
@@ -134,7 +134,7 @@ public sealed class EditBarTableElement : TableElement {
         }
 
         tableView.Table.ColumnArrangements = tcvc.AsReadOnly();
-        tableView.Invalidate_CurrentArrangement();
+        tableView.InvalidateCurrentArrangement();
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => ButtonSize + 4;

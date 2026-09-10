@@ -17,7 +17,10 @@ public class ScriptProperties {
         MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<ScriptCommand> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
+    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<ScriptCommand> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) {
+        Stufe = stufe;
+        DebugOutput = scriptProperties.DebugOutput;
+    }
 
     #endregion
 
@@ -26,6 +29,11 @@ public class ScriptProperties {
     public object? AdditionalInfo { get; }
     public IEnumerable<ScriptCommand> AllowedMethods { get; }
     public string Chain { get; } = string.Empty;
+
+    /// <summary>
+    /// DebugPrint-Ausgaben der gesamten Skript-Ausführung inkl. aller Unter-Skripte (gemeinsame Liste).
+    /// </summary>
+    public List<string> DebugOutput { get; private set; } = [];
 
     public string MainInfo { get; } = string.Empty;
 
