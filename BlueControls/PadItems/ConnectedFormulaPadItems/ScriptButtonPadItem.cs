@@ -135,9 +135,8 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
-        if (!string.IsNullOrEmpty(fensterId)) {
-            generatedVars.Add(new StringScriptVariable("WindowID", fensterId, true, "Die ID des Fensters, aus dem das Skript gestartet wurde."));
-        }
+        generatedVars.Add(new StringScriptVariable("WindowID", fensterId ?? string.Empty, true,
+            "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer."));
 
         BlueScript.Classes.Script.AddAttributes(generatedVars, args ?? []);
 

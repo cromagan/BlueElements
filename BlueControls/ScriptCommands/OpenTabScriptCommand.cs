@@ -29,14 +29,6 @@ internal class OpenTabScriptCommand : ScriptCommand {
             return new DoItFeedback("Tabelle nicht vorhanden", true);
         }
 
-        if (string.IsNullOrWhiteSpace(tb.Caption)) {
-            if (tb is TableFile tbf) {
-                return new DoItFeedback($"Die Benennung der Tabelle '{tbf.Filename.FileNameWithSuffix()}' fehlt.", true);
-            }
-
-            return new DoItFeedback("Die Benennung der Tabelle fehlt.", true);
-        }
-
         var aktuellerTabÜberschreiben = attvar.ValueBoolGet(1);
         var fensterId = attvar.ValueStringGet(2);
 
@@ -46,10 +38,10 @@ internal class OpenTabScriptCommand : ScriptCommand {
 
             if (aktuellerTabÜberschreiben) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
-                thisTbv.ReplaceCurrentTab(tb.Caption);
-            } else if (thisTbv.TabExists(tb.Caption) is null) {
+                thisTbv.ReplaceCurrentTab(tb.KeyName);
+            } else if (thisTbv.TabExists(tb.KeyName) is null) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
-                thisTbv.AddTabPage(tb.Caption);
+                thisTbv.AddTabPage(tb.KeyName);
             }
         }
 

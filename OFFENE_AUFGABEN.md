@@ -249,26 +249,9 @@ Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor
 ## Aufgabe
 Wenn die FailedRows einer Taballe über 10 sind, setze einen Script Fehler.
 
-## Aufgabe
-TextScale in DimensionPadItem und TextPadItem.
-Setze den Wert auf 1. Beim Speichern speicher es unter einen andern Namen.
-Beim Laden des alten Wertes, teile es durch 3.07 und passe die Routinen an
-Prüfe Vorab, wo die 3.07 herkommen.
-Wichtig: Das neue Json Format ist noch nicht aktiv und benötigt das nicht!
-
 ## Aufagbe
 mache weitere optimerungen des Buttons "Tabelle optimieren"
 
-## Aufgabe
-TableHeadEditor und ColumnEditor:
-Füge alle Buttons aussagenkräftige, einfach zu verstehende QuickInfos hinzu.
-Auch im TableViewForm 
-
-## Aufgabe
-bei FreezedTabellen soll beim ColumnEditor zwar eine Meldung kommen, aber dann einfach der Dialog beendet werden.
-
-## Aufgabe
-Wird mit "Ansicht Bearb." gedrückt und eine Spalte ergänzt, wird "Neue Spalte" fest gespeichert.
 
 ## Aufgabe
 Mache eine Ähnlich Suche,
@@ -280,30 +263,11 @@ Einzeilige Texte die Levensteindistanz
 Daraus ein Score berechnet, als VIR_ Spalte eingeblendet und danach Sortiert.
 Die Eigene Zeile hat natürloch einen Score von 100, weil es ja Identisch ist.
 
-## Aufgabe
-Wenn sich eine Zelle verändert und deine Tabelle ist offen, die mittels Link darauf zugreifft, soll der Wert auch aktualisiert werden.
 
 ## Aufgabe
 TableControlStrategy ist defekt. Die Bescheibung ist unleserlich für einen Benutzer
 Und es werden viel zu viele Zeilen nach einem Doppelklcok angezeigt. Kann es sein, dass die Tateblle nihct richtig resetted wird?
 Und die Breite wird falsch berechnete. Es wird leider zwingend auf die Spaltenbreite geachtet. Das Controll darf größer werden als die Ansicht, wenn nötigt
 
-## Aufgabe
-Mache mir einen Befehl, der beim Skript ausführen nachrichten in das Message Fenster anzeigeb kann: DebugPrint
 
-## Aufgabe
-Manchmal verschwinden Spalten aus der Ansicht.
-Letztes bei einem Reload Intervall
-
-## Aufgabe
-Die Variabel Filter zeigt im VariablenEditor keine Werte an
-
-## Aufgabe
-Read Only im VariablenEditor anstelle das X ein Schloss machen
-
-## Aufgabe
-In der Spalteninfo fehlt, ob es für UniqueRows benutz wird
-
-## Aufgabe
-in Scripten Suchen darf das Öffnen nicht blockiert wersdn (MainData blockert) - das Ersetzen dann schon. Suchen soll immer möglich sein.
 

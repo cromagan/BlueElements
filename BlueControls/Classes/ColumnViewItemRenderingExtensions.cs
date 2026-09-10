@@ -73,9 +73,18 @@ public static class ColumnViewItemRenderingExtensions {
     }
 
     public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (!cvi.IsOk()) { return; }
-
         GetRenderingData(cvi).ControlColumnLeft = x;
+
+        if (!cvi.IsOk()) {
+            // Item ohne gültige Spalte (z. B. während eines Reloads): minimale
+            // Breite zuweisen, damit die Positionskette nicht abreißt. Ohne dies
+            // übernimmt maxX den Altstand/Default (0 + 16) und alle folgenden
+            // Spalten werden gestapelt am Ansichtsanfang positioniert — sie
+            // "verschwinden" bis zur nächsten vollständigen Neuberechnung.
+            GetRenderingData(cvi).ControlColumnWidth = 16.CanvasToControl(zoom);
+            return;
+        }
+
         GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
     }
 

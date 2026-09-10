@@ -13,7 +13,8 @@ namespace BlueTable.Classes;
 /// Hauptdatei UND Fragmentdateien werden komplett als JSON gespeichert.
 /// Fragmentdateien verwenden NDJSON (Newline Delimited JSON): Jede Zeile ist ein
 /// eigenständiges JSON-Objekt. Steuerzeilen (Header/EOF) tragen den Key
-/// "_meta", UndoItems werden über UndoItem.ParseableJson serialisiert.
+/// "_meta". Kopf-Daten werden granular als Pfad/Wert-Zeilen gespeichert
+/// (TableJsonFragmentDiff), Zellwerte und Strukturkommandos als UndoItems.
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -45,6 +46,12 @@ public class TableJsonFragments : TableJsonFile {
     /// Liste der Änderungen, die noch nicht in der Hauptdatei enthalten sind.
     /// </summary>
     private readonly List<UndoItem> _changesNotIncluded = [];
+
+    /// <summary>
+    /// Fragmentdateien mit noch nicht in der Hauptdatei enthaltenen
+    /// Pfad/Wert-Zeilen. Diese dürfen nicht aufgeräumt werden.
+    /// </summary>
+    private readonly List<string> _jsonChangesNotIncluded = [];
 
     /// <summary>
     /// Cache für bereits verarbeitete Fragmente (Hashes der Undo-Zeilen), um doppelte Verarbeitung zu verhindern.
@@ -160,10 +167,10 @@ public class TableJsonFragments : TableJsonFile {
         // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
         var readStartedUtc = DateTime.UtcNow;
 
-        var (changes, files, failed) = GetLastChanges();
+        var (changes, jsonChanges, files, failed) = GetLastChanges();
         if (failed) { return false; }
 
-        var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
+        var opr = InjectData(files, changes, jsonChanges, DateTime.UtcNow, readStartedUtc, firstTime);
         return opr.IsSuccessful;
     }
 
@@ -245,9 +252,12 @@ public class TableJsonFragments : TableJsonFile {
 
     /// <summary>
     /// Schreibt einen Wert in die Fragmentdatei - als NDJSON-Zeile.
+    /// Granulare Kopf-Daten (TableJsonFragmentDiff.IsGranularType) werden als
+    /// Pfad/Wert-Zeilen mit nur den geänderten Werten gespeichert, alles andere
+    /// als UndoItem-Zeile.
     /// </summary>
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
+    protected override string WriteValueToDiscOrServer(TableDataType type, string previousValue, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (base.WriteValueToDiscOrServer(type, previousValue, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -256,16 +266,30 @@ public class TableJsonFragments : TableJsonFile {
         if (_writer is null) { StartWriter(); }
         if (_writer is null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
-
         try {
             lock (_writer) {
-                _writer.WriteLine(l.ParseableJson().ToJsonString());
+                if (TableJsonFragmentDiff.IsGranularType(type)) {
+                    foreach (var (path, node) in TableJsonFragmentDiff.GetChanges(this, type, previousValue, value)) {
+                        var line = new JsonObject {
+                            ["path"] = path,
+                            ["value"] = node?.DeepClone(),
+                            ["datetimeutc"] = datetimeutc
+                        };
+                        _writer.WriteLine(line.ToJsonString());
 
-                // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen.
-                // Hash() statt roher Zeile: PreviousValue ist im Fragment immer string.Empty,
-                // wäre aber im lokalen Undo befüllt - mit Hash() sind beide Wege konsistent.
-                _processedHashes.TryAdd(l.Hash(), default);
+                        // Eigene Änderungen in den Hash-Cache aufnehmen, damit das
+                        // Nachladen sie nicht erneut anwendet.
+                        _processedHashes.TryAdd((path + "|" + (node?.ToJsonString() ?? string.Empty)).GetMD5Hash(), default);
+                    }
+                } else {
+                    var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
+                    _writer.WriteLine(l.ParseableJson().ToJsonString());
+
+                    // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen.
+                    // Hash() statt roher Zeile: PreviousValue ist im Fragment immer string.Empty,
+                    // wäre aber im lokalen Undo befüllt - mit Hash() sind beide Wege konsistent.
+                    _processedHashes.TryAdd(l.Hash(), default);
+                }
 
                 if (!type.IsUnimportant()) { CanDeleteWriter = false; }
             }
@@ -345,6 +369,7 @@ public class TableJsonFragments : TableJsonFile {
             _masterNeeded = false;
             OnInvalidateView();
             _changesNotIncluded.Clear();
+            _jsonChangesNotIncluded.Clear();
         }
 
         #endregion
@@ -362,6 +387,10 @@ public class TableJsonFragments : TableJsonFile {
             foreach (var thisch in _changesNotIncluded) {
                 files.Remove(thisch.Container);
             }
+        }
+
+        foreach (var thisf in _jsonChangesNotIncluded) {
+            files.Remove(thisf);
         }
 
         #endregion
@@ -393,20 +422,21 @@ public class TableJsonFragments : TableJsonFile {
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den JSON-Fragmentdateien.
     /// Jede Zeile ist ein eigenständiges JSON-Objekt (NDJSON). Steuerzeilen
-    /// mit dem Key "_meta" (Header/EOF) werden übersprungen.
+    /// mit dem Key "_meta" (Header/EOF) werden übersprungen. Zeilen mit dem
+    /// Key "path" sind granulare Pfad/Wert-Änderungen, alles andere UndoItems.
     /// </summary>
-    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges() {
-        if (!string.IsNullOrEmpty(IsGenericEditable(true))) { return (null, null, true); }
-
+    private (List<UndoItem>? Changes, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>? JsonChanges, List<string>? Files, bool failed) GetLastChanges() {
+        if (!string.IsNullOrEmpty(IsGenericEditable(true))) { return (null, null, null, true); }
         CheckPath();
 
         try {
             var frgma = IO.GetFiles(FragmengtsPath(), KeyName.ToUpperInvariant() + "-*." + SuffixOfJsonFragments, System.IO.SearchOption.TopDirectoryOnly).ToList();
             frgma.Remove(_myFragmentsFilename);
 
-            if (frgma.Count == 0) { return ([], [], false); }
+            if (frgma.Count == 0) { return ([], [], [], false); }
 
             var l = new List<UndoItem>();
+            var j = new List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>();
 
             foreach (var thisf in frgma) {
                 var fil = IO.ReadAllText(thisf, Encoding.UTF8);
@@ -427,6 +457,27 @@ public class TableJsonFragments : TableJsonFile {
                     // Steuerzeilen (Header, EOF) überspringen - sie tragen den _meta-Key.
                     if (jo["_meta"] is not null) { continue; }
 
+                    // Granulare Pfad/Wert-Zeile: nur der geänderte Wert statt des Blobs.
+                    if (jo["path"] is JsonValue pv && pv.TryGetValue(out string? path) && path is { Length: > 0 }) {
+                        var node = jo["value"]?.DeepClone();
+                        if (node is null) { continue; }
+
+                        var timeUtc = DateTimeParse(jo.GetString("datetimeutc", string.Empty));
+
+                        // Zeilen, die sicher vor der letzten Hauptdatei-Speicherung
+                        // lagen, sind in deren Komplett-Stand bereits enthalten. Die
+                        // Toleranz überbrückt das Zeitfenster zwischen dem Lesen der
+                        // Fragmente und dem Speichern der Komplettierung.
+                        if (timeUtc.AddSeconds(60) < LastSaveMainFileUtcDate) { continue; }
+
+                        // Re-Apply ist idempotent; der Hash verhindert das wiederholte
+                        // Verarbeiten bereits bekannter Zeilen bei jedem Nachladen.
+                        if (!_processedHashes.TryAdd((path + "|" + node.ToJsonString()).GetMD5Hash(), default)) { continue; }
+
+                        j.Add((path, JsonSerializer.SerializeToElement(node), timeUtc, thisf));
+                        continue;
+                    }
+
                     var u = new UndoItem();
                     u.ParseJson(jo);
 
@@ -441,9 +492,9 @@ public class TableJsonFragments : TableJsonFile {
                 }
             }
 
-            return (l, frgma, false);
+            return (l, j, frgma, false);
         } catch { }
-        return (null, null, true);
+        return (null, null, null, true);
     }
 
     /// <summary>
@@ -451,11 +502,12 @@ public class TableJsonFragments : TableJsonFile {
     /// </summary>
     /// <param name="checkedDataFiles"></param>
     /// <param name="data"></param>
+    /// <param name="jsonChanges">Granulare Pfad/Wert-Änderungen aus den Fragmenten.</param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
     /// <param name="initialload"></param>
-    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
-        if (data is null) { return OperationResult.Success; }
+    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>? jsonChanges, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
+        if (data is null && jsonChanges is not { Count: > 0 }) { return OperationResult.Success; }
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
@@ -514,6 +566,25 @@ public class TableJsonFragments : TableJsonFile {
                         }
                     }
                 }
+
+                // Granulare Pfad/Wert-Zeilen anwenden. Der Zeitstempel sorgt dafür,
+                // dass ein neuerer Wert nie von einem älteren überschrieben wird.
+                // Sie betreffen immer den Tabellenkopf und sind idempotent - die
+                // Reihenfolge zu den UndoItems ist unkritisch.
+                if (jsonChanges is { Count: > 0 }) {
+                    foreach (var (path, jsonValue, _, container) in jsonChanges.OrderBy(c => c.TimeUtc)) {
+                        try {
+                            this.ApplyPartialJson(path, jsonValue);
+                        } catch {
+                            Freeze("Tabellen-Fehler bei: " + path);
+                            return OperationResult.Failed("Pfad-Zeile nicht anwendbar: " + path);
+                        }
+
+                        affectingHead = true;
+                        _jsonChangesNotIncluded.AddIfNotExists(container);
+                    }
+                }
+
                 _isInCache = endTimeUtc;
             } finally {
                 ResumeDataReload();
@@ -527,7 +598,7 @@ public class TableJsonFragments : TableJsonFile {
             }
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc, initialload);
+            return InjectData(checkedDataFiles, data, jsonChanges, startTimeUtc, endTimeUtc, initialload);
         }
 
         return OperationResult.Success;

@@ -1687,13 +1687,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
 
-        _minTextLength = 0;
+        // Systemspalten nicht anfassen: ResetSystemToDefault setzt deren Wert,
+        // ein Reset auf 0 hier würde über die Property ein unnötiges ChangeData auslösen
+        if (!IsSystemColumn()) {
+            _minTextLength = 0;
 
-        if (_scriptType is ScriptType.Bool or ScriptType.Numeral) {
-            _minTextLength = 1;
+            if (_scriptType is ScriptType.Bool or ScriptType.Numeral) {
+                _minTextLength = 1;
+            }
+
+            if (_isFirst) { _minTextLength = 1; }
         }
-
-        if (_isFirst) { _minTextLength = 1; }
 
         RepairControlStrategy();
 
@@ -1798,7 +1802,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
                 _ignoreAtRowFilter = true;
-                _minTextLength = 0;
                 this.GetStyleFrom(Formats.DateTimeFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {

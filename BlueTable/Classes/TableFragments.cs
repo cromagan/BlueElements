@@ -244,8 +244,8 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Schreibt einen Wert in die Fragmentdatei.
     /// </summary>
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
+    protected override string WriteValueToDiscOrServer(TableDataType type, string previousValue, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (base.WriteValueToDiscOrServer(type, previousValue, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 

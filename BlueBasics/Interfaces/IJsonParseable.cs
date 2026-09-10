@@ -82,7 +82,9 @@ public static class JsonParseableExtension {
     /// Pfad-Segmente: Container-Name, optionaler [<c>KeyName</c>], Punkt als Trenner.
     /// Am Blatt (kein weiterer Punkt im Pfad) wird der letzte Token als Property-Name
     /// zusammen mit dem Wert in ein JsonObject verpackt und an
-    /// IJsonParseable.ParseJson übergeben.
+    /// IJsonParseable.ParseJson übergeben. Endet der Pfad direkt auf
+    /// <c>[KeyName]</c>, ist das aufgelöste Sub-Item selbst das Blatt und
+    /// der Wert wird als komplettes Partial-Objekt an das Item übergeben.
     /// </summary>
     public static void ApplyPartialJson(this IJsonParseable root, string path, JsonElement value) {
         if (string.IsNullOrEmpty(path)) { return; }
@@ -104,16 +106,22 @@ public static class JsonParseableExtension {
         if (keyEnd < 0) { return; }
 
         var key = path[(bracketPos + 1)..keyEnd];
-
-        var dotAfterKey = path.IndexOf('.', keyEnd);
-        if (dotAfterKey < 0 || dotAfterKey >= path.Length - 1) { return; }
-
-        var rest = path[(dotAfterKey + 1)..];
         var child = root.GetSubItemByKey(containerName, key);
 
         if (child is null) { return; }
 
-        child.ApplyPartialJson(rest, value);
+        var dotAfterKey = path.IndexOf('.', keyEnd);
+
+        if (dotAfterKey < 0) {
+            // Kein weiterer Pfad: Das Sub-Item selbst ist das Blatt
+            // (z.B. "uniquevalues[KEY]" mit dem kompletten Item als Wert).
+            if (value.ValueKind == JsonValueKind.Object) { child.ParseJson(value); }
+            return;
+        }
+
+        if (dotAfterKey >= path.Length - 1) { return; }
+
+        child.ApplyPartialJson(path[(dotAfterKey + 1)..], value);
     }
 
     /// <summary>

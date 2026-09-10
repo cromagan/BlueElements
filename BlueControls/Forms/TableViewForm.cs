@@ -436,7 +436,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (tabPage.Tag is not List<object?> s || s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
-            TableView.Table = null;
+            Table = null;
             _switchingTabs = false;
             CheckButtons(true);
             return;
@@ -796,7 +796,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             TableView.Enabled = true;
         } else {
             TableView.ShowWaitScreen = true;
-            tbcTableSelector.Enabled = false;
             TableView.Enabled = false;
             tb = null;
         }

@@ -1139,7 +1139,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         // DANN Festplatte schreiben
-        var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, comment);
+        var f2 = WriteValueToDiscOrServer(type, previousValue, changedTo, colName, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f2)) {
             Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Rollback aufgrund eines Fehlers:\r\n{f2}", 0);
             // Rollback: Vorherigen Wert im Speicher wiederherstellen
@@ -1681,6 +1681,18 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (string.Equals(containerName, "Variables", StringComparison.OrdinalIgnoreCase)) {
             return Variables.GetByKey(key);
+        }
+
+        if (string.Equals(containerName, "EventScript", StringComparison.OrdinalIgnoreCase)) {
+            return _eventScript.GetByKey(key, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (string.Equals(containerName, "UniqueValues", StringComparison.OrdinalIgnoreCase)) {
+            return _uniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, key, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (string.Equals(containerName, "SortDefinition", StringComparison.OrdinalIgnoreCase)) {
+            return _sortDefinition;
         }
 
         if (string.Equals(containerName, "ColumnArrangements", StringComparison.OrdinalIgnoreCase)) {
@@ -2909,7 +2921,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+    /// <summary>
+    /// Schreibt einen Wert auf die Festplatte oder den Server.
+    /// previousValue enthält den Stand vor der Änderung (leer, wenn nicht
+    /// bekannt) - für granulare JSON-Fragmente (Diff) erforderlich.
+    /// </summary>
+    protected virtual string WriteValueToDiscOrServer(TableDataType type, string previousValue, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
         return IsGenericEditable(false);
     }
@@ -3102,7 +3119,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         foreach (var arrangement in _columnArrangements) {
             if (arrangement[column] is not null) {
                 var updatedArrangements = _columnArrangements.ToString(false);
-                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, "Automatische Aktualisierung nach Spaltenumbenennung");
+                // Kein vorheriger Stand bekannt - das JSON-Fragment arbeitet mit einer Komplett-Sync-Zeile.
+                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, string.Empty, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, "Automatische Aktualisierung nach Spaltenumbenennung");
                 return;
             }
         }
