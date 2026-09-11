@@ -268,16 +268,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         base.Dispose(disposing);
     }
 
-    protected VariableCollection GetEditorVariables() {
-        var vc = new VariableCollection();
-        foreach (var c in grpInjectVariables.Controls) {
-            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                vc.Add(new StringScriptVariable(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
-            }
-        }
-        return vc;
-    }
-
     /// <summary>
     /// Basis-Default: tut nichts. Abgeleitete Editoren füllen hier einmalig Dropdowns etc.
     /// </summary>
@@ -372,22 +362,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
-
-    /// <summary>
-    /// Hängt eine Live-Zeile aus dem Skript (je Zeile mit Zeitstempel) an das Ausgabe-Fenster an.
-    /// </summary>
-    private void DebugPrint_LineAdded(object? sender, TextEventArgs e) {
-        if (IsDisposed) { return; }
-
-        foreach (var t in e.Text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None)) {
-            var line = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + t;
-            _debugOutputLines.Add(line);
-            txbErrorInfo.Text += line + "\r\n";
-        }
-
-        // UI-Thread läuft synchron im Skript — Nachrichten verarbeiten, damit live sichtbar.
-        Develop.DoEvents();
-    }
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         CloseCommandList();
@@ -495,6 +469,22 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
 
         grpInjectVariables.ResumeLayout();
+    }
+
+    /// <summary>
+    /// Hängt eine Live-Zeile aus dem Skript (je Zeile mit Zeitstempel) an das Ausgabe-Fenster an.
+    /// </summary>
+    private void DebugPrint_LineAdded(object? sender, TextEventArgs e) {
+        if (IsDisposed) { return; }
+
+        foreach (var t in e.Text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None)) {
+            var line = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + t;
+            _debugOutputLines.Add(line);
+            txbErrorInfo.Text += line + "\r\n";
+        }
+
+        // UI-Thread läuft synchron im Skript — Nachrichten verarbeiten, damit live sichtbar.
+        Develop.DoEvents();
     }
 
     private void lstAssistant_ItemClicked(object sender, ListItemEventArgs e) {

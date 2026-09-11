@@ -84,8 +84,6 @@ public partial class Form : System.Windows.Forms.Form {
 
     #region Methods
 
-    public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
-
     public new void Show() {
         if (FormManager.Running) {
             FormManager.RegisterForm(this);

@@ -24,13 +24,10 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
     private bool _isDragging;
 
-    private Point _mouseDownPos;
-
     private float? _lastFiredValue;
     private float _maximum = 100;
-
     private float _minimum;
-
+    private Point _mouseDownPos;
     private Orientation _orientation = Orientation.Waagerecht;
 
     private Rectangle _slider;
@@ -179,8 +176,6 @@ public partial class Slider : GenericControl, IBackgroundNone {
     #endregion
 
     #region Methods
-
-    internal void DoMouseWheel(MouseEventArgs e) => OnMouseWheel(e);
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }

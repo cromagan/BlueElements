@@ -10,6 +10,8 @@ internal static class Program {
     private static int Main(string[] args) {
         // UTF-8 ohne BOM, damit Ausgaben in Pipes und Dateien sauber ankommen.
         Console.OutputEncoding = new UTF8Encoding(false);
+        // stdin ebenfalls als UTF-8 dekodieren, damit Pipes/Umleitungen korrekt ankommen.
+        Console.InputEncoding = Encoding.UTF8;
 
         StartService();
         // Die CLI arbeitet niemals als Administrator: Benutzergruppe #CLI, Benutzername CLI_<Windows-Benutzer>.

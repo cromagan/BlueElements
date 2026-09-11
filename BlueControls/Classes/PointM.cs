@@ -108,6 +108,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     public bool IsDisposed => _isDisposedFlag == 1;
     public string KeyName { get; set; }
+    // TODO: Unused
     public float Magnitude => (float)Math.Sqrt(_x * _x + _y * _y);
     public bool MoveXByMouse { get; set; } = true;
     public bool MoveYByMouse { get; set; } = true;

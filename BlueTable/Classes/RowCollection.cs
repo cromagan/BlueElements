@@ -316,6 +316,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
     /// </summary>
     /// <returns></returns>
+    // TODO: Unused
     public static List<RowItem> RowListToCheck() {
         var r = new List<RowItem>();
         List<Table> allfiles = [.. Table.AllInstances()];

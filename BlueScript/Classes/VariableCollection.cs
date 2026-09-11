@@ -136,23 +136,6 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         return _cachedStringableNames;
     }
 
-    //public static Collection Combine(Collection existingVars, Variable thisvar) {
-    //    var vaa = new List<String>();
-    //    vaa.AddRange(existingVars.ToListVariableString());
-    /// <summary>
-    /// Gibt von allen Variablen, die ein String sind, den Inhalt ohne " am Anfang/Ende zurück.
-    /// </summary>
-    /// <returns></returns>
-    public List<string> AllStringValues() {
-        var l = new List<string>();
-
-        foreach (var thisvar in _internal.Values) {
-            if (thisvar is StringScriptVariable vs) { l.Add(vs.ValueString); }
-        }
-
-        return l;
-    }
-
     /// <summary>
     /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten null
     /// </summary>

@@ -76,12 +76,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public List<ListItem>? GetContextMenuItems(object? hotItem) => null;
 
-    public void ResetETextAndInvalidate() {
-        Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        _eText = null;
-        Invalidate();
-    }
-
     internal void FitSize() {
         if (_design == Design.Undefined) { GetDesign(); }
         var s = RequiredTextSize(Text, _design, Translate, -1);
@@ -135,15 +129,15 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         if (e.Button == MouseButtons.Right) { ((IContextMenu)this).ContextMenuShow(this); }
     }
 
-    protected override void OnTextChanged(System.EventArgs e) {
-        base.OnTextChanged(e);
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
         _quickModePossible = null;
         _eText = null;
         Invalidate();
     }
 
-    protected override void OnSizeChanged(System.EventArgs e) {
-        base.OnSizeChanged(e);
+    protected override void OnTextChanged(System.EventArgs e) {
+        base.OnTextChanged(e);
         _quickModePossible = null;
         _eText = null;
         Invalidate();

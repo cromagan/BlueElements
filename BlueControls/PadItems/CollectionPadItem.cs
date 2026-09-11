@@ -814,17 +814,6 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
         return base.GetSubItemByKey(containerName, key);
     }
 
-    public CollectionPadItem? GetSubItemCollection(string keyOrCaption) {
-        foreach (var thisP in this) {
-            if (thisP is CollectionPadItem { IsDisposed: false } icp2) {
-                if (string.Equals(icp2.KeyName, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
-                if (string.Equals(icp2.Caption, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
-            }
-        }
-
-        return null;
-    }
-
     public PadItem? HotItem(Point controlPoint, bool topLevel, bool mustEnabled, float zoom, float offsetX, float offsetY) {
         if (EditMode == EditMode.Locked && mustEnabled) { return null; }
 

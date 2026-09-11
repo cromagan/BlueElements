@@ -134,11 +134,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     #region Methods
 
-    public void RefreshFromProperty() {
-        if (!Allinitialized || IsDisposed) { return; }
-        SetValueFromProperty();
-    }
-
     protected override void Dispose(bool disposing) {
         if (disposing && _accessor is not null) {
             _accessor.ValueChanged -= _accessor_ValueChanged;

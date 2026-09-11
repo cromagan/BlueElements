@@ -40,11 +40,6 @@ public partial class DialogWithOkAndCancel : Form {
 
     public bool Canceled { get; protected set; }
 
-    protected bool OK_Enabled {
-        get => butOK.Enabled;
-        set => butOK.Enabled = value;
-    }
-
     #endregion
 
     #region Methods

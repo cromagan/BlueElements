@@ -53,8 +53,6 @@ public class LayoutPreviewListItem : ListItem {
         return (int)(sc * (columnWidth - ConstPadding * 2)) + ConstTopPadding + badgeH * 2 / 3 + ConstPadding;
     }
 
-    public void RefreshPreview() => RemovePic();
-
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         try {
             if (_tmpBmp is null) { GeneratePic(); }

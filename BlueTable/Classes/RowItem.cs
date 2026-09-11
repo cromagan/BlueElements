@@ -158,14 +158,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public Color CellGetColor(ColumnItem? column) => ColorParse(CellGetString(column));
 
-    public int CellGetColorBgr(ColumnItem? column) {
-        var c = CellGetColor(column);
-        int colorBlue = c.B;
-        int colorGreen = c.G;
-        int colorRed = c.R;
-        return colorBlue << 16 | colorGreen << 8 | colorRed;
-    }
-
     /// <summary>
     ///
     /// </summary>

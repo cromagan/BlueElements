@@ -100,9 +100,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.Arrangement = value;
     }
 
-    [DefaultValue(false)]
-    public bool AutoPin { get; set; }
-
     /// <summary>
     /// Gibt an, ob Spalten per Drag/Drop verschoben werden dürfen.
     /// </summary>

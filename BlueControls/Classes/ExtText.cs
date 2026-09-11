@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
-
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
 // HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen
@@ -391,21 +390,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public void OnStyleChanged() {
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
         foreach (var c in _internal) { c.InvalidateFont(); }
-    }
-
-    public int SearchCharIndex(int direction, Type? charType, int fromPosition) {
-        if (direction != 1 && direction != -1) { return -1; }
-        if (fromPosition < 0 || fromPosition >= _internal.Count) { return -1; }
-
-        var idx = fromPosition + direction;
-        while (idx >= 0 && idx < _internal.Count) {
-            var current = _internal[idx];
-            if (charType is null || current.GetType() == charType) {
-                return idx;
-            }
-            idx += direction;
-        }
-        return -1;
     }
 
     public string Substring(int startIndex, int length) => BuildPlainText(startIndex, startIndex + length - 1);

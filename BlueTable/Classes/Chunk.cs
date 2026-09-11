@@ -284,13 +284,6 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         }
     }
 
-    public string ChunkFolder() {
-        var folder = MainFileName.FilePath();
-        var tablename = MainFileName.FileNameWithoutSuffix();
-
-        return $"{folder}{tablename}\\";
-    }
-
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);

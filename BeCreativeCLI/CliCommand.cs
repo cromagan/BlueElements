@@ -236,11 +236,5 @@ public abstract class CliCommand : IHasKeyName {
         return 0;
     }
 
-    /// <summary>
-    /// Schreibt eine Zeile als CSV auf die Standardausgabe.
-    /// </summary>
-    protected static void WriteCsvLine(char separator, params string[] fields) =>
-        Console.Out.WriteLine(string.Join(separator, CsvHelper.EscapeCSVFields([.. fields], separator)));
-
     #endregion
 }

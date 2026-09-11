@@ -47,6 +47,7 @@ public class InvalidatedRowsManager {
     /// Überprüft, ob gerade eine Verarbeitung stattfindet.
     /// Thread-sicher implementiert.
     /// </summary>
+    // TODO: Unused
     public bool IsProcessing {
         get {
             lock (_processingLock) {

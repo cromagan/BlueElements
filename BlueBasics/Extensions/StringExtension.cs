@@ -106,30 +106,6 @@ public static partial class Extensions {
         return true;
     }
 
-    /// <summary>
-    /// Entfernt alle unsichtbaren Zeichen: Steuer-, Format- (z. B. Zero-Width-Space, BOM),
-    /// Kombinierende Zeichen, Surrogate und andere Leerzeichen-Varianten.
-    /// Nur das normale Leerzeichen (U+0020) bleibt erhalten.
-    /// </summary>
-    public static string RemoveInvisibleChars(this string txt) {
-        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-
-        var sb = new StringBuilder(txt.Length);
-        foreach (var c in txt) {
-            if (c != ' '
-                && (char.IsControl(c) || char.IsWhiteSpace(c)
-                    || char.GetUnicodeCategory(c) is UnicodeCategory.Format
-                        or UnicodeCategory.Surrogate
-                        or UnicodeCategory.PrivateUse
-                        or UnicodeCategory.NonSpacingMark
-                        or UnicodeCategory.EnclosingMark
-                        or UnicodeCategory.OtherNotAssigned)) { continue; }
-
-            sb.Append(c);
-        }
-        return sb.ToString();
-    }
-
     public static string ConvertFromHtmlToRich(this string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 
@@ -283,6 +259,15 @@ public static partial class Extensions {
             using var streamReader = new System.IO.StreamReader(cryptoStream);
             return streamReader.ReadToEnd();
         } catch { return null; }
+    }
+
+    /// <summary>
+    /// Entfernt alle doppelten Zeichen (zeichenweise, nicht nur aufeinanderfolgende)
+    /// und sortiert die verbleibenden nach OrdinalIgnoreCase.
+    /// </summary>
+    public static string DistinctCharsSorted(this string input) {
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
+        return string.Concat(input.Distinct().OrderBy(c => c.ToString(), StringComparer.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -522,6 +507,14 @@ public static partial class Extensions {
         }
         while (noarunde);
         return result;
+    }
+
+    /// <summary>
+    /// Wandelt HTML in reinen Text um: loest Entities auf und entfernt alle Tags.
+    /// </summary>
+    public static string HtmlToPlain(this string text) {
+        if (string.IsNullOrEmpty(text)) { return string.Empty; }
+        return System.Net.WebUtility.HtmlDecode(text).RemoveXmlTags();
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
@@ -785,31 +778,6 @@ public static partial class Extensions {
         return sb.ToString();
     }
 
-    /// <summary>
-    /// Gibt eine Liste von Textstellen zurück, die dem Sternchen entsprechen
-    /// </summary>
-    /// <param name="text">Beispiel: Hund frisst Knochen, Hund vergräbt Knochen.</param>
-    /// <param name="search">Beispiel: Hund * Kochen.</param>
-    /// <param name="compare"></param>
-    /// <returns>Beispiel: Eine Liste mit: {"frisst", "vergräbt"}</returns>
-    /// <remarks></remarks>
-    public static List<string>? ReduceToMulti(this string text, string search, StringComparison compare) {
-        if (search.CountChar('*') != 1) { return null; }
-        var e = search.Split('*');
-        if (e.Length != 2) { return null; }
-
-        List<string> txt = [];
-        var enx = 0;
-        while (true) {
-            var bgx = text.IndexOf(e[0], enx, compare);
-            if (bgx < 0) { break; }
-            enx = text.IndexOf(e[1], bgx + e[0].Length, compare);
-            if (bgx + e[0].Length > enx) { break; }
-            txt.Add(text[(bgx + e[0].Length)..enx]);
-        }
-        return txt;
-    }
-
     public static bool RegexMatch(this string txt, string regex) {
         try {
             return string.IsNullOrEmpty(regex) || new Regex(regex).IsMatch(txt);
@@ -862,12 +830,27 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Entfernt alle doppelten Zeichen (zeichenweise, nicht nur aufeinanderfolgende)
-    /// und sortiert die verbleibenden nach OrdinalIgnoreCase.
+    /// Entfernt alle unsichtbaren Zeichen: Steuer-, Format- (z. B. Zero-Width-Space, BOM),
+    /// Kombinierende Zeichen, Surrogate und andere Leerzeichen-Varianten.
+    /// Nur das normale Leerzeichen (U+0020) bleibt erhalten.
     /// </summary>
-    public static string DistinctCharsSorted(this string input) {
-        if (string.IsNullOrEmpty(input)) { return string.Empty; }
-        return string.Concat(input.Distinct().OrderBy(c => c.ToString(), StringComparer.OrdinalIgnoreCase));
+    public static string RemoveInvisibleChars(this string txt) {
+        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+
+        var sb = new StringBuilder(txt.Length);
+        foreach (var c in txt) {
+            if (c != ' '
+                && (char.IsControl(c) || char.IsWhiteSpace(c)
+                    || char.GetUnicodeCategory(c) is UnicodeCategory.Format
+                        or UnicodeCategory.Surrogate
+                        or UnicodeCategory.PrivateUse
+                        or UnicodeCategory.NonSpacingMark
+                        or UnicodeCategory.EnclosingMark
+                        or UnicodeCategory.OtherNotAssigned)) { continue; }
+
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -876,14 +859,6 @@ public static partial class Extensions {
     /// <param name="text"></param>
     /// <returns></returns>
     public static string RemoveXmlTags(this string text) => HtmlTagRegex().Replace(text, string.Empty);
-
-    /// <summary>
-    /// Wandelt HTML in reinen Text um: loest Entities auf und entfernt alle Tags.
-    /// </summary>
-    public static string HtmlToPlain(this string text) {
-        if (string.IsNullOrEmpty(text)) { return string.Empty; }
-        return System.Net.WebUtility.HtmlDecode(text).RemoveXmlTags();
-    }
 
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
         if (string.IsNullOrEmpty(txt) || string.IsNullOrEmpty(alt)) { return txt; }

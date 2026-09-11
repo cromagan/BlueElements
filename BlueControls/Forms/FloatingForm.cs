@@ -106,20 +106,6 @@ public partial class FloatingForm : Form {
         }
     }
 
-    public void Position_LocateToMouse() {
-        var screenNr = PointOnScreenNr(Cursor.Position);
-        CheckMaxSize(screenNr);
-        var ypos = Cursor.Position.Y + 15;
-        var xpos = Cursor.Position.X + 15;
-        if (xpos + Width > Screen.AllScreens[screenNr].Bounds.Right) {
-            xpos = Cursor.Position.X - 5 - Width;
-        }
-        if (ypos + Height > Screen.AllScreens[screenNr].Bounds.Bottom) {
-            ypos = Cursor.Position.Y - 5 - Height;
-        }
-        Position_SetWindowIntoScreen(screenNr, xpos, ypos);
-    }
-
     public void Position_LocateToPosition(Point bestPosition) {
         var screenNr = PointOnScreenNr(bestPosition);
         CheckMaxSize(screenNr);

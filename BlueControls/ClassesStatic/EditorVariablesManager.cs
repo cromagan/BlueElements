@@ -36,14 +36,6 @@ public static class EditorVariablesManager {
         }
     }
 
-    public static bool HasSet(string storageKey, string setName) {
-        lock (_lock) {
-            InitializeIfNeeded();
-            if (!_sets.TryGetValue(storageKey, out var list)) { return false; }
-            return list.Exists(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase));
-        }
-    }
-
     public static void InitializeIfNeeded() {
         lock (_lock) {
             if (_initialized) { return; }

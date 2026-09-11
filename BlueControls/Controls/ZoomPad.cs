@@ -79,8 +79,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public bool Fitting { get; private set; }
 
-    public bool IsMaxYOffset => SliderY.Maximum < 6 || Math.Abs(OffsetY + SliderY.Maximum) < IntTolerance;
-
     /// <summary>
     /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde.
     /// </summary>
@@ -154,6 +152,16 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     } = 1f;
 
+    /// <summary>
+    /// Wenn <c>true</c>, kann OffsetX auch dann frei gesetzt werden,
+    /// wenn ShowSliderX <c>false</c> ist und der horizontale Slider
+    /// damit unsichtbar bleibt. Die Begrenzungen (SliderX.Minimum/Maximum) werden
+    /// in UpdateSliderBounds trotzdem berechnet, sodass der Offset
+    /// sauber geclampt wird. Wird z.B. von der TextBox für die Cursor-Verfolgung
+    /// im Singleline-Modus genutzt.
+    /// </summary>
+    protected virtual bool AllowScrollWithoutSliderX => false;
+
     [DefaultValue(true)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -168,16 +176,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
         private set;
     }
-
-    /// <summary>
-    /// Wenn <c>true</c>, kann OffsetX auch dann frei gesetzt werden,
-    /// wenn ShowSliderX <c>false</c> ist und der horizontale Slider
-    /// damit unsichtbar bleibt. Die Begrenzungen (SliderX.Minimum/Maximum) werden
-    /// in UpdateSliderBounds trotzdem berechnet, sodass der Offset
-    /// sauber geclampt wird. Wird z.B. von der TextBox für die Cursor-Verfolgung
-    /// im Singleline-Modus genutzt.
-    /// </summary>
-    protected virtual bool AllowScrollWithoutSliderX => false;
 
     protected abstract bool ShowSliderX { get; }
 
@@ -195,6 +193,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Methods
 
+    // TODO: Unused
     public static bool ScaleWarnung() {
         if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
         Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
@@ -457,6 +456,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected virtual void OnOffsetYChanged() => Invalidate();
 
+    protected override void OnSizeChanged(System.EventArgs e) {
+        if (!SlideAndZoomAllowed || Fitting) {
+            ZoomFit();
+        }
+        Invalidate_MaxBounds();
+        base.OnSizeChanged(e);
+    }
+
     /// <summary>
     /// Wird aufgerufen, wenn sich die Sichtbarkeit eines Sliders (X oder Y)
     /// während UpdateSliderBounds geändert hat. Abgeleitete
@@ -465,14 +472,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     /// CanvasMaxBounds die korrekte Zeichenbreite verwendet wird.
     /// </summary>
     protected virtual void OnSliderVisibilityChanged() { }
-
-    protected override void OnSizeChanged(System.EventArgs e) {
-        if (!SlideAndZoomAllowed || Fitting) {
-            ZoomFit();
-        }
-        Invalidate_MaxBounds();
-        base.OnSizeChanged(e);
-    }
 
     protected virtual void OnZoomChanged() => Invalidate();
 

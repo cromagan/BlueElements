@@ -427,6 +427,7 @@ public static class Develop {
         }
     }
 
+    // TODO: Unused
     public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
     public static bool IsHostRunning() => Debugger.IsAttached;

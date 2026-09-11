@@ -143,6 +143,7 @@ public static class Generic {
     /// Wandelt string[] in ein Dictionary um.
     /// Unterstützt: --Key Value, -Key Value, /Key Value
     /// </summary>
+    // TODO: Unused
     public static Dictionary<string, string> GetArgs(string[] args) {
         var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         for (var i = 0; i < args.Length; i++) {
