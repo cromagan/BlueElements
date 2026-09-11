@@ -25,6 +25,7 @@ public static class ScriptVerwendung {
     public static string Report() {
         var quellen = CollectScripts();
         var sb = new StringBuilder();
+        var t = new List<string>();
 
         foreach (var thisc in ScriptCommand.AllMethods.Instances) {
             sb.AppendLine(thisc.KeyName);
@@ -36,9 +37,18 @@ public static class ScriptVerwendung {
                 gefunden = true;
             }
 
-            if (!gefunden) { sb.AppendLine(" - Keine Verwendung"); }
+            if (!gefunden) {
+                t.Add(thisc.KeyName);
+                sb.AppendLine(" - Keine Verwendung");
+            }
             sb.AppendLine();
         }
+
+        sb.Append("\r#################################");
+        sb.Append("\r#################################");
+        sb.Append("\r#################################");
+        sb.Append("\rBefehle ohne Verwendung:\r");
+        sb.Append(string.Join('\r',t));
 
         return sb.ToString();
     }
