@@ -3028,7 +3028,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <summary>
     /// AssetFolder/Tabellepfad mit Forms und abschließenden \
     /// </summary>
-    private string DefaultFormulaPath() {
+    public string DefaultFormulaPath() {
         if (!string.IsNullOrEmpty(AssetFolderWhole())) { return AssetFolderWhole() + "Forms\\"; }
         return string.Empty;
     }

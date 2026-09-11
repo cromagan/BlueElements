@@ -16,7 +16,6 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
     private static readonly Brush HeadBrush = new SolidBrush(Color.FromArgb(255, 200, 200, 200));
     private readonly List<string> _childs = [];
-    private string _parentFile = string.Empty;
 
     #endregion
 
@@ -169,14 +168,14 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Parent", _parentFile);
+        result.ParseableAdd("Parent", ParentFile);
         result.ParseableAdd("Childs", _childs, false);
         return result;
     }
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("parent", _parentFile);
+        json.Set("parent", ParentFile);
         json.SetArrayIfNotEmpty("childs", _childs);
         return json;
     }
@@ -186,7 +185,7 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         try {
             var parent = json.GetString("parent");
             if (parent is { Length: > 0 }) {
-                _parentFile = parent;
+                ParentFile = parent;
                 ParentFormula = ConnectedFormula.Get(parent);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
             }
@@ -205,8 +204,8 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                _parentFile = value.FromNonCritical();
-                ParentFormula = ConnectedFormula.Get(_parentFile);
+                ParentFile = value.FromNonCritical();
+                ParentFormula = ConnectedFormula.Get(ParentFile);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 
@@ -232,6 +231,21 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
         const string txt = "Register-Karten: ";
 
         return txt + TableInput?.Caption;
+    }
+
+    /// <summary>
+    /// Liefert das Eltern-Formular plus alle als Kind gewählten Formulardateien.
+    /// </summary>
+    internal override List<string> ReferencedFormulaFiles() {
+        var result = base.ReferencedFormulaFiles();
+
+        foreach (var thisc in _childs) {
+            if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+                result.Add(thisc);
+            }
+        }
+
+        return result;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));

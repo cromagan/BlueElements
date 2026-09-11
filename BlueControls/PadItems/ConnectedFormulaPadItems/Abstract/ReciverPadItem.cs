@@ -23,6 +23,7 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
     private readonly List<string> _getFilterFromKeys = [];
     private ReadOnlyCollection<ReciverSenderPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
+    protected string ParentFile { get; set; } = string.Empty;
 
     #endregion
 
@@ -421,6 +422,18 @@ public abstract class ReciverPadItem : SizeableRectanglePadItem, IHasVersion, IE
                 return true;
         }
         return base.ParseThis(key, value);
+    }
+
+    /// <summary>
+    /// Liefert die Formulardateien (.cfo), auf die dieses Element verweist.
+    /// Basis ist die Eltern-Datei; abgeleitete Klassen ergänzen eigene Referenzen.
+    /// </summary>
+    internal virtual List<string> ReferencedFormulaFiles() {
+        List<string> result = [];
+        if (ParentFile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+            result.Add(ParentFile);
+        }
+        return result;
     }
 
     public override void PointMoved(object? sender, MoveEventArgs e) {

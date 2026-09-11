@@ -13,12 +13,6 @@ namespace BlueControls.PadItems.FunktionsItems_Formular;
 /// </summary>
 public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
-    #region Fields
-
-    private string _parentFile = string.Empty;
-
-    #endregion
-
     #region Constructors
 
     public RegionFormulaPadItem() : this(string.Empty, null) { }
@@ -129,7 +123,7 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Parent", _parentFile);
+        result.ParseableAdd("Parent", ParentFile);
         result.ParseableAdd("Child", Child);
         result.ParseableAdd("BorderStyle", RahmenStil);
         result.ParseableAdd("Detachable", Ausklappbar);
@@ -138,7 +132,7 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
 
     public override JsonObject ParseableJson() {
         var json = base.ParseableJson();
-        json.Set("parent", _parentFile);
+        json.Set("parent", ParentFile);
         json.Set("child", Child);
         json.Set("borderstyle", (int)RahmenStil);
         json.Set("detachable", Ausklappbar);
@@ -150,7 +144,7 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
         try {
             var parent = json.GetString("parent");
             if (parent is { Length: > 0 }) {
-                _parentFile = parent;
+                ParentFile = parent;
                 ParentFormula = ConnectedFormula.Get(parent);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
             }
@@ -166,8 +160,8 @@ public class RegionFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                _parentFile = value.FromNonCritical();
-                ParentFormula = ConnectedFormula.Get(_parentFile);
+                ParentFile = value.FromNonCritical();
+                ParentFormula = ConnectedFormula.Get(ParentFile);
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 

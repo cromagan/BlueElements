@@ -3,6 +3,7 @@
 using BlueControls.ControlStrategies;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.PadItems.Abstract;
+using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Interfaces;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -80,18 +81,25 @@ public static class ScriptVerwendung {
     }
 
     /// <summary>
-    /// Läuft rekursiv durch Seiten/Gruppen und sammelt die Skripte aller IHasScript-PadItems.
+    /// Läuft rekursiv durch Seiten/Gruppen, sammelt die Skripte aller IHasScript-PadItems
+    /// und stellt referenzierte Formulardateien von ReciverPadItems zur Verarbeitung.
     /// </summary>
-    private static void AddPadItemScripts(PadItem thisItem, string container, List<(string Ort, string Skript)> result) {
+    private static void AddPadItemScripts(PadItem thisItem, string container, Queue<ConnectedFormula> offen, HashSet<string> verarbeitet, List<(string Ort, string Skript)> result) {
         if (thisItem is CollectionPadItem collection) {
             var pageName = collection.ReadableText();
             if (string.IsNullOrEmpty(pageName)) { pageName = collection.KeyName; }
 
             foreach (var child in collection) {
                 if (child is not { IsDisposed: false }) { continue; }
-                AddPadItemScripts(child, container + "/" + pageName, result);
+                AddPadItemScripts(child, container + "/" + pageName, offen, verarbeitet, result);
             }
             return;
+        }
+
+        if (thisItem is ReciverPadItem thisRp) {
+            foreach (var datei in thisRp.ReferencedFormulaFiles()) {
+                EnqueueFormula(datei, offen, verarbeitet);
+            }
         }
 
         if (thisItem is not IHasScript hasScript) { return; }
@@ -105,8 +113,33 @@ public static class ScriptVerwendung {
     }
 
     /// <summary>
+    /// Baut die Verarbeitungswarteschlange aller Formulare auf:
+    /// bereits geladene Instanzen plus *.cfo-Dateien aus den Formular-Ordnern der geladenen Tabellen.
+    /// </summary>
+    private static Queue<ConnectedFormula> CollectFormulas(HashSet<string> verarbeitet) {
+        var offen = new Queue<ConnectedFormula>();
+
+        foreach (var thisCf in ConnectedFormula.AllInstances()) {
+            if (thisCf is not { IsDisposed: false }) { continue; }
+            if (thisCf.Filename.Length > 0 && !verarbeitet.Add(thisCf.Filename)) { continue; }
+            offen.Enqueue(thisCf);
+        }
+
+        foreach (var thisTb in Table.AllInstances()) {
+            if (thisTb is not { IsDisposed: false } tb) { continue; }
+
+            EnqueueFormula(tb.FormulaFileName(), offen, verarbeitet);
+            EnqueueFolder(tb.AssetFolderWhole(), offen, verarbeitet);
+            EnqueueFolder(tb.DefaultFormulaPath(), offen, verarbeitet);
+        }
+
+        return offen;
+    }
+
+    /// <summary>
     /// Sammelt Ort und Skripttext aller aktuell geladenen Skripte:
-    /// Tabellen-Skripte, skriptführende Spalten-Steuerstrategien und Formular-Elemente.
+    /// Tabellen-Skripte, skriptführende Spalten-Steuerstrategien sowie alle Formulare —
+    /// geladene, Dateien der Tabellen-Ordner und deren verschachtelte Unterformulare.
     /// </summary>
     private static List<(string Ort, string Skript)> CollectScripts() {
         List<(string Ort, string Skript)> result = [];
@@ -125,16 +158,46 @@ public static class ScriptVerwendung {
             }
         }
 
-        foreach (var thisCf in ConnectedFormula.AllInstances()) {
+        var verarbeitet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var offen = CollectFormulas(verarbeitet);
+
+        while (offen.Count > 0) {
+            var thisCf = offen.Dequeue();
+            if (thisCf is not { IsDisposed: false }) { continue; }
+
             var cfName = thisCf.ReadableText();
             if (string.IsNullOrEmpty(cfName)) { cfName = "(unbenannt)"; }
 
             foreach (var page in thisCf.Pages) {
-                AddPadItemScripts(page, "Formular " + cfName, result);
+                AddPadItemScripts(page, "Formular " + cfName, offen, verarbeitet, result);
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Lädt eine Formulardatei und stellt sie zur Verarbeitung, falls sie existiert und neu ist.
+    /// </summary>
+    private static void EnqueueFormula(string? datei, Queue<ConnectedFormula> offen, HashSet<string> verarbeitet) {
+        if (datei is not { Length: > 0 }) { return; }
+        if (!FileExists(datei)) { return; }
+
+        var cf = ConnectedFormula.Get(datei);
+        if (cf is not { IsDisposed: false }) { return; }
+        if (cf.Filename.Length > 0 && !verarbeitet.Add(cf.Filename)) { return; }
+
+        offen.Enqueue(cf);
+    }
+
+    /// <summary>
+    /// Stellt alle *.cfo-Dateien eines Ordners zur Verarbeitung.
+    /// </summary>
+    private static void EnqueueFolder(string? ordner, Queue<ConnectedFormula> offen, HashSet<string> verarbeitet) {
+        if (string.IsNullOrEmpty(ordner)) { return; }
+        foreach (var datei in GetFiles(ordner, "*.cfo", System.IO.SearchOption.TopDirectoryOnly)) {
+            EnqueueFormula(datei, offen, verarbeitet);
+        }
     }
 
     #endregion
