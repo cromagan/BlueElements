@@ -66,7 +66,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpSuche
             // 
             grpSuche.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            grpSuche.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            grpSuche.BackColor = Color.FromArgb(240, 240, 240);
             grpSuche.CausesValidation = false;
             grpSuche.Controls.Add(btnSuche);
             grpSuche.Controls.Add(txbAlt);
@@ -92,7 +92,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpErsetzen
             // 
             grpErsetzen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            grpErsetzen.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            grpErsetzen.BackColor = Color.FromArgb(240, 240, 240);
             grpErsetzen.CausesValidation = false;
             grpErsetzen.Controls.Add(txbNeu);
             grpErsetzen.Controls.Add(btnErsetzen);
@@ -105,7 +105,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpSonderzeichen
             // 
-            grpSonderzeichen.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            grpSonderzeichen.BackColor = Color.FromArgb(240, 240, 240);
             grpSonderzeichen.CausesValidation = false;
             grpSonderzeichen.Controls.Add(capSonderzeichen);
             grpSonderzeichen.Location = new Point(8, 272);
@@ -141,7 +141,7 @@ namespace BlueControls.BlueTableDialogs {
             btnVerwendung.Location = new Point(360, 288);
             btnVerwendung.Name = "btnVerwendung";
             btnVerwendung.QuickInfo = "Listet für jeden Befehl alle Verwendungen in einer Textdatei auf";
-            btnVerwendung.Size = new Size(168, 32);
+            btnVerwendung.Size = new Size(104, 32);
             btnVerwendung.TabIndex = 6;
             btnVerwendung.Text = "Verwendung";
             btnVerwendung.Click += btnVerwendung_Click;

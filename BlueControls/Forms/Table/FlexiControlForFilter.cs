@@ -23,7 +23,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, bool einschnappen, bool saveSettings) : base(false, false, false) {
+    public FlexiControlForFilter(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, SnapFilterMode einschnappen, bool saveSettings) : base(false, false, false) {
         InitializeComponent();
 
         Size = new Size(204, 24);
@@ -41,13 +41,19 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Properties
 
+    [DefaultValue(false)]
+    public bool AutoNext { get; set; }
+
     /// <summary>
     /// Da die CaptionPosition von dem Steuerelement bei Bedarf geändert wird,
     /// muss ein Defaultwert angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; }
 
-    public bool Einschnappen { get; set; } = true;
+    /// <summary>
+    /// Wann das Textfeld zu einem Knopf einschnappt.
+    /// </summary>
+    public SnapFilterMode Einschnappen { get; set; } = SnapFilterMode.Wenn_Vorhanden;
 
     public string FieldName {
         get {
@@ -210,7 +216,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => NextControl(e.Direction);
+    private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) {
+        if (AutoNext) { NextControl(e.Direction); }
+    }
 
     /// <summary>
     /// Reicht den Fokus an das werttragende Control der Strategie weiter.
@@ -256,7 +264,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var strategyBefore = f.Strategy;
         UpdateFilterData(filterSingle);
-        if (Einschnappen && !strategyBefore.IsCommandButton && f.Strategy.IsCommandButton) {
+        if (Einschnappen != SnapFilterMode.Niemals && !strategyBefore.IsCommandButton && f.Strategy.IsCommandButton) {
             NextControl(NavigationDirection.Next);
         }
     }
@@ -327,6 +335,11 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (FilterSingleColumn is null) { return false; }
         return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
     }
+
+    /// <summary>
+    /// Prüft, ob der Text die maximale Textlänge der Spalte erreicht hat.
+    /// </summary>
+    private static bool MaxTextLengthReached(string value, ColumnItem column) => column.MaxTextLength > 0 && value.Length >= column.MaxTextLength;
 
     private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed || f is null) { return; }
@@ -422,16 +435,24 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             if (filterSingle.FilterType == FilterType.Istgleich_MultiRowIgnorieren) { showDelFilterButton = true; }
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
-            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false }) {
-                using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
+            if (Einschnappen != SnapFilterMode.Niemals && !showDelFilterButton && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } column) {
+                if (Einschnappen == SnapFilterMode.Wenn_Format_Stimmt) {
+                    showDelFilterButton = f.Value.IsFormat(column, column.MultiLine) is { Length: 0 };
+                } else if (Einschnappen == SnapFilterMode.Maximallänge_erreicht) {
+                    showDelFilterButton = MaxTextLengthReached(f.Value, column);
+                } else if (Einschnappen == SnapFilterMode.Wenn_Format_Stimmt_UND_Maximallänge_erreicht) {
+                    showDelFilterButton = f.Value.IsFormat(column, column.MultiLine) is { Length: 0 } && MaxTextLengthReached(f.Value, column);
+                } else if (filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit) {
+                    using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 
-                if (filterSingle.Table?.Column.ChunkValueColumn is { IsDisposed: false } spc &&
-                    spc != FilterSingleColumn &&
-                    fic[spc] is { } fis) {
-                    fc.Add(fis);
+                    if (filterSingle.Table?.Column.ChunkValueColumn is { IsDisposed: false } spc &&
+                        spc != FilterSingleColumn &&
+                        fic[spc] is { } fis) {
+                        fc.Add(fis);
+                    }
+
+                    showDelFilterButton = fc.Rows.Count > 0;
                 }
-
-                showDelFilterButton = fc.Rows.Count > 0;
             }
 
             if (showDelFilterButton) {

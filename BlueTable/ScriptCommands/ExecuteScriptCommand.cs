@@ -5,8 +5,14 @@ using BlueScript.Classes;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Gibt den Befehl an Windows ab.
-/// Versucht das Beste daraus zu machen,
+/// Führt einen Befehl oder eine Datei über die Windows-Shell aus (UseShellExecute).
+/// Startet Programme mit Argumenten, öffnet Dokumente mit dem verknüpften Programm,
+/// URLs im Browser und Ordner im Windows Explorer.
+/// Beispiele:
+/// Execute("C:\Windows\System32\notepad.exe", "C:\Temp\Notizen.txt"); — Programm mit Argument
+/// Execute("C:\Temp", ""); — Ordner im Windows Explorer öffnen
+/// Execute("https://example.org", ""); — URL im Standardbrowser öffnen
+/// Execute("", "C:\Temp"); — nur Argumente angegeben, Windows entscheidet anhand der Argumente
 /// </summary>
 internal class ExecuteScriptCommand : ScriptCommand {
 

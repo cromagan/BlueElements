@@ -677,7 +677,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                     #region Filter bei Bedarf erstellen
 
                     if (flx is null) {
-                        flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
+                        flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, SnapFilterMode.Wenn_Vorhanden, false);
                         flx.FilterOutput.Table = thisColumn.Table;
                         ChildIsBorn(flx);
                         flx.FilterOutputPropertyChanged += FlexSingeFilter_FilterOutputPropertyChanged;

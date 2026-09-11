@@ -65,9 +65,9 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
     } = string.Empty;
 
     /// <summary>
-    /// Wenn gewählt, wird das Textfeld zu einem Knopf, sobald ein konkreter Wert gewählt ist.
+    /// Wann das Textfeld zu einem Knopf einschnappt.
     /// </summary>
-    public bool Einschnappen {
+    public SnapFilterMode Einschnappen {
         get;
         set {
             if (IsDisposed) { return; }
@@ -75,7 +75,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
             field = value;
             OnPropertyChanged();
         }
-    } = true;
+    } = SnapFilterMode.Wenn_Vorhanden;
 
     public string FieldName {
         get {
@@ -160,7 +160,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, ItemsOf(typeof(FlexiFilterDefaultOutput))));
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, ItemsOf(typeof(FlexiFilterDefaultFilter))));
-        result.Add(new FlexiControlForProperty<bool>(() => Einschnappen));
+        result.Add(new FlexiControlForProperty<SnapFilterMode>(() => Einschnappen, ItemsOf(typeof(SnapFilterMode))));
 
         return result;
     }
@@ -186,7 +186,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         json.Set("caption", (int)CaptionPosition);
         json.Set("defaultemptyfilter", (int)Standard_bei_keiner_Eingabe);
         json.Set("defaulttextfilter", (int)Filterart_bei_Texteingabe);
-        json.Set("snapfilter", Einschnappen);
+        json.Set("snapfilter", (int)Einschnappen);
         return json;
     }
 
@@ -197,7 +197,14 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
             CaptionPosition = json.GetEnum("caption", CaptionPosition);
             Standard_bei_keiner_Eingabe = json.GetEnum("defaultemptyfilter", Standard_bei_keiner_Eingabe);
             Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
-            Einschnappen = json.GetBool("snapfilter", Einschnappen);
+
+            if (json["snapfilter"] is JsonValue v && v.TryGetValue(out bool b)) {
+                // Legacy: Boolean-Wert
+                Einschnappen = b ? SnapFilterMode.Wenn_Vorhanden : SnapFilterMode.Niemals;
+            } else {
+                Einschnappen = json.GetEnum("snapfilter", Einschnappen);
+            }
+
             base.ParseJson(json);
         } finally {
             EndInit();
@@ -229,7 +236,12 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
                 return true;
 
             case "snapfilter":
-                Einschnappen = value.FromPlusMinus();
+                if (value is "+" or "-") {
+                    // Legacy: Plus/Minus-Schreibweise
+                    Einschnappen = value == "+" ? SnapFilterMode.Wenn_Vorhanden : SnapFilterMode.Niemals;
+                } else {
+                    Einschnappen = (SnapFilterMode)IntParse(value);
+                }
                 return true;
 
                 //case "captiontext":
