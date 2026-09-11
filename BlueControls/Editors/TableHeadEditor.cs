@@ -10,7 +10,7 @@ using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using SpellDictionary = BlueControls.Classes.Dictionary;
+using SpellDictionary = BlueControls.ClassesStatic.Dictionary;
 
 namespace BlueControls.BlueTableDialogs;
 

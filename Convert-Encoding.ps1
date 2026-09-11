@@ -105,7 +105,7 @@ Write-Host "Total files checked:        $($counterOk + $counterAddedBom + $count
 Write-Host ""
 Write-Host "=== License Header ===" -ForegroundColor Cyan
 
-$licenseHeader = "// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.`r`n"
+$licenseHeader = "// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.`r`n`r`n"
 $counterLicenseAdded = 0
 $counterLicenseOk = 0
 $counterLicenseStripped = 0
@@ -114,7 +114,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $file = $_.FullName
     $content = [System.IO.File]::ReadAllText($file)
 
-    if ($content.StartsWith($licenseHeader)) {
+    if ($content.StartsWith($licenseHeader) -and -not $content.StartsWith($licenseHeader + "`r`n")) {
         $script:counterLicenseOk++
         return
     }
@@ -126,7 +126,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         $stripped++
     }
 
-    $newContent = $licenseHeader + "`r`n" + ($lines -join "`r`n")
+    $newContent = $licenseHeader + ($lines -join "`r`n")
 
     if ($newContent -ne $content) {
         $utf8Bom = New-Object System.Text.UTF8Encoding $true

@@ -2,7 +2,7 @@
 
 using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 public static class Export {
     //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {

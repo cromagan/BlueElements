@@ -159,6 +159,27 @@ public sealed class CaptionBarListItemTableElement : TableElement {
         return true;
     }
 
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        var group = cvi.Column?.CaptionGroup(Caption) ?? string.Empty;
+        if (Arrangement?.Ansichtbearbeitung ?? false) {
+            tableView.QuickInfo = string.IsNullOrEmpty(group)
+                ? $"Überschrift Ebene {Caption + 1}: leer (Doppelklick zum Bearbeiten)"
+                : $"Überschrift Ebene {Caption + 1}: {group}\rDoppelklick zum Bearbeiten";
+            return;
+        }
+
+        tableView.QuickInfo = string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
+    }
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;
+
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
+
     /// <summary>
     /// Übernimmt die neue Überschrift der Caption-Gruppe (Ebene
     /// Caption). Commit-Callback aus
@@ -188,27 +209,6 @@ public sealed class CaptionBarListItemTableElement : TableElement {
         }
         tableView.InvalidateCurrentArrangement();
     }
-
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;
-
-    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
-        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
-            base.HandleMouseMove(mouseOverColumn, tableView, e);
-            return;
-        }
-
-        var group = cvi.Column?.CaptionGroup(Caption) ?? string.Empty;
-        if (Arrangement?.Ansichtbearbeitung ?? false) {
-            tableView.QuickInfo = string.IsNullOrEmpty(group)
-                ? $"Überschrift Ebene {Caption + 1}: leer (Doppelklick zum Bearbeiten)"
-                : $"Überschrift Ebene {Caption + 1}: {group}\rDoppelklick zum Bearbeiten";
-            return;
-        }
-
-        tableView.QuickInfo = string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
-    }
-
-    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 
     private void Draw_Column_Head_Captions_Now(Graphics gr, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom) {
         var isEdit = Arrangement?.Ansichtbearbeitung ?? false;

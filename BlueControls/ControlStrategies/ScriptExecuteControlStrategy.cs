@@ -2,6 +2,7 @@
 
 using BlueControls.Controls;
 using BlueScript.Classes;
+using BlueScript.Interfaces;
 using BlueTable.Interfaces;
 using System.Globalization;
 
@@ -11,7 +12,7 @@ namespace BlueControls.ControlStrategies;
 /// Zeigt nichts an: Ein einfacher Klick in die Zelle führt das direkt
 /// hinterlegte Skript sofort aus. Ein Doppelklick bleibt wirkungslos.
 /// </summary>
-public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
+public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn, IHasScript {
 
     #region Fields
 
@@ -64,6 +65,14 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasColumn {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// IHasScript: Liefert das Klick-Skript.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
+    }
 
     /// <summary>
     /// Meldung, warum die Konfiguration ungültig ist — insbesondere, wenn kein Skript hinterlegt ist.

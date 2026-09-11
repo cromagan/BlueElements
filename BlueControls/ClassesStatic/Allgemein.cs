@@ -2,7 +2,7 @@
 
 using BlueControls.Controls;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 public static class Allgemein {
 

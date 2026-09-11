@@ -25,6 +25,7 @@ namespace BlueControls.BlueTableDialogs {
             grpSonderzeichen = new GroupBox();
             capSonderzeichen = new Caption();
             btnFehler = new Button();
+            btnVerwendung = new Button();
             grpSuche.SuspendLayout();
             grpErsetzen.SuspendLayout();
             grpSonderzeichen.SuspendLayout();
@@ -133,11 +134,24 @@ namespace BlueControls.BlueTableDialogs {
             btnFehler.Text = "Alle Fehler zurücksetzen";
             btnFehler.Click += btnFehler_Click;
             // 
+            // btnVerwendung
+            // 
+            btnVerwendung.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnVerwendung.ImageCode = "Lupe|20";
+            btnVerwendung.Location = new Point(360, 288);
+            btnVerwendung.Name = "btnVerwendung";
+            btnVerwendung.QuickInfo = "Listet für jeden Befehl alle Verwendungen in einer Textdatei auf";
+            btnVerwendung.Size = new Size(168, 32);
+            btnVerwendung.TabIndex = 6;
+            btnVerwendung.Text = "Verwendung";
+            btnVerwendung.Click += btnVerwendung_Click;
+            // 
             // SearchAndReplaceInTbScripts
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(589, 336);
             Controls.Add(btnFehler);
+            Controls.Add(btnVerwendung);
             Controls.Add(grpSonderzeichen);
             Controls.Add(grpErsetzen);
             Controls.Add(grpSuche);
@@ -161,5 +175,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capSonderzeichen;
         private Button btnSuche;
         private Button btnFehler;
+        private Button btnVerwendung;
     }
 }

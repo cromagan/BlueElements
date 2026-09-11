@@ -1,6 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Chars;
+
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;

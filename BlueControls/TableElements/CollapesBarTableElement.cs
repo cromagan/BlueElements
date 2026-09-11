@@ -55,6 +55,15 @@ public sealed class CollapesBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        tableView.QuickInfo = cvi.CollapsableEnabled(SheetStyle) ? "Spalte auf-/zuklappen" : string.Empty;
+    }
+
     /// <summary>
     /// Klappt die angeklickte Spalte auf/zu, sofern sie klappbar ist.
     /// </summary>
@@ -67,15 +76,6 @@ public sealed class CollapesBarTableElement : TableElement {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CollapseButtonSize;
-
-    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
-        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
-            base.HandleMouseMove(mouseOverColumn, tableView, e);
-            return;
-        }
-
-        tableView.QuickInfo = cvi.CollapsableEnabled(SheetStyle) ? "Spalte auf-/zuklappen" : string.Empty;
-    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CollapseButtonSize, CollapseButtonSize);
 

@@ -70,12 +70,12 @@ public static partial class Extensions {
 
     public static bool IntersectsVericalyWith(this RectangleF r, RectangleF rect) => rect.X < r.X + r.Width && r.X < rect.X + rect.Width;
 
-    /// <summary>
-    /// Gibt den Punkt, der am nähesten zu einem der vier Mittelpunkte der Strecken ist, zurück
-    /// </summary>
-    /// <param name="r"></param>
-    /// <param name="p"></param>
-    /// <returns></returns>
+/// <summary>
+/// Gibt den Punkt, der am nähesten zu einem der vier Mittelpunkte der Strecken ist, zurück
+/// </summary>
+/// <param name="r"></param>
+/// <param name="p"></param>
+/// <returns></returns>
 // TODO: Unused
     public static PointF NearestLineMiddle(this RectangleF r, PointF p) {
         List<PointF> pl =

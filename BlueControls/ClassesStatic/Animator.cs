@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 /// <summary>
 /// Zentrale Animations-Engine für Controls (Notification, QuickNote, ...).
@@ -25,8 +25,8 @@ public static class Animator {
     private const int SwpPosFlags = SwpNoSize | SwpNoZOrder | SwpNoActivate | SwpNoOwnerZOrder;
     private const int TargetFps = 125;
     private const int WsExLayered = 0x00080000;
-    private static readonly Dictionary<IntPtr, Entry> _entries = [];
-    private static readonly HashSet<IntPtr> _layeredEnsured = [];
+    private static readonly Dictionary<nint, Entry> _entries = [];
+    private static readonly HashSet<nint> _layeredEnsured = [];
     private static readonly object _lock = new();
 
     // Hält die Referenz auf den Animations-Thread. Die CLR rootet zwar
@@ -68,20 +68,20 @@ public static class Animator {
     /// Nützlich, um aus dem Animations-Thread heraus festzustellen, ob der
     /// Nutzer das aktive Fenster gewechselt hat.
     /// </summary>
-    public static IntPtr GetForegroundWindowHandle() => GetForegroundWindowNative();
+    public static nint GetForegroundWindowHandle() => GetForegroundWindowNative();
 
     /// <summary>
     /// Liefert die aktuelle Y-Position (Bildschirmkoordinate) eines Fensters
     /// direkt via Win32 — thread-safe, ohne den UI-Thread zu berühren.
     /// </summary>
-    public static int GetWindowY(IntPtr hwnd) {
+    public static int GetWindowY(nint hwnd) {
         var rect = default(Rect);
         return GetWindowRect(hwnd, ref rect) ? rect.Top : 0;
     }
 
-    public static bool IsHwndAlive(IntPtr hwnd) => hwnd != IntPtr.Zero && IsWindow(hwnd);
+    public static bool IsHwndAlive(nint hwnd) => hwnd != nint.Zero && IsWindow(hwnd);
 
-    public static bool IsHwndVisible(IntPtr hwnd) => hwnd != IntPtr.Zero && IsWindowVisible(hwnd);
+    public static bool IsHwndVisible(nint hwnd) => hwnd != nint.Zero && IsWindowVisible(hwnd);
 
     /// <summary>
     /// True, wenn das Fenster-handle noch gültig ist.
@@ -100,7 +100,7 @@ public static class Animator {
     /// Standardmäßig wird das Fenster als Layered-Window markiert, damit
     /// AnimationFrame.Opacity greift (Top-Level-Fenster).
     /// </summary>
-    public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) => Start(hwnd, compute, onFinished, true);
+    public static void Start(nint hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished = null) => Start(hwnd, compute, onFinished, true);
 
     /// <summary>
     /// Startet eine Animation für das Fenster <paramref name="hwnd" />.
@@ -110,8 +110,8 @@ public static class Animator {
     /// ändern (z.B. Controls.SlideOutPanel) und weder
     /// Transparenz noch das WS_EX_LAYERED-Flag benötigen.
     /// </summary>
-    public static void Start(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, bool layered) {
-        if (hwnd == IntPtr.Zero) { return; }
+    public static void Start(nint hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, bool layered) {
+        if (hwnd == nint.Zero) { return; }
         if (layered) { EnsureLayered(hwnd); }
 
         var entry = new Entry(hwnd, compute, onFinished, DateTime.UtcNow, layered);
@@ -149,17 +149,17 @@ public static class Animator {
     /// Beendet die Animation für das Fenster <paramref name="hwnd" />,
     /// ohne <c>onFinished</c> aufzurufen.
     /// </summary>
-    public static void Stop(IntPtr hwnd) {
+    public static void Stop(nint hwnd) {
         lock (_lock) {
             _entries.Remove(hwnd);
         }
     }
 
-    private static void ApplyFrame(IntPtr hwnd, in AnimationFrame frame, bool layered) {
+    private static void ApplyFrame(nint hwnd, in AnimationFrame frame, bool layered) {
         // Position und — wenn im Frame angegeben — auch Größe, Win32 direkt,
         // am UI-Thread vorbei. Ohne Größenangabe bleibt die Größe unverändert.
         var flags = frame.Width > 0 && frame.Height > 0 ? SwpPosFlags & ~SwpNoSize : SwpPosFlags;
-        SetWindowPos(hwnd, IntPtr.Zero, frame.X, frame.Y, frame.Width, frame.Height, flags);
+        SetWindowPos(hwnd, nint.Zero, frame.X, frame.Y, frame.Width, frame.Height, flags);
 
         // Opacity — nur bei Layered-Windows sinnvoll/anwendbar.
         if (layered) {
@@ -168,7 +168,7 @@ public static class Animator {
         }
     }
 
-    private static void EnsureLayered(IntPtr hwnd) {
+    private static void EnsureLayered(nint hwnd) {
         lock (_lock) {
             if (_layeredEnsured.Contains(hwnd)) { return; }
         }
@@ -188,27 +188,27 @@ public static class Animator {
     private static extern bool GetCursorPos(out Point32 lpPoint);
 
     [DllImport("user32.dll", EntryPoint = "GetForegroundWindow", SetLastError = true)]
-    private static extern IntPtr GetForegroundWindowNative();
+    private static extern nint GetForegroundWindowNative();
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
-    private static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
+    private static extern int GetWindowLong32(nint hWnd, int nIndex);
 
-    private static int GetWindowLongCompat(IntPtr hWnd, int nIndex) => IntPtr.Size == 4 ? GetWindowLong32(hWnd, nIndex) : GetWindowLongPtr64(hWnd, nIndex).ToInt32();
+    private static int GetWindowLongCompat(nint hWnd, int nIndex) => nint.Size == 4 ? GetWindowLong32(hWnd, nIndex) : GetWindowLongPtr64(hWnd, nIndex).ToInt32();
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
-    private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+    private static extern nint GetWindowLongPtr64(nint hWnd, int nIndex);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetWindowRect(IntPtr hWnd, ref Rect lpRect);
+    private static extern bool GetWindowRect(nint hWnd, ref Rect lpRect);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool IsWindow(IntPtr hWnd);
+    private static extern bool IsWindow(nint hWnd);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool IsWindowVisible(IntPtr hWnd);
+    private static extern bool IsWindowVisible(nint hWnd);
 
     private static void Run() {
         while (!Ending) {
@@ -273,25 +273,25 @@ public static class Animator {
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+    private static extern bool SetLayeredWindowAttributes(nint hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
     [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
-    private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
+    private static extern int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
 
-    private static void SetWindowLongCompat(IntPtr hWnd, int nIndex, int value) {
-        if (IntPtr.Size == 4) {
+    private static void SetWindowLongCompat(nint hWnd, int nIndex, int value) {
+        if (nint.Size == 4) {
             _ = SetWindowLong32(hWnd, nIndex, value);
         } else {
-            _ = SetWindowLongPtr64(hWnd, nIndex, new IntPtr(value));
+            _ = SetWindowLongPtr64(hWnd, nIndex, new nint(value));
         }
     }
 
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
-    private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+    private static extern nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
+    private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
 
     /// <summary>
     /// Erzeugt den Animations-Thread, startet ihn und liefert die Referenz
@@ -330,12 +330,12 @@ public static class Animator {
 
     #region Classes
 
-    private sealed class Entry(IntPtr hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, DateTime startTime, bool layered) {
+    private sealed class Entry(nint hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, DateTime startTime, bool layered) {
 
         #region Properties
 
         public Func<TimeSpan, AnimationFrame> Compute { get; } = compute;
-        public IntPtr Hwnd { get; } = hwnd;
+        public nint Hwnd { get; } = hwnd;
         public bool Layered { get; } = layered;
         public Action? OnFinished { get; } = onFinished;
         public DateTime StartTime { get; } = startTime;
@@ -358,15 +358,13 @@ public readonly struct AnimationFrame {
 
     public bool Finished { get; init; }
 
+    public int Height { get; init; }
     public double Opacity { get; init; }
 
+    public int Width { get; init; }
     public int X { get; init; }
 
     public int Y { get; init; }
-
-    public int Width { get; init; }
-
-    public int Height { get; init; }
 
     #endregion
 }

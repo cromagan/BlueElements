@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
+
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
 // HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen

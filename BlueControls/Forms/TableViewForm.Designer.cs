@@ -95,7 +95,6 @@ namespace BlueControls.Forms {
             capZeilen2 = new Caption();
             LoadTab = new OpenFileDialog();
             SaveTab = new SaveFileDialog();
-            grpAufräumen = new Button();
             pnlStatusBar.SuspendLayout();
             ribMain.SuspendLayout();
             tabFile.SuspendLayout();
@@ -863,17 +862,6 @@ namespace BlueControls.Forms {
             SaveTab.Filter = resources.GetString("SaveTab.Filter");
             SaveTab.Title = "Bitte neuen Dateinamen der Tabelle wählen.";
             // 
-            // grpAufräumen
-            // 
-            grpAufräumen.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            grpAufräumen.ImageCode = "Zeile||||||||||Pinsel";
-            grpAufräumen.Location = new Point(160, 2);
-            grpAufräumen.Name = "grpAufräumen";
-            grpAufräumen.QuickInfo = "Angezeigte Zeilen löschen";
-            grpAufräumen.Size = new Size(72, 66);
-            grpAufräumen.TabIndex = 45;
-            grpAufräumen.Text = "Zeilen löschen";
-            // 
             // TableViewForm
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -970,8 +958,6 @@ namespace BlueControls.Forms {
         private ListBox lstAufgaben;
         private Button btnAufräumen;
 
-        // TODO: Unused
-        private Button grpAufräumen;
         private Button btnUserInfo;
         private Button btnSuchInScript;
         private Button btnMonitoring;

@@ -142,12 +142,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.CustomContextMenuItems = value;
     }
 
-    [DefaultValue(false)]
-    public bool EditButton {
-        get => TableInternal.EditButton;
-        set => TableInternal.EditButton = value;
-    }
-
     /// <summary>
     /// KeyName eines EventScripts, das beim Doppelklick auf eine Zelle
     /// ausgeführt wird, anstatt die Bearbeitung zu öffnen.
@@ -156,6 +150,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public string DoubleClickScript {
         get => TableInternal.DoubleClickScript;
         set => TableInternal.DoubleClickScript = value;
+    }
+
+    [DefaultValue(false)]
+    public bool EditButton {
+        get => TableInternal.EditButton;
+        set => TableInternal.EditButton = value;
     }
 
     /// <summary>
@@ -182,13 +182,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         }
     } = GroupBoxStyle.Nothing;
 
-    public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
-
     [DefaultValue(false)]
     public bool MiniToolbarEnabled {
         get => TableInternal.MiniToolbarEnabled;
         set => TableInternal.MiniToolbarEnabled = value;
     }
+
+    public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
     public bool PowerEdit {
         get => TableInternal.PowerEdit;
@@ -251,17 +251,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void CollapesAll() => TableInternal.CollapesAll();
 
-    /// <summary>
-    /// Führt ein Kontextmenü-Kommando über die interne TableView aus,
-    /// ohne die TableView-Instanz nach außen zu geben.
-    /// </summary>
-    public void ExecuteContextMenuCommand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
-        var hotItem = TableView.ContextMenuItemGenerate(TableInternal, viewItem, column, row, visibleRows);
-        ((IContextMenu)TableInternal).ExecuteContextMenuCommand(click, additional, hotItem);
-    }
-
-    public void ResetView() => TableInternal.ResetView();
-
     public void CursorPos_Set(ColumnViewItem? columnViewItem, RowTableElement? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
 
     public void DeleteView(string viewName) {
@@ -270,6 +259,15 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     public void DoZoom(bool zoomin) => TableInternal.DoZoom(zoomin);
+
+    /// <summary>
+    /// Führt ein Kontextmenü-Kommando über die interne TableView aus,
+    /// ohne die TableView-Instanz nach außen zu geben.
+    /// </summary>
+    public void ExecuteContextMenuCommand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, ColumnViewItem? viewItem, ColumnItem? column, RowItem? row, IReadOnlyList<RowItem>? visibleRows) {
+        var hotItem = TableView.ContextMenuItemGenerate(TableInternal, viewItem, column, row, visibleRows);
+        ((IContextMenu)TableInternal).ExecuteContextMenuCommand(click, additional, hotItem);
+    }
 
     public void ExpandAll() => TableInternal.ExpandAll();
 
@@ -294,6 +292,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public void ParseView(JsonObject? viewData) => TableInternal.ParseView(viewData);
 
     public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
+
+    public void ResetView() => TableInternal.ResetView();
 
     public void RowCleanUp() => TableInternal.RowCleanUp();
 
@@ -409,6 +409,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_Controls();
     }
 
+    protected virtual void OnInvalidateView() => InvalidateView?.Invoke(this, System.EventArgs.Empty);
+
+    protected virtual void OnLoaded(FirstEventArgs e) => Loaded?.Invoke(this, e);
+
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -418,10 +422,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     protected virtual void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
 
     protected virtual void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
-
-    protected virtual void OnLoaded(FirstEventArgs e) => Loaded?.Invoke(this, e);
-
-    protected virtual void OnInvalidateView() => InvalidateView?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         OnTableChanged();
@@ -1002,6 +1002,16 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         grpBorder.Text = Table?.Caption ?? "Keine Tabelle geladen";
     }
 
+    private void Table_InvalidateView(object? sender, System.EventArgs e) {
+        Invalidate_Controls();
+        OnInvalidateView();
+    }
+
+    private void Table_Loaded(object? sender, FirstEventArgs e) {
+        Invalidate_Controls();
+        OnLoaded(e);
+    }
+
     private void TableInternal_CellClicked(object? sender, CellEventArgs e) => OnCellClicked(e);
 
     private void TableInternal_DoubleClick(object? sender, System.EventArgs e) => OnDoubleClick(e);
@@ -1075,16 +1085,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void TableInternal_VisibleRowsChanged(object? sender, System.EventArgs e) => OnVisibleRowsChanged();
-
-    private void Table_InvalidateView(object? sender, System.EventArgs e) {
-        Invalidate_Controls();
-        OnInvalidateView();
-    }
-
-    private void Table_Loaded(object? sender, FirstEventArgs e) {
-        Invalidate_Controls();
-        OnLoaded(e);
-    }
 
     private void txbZeilenFilter_Enter(object? sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
 

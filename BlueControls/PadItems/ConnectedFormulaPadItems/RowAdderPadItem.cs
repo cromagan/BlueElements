@@ -4,6 +4,7 @@ using BlueControls.Controls;
 using BlueControls.ControlStrategies;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Classes;
+using BlueScript.Interfaces;
 using BlueScript.ScriptVariables;
 using System.Windows.Forms;
 
@@ -13,7 +14,7 @@ namespace BlueControls.PadItems.FunktionsItems_Formular;
 /// Zeigt Zeilen einer zweiten Tabelle an, die zur empfangenen Zeile gehören.
 /// Neue Zeilen werden dort über Skripte angelegt und über eine Kennung dauerhaft mit der empfangenen Zeile verknüpft.
 /// </summary>
-public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable, ISimpleEditor {
+public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizable, ISimpleEditor, IHasScript {
 
     #region Fields
 
@@ -158,6 +159,14 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// IHasScript: Liefert das RowAdder-Skript.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
+    }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new RowAdder {

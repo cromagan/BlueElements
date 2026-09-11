@@ -1,8 +1,9 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueControls;
 using System.Text;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 public static class EditorVariablesManager {
 

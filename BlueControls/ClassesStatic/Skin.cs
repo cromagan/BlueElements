@@ -3,7 +3,7 @@
 using BlueControls.Controls;
 using System.Reflection;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 public static class Skin {
 
@@ -16,9 +16,9 @@ public static class Skin {
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
+    private static readonly Dictionary<string, Dictionary<int, string>> _styleData = [];
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
-    private static readonly Dictionary<string, Dictionary<int, string>> _styleData = [];
     private static bool _stylesLoaded;
 
     #endregion

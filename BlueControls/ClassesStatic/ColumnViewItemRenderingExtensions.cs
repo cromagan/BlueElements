@@ -4,7 +4,7 @@ using BlueControls.Controls;
 using BlueControls.TableElements;
 using System.Runtime.CompilerServices;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 public static class ColumnViewItemRenderingExtensions {
 
@@ -239,7 +239,7 @@ public static class ColumnViewItemRenderingExtensions {
                 && items[i].Column?.KeyName != SystemColumnKeys.RowSortIndex;
         }
 
-        double scaleFactor = 1.0;
+        var scaleFactor = 1.0;
 
         // Iterativ: Spalten, die durch Skalierung unter den widthThreshold rutschen würden,
         // werden von der Skalierung ausgenommen und der Faktor neu berechnet.

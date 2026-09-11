@@ -2,6 +2,7 @@
 
 using BlueScript.Classes;
 using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueTable.ClassesStatic;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
@@ -19,7 +20,7 @@ using static BlueScript.Classes.Script;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IEditable, IJsonParseable {
+public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IHasScript, IEditable, IJsonParseable {
 
     #region Fields
 
@@ -607,6 +608,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// IHasScript: Liefert alle Tabellen-Skripte (EventScript).
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() => EventScript;
 
     public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {

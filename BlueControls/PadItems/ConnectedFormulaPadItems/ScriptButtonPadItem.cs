@@ -3,6 +3,7 @@
 using BlueControls.Controls;
 using BlueControls.PadItems.FunktionsItems_Formular.Abstract;
 using BlueScript.Classes;
+using BlueScript.Interfaces;
 using BlueScript.ScriptVariables;
 using Button = BlueControls.Controls.Button;
 
@@ -11,7 +12,7 @@ namespace BlueControls.PadItems.FunktionsItems_Formular;
 /// <summary>
 /// Ein Knopf, den der Benutzer drücken kann. Beim Drücken wird ein Skript ausgeführt.
 /// </summary>
-public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable, IErrorCheckable {
+public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable, IErrorCheckable, IHasScript {
 
     #region Fields
 
@@ -116,6 +117,14 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// IHasScript: Liefert das Skript des Knopfes.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
+    }
 
     /// <summary>
     /// Führt das Skript aus und stellt dabei alle benötigten Werte bereit.

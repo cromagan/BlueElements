@@ -56,8 +56,6 @@ public sealed class SortBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
-
     public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
         if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
             base.HandleMouseMove(mouseOverColumn, tableView, e);
@@ -68,6 +66,8 @@ public sealed class SortBarTableElement : TableElement {
             ? "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend")
             : string.Empty;
     }
+
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(14, 14);
 

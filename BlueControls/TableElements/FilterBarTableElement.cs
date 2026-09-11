@@ -119,6 +119,16 @@ public sealed class FilterBarTableElement : TableElement {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
+    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
+        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
+            base.HandleMouseMove(mouseOverColumn, tableView, e);
+            return;
+        }
+
+        if (!cvi.AutoFilterSymbolPossible) { tableView.QuickInfo = string.Empty; return; }
+        tableView.QuickInfo = FilterCombined?[cvi.Column] is not null ? "Aktiver Filter – Klicken zum Ändern" : "Klicken, um Auto-Filter zu öffnen";
+    }
+
     /// <summary>
     /// Öffnet den AutoFilter der angeklickten Spalte; die TableView
     /// prüft die Voraussetzungen und positioniert das Filter-Fenster.
@@ -133,16 +143,6 @@ public sealed class FilterBarTableElement : TableElement {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
-
-    public override void HandleMouseMove(ColumnViewItem? mouseOverColumn, TableView tableView, CanvasMouseEventArgs e) {
-        if (mouseOverColumn is not { IsDisposed: false } cvi || e.Button != MouseButtons.None) {
-            base.HandleMouseMove(mouseOverColumn, tableView, e);
-            return;
-        }
-
-        if (!cvi.AutoFilterSymbolPossible) { tableView.QuickInfo = string.Empty; return; }
-        tableView.QuickInfo = FilterCombined?[cvi.Column] is not null ? "Aktiver Filter – Klicken zum Ändern" : "Klicken, um Auto-Filter zu öffnen";
-    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(AutoFilterSize, AutoFilterSize + 2);
 

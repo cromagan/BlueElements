@@ -3,6 +3,7 @@
 using BlueControls.Controls;
 using BlueControls.PadItems.Abstract;
 using BlueScript.Classes;
+using BlueScript.Interfaces;
 using BlueScript.ScriptVariables;
 using System.Windows.Forms;
 
@@ -11,7 +12,7 @@ namespace BlueControls.PadItems.FunktionsItems_Formular;
 /// <summary>
 /// Ein Timer, der regelmäßig ein Skript ausführt – optional nur, solange der Benutzer inaktiv ist.
 /// </summary>
-public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizable {
+public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizable, IHasScript {
 
     #region Fields
 
@@ -126,6 +127,14 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// IHasScript: Liefert das Timer-Skript.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
+    }
 
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);

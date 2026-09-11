@@ -377,17 +377,6 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
     /// <summary>
-    /// Mausposition relativ zur linken oberen Ecke der Zelle
-    /// (Spaltenstart, Indent bereits abgezogen).
-    /// </summary>
-    protected Point MousePositionInColumn(ColumnViewItem viewItem, TableView tableView, CanvasMouseEventArgs e) {
-        var indentOffset = IndentWidth.CanvasToControl(tableView.Zoom) * Indent;
-        return new Point(
-            e.ControlX - viewItem.ControlColumnLeft(tableView.OffsetX) - indentOffset,
-            e.ControlY - ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY).Top);
-    }
-
-    /// <summary>
     /// Gemeinsame Logik für den Start einer Zell-Editierung direkt über
     /// TableView.BeginEdit. Wird von RowTableElement
     /// (mit echter Row) und NewRowTableElement (mit <c>null</c>)
@@ -621,6 +610,17 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     protected virtual string GetCompareKey() => KeyName;
 
     protected void Invalidate_UntrimmedCanvasSize() => _untrimmedCanvasSize = Size.Empty;
+
+    /// <summary>
+    /// Mausposition relativ zur linken oberen Ecke der Zelle
+    /// (Spaltenstart, Indent bereits abgezogen).
+    /// </summary>
+    protected Point MousePositionInColumn(ColumnViewItem viewItem, TableView tableView, CanvasMouseEventArgs e) {
+        var indentOffset = IndentWidth.CanvasToControl(tableView.Zoom) * Indent;
+        return new Point(
+            e.ControlX - viewItem.ControlColumnLeft(tableView.OffsetX) - indentOffset,
+            e.ControlY - ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY).Top);
+    }
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

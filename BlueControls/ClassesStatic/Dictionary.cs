@@ -3,7 +3,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace BlueControls.Classes;
+namespace BlueControls.ClassesStatic;
 
 internal static class Dictionary {
 
@@ -112,12 +112,12 @@ internal static class Dictionary {
 
             // Wir arbeiten direkt auf dem byte-Array (Span)
             ReadOnlySpan<byte> span = unzipped;
-            int start = 0;
+            var start = 0;
 
-            for (int i = 0; i <= span.Length; i++) {
+            for (var i = 0; i <= span.Length; i++) {
                 // Prüfe auf Zeilenumbruch (13 = \r, 10 = \n) oder Ende des Arrays
                 if (i == span.Length || span[i] == 13 || span[i] == 10) {
-                    int length = i - start;
+                    var length = i - start;
                     if (length > 0) {
                         var word = System.Text.Encoding.UTF8.GetString(span.Slice(start, length));
 

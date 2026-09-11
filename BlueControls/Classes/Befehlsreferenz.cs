@@ -32,6 +32,8 @@ public partial class Befehlsreferenz : Form {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => ScriptVerwendung.Show();
+
     private void lstCommands_ItemClicked(object sender, ListItemEventArgs e) {
         var co = string.Empty;
         if (e.Item is ReadableListItem { Item: ScriptCommand thisc }) {

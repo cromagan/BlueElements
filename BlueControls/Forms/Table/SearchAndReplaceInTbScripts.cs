@@ -77,6 +77,8 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         _isWorking = false;
     }
 
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => ScriptVerwendung.Show();
+
     private void btnSuche_Click(object sender, System.EventArgs e) {
         if (_isWorking) { return; }
         _isWorking = true;

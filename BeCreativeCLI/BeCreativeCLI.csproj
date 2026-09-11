@@ -57,6 +57,7 @@
     <Using Include="System.Linq" />
     <Using Include="System.Text" />
     <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueControls.ClassesStatic" />
     <Using Include="BlueBasics.Enums" />
     <Using Include="BlueBasics.Interfaces" />
     <Using Include="BlueTable.Classes" />

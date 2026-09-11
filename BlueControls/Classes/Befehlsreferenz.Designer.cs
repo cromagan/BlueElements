@@ -28,85 +28,110 @@ namespace BlueControls {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.lstCommands = new BlueControls.Controls.ListBox();
-            this.txbComms = new BlueControls.Controls.TextBox();
-            this.grpBefehle = new BlueControls.Controls.GroupBox();
-            this.btnFilterDel = new BlueControls.Controls.Button();
-            this.txbFilter = new BlueControls.Controls.TextBox();
-            this.grpBefehle.SuspendLayout();
-            this.SuspendLayout();
+            lstCommands = new ListBox();
+            txbComms = new TextBox();
+            grpBefehle = new GroupBox();
+            btnFilterDel = new Button();
+            txbFilter = new TextBox();
+            grpVerwendung = new GroupBox();
+            btnVerwendung = new Button();
+            grpBefehle.SuspendLayout();
+            grpVerwendung.SuspendLayout();
+            SuspendLayout();
             // 
             // lstCommands
             // 
-            this.lstCommands.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstCommands.Location = new System.Drawing.Point(8, 56);
-            this.lstCommands.Name = "lstCommands";
-            this.lstCommands.Size = new System.Drawing.Size(288, 384);
-            this.lstCommands.TabIndex = 3;
-            this.lstCommands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.ListItemEventArgs>(this.lstCommands_ItemClicked);
+            lstCommands.AddAllowed = AddType.None;
+            lstCommands.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            lstCommands.Location = new Point(8, 56);
+            lstCommands.Name = "lstCommands";
+            lstCommands.Size = new Size(288, 566);
+            lstCommands.TabIndex = 3;
+            lstCommands.ItemClicked += lstCommands_ItemClicked;
             // 
             // txbComms
             // 
-            this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbComms.Location = new System.Drawing.Point(304, 0);
-            this.txbComms.Name = "txbComms";
-            this.txbComms.Size = new System.Drawing.Size(496, 450);
-            this.txbComms.TabIndex = 2;
-            this.txbComms.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
+            txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
+            txbComms.Location = new Point(304, 32);
+            txbComms.Name = "txbComms";
+            txbComms.Size = new Size(496, 632);
+            txbComms.TabIndex = 2;
+            txbComms.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpBefehle
             // 
-            this.grpBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpBefehle.Controls.Add(this.btnFilterDel);
-            this.grpBefehle.Controls.Add(this.txbFilter);
-            this.grpBefehle.Controls.Add(this.lstCommands);
-            this.grpBefehle.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpBefehle.Location = new System.Drawing.Point(0, 0);
-            this.grpBefehle.Name = "grpBefehle";
-            this.grpBefehle.Size = new System.Drawing.Size(304, 450);
-            this.grpBefehle.TabIndex = 5;
-            this.grpBefehle.TabStop = false;
-            this.grpBefehle.Text = "Befehle";
+            grpBefehle.BackColor = Color.FromArgb(240, 240, 240);
+            grpBefehle.Controls.Add(btnFilterDel);
+            grpBefehle.Controls.Add(txbFilter);
+            grpBefehle.Controls.Add(lstCommands);
+            grpBefehle.Dock = System.Windows.Forms.DockStyle.Left;
+            grpBefehle.Location = new Point(0, 32);
+            grpBefehle.Name = "grpBefehle";
+            grpBefehle.Size = new Size(304, 632);
+            grpBefehle.TabIndex = 5;
+            grpBefehle.TabStop = false;
+            grpBefehle.Text = "Befehle";
             // 
             // btnFilterDel
             // 
-            this.btnFilterDel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFilterDel.Enabled = false;
-            this.btnFilterDel.ImageCode = "Trichter|16||1";
-            this.btnFilterDel.Location = new System.Drawing.Point(256, 24);
-            this.btnFilterDel.Name = "btnFilterDel";
-            this.btnFilterDel.QuickInfo = "Filter löschen";
-            this.btnFilterDel.Size = new System.Drawing.Size(40, 24);
-            this.btnFilterDel.TabIndex = 5;
-            this.btnFilterDel.Click += new System.EventHandler(this.btnFilterDel_Click);
+            btnFilterDel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnFilterDel.Enabled = false;
+            btnFilterDel.ImageCode = "Trichter|16||1";
+            btnFilterDel.Location = new Point(256, 24);
+            btnFilterDel.Name = "btnFilterDel";
+            btnFilterDel.QuickInfo = "Filter löschen";
+            btnFilterDel.Size = new Size(40, 24);
+            btnFilterDel.TabIndex = 5;
+            btnFilterDel.Click += btnFilterDel_Click;
             // 
             // txbFilter
             // 
-            this.txbFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilter.Location = new System.Drawing.Point(8, 24);
-            this.txbFilter.Name = "txbFilter";
-            this.txbFilter.QuickInfo = "Textfilter";
-            this.txbFilter.Size = new System.Drawing.Size(240, 24);
-            this.txbFilter.SpellCheckingEnabled = true;
-            this.txbFilter.TabIndex = 4;
-            this.txbFilter.TextChanged += new System.EventHandler(this.txbFilter_TextChanged);
+            txbFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
+            txbFilter.Location = new Point(8, 24);
+            txbFilter.Name = "txbFilter";
+            txbFilter.QuickInfo = "Textfilter";
+            txbFilter.Size = new Size(240, 24);
+            txbFilter.SpellCheckingEnabled = true;
+            txbFilter.TabIndex = 4;
+            txbFilter.TextChanged += txbFilter_TextChanged;
+            // 
+            // grpVerwendung
+            // 
+            grpVerwendung.BackColor = Color.FromArgb(255, 255, 255);
+            grpVerwendung.Controls.Add(btnVerwendung);
+            grpVerwendung.Dock = System.Windows.Forms.DockStyle.Top;
+            grpVerwendung.GroupBoxStyle = GroupBoxStyle.RoundRect;
+            grpVerwendung.Location = new Point(0, 0);
+            grpVerwendung.Name = "grpVerwendung";
+            grpVerwendung.Size = new Size(800, 32);
+            grpVerwendung.TabIndex = 6;
+            grpVerwendung.TabStop = false;
+            // 
+            // btnVerwendung
+            // 
+            btnVerwendung.ImageCode = "Lupe|16";
+            btnVerwendung.Location = new Point(8, 4);
+            btnVerwendung.Name = "btnVerwendung";
+            btnVerwendung.QuickInfo = "Listet für jeden Befehl alle Verwendungen in einer Textdatei auf";
+            btnVerwendung.Size = new Size(120, 24);
+            btnVerwendung.TabIndex = 0;
+            btnVerwendung.Text = "Verwendung";
+            btnVerwendung.Click += btnVerwendung_Click;
             // 
             // Befehlsreferenz
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.txbComms);
-            this.Controls.Add(this.grpBefehle);
-            this.Name = "Befehlsreferenz";
-            this.Text = "Befehlsübersicht";
-            this.TopMost = true;
-            this.grpBefehle.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            ClientSize = new Size(800, 664);
+            Controls.Add(txbComms);
+            Controls.Add(grpBefehle);
+            Controls.Add(grpVerwendung);
+            Name = "Befehlsreferenz";
+            Text = "Befehlsübersicht";
+            TopMost = true;
+            grpBefehle.ResumeLayout(false);
+            grpVerwendung.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
@@ -117,5 +142,7 @@ namespace BlueControls {
         private GroupBox grpBefehle;
         private Button btnFilterDel;
         private TextBox txbFilter;
+        private GroupBox grpVerwendung;
+        private Button btnVerwendung;
     }
 }

@@ -22,73 +22,6 @@ public class ButtonRenderer : Renderer {
     public static string ClassId => "Button";
 
     /// <summary>
-    /// Wenn gewählt, wird der Inhalt der Zelle unverändert als Text angezeigt.
-    /// Wenn nicht gewählt, wird der Inhalt als Ja/Nein-Angabe dargestellt.
-    /// </summary>
-    public bool ShowCellValue {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            OnPropertyChanged();
-            OnDoUpdateSideOptionMenu();
-        }
-    }
-
-    /// <summary>
-    /// Bild auf dem Knopf, wenn der Wert „Ja" ist.
-    /// </summary>
-    public string PictureTrue {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    /// <summary>
-    /// Aufschrift des Knopfes, wenn der Wert „Ja" ist.
-    /// </summary>
-    public string TextTrue {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    /// <summary>
-    /// Bild auf dem Knopf, wenn der Wert „Nein" ist.
-    /// </summary>
-    public string PictureFalse {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    /// <summary>
-    /// Aufschrift des Knopfes, wenn der Wert „Nein" ist.
-    /// </summary>
-    public string TextFalse {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    /// <summary>
     /// Wenn gewählt, wird bei einer leeren Zelle der Knopf im Zustand „Nein" angezeigt.
     /// </summary>
     public bool NoValuesShowFalse {
@@ -116,6 +49,73 @@ public class ButtonRenderer : Renderer {
             OnPropertyChanged();
         }
     }
+
+    /// <summary>
+    /// Bild auf dem Knopf, wenn der Wert „Nein" ist.
+    /// </summary>
+    public string PictureFalse {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Bild auf dem Knopf, wenn der Wert „Ja" ist.
+    /// </summary>
+    public string PictureTrue {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Wenn gewählt, wird der Inhalt der Zelle unverändert als Text angezeigt.
+    /// Wenn nicht gewählt, wird der Inhalt als Ja/Nein-Angabe dargestellt.
+    /// </summary>
+    public bool ShowCellValue {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+        }
+    }
+
+    /// <summary>
+    /// Aufschrift des Knopfes, wenn der Wert „Nein" ist.
+    /// </summary>
+    public string TextFalse {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Aufschrift des Knopfes, wenn der Wert „Ja" ist.
+    /// </summary>
+    public string TextTrue {
+        get;
+        set {
+            if (field == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     #endregion
 

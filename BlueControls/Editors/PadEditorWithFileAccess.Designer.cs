@@ -38,7 +38,6 @@ namespace BlueControls.Forms {
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSpeichern = new BlueControls.Controls.Button();
-            this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.btnWeitereAllItem = new BlueControls.Controls.Button();
@@ -202,13 +201,6 @@ namespace BlueControls.Forms {
             this.btnSpeichern.Text = "Speichern unter";
             this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
             // 
-            // btnDruckerDialog
-            // 
-            this.btnDruckerDialog.Location = new System.Drawing.Point(0, 0);
-            this.btnDruckerDialog.Name = "btnDruckerDialog";
-            this.btnDruckerDialog.Size = new System.Drawing.Size(0, 0);
-            this.btnDruckerDialog.TabIndex = 0;
-            // 
             // LoadTab
             // 
             this.LoadTab.DefaultExt = "BCR";
@@ -342,7 +334,6 @@ namespace BlueControls.Forms {
 
         protected TabPage tabDatei;
         protected GroupBox grpDateiSystem;
-        private Button btnDruckerDialog;
         protected LastFilesCombo btnLastFiles;
         private Button btnNeu;
         protected Button btnOeffnen;
