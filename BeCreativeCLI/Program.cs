@@ -9,9 +9,13 @@ internal static class Program {
     [STAThread]
     private static int Main(string[] args) {
         // UTF-8 ohne BOM, damit Ausgaben in Pipes und Dateien sauber ankommen.
-        Console.OutputEncoding = new UTF8Encoding(false);
-        // stdin ebenfalls als UTF-8 dekodieren, damit Pipes/Umleitungen korrekt ankommen.
-        Console.InputEncoding = Encoding.UTF8;
+        try {
+            Console.OutputEncoding = new UTF8Encoding(false);
+        } catch {
+            // Ohne nutzbare Konsole (z. B. geerbte Handles) die Standardausgabe belassen.
+        }
+
+        // stdin wird nicht umgestellt: Die Befehle lesen keine Standardeingabe.
 
         StartService();
         // Die CLI arbeitet niemals als Administrator: Benutzergruppe #CLI, Benutzername CLI_<Windows-Benutzer>.
@@ -28,7 +32,7 @@ internal static class Program {
             Console.Error.WriteLine();
             Console.Error.WriteLine("Benutzung: bcr <befehl> [optionen]");
             Console.Error.WriteLine("  bcr help              Listet alle verfügbaren Befehle auf.");
-            Console.Error.WriteLine("  bcr help <befehl>     Zeigt Syntax, Beschreibung und Schalter eines Befehls.");
+            Console.Error.WriteLine("  bcr help <befehl>     Zeigt Syntax, Beschreibung, Schalter und Beispiele eines Befehls.");
             Console.Error.WriteLine();
             Console.Error.WriteLine("Quellcode und Lizenz (AGPL-3.0): https://github.com/cromagan/BlueElements");
             return 2;
@@ -41,7 +45,7 @@ internal static class Program {
             return 2;
         }
 
-        var cliArgs = new CliArgs(args.Skip(1), cmd.Flags);
+        var cliArgs = new CliArgs(args.Skip(1), cmd.Flags, cmd.Options);
 
         if (cliArgs.ParseError is { Length: > 0 } parseError) {
             Console.Error.WriteLine(cmd.Syntax);

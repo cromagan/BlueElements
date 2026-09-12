@@ -11,7 +11,18 @@ public class TableInfoCliCommand : CliCommand {
 
     public override string Command => "table-info";
     public override List<string> Flags => ["columnnames", "rowkeys", "row", "firstvalues", "rows"];
+    public override List<string> Options => [.. AddressingOptions, "column", "max", "password"];
     public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--row + Zeilenadressierung [--max <anzahl>]]";
+
+    public override string? HelpDetails =>
+            "Zeilenadressierung (für --row und alle schreibenden Befehle):\n" +
+            "  --rowkey <key>                genau eine Zeile; der Key ist der numerische Zeitstempel-Key aus --rowkeys (nicht KEY=Wert).\n" +
+            "  --filtercolumn <spalte> --filtervalue <wert> [--filtertype equals|exact|contains|startswith]\n" +
+            "Beispiele:\n" +
+            "  bcr table-info X --rowkeys\n" +
+            "  bcr table-info X --row --rowkey 638009530362930000\n" +
+            "  bcr table-info X --row --filtercolumn KATEGORIE --filtervalue Glossar\n" +
+            "  bcr table-info X --rows --max 20";
 
     #endregion
 
@@ -19,8 +30,7 @@ public class TableInfoCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 1) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
 
         var tbl = LoadTable(args);
@@ -39,6 +49,11 @@ public class TableInfoCliCommand : CliCommand {
 
             if (detailCount > 1) {
                 Console.Error.WriteLine("Die Optionen dürfen nicht kombiniert werden, bitte genau eine wählen.");
+                return 2;
+            }
+
+            if (!args.Flag("row") && (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype"))) {
+                Console.Error.WriteLine("Zeilenadressierung wirkt nur zusammen mit --row.");
                 return 2;
             }
 
@@ -177,6 +192,11 @@ public class TableInfoCliCommand : CliCommand {
 
         if (error is not null) {
             Console.Error.WriteLine(error);
+            return 1;
+        }
+
+        if (rows.Count == 0) {
+            Console.Error.WriteLine("Keine Zeile getroffen.");
             return 1;
         }
 

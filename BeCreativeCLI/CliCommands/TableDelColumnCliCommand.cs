@@ -10,6 +10,7 @@ public class TableDelColumnCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-delcolumn";
+    public override List<string> Options => ["password"];
     public override string Syntax => "bcr table-delcolumn <tabelle> <spaltenname>";
 
     #endregion
@@ -18,8 +19,7 @@ public class TableDelColumnCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 2) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet werden 2 Positionsargumente (<tabelle> <spaltenname>), erhalten: {args.PositionalCount}.");
         }
 
         var name = args[1] ?? string.Empty;

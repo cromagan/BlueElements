@@ -10,7 +10,11 @@ public class TableDelRowCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-delrow";
-    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override List<string> Flags => ["dry-run"];
+    public override List<string> Options => [.. AddressingOptions, "password"];
+    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
+
+    public override string? HelpDetails => "--dry-run zeigt die Keys der Zeilen an, die gelöscht würden — ohne zu löschen und ohne zu speichern.";
 
     #endregion
 
@@ -18,8 +22,7 @@ public class TableDelRowCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 1) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
 
         var problem = RowAddressingProblem(args);
@@ -29,16 +32,20 @@ public class TableDelRowCliCommand : CliCommand {
             return 2;
         }
 
+        var dryRun = args.Flag("dry-run");
         var tbl = LoadTable(args);
 
         if (tbl is null) { return 1; }
 
         try {
-            var fragmentProblem = FragmentEditProblem(tbl);
+            // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
+            if (!dryRun) {
+                var fragmentProblem = FragmentEditProblem(tbl);
 
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
+                if (fragmentProblem is not null) {
+                    Console.Error.WriteLine(fragmentProblem);
+                    return 2;
+                }
             }
 
             // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
@@ -58,6 +65,12 @@ public class TableDelRowCliCommand : CliCommand {
             if (rows.Count == 0) {
                 Console.Error.WriteLine("Keine Zeile getroffen.");
                 return 1;
+            }
+
+            if (dryRun) {
+                Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", rows.Select(r => r.KeyName)));
+                Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
+                return 0;
             }
 
             var deleted = 0;

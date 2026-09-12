@@ -10,28 +10,37 @@ public class TableSwapRowsCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-swaprows";
-    public override string Syntax => "bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>";
+    public override List<string> Flags => ["dry-run"];
+    public override List<string> Options => ["rowkey", "rowkey2", "password"];
+    public override string Syntax => "bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2> [--dry-run]";
 
     #endregion
 
     #region Methods
 
     public override int DoIt(CliArgs args) {
-        if (args.PositionalCount != 1 || !args.HasOption("rowkey") || !args.HasOption("rowkey2")) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+        if (args.PositionalCount != 1) {
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
 
+        if (!args.HasOption("rowkey")) { return UsageError("Es fehlt die Option --rowkey <key1>."); }
+
+        if (!args.HasOption("rowkey2")) { return UsageError("Es fehlt die Option --rowkey2 <key2>."); }
+
+        var dryRun = args.Flag("dry-run");
         var tbl = LoadTable(args);
 
         if (tbl is null) { return 1; }
 
         try {
-            var fragmentProblem = FragmentEditProblem(tbl);
+            // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
+            if (!dryRun) {
+                var fragmentProblem = FragmentEditProblem(tbl);
 
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
+                if (fragmentProblem is not null) {
+                    Console.Error.WriteLine(fragmentProblem);
+                    return 2;
+                }
             }
 
             // Vertauschen ist nur über die benutzerdefinierte Sortierung möglich.
@@ -68,6 +77,11 @@ public class TableSwapRowsCliCommand : CliCommand {
                     Console.Error.WriteLine($"Zeile {r.KeyName}: Keine Rechte zum Verschieben: #CLI in den Bearbeitungsrechten der Spalte {sortCol.KeyName} ergänzen.");
                     return 1;
                 }
+            }
+
+            if (dryRun) {
+                Console.Out.WriteLine($"Trockenlauf — würde tauschen: {row1.KeyName} <-> {row2.KeyName}, nichts gespeichert.");
+                return 0;
             }
 
             var value1 = row1.CellGetString(sortCol);

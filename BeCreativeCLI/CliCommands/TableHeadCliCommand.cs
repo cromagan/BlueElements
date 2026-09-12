@@ -10,6 +10,7 @@ public class TableHeadCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-head";
+    public override List<string> Options => ["password"];
     public override string Syntax => "bcr table-head <tabelle> tags <tags, mit | getrennt>";
 
     #endregion
@@ -18,8 +19,7 @@ public class TableHeadCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 3) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet werden 3 Positionsargumente (<tabelle> tags <tags, mit | getrennt>), erhalten: {args.PositionalCount}.");
         }
 
         var what = args[1] ?? string.Empty;

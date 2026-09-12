@@ -347,6 +347,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         json.Set("valuesreadonly", ValuesReadOnly);
         json.Set("stoppedtimecount", StoppedTimeCount);
         json.Set("averageruntime", AverageRunTime);
+        json.Set("savedvariables", new VariableCollection(SavedVariables ?? [], false).ParseableJson());
         json.SetArrayIfNotEmpty("usergroups", UserGroups);
         return json;
     }
@@ -375,6 +376,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         ValuesReadOnly = json.GetBool("valuesreadonly", ValuesReadOnly);
         StoppedTimeCount = json.GetInt("stoppedtimecount", StoppedTimeCount);
         AverageRunTime = json.GetInt("averageruntime", (int)AverageRunTime);
+
+        if (json.GetJson("savedvariables") is JsonObject vc) {
+            var collection = new VariableCollection([], false);
+            collection.ParseJson((JsonObject)vc.DeepClone());
+            SavedVariables = collection.ToList();
+        }
+
         if (json["usergroups"] is JsonArray arr) {
             UserGroups = arr.ToStringList().AsReadOnly();
         }

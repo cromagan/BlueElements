@@ -5,7 +5,7 @@ using BlueBasics.ClassesStatic;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Zeigt alle Befehle oder die Details eines Befehls an.
+/// Zeigt alle Befehle oder die Details eines Befehls an: Syntax, Beschreibung, Schalter, Optionen und Beispiele.
 /// </summary>
 public class HelpCliCommand : CliCommand {
 
@@ -40,6 +40,15 @@ public class HelpCliCommand : CliCommand {
 
         if (cmd.Flags.Count > 0) {
             Console.Out.WriteLine("Schalter: " + string.Join(", ", cmd.Flags.Select(f => "--" + f)));
+        }
+
+        if (cmd.Options.Count > 0) {
+            Console.Out.WriteLine("Optionen: " + string.Join(", ", cmd.Options.Select(o => "--" + o + " <wert>")));
+        }
+
+        if (cmd.HelpDetails is { Length: > 0 } details) {
+            Console.Out.WriteLine();
+            Console.Out.WriteLine(details);
         }
 
         return 0;

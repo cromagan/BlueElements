@@ -20,8 +20,7 @@ public class TableColumnFormatsCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 0) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Dieser Befehl nimmt keine Argumente, erhalten: {args.PositionalCount}.");
         }
 
         foreach (var format in ColumnFormat.AllFormats.Instances.OrderBy(f => f.KeyName)) {

@@ -10,6 +10,7 @@ public class TableCellGetCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-cellget";
+    public override List<string> Options => [.. AddressingOptions, "column", "password"];
     public override string Syntax => "bcr table-cellget <tabelle> --column <spalte> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion
@@ -17,10 +18,11 @@ public class TableCellGetCliCommand : CliCommand {
     #region Methods
 
     public override int DoIt(CliArgs args) {
-        if (args.PositionalCount != 1 || !args.HasOption("column")) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+        if (args.PositionalCount != 1) {
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
+
+        if (!args.HasOption("column")) { return UsageError("Es fehlt die Option --column <spalte>."); }
 
         var problem = RowAddressingProblem(args);
 
@@ -53,7 +55,8 @@ public class TableCellGetCliCommand : CliCommand {
                 return 1;
             }
 
-            Console.Out.WriteLine(rows[0].CellGetString(column));
+            // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
+            Console.Out.WriteLine(rows[0].CellGetString(column).Replace("\r", "\n"));
             return 0;
         } finally {
             Release(tbl);

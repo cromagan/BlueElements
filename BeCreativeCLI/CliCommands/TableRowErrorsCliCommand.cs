@@ -10,6 +10,7 @@ public class TableRowErrorsCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-rowerrors";
+    public override List<string> Options => [.. AddressingOptions, "password"];
     public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
 
     #endregion
@@ -18,8 +19,7 @@ public class TableRowErrorsCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 1) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
 
         var problem = RowAddressingProblem(args);

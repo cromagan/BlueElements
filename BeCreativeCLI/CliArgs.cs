@@ -5,13 +5,15 @@ namespace BeCreativeCLI;
 /// <summary>
 /// Hält die geparsten Kommandozeilen-Argumente eines Befehls.
 /// Argumente ohne "--"-Präfix sind Positionsargumente, Argumente mit "--"-Präfix
-/// sind Optionen (mit Wert) oder Schalter (ohne Wert).
+/// sind Optionen (mit Wert) oder Schalter (ohne Wert). Optionen dürfen wiederholt
+/// angegeben werden; alle Werte einer Option liefert AllOptions.
 /// </summary>
 public class CliArgs {
 
     #region Fields
 
     private readonly Dictionary<string, string> _options;
+    private readonly List<(string Name, string Value)> _allOptions = [];
     private readonly HashSet<string> _flags;
     private readonly List<string> _positional;
 
@@ -20,12 +22,13 @@ public class CliArgs {
     #region Constructors
 
     /// <summary>
-    /// Parst die Argumente. Schalter-Optionen (ohne Wert) müssen vom Befehl
-    /// über <paramref name="flags" /> bekannt gegeben werden, alle übrigen
-    /// "--"-Optionen erwarten einen nachfolgenden Wert.
+    /// Parst die Argumente. Schalter (ohne Wert) müssen über <paramref name="flags" />,
+    /// Optionen mit Wert über <paramref name="options" /> bekannt gegeben werden.
+    /// Unbekannte "--"-Optionen erzeugen einen ParseError, statt still als Wert zu gelten.
     /// </summary>
-    public CliArgs(IEnumerable<string> args, IEnumerable<string> flags) {
+    public CliArgs(IEnumerable<string> args, IEnumerable<string> flags, IEnumerable<string> options) {
         var knownFlags = flags.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var knownOptions = options.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         _options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         _flags = [];
@@ -54,6 +57,11 @@ public class CliArgs {
                 continue;
             }
 
+            if (!knownOptions.Contains(name)) {
+                ParseError = $"Unbekannte Option '{token}'.";
+                return;
+            }
+
             if (i + 1 >= items.Count) {
                 ParseError = $"Der Option '{token}' fehlt ein Wert.";
                 return;
@@ -61,6 +69,7 @@ public class CliArgs {
 
             i++;
             _options[name] = items[i];
+            _allOptions.Add((name, items[i]));
         }
     }
 
@@ -87,6 +96,11 @@ public class CliArgs {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Liefert alle Werte einer mehrfach angegebenen Option in Reihenfolge (z. B. --set A=1 --set B=2).
+    /// </summary>
+    public List<string> AllOptions(string name) => [.. _allOptions.Where(o => o.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Select(o => o.Value)];
 
     /// <summary>
     /// Prüft, ob ein Schalter (Wert-lose Option) gesetzt ist.

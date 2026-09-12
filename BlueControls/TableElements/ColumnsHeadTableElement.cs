@@ -1,6 +1,5 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.ControlStrategies;
 using BlueControls.EventArgs;

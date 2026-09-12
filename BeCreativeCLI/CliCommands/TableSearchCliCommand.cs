@@ -3,30 +3,55 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Durchsucht alle Spalten oder nur die mit --column gewählte Spalte. Pro Treffer eine Ausgabezeile: Spalte, Zeilen-Key und der Treffer mit je drei Wörtern Kontext davor und danach. Groß-/Kleinschreibung wird ignoriert.
+/// Tabellen: Durchsucht alle Spalten oder nur die mit --column gewählte Spalte — auf dekodiertem Text (Entities wie &#246; werden mitgefunden). Pro Treffer eine Ausgabezeile: Spalte, Zeilen-Key und der Treffer mit zeichenbasiertem Kontext, der nicht mitten im Wort abreißt. Groß-/Kleinschreibung wird ignoriert.
 /// </summary>
 public class TableSearchCliCommand : CliCommand {
+
+    #region Fields
+
+    /// <summary>
+    /// Standard-Kontextlänge in Zeichen je Seite eines Treffers.
+    /// </summary>
+    private const int DefaultContext = 40;
+
+    #endregion
 
     #region Properties
 
     public override string Command => "table-search";
-    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>]";
+    public override List<string> Options => ["value", "column", "max", "context", "password"];
+    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>] [--max <anzahl>] [--context <zeichen>]";
+
+    public override string? HelpDetails =>
+            "Die Suche läuft auf dekodiertem Zelltext: 'möglich' findet auch als m&#246;glich gespeicherte Werte; der Suchtext darf beide Formen enthalten. " +
+            "Der Kontext umfasst standardmäßig 40 Zeichen je Seite und wird an Wortgrenzen ergänzt, statt Wörter abzureißen; --context <zeichen> ändert die Länge, --max <anzahl> begrenzt die Trefferzahl.";
 
     #endregion
 
     #region Methods
 
     public override int DoIt(CliArgs args) {
-        if (args.PositionalCount != 1 || !args.HasOption("value")) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+        if (args.PositionalCount != 1) {
+            var hint = args.PositionalCount > 1 && args.HasOption("value") ? " Hinweis: Enthält der Suchtext Leerzeichen, muss er in Anführungszeichen stehen (\"...\" oder '...')." : string.Empty;
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.{hint}");
         }
 
-        var searchValue = (args.Option("value") ?? string.Empty).Trim();
+        if (!args.HasOption("value")) { return UsageError("Es fehlt die Option --value <suchtext>."); }
 
-        if (searchValue.Length == 0) {
-            Console.Error.WriteLine("--value erwartet einen Suchtext.");
-            return 2;
+        var searchValue = System.Net.WebUtility.HtmlDecode((args.Option("value") ?? string.Empty).Trim());
+
+        if (searchValue.Length == 0) { return UsageError("--value erwartet einen Suchtext."); }
+
+        var (max, maxError) = ResolveMax(args);
+
+        if (maxError is not null) { return UsageError(maxError); }
+
+        var context = DefaultContext;
+
+        if (args.HasOption("context")) {
+            context = IntParse(args.Option("context") ?? string.Empty);
+
+            if (context <= 0) { return UsageError("--context erwartet eine positive Zeichenzahl."); }
         }
 
         var tbl = LoadTable(args);
@@ -49,18 +74,36 @@ public class TableSearchCliCommand : CliCommand {
                 columns = [.. tbl.Column.Where(c => c is { IsDisposed: false })];
             }
 
+            var matches = 0;
+            var limitReached = false;
+
             foreach (var row in tbl.RowsInSaveOrder()) {
+                if (limitReached) { break; }
+
                 foreach (var column in columns) {
-                    var cellText = row.CellGetString(column);
+                    if (limitReached) { break; }
+
+                    var cellText = SearchTextOf(column, row.CellGetString(column));
 
                     var index = cellText.IndexOf(searchValue, StringComparison.OrdinalIgnoreCase);
 
                     while (index >= 0) {
-                        Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + ": " + BuildContext(cellText, index, searchValue.Length));
+                        if (max > 0 && matches >= max) {
+                            limitReached = true;
+                            break;
+                        }
+
+                        Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + ": " + BuildContext(cellText, index, searchValue.Length, context));
+                        matches++;
 
                         index = cellText.IndexOf(searchValue, index + searchValue.Length, StringComparison.OrdinalIgnoreCase);
                     }
                 }
+            }
+
+            if (matches == 0) {
+                Console.Error.WriteLine("Keine Treffer.");
+                return 1;
             }
 
             return 0;
@@ -70,60 +113,30 @@ public class TableSearchCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Baut die Kontextausgabe: der Treffer mit bis zu drei Wörtern davor und danach.
-    /// Gekürzte Seiten werden mit "..." angedeutet.
+    /// Baut die Kontextausgabe zeichenbasiert: bis zu <paramref name="context"/> Zeichen
+    /// vor und nach dem Treffer, wobei angetroffene Wörter bis zur Wortgrenze ergänzt
+    /// werden. Gekürzte Seiten werden mit "..." angedeutet, Whitespace zu Leerzeichen
+    /// zusammengefasst.
     /// </summary>
-    private static string BuildContext(string text, int matchIndex, int matchLength) {
-        var words = WordsOf(text);
-        var endIndex = matchIndex + matchLength - 1;
+    private static string BuildContext(string text, int matchIndex, int matchLength, int context) {
+        var start = Math.Max(0, matchIndex - context);
+        var end = Math.Min(text.Length, matchIndex + matchLength + context);
 
-        var firstWordIndex = 0;
-        var lastWordIndex = 0;
+        // Fenster nicht mitten im Wort abreißen lassen.
+        while (start > 0 && !char.IsWhiteSpace(text[start - 1])) { start--; }
 
-        for (var i = 0; i < words.Count; i++) {
-            if (words[i].Start <= matchIndex) { firstWordIndex = i; }
-            if (words[i].Start <= endIndex) { lastWordIndex = i; }
-        }
+        while (end < text.Length && !char.IsWhiteSpace(text[end])) { end++; }
 
-        var beforeStart = Math.Max(0, firstWordIndex - 3);
-        var afterEnd = Math.Min(words.Count - 1, lastWordIndex + 3);
+        var segment = string.Join(' ', text[start..end].Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        var sb = new StringBuilder();
 
-        List<string> parts = [];
+        if (start > 0) { sb.Append("... "); }
 
-        if (beforeStart > 0) { parts.Add("..."); }
+        sb.Append(segment);
 
-        for (var i = beforeStart; i < firstWordIndex; i++) { parts.Add(words[i].Word); }
+        if (end < text.Length) { sb.Append(" ..."); }
 
-        parts.Add(text[matchIndex..(matchIndex + matchLength)]);
-
-        for (var i = lastWordIndex + 1; i <= afterEnd; i++) { parts.Add(words[i].Word); }
-
-        if (afterEnd < words.Count - 1) { parts.Add("..."); }
-
-        return string.Join(" ", parts);
-    }
-
-    /// <summary>
-    /// Zerlegt den Text in Wörter (Nicht-Whitespace-Abschnitte) mit ihrer Startposition.
-    /// </summary>
-    private static List<(int Start, string Word)> WordsOf(string text) {
-        List<(int Start, string Word)> words = [];
-
-        var i = 0;
-
-        while (i < text.Length) {
-            while (i < text.Length && char.IsWhiteSpace(text[i])) { i++; }
-
-            if (i >= text.Length) { break; }
-
-            var start = i;
-
-            while (i < text.Length && !char.IsWhiteSpace(text[i])) { i++; }
-
-            words.Add((start, text[start..i]));
-        }
-
-        return words;
+        return sb.ToString();
     }
 
     #endregion

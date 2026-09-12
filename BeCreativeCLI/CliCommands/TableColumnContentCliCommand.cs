@@ -10,6 +10,7 @@ public class TableColumnContentCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-columncontent";
+    public override List<string> Options => ["column", "max", "password"];
     public override string Syntax => "bcr table-columncontent <tabelle> --column <spalte> [--max <anzahl>]";
 
     #endregion
@@ -17,10 +18,11 @@ public class TableColumnContentCliCommand : CliCommand {
     #region Methods
 
     public override int DoIt(CliArgs args) {
-        if (args.PositionalCount != 1 || !args.HasOption("column")) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+        if (args.PositionalCount != 1) {
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
         }
+
+        if (!args.HasOption("column")) { return UsageError("Es fehlt die Option --column <spalte>."); }
 
         var (max, maxError) = ResolveMax(args);
 
@@ -46,7 +48,8 @@ public class TableColumnContentCliCommand : CliCommand {
             foreach (var value in column.Contents()) {
                 if (max > 0 && count >= max) { break; }
 
-                Console.Out.WriteLine(value);
+                // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
+                Console.Out.WriteLine(value.Replace("\r", "\n"));
                 count++;
             }
 

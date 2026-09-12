@@ -26,13 +26,13 @@ public static partial class Extensions {
 
     /// <summary>
     /// Liest einen ARGB-Farbwert (als int) unter <paramref name="key" /> und
-    /// konvertiert ihn in ein Color. Negative Werte gelten als
-    /// "nicht gesetzt" (Sentinel). Fehlt der Key, ist er keine Zahl oder ist der
-    /// Wert negativ, wird <paramref name="defaultValue" /> geliefert - so bleiben
-    /// Partial-Updates möglich, ohne bestehende Farben zu überschreiben.
+    /// konvertiert ihn in ein Color. Deckende Farben haben per ToArgb() einen
+    /// negativen Wert, daher sind negative Zahlen normale Farbwerte. Fehlt der
+    /// Key oder ist er keine Zahl, wird <paramref name="defaultValue" /> geliefert -
+    /// so bleiben Partial-Updates möglich, ohne bestehende Farben zu überschreiben.
     /// </summary>
     public static Color GetColor(this JsonObject json, string key, Color defaultValue) {
-        if (json[key] is JsonValue v && v.TryGetValue(out int i) && i >= 0) { return Color.FromArgb(i); }
+        if (json[key] is JsonValue v && v.TryGetValue(out int i)) { return Color.FromArgb(i); }
         return defaultValue;
     }
 

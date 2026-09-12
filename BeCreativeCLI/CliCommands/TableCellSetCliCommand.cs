@@ -10,16 +10,29 @@ public class TableCellSetCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-cellset";
-    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override List<string> Flags => ["dry-run"];
+    public override List<string> Options => [.. AddressingOptions, "column", "value", "password"];
+    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
+
+    public override string? HelpDetails =>
+            "--dry-run zeigt nur die Keys der Zeilen, in denen gesetzt würde — ohne zu ändern und ohne zu speichern. " +
+            "Werte mit Leerzeichen gehören in Anführungszeichen.";
 
     #endregion
 
     #region Methods
 
     public override int DoIt(CliArgs args) {
-        if (args.PositionalCount != 1 || !args.HasOption("column") || !args.HasOption("value")) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+        if (args.PositionalCount != 1) {
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
+        }
+
+        if (!args.HasOption("column")) {
+            return UsageError("Es fehlt --column <spalte>. Werte mit Leerzeichen gehören in Anführungszeichen.");
+        }
+
+        if (!args.HasOption("value")) {
+            return UsageError("Es fehlt --value <wert>. Werte mit Leerzeichen gehören in Anführungszeichen.");
         }
 
         var problem = RowAddressingProblem(args);
@@ -34,17 +47,29 @@ public class TableCellSetCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
-            var fragmentProblem = FragmentEditProblem(tbl);
+            // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
+            var dryRun = args.Flag("dry-run");
 
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
+            if (!dryRun) {
+                var fragmentProblem = FragmentEditProblem(tbl);
+
+                if (fragmentProblem is not null) {
+                    Console.Error.WriteLine(fragmentProblem);
+                    return 2;
+                }
             }
 
             var column = ColumnOfOption(tbl, args);
 
             if (column is null) {
                 Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
+                return 1;
+            }
+
+            var columnProblem = ColumnWriteProblem(column);
+
+            if (columnProblem is not null) {
+                Console.Error.WriteLine(columnProblem);
                 return 1;
             }
 
@@ -69,6 +94,15 @@ public class TableCellSetCliCommand : CliCommand {
                 return 2;
             }
 
+            // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
+            value = StorageTextOf(column, value);
+
+            if (dryRun) {
+                Console.Out.WriteLine("Trockenlauf — gesetzt würde in: " + string.Join(", ", rows.Select(r => r.KeyName)));
+                Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
+                return 0;
+            }
+
             var done = 0;
             var permissionDenied = false;
 
@@ -85,7 +119,7 @@ public class TableCellSetCliCommand : CliCommand {
                 if (!string.IsNullOrEmpty(failed)) {
                     Console.Error.WriteLine($"Zeile {row.KeyName} konnte nicht gesetzt werden: {failed}");
                 } else {
-                    Console.Error.WriteLine($"Wert gesetzt in {row.KeyName}");
+                    Console.Out.WriteLine($"Wert gesetzt in {row.KeyName}");
                     done++;
                 }
             }

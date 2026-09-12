@@ -2602,7 +2602,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         WriteAccessChanged?.Invoke(this, new WriteAccessChangedEventArgs(string.IsNullOrEmpty(reason), reason));
     }
 
-    protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);
+    /// <summary>
+    /// Hält den periodischen Skript-Prüftimer an (z. B. für Bit-Vergleiche im
+    /// Batch-Betrieb, bei denen veraltete Zeilen nicht neu gestempelt werden dürfen).
+    /// Muss über ResumeTimer wieder aufgehoben werden.
+    /// </summary>
+    public void PauseTimer() => Interlocked.Increment(ref _timerPaused);
 
     /// <summary>
     /// Markiert den Bereich, in dem Daten neu eingespielt werden. In diesem Fenster
@@ -2618,7 +2623,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
 
-    protected void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
+    public void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
 
     protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 

@@ -30,11 +30,20 @@ public class RoundtripCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 1) {
-            Console.Error.WriteLine(Syntax);
-            return 2;
+            return UsageError($"Erwartet wird genau 1 Positionsargument (<datei>), erhalten: {args.PositionalCount}.");
         }
 
         var filename = args[0] ?? string.Empty;
+
+        // Relative Pfade auflösen — IO.FileExists verlangt gültige (absolute) Pfade.
+        if (!filename.IsValidFilepathAndName()) {
+            try {
+                filename = Path.GetFullPath(filename);
+            } catch {
+                Console.Error.WriteLine("Datei nicht gefunden: " + filename);
+                return 1;
+            }
+        }
 
         if (!FileExists(filename)) {
             Console.Error.WriteLine("Datei nicht gefunden: " + filename);
@@ -465,6 +474,10 @@ public class RoundtripCliCommand : CliCommand {
                 return 1;
             }
 
+            // Bit-Vergleich: Veraltete Zeilen dürfen während des Roundtrips weder
+            // neu berechnet noch mit Changer/Datum neu gestempelt werden.
+            origTable.PauseTimer();
+
             using (origTable) {
                 Out("--- Schritt 1: Original laden ---");
                 Out("Zeilen : " + origTable.Row.Count);
@@ -481,6 +494,9 @@ public class RoundtripCliCommand : CliCommand {
                     Out("FEHLER: Kein Tabellentyp für Suffix '" + jsonSuffix + "'.");
                     return 1;
                 }
+
+                // Der Prüftimer scannt alle geladenen Tabellen — auch diese pausieren.
+                jsonTable.PauseTimer();
 
                 using (jsonTable) {
                     Out("Ziel-Ordnung   : " + string.Join(", ", jsonTable.Column.Select(c => c.KeyName)));
@@ -512,6 +528,8 @@ public class RoundtripCliCommand : CliCommand {
                 return 1;
             }
 
+            loadedTable.PauseTimer();
+
             using (loadedTable) {
                 Out(string.Empty);
                 Out("--- Schritt 3: ." + jsonSuffix + " laden ---");
@@ -528,6 +546,8 @@ public class RoundtripCliCommand : CliCommand {
                     Out("FEHLER: Kein Tabellentyp für Suffix '" + suffix + "'.");
                     return 1;
                 }
+
+                outTable.PauseTimer();
 
                 using (outTable) {
                     var outResult = outTable.Save();
@@ -576,3 +596,5 @@ public class RoundtripCliCommand : CliCommand {
 
     #endregion
 }
+
+

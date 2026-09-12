@@ -167,6 +167,43 @@ public class TableFragments : TableFile {
     }
 
     /// <summary>
+    /// Bereitet die Fortführung einer mit "- EOF" abgeschlossenen Fragment-Datei vor.
+    /// Öffnet den Writer im Append-Modus auf diese Datei und hängt neue Änderungen an.
+    /// Liefert bei Problemen die Fehlermeldung, sonst leer.
+    /// </summary>
+    public string ContinueFragment(string fragmentFilename) {
+        if (!fragmentFilename.StartsWith(FragmengtsPath(), StringComparison.OrdinalIgnoreCase)) { return "Die Datei liegt nicht im Fragment-Ordner der Tabelle: " + fragmentFilename; }
+        if (!IO.FileExists(fragmentFilename)) { return "Fragment-Datei nicht gefunden: " + fragmentFilename; }
+
+        // Ggf. bereits offenen Writer schließen (z. B. Master-Eintrag beim Laden):
+        // Diese (fast leere) Neue-Datei darf das Aufräumen dann entsorgen.
+        CloseWriter();
+
+        // Ab sofort als eigene Datei führen: hält sie beim Nachladen aus den
+        // Fremd-Fragmenten heraus und schützt sie vor Aufräum-Löschungen.
+        _myFragmentsFilename = fragmentFilename;
+        CanDeleteWriter = false;
+
+        if (Develop.AllReadOnly) { return string.Empty; }
+
+        System.IO.FileStream? fileStream = null;
+        try {
+            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
+            fileStream = null;
+
+            _writer.AutoFlush = true;
+            return string.Empty;
+        } catch (Exception ex) {
+            fileStream?.Dispose();
+            _writer?.Dispose();
+            _writer = null;
+
+            return ex.Message;
+        }
+    }
+
+    /// <summary>
     /// Friert die Tabelle ein und schließt den Writer.
     /// </summary>
     public override void Freeze(string reason) {

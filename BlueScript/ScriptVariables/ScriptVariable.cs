@@ -166,6 +166,9 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
         json.Set("key", KeyName);
         json.Set("comment", Comment);
         json.Set("readonly", ReadOnly);
+        // Objekt-Werte (z. B. Tabellen-Referenzen) haben keine eigene JSON-Darstellung
+        // und laufen wie im Textformat über den Replace-Wert.
+        if (ToStringPossible) { json.Set("replacevalue", ValueForReplace); }
         return json;
     }
 
@@ -183,6 +186,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
             KeyName = json.GetString("key", KeyName);
             Comment = json.GetString("comment", Comment);
             ReadOnly = json.GetBool("readonly", ReadOnly);
+            if (json.GetString("replacevalue", string.Empty) is { Length: > 0 } replaceValue) { ValueForReplace = replaceValue; }
         } finally {
             EndInit();
         }
