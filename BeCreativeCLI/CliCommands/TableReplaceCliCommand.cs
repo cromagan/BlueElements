@@ -57,16 +57,6 @@ public class TableReplaceCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
-            // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
-            if (!dryRun) {
-                var fragmentProblem = FragmentEditProblem(tbl);
-
-                if (fragmentProblem is not null) {
-                    Console.Error.WriteLine(fragmentProblem);
-                    return 2;
-                }
-            }
-
             List<ColumnItem> columns;
 
             if (args.HasOption("column")) {
@@ -114,6 +104,17 @@ public class TableReplaceCliCommand : CliCommand {
             var changedCells = 0;
             var changedRows = 0;
             var denied = false;
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            if (!dryRun) {
+                var fragmentProblem = FragmentEditProblem(tbl);
+
+                if (fragmentProblem is not null) {
+                    Console.Error.WriteLine(fragmentProblem);
+                    return 2;
+                }
+            }
 
             foreach (var row in rows) {
                 var rowChanged = 0;

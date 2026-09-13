@@ -59,13 +59,6 @@ public class TableAddRowCliCommand : CliCommand {
                 sets.Add((column, set[(eq + 1)..]));
             }
 
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
             // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
             var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
 
@@ -90,6 +83,15 @@ public class TableAddRowCliCommand : CliCommand {
             if (!tbl.PermissionCheck(firstColumn.PermissionGroupsChangeCell, null, true)) {
                 Console.Error.WriteLine("Keine Rechte für die Spalte " + firstColumn.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
                 return 1;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
             }
 
             // Wert in das Speicherformat der ersten Spalte überführen (z. B. HTML-Entities).

@@ -168,7 +168,8 @@ public class TableFragments : TableFile {
 
     /// <summary>
     /// Bereitet die Fortführung einer mit "- EOF" abgeschlossenen Fragment-Datei vor.
-    /// Öffnet den Writer im Append-Modus auf diese Datei und hängt neue Änderungen an.
+    /// Öffnet den Writer im Append-Modus auf diese Datei und markiert sie sofort mit
+    /// "- CONTINUED", damit kein zweiter Prozess Schreibzugriff auf dieselbe Datei erhält.
     /// Liefert bei Problemen die Fehlermeldung, sonst leer.
     /// </summary>
     public string ContinueFragment(string fragmentFilename) {
@@ -193,6 +194,11 @@ public class TableFragments : TableFile {
             fileStream = null;
 
             _writer.AutoFlush = true;
+
+            // Sofort als "in Bearbeitung" markieren: Die Datei endet damit nicht
+            // mehr auf "- EOF", also wählt kein weiterer Prozess sie zur Fortführung.
+            _writer.WriteLine("- CONTINUED");
+
             return string.Empty;
         } catch (Exception ex) {
             fileStream?.Dispose();

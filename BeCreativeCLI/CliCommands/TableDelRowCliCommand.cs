@@ -38,16 +38,6 @@ public class TableDelRowCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
-            // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
-            if (!dryRun) {
-                var fragmentProblem = FragmentEditProblem(tbl);
-
-                if (fragmentProblem is not null) {
-                    Console.Error.WriteLine(fragmentProblem);
-                    return 2;
-                }
-            }
-
             // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
             // (#CLI muss also bei den Tabellen-Administratoren stehen).
             if (!tbl.IsAdministrator()) {
@@ -71,6 +61,15 @@ public class TableDelRowCliCommand : CliCommand {
                 Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", rows.Select(r => r.KeyName)));
                 Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
                 return 0;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
             }
 
             var deleted = 0;

@@ -46,13 +46,6 @@ public class TableAddColumnCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
             // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten anlegen.
             if (!tbl.IsAdministrator()) {
                 Console.Error.WriteLine("Keine Rechte zum Anlegen von Spalten: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
@@ -62,6 +55,15 @@ public class TableAddColumnCliCommand : CliCommand {
             if (tbl.Column[name] is not null) {
                 Console.Error.WriteLine("Spalte existiert bereits: " + name);
                 return 1;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
             }
 
             var column = tbl.Column.GenerateAndAdd(name, args.Option("caption") ?? string.Empty, format, args.Option("quickinfo") ?? string.Empty);

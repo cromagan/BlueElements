@@ -50,15 +50,6 @@ public class TableCellSetCliCommand : CliCommand {
             // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
             var dryRun = args.Flag("dry-run");
 
-            if (!dryRun) {
-                var fragmentProblem = FragmentEditProblem(tbl);
-
-                if (fragmentProblem is not null) {
-                    Console.Error.WriteLine(fragmentProblem);
-                    return 2;
-                }
-            }
-
             var column = ColumnOfOption(tbl, args);
 
             if (column is null) {
@@ -101,6 +92,15 @@ public class TableCellSetCliCommand : CliCommand {
                 Console.Out.WriteLine("Trockenlauf — gesetzt würde in: " + string.Join(", ", rows.Select(r => r.KeyName)));
                 Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
                 return 0;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
             }
 
             var done = 0;

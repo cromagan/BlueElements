@@ -29,13 +29,6 @@ public class TableDelColumnCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
             // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten löschen.
             if (!tbl.IsAdministrator()) {
                 Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
@@ -53,6 +46,15 @@ public class TableDelColumnCliCommand : CliCommand {
             if (column.IsSystemColumn()) {
                 Console.Error.WriteLine("Systemspalte " + column.KeyName + " kann nicht gelöscht werden.");
                 return 1;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+            var fragmentProblem = FragmentEditProblem(tbl);
+
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
             }
 
             if (!tbl.Column.Remove(column, "bcr table-delcolumn")) {

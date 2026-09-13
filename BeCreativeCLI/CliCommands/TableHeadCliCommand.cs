@@ -13,6 +13,10 @@ public class TableHeadCliCommand : CliCommand {
     public override List<string> Options => ["password"];
     public override string Syntax => "bcr table-head <tabelle> tags <tags, mit | getrennt>";
 
+    public override string? HelpDetails =>
+            "Leerer Wert entfernt alle Tags. Je Shell ist ein leeres Argument anders zu übergeben: " +
+            "cmd.exe: bcr table-head X.mbdb tags \"\" — PowerShell 5.1 verwirft leere Argumente, dort eine Dateiumleitung oder cmd /c nutzen.";
+
     #endregion
 
     #region Methods
@@ -34,17 +38,19 @@ public class TableHeadCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         try {
+            // Tags liegen am Tabellenkopf: Nur ein Administrator der Tabelle darf sie ändern.
+            if (!tbl.IsAdministrator()) {
+                Console.Error.WriteLine("Keine Rechte zum Ändern der Tags: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
+                return 1;
+            }
+
+            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
             var fragmentProblem = FragmentEditProblem(tbl);
 
             if (fragmentProblem is not null) {
                 Console.Error.WriteLine(fragmentProblem);
                 return 2;
-            }
-
-            // Tags liegen am Tabellenkopf: Nur ein Administrator der Tabelle darf sie ändern.
-            if (!tbl.IsAdministrator()) {
-                Console.Error.WriteLine("Keine Rechte zum Ändern der Tags: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
-                return 1;
             }
 
             var value = args[2] ?? string.Empty;

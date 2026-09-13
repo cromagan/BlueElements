@@ -124,6 +124,8 @@ public abstract class CliCommand : IHasKeyName {
     /// jüngste, sauber mit EOF abgeschlossene Fragment-Datei des eigenen Benutzers fort
     /// (jünger als 5 Minuten; neue Änderungen werden per Append angehängt).
     /// Gibt es keine, legt das System beim ersten Schreiben eine neue Fragment-Datei an.
+    /// Das Öffnen hängt sofort "- CONTINUED" an, damit kein zweiter Prozess dieselbe
+    /// Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
@@ -161,7 +163,9 @@ public abstract class CliCommand : IHasKeyName {
             using var reader = new StreamReader(stream, Encoding.UTF8);
             string? line = null;
 
-            while (reader.ReadLine() is { Length: > 0 } l) { line = l; }
+            while (reader.ReadLine() is { } l) {
+                if (l.Length > 0) { line = l; }
+            }
 
             if (line is null) { return false; }
 
