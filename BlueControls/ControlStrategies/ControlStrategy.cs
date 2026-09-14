@@ -3,7 +3,6 @@
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueScript.EventArgs;
-using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -662,7 +661,6 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         var strategy = CreateNew(col.ControlStrategy);
         strategy.ControlStrategyParameter = col.ControlStrategyParameter;
 
-        if (strategy is IHasColumn hasColumn) { hasColumn.Column = col; }
         if (strategy is ScriptExecuteControlStrategy scriptExecute) { scriptExecute.OwnerForm = source.FindForm(); }
 
         if (!tb.PermissionCheck(col.PermissionGroupsChangeCell, row, true)) {
@@ -721,6 +719,15 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// Meldung, warum die Konfiguration der Strategie ungültig ist. Leer, wenn sie gültig ist.
     /// </summary>
     public virtual string ErrorReason() => string.Empty;
+
+    /// <summary>
+    /// Meldung, warum die Strategie für eine Spalte mit den übergebenen
+    /// Eigenschaften ungültig ist. Leer, wenn sie gültig ist.
+    /// Strategien prüfen nur die Werte, die sie benötigen.
+    /// </summary>
+    /// <param name="mayHaveDropDown">Die Spalte hat auswählbare Werte (Dropdown-Items, Zellwerte oder Beziehung).</param>
+    /// <param name="multiLine">Die Spalte darf mehrzeilig sein.</param>
+    public virtual string ErrorReason(bool mayHaveDropDown, bool multiLine) => ErrorReason();
 
     /// <summary>
     /// Setzt den Fokus auf das werttragende Control — bei aktivem Rahmen

@@ -119,35 +119,20 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     #region Methods
 
     /// <summary>
-    /// IHasScript: Liefert das Skript des Knopfes.
-    /// </summary>
-    public IEnumerable<ScriptDescription> GetAllScripts() {
-        if (Script is not { Length: > 0 } s) { return []; }
-        return [new ScriptDescription(KeyName, s)];
-    }
-
-    /// <summary>
     /// Führt das Skript aus und stellt dabei alle benötigten Werte bereit.
     /// Im Testmodus werden Platzhalter-Werte verwendet, im Produktivmodus die echten Daten.
     /// </summary>
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, List<string>? args,
-                                                    RowItem? row, Table? table, IEnumerable<FilterItem>? filterItems,
-                                                    IEnumerable<IHasFieldVariable>? fieldSources, string? fensterId) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, bool produktiv, RowItem? row,
+                                                    Table? table, IEnumerable<FilterItem>? filterItems, IEnumerable<IHasFieldVariable>? fieldSources) {
         VariableCollection generatedVars =
         [
             new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
-            new StringScriptVariable("User", UserName, true,
-                "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
-            new StringScriptVariable("Usergroup", UserGroup, true,
-                "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
+            new StringScriptVariable("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
+            new StringScriptVariable("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new StringScriptVariable("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
-        generatedVars.Add(new StringScriptVariable("WindowID", fensterId ?? string.Empty, true,
-            "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer."));
-
-        BlueScript.Classes.Script.AddAttributes(generatedVars, args ?? []);
 
         if (row?.Table is { IsDisposed: false } rowTb) {
             generatedVars.AddRange(rowTb.CreateVariableCollection(row, false, false, produktiv, true, filterItems));
@@ -192,6 +177,14 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
         }
 
         return base.ErrorReason();
+    }
+
+    /// <summary>
+    /// IHasScript: Liefert das Skript des Knopfes.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -366,7 +359,7 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             }
         }
 
-        return ExecuteScript(script, "Testmodus", !testmode, null, row, TableInput, fi, fieldSources, null);
+        return ExecuteScript(script, "Testmodus", !testmode, row, TableInput, fi, fieldSources);
     }
 
     #endregion

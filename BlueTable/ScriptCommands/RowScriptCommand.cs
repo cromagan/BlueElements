@@ -40,7 +40,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
 
-    public override string Syntax => "Row(AgeInDays, FilterScriptCommand, ...)";
+    public override string Syntax => "Row(AgeInDays, Filter, ...)";
 
     #endregion
 
@@ -56,23 +56,23 @@ public class RowScriptCommand : TableGenericScriptCommand {
 
         foreach (var thisFi in fic) {
             if (thisFi.Column is not { IsDisposed: false } c) {
-                return new DoItFeedback("Fehler im FilterScriptCommand, Spalte ungültig", true);
+                return new DoItFeedback("Fehler im Filter, Spalte ungültig", true);
             }
 
             //if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
-            //    return new DoItFeedback("Fehler im FilterScriptCommand, nur 'is' ist erlaubt", true);
+            //    return new DoItFeedback("Fehler im Filter, nur 'is' ist erlaubt", true);
             //}
 
             //if (thisFi.SearchValue.Count != 1) {
-            //    return new DoItFeedback("Fehler im FilterScriptCommand, ein einzelner Suchwert wird benötigt", true);
+            //    return new DoItFeedback("Fehler im Filter, ein einzelner Suchwert wird benötigt", true);
             //}
 
             if (FilterCollection.InitValue(c, true, false, [.. fic]) is not { } l) {
-                return new DoItFeedback("Fehler im FilterScriptCommand, dieser Filtertyp kann nicht initialisiert werden.", true);
+                return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true);
             }
 
             if (thisFi.SearchValue[0] != l) {
-                return new DoItFeedback($"Fehler im FilterScriptCommand:\r\nWert '{thisFi.SearchValue[0]}' kann nicht gesetzt werden.\r\nVorgeschlager Wert: '{l}'\r\nSpalte: {thisFi.Column.Caption}", true);
+                return new DoItFeedback($"Fehler im Filter:\r\nWert '{thisFi.SearchValue[0]}' kann nicht gesetzt werden.\r\nVorgeschlager Wert: '{l}'\r\nSpalte: {thisFi.Column.Caption}", true);
             }
         }
 

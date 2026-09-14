@@ -151,7 +151,8 @@ public class EditFieldPadItem : ReciverPadItem, IItemToControl, IAutosizable {
 
         foreach (var thisStrategy in ControlStrategies.ControlStrategy.AllStrategies.Instances) {
             if (thisStrategy.IsAllowed(textEditable, mayHaveDropdownItems)) {
-                l.Add(new ReadableListItem(thisStrategy, true, string.Empty));
+                // Prototypen sind nie konfiguriert — deren Konfigurationsfehler gehören nicht in die Auswahlliste.
+                l.Add(new ReadableListItem(thisStrategy, true, string.Empty) { ShowError = false });
             }
         }
         return l;

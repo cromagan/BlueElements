@@ -246,8 +246,14 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (string.IsNullOrEmpty(feh)) {
             Column_DatenZurückschreiben();
-            if (string.IsNullOrEmpty(feh) && InputItem is ColumnItem { IsDisposed: false } col2) { feh = col2.ErrorReason(); }
-            if (string.IsNullOrEmpty(feh) && _strategyOptions is { IsDisposed: false } strat) { feh = strat.ErrorReason(); }
+
+            if (string.IsNullOrEmpty(feh) && InputItem is ColumnItem { IsDisposed: false } col2) {
+                feh = col2.ErrorReason();
+
+                if (string.IsNullOrEmpty(feh) && _strategyOptions is { IsDisposed: false } strat) {
+                    feh = strat.ErrorReason(col2.MayHaveDropDown(), col2.MultiLine);
+                }
+            }
         }
 
         if (!string.IsNullOrEmpty(feh)) {
@@ -347,11 +353,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (InputItem is ColumnItem { IsDisposed: false } c) {
             _strategyOptions = ControlStrategy.CreateNew(cbxControlStrategy.Text);
             _strategyOptions.ControlStrategyParameter = c.ControlStrategyParameter;
-
-            // Strategien mit Spalten-Kontext brauchen die Spalte für ihre Optionen (z. B. Skript-Auswahl).
-            if (_strategyOptions is { IsDisposed: false } && _strategyOptions is IHasColumn ihc) {
-                ihc.Column = c;
-            }
         }
 
         _strategyOptions?.DoForm(StrategyEditor);
@@ -958,7 +959,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxControlStrategy.ItemClear();
 
         foreach (var thiss in ControlStrategy.AllStrategies.Instances.Where(s => !s.IsSpecial)) {
-            cbxControlStrategy.ItemAdd(ItemOf(thiss));
+            // Prototypen sind nie konfiguriert — deren Konfigurationsfehler gehören nicht in die Auswahlliste.
+            cbxControlStrategy.ItemAdd(new ReadableListItem(thiss, true, string.Empty) { ShowError = false });
         }
     }
 

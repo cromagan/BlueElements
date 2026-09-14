@@ -341,7 +341,7 @@ public sealed class RowTableElement : TableElement {
         }
 
         if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
-            // Instant-Action-Strategien (z. B. Tabellen-Skript-Knopf) führen den
+            // Instant-Action-Strategien (z. B. "Skript ausführen") führen den
             // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
             if (ControlStrategy.InstantActionClicked(tableView, col, Row)) { return; }
 

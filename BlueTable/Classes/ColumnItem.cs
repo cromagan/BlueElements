@@ -23,11 +23,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private const string TmpNewDummy = "TMPNEWDUMMY";
 
-    /// <summary>
-    /// Strategien mit spaltenabhängiger Gültigkeits-Prüfung, keyed nach Strategy-Key (siehe IHasColumn).
-    /// </summary>
-    private static readonly AssemblyAwareCache<IHasColumn> _columnChecks = new();
-
     private readonly List<string> _afterEditAutoReplace = [];
 
     private readonly List<string> _dropDownItems = [];
@@ -2490,12 +2485,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains('|')) { return InvalidGroupChar; }
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
-        }
-
-        // Strategie-spezifische Prüfungen zur Spalte liegen bei den Strategien selbst.
-        if (_columnChecks[_controlStrategy] is { } check) {
-            check.Column = this;
-            if (check.ErrorReason() is { Length: > 0 } reason) { return reason; }
         }
 
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }

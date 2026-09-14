@@ -2,7 +2,6 @@
 
 using BlueControls.Controls.ConnectedFormula;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -123,7 +122,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         #endregion
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, true, null, row, tb, FilterInput, fieldSources, FindForm()?.Handle.ToString(CultureInfo.InvariantCulture));
+        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, true, row, tb, FilterInput, fieldSources);
 
         var errorreason = string.Empty;
 

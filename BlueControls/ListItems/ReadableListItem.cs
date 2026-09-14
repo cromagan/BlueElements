@@ -56,6 +56,12 @@ public class ReadableListItem : ListItem {
         }
     }
 
+    /// <summary>
+    /// Fehlerzustand des Items unter dem Text anzeigen. Für Auswahllisten
+    /// unveränderlicher Prototypen deaktivieren.
+    /// </summary>
+    public bool ShowError { get; set; } = true;
+
     #endregion
 
     #region Methods
@@ -169,7 +175,7 @@ public class ReadableListItem : ListItem {
 
     private string ErrorText() => Item is IErrorCheckable ec ? ec.ErrorReason() ?? string.Empty : string.Empty;
 
-    private bool HasError() => !string.IsNullOrEmpty(ErrorText());
+    private bool HasError() => ShowError && !string.IsNullOrEmpty(ErrorText());
 
     private void Item_Disposed(object? sender, System.EventArgs e) => Item = null;
 

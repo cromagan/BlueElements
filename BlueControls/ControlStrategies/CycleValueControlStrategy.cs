@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
-using BlueTable.Interfaces;
 
 namespace BlueControls.ControlStrategies;
 
@@ -11,16 +10,11 @@ namespace BlueControls.ControlStrategies;
 /// anderen Zellen). Nach dem letzten Wert folgt wieder der erste - bei
 /// MinTextLength 0 dazwischen ein Leerwert.
 /// </summary>
-public class CycleValueControlStrategy : ControlStrategy, IHasColumn {
+public class CycleValueControlStrategy : ControlStrategy {
 
     #region Properties
 
     public static string ClassId => "CycleValue";
-
-    /// <summary>
-    /// Die Spalte, zu der das Control gehört.
-    /// </summary>
-    public ColumnItem? Column { get; set; }
 
     public override bool IsInstantAction => true;
 
@@ -35,10 +29,9 @@ public class CycleValueControlStrategy : ControlStrategy, IHasColumn {
     /// <summary>
     /// Die Spalte braucht auswählbare Werte und darf nicht mehrzeilig sein.
     /// </summary>
-    public override string ErrorReason() {
-        if (Column is not { IsDisposed: false } column) { return string.Empty; }
-        if (!column.MayHaveDropDown()) { return ColumnErrorConstants.NoDropdownItems; }
-        if (column.MultiLine) { return ColumnErrorConstants.NoMultilineAllowed; }
+    public override string ErrorReason(bool mayHaveDropDown, bool multiLine) {
+        if (!mayHaveDropDown) { return ColumnErrorConstants.NoDropdownItems; }
+        if (multiLine) { return ColumnErrorConstants.NoMultilineAllowed; }
         return string.Empty;
     }
 

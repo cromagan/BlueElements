@@ -25,7 +25,7 @@ internal class ExportScriptCommandsScriptCommand : TableGenericScriptCommand {
 
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
 
-    public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, FilterScriptCommand, ...);";
+    public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 
     #endregion
 

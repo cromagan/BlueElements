@@ -5,7 +5,7 @@ using BlueScript.Classes;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Erstellt einen FilterScriptCommand, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.
+/// Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.
 /// Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.
 /// Bei diesem FilterScriptCommand wird die Groß/Kleinschreibung ignoriert.
 /// Bei Between müssen die Werte so Angegeben werden: 50|100
