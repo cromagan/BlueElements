@@ -13,7 +13,8 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     #region Fields
 
     /// <summary>
-    /// Zeitraum in Minuten, nach dem ein ungenutzter Chunk bei BeSureUpToDate übersprungen wird.
+    /// Zeitraum in Minuten, nach dem ein ungenutzter Chunk bei Aktualitätsprüfungen
+    /// (BeSureUpToDate, RefreshLoadedChunks) übersprungen wird.
     /// Wird der Chunk wieder benötigt, laden die Daten automatisch neu.
     /// </summary>
     public const int SkipIfUnusedMinutes = 5;

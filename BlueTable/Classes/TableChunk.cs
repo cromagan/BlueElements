@@ -79,8 +79,9 @@ public class TableChunk : TableFile {
     private readonly ConcurrentDictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern, Refresh).
-    /// Wird genutzt, um ungenutzte Chunks bei BeSureToBeUpToDate zu überspringen.
+    /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern,
+    /// Refresh, Anzeige via TouchChunk). Wird genutzt, um ungenutzte Chunks bei
+    /// BeSureToBeUpToDate zu überspringen.
     /// </summary>
     private readonly ConcurrentDictionary<string, DateTime> _lastUsed = new(StringComparer.OrdinalIgnoreCase);
 
@@ -422,7 +423,7 @@ public class TableChunk : TableFile {
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
             OnLoading();
-            var result = LoadChunkWithChunkId(Chunk_Master);
+            var result = LoadChunkWithChunkId(Chunk_Master, false);
             if (result.IsFailed) { return false; }
             if (result.Value is true) { OnLoaded(false, true); }
         }
@@ -430,8 +431,8 @@ public class TableChunk : TableFile {
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
-    public override OperationResult BeSureRowIsLoaded(string chunkValue) {
-        var baseResult = base.BeSureRowIsLoaded(chunkValue);
+    public override OperationResult BeSureRowIsLoaded(string chunkValue, bool trustProcessedFile) {
+        var baseResult = base.BeSureRowIsLoaded(chunkValue, trustProcessedFile);
         if (baseResult.IsFailed) { return baseResult; }
 
         var chunkValues = chunkValue.SplitAndCutByCr().SortedDistinctList();
@@ -441,7 +442,7 @@ public class TableChunk : TableFile {
 
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
-            var result = LoadChunkWithChunkId(chunkId);
+            var result = LoadChunkWithChunkId(chunkId, trustProcessedFile);
             if (result.IsFailed) { return result; }
             loaded = loaded || result.Value is true;
         }
@@ -487,7 +488,7 @@ public class TableChunk : TableFile {
                 OnLoading();
 
                 if (!firstTime) {
-                    var result = LoadChunkWithChunkId(Chunk_MainData);
+                    var result = LoadChunkWithChunkId(Chunk_MainData, false);
                     if (result.IsFailed) {
                         Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}", 0);
                         return false;
@@ -506,7 +507,7 @@ public class TableChunk : TableFile {
                     // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
                     // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
                     // (Already-Current-Check via Dateiname-Vergleich).
-                    var result = LoadChunkWithChunkId(item);
+                    var result = LoadChunkWithChunkId(item, false);
                     loaded = loaded || result.Value is true;
                     ok = ok && result.IsSuccessful;
                 }
@@ -617,7 +618,7 @@ public class TableChunk : TableFile {
         OnLoading();
 
         foreach (var chunkId in chunkIds) {
-            var result = LoadChunkWithChunkId(chunkId);
+            var result = LoadChunkWithChunkId(chunkId, false);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -646,6 +647,18 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
+    /// Setzt den LastUsed-Stempel des Row-Chunks. Rufen TableViews und
+    /// ConnectedFormula-Views beim Anzeigen von Zeilen auf sowie längere
+    /// Import-/Skriptläufe, damit RefreshLoadedChunks den Chunk im
+    /// 2-Minuten-Fenster weiterhin aktuell hält.
+    /// </summary>
+    public override void TouchChunk(string chunkValue) {
+        if (chunkValue is not { Length: > 0 }) { return; }
+        var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkValue);
+        _lastUsed[chunkId] = DateTime.UtcNow;
+    }
+
+    /// <summary>
     /// Generiert den Timestamp-String für Chunk-Dateinamen im Format
     /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash. Wird beim Speichern von Row-Chunks
     /// verwendet, um einheitliche, zeitlich sortierbare Dateinamen zu erzeugen.
@@ -659,7 +672,7 @@ public class TableChunk : TableFile {
 
         if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
 
-        var result = LoadChunkWithChunkId(Chunk_MainData);
+        var result = LoadChunkWithChunkId(Chunk_MainData, false);
         if (result.IsFailed) { return false; }
 
         // Bei einer geladenen Tabelle muss der Hauptchunk vorhanden sein.
@@ -690,7 +703,7 @@ public class TableChunk : TableFile {
         // auf einem veralteten Stand gearbeitet und eine spätere Speicherung
         // fremde Änderungen überdecken. Bei unverändertem Ordner ist
         // LoadChunkWithChunkId ein schneller Frühpfad (ein Folder-Stat).
-        var loadResult = LoadChunkWithChunkId(chunkId);
+        var loadResult = LoadChunkWithChunkId(chunkId, false);
         if (loadResult.IsFailed) {
             return $"Chunk '{chunkId}' konnte nicht geladen werden: {loadResult.FailedReason}";
         }
@@ -1109,10 +1122,21 @@ public class TableChunk : TableFile {
     /// für Aktualitätsprüfungen gemerkt.
     /// </summary>
     /// <param name="chunkId">Chunk-ID (wird auf Lowercase normalisiert).</param>
+    /// <param name="trustProcessedFile">True: bereits geladene Chunks (Eintrag in _processedFile)
+    /// erzeugen keinen Verzeichniszugriff mehr — der erste Load bleibt unberührt,
+    /// der Reload läuft ausschließlich über RefreshLoadedChunks. False: immer prüfen
+    /// (System-Chunks im Timer und gezielter Refresh nach erkannter neuer Datei).</param>
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordnung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    private OperationResult LoadChunkWithChunkId(string chunkId) {
+    private OperationResult LoadChunkWithChunkId(string chunkId, bool trustProcessedFile) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
+
+        // Reload ignorieren: Der Chunk ist geladen und wird nicht erneut von der
+        // Festplatte geprüft. Aktualität liefert RefreshLoadedChunks (2-Minuten-Fenster).
+        if (trustProcessedFile && _processedFile.ContainsKey(chunkId)) {
+            _lastUsed[chunkId] = DateTime.UtcNow;
+            return OperationResult.SuccessFalse;
+        }
 
         var folder = GetChunkFolder(chunkId);
 
@@ -1232,7 +1256,7 @@ public class TableChunk : TableFile {
     /// Datei im Ordner existiert und lädt diese ggf. neu.
     /// Entdeckt außerdem neue Row-Chunk-Ordner, die andere Benutzer seit dem
     /// letzten Refresh angelegt haben (z.B. Zeilen in einem neuen Chunk-Wert).
-    /// Chunks, die länger als SkipIfUnusedMinutes nicht verwendet wurden,
+    /// Chunks, deren LastUsed-Stempel älter als SkipIfUnusedMinutes ist,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).
     /// </summary>
@@ -1253,6 +1277,7 @@ public class TableChunk : TableFile {
             // werden in BeSureToBeUpToDate vor diesem Refresh explizit geladen.
             if (!IsRowChunk(chunkId)) { continue; }
 
+            // SkipIfUnusedMinutes-Fenster: Niemand schaut den Chunk mehr an — kein Refresh nötig.
             if (!firstTime && _lastUsed.TryGetValue(chunkId, out var lastUsed)
                 && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= SkipIfUnusedMinutes) {
                 continue;
@@ -1272,7 +1297,7 @@ public class TableChunk : TableFile {
                 continue;
             }
 
-            var result = LoadChunkWithChunkId(chunkId);
+            var result = LoadChunkWithChunkId(chunkId, false);
             if (result.IsFailed) {
                 Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
             }
@@ -1292,7 +1317,7 @@ public class TableChunk : TableFile {
         string[] checkIds = [Chunk_MainData, Chunk_Master, Chunk_Variables, Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
-            var loadResult = LoadChunkWithChunkId(id);
+            var loadResult = LoadChunkWithChunkId(id, false);
             if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}'\r\n({loadResult.FailedReason})"; }
         }
 

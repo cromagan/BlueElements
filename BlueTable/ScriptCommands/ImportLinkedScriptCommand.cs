@@ -48,6 +48,10 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
             var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
             if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true); }
 
+            // LastUsed-Stempel: Lange Importläufe dürfen den Ziel-Chunk nicht aus
+            // dem 2-Minuten-Refresh-Fenster von RefreshLoadedChunks fallen lassen.
+            linkedTable.TouchChunk(fc.ChunkVal);
+
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' der Tabelle '{linkedTable.Caption}' liefert mehrere Ergebnisse.", false); }
 

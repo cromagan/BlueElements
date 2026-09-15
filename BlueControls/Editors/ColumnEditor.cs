@@ -958,7 +958,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void RefillControlStrategyItems() {
         cbxControlStrategy.ItemClear();
 
-        foreach (var thiss in ControlStrategy.AllStrategies.Instances.Where(s => !s.IsSpecial)) {
+        foreach (var thiss in ControlStrategy.AllStrategies.Instances.Where(s => !s.IsSpecial && !s.IsCommandButton)) {
             // Prototypen sind nie konfiguriert — deren Konfigurationsfehler gehören nicht in die Auswahlliste.
             cbxControlStrategy.ItemAdd(new ReadableListItem(thiss, true, string.Empty) { ShowError = false });
         }

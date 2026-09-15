@@ -105,7 +105,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (Table.Column.First is not { IsDisposed: false } c) { return null; }
 
             if (c.Value_for_Chunk != ChunkType.None) {
-                if (Table.BeSureRowIsLoaded(primärSchlüssel).IsFailed) { return null; }
+                if (Table.BeSureRowIsLoaded(primärSchlüssel, false).IsFailed) { return null; }
             }
 
             foreach (var thisRow in _internal.Values) {
@@ -121,7 +121,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? this[params FilterItem[] filter] {
         get {
-            var f = FilterCollection.CalculateFilteredRows(Table, filter);
+            var f = FilterCollection.CalculateFilteredRows(Table, false, filter);
 
             //var parallelQuery = _internal.Values.AsParallel()
             //                                    .Where(thisRow => thisRow is not null)
@@ -483,7 +483,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
                     chunkval = inval;
-                    var loadResult = tb.BeSureRowIsLoaded(inval);
+                    var loadResult = tb.BeSureRowIsLoaded(inval, false);
                     if (loadResult.IsFailed) {
                         return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
                     }
@@ -623,7 +623,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public OperationResult Remove(FilterItem fi, string comment) =>
         //TODO: unbenutzt
-        Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
+        Remove(FilterCollection.CalculateFilteredRows(Table, false, fi), comment);
 
     public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }

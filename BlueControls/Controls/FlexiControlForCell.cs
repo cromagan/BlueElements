@@ -400,7 +400,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         var realColumn = column;
 
         if (column?.RelationType == RelationType.CellValues) {
-            (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
+            (realColumn, _, _, _) = row.LinkedCellData(column, true, false, false);
         }
 
         StyleFromColumn(column, realColumn);

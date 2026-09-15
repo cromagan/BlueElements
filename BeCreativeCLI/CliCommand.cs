@@ -385,7 +385,7 @@ public abstract class CliCommand : IHasKeyName {
 
         if (column is null) { return ([], $"Spalte nicht gefunden: {columnName}"); }
 
-        var rows = FilterCollection.CalculateFilteredRows(tbl, new FilterItem(column, GetFilterType(args), args.Option("filtervalue") ?? string.Empty));
+        var rows = FilterCollection.CalculateFilteredRows(tbl, false, new FilterItem(column, GetFilterType(args), args.Option("filtervalue") ?? string.Empty));
         return (rows, null);
     }
 

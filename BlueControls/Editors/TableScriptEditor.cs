@@ -92,7 +92,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// <summary>
     /// Erzeugt eine Liste von Chunk-Werten für das Dropdown-Menü.
     /// Chunk-IDs (Hash-Ordnernamen) können nicht verwendet werden, da
-    /// TableChunk.BeSureRowIsLoaded(string) und
+    /// TableChunk.BeSureRowIsLoaded(string, bool) und
     /// TableChunk.GetChunkId einen Chunk-<b>Wert</b> erwarten
     /// und diesen erneut hashen würden.
     /// </summary>
@@ -374,7 +374,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         if (!_loaded && Table is { Row.Count: 0 }) {
             _loaded = true;
             if (Table is TableChunk && !string.IsNullOrEmpty(txbChunk.Text)) {
-                Table.BeSureRowIsLoaded(txbChunk.Text);
+                Table.BeSureRowIsLoaded(txbChunk.Text, false);
             } else {
                 Table.LoadTableRows(false, 5);
             }
@@ -552,7 +552,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
         }
 
-        if (!string.IsNullOrEmpty(txbChunk.Text)) { tc.BeSureRowIsLoaded(txbChunk.Text); }
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { tc.BeSureRowIsLoaded(txbChunk.Text, false); }
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {

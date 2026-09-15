@@ -312,7 +312,7 @@ public sealed class RowTableElement : TableElement {
                     if (column.LinkedTable is null) {
                         qt = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
                     } else {
-                        var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false);
+                        var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false, false);
                         if (lcolumn is { } lc) { qt = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
 
                         if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {

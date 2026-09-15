@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueBasics;
 using BlueControls.BlueTableDialogs;
 using BlueControls.ControlStrategies;
 using BlueControls.Designer_Support;
@@ -535,7 +536,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         var posError = false;
 
         if (column.RelationType == RelationType.CellValues && row is not null) {
-            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
+            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false, false);
             posError = true;
         }
 
@@ -635,7 +636,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (!column.SaveContent) { return; }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = row.LinkedCellData(column, true, false);
+            var (lcolumn, lrow, _, _) = row.LinkedCellData(column, true, false, false);
             if (lcolumn is not null && lrow is not null) { DoUndo(lcolumn, lrow); }
             return;
         }
@@ -770,7 +771,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (column.RelationType == RelationType.CellValues) {
             if (row is null) { return "Verlinkungs-Fehler"; }
 
-            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
+            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false, false);
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
@@ -1894,7 +1895,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
         if (contentHolderCellRow is { IsDisposed: false } cellRow && contentHolderCellColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true);
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cellRow.LinkedCellData(contentHolderCellColumn, true, true, false);
             if (contentHolderCellColumn is null || contentHolderCellRow is null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
 
@@ -4265,7 +4266,14 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                 thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
 
-                if (thisItem is RowTableElement drawnRow) { _drawnRowViewItems.Add(drawnRow); }
+                if (thisItem is RowTableElement drawnRow) {
+                    _drawnRowViewItems.Add(drawnRow);
+
+                    // LastUsed-Stempel: Angezeigte Zeilen halten ihren Chunk im Refresh-Fenster.
+                    if (drawnRow.Row is { IsDisposed: false } drawnRowItem) {
+                        drawnRow.Row.Table?.TouchChunk(drawnRowItem.ChunkValue);
+                    }
+                }
             }
         } catch { }
     }
@@ -4730,12 +4738,17 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     /// <summary>
     /// Repariert nach dem Zeichnen die LinkedCells der gezeichneten (bildschirmsichtbaren) Zeilen,
-    /// wenn ihre letzte Änderung die Frist überschritten hat.
+    /// wenn ihre letzte Änderung die Frist überschritten hat. Die Reihenfolge wird gemischt und
+    /// nur das Zeitbudget abgearbeitet; der Rest kommt beim nächsten Aufbau dran.
     /// </summary>
     private void RepairVisibleRowsAfterDraw() {
+        _drawnRowViewItems.Shuffle();
+        var start = DateTime.UtcNow;
+
         foreach (var rowElement in _drawnRowViewItems) {
             if (rowElement is not { IsDisposed: false, Visible: true }) { continue; }
-            CellCollection.RepairLinkedCellIfDue(rowElement.Row);
+            CellCollection.RepairLinkedCellIfDue(rowElement.Row, true);
+            if (DateTime.UtcNow.Subtract(start) > CellCollection.LinkedCellRepairTimeBudget) { return; }
         }
     }
 

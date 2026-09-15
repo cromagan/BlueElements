@@ -41,7 +41,7 @@ public class CellGetKeyScriptCommand : TableGenericScriptCommand {
         if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true); }
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
-        var r = FilterCollection.CalculateFilteredRows(tb, new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
+        var r = FilterCollection.CalculateFilteredRows(tb, false, new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
 
         if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(3)); }
         if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(4)); }

@@ -103,7 +103,7 @@ public class RowScriptVariable : ScriptVariable {
 
             if (Table.Get(tx[0]) is not { IsDisposed: false } tb) { return true; }
 
-            tb.BeSureRowIsLoaded(tx[2]);
+            tb.BeSureRowIsLoaded(tx[2], false);
 
             if (tb.Row.GetByKey(tx[1]) is not { IsDisposed: false } row) { return true; }
 

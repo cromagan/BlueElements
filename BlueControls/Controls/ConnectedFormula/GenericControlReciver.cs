@@ -224,6 +224,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             var fc = new FilterCollection(tb2, "SetToRow Filter");
             FilterInputChangedHandled = true;
 
+            // LastUsed-Stempel: Angezeigte Zeilen halten ihren Chunk im Refresh-Fenster.
+            tb2.TouchChunk(row.ChunkValue);
+
             // FilterInput direkt setzen
             lock (_filterInputLock) {
                 fc.Add(new FilterItem(tb2, FilterType.RowKey, row.KeyName));
@@ -336,6 +339,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     /// <summary>
+    /// Setzt den Fokus auf das eigentliche Eingabe-Element des Controls.
+    /// Standard ist das Control selbst; Ableitungen reichen den Fokus an ein
+    /// eingebettetes Eingabe-Control weiter.
+    /// </summary>
+    protected virtual void FocusInput() => Focus();
+
+    /// <summary>
     /// Befüllt TableInput. Der Wert wird aus FilterInput generiert.
     /// </summary>
     protected virtual void HandleChangesNow() {
@@ -403,13 +413,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         target.FocusInput();
     }
 
-    /// <summary>
-    /// Setzt den Fokus auf das eigentliche Eingabe-Element des Controls.
-    /// Standard ist das Control selbst; Ableitungen reichen den Fokus an ein
-    /// eingebettetes Eingabe-Control weiter.
-    /// </summary>
-    protected virtual void FocusInput() => Focus();
-
     protected override void OnCreateControl() {
         base.OnCreateControl();
         RegisterEvents();
@@ -436,9 +439,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void TableInput_Loaded(object? sender, System.EventArgs e) { }
 
-    protected virtual void TableInput_ScriptChanged(object? sender, System.EventArgs e) { }
-
     protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) { }
+
+    protected virtual void TableInput_ScriptChanged(object? sender, System.EventArgs e) { }
 
     private static bool IsToTheRightOrBelow(System.Windows.Forms.Control current, System.Windows.Forms.Control candidate) {
         if (candidate.Top > current.Top) { return true; }

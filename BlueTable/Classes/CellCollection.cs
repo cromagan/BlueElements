@@ -14,6 +14,11 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     /// </summary>
     public static readonly TimeSpan LinkedCellRepairDelay = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Zeitbudget einer Reparatur-Runde; nicht geschaffte Zeilen bleiben einer späteren Runde überlassen.
+    /// </summary>
+    public static readonly TimeSpan LinkedCellRepairTimeBudget = TimeSpan.FromSeconds(1);
+
     private readonly ConcurrentDictionary<(ColumnItem column, RowItem row), CellItem> _internal = new();
     private volatile int _isDisposedFlag;
 
@@ -122,7 +127,9 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     /// <summary>
     /// Berechnet die LinkedCells der Zeile neu, wenn ihre letzte Zelländerung länger als die Frist zurückliegt.
     /// </summary>
-    public static void RepairLinkedCellIfDue(RowItem? row) {
+    /// <param name="row">Die zu reparierende Zeile.</param>
+    /// <param name="trustProcessedFile">True: bereits verarbeitete Chunk-Dateien werden als aktuell vertraut.</param>
+    public static void RepairLinkedCellIfDue(RowItem? row, bool trustProcessedFile) {
         if (row is not { IsDisposed: false } r) { return; }
 
         var change = r.LastLinkedCellCheck;
@@ -131,7 +138,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         // Zuerst zurücksetzen, damit ein erneuter Aufruf (z. B. beim nächsten Paint) nicht mehrfach repariert.
         r.LastLinkedCellCheck = DateTime.UtcNow;
 
-        _ = r.RepairAllLinks();
+        _ = r.RepairAllLinks(trustProcessedFile);
     }
 
     /// <summary>

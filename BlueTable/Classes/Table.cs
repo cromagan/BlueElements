@@ -574,18 +574,18 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Gibt an, ob der Instanz-Timer dieser Tabelle pausiert ist (Zähler &gt; 0).
-    /// Wird vom statischen TableFile-Update-Timer ausgewertet, damit während
-    /// kritischer Bereiche (z.B. SaveInternal) kein Reload angestoßen wird.
-    /// </summary>
-    internal bool IsTimerPaused => _timerPaused > 0;
-
-    /// <summary>
     /// Gibt an, ob gerade Daten neu eingespielt werden (Chunk-Reload, Fragment-Merge).
     /// Dabei sind Spaltenschlüssel kurzzeitig nicht auflösbar; Ansichten dürfen
     /// in diesem Fenster keine Einträge endgültig entfernen.
     /// </summary>
     internal bool IsDataReloading => _dataReloadPaused > 0;
+
+    /// <summary>
+    /// Gibt an, ob der Instanz-Timer dieser Tabelle pausiert ist (Zähler &gt; 0).
+    /// Wird vom statischen TableFile-Update-Timer ausgewertet, damit während
+    /// kritischer Bereiche (z.B. SaveInternal) kein Reload angestoßen wird.
+    /// </summary>
+    internal bool IsTimerPaused => _timerPaused > 0;
 
     protected string LoadedVersion { get; private set; }
 
@@ -608,11 +608,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// IHasScript: Liefert alle Tabellen-Skripte (EventScript).
-    /// </summary>
-    public IEnumerable<ScriptDescription> GetAllScripts() => EventScript;
 
     public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {
@@ -763,7 +758,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (onlyTopLevel) { return string.Empty; }
 
         if (column.RelationType == RelationType.CellValues && row is not null) {
-            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
+            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false, false);
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
             if (lcolumn?.Table is not { IsDisposed: false } tb2) { return "Verknüpfte Tabelle verworfen."; }
@@ -1085,7 +1080,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return string.Empty;
     }
 
-    public virtual OperationResult BeSureRowIsLoaded(string chunkValue) {
+    /// <summary>
+    /// Stellt sicher, dass die Zeile zum Chunk-Wert geladen ist.
+    /// </summary>
+    /// <param name="chunkValue">Der Chunk-Wert der Zeile.</param>
+    /// <param name="trustProcessedFile">True: bereits verarbeitete Chunk-Dateien werden als aktuell vertraut. Nur die Anzeige-Reparatur (RepairVisibleRowsAfterDraw) darf true übergeben.</param>
+    public virtual OperationResult BeSureRowIsLoaded(string chunkValue, bool trustProcessedFile) {
         var f = IsGenericEditable(false);
         return string.IsNullOrEmpty(f) ? OperationResult.Success : OperationResult.Failed(f);
     }
@@ -1369,6 +1369,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         #endregion
 
         return vars;
+    }
+
+    /// <summary>
+    /// AssetFolder/Tabellepfad mit Forms und abschließenden \
+    /// </summary>
+    public string DefaultFormulaPath() {
+        if (!string.IsNullOrEmpty(AssetFolderWhole())) { return AssetFolderWhole() + "Forms\\"; }
+        return string.Empty;
     }
 
     /// <summary>
@@ -1674,6 +1682,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
         return r;
     }
+
+    /// <summary>
+    /// IHasScript: Liefert alle Tabellen-Skripte (EventScript).
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() => EventScript;
 
     public IJsonParseable? GetSubItemByKey(string containerName, string key) {
         if (IsDisposed) { return null; }
@@ -2187,6 +2200,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         #endregion
     }
 
+    /// <summary>
+    /// Hält den periodischen Skript-Prüftimer an (z. B. für Bit-Vergleiche im
+    /// Batch-Betrieb, bei denen veraltete Zeilen nicht neu gestempelt werden dürfen).
+    /// Muss über ResumeTimer wieder aufgehoben werden.
+    /// </summary>
+    public void PauseTimer() => Interlocked.Increment(ref _timerPaused);
+
     public bool PermissionCheck(IList<string>? allowed, RowItem? row, bool adminValue) {
         try {
             if (IsAdministrator() || PowerEdit) { return adminValue; }
@@ -2300,6 +2320,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         OnInvalidateView();
     }
 
+    public void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
+
     /// <summary>
     /// Liefert die nicht-disposed Zeilen dieser Tabelle in der Reihenfolge,
     /// in der sie gespeichert werden sollen. Ist eine SortDefinition
@@ -2354,6 +2376,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
+
+    public virtual void TouchChunk(string chunkValue) { }
 
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, List<string> debugOutput, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
         var failed = script.FailedReason;
@@ -2423,11 +2447,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    /// <summary>
-    /// Die gesammelten DebugPrint-Ausgaben des Laufs als Anhang für die Fehlermeldung (oder leer).
-    /// </summary>
-    private static string DebugPrintSuffix(List<string> debugOutput) => debugOutput is { Count: > 0 } l ? "\r\n\r\nDebugPrint-Ausgaben:\r\n" + string.Join("\r\n", l) : string.Empty;
-
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
         if (existingScript is null) { return false; }
@@ -2473,7 +2492,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (column.Am_A_Key_For.Count > 0) {
             foreach (var linkedColumnName in column.Am_A_Key_For) {
                 if (Column[linkedColumnName] is { IsDisposed: false } thisColumn) {
-                    rowItem.LinkedCellData(thisColumn, true, true);
+                    rowItem.LinkedCellData(thisColumn, true, true, false);
                 }
             }
         }
@@ -2603,13 +2622,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Hält den periodischen Skript-Prüftimer an (z. B. für Bit-Vergleiche im
-    /// Batch-Betrieb, bei denen veraltete Zeilen nicht neu gestempelt werden dürfen).
-    /// Muss über ResumeTimer wieder aufgehoben werden.
-    /// </summary>
-    public void PauseTimer() => Interlocked.Increment(ref _timerPaused);
-
-    /// <summary>
     /// Markiert den Bereich, in dem Daten neu eingespielt werden. In diesem Fenster
     /// löst RepairAfterParse keine endgültigen Entfernungen in den Ansichten aus.
     /// </summary>
@@ -2622,8 +2634,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// IsValueEditable. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
     /// </summary>
     protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
-
-    public void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
 
     protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 
@@ -2988,6 +2998,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         throw new FileNotFoundException($"Tabelle '{key}' konnte in keinem Suchpfad gefunden werden.");
     }
 
+    /// <summary>
+    /// Die gesammelten DebugPrint-Ausgaben des Laufs als Anhang für die Fehlermeldung (oder leer).
+    /// </summary>
+    private static string DebugPrintSuffix(List<string> debugOutput) => debugOutput is { Count: > 0 } l ? "\r\n\r\nDebugPrint-Ausgaben:\r\n" + string.Join("\r\n", l) : string.Empty;
+
     private static bool HasActiveThreadsExcept(string excludeThreadId) {
         try {
             return ExecutingScriptThreadsAnyTable.Exists(thread => thread != excludeThreadId);
@@ -3029,14 +3044,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private void Column_ColumnChanged(object? sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         RepairAfterParse();
-    }
-
-    /// <summary>
-    /// AssetFolder/Tabellepfad mit Forms und abschließenden \
-    /// </summary>
-    public string DefaultFormulaPath() {
-        if (!string.IsNullOrEmpty(AssetFolderWhole())) { return AssetFolderWhole() + "Forms\\"; }
-        return string.Empty;
     }
 
     /// <summary>

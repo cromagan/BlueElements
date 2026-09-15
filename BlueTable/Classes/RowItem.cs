@@ -483,7 +483,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return txt;
     }
 
-    public (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, bool repairallowed, bool addRowIfNotExists) {
+    public (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, bool repairallowed, bool addRowIfNotExists, bool trustProcessedFile) {
         if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
         if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine ChunkValue-Spalte sein.", false); }
@@ -502,6 +502,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         RowItem? targetRow = null;
+        fc.EnsureRowsCalculated(trustProcessedFile);
         var rows = fc.Rows;
         switch (rows.Count) {
             case > 1:
@@ -698,15 +699,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    ///
+    /// Repariert alle LinkedCells der Zeile.
     /// </summary>
     /// <returns>Empty, wenn alles in Ordung ist. Ansonten ein Grund.</returns>
-    public string RepairAllLinks() {
+    public string RepairAllLinks(bool trustProcessedFile) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
         foreach (var thisColumn in tb.Column) {
             if (thisColumn.RelationType == RelationType.CellValues) {
-                LinkedCellData(thisColumn, true, false);
+                LinkedCellData(thisColumn, true, false, trustProcessedFile);
 
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
             }
@@ -812,7 +813,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         WaitScriptsDone();
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) {
-            return new ScriptEndedFeedback([], RepairAllLinks());
+            return new ScriptEndedFeedback([], RepairAllLinks(false));
         }
 
         var mustBeExtended = NeedsRowInitialization();
@@ -830,7 +831,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (ok.Failed) { return ok; }
 
-            var reas = RepairAllLinks();
+            var reas = RepairAllLinks(false);
 
             if (!string.IsNullOrEmpty(reas)) {
                 return new ScriptEndedFeedback([], reas);
@@ -924,7 +925,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
+            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value), false);
 
             //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
             lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");

@@ -12,13 +12,25 @@ namespace BlueControls.ControlStrategies;
 /// Zeigt nichts an: Ein einfacher Klick in die Zelle führt das direkt
 /// hinterlegte Skript sofort aus. Ein Doppelklick bleibt wirkungslos.
 /// </summary>
-public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
+public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotifyPropertyChanged {
 
     #region Fields
 
     private const string _scriptKey = "script";
 
     private FlexiControlForDelegate? _button;
+
+    private FlexiControlForProperty<string>? _scriptField;
+
+    #endregion
+
+    #region Events
+
+    /// <summary>
+    /// Meldet Script-Änderungen an gebundene Editoren (z. B. FlexiControlForProperty),
+    /// damit deren Anzeige nach dem Schließen des Skript-Editors aktualisiert wird.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -46,6 +58,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
             field = value;
 
             ControlStrategyParameter.Set(_scriptKey, value);
+            OnPropertyChanged(nameof(Script));
         }
     } = string.Empty;
 
@@ -114,7 +127,8 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
 
         _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
         result.Add(_button);
-        result.Add(new FlexiControlForProperty<string>(() => Script, 3));
+        _scriptField = new FlexiControlForProperty<string>(() => Script, 3);
+        result.Add(_scriptField);
 
         return result;
     }
@@ -128,6 +142,12 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
         f?.Opacity = 0f;
 
         try {
+            // Das kleine Textfeld meldet Änderungen verzögert (RaiseChangeDelay);
+            // der aktuelle Stand wird deshalb direkt übernommen, bevor der Editor geöffnet wird.
+            if (_scriptField?.Strategy.Control is TextBox txb) {
+                Script = txb.Text;
+            }
+
             var sd = new ScriptDescription(KeyName, Script);
 
             sd.ExecuteScript = ExecuteScriptTest;
@@ -152,6 +172,13 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
 
     protected override void CreateControlCore() { }
 
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        if (disposing) {
+            PropertyChanged = null;
+        }
+    }
+
     /// <summary>
     /// Führt das hinterlegte Skript für die angeklickte Zeile aus.
     /// Das Zurückschreiben der Zeilen-Variablen erfolgt bei Erfolg in <see cref="ExecuteScript"/>.
@@ -174,6 +201,14 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript {
     }
 
     protected override void ForceWriteBackValue() { }
+
+    /// <summary>
+    /// Löst <see cref="PropertyChanged"/> aus, solange die Strategie nicht verworfen ist.
+    /// </summary>
+    protected virtual void OnPropertyChanged(string propertyName) {
+        if (IsDisposed) { return; }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     protected override void ReadParameters(JsonObject json) => Script = json.GetString(_scriptKey, Script);
 

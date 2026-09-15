@@ -414,7 +414,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
         var contentHolderCellColumn = originalColumn;
         var contentHolderCellRow = row;
         if (contentHolderCellRow is { IsDisposed: false } cr && originalColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = cr.LinkedCellData(contentHolderCellColumn, true, true);
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = cr.LinkedCellData(contentHolderCellColumn, true, true, false);
         }
 
         if (contentHolderCellColumn is not { IsDisposed: false }) {

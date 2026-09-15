@@ -109,7 +109,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public ReadOnlyCollection<RowItem> Rows {
         get {
             if (IsDisposed || Table is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
-            _rows ??= CalculateFilteredRows(_table, [.. _internal]);
+            _rows ??= CalculateFilteredRows(_table, false, [.. _internal]);
             return _rows.AsReadOnly();
         }
     }
@@ -117,7 +117,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-            _rows ??= CalculateFilteredRows(_table, [.. _internal]);
+            _rows ??= CalculateFilteredRows(_table, false, [.. _internal]);
             return _rows.Count != 1 ? null : _rows[0];
         }
     }
@@ -162,14 +162,23 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Methods
 
-    public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
+    /// <summary>
+    /// Berechnet die gefilterten Zeilen vor, falls noch nicht geschehen.
+    /// </summary>
+    /// <param name="trustProcessedFile">True: bereits verarbeitete Chunk-Dateien werden als aktuell vertraut.</param>
+    public void EnsureRowsCalculated(bool trustProcessedFile) {
+        if (IsDisposed || _table is not { IsDisposed: false }) { return; }
+        _rows ??= CalculateFilteredRows(_table, trustProcessedFile, [.. _internal]);
+    }
+
+    public static List<RowItem> CalculateFilteredRows(Table? tb, bool trustProcessedFile, params FilterItem[] filter) {
         if (tb?.IsDisposed != false) { return []; }
 
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
                 // Chunk immer laden — auch im PowerEdit-Modus. Ohne Laden können
                 // die Zeilen des neu ausgewählten Chunks nicht angezeigt werden.
-                if (tb.BeSureRowIsLoaded(i).IsFailed) { return []; }
+                if (tb.BeSureRowIsLoaded(i, trustProcessedFile).IsFailed) { return []; }
             } else if (!tb.PowerEdit) {
                 // Ohne PowerEdit ist ein Chunk-Filter zwingend erforderlich.
                 return [];
@@ -189,7 +198,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 .ToList();
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return CalculateFilteredRows(tb, filter);
+            return CalculateFilteredRows(tb, trustProcessedFile, filter);
         }
     }
 
