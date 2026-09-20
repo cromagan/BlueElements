@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueTable.ClassesStatic;
 using BlueTable.Interfaces;
 
 namespace BlueControls.BlueTableDialogs;
@@ -18,9 +19,8 @@ public sealed partial class ImportCsvScriptCommand : FormWithStatusBar, IHasTabl
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
-        var ein = _originalImportText.SplitAndCutByCr().ToList();
-        capEinträge.Text = $"{ein.Count - 1} zum Importieren bereit.";
+        _originalImportText = importtext;
+        capEinträge.Text = $"{CsvHelper.SplitCsvRecords(_originalImportText).Count - 1} zum Importieren bereit.";
         Table = table;
     }
 

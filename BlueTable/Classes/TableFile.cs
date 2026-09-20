@@ -45,7 +45,7 @@ public class TableFile : Table {
     /// <summary>
     /// Wert in Minuten. Ab diesen Wert dürfen Master die Zeilenberechnung übernehmen
     /// </summary>
-    public static readonly int MyRowLost = 6;
+    public static readonly int MyRowLost = 15;
 
     /// <summary>
     /// Wert in Minuten, in welchem Intervall die Tabellen auf Aktualität geprüft werden.
@@ -268,14 +268,13 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    ///
+    /// Prüft, ob diese Instanz der registrierte Master der Tabelle ist.
+    /// Der Master-Eintrag muss mindestens <paramref name="ranges"/> Minuten alt sein (Propagations-Schutz),
+    /// und älter als <paramref name="rangee"/> Minuten zählt er als abgelaufen.
     /// </summary>
-    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
-    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
-    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
-    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
-    /// </param>
-    /// <param name="updateAllowed"></param>
+    /// <param name="ranges">Mindestalter des Master-Eintrags in Minuten, ab dem er vertraut wird.</param>
+    /// <param name="rangee">Maximalalter des Master-Eintrags in Minuten, bis dem er gilt.</param>
+    /// <param name="updateAllowed">True lädt den Master-Status zuvor von der Festplatte.</param>
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (!MultiUserPossible) { return true; }
@@ -708,6 +707,9 @@ public class TableFile : Table {
         if (!IsAdministrator()) { return false; }
 
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
+
+        // Master wurde bewusst freigegeben (UnMasterMe) — ein neuer Master darf sofort übernehmen.
+        if (TemporaryTableMasterUser.Contains("Unset")) { return true; }
 
         if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
             if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }

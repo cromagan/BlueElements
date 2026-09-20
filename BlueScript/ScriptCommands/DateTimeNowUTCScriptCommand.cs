@@ -27,7 +27,7 @@ internal class DateTimeNowUTCScriptCommand : ScriptCommand {
         try {
             return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback("Der Umwandlungs-StringScriptCommand '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true);
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true);
         }
     }
 

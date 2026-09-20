@@ -172,7 +172,7 @@ public partial class Progressbar : FloatingForm {
     private void UpdateInternal(string text) {
         if (text != capText.Text) {
             capText.Text = text;
-            capText.FitSize();
+            capText.FitSize(-1);
             capText.Location = new Point(Skin.Padding, Skin.Padding);
             LayoutForm();
         }

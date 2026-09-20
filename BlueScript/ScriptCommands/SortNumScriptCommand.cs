@@ -4,7 +4,7 @@ namespace BlueScript.ScriptCommands;
 
 
 /// <summary>
-/// Sortiert die Liste. Der Zahlenwert wird verwendet wenn der StringScriptCommand nicht in eine Zahl umgewandelt werden kann.
+/// Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.
 /// </summary>
 internal class SortNumScriptCommand : ScriptCommand {
 

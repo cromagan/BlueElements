@@ -2,6 +2,7 @@
 
 using System.IO;
 using System.Text.Json.Nodes;
+using BlueTable.EventArgs;
 
 namespace BeCreativeCLI;
 
@@ -78,14 +79,14 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Liefert null, wenn die Spalte per CLI beschreibbar ist, ansonsten die Fehlermeldung.
-    /// Datenverwaltete Systemspalten sind tabu, da die Datenprüfung ihre Werte selbst führt.
+    /// Systemspalten durchlaufen die separate SystemColumnWriteProblem-Prüfung.
     /// Verknüpfte Spalten (Werte aus anderer Tabelle) leiten Schreibvorgänge in die
     /// Fremdtabelle um und nicht gespeicherte Spalten verlieren Änderungen beim Entladen —
     /// beides meldet CellSet fälschlich als Erfolg. Die CLI lehnt solche Spalten ab.
     /// </summary>
     protected static string? ColumnWriteProblem(ColumnItem column) {
         if (column.IsSystemColumn()) {
-            return "Die Spalte '" + column.KeyName + "' wird von der Datenverwaltung geführt und kann nicht per CLI geändert werden.";
+            return SystemColumnWriteProblem(column);
         }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -97,6 +98,23 @@ public abstract class CliCommand : IHasKeyName {
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Beschreibbar
+    /// nur, wenn #CLI oder #CLI-(Benutzername) explizit in den Bearbeitungsrechten
+    /// der Spalte steht. Die Administrator-Rolle wird bewusst ignoriert — sie
+    /// ersetzt keine gesetzten Rechte. Nicht-Systemspalten liefert null.
+    /// </summary>
+    protected static string? SystemColumnWriteProblem(ColumnItem column) {
+        if (!column.IsSystemColumn()) { return null; }
+
+        var allowed = column.PermissionGroupsChangeCell;
+
+        if (allowed.Contains(Cli, StringComparer.OrdinalIgnoreCase) ||
+            allowed.Contains(Cli + "-" + UserName, StringComparer.OrdinalIgnoreCase)) { return null; }
+
+        return "Die Systemspalte '" + column.KeyName + "' ist nur änderbar, wenn #CLI oder #CLI-" + UserName + " in den Bearbeitungsrechten der Spalte steht.";
     }
 
     /// <summary>
@@ -244,7 +262,8 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Lädt die Tabelle aus dem ersten Positionsargument und entsperrt sie bei Bedarf
     /// mit --password. Ohne Pfadangabe wird das aktuelle Verzeichnis als Suchpfad ergänzt.
-    /// Gibt bei Problemen (nicht gefunden, falsches Kennwort) eine Fehlermeldung aus und liefert null.
+    /// Gibt bei Problemen (nicht gefunden, falsches Kennwort, defekte Skripte) eine
+    /// Fehlermeldung aus und liefert null.
     /// </summary>
     protected static Table? LoadTable(CliArgs args) {
         var tbl = LoadTableIgnoreLock(args);
@@ -273,6 +292,13 @@ public abstract class CliCommand : IHasKeyName {
         // Prozesse seit dem letzten Laden geschrieben haben.
         if (!tbl.BeSureToBeUpToDate(false)) {
             Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' konnte nicht auf den aktuellen Stand gebracht werden (Fragmentspeicher nicht lesbar).");
+            tbl.Dispose();
+            return null;
+        }
+
+        // Defekte Skripte sofort abweisen — kein CLI-Befehl darf eine solche Tabelle bearbeiten.
+        if (tbl.CheckScriptError() is { Length: > 0 } scriptError) {
+            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' enthält defekte Skripte und wird nicht bearbeitet: " + scriptError);
             tbl.Dispose();
             return null;
         }
@@ -343,16 +369,6 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Gibt eine geladene Tabelle frei. Zuvor laufen die Datenüberprüfung veralteter Zeilen
-    /// und die Verarbeitung explizit invalidierter Zeilen.
-    /// </summary>
-    protected static void Release(Table tbl) {
-        RowCollection.ExecuteValueChangedEvent();
-        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-        tbl.Dispose();
-    }
-
-    /// <summary>
     /// Liest die Option --max (0 = unbegrenzt). Liefert null, wenn die Angabe gültig ist, ansonsten die Fehlerbeschreibung.
     /// </summary>
     protected static (int Max, string? Error) ResolveMax(CliArgs args) {
@@ -416,10 +432,13 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Speichert die Tabelle (sofern dateibasiert) und gibt sie anschließend frei.
+    /// Speichert die Tabelle (sofern dateibasiert), nachdem alle in dieser Session
+    /// invalidierten Zeilen vollständig abgearbeitet sind.
     /// Liefert den Exit-Code: 0 = Erfolg, 1 = Fehler beim Speichern.
     /// </summary>
     protected static int SaveTable(Table tbl) {
+        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+
         if (tbl is TableFile tableFile) {
             var opr = tableFile.Save();
 
@@ -446,6 +465,20 @@ public abstract class CliCommand : IHasKeyName {
     /// </summary>
     protected static string StorageTextOf(ColumnItem column, string text) =>
         IsHtmlContent(column) ? text.CreateHtmlCodes() : text;
+
+    /// <summary>
+    /// Prüft die Zeile per prepare_formula. Meldet die Prüfung einen Fehler,
+    /// wird der Zeilenstatus invalidiert und die komplette Datenüberprüfung
+    /// erneut ausgeführt — veraltete Fehlalarme werden so ausgeschlossen.
+    /// </summary>
+    protected static RowPrepareFormulaEventArgs VerifiedCheckRow(RowItem row) {
+        var check = row.CheckRow();
+
+        if (check.ColumnsWithErrors is { Count: 0 }) { return check; }
+
+        row.InvalidateCheckData();
+        return row.CheckRow();
+    }
 
     /// <summary>
     /// Gibt eine konkrete Fehlerursache plus die Syntaxzeile aus. Exit-Code 2.

@@ -37,66 +37,62 @@ public class TableDelRowCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
-            // (#CLI muss also bei den Tabellen-Administratoren stehen).
-            if (!tbl.IsAdministrator()) {
-                Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
-                return 1;
-            }
-
-            var (rows, error) = ResolveRows(tbl, args);
-
-            if (error is not null) {
-                Console.Error.WriteLine(error);
-                return 1;
-            }
-
-            if (rows.Count == 0) {
-                Console.Error.WriteLine("Keine Zeile getroffen.");
-                return 1;
-            }
-
-            if (dryRun) {
-                Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", rows.Select(r => r.KeyName)));
-                Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
-                return 0;
-            }
-
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
-            var deleted = 0;
-            var failed = 0;
-
-            foreach (var r in rows) {
-                var opr = RowCollection.Remove(r, "bcr table-delrow");
-
-                if (opr.IsFailed) {
-                    Console.Error.WriteLine("Key: " + r.KeyName + " löschen fehlgeschlagen: " + opr.FailedReason);
-                    failed++;
-                } else {
-                    Console.Out.WriteLine("Key: " + r.KeyName + " gelöscht");
-                    deleted++;
-                }
-            }
-
-            if (deleted > 0) {
-                var sr = SaveTable(tbl);
-
-                if (sr != 0) { return sr; }
-            }
-
-            return failed > 0 ? 1 : 0;
-        } finally {
-            Release(tbl);
+        // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
+        // (#CLI muss also bei den Tabellen-Administratoren stehen).
+        if (!tbl.IsAdministrator()) {
+            Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
+            return 1;
         }
+
+        var (rows, error) = ResolveRows(tbl, args);
+
+        if (error is not null) {
+            Console.Error.WriteLine(error);
+            return 1;
+        }
+
+        if (rows.Count == 0) {
+            Console.Error.WriteLine("Keine Zeile getroffen.");
+            return 1;
+        }
+
+        if (dryRun) {
+            Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", rows.Select(r => r.KeyName)));
+            Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
+            return 0;
+        }
+
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        var fragmentProblem = FragmentEditProblem(tbl);
+
+        if (fragmentProblem is not null) {
+            Console.Error.WriteLine(fragmentProblem);
+            return 2;
+        }
+
+        var deleted = 0;
+        var failed = 0;
+
+        foreach (var r in rows) {
+            var opr = RowCollection.Remove(r, "bcr table-delrow");
+
+            if (opr.IsFailed) {
+                Console.Error.WriteLine("Key: " + r.KeyName + " löschen fehlgeschlagen: " + opr.FailedReason);
+                failed++;
+            } else {
+                Console.Out.WriteLine("Key: " + r.KeyName + " gelöscht");
+                deleted++;
+            }
+        }
+
+        if (deleted > 0) {
+            var sr = SaveTable(tbl);
+
+            if (sr != 0) { return sr; }
+        }
+
+        return failed > 0 ? 1 : 0;
     }
 
     #endregion

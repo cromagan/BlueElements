@@ -12,7 +12,7 @@ public class StopScriptCommand : ScriptCommand {
     public override string Command => "stop";
     public override string StartSequence => string.Empty;
 
-    public override string Syntax => "StopScriptCommand;";
+    public override string Syntax => "Stop;";
 
     #endregion
 

@@ -52,7 +52,7 @@ internal class ForEachRow2ScriptCommand : TableGenericScriptCommand {
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 
-            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2ScriptCommand");
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

@@ -76,6 +76,7 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
+        _control?.ItemClicked += ListBox_ItemClicked;
         _control?.RemoveClicked += ListBox_ItemRemoved;
         _control?.LostFocus += Control_LostFocus;
     }
@@ -84,6 +85,7 @@ public class ListBoxControlStrategy : ControlStrategy {
 
     public override void UnsubscribeEvents() {
         _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
+        _control?.ItemClicked -= ListBox_ItemClicked;
         _control?.RemoveClicked -= ListBox_ItemRemoved;
         _control?.LostFocus -= Control_LostFocus;
     }
@@ -173,6 +175,11 @@ public class ListBoxControlStrategy : ControlStrategy {
     private void Control_LostFocus(object? sender, System.EventArgs e) => OnLostFocus();
 
     private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ForceWriteBackValue();
+
+    private void ListBox_ItemClicked(object? sender, ListItemEventArgs e) {
+        // Bei Einzelauswahl ist mit dem Klick die Wahl getroffen — das Edit schließt wie bei Enter.
+        if (CheckBehavior == CheckBehavior.SingleSelection) { OnEnterKey(); }
+    }
 
     private void ListBox_ItemRemoved(object? sender, ListItemEventArgs e) => OnItemRemoved(e);
 

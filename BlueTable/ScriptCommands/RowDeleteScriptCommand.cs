@@ -20,7 +20,7 @@ public class RowDeleteScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowDelete(RowScriptCommand)";
+    public override string Syntax => "RowDelete(Row)";
 
     #endregion
 
@@ -36,7 +36,7 @@ public class RowDeleteScriptCommand : TableGenericScriptCommand {
             return new DoItFeedback("Eigene Zeile kann nur bei ReadOnly Skripten gelöscht werden", true);
         }
 
-        var r = RowCollection.Remove(row, "Script Command: RowDeleteScriptCommand");
+        var r = RowCollection.Remove(row, "Script Command: RowDelete");
 
         return new DoItFeedback(r.FailedReason);
     }

@@ -478,7 +478,7 @@ public class TableControlStrategy : ControlStrategy {
             var columns = CsvColumns(tb);
 
             if (value is { Length: > 0 }) {
-                foreach (var line in value.Replace("\r\n", "\r").SplitAndCutByCr()) {
+                foreach (var line in CsvHelper.SplitCsvRecords(value)) {
                     if (line.StartsWith("##", StringComparison.Ordinal) && _table.Column[_chapterColumnKey] is not null) {
                         currentChapter = line[2..].Trim();
                         continue;

@@ -143,6 +143,9 @@ public static partial class Constants {
     [GeneratedRegex(@"<[^>]+>", RegexOptions.IgnoreCase)]
     public static partial Regex HtmlTagRegex();
 
+    [GeneratedRegex(@"<br\s*/?\s*>|</(p|div|li|tr)\s*>", RegexOptions.IgnoreCase)]
+    public static partial Regex HtmlBreakTagRegex();
+
     [GeneratedRegex(@"\p{L}+")]
     public static partial Regex WordPatternRegex();
 

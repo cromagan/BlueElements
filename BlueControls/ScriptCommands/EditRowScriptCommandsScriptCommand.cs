@@ -21,7 +21,7 @@ public class EditRowScriptCommandsScriptCommand : TableGenericScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
 
-    public override string Syntax => "EditRow(RowScriptCommand);";
+    public override string Syntax => "EditRow(Row);";
 
     #endregion
 

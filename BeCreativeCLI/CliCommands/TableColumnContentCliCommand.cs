@@ -35,28 +35,24 @@ public class TableColumnContentCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            var column = ColumnOfOption(tbl, args);
+        var column = ColumnOfOption(tbl, args);
 
-            if (column is null) {
-                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
-                return 1;
-            }
-
-            var count = 0;
-
-            foreach (var value in column.Contents()) {
-                if (max > 0 && count >= max) { break; }
-
-                // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
-                Console.Out.WriteLine(value.Replace("\r", "\n"));
-                count++;
-            }
-
-            return 0;
-        } finally {
-            Release(tbl);
+        if (column is null) {
+            Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
+            return 1;
         }
+
+        var count = 0;
+
+        foreach (var value in column.Contents()) {
+            if (max > 0 && count >= max) { break; }
+
+            // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
+            Console.Out.WriteLine(value.Replace("\r", "\n"));
+            count++;
+        }
+
+        return 0;
     }
 
     #endregion

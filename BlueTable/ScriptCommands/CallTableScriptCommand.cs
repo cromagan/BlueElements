@@ -28,7 +28,7 @@ public class CallTableScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (attvar.Attributes[0] is not TableScriptVariable vtb || vtb.ValueTable is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true); }
-        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl CallScriptCommand benutzen!", true); }
+        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true); }
 
         var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }

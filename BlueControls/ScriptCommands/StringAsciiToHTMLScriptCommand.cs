@@ -6,7 +6,7 @@ using BlueScript.ScriptVariables;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Ersetzt einen ASCII-StringScriptCommand zu einem HTML-StringScriptCommand. Beispiel: aus ä wird &amp;auml;
+/// Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &amp;auml;
 /// </summary>
 internal class StringAsciiToHTMLScriptCommand : ScriptCommand {
 
@@ -16,7 +16,7 @@ internal class StringAsciiToHTMLScriptCommand : ScriptCommand {
     public override string Command => "stringasciitohtml";
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "StringAsciiToHTML(StringScriptCommand)";
+    public override string Syntax => "StringAsciiToHTML(String)";
 
     #endregion
 

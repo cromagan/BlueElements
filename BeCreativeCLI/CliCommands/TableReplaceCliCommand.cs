@@ -14,7 +14,7 @@ public class TableReplaceCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'gewürfelten' trifft auch als gew&#252;rfelten gespeicherte Werte; --find und --replace dürfen selbst Entities enthalten. " +
-            "Ohne --column werden alle Spalten durchsucht (datenverwaltete Systemspalten wie SYS_DATECREATED ausgenommen), ohne Zeilenadressierung alle Zeilen. " +
+            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit expliziten CLI-Rechten: #CLI oder #CLI-(Benutzername)), ohne Zeilenadressierung alle Zeilen. " +
             "Der neue Zellwert wird wie in der App gespeichert (Sonderzeichen als HTML-Entities). " +
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
 
@@ -56,127 +56,125 @@ public class TableReplaceCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            List<ColumnItem> columns;
+        List<ColumnItem> columns;
 
-            if (args.HasOption("column")) {
-                var column = ColumnOfOption(tbl, args);
+        if (args.HasOption("column")) {
+            var column = ColumnOfOption(tbl, args);
 
-                if (column is null) {
-                    Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
-                    return 1;
-                }
-
-                var columnProblem = ColumnWriteProblem(column);
-
-                if (columnProblem is not null) {
-                    Console.Error.WriteLine(columnProblem);
-                    return 1;
-                }
-
-                columns = [column];
-            } else {
-                // Datenverwaltete Systemspalten still auslassen; sonstige nicht
-                // änderbare Spalten dem Benutzer melden.
-                columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && !c.IsSystemColumn() && ColumnWriteProblem(c) is null)];
-
-                var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && !c.IsSystemColumn() && ColumnWriteProblem(c) is not null).ToList();
-
-                if (skipped.Count > 0) {
-                    Console.Error.WriteLine("Übersprungen (nicht per CLI änderbar): " + string.Join(", ", skipped.Select(c => c.KeyName)));
-                }
+            if (column is null) {
+                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
+                return 1;
             }
 
-            List<RowItem> rows;
+            var columnProblem = ColumnWriteProblem(column);
 
-            if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue")) {
-                var (resolved, error) = ResolveRows(tbl, args);
-                if (error is not null) {
-                    Console.Error.WriteLine(error);
-                    return 1;
-                }
-
-                rows = resolved;
-            } else {
-                rows = [.. tbl.RowsInSaveOrder()];
+            if (columnProblem is not null) {
+                Console.Error.WriteLine(columnProblem);
+                return 1;
             }
 
-            var changedCells = 0;
-            var changedRows = 0;
-            var denied = false;
+            columns = [column];
+        } else {
+            // Systemspalten nur mit expliziten CLI-Rechten einschließen; alle
+            // übrigen nicht änderbaren Spalten dem Benutzer melden.
+            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(c) is null)];
 
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            if (!dryRun) {
-                var fragmentProblem = FragmentEditProblem(tbl);
+            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(c) is not null).ToList();
 
-                if (fragmentProblem is not null) {
-                    Console.Error.WriteLine(fragmentProblem);
-                    return 2;
-                }
+            if (skipped.Count > 0) {
+                Console.Error.WriteLine("Übersprungen (nicht per CLI änderbar): " + string.Join(", ", skipped.Select(c => c.KeyName)));
+            }
+        }
+
+        List<RowItem> rows;
+
+        if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue")) {
+            var (resolved, error) = ResolveRows(tbl, args);
+            if (error is not null) {
+                Console.Error.WriteLine(error);
+                return 1;
             }
 
-            foreach (var row in rows) {
-                var rowChanged = 0;
+            rows = resolved;
+        } else {
+            rows = [.. tbl.RowsInSaveOrder()];
+        }
 
-                foreach (var column in columns) {
-                    var searchtext = SearchTextOf(column, row.CellGetString(column));
-                    var count = CountOccurrences(searchtext, find);
+        var changedCells = 0;
+        var changedRows = 0;
+        var denied = false;
 
-                    if (count == 0) { continue; }
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        if (!dryRun) {
+            var fragmentProblem = FragmentEditProblem(tbl);
 
-                    var newValue = StorageTextOf(column, searchtext.Replace(find, replace, StringComparison.OrdinalIgnoreCase));
+            if (fragmentProblem is not null) {
+                Console.Error.WriteLine(fragmentProblem);
+                return 2;
+            }
+        }
 
-                    if (newValue == row.CellGetString(column)) { continue; }
+        foreach (var row in rows) {
+            var rowChanged = 0;
 
-                    if (dryRun) {
-                        Console.Out.WriteLine($"Trockenlauf Zeile {row.KeyName} Spalte {column.KeyName}: {count} Fundstelle(n)");
-                        changedCells += count;
-                        rowChanged++;
-                        continue;
-                    }
+            foreach (var column in columns) {
+                var searchtext = SearchTextOf(column, row.CellGetString(column));
+                var count = CountOccurrences(searchtext, find);
 
-                    // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
-                    if (!tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-                        Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName}: Keine Rechte, um diesen Wert zu ändern.");
-                        denied = true;
-                        continue;
-                    }
+                if (count == 0) { continue; }
 
-                    var failed = row.CellSet(column, newValue, "bcr table-replace");
+                var newValue = StorageTextOf(column, searchtext.Replace(find, replace, StringComparison.OrdinalIgnoreCase));
 
-                    if (!string.IsNullOrEmpty(failed)) {
-                        Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
-                        continue;
-                    }
+                if (newValue == row.CellGetString(column)) { continue; }
 
-                    Console.Out.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName}: {count} Ersetzung(en)");
+                if (dryRun) {
+                    Console.Out.WriteLine($"Trockenlauf Zeile {row.KeyName} Spalte {column.KeyName}: {count} Fundstelle(n)");
                     changedCells += count;
                     rowChanged++;
+                    continue;
                 }
 
-                if (rowChanged > 0) { changedRows++; }
+                // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
+                // Systemspalten sind bereits über SystemColumnWriteProblem geprüft — PermissionCheck
+                // würde dort den Administrator fälschlich gewähren lassen.
+                if (!column.IsSystemColumn() && !tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName}: Keine Rechte, um diesen Wert zu ändern.");
+                    denied = true;
+                    continue;
+                }
+
+                var failed = row.CellSet(column, newValue, "bcr table-replace");
+
+                if (!string.IsNullOrEmpty(failed)) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
+                    continue;
+                }
+
+                Console.Out.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName}: {count} Ersetzung(en)");
+                changedCells += count;
+                rowChanged++;
             }
 
-            if (denied) {
-                Console.Error.WriteLine("Keine Rechte für mindestens eine Spalte: #CLI in deren Bearbeitungsrechten ergänzen.");
-            }
-
-            if (dryRun) {
-                Console.Out.WriteLine($"Trockenlauf beendet: {changedCells} Fundstelle(n) in {changedRows} Zeile(n) — nichts geändert.");
-                return 0;
-            }
-
-            if (changedCells == 0) {
-                Console.Out.WriteLine("Keine Fundstellen.");
-                return 0;
-            }
-
-            Console.Out.WriteLine($"{changedCells} Ersetzung(en) in {changedRows} Zeile(n).");
-            return SaveTable(tbl);
-        } finally {
-            Release(tbl);
+            if (rowChanged > 0) { changedRows++; }
         }
+
+        if (denied) {
+            Console.Error.WriteLine("Keine Rechte für mindestens eine Spalte: #CLI in deren Bearbeitungsrechten ergänzen.");
+        }
+
+        if (dryRun) {
+            Console.Out.WriteLine($"Trockenlauf beendet: {changedCells} Fundstelle(n) in {changedRows} Zeile(n) — nichts geändert.");
+            return 0;
+        }
+
+        if (changedCells == 0) {
+            Console.Out.WriteLine("Keine Fundstellen.");
+            return 0;
+        }
+
+        Console.Out.WriteLine($"{changedCells} Ersetzung(en) in {changedRows} Zeile(n).");
+        return SaveTable(tbl);
     }
 
     /// <summary>

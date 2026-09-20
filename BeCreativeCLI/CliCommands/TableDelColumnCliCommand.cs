@@ -28,45 +28,41 @@ public class TableDelColumnCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten löschen.
-            if (!tbl.IsAdministrator()) {
-                Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
-                return 1;
-            }
-
-            var column = tbl.Column[name];
-
-            if (column is not { IsDisposed: false }) {
-                Console.Error.WriteLine("Spalte nicht gefunden: " + name);
-                return 1;
-            }
-
-            // Headless gibt es keinen Sicherheitsdialog: Systemspalten niemals löschen.
-            if (column.IsSystemColumn()) {
-                Console.Error.WriteLine("Systemspalte " + column.KeyName + " kann nicht gelöscht werden.");
-                return 1;
-            }
-
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
-            if (!tbl.Column.Remove(column, "bcr table-delcolumn")) {
-                Console.Error.WriteLine("Spalte konnte nicht gelöscht werden: " + column.KeyName);
-                return 1;
-            }
-
-            Console.Out.WriteLine("Spalte gelöscht: " + column.KeyName);
-            return SaveTable(tbl);
-        } finally {
-            Release(tbl);
+        // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten löschen.
+        if (!tbl.IsAdministrator()) {
+            Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
+            return 1;
         }
+
+        var column = tbl.Column[name];
+
+        if (column is not { IsDisposed: false }) {
+            Console.Error.WriteLine("Spalte nicht gefunden: " + name);
+            return 1;
+        }
+
+        // Headless gibt es keinen Sicherheitsdialog: Systemspalten niemals löschen.
+        if (column.IsSystemColumn()) {
+            Console.Error.WriteLine("Systemspalte " + column.KeyName + " kann nicht gelöscht werden.");
+            return 1;
+        }
+
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        var fragmentProblem = FragmentEditProblem(tbl);
+
+        if (fragmentProblem is not null) {
+            Console.Error.WriteLine(fragmentProblem);
+            return 2;
+        }
+
+        if (!tbl.Column.Remove(column, "bcr table-delcolumn")) {
+            Console.Error.WriteLine("Spalte konnte nicht gelöscht werden: " + column.KeyName);
+            return 1;
+        }
+
+        Console.Out.WriteLine("Spalte gelöscht: " + column.KeyName);
+        return SaveTable(tbl);
     }
 
     #endregion

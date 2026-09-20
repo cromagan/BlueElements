@@ -714,7 +714,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ? " "
             : Caption;
 
-        _captionObject.FitSize();
+        _captionObject.FitSize(-1);
         _captionObject.BringToFront();
     }
 

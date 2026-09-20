@@ -43,7 +43,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
 
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
 
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         var r = allFi.Rows;
         allFi.Dispose();
@@ -57,7 +57,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 
-            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRowScriptCommand");
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

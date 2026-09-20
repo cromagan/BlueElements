@@ -23,8 +23,8 @@ internal static class Program {
         UserName = "CLI_" + UserName;
         UserGroup = Cli;
         MessageDG += Program_MessageDG;
-        // Headless: Jeder Konsolen-Input ist eine Benutzeraktion — der Idle-Schutz der Datenüberprüfung darf nicht abbrechen.
-        RowCollection.AbortOnUserIdle = false;
+        // Headless: Die CLI bearbeitet in jedem Fall alle Zeilen — kein Abbruch durch Benutzeraktivität oder Zeitlimit.
+        RowCollection.AllowProcessingAborts = false;
 
         if (args.Length == 0) {
             Console.Error.WriteLine("BeCreative (bcr) — © 2026 Christian Peter, cp33@gmx.de");

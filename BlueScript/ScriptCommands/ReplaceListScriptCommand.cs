@@ -32,7 +32,7 @@ internal class ReplaceListScriptCommand : ScriptCommand {
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceListScriptCommand.", true); }
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei Replace.", true); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (attvar.ValueBoolGet(2)) {

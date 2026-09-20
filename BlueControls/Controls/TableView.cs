@@ -2111,9 +2111,13 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (items is { Count: > 0 }) { strategy.ListItems = items; }
 
             // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
-            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown()) {
+            // Spalten, deren Zelle nur ein Einzelzeichen fassen kann (z. B. Bool),
+            // bleiben bei Einzelauswahl, sonst entstehen Mischwerte wie «+-».
+            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown() && cc.MaxTextLength > 1) {
                 strategy.CheckBehavior = CheckBehavior.MultiSelection;
                 strategy.AutoSort = true;
+            } else if (strategy.SupportsSuggestions) {
+                strategy.CheckBehavior = CheckBehavior.SingleSelection;
             }
 
             strategy.EndInit();

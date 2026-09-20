@@ -7,8 +7,8 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Lädt eine andere Tabelle (die mit den Filtern definiert wurde)
 /// und gibt aus der angegebenen Spalte alle Einträge summiert zurück.
-/// Dabei wird der FilterScriptCommand benutzt.
-/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// Dabei wird der Filter benutzt.
+/// Ein Filter kann mit dem Befehl 'Filter' erstellt werden.
 /// </summary>
 public class SumFilterScriptCommand : TableGenericScriptCommand {
 
@@ -28,7 +28,7 @@ public class SumFilterScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, errorreason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {errorreason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();

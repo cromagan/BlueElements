@@ -37,33 +37,29 @@ public class TableHeadCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            // Tags liegen am Tabellenkopf: Nur ein Administrator der Tabelle darf sie ändern.
-            if (!tbl.IsAdministrator()) {
-                Console.Error.WriteLine("Keine Rechte zum Ändern der Tags: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
-                return 1;
-            }
-
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
-            var value = args[2] ?? string.Empty;
-
-            tbl.Tags = new(value.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-
-            Console.Out.WriteLine(tbl.Tags.Count > 0
-                                              ? "Tags gesetzt: " + string.Join(", ", tbl.Tags)
-                                              : "Alle Tags entfernt.");
-            return SaveTable(tbl);
-        } finally {
-            Release(tbl);
+        // Tags liegen am Tabellenkopf: Nur ein Administrator der Tabelle darf sie ändern.
+        if (!tbl.IsAdministrator()) {
+            Console.Error.WriteLine("Keine Rechte zum Ändern der Tags: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
+            return 1;
         }
+
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        var fragmentProblem = FragmentEditProblem(tbl);
+
+        if (fragmentProblem is not null) {
+            Console.Error.WriteLine(fragmentProblem);
+            return 2;
+        }
+
+        var value = args[2] ?? string.Empty;
+
+        tbl.Tags = new(value.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+
+        Console.Out.WriteLine(tbl.Tags.Count > 0
+                                          ? "Tags gesetzt: " + string.Join(", ", tbl.Tags)
+                                          : "Alle Tags entfernt.");
+        return SaveTable(tbl);
     }
 
     #endregion

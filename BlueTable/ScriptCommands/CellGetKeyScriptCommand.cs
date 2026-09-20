@@ -7,7 +7,7 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.
 /// 
-/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.
+/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.
 /// 
 /// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
 /// Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.

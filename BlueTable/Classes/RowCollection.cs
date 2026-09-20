@@ -61,10 +61,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Properties
 
     /// <summary>
-    /// True: Die Abarbeitung veralteter Zeilen bricht ab, sobald der Benutzer gerade aktiv ist (Schutz für die GUI).
-    /// Headless-Anwendungen (z. B. CLI) setzen dies auf false, da dort jede Eingabe eine Benutzeraktion ist.
+    /// True: Die Hintergrund-Verarbeitung darf vorzeitig abbrechen — bei Benutzeraktivität oder nach Zeitlimit (Schutz für die GUI).
+    /// Headless-Anwendungen (z. B. CLI) setzen dies auf false, damit in jedem Fall alle Zeilen bearbeitet werden.
     /// </summary>
-    public static bool AbortOnUserIdle { get; set; } = true;
+    public static bool AllowProcessingAborts { get; set; } = true;
 
     /// <summary>
     /// Wert in Minuten.
@@ -156,38 +156,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.ReadableText(), 0);
     }
 
+    /// <summary>
+    /// Arbeitet zentral alle veralteten Zeilen aller Tabellen ab (SYS_ROWSTATE älter als die Skript-Version):
+    /// Pro Zeile läuft die komplette Datenüberprüfung inkl. Fehlerprüfung (UpdateRow).
+    /// Bricht bei Benutzeraktivität oder nach Zeitlimit ab, solange AllowProcessingAborts true ist.
+    /// </summary>
     public static void ExecuteValueChangedEvent() {
-        List<Table> l;
-        try {
-            l = Table.AllInstances().ToList(); // Explizites ToList() ist oft stabiler als der Spread-Operator bei Multithreading
-            l = l.Where(x => x is not null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            ExecuteValueChangedEvent();
-            return; // Liste wurde während des Kopierens modifiziert
-        }
-
         // Lock-freie Implementierung mit Interlocked für bessere Performance und Deadlock-Vermeidung
         if (Interlocked.CompareExchange(ref _executingchangedrows, 1, 0) != 0) {
             return; // Bereits in Ausführung
         }
 
         try {
+            var l = GetTablesByLastUse();
             if (l.Count == 0) { return; }
             var tim = Stopwatch.StartNew();
 
             while (NextRowToCeck() is { IsDisposed: false } row) {
                 if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
-                if (AbortOnUserIdle && tbl.ChangedScriptMayAffectUser) {
+                if (AllowProcessingAborts && tbl.ChangedScriptMayAffectUser) {
                     if (l.Count > 0 && row.Table == l[0]) {
                         if (Develop.GetUserIdleSeconds() < 1) { break; }
                     } else {
                         if (Develop.GetUserIdleSeconds() < 10) { break; }
                     }
                 }
-
-                if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
 
                 WaitDelay = Pendingworker.Count * 5;
                 if (Pendingworker.Count > 2) { break; }
@@ -198,9 +192,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (!string.IsNullOrEmpty(f)) { break; }
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
+
+                // Andere Threads (z. B. InvalidatedRowsManager) können die Zeile inzwischen bereits abgearbeitet haben
+                if (!row.NeedsRowUpdate()) { continue; }
+
                 row.UpdateRow(true, "Allgemeines Update (User Idle)");
-                if (AbortOnUserIdle && Develop.GetUserIdleSeconds() < 1) { break; }
-                if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
+
+                if (AllowProcessingAborts) {
+                    if (Develop.GetUserIdleSeconds() < 1) { break; }
+                    if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
+                }
             }
 
             WaitDelay = Math.Min(WaitDelay + 5, 100);
@@ -310,26 +311,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand);
 
         return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
-    }
-
-    /// <summary>
-    /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
-    /// </summary>
-    /// <returns></returns>
-    // TODO: Unused
-    public static List<RowItem> RowListToCheck() {
-        var r = new List<RowItem>();
-        List<Table> allfiles = [.. Table.AllInstances()];
-
-        foreach (var thisTb in allfiles) {
-            if (thisTb is { IsDisposed: false } tb) {
-                if (!tb.CanDoValueChangedScript(false)) { continue; }
-                tb.LoadTableRows(true, 30);
-                r.AddRange(tb.Row);
-            }
-        }
-
-        return [.. r.OrderBy(eintrag => eintrag.UrgencyUpdate)];
     }
 
     public static string UniqueKeyValue() {
@@ -544,7 +525,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // ToArray() erstellt eine Kopie zum Zeitpunkt des Aufrufs
         // TryRemove ist atomar und gibt einfach false zurück wenn Key nicht mehr existiert
         foreach (var kvp in FailedRows.ToArray()) {
-            if (kvp.Key.Table == Table) {
+            if (kvp.Key.IsDisposed || kvp.Key.Table is null || kvp.Key.Table == Table) {
                 FailedRows.TryRemove(kvp.Key, out _);
             }
         }
@@ -564,12 +545,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck is not null) { return rowToCheck; }
 
-        var mup = tb is not TableFile tbf || tbf.MultiUserPossible;
-
-        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !mup));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, true));
         if (rowToCheck is not null) { return rowToCheck; }
 
-        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && (!tb.ChangedScriptMayAffectUser || !r.NeedsRowInitialization()) && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !mup));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && (!tb.ChangedScriptMayAffectUser || !r.NeedsRowInitialization()) && !FailedRows.ContainsKey(r) && r.IsMyRow(TableFile.MyRowLost - 3, true));
         if (rowToCheck is not null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -580,7 +559,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in tb.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && thisRow.NeedsRowUpdate() && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15, true)) {
+            if (dateofmyrow < datefoundmax && thisRow.NeedsRowUpdate() && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(TableFile.MyRowLost - 3, true)) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }
@@ -622,8 +601,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public OperationResult Remove(FilterItem fi, string comment) =>
-        //TODO: unbenutzt
-        Remove(FilterCollection.CalculateFilteredRows(Table, false, fi), comment);
+            //TODO: unbenutzt
+            Remove(FilterCollection.CalculateFilteredRows(Table, false, fi), comment);
 
     public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -791,6 +770,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisR in _internal) {
             thisR.Value.Repair();
         }
+    }
+
+    /// <summary>
+    /// Liefert alle aktiven Tabellen absteigend nach LastUsedDate. Wird die Instanz-Liste
+    /// während des Kopierens geändert, wird der Vorgang maximal dreimal wiederholt.
+    /// </summary>
+    private static List<Table> GetTablesByLastUse() {
+        for (var attempt = 0; attempt < 3; attempt++) {
+            try {
+                return Table.AllInstances().Where(x => x is not null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+            } catch {
+                // Liste wurde während des Kopierens modifiziert — erneuter Versuch
+            }
+        }
+        return [];
     }
 
     private static void PendingWorker_DoWork(object? sender, DoWorkEventArgs e) {

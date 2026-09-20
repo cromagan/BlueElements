@@ -5,7 +5,7 @@ using static BlueScript.ScriptVariables.AiScriptVariable;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Sendet einen Text an die KI und gibt die Antwort als StringScriptCommand zurück. Nutzt den OpenAI-kompatiblen Chat-Completion-Endpunkt (/chat/completions).
+/// Sendet einen Text an die KI und gibt die Antwort als String zurück. Nutzt den OpenAI-kompatiblen Chat-Completion-Endpunkt (/chat/completions).
 /// </summary>
 internal class AskAiScriptCommand : ScriptCommand {
 
@@ -16,7 +16,7 @@ internal class AskAiScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "AskAiScriptCommand(Ai, text)";
+    public override string Syntax => "AskAi(Ai, text)";
 
     #endregion
 

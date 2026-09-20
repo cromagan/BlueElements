@@ -21,7 +21,7 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
-        var t = "Befehl: ImportLinkedScriptCommand";
+        var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);
 

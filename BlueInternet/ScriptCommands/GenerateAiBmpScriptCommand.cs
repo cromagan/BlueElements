@@ -16,7 +16,7 @@ internal class GenerateAiBmpScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => BitmapScriptVariable.ShortName_Variable;
-    public override string Syntax => "GenerateAiBmpScriptCommand(Ai, text, imagemodel)";
+    public override string Syntax => "GenerateAiBmp(Ai, text, imagemodel)";
 
     #endregion
 

@@ -58,58 +58,54 @@ public class TableSearchCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            List<ColumnItem> columns;
+        List<ColumnItem> columns;
 
-            if (args.HasOption("column")) {
-                var column = ColumnOfOption(tbl, args);
+        if (args.HasOption("column")) {
+            var column = ColumnOfOption(tbl, args);
 
-                if (column is null) {
-                    Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
-                    return 1;
-                }
-
-                columns = [column];
-            } else {
-                columns = [.. tbl.Column.Where(c => c is { IsDisposed: false })];
-            }
-
-            var matches = 0;
-            var limitReached = false;
-
-            foreach (var row in tbl.RowsInSaveOrder()) {
-                if (limitReached) { break; }
-
-                foreach (var column in columns) {
-                    if (limitReached) { break; }
-
-                    var cellText = SearchTextOf(column, row.CellGetString(column));
-
-                    var index = cellText.IndexOf(searchValue, StringComparison.OrdinalIgnoreCase);
-
-                    while (index >= 0) {
-                        if (max > 0 && matches >= max) {
-                            limitReached = true;
-                            break;
-                        }
-
-                        Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + ": " + BuildContext(cellText, index, searchValue.Length, context));
-                        matches++;
-
-                        index = cellText.IndexOf(searchValue, index + searchValue.Length, StringComparison.OrdinalIgnoreCase);
-                    }
-                }
-            }
-
-            if (matches == 0) {
-                Console.Error.WriteLine("Keine Treffer.");
+            if (column is null) {
+                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
                 return 1;
             }
 
-            return 0;
-        } finally {
-            Release(tbl);
+            columns = [column];
+        } else {
+            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false })];
         }
+
+        var matches = 0;
+        var limitReached = false;
+
+        foreach (var row in tbl.RowsInSaveOrder()) {
+            if (limitReached) { break; }
+
+            foreach (var column in columns) {
+                if (limitReached) { break; }
+
+                var cellText = SearchTextOf(column, row.CellGetString(column));
+
+                var index = cellText.IndexOf(searchValue, StringComparison.OrdinalIgnoreCase);
+
+                while (index >= 0) {
+                    if (max > 0 && matches >= max) {
+                        limitReached = true;
+                        break;
+                    }
+
+                    Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + ": " + BuildContext(cellText, index, searchValue.Length, context));
+                    matches++;
+
+                    index = cellText.IndexOf(searchValue, index + searchValue.Length, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+        }
+
+        if (matches == 0) {
+            Console.Error.WriteLine("Keine Treffer.");
+            return 1;
+        }
+
+        return 0;
     }
 
     /// <summary>

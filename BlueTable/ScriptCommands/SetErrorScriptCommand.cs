@@ -8,7 +8,7 @@ namespace BlueScript.ScriptCommands;
 /// Kann nur im Skript "Formular vorbereiten" benutzt werden.
 /// Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.
 /// Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier
-/// angegebenen Nachricht. Die Nachricht darf keine Zeilenumbrüche und kein '|' enthalten.
+/// angegebenen Nachricht. Zeilenumbrüche und '|' werden automatisch aus der Nachricht entfernt.
 /// </summary>
 public class SetErrorScriptCommand : TableGenericScriptCommand {
 
@@ -35,11 +35,7 @@ public class SetErrorScriptCommand : TableGenericScriptCommand {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (varCol.GetByKey("ErrorColumns") is not ListOfStringsScriptVariable vls) { return DoItFeedback.InternerFehler(); }
 
-        var message = attvar.ValueStringGet(0);
-
-        if (message.Contains('|') || message.Contains('\r') || message.Contains('\n')) {
-            return new DoItFeedback("Die Nachricht enthält verbotene Zeichen (Zeilenumbruch oder '|').", true);
-        }
+        var message = attvar.ValueStringGet(0).Replace("|", "").Replace("\r", "").Replace("\n", "");
 
         var l = vls.ValueList;
 

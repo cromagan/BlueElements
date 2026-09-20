@@ -6,7 +6,7 @@ using static BlueScript.ScriptVariables.BitmapScriptVariable;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Sendet einen Text und ein Bild an die KI (Vision) und gibt die Antwort als StringScriptCommand zurück. Nutzt den OpenAI-kompatiblen Chat-Completion-Endpunkt mit image_url-Inhalt. Das Modell muss Vision-fähig sein.
+/// Sendet einen Text und ein Bild an die KI (Vision) und gibt die Antwort als String zurück. Nutzt den OpenAI-kompatiblen Chat-Completion-Endpunkt mit image_url-Inhalt. Das Modell muss Vision-fähig sein.
 /// </summary>
 internal class AskAiBmpScriptCommand : ScriptCommand {
 
@@ -17,7 +17,7 @@ internal class AskAiBmpScriptCommand : ScriptCommand {
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => StringScriptVariable.ShortName_Plain;
-    public override string Syntax => "AskAiBmpScriptCommand(Ai, text, image)";
+    public override string Syntax => "AskAiBmp(Ai, text, image)";
 
     #endregion
 

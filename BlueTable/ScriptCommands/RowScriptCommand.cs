@@ -5,13 +5,6 @@ using System.Diagnostics;
 
 namespace BlueScript.ScriptCommands;
 
-/// <summary>
-/// Sucht eine Zeile mittels dem gegebenen FilterScriptCommand.
-/// Wird keine Zeile gefunden, wird eine neue Zeile erstellt.
-/// Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).
-/// Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.
-/// Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.
-/// </summary>
 public static class Row_Extension {
 
     #region Methods
@@ -25,6 +18,13 @@ public static class Row_Extension {
     #endregion
 }
 
+/// <summary>
+/// Sucht eine Zeile mittels des gegebenen FilterScriptCommand.
+/// Wird keine Zeile gefunden, wird eine neue Zeile erstellt.
+/// Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).
+/// Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.
+/// Mit AgeInDays kann angeben werden, ab welchem Alter eine gefundene Zeile invalidiert werden soll.
+/// </summary>
 public class RowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
@@ -51,7 +51,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
     public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
         if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true); }
 
-        if (fic.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der FilterScriptCommand", true); }
+        if (fic.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Filter", true); }
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{tb.KeyName}' nicht gefunden", true); }
 
         foreach (var thisFi in fic) {
@@ -122,11 +122,11 @@ public class RowScriptCommand : TableGenericScriptCommand {
         var cap = myTb?.Caption ?? "Unbekannt";
 
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 1, myTb, scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         var d = attvar.ValueNumGet(0);
 
-        var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'RowScriptCommand' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
+        var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'Row' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
         allFi.Dispose();
 
         return fb;

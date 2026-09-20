@@ -25,6 +25,11 @@ public static class CsvHelper {
     public static List<string> EscapeCSVFields(List<string> fields, char separator) =>
         fields.Select(field => EscapeCSVField(field, separator)).ToList();
 
+    /// <summary>
+    /// Serialisiert die Tabelle RFC-4180-konform: Felder mit Separator, Anführungszeichen
+    /// oder Zeilenumbrüchen werden in Anführungszeichen gesetzt, sodass der Round-Trip
+    /// mit SplitCsvRecords und ParseCSVLine verlustfrei ist.
+    /// </summary>
     public static string ExportCsv(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         var columns = columnList?.ToList() ?? [.. tbl.Column.Where(c => c is not null)];
 
@@ -34,7 +39,7 @@ public static class CsvHelper {
                 break;
 
             case FirstRow.ColumnCaption:
-                AppendCsvRow(sb, columns, c => c.ReadableText().Replace(';', '|').Replace(" |", "|").Replace("| ", "|"));
+                AppendCsvRow(sb, columns, c => c.ReadableText());
                 break;
 
             case FirstRow.ColumnInternalName:
@@ -61,7 +66,7 @@ public static class CsvHelper {
     /// ColumnItem.SaveContent == false werden ausgelassen.
     /// Felder werden escapet (in Anführungszeichen gesetzt, wenn sie Separator,
     /// ", \r oder \n enthalten), sodass der Round-Trip mit
-    /// ParseCSVLine verlustfrei ist.
+    /// SplitCsvRecords und ParseCSVLine verlustfrei ist.
     /// Zeilentrenner ist Environment.NewLine.
     /// </summary>
     /// <param name="firstLineIsHeader">Wenn true, wird als erste Zeile ein Header
@@ -98,19 +103,12 @@ public static class CsvHelper {
             return $"Abbruch, {f}";
         }
 
-        #region Text vorbereiten
-
-        importText = importText.Replace("\r\n", "\r").Trim('\r');
-
-        #endregion
-
         #region Die Zeilen (zeil) vorbereiten
 
-        var ein = importText.SplitAndCutByCr();
         List<List<string>> zeil = [];
         var neuZ = 0;
-        for (var z = 0; z <= ein.GetUpperBound(0); z++) {
-            var line = ein[z];
+        foreach (var record in SplitCsvRecords(importText)) {
+            var line = record;
             if (eliminateMultipleSplitter) {
                 line = line.Replace(separator.ToString() + separator.ToString(), separator.ToString());
             }
@@ -233,7 +231,7 @@ public static class CsvHelper {
             #region Werte in die Spalten schreiben
 
             for (var colNo = 0; colNo < maxColCount; colNo++) {
-                row.CellSet(columns[colNo], string.Join('\r', thisD.Value[colNo].SplitAndCutBy("|")), "CSV-Import");
+                row.CellSet(columns[colNo], thisD.Value[colNo], "CSV-Import");
             }
 
             #endregion
@@ -252,6 +250,45 @@ public static class CsvHelper {
 
         Develop.Message(ErrorType.Info, table, table.Caption, ImageCode.Tabelle, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.", 0);
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Teilt einen CSV-Text in Datensätze auf; Zeilentrenner sind \r, \n oder \r\n.
+    /// Zeilenumbrüche innerhalb von Anführungszeichen bleiben erhalten (RFC 4180).
+    /// </summary>
+    public static List<string> SplitCsvRecords(string text) {
+        List<string> records = [];
+        var current = new StringBuilder();
+        var inQuotes = false;
+
+        for (var i = 0; i < text.Length; i++) {
+            var c = text[i];
+
+            if (inQuotes) {
+                current.Append(c);
+                if (c == '"') {
+                    if (i + 1 < text.Length && text[i + 1] == '"') {
+                        current.Append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                }
+            } else if (c == '"') {
+                inQuotes = true;
+                current.Append(c);
+            } else if (c is '\r' or '\n') {
+                if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n') { i++; }
+                records.Add(current.ToString());
+                current.Clear();
+            } else {
+                current.Append(c);
+            }
+        }
+
+        if (current.Length > 0 || records.Count == 0) { records.Add(current.ToString()); }
+
+        return records;
     }
 
     public static IEnumerable<string> ParseCSVLine(string line, char separator) {
@@ -290,7 +327,7 @@ public static class CsvHelper {
     private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
         for (var colNr = 0; colNr < columns.Count; colNr++) {
             if (columns[colNr] is { } col) {
-                sb.Append(formatter(col));
+                sb.Append(EscapeCSVField(formatter(col), ';'));
                 if (colNr < columns.Count - 1) { sb.Append(';'); }
             }
         }
@@ -304,7 +341,7 @@ public static class CsvHelper {
             tmp = tmp.HtmlToPlain();
         }
 
-        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
+        return tmp;
     }
 
     #endregion

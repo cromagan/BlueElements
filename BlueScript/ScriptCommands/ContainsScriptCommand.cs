@@ -3,19 +3,23 @@
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.
+/// Prüft, ob mindestens einer der angegebenen Werte gefunden wird.
+/// Bei Listen: Prüft, ob einer der Werte als kompletter Eintrag in der Liste steht.
+/// Bei Strings: Prüft, ob eine der Zeichenketten im Text vorkommt (auch mitten im Wort).
+/// Das zweite Attribut legt fest, ob Groß- und Kleinschreibung beachtet wird (true) oder ignoriert wird (false).
+/// Die Rückgabe ist true, sobald ein Wert gefunden wurde, sonst false.
 /// </summary>
 internal class ContainsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable], BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
     public override string Command => "contains";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => BoolScriptVariable.ShortName_Plain;
 
-    public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+    public override string Syntax => "Contains(String/Liste, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 

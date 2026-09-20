@@ -5,10 +5,10 @@ using BlueScript.Classes;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.
+/// Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.
 /// 
 /// Bei Sort True  werden alle Suchergebnisse kombiniert, gemischt und sortiert.
-/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// Ein Filter kann mit dem Befehl 'Filter' erstellt werden.
 /// Es ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.
 /// Dann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.
 /// Ähnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
@@ -31,7 +31,7 @@ public class FilterAllValuesScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();

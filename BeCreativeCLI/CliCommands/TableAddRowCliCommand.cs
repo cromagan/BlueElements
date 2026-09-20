@@ -34,97 +34,95 @@ public class TableAddRowCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            foreach (var set in args.AllOptions("set")) {
-                var eq = set.IndexOf('=');
+        foreach (var set in args.AllOptions("set")) {
+            var eq = set.IndexOf('=');
 
-                if (eq <= 0) {
-                    return UsageError("--set erwartet <spalte>=<wert>, erhalten: " + set);
-                }
-
-                var columnName = set[..eq];
-                var column = tbl.Column[columnName];
-
-                if (column is not { IsDisposed: false }) {
-                    return UsageError("Spalte nicht gefunden: " + columnName);
-                }
-
-                var columnProblem = ColumnWriteProblem(column);
-
-                if (columnProblem is not null) {
-                    Console.Error.WriteLine(columnProblem);
-                    return 1;
-                }
-
-                sets.Add((column, set[(eq + 1)..]));
+            if (eq <= 0) {
+                return UsageError("--set erwartet <spalte>=<wert>, erhalten: " + set);
             }
 
-            // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
-            var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
+            var columnName = set[..eq];
+            var column = tbl.Column[columnName];
 
-            if (firstColumn is not { IsDisposed: false }) {
-                Console.Error.WriteLine("Die Tabelle hat keine erste Spalte.");
+            if (column is not { IsDisposed: false }) {
+                return UsageError("Spalte nicht gefunden: " + columnName);
+            }
+
+            var columnProblem = ColumnWriteProblem(column);
+
+            if (columnProblem is not null) {
+                Console.Error.WriteLine(columnProblem);
                 return 1;
             }
 
-            var firstProblem = ColumnWriteProblem(firstColumn);
-
-            if (firstProblem is not null) {
-                Console.Error.WriteLine(firstProblem);
-                return 1;
-            }
-
-            // Wie eine Benutzereingabe: Neue-Zeilen-Rechte und Bearbeitungsrechte der ersten Spalte prüfen.
-            if (!tbl.PermissionCheck(tbl.PermissionGroupsNewRow, null, true)) {
-                Console.Error.WriteLine("Keine Rechte für neue Zeilen: #CLI bei 'Neue Zeilen anlegen' ergänzen.");
-                return 1;
-            }
-
-            if (!tbl.PermissionCheck(firstColumn.PermissionGroupsChangeCell, null, true)) {
-                Console.Error.WriteLine("Keine Rechte für die Spalte " + firstColumn.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
-                return 1;
-            }
-
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
-            // Wert in das Speicherformat der ersten Spalte überführen (z. B. HTML-Entities).
-            var value = StorageTextOf(firstColumn, args.Option("firstvalue") ?? string.Empty);
-
-            var opr = tbl.Row.GenerateAndAdd([new FilterItem(firstColumn, FilterType.Istgleich, value)], "bcr table-addrow");
-
-            if (opr.IsFailed || opr.Value is not RowItem row) {
-                Console.Error.WriteLine("Zeile konnte nicht angelegt werden: " + opr.FailedReason);
-                return 1;
-            }
-
-            foreach (var (column, setValue) in sets) {
-                // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
-                if (!tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-                    Console.Error.WriteLine("Keine Rechte für die Spalte " + column.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
-                    return 1;
-                }
-
-                // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
-                var failed = row.CellSet(column, StorageTextOf(column, setValue), "bcr table-addrow");
-
-                if (!string.IsNullOrEmpty(failed)) {
-                    Console.Error.WriteLine($"Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
-                    return 1;
-                }
-            }
-
-            Console.Out.WriteLine($"Key der neuen Zeile: {row.KeyName}");
-            return SaveTable(tbl);
-        } finally {
-            Release(tbl);
+            sets.Add((column, set[(eq + 1)..]));
         }
+
+        // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
+        var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
+
+        if (firstColumn is not { IsDisposed: false }) {
+            Console.Error.WriteLine("Die Tabelle hat keine erste Spalte.");
+            return 1;
+        }
+
+        var firstProblem = ColumnWriteProblem(firstColumn);
+
+        if (firstProblem is not null) {
+            Console.Error.WriteLine(firstProblem);
+            return 1;
+        }
+
+        // Wie eine Benutzereingabe: Neue-Zeilen-Rechte und Bearbeitungsrechte der ersten Spalte prüfen.
+        if (!tbl.PermissionCheck(tbl.PermissionGroupsNewRow, null, true)) {
+            Console.Error.WriteLine("Keine Rechte für neue Zeilen: #CLI bei 'Neue Zeilen anlegen' ergänzen.");
+            return 1;
+        }
+
+        if (!tbl.PermissionCheck(firstColumn.PermissionGroupsChangeCell, null, true)) {
+            Console.Error.WriteLine("Keine Rechte für die Spalte " + firstColumn.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
+            return 1;
+        }
+
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        var fragmentProblem = FragmentEditProblem(tbl);
+
+        if (fragmentProblem is not null) {
+            Console.Error.WriteLine(fragmentProblem);
+            return 2;
+        }
+
+        // Wert in das Speicherformat der ersten Spalte überführen (z. B. HTML-Entities).
+        var value = StorageTextOf(firstColumn, args.Option("firstvalue") ?? string.Empty);
+
+        var opr = tbl.Row.GenerateAndAdd([new FilterItem(firstColumn, FilterType.Istgleich, value)], "bcr table-addrow");
+
+        if (opr.IsFailed || opr.Value is not RowItem row) {
+            Console.Error.WriteLine("Zeile konnte nicht angelegt werden: " + opr.FailedReason);
+            return 1;
+        }
+
+        foreach (var (column, setValue) in sets) {
+            // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
+            // Systemspalten sind bereits über SystemColumnWriteProblem geprüft — PermissionCheck
+            // würde dort den Administrator fälschlich gewähren lassen.
+            if (!column.IsSystemColumn() && !tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
+                Console.Error.WriteLine("Keine Rechte für die Spalte " + column.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
+                return 1;
+            }
+
+            // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
+            var failed = row.CellSet(column, StorageTextOf(column, setValue), "bcr table-addrow");
+
+            if (!string.IsNullOrEmpty(failed)) {
+                Console.Error.WriteLine($"Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
+                return 1;
+            }
+        }
+
+        Console.Out.WriteLine($"Key der neuen Zeile: {row.KeyName}");
+        return SaveTable(tbl);
     }
 
     #endregion

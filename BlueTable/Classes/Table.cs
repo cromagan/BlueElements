@@ -63,6 +63,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
     private DateTime _eventScriptVersion = DateTime.MinValue;
     private string _globalShowPass = string.Empty;
+    private bool? _hasPrepareFormulaScript;
     private bool? _hasValueChangedScript;
     private volatile int _isDisposedFlag;
 
@@ -339,6 +340,20 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_globalShowPass == value) { return; }
             ChangeData(TableDataType.GlobalShowPass, null, _globalShowPass, value);
+        }
+    }
+
+    /// <summary>
+    /// True, wenn die Tabelle genau ein prepare_formula-Skript besitzt (Fehlerprüfung der Zeilen).
+    /// </summary>
+    public bool HasPrepareFormulaScript {
+        get {
+            if (_hasPrepareFormulaScript is { } b) { return b; }
+
+            var a = EventScript.Get(ScriptEventTypes.prepare_formula).Count == 1;
+
+            _hasPrepareFormulaScript = a;
+            return a;
         }
     }
 
@@ -2181,6 +2196,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
             scripts.Sort();
             _eventScript = scripts.AsReadOnly();
+            _hasPrepareFormulaScript = null;
             _hasValueChangedScript = null;
             _mayAffectUser = null;
             _changesRowColor = null;
@@ -2292,6 +2308,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 .ToList();
             deduplicated.Sort();
 
+            _hasPrepareFormulaScript = null;
             _hasValueChangedScript = null;
             _mayAffectUser = null;
             _changesRowColor = null;
@@ -2831,6 +2848,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         return newItem;
                     }).ToList().AsReadOnly();
 
+                    _hasPrepareFormulaScript = null;
                     _hasValueChangedScript = null;
                     _mayAffectUser = null;
                     _changesRowColor = null;
@@ -2873,6 +2891,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.EventScriptVersion:
                 _eventScriptVersion = DateTimeParse(value);
+                _hasPrepareFormulaScript = null; // Sicherheitshalber
                 _hasValueChangedScript = null; // Sicherheitshalber
                 break;
 

@@ -76,9 +76,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public List<ListItem>? GetContextMenuItems(object? hotItem) => null;
 
-    internal void FitSize() {
+    internal void FitSize(int maxwidth) {
         if (_design == Design.Undefined) { GetDesign(); }
-        var s = RequiredTextSize(Text, _design, Translate, -1);
+        var s = RequiredTextSize(Text, _design, Translate, maxwidth);
         Width = s.Width;
         Height = s.Height;
     }

@@ -37,38 +37,34 @@ public class TableInfoCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            var detailCount = 0;
+        var detailCount = 0;
 
-            if (args.Flag("columnnames")) { detailCount++; }
-            if (args.Flag("rowkeys")) { detailCount++; }
-            if (args.Flag("rows")) { detailCount++; }
-            if (args.Flag("firstvalues")) { detailCount++; }
-            if (args.HasOption("column")) { detailCount++; }
-            if (args.Flag("row")) { detailCount++; }
+        if (args.Flag("columnnames")) { detailCount++; }
+        if (args.Flag("rowkeys")) { detailCount++; }
+        if (args.Flag("rows")) { detailCount++; }
+        if (args.Flag("firstvalues")) { detailCount++; }
+        if (args.HasOption("column")) { detailCount++; }
+        if (args.Flag("row")) { detailCount++; }
 
-            if (detailCount > 1) {
-                Console.Error.WriteLine("Die Optionen dürfen nicht kombiniert werden, bitte genau eine wählen.");
-                return 2;
-            }
-
-            if (!args.Flag("row") && (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype"))) {
-                Console.Error.WriteLine("Zeilenadressierung wirkt nur zusammen mit --row.");
-                return 2;
-            }
-
-            if (args.Flag("columnnames")) { WriteColumnNames(tbl); return 0; }
-            if (args.Flag("rowkeys")) { WriteRowKeys(tbl); return 0; }
-            if (args.Flag("rows")) { return WriteRowsWithFirstValue(tbl, args); }
-            if (args.Flag("firstvalues")) { return WriteFirstValues(tbl, args); }
-            if (args.HasOption("column")) { return WriteColumnDetails(tbl, args); }
-            if (args.Flag("row")) { return WriteRowValues(tbl, args); }
-
-            WriteSummary(tbl);
-            return 0;
-        } finally {
-            Release(tbl);
+        if (detailCount > 1) {
+            Console.Error.WriteLine("Die Optionen dürfen nicht kombiniert werden, bitte genau eine wählen.");
+            return 2;
         }
+
+        if (!args.Flag("row") && (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype"))) {
+            Console.Error.WriteLine("Zeilenadressierung wirkt nur zusammen mit --row.");
+            return 2;
+        }
+
+        if (args.Flag("columnnames")) { WriteColumnNames(tbl); return 0; }
+        if (args.Flag("rowkeys")) { WriteRowKeys(tbl); return 0; }
+        if (args.Flag("rows")) { return WriteRowsWithFirstValue(tbl, args); }
+        if (args.Flag("firstvalues")) { return WriteFirstValues(tbl, args); }
+        if (args.HasOption("column")) { return WriteColumnDetails(tbl, args); }
+        if (args.Flag("row")) { return WriteRowValues(tbl, args); }
+
+        WriteSummary(tbl);
+        return 0;
     }
 
     /// <summary>

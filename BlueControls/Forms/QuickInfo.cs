@@ -16,10 +16,9 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
 
     private static QuickInfo? _instance;
     private static string _shownTxt = string.Empty;
-    private readonly (Rectangle Bounds, Rectangle WorkingArea)[] _screens;
-
     private readonly int _cachedHeight;
     private readonly int _cachedWidth;
+    private readonly (Rectangle Bounds, Rectangle WorkingArea)[] _screens;
     private volatile bool _externallyClosing;
 
     private volatile bool _wasAutoClose;
@@ -33,7 +32,7 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
         DismissMode = DismissMode.ManualOnly;
 
         capText.Text = text;
-        capText.FitSize();
+        capText.FitSize(-1);
         capText.Location = new Point(Skin.PaddingMedium, Skin.PaddingMedium);
         var primary = Screen.PrimaryScreen;
         var primaryWi = primary is null ? 1920 : primary.Bounds.Size.Width;

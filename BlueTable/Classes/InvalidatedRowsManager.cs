@@ -88,11 +88,11 @@ public class InvalidatedRowsManager {
     public bool AddInvalidatedRow(RowItem? rowItem) {
         if (rowItem?.Table is not { IsDisposed: false } tb) { return false; }
 
-        // Ohne Skript gibt es nichts zu berechnen
-        if (!tb.HasValueChangedScript) { return false; }
+        // Ohne Berechnungs- und Prüfskript gibt es nichts zu tun
+        if (!tb.HasValueChangedScript && !tb.HasPrepareFormulaScript) { return false; }
 
-        // Ansosten ist Endloschleife mit Monitor; lehnt auch defekte/mehrere Skripte ab
-        if (!tb.CanDoValueChangedScript(false)) { return false; }
+        // Gegenstück ist Endloschleife mit Monitor; lehnt auch defekte/mehrere Skripte ab
+        if (tb.HasValueChangedScript && !tb.CanDoValueChangedScript(false)) { return false; }
 
         //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
         //if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
@@ -138,14 +138,16 @@ public class InvalidatedRowsManager {
 
             // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
             do {
-                if (processingStart.ElapsedMilliseconds > 60 * 1000) {
-                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
-                    break;
-                }
+                if (RowCollection.AllowProcessingAborts) {
+                    if (processingStart.ElapsedMilliseconds > 60 * 1000) {
+                        Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                        break;
+                    }
 
-                if (RowCollection.AbortOnUserIdle && Develop.GetUserIdleSeconds() < 1) {
-                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
-                    break;
+                    if (Develop.GetUserIdleSeconds() < 1) {
+                        Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                        break;
+                    }
                 }
                 // Prüfe, ob der Delegat aufgerufen werden soll (mindestens 1 Minute vergangen)
                 var currentTime = DateTime.Now;

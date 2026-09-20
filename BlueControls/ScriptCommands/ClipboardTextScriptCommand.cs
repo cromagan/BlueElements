@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer StringScriptCommand zurückgegeben.
+/// Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.
 /// Mit SetClipoard kann ein Wert in das Clipboard geschrieben werden.
 /// </summary>
 internal class ClipboardTextScriptCommand : ScriptCommand {

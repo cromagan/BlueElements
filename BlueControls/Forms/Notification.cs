@@ -23,14 +23,12 @@ public partial class Notification : FloatingForm, IAnimatable {
     // Kandidaten nach unten, statt sofort auszufaden.
     private readonly IntPtr[] _belowCandidates = [];
 
+    private readonly Action? _buttonAction;
     private readonly int _screenHeight;
 
     private readonly int _screenTime = -999;
 
     private readonly int _screenWidth;
-
-    private readonly Action? _buttonAction;
-
     private int _cachedHeight;
     private int _cachedWidth;
     private volatile bool _hiddenNow;
@@ -48,7 +46,7 @@ public partial class Notification : FloatingForm, IAnimatable {
 
     private Notification(string text) : this() {
         capText.Text = text;
-        capText.FitSize();
+        capText.FitSize(-1);
         capText.Location = new Point(Skin.Padding, Skin.Padding);
         var lines = (capText.Text ?? string.Empty).Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         var needsWider = false;

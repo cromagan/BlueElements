@@ -510,11 +510,13 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Wandelt HTML in reinen Text um: loest Entities auf und entfernt alle Tags.
+    /// Wandelt HTML in reinen Text um: loest Entities auf, wandelt Umbruch-Tags
+    /// in Zeilenumbrüche und entfernt alle übrigen Tags.
     /// </summary>
     public static string HtmlToPlain(this string text) {
         if (string.IsNullOrEmpty(text)) { return string.Empty; }
-        return System.Net.WebUtility.HtmlDecode(text).RemoveXmlTags();
+        var decoded = System.Net.WebUtility.HtmlDecode(text);
+        return HtmlBreakTagRegex().Replace(decoded, "\r\n").RemoveXmlTags();
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {

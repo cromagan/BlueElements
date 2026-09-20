@@ -5,15 +5,15 @@ using BlueScript.Classes;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Lädt eine andere Tabelle sucht eine Zeile mit einem FilterScriptCommand und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.
+/// Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.
 /// 
-/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinkedScriptCommand benutzen.
+/// Achtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.
 /// 
 /// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
 /// Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.
-/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// Ein Filter kann mit dem Befehl 'Filter' erstellt werden.
 /// 
-/// Ähnlichr Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
+/// Ähnlichr Befehle: CellGetRow, ImportLinked
 /// </summary>
 public class CellGetFilterScriptCommand : TableGenericScriptCommand {
 
@@ -34,7 +34,7 @@ public class CellGetFilterScriptCommand : TableGenericScriptCommand {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, errorreason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 3, MyTable(scp), scp.ScriptName, true);
 
-        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {errorreason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();

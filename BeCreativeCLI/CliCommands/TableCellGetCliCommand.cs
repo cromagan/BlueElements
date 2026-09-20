@@ -35,32 +35,28 @@ public class TableCellGetCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            var column = ColumnOfOption(tbl, args);
+        var column = ColumnOfOption(tbl, args);
 
-            if (column is null) {
-                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
-                return 1;
-            }
-
-            var (rows, error) = ResolveRows(tbl, args);
-
-            if (error is not null) {
-                Console.Error.WriteLine(error);
-                return 1;
-            }
-
-            if (rows.Count != 1) {
-                Console.Error.WriteLine($"Die Adressierung lieferte {rows.Count} Zeilen, erwartet wurde genau eine.");
-                return 1;
-            }
-
-            // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
-            Console.Out.WriteLine(rows[0].CellGetString(column).Replace("\r", "\n"));
-            return 0;
-        } finally {
-            Release(tbl);
+        if (column is null) {
+            Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
+            return 1;
         }
+
+        var (rows, error) = ResolveRows(tbl, args);
+
+        if (error is not null) {
+            Console.Error.WriteLine(error);
+            return 1;
+        }
+
+        if (rows.Count != 1) {
+            Console.Error.WriteLine($"Die Adressierung lieferte {rows.Count} Zeilen, erwartet wurde genau eine.");
+            return 1;
+        }
+
+        // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
+        Console.Out.WriteLine(rows[0].CellGetString(column).Replace("\r", "\n"));
+        return 0;
     }
 
     #endregion

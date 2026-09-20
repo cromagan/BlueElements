@@ -45,39 +45,35 @@ public class TableAddColumnCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten anlegen.
-            if (!tbl.IsAdministrator()) {
-                Console.Error.WriteLine("Keine Rechte zum Anlegen von Spalten: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
-                return 1;
-            }
-
-            if (tbl.Column[name] is not null) {
-                Console.Error.WriteLine("Spalte existiert bereits: " + name);
-                return 1;
-            }
-
-            // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
-            // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
-            var fragmentProblem = FragmentEditProblem(tbl);
-
-            if (fragmentProblem is not null) {
-                Console.Error.WriteLine(fragmentProblem);
-                return 2;
-            }
-
-            var column = tbl.Column.GenerateAndAdd(name, args.Option("caption") ?? string.Empty, format, args.Option("quickinfo") ?? string.Empty);
-
-            if (column is not { IsDisposed: false }) {
-                Console.Error.WriteLine("Spalte konnte nicht angelegt werden: " + name);
-                return 1;
-            }
-
-            Console.Out.WriteLine($"Key der neuen Spalte: {column.KeyName}");
-            return SaveTable(tbl);
-        } finally {
-            Release(tbl);
+        // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten anlegen.
+        if (!tbl.IsAdministrator()) {
+            Console.Error.WriteLine("Keine Rechte zum Anlegen von Spalten: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
+            return 1;
         }
+
+        if (tbl.Column[name] is not null) {
+            Console.Error.WriteLine("Spalte existiert bereits: " + name);
+            return 1;
+        }
+
+        // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
+        // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
+        var fragmentProblem = FragmentEditProblem(tbl);
+
+        if (fragmentProblem is not null) {
+            Console.Error.WriteLine(fragmentProblem);
+            return 2;
+        }
+
+        var column = tbl.Column.GenerateAndAdd(name, args.Option("caption") ?? string.Empty, format, args.Option("quickinfo") ?? string.Empty);
+
+        if (column is not { IsDisposed: false }) {
+            Console.Error.WriteLine("Spalte konnte nicht angelegt werden: " + name);
+            return 1;
+        }
+
+        Console.Out.WriteLine($"Key der neuen Spalte: {column.KeyName}");
+        return SaveTable(tbl);
     }
 
     #endregion

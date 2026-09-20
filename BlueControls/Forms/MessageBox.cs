@@ -32,7 +32,9 @@ public partial class MessageBox : Form {
             ? QuickImage.Get(im, 32).HTMLCode + " <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
             : LanguageTool.DoTranslate(txt, false);
 
-        capText.FitSize();
+        var maxSize = MaximumDialogSize();
+
+        capText.FitSize(maxSize.Width - (Skin.Padding * 2) - BorderWidth);
         capText.Location = new Point(Skin.Padding, Skin.Padding);
 
         Size = new Size(capText.Right + BorderWidth + Skin.Padding, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
@@ -44,6 +46,8 @@ public partial class MessageBox : Form {
                 Width = Width - thisButton.Left + BorderWidth;
             }
         }
+        if (Width > maxSize.Width) { Width = maxSize.Width; }
+        if (Height > maxSize.Height) { Height = maxSize.Height; }
         _pressed = null;
         if (Owner is null) {
             StartPosition = FormStartPosition.CenterScreen;
@@ -63,6 +67,14 @@ public partial class MessageBox : Form {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Maximale MsgBox-Größe: zwei Drittel der Arbeitsfläche des Hauptbildschirmes.
+    /// </summary>
+    private static Size MaximumDialogSize() {
+        var wa = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1920, 1080);
+        return new Size((int)(wa.Width * 2.0 / 3.0), (int)(wa.Height * 2.0 / 3.0));
+    }
 
     public static void Show(string txt) => Show(txt, null, true, "OK");
 

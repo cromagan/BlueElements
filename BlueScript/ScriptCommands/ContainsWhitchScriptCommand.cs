@@ -20,7 +20,7 @@ internal class ContainsWhitchScriptCommand : ScriptCommand {
     public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
 
 
-    public override string Syntax => "ContainsWhich(StringScriptCommand, CaseSensitive, Value1, Value2, ...)";
+    public override string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 

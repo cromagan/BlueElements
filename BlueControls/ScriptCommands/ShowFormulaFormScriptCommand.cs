@@ -8,7 +8,7 @@ namespace BlueScript.ScriptCommands;
 
 /// <summary>
 /// Öffnet ein Formular-Fenster.
-/// 1. Dateiname (StringScriptCommand) - Pfad zur Formular-Datei
+/// 1. Dateiname (String) - Pfad zur Formular-Datei
 /// 2. Zeile (RowItem) - Darf Null sein (evtl. RowEmpty-Variable benutzen)
 /// 3. Modus
 /// 4. IsModal (Bool) - Ob das Fenster modal angezeigt werden soll

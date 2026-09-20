@@ -7,7 +7,7 @@ using BlueScript.ScriptVariables;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Simuliert Tastatureingaben. Die Eingabe wird als StringScriptCommand übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.
+/// Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.
 /// </summary>
 internal class SendKeysScriptCommand : ScriptCommand {
 

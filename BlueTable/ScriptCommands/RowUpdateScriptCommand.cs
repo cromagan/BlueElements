@@ -7,7 +7,7 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.
 /// Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.
-/// Beispiel: RowUpdate(RowScriptCommand,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.
+/// Beispiel: RowUpdate(Row,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.
 /// </summary>
 public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
@@ -21,7 +21,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => BoolScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowUpdate(RowScriptCommand, MinAgeInDays, MaxAgeInDays)";
+    public override string Syntax => "RowUpdate(Row, MinAgeInDays, MaxAgeInDays)";
 
     #endregion
 
@@ -29,7 +29,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (scp.Stufe > 10) {
-            return new DoItFeedback("'RowUpdateScriptCommand' wird zu verschachtelt aufgerufen.", true);
+            return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true);
         }
 
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
@@ -51,7 +51,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";
 
-        var coment = $"Skript-Befehl: 'RowUpdateScriptCommand' der Tabelle {cap}, Skript {scp.ScriptName}";
+        var coment = $"Skript-Befehl: 'RowUpdate' der Tabelle {cap}, Skript {scp.ScriptName}";
 
         var v = row.CellGetDateTime(srs);
         var age = DateTime.UtcNow.Subtract(v).TotalDays;

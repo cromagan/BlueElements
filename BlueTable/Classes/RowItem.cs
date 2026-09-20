@@ -77,18 +77,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Wie wichtig ein Update ist. Kleine Zahlen sind wichtiger.
-    /// </summary>
-    public long UrgencyUpdate {
-        get {
-            if (NeedsRowInitialization()) { return 0; }
-            if (NeedsRowUpdate()) { return 1; }
-            if (Table?.Column.SysRowState is { IsDisposed: false } srs) { return CellGetDateTime(srs).Ticks; }
-            return long.MaxValue;
-        }
-    }
-
-    /// <summary>
     /// Interner Zeitstempel der letzten Zelländerung der Zeile.
     /// Wird nach der LinkedCell-Reparatur auf DateTime.MinValue gesetzt (nichts mehr zu reparieren).
     /// </summary>
@@ -428,7 +416,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // benutzerdefiniert immer anders sein können — das wäre inkonsistent.
         if (sourceColumn is { SaveContent: false } or { ScriptType: ScriptType.Nicht_vorhanden }) { return; }
 
-        if (tb.HasValueChangedScript) {
+        if (tb.HasValueChangedScript || tb.HasPrepareFormulaScript) {
             InvalidateCheckData();
             RowCollection.WaitDelay = 0;
         }
@@ -461,9 +449,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         // Erst stempeln, dann einreihen — der Manager prüft den Status über NeedsRowUpdate()
-        if (tb.HasValueChangedScript) {
-            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
-        }
+        RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
         if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
     }
@@ -615,7 +601,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns></returns>
     public bool NeedsRowUpdate() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
-        if (!tb.HasValueChangedScript) { return false; }
+        if (!tb.HasValueChangedScript && !tb.HasPrepareFormulaScript) { return false; }
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
 
@@ -840,6 +826,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
             InvalidateCheckData();
+
+            // Nach der Datenüberprüfung das Formular vorbereiten, um die Fehlerfreiheit der Zeile zu bestimmen
+            if (tb.EventScript.Get(ScriptEventTypes.prepare_formula) is { Count: 1 }) { CheckRow(); }
+
             RowCollection.AddBackgroundWorker(this);
             tb.OnInvalidateView();
             return ok;

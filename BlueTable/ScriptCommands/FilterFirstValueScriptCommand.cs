@@ -11,7 +11,7 @@ namespace BlueScript.ScriptCommands;
 /// 
 /// Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.
 /// Ist der Wert mehrfach vorhanden, wird der nächstbeste zurückgegeben.
-/// Ein FilterScriptCommand kann mit dem Befehl 'FilterScriptCommand' erstellt werden.
+/// Ein Filter kann mit dem Befehl 'Filter' erstellt werden.
 /// Es ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.
 /// Dann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.
 /// Ähnliche Befehle: CellGetRowScriptCommand, ImportLinkedScriptCommand
@@ -34,7 +34,7 @@ public class FilterFirstValueScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellenfehler!", true);

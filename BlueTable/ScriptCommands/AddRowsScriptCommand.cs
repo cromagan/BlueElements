@@ -52,7 +52,7 @@ public class AddRowsScriptCommand : TableGenericScriptCommand {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var scx = RowScriptCommand.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRowsScriptCommand' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
+            var scx = RowScriptCommand.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
             allFi.Dispose();
             if (scx.Failed) { return scx; }
         }

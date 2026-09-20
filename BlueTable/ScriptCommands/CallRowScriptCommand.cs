@@ -21,7 +21,7 @@ public class CallRowScriptCommand : TableGenericScriptCommand {
 
     public override string Returns => StringScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
-    public override string Syntax => "CallRow(Scriptname, RowScriptCommand, Attribut0, ...);";
+    public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 
     #endregion
 
@@ -31,7 +31,7 @@ public class CallRowScriptCommand : TableGenericScriptCommand {
         if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }
 
         if (row == BlockedRow(scp)) {
-            return new DoItFeedback("Mit der eigenen Zeile kann CallRowScriptCommand nicht benutzt werden. Evtl. CallScriptCommand in betracht ziehen.", true);
+            return new DoItFeedback("Mit der eigenen Zeile kann CallRow nicht benutzt werden. Evtl. Call in betracht ziehen.", true);
         }
 
         #region Attributliste erzeugen

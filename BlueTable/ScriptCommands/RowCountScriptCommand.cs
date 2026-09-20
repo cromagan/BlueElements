@@ -5,7 +5,7 @@ using BlueScript.Classes;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Zählt die Zeilen, die mit dem gegebenen FilterScriptCommand gefunden werden.
+/// Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.
 /// </summary>
 public class RowCountScriptCommand : TableGenericScriptCommand {
 
@@ -17,7 +17,7 @@ public class RowCountScriptCommand : TableGenericScriptCommand {
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
-    public override string Syntax => "RowCount(FilterScriptCommand, ...)";
+    public override string Syntax => "RowCount(Filter, ...)";
 
     #endregion
 
@@ -25,7 +25,7 @@ public class RowCountScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 0, MyTable(scp), scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         var r = allFi.Rows;
         allFi.Dispose();

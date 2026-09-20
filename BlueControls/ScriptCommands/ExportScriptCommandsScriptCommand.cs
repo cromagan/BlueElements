@@ -34,10 +34,10 @@ internal class ExportScriptCommandsScriptCommand : TableGenericScriptCommand {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(); }
 
-        #region  FilterScriptCommand ermitteln (allfi)
+        #region  Filter ermitteln (allfi)
 
         var (allFi, failedReason, needsScriptFix) = FilterScriptCommand.ObjectToFilter(attvar.Attributes, 3, myTb, scp.ScriptName, true);
-        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"FilterScriptCommand-Fehler: {failedReason}", needsScriptFix); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         #endregion
 

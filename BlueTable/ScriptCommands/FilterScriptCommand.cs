@@ -7,7 +7,7 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.
 /// Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.
-/// Bei diesem FilterScriptCommand wird die Groß/Kleinschreibung ignoriert.
+/// Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.
 /// Bei Between müssen die Werte so Angegeben werden: 50|100
 /// </summary>
 public class FilterScriptCommand : TableGenericScriptCommand {
@@ -32,22 +32,22 @@ public class FilterScriptCommand : TableGenericScriptCommand {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein FilterScriptCommand.", true); } // new DoItFeedback(infos.LogData, s, "Kein FilterScriptCommand übergeben.");
+            if (attributes[z] is not FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein Filter.", true); } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
 
-            if (fi.ValueFilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen FilterScriptCommand.", true); }
+            if (fi.ValueFilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen Filter.", true); }
 
             if (fii.Column?.Table is { IsDisposed: false } tb) {
-                fii.Column.AddSystemInfo("Value Used in Script-FilterScriptCommand", sourcetable ?? tb, user);
+                fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcetable ?? tb, user);
 
                 if (tb.IsDisposed) { return (null, "Tabellenfehler!", false); }
 
                 //if (tb != sourcetable && !tb.AreScriptsExecutable()) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false); }
             }
 
-            if (!fii.IsOk()) { return (null, $"Der FilterScriptCommand des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "FilterScriptCommand fehlerhaft"); }
+            if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
 
             if (z > ab) {
-                if (fii.Table != allFi[0].Table) { return (null, "FilterScriptCommand über verschiedene Tabellen wird nicht unterstützt.", true); }// new DoItFeedback(infos.LogData, s, "FilterScriptCommand über verschiedene Tabellen wird nicht unterstützt."); }
+                if (fii.Table != allFi[0].Table) { return (null, "Filter über verschiedene Tabellen wird nicht unterstützt.", true); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Tabellen wird nicht unterstützt."); }
             }
 
             allFi.Add(fii);
@@ -113,10 +113,10 @@ public class FilterScriptCommand : TableGenericScriptCommand {
         var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
 
         if (!fii.IsOk()) {
-            return new DoItFeedback("FilterScriptCommand konnte nicht erstellt werden: '" + fii.ErrorReason() + "'", true);
+            return new DoItFeedback("Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'", true);
         }
 
-        filterColumn.AddSystemInfo("FilterScriptCommand in Script", tb, scp.ScriptName);
+        filterColumn.AddSystemInfo("Filter in Script", tb, scp.ScriptName);
 
         return new DoItFeedback(new FilterScriptVariable(fii));
     }

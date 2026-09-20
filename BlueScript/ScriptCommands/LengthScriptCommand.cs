@@ -16,7 +16,7 @@ internal class LengthScriptCommand : ScriptCommand {
 
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override string Syntax => "Length(StringScriptCommand)";
+    public override string Syntax => "Length(String)";
 
     #endregion
 

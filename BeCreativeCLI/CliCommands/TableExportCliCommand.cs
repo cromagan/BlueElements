@@ -54,40 +54,36 @@ public class TableExportCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        try {
-            var columns = tbl.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+        var columns = tbl.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
 
-            if (args.Flag("no-system-columns")) {
-                columns = [.. columns.Where(c => !c.IsSystemColumn())];
-            }
+        if (args.Flag("no-system-columns")) {
+            columns = [.. columns.Where(c => !c.IsSystemColumn())];
+        }
 
-            List<RowItem> rows;
+        List<RowItem> rows;
 
-            if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue")) {
-                var (resolved, error) = ResolveRows(tbl, args);
+        if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue")) {
+            var (resolved, error) = ResolveRows(tbl, args);
 
-                if (error is not null) {
-                    Console.Error.WriteLine(error);
-                    return 1;
-                }
-
-                rows = resolved;
-            } else {
-                rows = [.. tbl.RowsInSaveOrder()];
-            }
-
-            var addressed = args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue");
-
-            if (addressed && rows.Count == 0) {
-                Console.Error.WriteLine("Keine Zeile getroffen.");
+            if (error is not null) {
+                Console.Error.WriteLine(error);
                 return 1;
             }
 
-            Console.Out.Write(BuildCsv(columns, rows, separator, !args.Flag("noheader"), args.Flag("decode")));
-            return 0;
-        } finally {
-            Release(tbl);
+            rows = resolved;
+        } else {
+            rows = [.. tbl.RowsInSaveOrder()];
         }
+
+        var addressed = args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue");
+
+        if (addressed && rows.Count == 0) {
+            Console.Error.WriteLine("Keine Zeile getroffen.");
+            return 1;
+        }
+
+        Console.Out.Write(BuildCsv(columns, rows, separator, !args.Flag("noheader"), args.Flag("decode")));
+        return 0;
     }
 
     /// <summary>
