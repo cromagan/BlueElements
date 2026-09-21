@@ -16,6 +16,8 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
 
     #region Fields
 
+    private const string _readOnlytKey = "ReadOnly";
+
     private const string _scriptKey = "script";
 
     private FlexiControlForDelegate? _button;
@@ -49,6 +51,21 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
     public System.Windows.Forms.Form? OwnerForm { get; set; }
 
     /// <summary>
+    /// Gibt an, ob das Script als ReadOnly ausgeführt wird.
+    /// Dadurch werden Fehlermeldungen unterdrpckt, falls die Zeile während der bearbeitung verändert wurde.
+    /// </summary>
+    public bool ReadOnly {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+
+            ControlStrategyParameter.Set(_readOnlytKey, value);
+            OnPropertyChanged(nameof(ReadOnly));
+        }
+    }
+
+    /// <summary>
     /// Das Skript, das beim Anklicken der Zelle ausgeführt wird.
     /// </summary>
     public string Script {
@@ -72,19 +89,18 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
     /// Führt das Skript aus. Mit Zeile kommen alle Zeilen-Variablen zum Skript
     /// und werden bei Erfolg im Produktivmodus zurückgeschrieben.
     /// </summary>
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktiv, RowItem? row, string? fensterId) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktiv, bool readOnly, RowItem? row, string? fensterId) {
         VariableCollection generatedVars =
         [
             new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
             new StringScriptVariable("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
             new StringScriptVariable("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
-            new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
+            new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"),
+            new StringScriptVariable("WindowID", fensterId ?? string.Empty, true, "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer.")
         ];
 
-        generatedVars.Add(new StringScriptVariable("WindowID", fensterId ?? string.Empty, true, "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer."));
-
         if (row?.Table is { IsDisposed: false } rowTb) {
-            generatedVars.AddRange(rowTb.CreateVariableCollection(row, false, false, produktiv, true, null));
+            generatedVars.AddRange(rowTb.CreateVariableCollection(row, readOnly, false, false, true, null));
         }
 
         var scp = new ScriptProperties("ScriptButton", ScriptCommand.AllMethods.Instances, produktiv, [], row, "ScriptExecuteControlStrategy", "ScriptExecuteControlStrategy in Formular");
@@ -97,12 +113,12 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
 
         var t = sc.Parse(0, "Main", null);
 
-        if (!t.Failed && produktiv && t.Variables is { } vars) {
+        if (!t.Failed && !readOnly && produktiv && t.Variables is { } vars) {
             if (row?.RowStamp() != rowstamp) {
                 return new ScriptEndedFeedback(vars, "Die Zeile wurde während des Ausführens verändert.");
             }
             if (row?.Table is { IsDisposed: false } wtb) {
-                wtb.WriteBackVariables(row, vars, produktiv, false, "Skript ausführen", true);
+                wtb.WriteBackVariables(row, vars, false, false, "Skript ausführen", true);
             }
         }
 
@@ -129,6 +145,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
         result.Add(_button);
         _scriptField = new FlexiControlForProperty<string>(() => Script, 3);
         result.Add(_scriptField);
+        result.Add(new FlexiControlForProperty<bool>(() => ReadOnly, "Variablen schreibgeschützt"));
 
         return result;
     }
@@ -193,7 +210,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
 
         var fensterId = OwnerForm is { IsDisposed: false } owner ? owner.Handle.ToString(CultureInfo.InvariantCulture) : null;
 
-        var t = ExecuteScript(Script, true, row, fensterId);
+        var t = ExecuteScript(Script, true, ReadOnly, row, fensterId);
 
         if (t.Failed) {
             Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{t.ProtocolText}", ImageCode.Kritisch, "Ok");
@@ -210,7 +227,10 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected override void ReadParameters(JsonObject json) => Script = json.GetString(_scriptKey, Script);
+    protected override void ReadParameters(JsonObject json) {
+        Script = json.GetString(_scriptKey, Script);
+        ReadOnly = json.GetBool(_readOnlytKey, ReadOnly);
+    }
 
     protected override void SetValueToControlInternal(string value) { }
 
@@ -218,7 +238,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
     /// Führt das Skript im Editor-Testmodus ohne Tabellen- und Zeilenkontext aus.
     /// Die Zeilen-Variablen stehen nur im Produktivdurchlauf zur Verfügung.
     /// </summary>
-    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) => ExecuteScript(script, !testmode, null, null);
+    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) => ExecuteScript(script, testmode, ReadOnly, null, null);
 
     #endregion
 }

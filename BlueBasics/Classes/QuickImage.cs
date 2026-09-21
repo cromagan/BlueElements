@@ -15,14 +15,13 @@ public sealed class QuickImage : IReadableText, IEditable {
     /// </summary>
     private static readonly object _picsLock = new object();
 
+    private static readonly object _searchPathsLock = new object();
     private static readonly ConcurrentCache<string, QuickImage> Pics = new(StringComparer.OrdinalIgnoreCase, 1000);
 
     /// <summary>
     /// Zusätzliche Ordner, die Generate() nach Symbol-Dateien (Name.PNG) durchsucht. Z. B. Symbol-Pfade von Tabellen.
     /// </summary>
     private static readonly List<string> SearchPaths = [];
-
-    private static readonly object _searchPathsLock = new object();
 
     private readonly Bitmap _bitmap;
 
@@ -83,9 +82,9 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     #endregion
 
-    #region Properties
+    // public static string CachePfad { get; set; } = string.Empty;
 
-    public static string CachePfad { get; set; } = string.Empty;
+    #region Properties
 
     public string CaptionForEditor => "Bild";
     public Color? ChangeGreenTo { get; }
@@ -111,29 +110,6 @@ public sealed class QuickImage : IReadableText, IEditable {
     #region Methods
 
     public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && Pics.ContainsKey(imageCode);
-
-    /// <summary>
-    /// Registriert einen Ordner, den Generate() zusätzlich nach Symbol-Dateien (Name.PNG) durchsucht.
-    /// </summary>
-    public static void RegisterSearchPath(string path) {
-        if (string.IsNullOrWhiteSpace(path)) { return; }
-        var p = path.NormalizePath();
-        if (!p.IsValidFilePath()) { return; }
-        lock (_searchPathsLock) {
-            if (!SearchPaths.Contains(p)) { SearchPaths.Add(p); }
-        }
-    }
-
-    /// <summary>
-    /// Liefert die Namen aller PNG-Symboldateien aus den registrierten Suchpfaden (ohne Dateiendung).
-    /// </summary>
-    public static List<string> UserSymbols() {
-        lock (_searchPathsLock) {
-            return SearchPaths.SelectMany(p => IO.GetFiles(p, "*.png", System.IO.SearchOption.TopDirectoryOnly))
-                .Select(f => f.FileNameWithoutSuffix())
-                .SortedDistinctList();
-        }
-    }
 
     public static ImageCode FileTypeImage(FileFormat file) {
         switch (file) {
@@ -239,7 +215,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     }
 
     public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.None ? qi
-            : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
+                : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
 
     public static QuickImage Get(string code) => Pics.TryGetValue(code, out var p) ? p : new QuickImage(code);
 
@@ -286,6 +262,29 @@ public sealed class QuickImage : IReadableText, IEditable {
     }
 
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
+
+    /// <summary>
+    /// Registriert einen Ordner, den Generate() zusätzlich nach Symbol-Dateien (Name.PNG) durchsucht.
+    /// </summary>
+    public static void RegisterSearchPath(string path) {
+        if (string.IsNullOrWhiteSpace(path)) { return; }
+        var p = path.NormalizePath();
+        if (!p.IsValidFilePath()) { return; }
+        lock (_searchPathsLock) {
+            if (!SearchPaths.Contains(p)) { SearchPaths.Add(p); }
+        }
+    }
+
+    /// <summary>
+    /// Liefert die Namen aller PNG-Symboldateien aus den registrierten Suchpfaden (ohne Dateiendung).
+    /// </summary>
+    public static List<string> UserSymbols() {
+        lock (_searchPathsLock) {
+            return SearchPaths.SelectMany(p => IO.GetFiles(p, "*.png", System.IO.SearchOption.TopDirectoryOnly))
+                .Select(f => f.FileNameWithoutSuffix())
+                .SortedDistinctList();
+        }
+    }
 
     public string IsNowEditable() => string.Empty;
 
@@ -350,13 +349,6 @@ public sealed class QuickImage : IReadableText, IEditable {
                 bmpOri = p._bitmap;
             } else {
                 var dateiName = Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
-
-                if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                    var fullname = CachePfad.NormalizePath() + dateiName;
-                    if (IO.FileExists(fullname)) {
-                        if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
-                    }
-                }
 
                 if (bmpOri is null) {
                     lock (_searchPathsLock) {
