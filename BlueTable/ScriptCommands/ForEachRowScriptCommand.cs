@@ -27,7 +27,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
 
         var varnam = "value";
@@ -57,7 +57,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 
-            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow");
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.Line - 1, infos.Subname, addme, null, "ForEachRow");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

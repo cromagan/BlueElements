@@ -30,10 +30,9 @@ public class CallByFilenameScriptCommand : ScriptCommand {
     ///
     /// </summary>
     /// <param name="scp"></param>
-    /// <param name="ld"></param>
     /// <param name="normalizedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
     /// <param name="lineadd">Zb. bei einer Do Schleife, die Zeile, in der das Do steht. Bei Scripten aus dem Dateisytem 0</param>
-    /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
+    /// <param name="subname">Zb. bei einer Do Schleife, der Subname des äußeren Skripts. Bei Scripten aus dem Dateisystem dessen Name</param>
     /// <param name="addMe"></param>
     /// <param name="varCol"></param>
     /// <param name="args"></param>

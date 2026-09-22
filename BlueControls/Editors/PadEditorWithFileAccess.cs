@@ -111,12 +111,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
-    private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
-        if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
-
-        LoadSymbol.ShowDialog();
-    }
-
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
         var l = GetInstanceOfType<PadItem>();
 
@@ -156,19 +150,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private static void SaveLayoutToDisk(string fileName, string content) {
         WriteAllText(fileName, content, Win1252, false);
         ConnectedFormula.Get(fileName)?.Invalidate();
-    }
-
-    private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
-        if (Pad.Items is null) { return; }
-
-        if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = ReadAllText(LoadSymbol.FileName, Win1252);
-        LastFilePath = LoadSymbol.FileName.FilePath();
-
-        var i = ParseableItem.NewByParsing<PadItem>(x);
-        if (i is null) { return; }
-        i.GetNewIdsForEverything();
-        Pad.Items.Add(i);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName);

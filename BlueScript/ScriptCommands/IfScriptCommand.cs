@@ -41,11 +41,11 @@ public class IfScriptCommand : ScriptCommand {
 
         var scpt = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain);
 
-        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls: " + attvar.FailedReason, true); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = CallByFilenameScriptCommand.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If");
+            var scx = CallByFilenameScriptCommand.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.Line - 1, infos.Subname, null, null, "If");
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 

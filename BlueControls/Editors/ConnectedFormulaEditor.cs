@@ -321,12 +321,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         System.IO.File.WriteAllText(@"D:\01_Data\test.json", json, Win1252);
     }
 
-    private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
-        if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
-
-        LoadSymbol.ShowDialog();
-    }
-
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (Formula is null) { return; }
 
@@ -437,21 +431,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var x = new FileExplorerPadItem();
 
         AddCentered(x);
-    }
-
-    private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
-        if (Pad.Items is null) { return; }
-
-        if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var toparse = ReadAllText(LoadSymbol.FileName, Win1252);
-        LastFilePath = LoadSymbol.FileName.FilePath();
-
-        var i = ParseableItem.NewByParsing<ReciverPadItem>(toparse);
-        if (i is not { IsDisposed: false } api) { return; }
-
-        api.GetNewIdsForEverything();
-
-        Pad.Items.Add(api);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);

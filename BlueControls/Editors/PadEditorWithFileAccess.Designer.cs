@@ -47,8 +47,6 @@ namespace BlueControls.Forms {
             this.btnAddImage = new BlueControls.Controls.Button();
             this.btnAddDimension = new BlueControls.Controls.Button();
             this.btnAddLine = new BlueControls.Controls.Button();
-            this.LoadSymbol = new System.Windows.Forms.OpenFileDialog();
-            this.btnSymbolLaden = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -87,7 +85,6 @@ namespace BlueControls.Forms {
             // 
             // grpKomponenteHinzufügen
             // 
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnSymbolLaden);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
@@ -291,24 +288,6 @@ namespace BlueControls.Forms {
             this.btnAddLine.Text = "Linie";
             this.btnAddLine.Click += new System.EventHandler(this.btnAddLine_Click);
             // 
-            // LoadSymbol
-            // 
-            this.LoadSymbol.DefaultExt = "BCS";
-            this.LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
-            this.LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
-            this.LoadSymbol.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadSymbol_FileOk);
-            // 
-            // btnSymbolLaden
-            // 
-            this.btnSymbolLaden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSymbolLaden.ImageCode = "Ordner|16";
-            this.btnSymbolLaden.Location = new System.Drawing.Point(288, 2);
-            this.btnSymbolLaden.Name = "btnSymbolLaden";
-            this.btnSymbolLaden.Size = new System.Drawing.Size(72, 66);
-            this.btnSymbolLaden.TabIndex = 13;
-            this.btnSymbolLaden.Text = "Symbol laden";
-            this.btnSymbolLaden.Click += new System.EventHandler(this.btnSymbolLaden_Click);
-            // 
             // PadEditorWithFileAccess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -348,7 +327,5 @@ namespace BlueControls.Forms {
         private Button btnAddImage;
         private Button btnAddDimension;
         private Button btnAddLine;
-        private Button btnSymbolLaden;
-        private OpenFileDialog LoadSymbol;
     }
 }

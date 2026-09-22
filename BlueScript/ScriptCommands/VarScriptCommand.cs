@@ -27,7 +27,7 @@ internal class VarScriptCommand : ScriptCommand {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen.", true); }
 
-        return VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
+        return VariablenBerechnung(varCol, scp, infos.AttributText + ";", true);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {

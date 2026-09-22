@@ -413,8 +413,9 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
         // nur der ControlStrategy und das Dropdown werden über die Ziel-Spalte bestimmt.
         var contentHolderCellColumn = originalColumn;
         var contentHolderCellRow = row;
+        var linkedCellInfo = string.Empty;
         if (contentHolderCellRow is { IsDisposed: false } cr && originalColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = cr.LinkedCellData(contentHolderCellColumn, true, true, false);
+            (contentHolderCellColumn, contentHolderCellRow, linkedCellInfo, _) = cr.LinkedCellData(contentHolderCellColumn, true, true, false);
         }
 
         if (contentHolderCellColumn is not { IsDisposed: false }) {
@@ -441,7 +442,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
             // Bei LinkedCell-Spalten (column != originalColumn) kann für
             // eine neue Zeile kein Dropdown erstellt werden.
             if (contentHolderCellColumn != originalColumn && contentHolderCellRow is null) {
-                TableView.NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
+                TableView.NotEditableInfo(linkedCellInfo is { Length: > 0 } li ? li : "Bei Zellverweisen kann keine neue Zeile erstellt werden.");
                 return true;
             }
 

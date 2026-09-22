@@ -20,7 +20,7 @@ internal class IsNullOrZeroScriptCommand : ScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, scp);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden) {

@@ -275,7 +275,6 @@ public static class IO {
                                             "TBLC" => FileFormat.TableChunk,
                                             "LNK" or "URL" => FileFormat.Link,
                                             "BCR" => FileFormat.BlueCreativeFile,
-                                            "BCS" => FileFormat.BlueCreativeSymbol,
                                             _ => FileFormat.Unknown
                                         };
 

@@ -41,11 +41,7 @@ public partial class GlobalMonitor : Form {
         tb.Column.GenerateAndAdd("Message", "Message", TextMultilineColumnFormat.Instance);
         tb.Column.GenerateAndAdd("Indent", "Stufe", LongColumnFormat.Instance);
 
-        foreach (var thisColumn in tb.Column) {
-            if (!thisColumn.IsSystemColumn()) {
-                thisColumn.DisableAllEditing();
-            }
-        }
+        tb.Column.DisableAllEditing();
 
         if (tb.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new ImageAndTextRenderer {

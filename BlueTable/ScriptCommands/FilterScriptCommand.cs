@@ -32,7 +32,7 @@ public class FilterScriptCommand : TableGenericScriptCommand {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein Filter.", true); } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
+            if (attributes[z] is not FilterScriptVariable fi) { return (null, $"Attribut {z + 1} ist kein Filter.", true); }
 
             if (fi.ValueFilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen Filter.", true); }
 
@@ -44,10 +44,10 @@ public class FilterScriptCommand : TableGenericScriptCommand {
                 //if (tb != sourcetable && !tb.AreScriptsExecutable()) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false); }
             }
 
-            if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
+            if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }
 
             if (z > ab) {
-                if (fii.Table != allFi[0].Table) { return (null, "Filter über verschiedene Tabellen wird nicht unterstützt.", true); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Tabellen wird nicht unterstützt."); }
+                if (fii.Table != allFi[0].Table) { return (null, "Filter über verschiedene Tabellen wird nicht unterstützt.", true); }
             }
 
             allFi.Add(fii);

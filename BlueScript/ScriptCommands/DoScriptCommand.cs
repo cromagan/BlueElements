@@ -20,7 +20,7 @@ internal class DoScriptCommand : ScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
 
         var index = -1;
@@ -33,7 +33,7 @@ internal class DoScriptCommand : ScriptCommand {
             if (index > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true); }
 
             var addme = new List<ScriptVariable>() { new DoubleScriptVariable("Index", index, true, "Iterations-Variable") };
-            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "Do");
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.Line - 1, infos.Subname, addme, null, "Do");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 

@@ -822,10 +822,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             var b = tb.Column.GenerateAndAdd("Such", "Suchtext", TextOneLineColumnFormat.Instance);
             if (b is not { IsDisposed: false }) { return; }
+
+            // Nur die Such-Spalte bleibt editierbar; alle anderen Spalten sind reine Anzeigen.
+            tb.Column.DisableAllEditing();
+
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
             b.ControlStrategy = ComboBoxControlStrategy.ClassId;
+            b.PermissionGroupsChangeCell = new([Everybody]);
             b.MinTextLength = 1;
 
             var dd = b.DropDownItems.Clone();

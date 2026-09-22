@@ -109,8 +109,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             if (menu.Count == 0 || infos.Count == 0 || menu.Count != infos.Count) {
                 if (scf.Variables is { } resultVars) {
                     var txt = "Menu und Infos müssen die gleiche Anzahl Einträge > 0 haben";
-                    var ld = new LogData("Row-Adder", 0);
-                    scf = new ScriptEndedFeedback(resultVars, ld, true, false, false, txt, null);
+                    scf = new ScriptEndedFeedback(resultVars, "Row-Adder", 0, true, false, false, txt, null);
                 }
             }
         }

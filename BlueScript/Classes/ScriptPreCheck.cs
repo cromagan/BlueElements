@@ -89,7 +89,7 @@ public static class ScriptPreCheck {
 
             if (idEnd > pos && lookup.TryGetValue(text[pos..idEnd], out var matchingMethods)) {
                 foreach (var thisC in matchingMethods) {
-                    var f = thisC.CanDo(text, pos, false, new LogData(context, line));
+                    var f = thisC.CanDo(text, pos, false, context, line);
 
                     // Phase 1: Exakter Command-Match → NeedsScriptFix ist ein echter Fehler
                     if (f.NeedsScriptFix) {
@@ -115,7 +115,7 @@ public static class ScriptPreCheck {
                     // Bereits in Phase 1 geprüft → überspringen
                     if (idEnd > pos && string.Equals(text[pos..idEnd], thisC.Command, StringComparison.OrdinalIgnoreCase)) { continue; }
 
-                    var f = thisC.CanDo(text, pos, false, new LogData(context, line));
+                    var f = thisC.CanDo(text, pos, false, context, line);
 
                     if (f.NeedsScriptFix) {
                         // Phase 2: Prefix-Match → könnte ein False Positive sein

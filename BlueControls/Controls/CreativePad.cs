@@ -237,7 +237,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             LastClickedItem = bpi;
             contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
             contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, hotItem is ICloneable));
-            contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, hotItem is IStringable));
             //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem is IStringable));
             //contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, hotItem is IStringable));
             contextMenu.Add(Separator());
@@ -648,20 +647,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatSystemname.Instance);
     //    Unselect();
     //}
-    private void ContextMenu_Export(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is not IStringable ps) { return; }
-        using var f = new System.Windows.Forms.SaveFileDialog();
-        f.CheckFileExists = false;
-        f.CheckPathExists = true;
-        if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }
-        f.AddExtension = true;
-        f.DefaultExt = "bcs";
-        f.Title = "Speichern:";
-        f.ShowDialog();
-        if (string.IsNullOrEmpty(f.FileName)) { return; }
-        IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Win1252, false);
-        IO.LastFilePath = f.FileName.FilePath();
-    }
 
     private void ContextMenu_Hinten(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not PadItem item) { return; }

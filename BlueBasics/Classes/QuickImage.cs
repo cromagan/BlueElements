@@ -174,9 +174,6 @@ public sealed class QuickImage : IReadableText, IEditable {
             case FileFormat.BlueCreativeFile:
                 return ImageCode.Smiley;
 
-            case FileFormat.BlueCreativeSymbol:
-                return ImageCode.Smiley;
-
             case FileFormat.Icon:
                 return ImageCode.Bild;
 

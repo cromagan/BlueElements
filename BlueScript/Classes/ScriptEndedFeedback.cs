@@ -6,11 +6,11 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, LogData ld, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
+    public ScriptEndedFeedback(VariableCollection variables, string routine, int line, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, ScriptVariable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue) {
         Variables = variables;
         GiveItAnotherTry = false;
-        Routine = ld.Subname;
-        Line = ld.Line;
+        Routine = routine;
+        Line = line;
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     /// <summary>
     /// Überschreibt die virtuale DoItFeedback.Line. Wird beim
-    /// Konstruieren aus dem übergebenen LogData gesetzt.
+    /// Konstruieren aus Routine und Zeile gesetzt.
     /// </summary>
     public override int Line { get; }
 

@@ -29,7 +29,6 @@ namespace BlueControls.Forms {
             grpVorschau = new GroupBox();
             btnPfeileAusblenden = new Button();
             grpFelder = new GroupBox();
-            btnSymbolLaden = new Button();
             btnWeitereCF = new Button();
             btnRegionAdd = new Button();
             btnButton = new Button();
@@ -56,7 +55,6 @@ namespace BlueControls.Forms {
             lstPages = new ListBox();
             LoadTab = new OpenFileDialog();
             SaveTab = new SaveFileDialog();
-            LoadSymbol = new OpenFileDialog();
             grpBETA = new GroupBox();
             btnSpeichernBeta = new Button();
             btnOeffnenBeta = new Button();
@@ -177,7 +175,6 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             grpFelder.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
-            grpFelder.Controls.Add(btnSymbolLaden);
             grpFelder.Controls.Add(btnWeitereCF);
             grpFelder.Controls.Add(btnRegionAdd);
             grpFelder.Controls.Add(btnButton);
@@ -192,17 +189,6 @@ namespace BlueControls.Forms {
             grpFelder.TabIndex = 0;
             grpFelder.TabStop = false;
             grpFelder.Text = "Felder";
-            // 
-            // btnSymbolLaden
-            // 
-            btnSymbolLaden.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnSymbolLaden.ImageCode = "Ordner|16";
-            btnSymbolLaden.Location = new Point(256, 2);
-            btnSymbolLaden.Name = "btnSymbolLaden";
-            btnSymbolLaden.Size = new Size(72, 66);
-            btnSymbolLaden.TabIndex = 14;
-            btnSymbolLaden.Text = "Symbol laden";
-            btnSymbolLaden.Click += btnSymbolLaden_Click;
             // 
             // btnWeitereCF
             // 
@@ -503,13 +489,6 @@ namespace BlueControls.Forms {
             SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
             SaveTab.Title = "Bitte neuen Dateinamen des Formulars wählen.";
             // 
-            // LoadSymbol
-            // 
-            LoadSymbol.DefaultExt = "BCS";
-            LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
-            LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
-            LoadSymbol.FileOk += LoadSymbol_FileOk;
-            // 
             // grpBETA
             // 
             grpBETA.BackColor = System.Drawing.Color.FromArgb(244, 245, 246);
@@ -611,8 +590,6 @@ namespace BlueControls.Forms {
         private Button btnArbeitsbereich;
         private Button btnRegionAdd;
         private Button btnWeitereCF;
-        private Button btnSymbolLaden;
-        private OpenFileDialog LoadSymbol;
         private GroupBox grpBETA;
         private Button btnSpeichernBeta;
         private Button btnOeffnenBeta;

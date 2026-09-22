@@ -6,22 +6,24 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData ld) {
+    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, string subname, int line) {
         ContinueOrErrorPosition = errorposition;
         FailedReason = failedreason;
         NeedsScriptFix = needsScriptFix;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
-        LogData = ld;
+        Subname = subname;
+        Line = line;
     }
 
-    public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
+    public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, string subname, int line) {
         ContinueOrErrorPosition = continuePosition;
         FailedReason = string.Empty;
         NeedsScriptFix = false;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        LogData = ld;
+        Subname = subname;
+        Line = line;
     }
 
     #endregion
@@ -44,13 +46,21 @@ public readonly struct CanDoFeedback {
     public int ContinueOrErrorPosition { get; }
 
     /// <summary>
+    /// Zeilennummer des Befehls im äußeren Skript (für Fehlermeldungen und verschachtelte Blöcke).
+    /// </summary>
+    public int Line { get; }
+
+    /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
     /// Ansonsten den Grund, warum er nicht ausgeführt werden kann.
     /// Nur in Zusammenhang mit NeedsScriptFix zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
     /// </summary>
     public string FailedReason { get; }
 
-    public LogData LogData { get; }
+    /// <summary>
+    /// In welcher Sub wir uns gerade befinden.
+    /// </summary>
+    public string Subname { get; }
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.

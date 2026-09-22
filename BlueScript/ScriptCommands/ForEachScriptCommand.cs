@@ -25,7 +25,7 @@ internal class ForEachScriptCommand : ScriptCommand {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(attvar); }
 
         var l = attvar.ValueListStringGet(1);
@@ -50,7 +50,7 @@ internal class ForEachScriptCommand : ScriptCommand {
                 new DoubleScriptVariable("Index", index, true, "Iterations-Variable")
             };
 
-            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach");
+            scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.Line - 1, infos.Subname, addme, null, "ForEach");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
