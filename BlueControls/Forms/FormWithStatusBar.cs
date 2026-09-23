@@ -25,8 +25,8 @@ public partial class FormWithStatusBar : Form {
     /// </summary>
     private static bool _staticHandlerRegistered;
 
-    private DateTime _lastMessage = DateTime.UtcNow;
     private readonly System.Threading.Timer? _timMessageClearer;
+    private DateTime _lastMessage = DateTime.UtcNow;
 
     #endregion
 
@@ -57,7 +57,7 @@ public partial class FormWithStatusBar : Form {
     public int MessageSeconds { get; } = 10;
 
     [DefaultValue(true)]
-    public bool ShowStatusBar { get; } = true;
+    public bool ShowStatusBar { get; set; } = true;
 
     #endregion
 

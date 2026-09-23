@@ -20,6 +20,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #region Fields
 
     private ColumnItem? _column;
+
+    private string _columnKey;
     private RowItem? _lastrow;
     private CancellationTokenSource? _markerCancellation;
 
@@ -40,7 +42,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.ShowInfoWhenDisabled = true;
         f.CaptionPosition = captionPosition;
         f.ControlStrategy = strategy;
-        ColumnKey = columnKey;
+        _columnKey = columnKey;
     }
 
     #endregion
@@ -58,8 +60,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 return _column.ReadableText() + ":";
             }
 
-            if (!string.IsNullOrEmpty(ColumnKey)) {
-                return ColumnKey + ":";
+            if (!string.IsNullOrEmpty(_columnKey)) {
+                return _columnKey + ":";
             }
 
             return "[?]";
@@ -67,12 +69,12 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     [DefaultValue(CaptionPosition.Über_dem_Feld)]
-    public CaptionPosition CaptionPosition { get => f?.CaptionPosition ?? CaptionPosition.Über_dem_Feld; init => f?.CaptionPosition = value; }
+    public CaptionPosition CaptionPosition { get => f?.CaptionPosition ?? CaptionPosition.Über_dem_Feld; set => f?.CaptionPosition = value; }
 
     public ColumnItem? Column {
         get {
             try {
-                return _column ??= TableInput is { IsDisposed: false } tb ? tb.Column[ColumnKey] : null;
+                return _column ??= TableInput is { IsDisposed: false } tb ? tb.Column[_columnKey] : null;
             } catch {
                 // Multitasking sei dank kann _table trotzem null sein...
                 Develop.AbortAppIfStackOverflow();
@@ -82,14 +84,22 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     [DefaultValue("")]
-    public string ColumnKey { get; init; }
+    public string ColumnKey {
+        get => _columnKey;
+        set {
+            if (_columnKey == value) { return; }
+            _columnKey = value;
+            Invalidate_CachedColumn();
+            Invalidate();
+        }
+    }
 
-    public string ControlStrategy { get => f.ControlStrategy; init => f.ControlStrategy = value; }
+    public string ControlStrategy { get => f.ControlStrategy; set => f.ControlStrategy = value; }
 
     /// <summary>
     /// Parameter der strategie-spezifischen Werte der ControlStrategie als Json.
     /// </summary>
-    public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; init => f.ControlStrategyParameter = value; }
+    public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; set => f.ControlStrategyParameter = value; }
 
     [DefaultValue(-1)]
     public int ControlX {

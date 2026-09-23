@@ -102,7 +102,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
             field?.Disposed -= _table_Disposed;
             field = value;
 
-            _tableName = value?.KeyName ?? string.Empty;
+            // Bei null (Tabellen-Ende/Dispose) den Namen behalten, damit die Bindung serialisierbar bleibt.
+            _tableName = value?.KeyName ?? _tableName;
             _tableLoaded = true;
 
             field?.Disposed += _table_Disposed;

@@ -59,13 +59,13 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
     public bool AllowEdit { get; set; } = true;
 
     [DefaultValue(true)]
-    public bool AllowScreenshots { get; } = true;
+    public bool AllowScreenshots { get; set; } = true;
 
     [DefaultValue(false)]
-    public bool CreateDir { get; init; } = false;
+    public bool CreateDir { get; set; } = false;
 
     [DefaultValue(false)]
-    public bool DeleteDir { get; init; } = false;
+    public bool DeleteDir { get; set; } = false;
 
     [DefaultValue("")]
     public string Directory {

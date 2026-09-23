@@ -14,6 +14,13 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(ItemClicked))]
 public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
+    #region Fields
+
+    // Maximale Anzahl der anzuzeigenden Einträge.
+    private const int MaxCount = 20;
+
+    #endregion
+
     #region Constructors
 
     public LastFilesCombo() : base() {
@@ -29,8 +36,18 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Properties
 
-    // Maximale Anzahl der anzuzeigenden Einträge.
-    private const int MaxCount = 20;
+    /// <summary>
+    /// Gibt an, ob die Datei physisch existieren muss, um angezeigt zu werden.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool MustExist {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            GenerateMenu();
+        }
+    } = true;
 
     public List<string> Settings { get; } = [];
 
@@ -62,7 +79,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public void AddFileName(string? fileName, string additionalText) {
         if (fileName is null) { return; }
 
-        if (FileExists(fileName)) {
+        if (!MustExist || FileExists(fileName)) {
             this.SettingsAdd($"{fileName}|{additionalText}");
         }
 
@@ -120,7 +137,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             .Reverse()
             .Select(s => s.SplitAndCutBy("|"))
             .Where(x => x.Length > 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null)
-            .Where(x => FileExists(x[0]))
+            .Where(x => !MustExist || FileExists(x[0]))
             .Take(MaxCount)
             .ToList();
 
@@ -129,7 +146,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             var sb = new StringBuilder();
 
             sb.Append((i + 1).ToString3()).Append(": ");
-            sb.Append(x[0].FileNameWithSuffix());
+            sb.Append(MustExist ? x[0].FileNameWithSuffix() : x[0]);
 
             if (x.Length > 1 && !string.IsNullOrEmpty(x[1])) {
                 sb.Append(" - ").Append(x[1]);
