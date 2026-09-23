@@ -61,7 +61,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string KeyName { get; private set; }
+    public string KeyName { get; }
 
     public Table? Table {
         get;
@@ -508,26 +508,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
         }
 
-        if (targetRow is not null) {
-            if (repairallowed && inputColumn.RelationType == RelationType.CellValues) {
-                var oldvalue = CellGetStringCore(inputColumn);
-                var newvalue = targetRow.CellGetString(targetColumn);
+        // Reparatur-Schreibvorgang: Ist die Ziel-Zeile vorhanden, wird ihr Wert übernommen,
+        // fehlt sie, wird der eigene Wert geleert. Ein Leeren ist aber nur erlaubt, wenn das
+        // "nicht gefunden" verlässlich ist: Bei einer Chunk-Tabelle ohne geladenen Chunk kann
+        // die Zeile trotzdem existieren — der alte Wert bliebe sonst unwiederbringlich verloren.
+        if (repairallowed && (targetRow is not null || linkedTable is not TableChunk tc || tc.ChunkIsLoaded(fc.ChunkVal))) {
+            var oldvalue = CellGetStringCore(inputColumn);
+            var newvalue = targetRow?.CellGetString(targetColumn) ?? string.Empty;
 
-                if (oldvalue != newvalue) {
-                    var chunkValue = ChunkValue;
-                    var f = IsCellEditable(inputColumn, this, chunkValue, true);
-                    if (!string.IsNullOrEmpty(f)) { return (targetColumn, targetRow, f, false); }
+            if (oldvalue != newvalue) {
+                if (IsCellEditable(inputColumn, this, ChunkValue, true) is { Length: > 0 } f) { return (targetColumn, targetRow, f, false); }
 
-                    //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
-                    //row.CellSet(column, targetRow.KeyName);
-                    //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
-
-                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", ChangeFlags.UserCommand);
-                    if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
-                }
+                //Nicht CellSet! Damit würde der Wert der Ziel-Tabelle verändert.
+                var comment = targetRow is null ? "Ziel-Zeile nicht mehr vorhanden" : "Automatische Reparatur";
+                if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand) is { Length: > 0 } fehler) { return (targetColumn, targetRow, fehler, false); }
             }
-            targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
         }
+
+        if (targetRow is not null) { targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName); }
 
         return (targetColumn, targetRow, string.Empty, true);
     }

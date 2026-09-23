@@ -76,10 +76,10 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public string KeyName { get; }
 
     /// <summary>
-    /// UTC-Zeitpunkt der Konstruktion dieser Instanz. Wird von IsChunkRecentlyUsed
-    /// ausgewertet, um kürzlich erzeugte Chunks beim Update zu bevorzugen.
+    /// UTC-Zeitpunkt der letzten Nutzung dieser Instanz. Wird von IsChunkRecentlyUsed
+    /// ausgewertet, um aktive Chunks in Aktualitätsprüfungen zu berücksichtigen.
     /// </summary>
-    public DateTime LastUsed { get; set; } = DateTime.UtcNow;
+    public DateTime LastUsed { get; private set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
@@ -300,6 +300,12 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Setzt den LastUsed-Stempel auf jetzt. Aufrufer dokumentieren damit eine
+    /// echte Chunk-Nutzung (Laden, Speichern).
+    /// </summary>
+    public void Touch() => LastUsed = DateTime.UtcNow;
+
     public string IsNowEditable() {
         if (IsDisposed) { return "Verworfen."; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
@@ -331,12 +337,14 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     /// <summary>
     /// Liest den logischen Dateiinhalt frisch vom Dateisystem (auf Disk gezippt,
     /// hier entpackt). Der Inhalt wird NICHT im Speicher gehalten.
-    /// Aktualisiert LoadFailed, FileInfo und
+    /// Aktualisiert LastUsed, LoadFailed, FileInfo und
     /// MinimumBytes als Seiteneffekt.
     /// Schreiben erfolgt über TableFile.Save(byte[]).
     /// </summary>
     public byte[] LoadContent() {
         if (IsDisposed) { return []; }
+
+        Touch();
 
         var (content, fileInfo, loadFailed) = ReadContentFromFileSystem();
 

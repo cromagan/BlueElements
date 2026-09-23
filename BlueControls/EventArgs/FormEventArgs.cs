@@ -12,7 +12,7 @@ public class FormEventArgs : System.EventArgs {
 
     #region Properties
 
-    public System.Windows.Forms.Form Form { get; private set; }
+    public System.Windows.Forms.Form Form { get; }
 
     #endregion
 }

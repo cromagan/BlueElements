@@ -32,7 +32,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
     public bool ContextMenuDefault { get; set; } = true;
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
-    public string ErrorText { get; set; } = string.Empty;
+    public string ErrorText { get; init; } = string.Empty;
 
     #endregion
 

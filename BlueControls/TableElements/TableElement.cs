@@ -36,7 +36,6 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     protected TableElement(string keyname, ColumnViewCollection? arrangement, string alignsToCaption) {
         KeyName = string.IsNullOrEmpty(keyname) ? GetUniqueKey() : keyname;
         if (string.IsNullOrEmpty(KeyName)) { Develop.DebugError("Interner Name nicht vergeben."); }
-        Enabled = true;
         CanvasPosition = Rectangle.Empty;
         UserDefCompareKey = string.Empty;
         Arrangement = arrangement;
@@ -62,12 +61,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     /// </summary>
     public string AlignsToChapter {
         get;
-        private set {
-            value = value.ToUpperInvariant();
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
+        private init => field = value.ToUpperInvariant();
     }
 
     public ColumnViewCollection? Arrangement {
@@ -85,24 +79,6 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
         get;
         set {
             if (field.Equals(value)) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool Enabled {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool IgnoreXOffset {
-        get;
-        set {
-            if (field == value) { return; }
             field = value;
             OnPropertyChanged();
         }
@@ -128,21 +104,12 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string KeyName {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public string KeyName { get; init; }
 
     public EventHandler<ContextMenuEventArgs>? LeftClickExecute { get; set; }
 
     // Es wird mit Zeilenschlüsseln gearbeitet
-    public string QuickInfo { get; set; } = string.Empty;
-
-    public bool RemoveLocked { get; set; }
+    public string QuickInfo { get; } = string.Empty;
 
     [DefaultValue(Win11)]
     public string SheetStyle {
@@ -205,11 +172,10 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
     }
 
     /// <summary>
-    /// Spezielle Berechnung, die die Ignore-Werte berücksichtigt
+    /// Berechnung, die IgnoreYOffset berücksichtigt
     /// </summary>
     public Rectangle ControlPosition(float zoom, float offsetX, float offsetY) {
         if (IgnoreYOffset) { offsetY = 0; }
-        if (IgnoreXOffset) { offsetX = 0; }
 
         return CanvasPosition.CanvasToControl(zoom, offsetX, offsetY, true);
     }
@@ -592,7 +558,7 @@ public abstract class TableElement : IStyleable, IComparable, IHasKeyName, IHasQ
         // scrollt NICHT mit dem Inhalt. Daher muss der effektive offsetX
         // abgezogen werden, damit die Füllung immer am fixen linken Rand liegt.
         if (indentOffset > 0) {
-            var effectiveOffsetX = IgnoreXOffset ? 0 : (int)offsetX;
+            var effectiveOffsetX = (int)offsetX;
             var fillX = positionControl.X - indentOffset - effectiveOffsetX;
             gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard)), new RectangleF(fillX, positionControl.Y, indentOffset, positionControl.Height));
         }

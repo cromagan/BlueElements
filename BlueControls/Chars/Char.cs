@@ -9,7 +9,6 @@ public abstract class Char : IDisposableExtended {
     #region Fields
 
     internal ExtText? _parent;
-    private BlueFont? _font;
     private volatile int _isDisposedFlag;
     private SizeF _size;
 
@@ -49,15 +48,11 @@ public abstract class Char : IDisposableExtended {
 
     public BlueFont? Font {
         get {
-            _font ??= ResolveFont(BaseFont);
-            return _font;
+            field ??= ResolveFont(BaseFont);
+            return field;
         }
-        set {
-            if (_font != value) {
-                _font = value;
-                _size = SizeF.Empty;
-            }
-        }
+
+        private set;
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
@@ -191,7 +186,7 @@ public abstract class Char : IDisposableExtended {
     }
 
     internal void InvalidateFont() {
-        _font = null;
+        Font = null;
         _size = SizeF.Empty;
     }
 

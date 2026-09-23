@@ -39,7 +39,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? AdditionalInfoColumn { get; internal set; }
+    public ColumnItem? AdditionalInfoColumn { get; internal init; }
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -49,7 +49,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string EntityID { get; internal set; } = string.Empty;
+    public string EntityID { get; internal init; } = string.Empty;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Tabelle.
@@ -60,10 +60,10 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? OriginIDColumn { get; internal set; }
+    public ColumnItem? OriginIDColumn { get; internal init; }
 
     [DefaultValue("")]
-    public string Script { get; set; } = string.Empty;
+    public string Script { get; init; } = string.Empty;
 
     #endregion
 

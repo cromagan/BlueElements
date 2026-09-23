@@ -137,7 +137,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (controlDesign == ListBoxAppearance.MiniToolbar) {
             pad = Skin.PaddingSmal;
             var itemSize = IMiniToolbar.IconSize;
-            var visibleCount = items.Count(i => i.Visible);
+            var visibleCount = items.Count;
             biggestItemX = Math.Max(biggestItemX, visibleCount * itemSize + Math.Max(0, visibleCount - 1) * pad);
             heightAdded = itemSize;
         }
@@ -249,7 +249,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
         if (lstbx.AddAllowed != AddType.None) { heightAdded += 26; }
         if (lstbx.Appearance != ListBoxAppearance.MiniToolbar) {
-            var visibleCount = lstbx.Items.Count(i => i.Visible);
+            var visibleCount = lstbx.Items.Count;
             heightAdded += Math.Max(0, visibleCount - 1) * lstbx.ItemPadding;
         }
         AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));

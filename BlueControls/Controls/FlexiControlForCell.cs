@@ -20,8 +20,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #region Fields
 
     private ColumnItem? _column;
-
-    private string _columnKey;
     private RowItem? _lastrow;
     private CancellationTokenSource? _markerCancellation;
 
@@ -42,7 +40,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.ShowInfoWhenDisabled = true;
         f.CaptionPosition = captionPosition;
         f.ControlStrategy = strategy;
-        _columnKey = columnKey;
+        ColumnKey = columnKey;
     }
 
     #endregion
@@ -50,7 +48,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #region Properties
 
     [DefaultValue(false)]
-    public bool AutoNext { get; set; }
+    public bool AutoNext { get; init; }
 
     public string Caption {
         get {
@@ -60,8 +58,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 return _column.ReadableText() + ":";
             }
 
-            if (!string.IsNullOrEmpty(_columnKey)) {
-                return _columnKey + ":";
+            if (!string.IsNullOrEmpty(ColumnKey)) {
+                return ColumnKey + ":";
             }
 
             return "[?]";
@@ -69,12 +67,12 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     [DefaultValue(CaptionPosition.Über_dem_Feld)]
-    public CaptionPosition CaptionPosition { get => f?.CaptionPosition ?? CaptionPosition.Über_dem_Feld; set => f?.CaptionPosition = value; }
+    public CaptionPosition CaptionPosition { get => f?.CaptionPosition ?? CaptionPosition.Über_dem_Feld; init => f?.CaptionPosition = value; }
 
     public ColumnItem? Column {
         get {
             try {
-                return _column ??= TableInput is { IsDisposed: false } tb ? tb.Column[_columnKey] : null;
+                return _column ??= TableInput is { IsDisposed: false } tb ? tb.Column[ColumnKey] : null;
             } catch {
                 // Multitasking sei dank kann _table trotzem null sein...
                 Develop.AbortAppIfStackOverflow();
@@ -84,22 +82,14 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     [DefaultValue("")]
-    public string ColumnKey {
-        get => _columnKey;
-        set {
-            if (_columnKey == value) { return; }
-            _columnKey = value;
-            Invalidate_CachedColumn();
-            Invalidate();
-        }
-    }
+    public string ColumnKey { get; init; }
 
-    public string ControlStrategy { get => f.ControlStrategy; set => f.ControlStrategy = value; }
+    public string ControlStrategy { get => f.ControlStrategy; init => f.ControlStrategy = value; }
 
     /// <summary>
     /// Parameter der strategie-spezifischen Werte der ControlStrategie als Json.
     /// </summary>
-    public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; set => f.ControlStrategyParameter = value; }
+    public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; init => f.ControlStrategyParameter = value; }
 
     [DefaultValue(-1)]
     public int ControlX {
@@ -163,6 +153,17 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
 
         base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Reicht den Fokus an das werttragende Control der Strategie weiter.
+    /// </summary>
+    protected override void FocusInput() {
+        if (f.Strategy.Control is { CanFocus: true }) {
+            f.Strategy.Focus();
+            return;
+        }
+        base.FocusInput();
     }
 
     protected override void HandleChangesNow() {
@@ -351,17 +352,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) {
         if (AutoNext) { NextControl(e.Direction); }
-    }
-
-    /// <summary>
-    /// Reicht den Fokus an das werttragende Control der Strategie weiter.
-    /// </summary>
-    protected override void FocusInput() {
-        if (f.Strategy.Control is { CanFocus: true }) {
-            f.Strategy.Focus();
-            return;
-        }
-        base.FocusInput();
     }
 
     private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();

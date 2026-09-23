@@ -4266,7 +4266,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                 var itemState = controlState;
 
-                if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
+                if (controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
 
                 thisItem.Draw(gr, visControlArea, offsetX, offsetY, controlDesign, itemDesign, itemState, true, string.Empty, false, Design.Undefined, zoom);
 

@@ -26,9 +26,6 @@ public class ComicCompPadItem : PadItem {
     private readonly PointM _ber_Ro = new();
 
     private readonly PointM _ber_Ru = new();
-
-    private Bitmap? _bitmap;
-
     private int _width;
 
     #endregion
@@ -41,7 +38,7 @@ public class ComicCompPadItem : PadItem {
         BeginInit();
 
         try {
-            _bitmap = bitmap;
+            Bitmap = bitmap;
             _width = 100;
             P1 = new PointM(this, "Punkt1", 0, 0);
             P2 = new PointM(this, "Punkt2", 0, 0);
@@ -49,7 +46,6 @@ public class ComicCompPadItem : PadItem {
             PointsForSuccessfullyMove.Add(P2);
             MovablePoint.Add(P1);
             MovablePoint.Add(P2);
-            _bitmap = null;
             CalculateJointMiddle(P1, P2);
             JointPoints.CollectionChanged += JointPoints_CollectionChanged;
             JointMiddle.Moved += JointMiddle_Moved;
@@ -63,13 +59,7 @@ public class ComicCompPadItem : PadItem {
 
     public static string ClassId => "COMIC";
 
-    public Bitmap? Bitmap {
-        get => _bitmap;
-        set {
-            _bitmap = value;
-            ImageChanged();
-        }
-    }
+    public Bitmap? Bitmap { get; }
 
     /// <summary>
     /// Zusätzliche Verbindungspunkte am Bild.
@@ -175,8 +165,8 @@ public class ComicCompPadItem : PadItem {
             p[z].Y -= minY;
         }
         PointF[] destPara2 = [p[0], p[1], p[2]]; //LO,RO,RU
-        if (_bitmap is not null) {
-            gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
+        if (Bitmap is not null) {
+            gr.DrawImage(Bitmap, destPara2, new RectangleF(0, 0, Bitmap.Width, Bitmap.Height), GraphicsUnit.Pixel);
         }
         return bmp;
     }
@@ -291,10 +281,10 @@ public class ComicCompPadItem : PadItem {
         var rUt = _ber_Ru.CanvasToControl(zoom, offsetX, offsetY);
         var lUt = _ber_Lu.CanvasToControl(zoom, offsetX, offsetY);
         PointF[] destPara2 = [lOt, rOt, lUt];
-        if (_bitmap is not null) {
-            gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
+        if (Bitmap is not null) {
+            gr.DrawImage(Bitmap, destPara2, new RectangleF(0, 0, Bitmap.Width, Bitmap.Height), GraphicsUnit.Pixel);
         }
-        if (_bitmap is null || !forPrinting) {
+        if (Bitmap is null || !forPrinting) {
             gr.DrawLine(ZoomPad.PenGray, lOt, rOt);
             gr.DrawLine(ZoomPad.PenGray, rOt, rUt);
             gr.DrawLine(ZoomPad.PenGray, rUt, lUt);
@@ -310,12 +300,12 @@ public class ComicCompPadItem : PadItem {
     private void ImageChanged() {
         P1.X = 0f;
         P1.Y = 0f;
-        if (_bitmap is null) {
+        if (Bitmap is null) {
             P2.X = 100f;
             P2.Y = 100f;
         } else {
-            P2.X = _bitmap.Width;
-            P2.Y = _bitmap.Height;
+            P2.X = Bitmap.Width;
+            P2.Y = Bitmap.Height;
         }
         OnPropertyChanged();
     }

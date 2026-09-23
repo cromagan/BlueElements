@@ -162,18 +162,12 @@ KeyName = json.GetString("key", KeyName);
 Alle json Keys in kleinschreibung.
 
 ## Aufgabe
-In Table ist das Json laden nicht nicht implementiert.
-Und TableFragments muss auf das neue Json Format geändert werden.
-
-## Aufgabe
 Ich denke, LogData ist nicht mehr nötig und einfach zu ersetzen.
 Was meinst du?
 
 ## Aufgabe
 Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nicht.
 
-## Aufgabe
-Wird die Listbox gezoomt. verändern sich intern die Items nicht, sie werden immer mit Scale 1 gezeichnet
 
 ## Aufgabe
 Umbennennen in Explorer Soll eine Textbox IM angezeigten Explorer Fenster gehen.
@@ -185,25 +179,11 @@ Prüfe die OnLoaded Logik von Tabellen.
 TableFragments wirft ein "First=false" (BeSureUptoDate) vor dem ersten echten Laden.
 Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 
-## Aufgabe
-Prüfe alle LINQ, ob Exists RICHTIG ist und ob evtl.TrueForAll oder FalseForAll benutzt werden sollte.
-
-## Aufgabe
-Verändere ich den Wert, der für eine Verlinkte Zelle zuständig ist, ändert sich der Verlinkte wert nicht.
-Aufgefallen, wenn die Zeile des neuen Wertes nicht existiert.
 
 ## Aufgabe
 IInputFormat um eine `TextCase`-Eigenschaft ergänzen (None/Upper/Lower/Title), die die Groß-/Kleinschreibung bei der Eingabe erzwingt.
 Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiControl`) müssen dies bei der Eingabe und beim `AfterEdit` berücksichtigen.
 
-## Aufgabe
-Schau, wo DisableAllEditing du noch benutzen kannst.
-
-## Aufgabe
-übreprüfe, ob der FormManager Application.OpenForms benutzen kann.
-
-## Aufgabe
-Entferne ALLES rund um BCS - Symbol-Dateien werden nicht mehr unterstützt.
 
 ## Aufgabe
 Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor ein
@@ -216,15 +196,8 @@ TableControlStrategy ist defekt. Die Bescheibung ist unleserlich für einen Benu
 Und es werden viel zu viele Zeilen nach einem Doppelklcok angezeigt. Kann es sein, dass die Tateblle nihct richtig resetted wird?
 Und die Breite wird falsch berechnete. Es wird leider zwingend auf die Spaltenbreite geachtet. Das Controll darf größer werden als die Ansicht, wenn nötigt
 
-##Aufgabe
-LinkedCell, wenn eine Zeile nicht mehr vorhanden ist, soll die übergeordnete Zeile den Wert entfernen. Aktuell wird er ignoriert und belassen
 
-##Aufgabe
-LinkedCell, wenn ich einen Doppeklick auf eine Zelle mache, soll die Zeile angelegt werden, wenn diese in der untergeordneten Datenbank noch nicht vorhanden ist
 
-##Aufgabe
-ScriptControlStratgy braucht ein Readonly Flag:
-Bei ReadOnly darf dann keine Meldung kommen: Zeile wurde verändert
 
 
 

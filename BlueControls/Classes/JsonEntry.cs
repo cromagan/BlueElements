@@ -19,7 +19,7 @@ public sealed class JsonEntry : IHasKeyName {
     #region Properties
 
     public JsonObject? JsonData { get; set; }
-    public string KeyName { get; set; }
+    public string KeyName { get; }
     public DateTime Modified { get; set; }
 
     #endregion

@@ -60,7 +60,7 @@ public class ReadableListItem : ListItem {
     /// Fehlerzustand des Items unter dem Text anzeigen. Für Auswahllisten
     /// unveränderlicher Prototypen deaktivieren.
     /// </summary>
-    public bool ShowError { get; set; } = true;
+    public bool ShowError { get; init; } = true;
 
     #endregion
 

@@ -34,7 +34,7 @@ public sealed class CaptionBarListItemTableElement : TableElement {
 
     #region Properties
 
-    public int Caption { get; private set; }
+    public int Caption { get; }
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
 

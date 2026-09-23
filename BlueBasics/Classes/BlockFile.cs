@@ -37,15 +37,15 @@ public sealed class BlockFile {
 
     #region Properties
 
-    public string App { get; private set; } = string.Empty;
+    public string App { get; private init; } = string.Empty;
 
-    public string Id { get; private set; } = string.Empty;
+    public string Id { get; private init; } = string.Empty;
 
-    public string MachineName { get; private set; } = string.Empty;
+    public string MachineName { get; private init; } = string.Empty;
 
-    public DateTime TimeUtc { get; private set; } = DateTime.MinValue;
+    public DateTime TimeUtc { get; private init; } = DateTime.MinValue;
 
-    public string User { get; private set; } = string.Empty;
+    public string User { get; private init; } = string.Empty;
 
     #endregion
 

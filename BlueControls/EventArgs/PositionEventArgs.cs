@@ -15,9 +15,9 @@ public class PositionEventArgs : System.EventArgs {
 
     #region Properties
 
-    public float X { get; set; }
+    public float X { get; }
 
-    public float Y { get; set; }
+    public float Y { get; }
 
     #endregion
 }

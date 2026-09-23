@@ -33,7 +33,7 @@ public class ScriptProperties {
     /// <summary>
     /// DebugPrint-Ausgaben der gesamten Skript-Ausführung inkl. aller Unter-Skripte (gemeinsame Liste).
     /// </summary>
-    public List<string> DebugOutput { get; private set; } = [];
+    public List<string> DebugOutput { get; } = [];
 
     public string MainInfo { get; } = string.Empty;
 

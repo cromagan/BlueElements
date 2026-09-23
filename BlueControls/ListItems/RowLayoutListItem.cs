@@ -7,9 +7,6 @@ public class RowLayoutListItem : ListItem {
     #region Fields
 
     private readonly string _layoutFileName;
-
-    private RowItem? _row;
-
     private Bitmap? _tmpBmp;
 
     #endregion
@@ -23,11 +20,11 @@ public class RowLayoutListItem : ListItem {
     /// <param name="layoutId"></param>
     /// <param name="userDefCompareKey"></param>
     public RowLayoutListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.KeyName, true) {
-        _row = row;
+        Row = row;
         _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
 
-        QuickInfo = _row.ReadableText().CreateHtmlCodes();
+        QuickInfo = Row.ReadableText().CreateHtmlCodes();
     }
 
     /// <summary>
@@ -49,10 +46,10 @@ public class RowLayoutListItem : ListItem {
     #region Properties
 
     public RowItem? Row {
-        get => _row;
+        get;
         set {
-            if (_row == value) { return; }
-            _row = value;
+            if (field == value) { return; }
+            field = value;
             RemovePic();
         }
     }
@@ -84,8 +81,7 @@ public class RowLayoutListItem : ListItem {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            RemovePic();
-            _row = null;
+            Row = null;
         }
         base.Dispose(disposing);
     }
@@ -109,7 +105,7 @@ public class RowLayoutListItem : ListItem {
     }
 
     protected override string GetCompareKey() {
-        if (_row is not { IsDisposed: false } r) { return string.Empty; }
+        if (Row is not { IsDisposed: false } r) { return string.Empty; }
         if (r.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var columns = new List<ColumnItem>();

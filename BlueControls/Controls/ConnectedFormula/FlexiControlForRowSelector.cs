@@ -33,8 +33,8 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     #region Properties
 
-    public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
-    public string ControlStrategy { get => f.ControlStrategy; internal set => f.ControlStrategy = value; }
+    public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal init => f.CaptionPosition = value; }
+    public string ControlStrategy { get => f.ControlStrategy; internal init => f.ControlStrategy = value; }
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;

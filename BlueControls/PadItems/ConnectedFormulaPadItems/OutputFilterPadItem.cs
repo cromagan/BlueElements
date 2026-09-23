@@ -28,6 +28,21 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
 
     public static string ClassId => "FI-InputOutputElement";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+
+    /// <summary>
+    /// Wenn gewählt, springt der Cursor zum nächsten Eingabefeld, wenn am Ende des Textes die Nach-rechts-Taste gedrückt wird.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool AutoNext {
+        get;
+        set {
+            if (IsDisposed) { return; }
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool AutoSizeableHeight => false;
 
     /// <summary>
@@ -122,6 +137,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlForFilter(Column, CaptionPosition, Standard_bei_keiner_Eingabe, Filterart_bei_Texteingabe, Einschnappen, true) {
+            AutoNext = AutoNext,
             SavesSettings = true
         };
 
@@ -161,6 +177,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, ItemsOf(typeof(FlexiFilterDefaultOutput))));
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, ItemsOf(typeof(FlexiFilterDefaultFilter))));
         result.Add(new FlexiControlForProperty<SnapFilterMode>(() => Einschnappen, ItemsOf(typeof(SnapFilterMode))));
+        result.Add(new FlexiControlForProperty<bool>(() => AutoNext));
 
         return result;
     }
@@ -176,6 +193,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         result.ParseableAdd("DefaultEmptyFilter", Standard_bei_keiner_Eingabe);
         result.ParseableAdd("DefaultTextFilter", Filterart_bei_Texteingabe);
         result.ParseableAdd("SnapFilter", Einschnappen);
+        result.ParseableAdd("AutoNext", AutoNext);
 
         return result;
     }
@@ -187,6 +205,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         json.Set("defaultemptyfilter", (int)Standard_bei_keiner_Eingabe);
         json.Set("defaulttextfilter", (int)Filterart_bei_Texteingabe);
         json.Set("snapfilter", (int)Einschnappen);
+        json.Set("autonext", AutoNext);
         return json;
     }
 
@@ -197,6 +216,7 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
             CaptionPosition = json.GetEnum("caption", CaptionPosition);
             Standard_bei_keiner_Eingabe = json.GetEnum("defaultemptyfilter", Standard_bei_keiner_Eingabe);
             Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
+            AutoNext = json.GetBool("autonext", AutoNext);
 
             if (json["snapfilter"] is JsonValue v && v.TryGetValue(out bool b)) {
                 // Legacy: Boolean-Wert
@@ -215,6 +235,10 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
         switch (key) {
             case "id":
             case "style":
+                return true;
+
+            case "autonext":
+                AutoNext = value.FromPlusMinus();
                 return true;
 
             case "caption":

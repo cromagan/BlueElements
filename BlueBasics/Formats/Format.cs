@@ -25,7 +25,7 @@ public abstract class Format : IInputFormat, IReadableTextWithKey {
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
     public string ForbiddenChars { get; set; } = string.Empty;
-    public string KeyName { get; protected set; }
+    public string KeyName { get; }
     public int MaxTextLength { get; set; }
     public int MinTextLength { get; set; }
     public bool MultiLine { get; set; }

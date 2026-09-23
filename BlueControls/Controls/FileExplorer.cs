@@ -59,13 +59,13 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
     public bool AllowEdit { get; set; } = true;
 
     [DefaultValue(true)]
-    public bool AllowScreenshots { get; set; } = true;
+    public bool AllowScreenshots { get; } = true;
 
     [DefaultValue(false)]
-    public bool CreateDir { get; set; } = false;
+    public bool CreateDir { get; init; } = false;
 
     [DefaultValue(false)]
-    public bool DeleteDir { get; set; } = false;
+    public bool DeleteDir { get; init; } = false;
 
     [DefaultValue("")]
     public string Directory {
@@ -123,30 +123,11 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
 
     public string Sort {
         get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            ReloadDirectory();
-        }
     } = "Name";
 
-    public string Var_Directory {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            ReloadDirectory();
-        }
-    } = string.Empty;
+    public string Var_Directory { get; init; } = string.Empty;
 
-    public string Var_DirectoryMin {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            ReloadDirectory();
-        }
-    } = string.Empty;
+    public string Var_DirectoryMin { get; init; } = string.Empty;
 
     #endregion
 

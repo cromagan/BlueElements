@@ -16,33 +16,17 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
     #region Properties
 
-    public ButtonArgs Drückbar_wenn {
-        get;
-        set {
-            if (IsDisposed) { return; }
-            if (field == value) { return; }
-            field = value;
-            Invalidate();
-        }
-    }
+    public ButtonArgs Drückbar_wenn { get; init; }
 
     public string ImageCode {
         get => mainButton.ImageCode;
-        set => mainButton.ImageCode = value;
+        init => mainButton.ImageCode = value;
     }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string Script {
-        get;
-        set {
-            if (IsDisposed) { return; }
-            if (field == value) { return; }
-            field = value;
-            Invalidate();
-        }
-    } = string.Empty;
+    public string Script { get; init; } = string.Empty;
 
     [AllowNull]
     public override string Text {

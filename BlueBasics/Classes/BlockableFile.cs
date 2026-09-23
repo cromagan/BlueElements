@@ -229,17 +229,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
                 }
             }
         }
-        set {
-            lock (_lock) {
-                if (ReferenceEquals(_content, value)) { return; }
-                if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
-
-                _content = value;
-                _contentHash = null;
-                if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
-                if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
-            }
-        }
     }
 
     public abstract bool ExtendedSave { get; }
@@ -312,16 +301,8 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
-    /// Wird auch gesetzt, wenn der geladene Inhalt kleiner als MinimumBytes ist.
     /// </summary>
     public bool LoadFailed { get; protected set; }
-
-    /// <summary>
-    /// Mindestgröße des Inhalts in Bytes.
-    /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
-    /// Wird von abgeleiteten Klassen nach erfolgreichem Laden/Speichern gesetzt.
-    /// </summary>
-    public int MinimumBytes { get; protected set; }
 
     /// <summary>
     /// Gibt an, ob der Inhalt beim Speichern automatisch gezippt werden soll.
@@ -520,12 +501,12 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// Berücksichtigt: IsDisposed, LoadFailed, MinimumBytes.
+    /// Berücksichtigt: IsDisposed, LoadFailed.
     /// </summary>
     public virtual string IsSaveAbleNow() {
         if (IsNowEditable() is { Length: > 0 } f) { return f; }
 
-        if (_content is null || _content.Length < MinimumBytes) { return "Byte-Fehler"; }
+        if (_content is null) { return "Byte-Fehler"; }
         return string.Empty;
     }
 
@@ -949,11 +930,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
                 } else {
                     processedContent = unzipped;
                 }
-            }
-
-            if (MinimumBytes > 0 && !finalLoadFailed && processedContent.Length < MinimumBytes) {
-                finalLoadFailed = true;
-                processedContent = [];
             }
         }
 

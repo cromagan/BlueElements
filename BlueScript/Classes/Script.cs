@@ -48,7 +48,7 @@ public class Script {
 
     public string NormalizedScriptText { get; private set; }
     public ScriptProperties Properties { get; }
-    public string ScriptText { get; set; } = string.Empty;
+    public string ScriptText { get; init; } = string.Empty;
 
     public VariableCollection Variables { get; }
 

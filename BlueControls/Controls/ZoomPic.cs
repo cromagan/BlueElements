@@ -14,8 +14,8 @@ public partial class ZoomPic : CreativePad {
     #region Fields
 
     private const int DrawSize = 20;
-    private static readonly Pen PenCrosshairShadow = new(Color.FromArgb(10, 0, 0, 0), 3);
     private static readonly Pen PenCrosshairLine = new(Color.FromArgb(220, 100, 255, 100));
+    private static readonly Pen PenCrosshairShadow = new(Color.FromArgb(10, 0, 0, 0), 3);
     private BitmapPadItem? _bmpItem;
     private TrimmedCanvasMouseEventArgs? _trimmedCurrentMouseData;
 

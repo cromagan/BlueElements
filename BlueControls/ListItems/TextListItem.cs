@@ -22,32 +22,11 @@ public class TextListItem : ListItem {
 
     #region Properties
 
-    public bool IsCaption {
-        get;
-        protected set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public bool IsCaption { get; protected init; }
 
-    public QuickImage? Symbol {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public QuickImage? Symbol { get; init; }
 
-    public string Text {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Text { get; init; }
 
     #endregion
 

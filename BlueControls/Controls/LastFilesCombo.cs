@@ -29,31 +29,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Properties
 
-    /// <summary>
-    /// Maximale Anzahl der anzuzeigenden Einträge.
-    /// </summary>
-    [DefaultValue(20)]
-    public int MaxCount {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            GenerateMenu();
-        }
-    } = 20;
-
-    /// <summary>
-    /// Gibt an, ob die Datei physisch existieren muss, um angezeigt zu werden.
-    /// </summary>
-    [DefaultValue(true)]
-    public bool MustExist {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            GenerateMenu();
-        }
-    } = true;
+    // Maximale Anzahl der anzuzeigenden Einträge.
+    private const int MaxCount = 20;
 
     public List<string> Settings { get; } = [];
 
@@ -85,7 +62,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public void AddFileName(string? fileName, string additionalText) {
         if (fileName is null) { return; }
 
-        if (!MustExist || FileExists(fileName)) {
+        if (FileExists(fileName)) {
             this.SettingsAdd($"{fileName}|{additionalText}");
         }
 
@@ -143,7 +120,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             .Reverse()
             .Select(s => s.SplitAndCutBy("|"))
             .Where(x => x.Length > 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null)
-            .Where(x => !MustExist || FileExists(x[0]))
+            .Where(x => FileExists(x[0]))
             .Take(MaxCount)
             .ToList();
 
@@ -152,7 +129,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             var sb = new StringBuilder();
 
             sb.Append((i + 1).ToString3()).Append(": ");
-            sb.Append(MustExist ? x[0].FileNameWithSuffix() : x[0]);
+            sb.Append(x[0].FileNameWithSuffix());
 
             if (x.Length > 1 && !string.IsNullOrEmpty(x[1])) {
                 sb.Append(" - ").Append(x[1]);

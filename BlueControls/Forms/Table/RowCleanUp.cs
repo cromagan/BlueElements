@@ -13,9 +13,8 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        TableView = table;
+        TableView = table.IsDisposed ? null : table;
 
-        Table = table.Table;
         //_table.SelectedCellChanged += SelectedCellChanged;
         //SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
 
@@ -61,6 +60,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             field = value;
 
             field?.VisibleRowsChanged += _table_VisibleRowsChanged;
+            Table = value?.Table;
         }
     }
 
@@ -68,8 +68,13 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
     #region Methods
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) { TableView = null; }
+        base.Dispose(disposing);
+    }
+
     protected override void OnClosing(CancelEventArgs e) {
-        Table = null;
+        TableView = null;
         base.OnClosing(e);
     }
 

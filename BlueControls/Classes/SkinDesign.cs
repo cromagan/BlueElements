@@ -72,17 +72,17 @@ public class SkinDesign {
     public BorderStyle BorderStyle { get; set; }
     public Contour Contour { get; set; }
     public BlueFont Font { get; set; } = BlueFont.DefaultFont;
-    public float GradientMidpoint { get; set; } = 0.7f;
+    public float GradientMidpoint { get; init; } = 0.7f;
     public string Image { get; set; } = string.Empty;
-    public bool Need { get; set; }
+    public bool Need { get; init; }
     public States Status { get; set; }
-    public int X1 { get; set; }
+    public int X1 { get; init; }
 
-    public int X2 { get; set; }
+    public int X2 { get; init; }
 
-    public int Y1 { get; set; }
+    public int Y1 { get; init; }
 
-    public int Y2 { get; set; }
+    public int Y2 { get; init; }
 
     #endregion
 }

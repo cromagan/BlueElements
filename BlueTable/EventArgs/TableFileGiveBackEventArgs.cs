@@ -6,7 +6,7 @@ public class TableFileGiveBackEventArgs : System.EventArgs, IHasTable {
 
     #region Properties
 
-    public Table? Table { get; set; }
+    public Table? Table { get; }
 
     #endregion
 }

@@ -42,7 +42,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Properties
 
     [DefaultValue(false)]
-    public bool AutoNext { get; set; }
+    public bool AutoNext { get; init; }
 
     /// <summary>
     /// Da die CaptionPosition von dem Steuerelement bei Bedarf geändert wird,
@@ -53,7 +53,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// <summary>
     /// Wann das Textfeld zu einem Knopf einschnappt.
     /// </summary>
-    public SnapFilterMode Einschnappen { get; set; } = SnapFilterMode.Wenn_Vorhanden;
+    public SnapFilterMode Einschnappen { get; } = SnapFilterMode.Wenn_Vorhanden;
 
     public string FieldName {
         get {
@@ -62,7 +62,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe { get; set; } = FlexiFilterDefaultFilter.Textteil;
+    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe { get; } = FlexiFilterDefaultFilter.Textteil;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -72,12 +72,12 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// <summary>
     /// Bei True werden die zuletzt eingegebenen Werte auf Festplatte gespeichert und geladen.
     /// </summary>
-    public bool SavesSettings { get; internal set; }
+    public bool SavesSettings { get; internal init; }
 
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;
-    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe { get; set; } = FlexiFilterDefaultOutput.Alles_Anzeigen;
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe { get; } = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public bool UsesSettings => true;
 
     public string Value {

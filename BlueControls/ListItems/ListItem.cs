@@ -36,7 +36,7 @@ public static class ListItemExtension {
             item.PreComputeSize(itemDesign);
 
             foreach (var thisItem in item) {
-                if (thisItem is { Visible: true }) {
+                if (thisItem is not null) {
                     var s = thisItem.UntrimmedCanvasSize(itemDesign);
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
@@ -82,7 +82,7 @@ public static class ListItemExtension {
 
         for (var i = list.Count - 1; i >= 0; i--) {
             var thisItem = list[i];
-            if (thisItem?.Visible == true && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY)) {
+            if (thisItem is not null && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY)) {
                 return thisItem;
             }
         }
@@ -90,12 +90,12 @@ public static class ListItemExtension {
     }
 
     /// <summary>
-    /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
+    /// Gibt das erste Element vom Typ <typeparamref name="T"/> in der Liste zurück.
     /// </summary>
     /// <typeparam name="T">Der Typ des gesuchten Elements, muss von ListItem erben.</typeparam>
     /// <param name="list">Die Liste, in der gesucht werden soll.</param>
     /// <returns>
-    /// Das erste sichtbare Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,
+    /// Das erste Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,
     /// wenn kein passendes Element gefunden wurde oder die Liste ungültig ist.
     /// </returns>
     /// <example>
@@ -108,7 +108,7 @@ public static class ListItemExtension {
         if (list is not { Count: > 0 }) { return null; }
 
         for (var i = 0; i < list.Count; i++) {
-            if (list[i] is T typedItem && list[i].Visible) {
+            if (list[i] is T typedItem) {
                 return typedItem;
             }
         }
@@ -415,24 +415,6 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         }
     }
 
-    public bool IgnoreXOffset {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool IgnoreYOffset {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
     public int Indent {
         get;
         set {
@@ -472,16 +454,6 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         }
     }
 
-    public bool Visible {
-        get;
-        set {
-            if (field == value) { return; }
-
-            field = value;
-            OnPropertyChanged();
-        }
-    } = true;
-
     #endregion
 
     #region Methods
@@ -504,17 +476,7 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         return 0;
     }
 
-    /// <summary>
-    /// Spezielle Berechnung, doe die Ignore-Werte berücksichtigt
-    /// </summary>
-    /// <param name="zoom"></param>
-    /// <param name="offsetX"></param>
-    /// <param name="offsetY"></param>
-    /// <returns></returns>
     public Rectangle ControlPosition(float zoom, float offsetX, float offsetY) {
-        if (IgnoreYOffset) { offsetY = 0; }
-        if (IgnoreXOffset) { offsetX = 0; }
-
         return CanvasPosition.CanvasToControl(zoom, offsetX, offsetY, true);
     }
 
@@ -570,7 +532,7 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         return _untrimmedCanvasSize;
     }
 
-    internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
+    internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 

@@ -31,7 +31,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
     #region Properties
 
-    public ConnectedFormulaView? ConnectedFormula { get; internal set; }
+    public ConnectedFormulaView? ConnectedFormula { get; internal init; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -46,37 +46,28 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int Seconds { get; set; }
+    public int Seconds { get; init; }
 
-    internal bool Deaktivierbar {
-        get;
-        set {
-            field = value;
-            chkAktiv.Visible = value;
-        }
-    }
+    internal bool Deaktivierbar { get; init; }
 
     internal bool IsActive {
         get => !Deaktivierbar || chkAktiv.Checked;
-        set {
-            if (!Deaktivierbar) { value = true; }
-            chkAktiv.Checked = value;
-        }
+        init => chkAktiv.Checked = value;
     }
 
-    internal string ItemText {
-        get;
-        set {
-            field = value;
-            chkAktiv.Text = value;
-        }
-    } = string.Empty;
+    internal string ItemText { get; init; } = string.Empty;
 
-    internal int MinIdleSekunden { get; set; }
+    internal int MinIdleSekunden { get; init; }
 
     #endregion
 
     #region Methods
+
+    protected override void OnHandleCreated(System.EventArgs e) {
+        base.OnHandleCreated(e);
+        chkAktiv.Visible = Deaktivierbar;
+        chkAktiv.Text = ItemText;
+    }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

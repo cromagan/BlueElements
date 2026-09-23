@@ -13,11 +13,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
                                                   {
     #region Fields
 
+    private readonly System.Threading.Timer? _panelMover;
     private Bitmap? _bitmap;
 
     private int _panelMoveDirection;
-
-    private readonly System.Threading.Timer? _panelMover;
 
     #endregion
 
@@ -42,14 +41,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(true)]
-    public bool Editable {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            InvalidateAndCheckButtons();
-        }
-    } = true;
+    public bool Editable { get; init; } = true;
 
     [DefaultValue("")]
     public string FileName {
@@ -64,14 +56,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         }
     } = string.Empty;
 
-    public string OriginalText {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            InvalidateAndCheckButtons();
-        }
-    } = string.Empty;
+    public string OriginalText { get; init; } = string.Empty;
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -159,6 +144,11 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         }
     }
 
+    protected override void OnHandleCreated(System.EventArgs e) {
+        base.OnHandleCreated(e);
+        CheckButtons();
+    }
+
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
         if (Editable) {
@@ -193,6 +183,12 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         InvalidateAndCheckButtons();
     }
 
+    private void CheckButtons() {
+        btnDeleteImage.Enabled = _bitmap is not null && Editable;
+        btnLoad.Enabled = Editable;
+        btnScreenshot.Enabled = Editable;
+    }
+
     private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
 
     private bool HasFileName() {
@@ -211,9 +207,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     private void InvalidateAndCheckButtons() {
         _panelMoveDirection = -1;
         _panelMover?.Change(5, 5);
-        btnDeleteImage.Enabled = _bitmap is not null && Editable;
-        btnLoad.Enabled = Editable;
-        btnScreenshot.Enabled = Editable;
+        CheckButtons();
         //Invalidate();
     }
 

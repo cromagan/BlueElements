@@ -466,8 +466,9 @@ public class TableFile : Table {
 
             var result = SaveExtended(Filename, contentToWrite);
 
-            if (result.IsSuccessful) {
-                Chunk.Get(Filename)?.Invalidate();
+            if (result.IsSuccessful && Chunk.Get(Filename) is { } chunk) {
+                chunk.Touch();
+                chunk.Invalidate();
             }
 
             return result;

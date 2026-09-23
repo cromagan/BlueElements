@@ -44,15 +44,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     #region Properties
 
     [DefaultValue(false)]
-    public bool Detachable {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            btnDetach.Visible = field;
-            Invalidate();
-        }
-    }
+    public bool Detachable { get; init; }
 
     public string FieldName => "Field_EntryRow";
 

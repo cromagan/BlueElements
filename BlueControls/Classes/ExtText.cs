@@ -185,7 +185,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     /// keine automatischen Umbrüche — volle Zeilen laufen weiter und müssen
     /// extern gekürzt werden. Die Ausrichtung bleibt an TextDimensions orientiert.
     /// </summary>
-    public bool WordWrap { get; set; } = true;
+    public bool WordWrap { get; init; } = true;
 
     public float Zeilenabstand {
         get => _zeilenabstand;

@@ -54,10 +54,10 @@ public partial class FormWithStatusBar : Form {
     public bool MessageBoxOnError { get; set; } = true;
 
     [DefaultValue(10)]
-    public int MessageSeconds { get; set; } = 10;
+    public int MessageSeconds { get; } = 10;
 
     [DefaultValue(true)]
-    public bool ShowStatusBar { get; set; } = true;
+    public bool ShowStatusBar { get; } = true;
 
     #endregion
 

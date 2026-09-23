@@ -10,7 +10,6 @@ public class LayoutPreviewListItem : ListItem {
     private const int ConstBadgeVPad = 2;
     private const int ConstPadding = 8;
     private const int ConstTopPadding = 4;
-    private string _caption;
     private Bitmap? _tmpBmp;
 
     #endregion
@@ -18,7 +17,7 @@ public class LayoutPreviewListItem : ListItem {
     #region Constructors
 
     public LayoutPreviewListItem(CollectionPadItem page) : base(page.KeyName, true) {
-        _caption = page.Caption;
+        Caption = page.Caption;
         Page = page;
     }
 
@@ -26,14 +25,7 @@ public class LayoutPreviewListItem : ListItem {
 
     #region Properties
 
-    public string Caption {
-        get => _caption;
-        set {
-            if (_caption == value) { return; }
-            _caption = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Caption { get; }
 
     public CollectionPadItem Page { get; }
 
@@ -122,7 +114,7 @@ public class LayoutPreviewListItem : ListItem {
                 badge.Height);
 
             Skin.Draw_Back(gr, Design.Badge_Caption, States.Standard, badgeRect.ToRect(), null, false);
-            Skin.Draw_FormatedText(gr, _caption, null, Alignment.Horizontal_Vertical_Center, badgeRect.ToRect(), Design.Badge_Caption, States.Standard, null, false, false);
+            Skin.Draw_FormatedText(gr, Caption, null, Alignment.Horizontal_Vertical_Center, badgeRect.ToRect(), Design.Badge_Caption, States.Standard, null, false, false);
             Skin.Draw_Border(gr, Design.Badge_Caption, States.Standard, badgeRect.ToRect());
         }
 
@@ -135,7 +127,7 @@ public class LayoutPreviewListItem : ListItem {
 
     private SizeF BadgeSize() {
         var font = Skin.GetBlueFont(Design.Badge_Caption, States.Standard);
-        var s = font.MeasureString(_caption);
+        var s = font.MeasureString(Caption);
         return new SizeF(s.Width + ConstBadgeHPad * 2, s.Height + ConstBadgeVPad * 2);
     }
 

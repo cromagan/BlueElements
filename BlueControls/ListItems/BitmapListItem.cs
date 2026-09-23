@@ -12,8 +12,6 @@ public class BitmapListItem : ListItem {
     private const int ConstMy = 15;
     private readonly int _captionlines = 2;
     private Bitmap? _bitmap;
-
-    private string _caption;
     private List<string> _captiontmp = [];
 
     private string _imageFilename = string.Empty;
@@ -23,7 +21,7 @@ public class BitmapListItem : ListItem {
     #region Constructors
 
     public BitmapListItem(Bitmap? bmp, string keyName, string caption, string quickInfo) : base(keyName, true) {
-        _caption = caption;
+        Caption = caption;
         _captiontmp.Clear();
         _bitmap = bmp;
         Padding = 0;
@@ -32,7 +30,7 @@ public class BitmapListItem : ListItem {
     }
 
     public BitmapListItem(string filename, string keyName, string caption, string quickInfo) : base(keyName, true) {
-        _caption = caption;
+        Caption = caption;
         _captiontmp.Clear();
         _imageFilename = filename;
         Padding = 0;
@@ -56,15 +54,7 @@ public class BitmapListItem : ListItem {
         }
     }
 
-    public string Caption {
-        get => _caption;
-        set {
-            if (_caption == value) { return; }
-            _caption = value;
-            _captiontmp.Clear();
-            OnPropertyChanged();
-        }
-    }
+    public string Caption { get; }
 
     //public int CaptionLines {
     //    get => _captionlines;
@@ -140,7 +130,7 @@ public class BitmapListItem : ListItem {
         var areaOfWholeImage = RectangleF.Empty;
         var bFont = Skin.GetBlueFont(itemdesign, state);
         GetImage();
-        if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = BlueFont.SplitByWidth(bFont, _caption, drawingCoordinates.Width, _captionlines); }
+        if (!string.IsNullOrEmpty(Caption) && _captiontmp.Count == 0) { _captiontmp = BlueFont.SplitByWidth(bFont, Caption, drawingCoordinates.Width, _captionlines); }
 
         //Point trp;
 
@@ -193,7 +183,7 @@ public class BitmapListItem : ListItem {
             }
         } while (!ok2);
 
-        if (!string.IsNullOrEmpty(_caption)) {
+        if (!string.IsNullOrEmpty(Caption)) {
             var c = _captiontmp.Count;
             var ausgl = (c - _captionlines) * ConstMy / 2;
             foreach (var thisCap in _captiontmp) {

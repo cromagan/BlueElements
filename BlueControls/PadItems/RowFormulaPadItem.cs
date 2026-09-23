@@ -15,7 +15,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     private string _lastQuickInfo = string.Empty;
     private string _rowKey;
-    private Table? _table;
     private bool _tableLoaded;
     private string _tableName = string.Empty;
     private string _tmpQuickInfo = string.Empty;
@@ -81,32 +80,32 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     public Table? Table {
         get {
-            if (_tableLoaded) { return _table; }
+            if (_tableLoaded) { return field; }
 
-            _table?.Disposed -= _table_Disposed;
+            field?.Disposed -= _table_Disposed;
 
             if (string.IsNullOrEmpty(_tableName)) {
-                _table = null;
+                field = null;
             } else {
-                _table = Table.Get(_tableName);
+                field = Table.Get(_tableName);
             }
 
-            _table?.Disposed += _table_Disposed;
+            field?.Disposed += _table_Disposed;
             _tableLoaded = true;
 
-            return _table;
+            return field;
         }
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table && _tableLoaded) { return; }
+            if (value == field && _tableLoaded) { return; }
 
-            _table?.Disposed -= _table_Disposed;
-            _table = value;
+            field?.Disposed -= _table_Disposed;
+            field = value;
 
             _tableName = value?.KeyName ?? string.Empty;
             _tableLoaded = true;
 
-            _table?.Disposed += _table_Disposed;
+            field?.Disposed += _table_Disposed;
             RemovePic();
             OnPropertyChanged();
         }
@@ -211,6 +210,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) { Table = null; }
+        base.Dispose(disposing);
+    }
+
     protected override void GeneratePic() {
         if (IsDisposed || string.IsNullOrEmpty(Layout_Dateiname) || Table is not { IsDisposed: false } tb) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
@@ -229,15 +233,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         GeneratedBitmap = icp.ToBitmap(1);
     }
 
-    private void _table_Disposed(object? sender, System.EventArgs e) {
-        if (_table is not null) {
-            _table.Disposed -= _table_Disposed;
-            _table = null;
-        }
-        _tableLoaded = true;
-        RemovePic();
-        OnPropertyChanged();
-    }
+    private void _table_Disposed(object? sender, System.EventArgs e) => Table = null;
 
     #endregion
 }

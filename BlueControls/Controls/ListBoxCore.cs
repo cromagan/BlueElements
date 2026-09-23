@@ -493,7 +493,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
             var index = -1;
             DoItemOrder();
 
-            foreach (var item in _item.Where(i => i is { Visible: true })) {
+            foreach (var item in _item.Where(i => i is not null)) {
                 index++;
                 var isCaption = item is TextListItem { IsCaption: true };
                 var wi = (layoutOrientation == Orientation.Waagerecht && isCaption) ? drawAreaControl.Width : colWidth;
@@ -544,7 +544,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         }
         var max = 0;
         foreach (var item in _item) {
-            if (item.Visible) { max = Math.Max(max, item.CanvasPosition.Bottom); }
+            max = Math.Max(max, item.CanvasPosition.Bottom);
         }
         return max;
     }

@@ -58,7 +58,7 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
     public bool MultiLine { get; set; }
 
     // IReadableTextWithKey
-    public string QuickInfo { get; protected set; }
+    public string QuickInfo { get; }
 
     public string RegexCheck { get => _format.RegexCheck; set { } }
     public string RendererSettings { get; set; } = string.Empty;
