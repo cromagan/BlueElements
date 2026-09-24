@@ -234,6 +234,7 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords.SortedDistinctList()));
         SaveToByteList(result, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow.SortedDistinctList()));
         SaveToByteList(result, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin.SortedDistinctList()));
+        SaveToByteList(result, TableDataType.CliRights, string.Join('\r', tb.CliRights.SortedDistinctList()));
 
         SaveToByteList(result, TableDataType.AssetFolder, tb.AssetFolder);
         SaveToByteList(result, TableDataType.SymbolFolder, tb.SymbolFolder);

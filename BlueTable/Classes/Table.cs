@@ -42,6 +42,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private readonly List<string> _tableAdmin = [];
 
+    private readonly List<string> _cliRights = [];
+
     private readonly List<string> _tags = [];
 
     private readonly List<ScriptVariable> _variables = [];
@@ -277,6 +279,19 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         private set {
             if (_creator == value) { return; }
             ChangeData(TableDataType.Creator, null, _creator, value);
+        }
+    }
+
+    /// <summary>
+    /// Die per Kommandozeile (CLI) erlaubten Aktionen. Die CLI vergleicht ausschließlich diese Texte.
+    /// Bekannte Werte siehe <see cref="BlueTable.ClassesStatic.CliRights"/>.
+    /// </summary>
+    public ReadOnlyCollection<string> CliRights {
+        get => new(_cliRights);
+        set {
+            var repaired = value.Where(ClassesStatic.CliRights.AllRights.Contains).ToList();
+            if (!_cliRights.IsDifferentTo(repaired)) { return; }
+            ChangeData(TableDataType.CliRights, null, string.Join('\r', _cliRights), string.Join('\r', repaired));
         }
     }
 
@@ -904,8 +919,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 l.Add(Everybody);
             } else if (string.Equals(thisUser, Administrator, StringComparison.OrdinalIgnoreCase)) {
                 l.Add(Administrator);
-            } else if (string.Equals(thisUser, Cli, StringComparison.OrdinalIgnoreCase)) {
-                l.Add(Cli);
             } else if (string.Equals(thisUser, "#RowCreator", StringComparison.OrdinalIgnoreCase)) {
                 l.Add("#RowCreator");
             } else if (thisUser.StartsWith("#USER:", StringComparison.OrdinalIgnoreCase)) {
@@ -1258,6 +1271,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         target.DictionaryWords = DictionaryWords;
         target.PermissionGroupsNewRow = PermissionGroupsNewRow;
         target.TableAdmin = TableAdmin;
+        target.CliRights = CliRights;
 
         target.SortDefinition = SortDefinition is not null
             ? new RowSortDefinition(target, SortDefinition.ParseableItems().FinishParseable())
@@ -2008,6 +2022,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         json.SetArrayIfNotEmpty("dictionarywords", _dictionaryWords);
         json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow);
         json.SetArrayIfNotEmpty("tableadmin", _tableAdmin);
+        json.SetArrayIfNotEmpty("clirights", _cliRights);
 
         if (SortDefinition is { } sd) { json.Set("sortdefinition", sd.ParseableJson()); }
         json.SetArrayIfNotEmpty("uniquevalues", _uniqueValues);
@@ -2124,6 +2139,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (json["tableadmin"] is JsonArray taArr) {
             _tableAdmin.Clear();
             _tableAdmin.AddRange(RepairUserGroups(taArr.ToStringList()));
+        }
+
+        if (json["clirights"] is JsonArray crArr) {
+            _cliRights.Clear();
+            _cliRights.AddRange(crArr.ToStringList().Where(ClassesStatic.CliRights.AllRights.Contains));
         }
 
         #endregion
@@ -2601,6 +2621,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
+                _cliRights.Clear();
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
                 _dictionaryWords.Clear();
@@ -2772,6 +2793,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.TableAdminGroups:
                 _tableAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case TableDataType.CliRights:
+                _cliRights.Clear();
+                _cliRights.AddRange(value.SplitAndCutByCr().Where(ClassesStatic.CliRights.AllRights.Contains));
                 break;
 
             case TableDataType.SortDefinition:

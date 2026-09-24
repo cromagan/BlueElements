@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Bearbeitet den Tabellenkopf. Aktuell: Tags setzen (nur als Tabellen-Administrator); leerer Wert entfernt alle Tags.
+/// Tabellen: Bearbeitet den Tabellenkopf. Aktuell: Tags setzen (nur mit dem CLI-Recht 'Edit table head'); leerer Wert entfernt alle Tags.
 /// </summary>
 public class TableHeadCliCommand : CliCommand {
 
@@ -37,9 +37,11 @@ public class TableHeadCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Tags liegen am Tabellenkopf: Nur ein Administrator der Tabelle darf sie ändern.
-        if (!tbl.IsAdministrator()) {
-            Console.Error.WriteLine("Keine Rechte zum Ändern der Tags: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.EditTableHead);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 

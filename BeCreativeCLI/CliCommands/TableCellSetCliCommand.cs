@@ -46,6 +46,14 @@ public class TableCellSetCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.ChangeCellValues);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
+            return 1;
+        }
+
         // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
         var dryRun = args.Flag("dry-run");
 
@@ -56,7 +64,7 @@ public class TableCellSetCliCommand : CliCommand {
             return 1;
         }
 
-        var columnProblem = ColumnWriteProblem(column);
+        var columnProblem = ColumnWriteProblem(tbl, column);
 
         if (columnProblem is not null) {
             Console.Error.WriteLine(columnProblem);
@@ -103,18 +111,8 @@ public class TableCellSetCliCommand : CliCommand {
         }
 
         var done = 0;
-        var permissionDenied = false;
 
         foreach (var row in rows) {
-            // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
-            // Systemspalten sind bereits über SystemColumnWriteProblem geprüft — PermissionCheck
-            // würde dort den Administrator fälschlich gewähren lassen.
-            if (!column.IsSystemColumn() && !tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-                Console.Error.WriteLine($"Zeile {row.KeyName}: Keine Rechte, um diesen Wert zu ändern.");
-                permissionDenied = true;
-                continue;
-            }
-
             var failed = row.CellSet(column, value, "bcr table-cellset");
 
             if (!string.IsNullOrEmpty(failed)) {
@@ -123,10 +121,6 @@ public class TableCellSetCliCommand : CliCommand {
                 Console.Out.WriteLine($"Wert gesetzt in {row.KeyName}");
                 done++;
             }
-        }
-
-        if (permissionDenied) {
-            Console.Error.WriteLine("Keine Rechte für die Spalte " + column.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
         }
 
         if (done == 0) { return 1; }

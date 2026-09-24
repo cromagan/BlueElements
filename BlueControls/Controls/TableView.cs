@@ -842,7 +842,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             e.RemoveString("#RowCreator", false);
         }
         e.Add(UserGroup);
-        e.Add(Cli);
         e.RemoveString(Administrator, false);
 
         return RepairUserGroups(e);

@@ -18,10 +18,10 @@ internal static class Program {
         // stdin wird nicht umgestellt: Die Befehle lesen keine Standardeingabe.
 
         StartService();
-        // Die CLI arbeitet niemals als Administrator: Benutzergruppe #CLI, Benutzername CLI_<Windows-Benutzer>.
-        // Bearbeitungen durchlaufen damit die gleichen Rechteprüfungen wie Benutzereingaben.
+        // Die CLI ist kein Tabellen-Benutzer: Erlaubte Aktionen stehen als CLI-Rechte
+        // (Texte) in der Tabelle und werden direkt als String verglichen — nicht über
+        // Benutzergruppen. Der Namenspräfix dient der Zuordnung von Fragment-Dateien.
         UserName = "CLI_" + UserName;
-        UserGroup = Cli;
         MessageDG += Program_MessageDG;
         // Headless: Die CLI bearbeitet in jedem Fall alle Zeilen — kein Abbruch durch Benutzeraktivität oder Zeitlimit.
         RowCollection.AllowProcessingAborts = false;

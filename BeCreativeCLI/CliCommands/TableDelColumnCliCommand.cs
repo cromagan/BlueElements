@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Löscht eine Spalte permanent (nur als Tabellen-Administrator). Systemspalten sind geschützt.
+/// Tabellen: Löscht eine Spalte permanent (nur mit dem CLI-Recht 'Delete column'). Systemspalten sind geschützt.
 /// </summary>
 public class TableDelColumnCliCommand : CliCommand {
 
@@ -28,9 +28,11 @@ public class TableDelColumnCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten löschen.
-        if (!tbl.IsAdministrator()) {
-            Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.DeleteColumn);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 

@@ -69,9 +69,8 @@ public class TableSwapRowsCliCommand : CliCommand {
             return 2;
         }
 
-        // Systemspalte: Separate CLI-Prüfung — PermissionCheck würde den
-        // Administrator fälschlich gewähren lassen.
-        var swapProblem = SystemColumnWriteProblem(sortCol);
+        // Systemspalte: Nur mit dem CLI-Recht 'Change cell values'.
+        var swapProblem = SystemColumnWriteProblem(tbl, sortCol);
 
         if (swapProblem is not null) {
             Console.Error.WriteLine(swapProblem);

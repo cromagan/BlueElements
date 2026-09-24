@@ -37,10 +37,11 @@ public class TableDelRowCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Wie eine Benutzereingabe: Zeilen löschen darf nur ein Tabellen-Administrator
-        // (#CLI muss also bei den Tabellen-Administratoren stehen).
-        if (!tbl.IsAdministrator()) {
-            Console.Error.WriteLine("Keine Rechte zum Löschen: #CLI bei den Tabellen-Administratoren ergänzen.");
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.DeleteRow);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 

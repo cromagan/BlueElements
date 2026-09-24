@@ -5,7 +5,7 @@ using BlueTable.ColumnFormats;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Legt eine neue Spalte an (nur als Tabellen-Administrator). Standardformat TextOneLine;
+/// Tabellen: Legt eine neue Spalte an (nur mit dem CLI-Recht 'Add column'). Standardformat TextOneLine;
 /// Format, Beschriftung und Quickinfo per Option. Alle Formate listet 'bcr table-columnformats'.
 /// </summary>
 public class TableAddColumnCliCommand : CliCommand {
@@ -45,9 +45,11 @@ public class TableAddColumnCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Der Tabellenkopf wird verändert: Nur ein Administrator der Tabelle darf Spalten anlegen.
-        if (!tbl.IsAdministrator()) {
-            Console.Error.WriteLine("Keine Rechte zum Anlegen von Spalten: #CLI in den Tabellen-Admin-Gruppen der Tabelle ergänzen.");
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.AddColumn);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 

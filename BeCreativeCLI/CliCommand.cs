@@ -84,9 +84,9 @@ public abstract class CliCommand : IHasKeyName {
     /// Fremdtabelle um und nicht gespeicherte Spalten verlieren Änderungen beim Entladen —
     /// beides meldet CellSet fälschlich als Erfolg. Die CLI lehnt solche Spalten ab.
     /// </summary>
-    protected static string? ColumnWriteProblem(ColumnItem column) {
+    protected static string? ColumnWriteProblem(Table tbl, ColumnItem column) {
         if (column.IsSystemColumn()) {
-            return SystemColumnWriteProblem(column);
+            return SystemColumnWriteProblem(tbl, column);
         }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -98,23 +98,6 @@ public abstract class CliCommand : IHasKeyName {
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Beschreibbar
-    /// nur, wenn #CLI oder #CLI-(Benutzername) explizit in den Bearbeitungsrechten
-    /// der Spalte steht. Die Administrator-Rolle wird bewusst ignoriert — sie
-    /// ersetzt keine gesetzten Rechte. Nicht-Systemspalten liefert null.
-    /// </summary>
-    protected static string? SystemColumnWriteProblem(ColumnItem column) {
-        if (!column.IsSystemColumn()) { return null; }
-
-        var allowed = column.PermissionGroupsChangeCell;
-
-        if (allowed.Contains(Cli, StringComparer.OrdinalIgnoreCase) ||
-            allowed.Contains(Cli + "-" + UserName, StringComparer.OrdinalIgnoreCase)) { return null; }
-
-        return "Die Systemspalte '" + column.KeyName + "' ist nur änderbar, wenn #CLI oder #CLI-" + UserName + " in den Bearbeitungsrechten der Spalte steht.";
     }
 
     /// <summary>
@@ -250,6 +233,13 @@ public abstract class CliCommand : IHasKeyName {
                 return FilterType.Istgleich_GroßKleinEgal;
         }
     }
+
+    /// <summary>
+    /// True, wenn die Tabelle das CLI-Recht gesetzt hat. Die CLI vergleicht
+    /// ausschließlich diese Texte — die Benutzergruppen-Rechte der Tabelle
+    /// (Spalten-Rechte, Neue Zeilen, Administratoren) werden ignoriert.
+    /// </summary>
+    protected static bool HasRight(Table tbl, string right) => tbl.CliRights.Contains(right, StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// True, wenn Zellinhalte der Spalte als HTML gelesen werden (RichText-Renderer
@@ -406,6 +396,14 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
+    /// Liefert null, wenn das CLI-Recht gesetzt ist, ansonsten die Fehlermeldung.
+    /// </summary>
+    protected static string? RightProblem(Table tbl, string right) =>
+        HasRight(tbl, right)
+            ? null
+            : "Keine Rechte: Das CLI-Recht '" + right + "' ist in der Tabelle nicht gesetzt (Tabellen-Eigenschaften > CLI-Rechte).";
+
+    /// <summary>
     /// Prüft die Zeilenadressierung (--rowkey oder --filtercolumn/--filtervalue)
     /// und den Vergleichstyp --filtertype. Liefert null, wenn alle Angaben gültig
     /// sind, ansonsten die Fehlerbeschreibung.
@@ -465,6 +463,22 @@ public abstract class CliCommand : IHasKeyName {
     /// </summary>
     protected static string StorageTextOf(ColumnItem column, string text) =>
         IsHtmlContent(column) ? text.CreateHtmlCodes() : text;
+
+    /// <summary>
+    /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Die
+    /// Sperrspalte (SYS_LOCKED) beschreibbar nur mit dem Recht 'Remove row lock',
+    /// alle übrigen Systemspalten nur mit 'Change cell values'. Nicht-Systemspalten
+    /// liefert null.
+    /// </summary>
+    protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column) {
+        if (!column.IsSystemColumn()) { return null; }
+
+        var right = tbl.Column.SysLocked == column ? CliRights.RemoveRowLock : CliRights.ChangeCellValues;
+
+        return HasRight(tbl, right)
+            ? null
+            : "Die Systemspalte '" + column.KeyName + "' ist nur mit dem CLI-Recht '" + right + "' änderbar.";
+    }
 
     /// <summary>
     /// Prüft die Zeile per prepare_formula. Meldet die Prüfung einen Fehler,

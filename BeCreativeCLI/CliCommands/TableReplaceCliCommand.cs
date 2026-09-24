@@ -14,7 +14,7 @@ public class TableReplaceCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'gewürfelten' trifft auch als gew&#252;rfelten gespeicherte Werte; --find und --replace dürfen selbst Entities enthalten. " +
-            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit expliziten CLI-Rechten: #CLI oder #CLI-(Benutzername)), ohne Zeilenadressierung alle Zeilen. " +
+            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den CLI-Rechten 'Change cell values' bzw. 'Remove row lock'), ohne Zeilenadressierung alle Zeilen. " +
             "Der neue Zellwert wird wie in der App gespeichert (Sonderzeichen als HTML-Entities). " +
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
 
@@ -56,6 +56,14 @@ public class TableReplaceCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.ChangeCellValues);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
+            return 1;
+        }
+
         List<ColumnItem> columns;
 
         if (args.HasOption("column")) {
@@ -66,7 +74,7 @@ public class TableReplaceCliCommand : CliCommand {
                 return 1;
             }
 
-            var columnProblem = ColumnWriteProblem(column);
+            var columnProblem = ColumnWriteProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -75,11 +83,11 @@ public class TableReplaceCliCommand : CliCommand {
 
             columns = [column];
         } else {
-            // Systemspalten nur mit expliziten CLI-Rechten einschließen; alle
+            // Systemspalten nur mit passendem CLI-Recht einschließen; alle
             // übrigen nicht änderbaren Spalten dem Benutzer melden.
-            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(c) is null)];
+            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c) is null)];
 
-            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(c) is not null).ToList();
+            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c) is not null).ToList();
 
             if (skipped.Count > 0) {
                 Console.Error.WriteLine("Übersprungen (nicht per CLI änderbar): " + string.Join(", ", skipped.Select(c => c.KeyName)));
@@ -102,7 +110,6 @@ public class TableReplaceCliCommand : CliCommand {
 
         var changedCells = 0;
         var changedRows = 0;
-        var denied = false;
 
         // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
         // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
@@ -135,15 +142,6 @@ public class TableReplaceCliCommand : CliCommand {
                     continue;
                 }
 
-                // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
-                // Systemspalten sind bereits über SystemColumnWriteProblem geprüft — PermissionCheck
-                // würde dort den Administrator fälschlich gewähren lassen.
-                if (!column.IsSystemColumn() && !tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-                    Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName}: Keine Rechte, um diesen Wert zu ändern.");
-                    denied = true;
-                    continue;
-                }
-
                 var failed = row.CellSet(column, newValue, "bcr table-replace");
 
                 if (!string.IsNullOrEmpty(failed)) {
@@ -157,10 +155,6 @@ public class TableReplaceCliCommand : CliCommand {
             }
 
             if (rowChanged > 0) { changedRows++; }
-        }
-
-        if (denied) {
-            Console.Error.WriteLine("Keine Rechte für mindestens eine Spalte: #CLI in deren Bearbeitungsrechten ergänzen.");
         }
 
         if (dryRun) {

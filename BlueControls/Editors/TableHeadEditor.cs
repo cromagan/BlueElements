@@ -5,6 +5,7 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueScript.ScriptVariables;
+using BlueTable.ClassesStatic;
 using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -288,6 +289,21 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));
         lbxTableAdmin.Check(tb.TableAdmin, true);
 
+        lbxCliRights.ItemClear();
+        lbxCliRights.ItemAddRange(
+        [
+            ItemOf("Zeile erstellen", CliRights.AddRow),
+            ItemOf("Zeile löschen", CliRights.DeleteRow),
+            ItemOf("Zellwerte ändern", CliRights.ChangeCellValues),
+            ItemOf("Zeilenlock entfernen", CliRights.RemoveRowLock),
+            ItemOf("Skript ändern", CliRights.EditScript),
+            ItemOf("Skript ausführen", CliRights.ExecuteScript),
+            ItemOf("Spalte erstellen", CliRights.AddColumn),
+            ItemOf("Spalte löschen", CliRights.DeleteColumn),
+            ItemOf("Tabellenkopf ändern", CliRights.EditTableHead)
+        ]);
+        lbxCliRights.Check(tb.CliRights, true);
+
         variableEditor.InputItem = Table?.Variables;
 
         uniqueValueDefinitionEditor.Table = Table;
@@ -542,6 +558,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.Tags = new(txbTags.Text.SplitAndCutByCr());
 
         Table.TableAdmin = new(lbxTableAdmin.Checked);
+
+        Table.CliRights = new(lbxCliRights.Checked);
 
         var tmp = PermissionGroups_NewRow.Checked.ToList();
         tmp.Remove(Administrator);

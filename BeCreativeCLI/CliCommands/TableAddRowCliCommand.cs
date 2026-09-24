@@ -48,7 +48,7 @@ public class TableAddRowCliCommand : CliCommand {
                 return UsageError("Spalte nicht gefunden: " + columnName);
             }
 
-            var columnProblem = ColumnWriteProblem(column);
+            var columnProblem = ColumnWriteProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -66,21 +66,18 @@ public class TableAddRowCliCommand : CliCommand {
             return 1;
         }
 
-        var firstProblem = ColumnWriteProblem(firstColumn);
+        var firstProblem = ColumnWriteProblem(tbl, firstColumn);
 
         if (firstProblem is not null) {
             Console.Error.WriteLine(firstProblem);
             return 1;
         }
 
-        // Wie eine Benutzereingabe: Neue-Zeilen-Rechte und Bearbeitungsrechte der ersten Spalte prüfen.
-        if (!tbl.PermissionCheck(tbl.PermissionGroupsNewRow, null, true)) {
-            Console.Error.WriteLine("Keine Rechte für neue Zeilen: #CLI bei 'Neue Zeilen anlegen' ergänzen.");
-            return 1;
-        }
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        var rightProblem = RightProblem(tbl, CliRights.AddRow);
 
-        if (!tbl.PermissionCheck(firstColumn.PermissionGroupsChangeCell, null, true)) {
-            Console.Error.WriteLine("Keine Rechte für die Spalte " + firstColumn.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 
@@ -104,14 +101,6 @@ public class TableAddRowCliCommand : CliCommand {
         }
 
         foreach (var (column, setValue) in sets) {
-            // Wie eine Benutzereingabe: Die Gruppe #CLI muss in den Bearbeitungsrechten der Spalte stehen.
-            // Systemspalten sind bereits über SystemColumnWriteProblem geprüft — PermissionCheck
-            // würde dort den Administrator fälschlich gewähren lassen.
-            if (!column.IsSystemColumn() && !tbl.PermissionCheck(column.PermissionGroupsChangeCell, row, true)) {
-                Console.Error.WriteLine("Keine Rechte für die Spalte " + column.KeyName + ": #CLI in den Bearbeitungsrechten der Spalte ergänzen.");
-                return 1;
-            }
-
             // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
             var failed = row.CellSet(column, StorageTextOf(column, setValue), "bcr table-addrow");
 

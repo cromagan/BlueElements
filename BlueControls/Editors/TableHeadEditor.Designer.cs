@@ -43,10 +43,10 @@ namespace BlueControls.BlueTableDialogs {
             GlobalTab = new TabControl();
             tabAllgemein = new TabPage();
             txbZeilenQuickInfo = new TextBoxSuggestions();
+            txbSymbolFolder = new TextBox();
             capZeilenQuickInfo = new Caption();
             txbAssetFolder = new TextBox();
             capSymbolFolder = new Caption();
-            txbSymbolFolder = new TextBox();
             txbStandardFormulaFile = new TextBox();
             btnFormularBearbeiten = new Button();
             btnLoadAll = new Button();
@@ -60,6 +60,8 @@ namespace BlueControls.BlueTableDialogs {
             capAdditional = new Caption();
             btnSpaltenuebersicht = new Button();
             tabRechte = new TabPage();
+            lbxCliRights = new ListBox();
+            capCliRights = new Caption();
             tabSortierung = new TabPage();
             rowSortDefinitionEditor = new RowSortDefinitionEditor();
             capCustomSortInfo = new Caption();
@@ -77,6 +79,7 @@ namespace BlueControls.BlueTableDialogs {
             capDictionary = new Caption();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
+            grpCLI = new GroupBox();
             pnlStatusBar.SuspendLayout();
             grpBenutzergruppen.SuspendLayout();
             grpKennwort.SuspendLayout();
@@ -88,6 +91,7 @@ namespace BlueControls.BlueTableDialogs {
             tabVariablen.SuspendLayout();
             tabDictionary.SuspendLayout();
             tabUndo.SuspendLayout();
+            grpCLI.SuspendLayout();
             SuspendLayout();
             // 
             // capStatusBar
@@ -327,6 +331,16 @@ namespace BlueControls.BlueTableDialogs {
             txbZeilenQuickInfo.Size = new Size(616, 152);
             txbZeilenQuickInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
+            // txbSymbolFolder
+            // 
+            txbSymbolFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbSymbolFolder.Cursor = Cursors.IBeam;
+            txbSymbolFolder.Location = new Point(8, 392);
+            txbSymbolFolder.Name = "txbSymbolFolder";
+            txbSymbolFolder.Size = new Size(616, 24);
+            txbSymbolFolder.TabIndex = 46;
+            txbSymbolFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // capZeilenQuickInfo
             // 
             capZeilenQuickInfo.CausesValidation = false;
@@ -353,16 +367,6 @@ namespace BlueControls.BlueTableDialogs {
             capSymbolFolder.Name = "capSymbolFolder";
             capSymbolFolder.Size = new Size(152, 18);
             capSymbolFolder.Text = "Symbol-Ordner:";
-            // 
-            // txbSymbolFolder
-            // 
-            txbSymbolFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            txbSymbolFolder.Cursor = Cursors.IBeam;
-            txbSymbolFolder.Location = new Point(8, 392);
-            txbSymbolFolder.Name = "txbSymbolFolder";
-            txbSymbolFolder.Size = new Size(616, 24);
-            txbSymbolFolder.TabIndex = 46;
-            txbSymbolFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbStandardFormulaFile
             // 
@@ -503,6 +507,7 @@ namespace BlueControls.BlueTableDialogs {
             // tabRechte
             // 
             tabRechte.BackColor = Color.FromArgb(255, 255, 255);
+            tabRechte.Controls.Add(grpCLI);
             tabRechte.Controls.Add(grpKennwort);
             tabRechte.Controls.Add(grpBenutzergruppen);
             tabRechte.Location = new Point(4, 25);
@@ -511,6 +516,28 @@ namespace BlueControls.BlueTableDialogs {
             tabRechte.Size = new Size(1178, 678);
             tabRechte.TabIndex = 4;
             tabRechte.Text = "Rechte";
+            // 
+            // lbxCliRights
+            // 
+            lbxCliRights.AddAllowed = AddType.None;
+            lbxCliRights.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lbxCliRights.Appearance = ListBoxAppearance.Listbox_Boxes;
+            lbxCliRights.CheckBehavior = CheckBehavior.MultiSelection;
+            lbxCliRights.FilterText = null;
+            lbxCliRights.Location = new Point(8, 48);
+            lbxCliRights.Name = "lbxCliRights";
+            lbxCliRights.Size = new Size(304, 608);
+            lbxCliRights.TabIndex = 1;
+            lbxCliRights.Translate = false;
+            // 
+            // capCliRights
+            // 
+            capCliRights.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capCliRights.CausesValidation = false;
+            capCliRights.Location = new Point(8, 24);
+            capCliRights.Name = "capCliRights";
+            capCliRights.Size = new Size(304, 20);
+            capCliRights.Text = "Der Kommandozeile (CLI) erlaubte Aktionen:";
             // 
             // tabSortierung
             // 
@@ -689,6 +716,20 @@ namespace BlueControls.BlueTableDialogs {
             tblUndo.TabIndex = 0;
             tblUndo.Text = "UndoTab";
             // 
+            // grpCLI
+            // 
+            grpCLI.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            grpCLI.BackColor = Color.FromArgb(255, 255, 255);
+            grpCLI.CausesValidation = false;
+            grpCLI.Controls.Add(lbxCliRights);
+            grpCLI.Controls.Add(capCliRights);
+            grpCLI.Location = new Point(664, 8);
+            grpCLI.Name = "grpCLI";
+            grpCLI.Size = new Size(320, 664);
+            grpCLI.TabIndex = 3;
+            grpCLI.TabStop = false;
+            grpCLI.Text = "CLI-Rechte:";
+            // 
             // TableHeadEditor
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -714,6 +755,7 @@ namespace BlueControls.BlueTableDialogs {
             tabVariablen.ResumeLayout(false);
             tabDictionary.ResumeLayout(false);
             tabUndo.ResumeLayout(false);
+            grpCLI.ResumeLayout(false);
             ResumeLayout(false);
 
         }
@@ -731,6 +773,8 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabAllgemein;
         private TabPage tabSortierung;
         private TabPage tabRechte;
+        private ListBox lbxCliRights;
+        private Caption capCliRights;
         private GroupBox grpKennwort;
         private GroupBox grpBenutzergruppen;
         private TabPage tabUndo;
@@ -770,5 +814,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capDictionary;
         private Button btnExtractWords;
         private Button btnFormularBearbeiten;
+        private GroupBox grpCLI;
     }
 }

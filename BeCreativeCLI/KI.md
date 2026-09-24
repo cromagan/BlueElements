@@ -15,12 +15,13 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Tabellenname ohne Pfad = aktuelles Arbeitsverzeichnis. Konsole also per workdir in den Tabellen-Ordner setzen.
 - Exit-Codes: 0 = Erfolg, 1 = Fehler, 2 = Benutzungsfehler (`$LASTEXITCODE` prüfen).
 - Daten auf stdout (CSV, UTF-8), Fehler auf stderr.
-- Die CLI läuft mit Benutzergruppe `#CLI` (nicht Administrator): Bearbeitungen brauchen `#CLI` als Recht (Spalten-Bearbeitung, Neue Zeilen, Tabellen-Admin für table-delrow; table-swaprows braucht `#CLI` in den Bearbeitungsrechten der Spalte SYS_ROWSORTINDEX).
+- Rechte-Modell der CLI: Die CLI ist kein Tabellen-Benutzer und ignoriert die Benutzergruppen-Rechte (Spalten-Rechte, Neue Zeilen, Administratoren). Erlaubte Aktionen stehen als CLI-Rechte (englische Texte) in den Tabellen-Eigenschaften (Tab 'CLI-Rechte') und werden direkt als String verglichen: `Create row` (table-addrow), `Delete row` (table-delrow), `Change cell values` (table-cellset, table-replace, table-swaprows), `Remove row lock` (Schreiben der Sperrspalte SYS_LOCKED), `Edit script` (table-scriptedit), `Execute script` (table-scriptexecute), `Add column` (table-addcolumn), `Delete column` (table-delcolumn), `Edit table head` (table-head). Ohne das jeweilige Recht meldet der Befehl sofort einen Fehler.
 - Tabellen mit Kennwort: per `--password <kennwort>` mitgeben (gilt für alle table-Befehle, die die Tabelle laden). Ohne korrektes Kennwort sofortiger Fehler.
 - Dateiendungen: Nur `.bdb`, `.mbdb`, `.tblh`, `.tblj`, `.mtblj` werden akzeptiert (oder der Name ganz ohne Endung). Ein anderer Name wird abgelehnt, statt stillschweigend eine gleichnamige Tabelle zu öffnen.
 - Nicht beschreibbare Spalten: Spalten, die auf Werte einer anderen Tabelle verknüpft sind, und berechnete Spalten (`WirdGespeichert: nein`) lehnen Schreibversuche (`table-cellset`, `table-replace --column`, `table-addrow --set`) mit Fehler ab — in der GUI oder in der Quell-Tabelle ändern. `table-replace` ohne `--column` überspringt diese Spalten und nennt sie auf stderr.
-- Spalten anlegen/löschen: `table-addcolumn` und `table-delcolumn` (nur als Tabellen-Administrator); gültige Formate listet `table-columnformats`. Systemspalten sind geschützt.
-- Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (Rechte für `#CLI` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
+- Spalten anlegen/löschen: `table-addcolumn` und `table-delcolumn` (nur mit den CLI-Rechten `Add column` bzw. `Delete column`); gültige Formate listet `table-columnformats`. Systemspalten sind geschützt.
+- Skripte: `table-scriptexecute <tabelle> --name <skript>` führt ein Tabellen-Skript aus (Zeilen-Skripte mit `--rowkey`), `table-scriptedit <tabelle> --name <skript> --file <datei>` legt ein Skript an oder ersetzt den Text komplett (bei Syntax-Fehlern wird nichts geändert), `script-syntax [filter]` listet die Syntax aller Skript-Befehle auf.
+- Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (CLI-Recht `Change cell values` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
 - Ist die Spalte SYS_ROWSORTINDEX vorhanden, ist nur EIN Kapitel möglich — `table-cellset` weist \r in der Kapitelspalte dann mit Fehler ab. Ansonsten kann eine Zeile mehreren Kapiteln zugeordnet werden. Getrennt mit \r
 - Fragment-Tabellen: `.mbdb` (TableFragments) ist bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten); `.mtblj` (TableJsonFragments) bleibt für Bearbeitungen gesperrt. Lesen (`table-info` etc.) geht überall.
@@ -53,13 +54,16 @@ Wichtige Stolperfalle:
 - `bcr table-cellset <tabelle> --column <c> --value <w>` + Zeilenadressierung — Zelle setzen (speichert); `--dry-run` zeigt nur die betroffenen Zeilen-Keys
 - `bcr table-replace <tabelle> --find <text> --replace <ersatz> [--column <c>] [+ Zeilenadressierung]` — Suchen & Ersetzen über Zellen, entity-bewusst (Suche auf dekodiertem Text: 'gewürfelten' trifft auch gew&#252;rfelten); `--dry-run` zeigt Fundstellen ohne zu ändern (speichert)
 - `bcr table-delrow <tabelle>` + Zeilenadressierung — Zeilen löschen (speichert); `--dry-run` zeigt nur die Keys
-- `bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>` — Positionen zweier Zeilen tauschen (nur wenn die benutzerdefinierte Sortierung aktiv ist; braucht `#CLI` in den Bearbeitungsrechten der Spalte SYS_ROWSORTINDEX; speichert); `--dry-run` möglich
+- `bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>` — Positionen zweier Zeilen tauschen (nur wenn die benutzerdefinierte Sortierung aktiv ist; braucht das CLI-Recht `Change cell values`; speichert); `--dry-run` möglich
 - `bcr table-search <tabelle> --value <w> [--column <c>] [--max <n>] [--context <zeichen>]` — Suche auf dekodiertem Text (Umlaut-Entities werden mitgefunden, Groß-/Kleinschreibung egal); Ausgabe pro Treffer: `Spalte <c> Zeile <key>: <treffer>` — zeichenbasierter Kontext (Standard 40 Zeichen je Seite, reißt nicht mitten im Wort ab); Key direkt als `--rowkey` verwendbar
 - `bcr table-columncontent <tabelle> --column <c> [--max <n>]` — alle Werte einer Spalte
 - `bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader] [--no-system-columns] [--decode] [+ Zeilenadressierung]` — CSV auf stdout; `--decode` gibt echte Umlaute statt Entities aus (gut für Diffs/Reviews, nicht für Rückverarbeitung); Zeilenadressierung begrenzt die Auswahl
-- `bcr table-head <tabelle> tags <tags mit | getrennt>` — Tags des Tabellenkopfs setzen (leerer Wert entfernt alle; speichert). NUR als Tabellen-Administrator: Die Gruppe `#CLI` muss in den Tabellen-Admin-Gruppen stehen.
-- `bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>]` — Spalte anlegen (NUR als Tabellen-Administrator; Standardformat TextOneLine; speichert)
-- `bcr table-delcolumn <tabelle> <spaltenname>` — Spalte löschen (NUR als Tabellen-Administrator; Systemspalten sind geschützt; speichert)
+- `bcr table-head <tabelle> tags <tags mit | getrennt>` — Tags des Tabellenkopfs setzen (leerer Wert entfernt alle; speichert). NUR mit dem CLI-Recht `Edit table head`.
+- `bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>]` — Spalte anlegen (NUR mit dem CLI-Recht `Add column`; Standardformat TextOneLine; speichert)
+- `bcr table-delcolumn <tabelle> <spaltenname>` — Spalte löschen (NUR mit dem CLI-Recht `Delete column`; Systemspalten sind geschützt; speichert)
+- `bcr table-scriptexecute <tabelle> --name <skript> [--rowkey <key>]` — Tabellen-Skript ausführen (NUR mit dem CLI-Recht `Execute script`; Zeilen-Skripte brauchen `--rowkey`; speichert bei Änderungen)
+- `bcr table-scriptedit <tabelle> --name <skript> --file <datei>` — Skript anlegen oder Text ersetzen (NUR mit dem CLI-Recht `Edit script`; bei Syntax-Fehlern nichts ändernd)
+- `bcr script-syntax [filter]` — Syntax aller Skript-Befehle auflisten, optional gefiltert
 - `bcr table-rowerrors <tabelle>` + Zeilenadressierung — Datenüberprüfung adressierter Zeilen; Exit-Code 1 bei Fehlern
 
 Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>` (optional `--filtertype equals|exact|contains|startswith`). Der Zeilen-Key ist numerisch (Zeitstempel-artiger Long); `--row 123` mit `KEY=Wert`-Syntax ist falsch — Beispiele: `bcr help table-info`.
@@ -71,7 +75,7 @@ Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-replace`, `ta
 - Das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt werden kann: Die letzte sauber geschlossene Fragment-Datei des eigenen Benutzers (jünger als 5 Minuten, endend mit `- EOF`) wird wiederaufgenommen: Der Writer wird direkt im Append-Modus auf diese Datei geöffnet und die neuen Änderungen werden angehängt. Damit bleiben alle Änderungen einer Aufgabenkette in EINER Fragment-Datei gebündelt.
 - Gibt es keine geeignete Fragment-Datei (zu alt, kein EOF, fremder Benutzer), legt der Befehl beim ersten Schreiben selbst eine neue Fragment-Datei an.
 - `--dry-run` öffnet den Fragment-Writer nicht und lässt die Dateien unangetastet; wird ein Befehl nach der Fortführung abgebrochen, erhält die Datei lediglich einen frischen `- EOF`-Marker.
-- Auch bei Fragment-Tabellen gilt: Die Berechtigungen (`#CLI`) werden wie bei Benutzereingaben geprüft.
+- Auch bei Fragment-Tabellen gilt: Die CLI-Rechte der Tabelle werden als String verglichen und erzwingen dieselben Grenzen wie bei normalen Tabellen.
 
 ## Roundtrip-Test (roundtrip)
 

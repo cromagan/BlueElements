@@ -149,6 +149,12 @@ public enum TableDataType : byte {
 
     SymbolFolder = 84,
 
+    /// <summary>
+    /// Liste der per Kommandozeile (CLI) erlaubten Aktionen (String-Liste, \r-getrennt).
+    /// Bekannte Werte siehe <see cref="BlueTable.ClassesStatic.CliRights"/>.
+    /// </summary>
+    CliRights = 85,
+
     ColumnKey = 100,
 
     ColumnCaption = 101,
