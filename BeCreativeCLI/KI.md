@@ -15,7 +15,7 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Tabellenname ohne Pfad = aktuelles Arbeitsverzeichnis. Konsole also per workdir in den Tabellen-Ordner setzen.
 - Exit-Codes: 0 = Erfolg, 1 = Fehler, 2 = Benutzungsfehler (`$LASTEXITCODE` prüfen).
 - Daten auf stdout (CSV, UTF-8), Fehler auf stderr.
-- Rechte-Modell der CLI: Die CLI ist kein Tabellen-Benutzer und ignoriert die Benutzergruppen-Rechte (Spalten-Rechte, Neue Zeilen, Administratoren). Erlaubte Aktionen stehen als CLI-Rechte (englische Texte) in den Tabellen-Eigenschaften (Tab 'CLI-Rechte') und werden direkt als String verglichen: `Create row` (table-addrow), `Delete row` (table-delrow), `Change cell values` (table-cellset, table-replace, table-swaprows), `Remove row lock` (Schreiben der Sperrspalte SYS_LOCKED), `Edit script` (table-scriptedit), `Execute script` (table-scriptexecute), `Add column` (table-addcolumn), `Delete column` (table-delcolumn), `Edit table head` (table-head). Ohne das jeweilige Recht meldet der Befehl sofort einen Fehler.
+- Rechte-Modell der CLI: Die CLI ist kein Tabellen-Benutzer und ignoriert die Benutzergruppen-Rechte (Spalten-Rechte, Neue Zeilen, Administratoren). Erlaubte Aktionen stehen als CLI-Rechte (englische Texte) in den Tabellen-Eigenschaften (Tab 'CLI-Rechte') und werden direkt als String verglichen: `Create row` (table-addrow), `Delete row` (table-delrow), `Move rows` (table-cellset auf die Sortierindex-Spalte SYS_ROWSORTINDEX — verschiebt die Zeile), `Change cell values` (table-cellset, table-replace), `Remove row lock` (Schreiben der Sperrspalte SYS_LOCKED), `Edit script` (table-scriptedit), `Execute script` (table-scriptexecute), `Add column` (table-addcolumn), `Delete column` (table-delcolumn), `Edit table head` (table-head). Ohne das jeweilige Recht meldet der Befehl sofort einen Fehler.
 - Tabellen mit Kennwort: per `--password <kennwort>` mitgeben (gilt für alle table-Befehle, die die Tabelle laden). Ohne korrektes Kennwort sofortiger Fehler.
 - Dateiendungen: Nur `.bdb`, `.mbdb`, `.tblh`, `.tblj`, `.mtblj` werden akzeptiert (oder der Name ganz ohne Endung). Ein anderer Name wird abgelehnt, statt stillschweigend eine gleichnamige Tabelle zu öffnen.
 - Nicht beschreibbare Spalten: Spalten, die auf Werte einer anderen Tabelle verknüpft sind, und berechnete Spalten (`WirdGespeichert: nein`) lehnen Schreibversuche (`table-cellset`, `table-replace --column`, `table-addrow --set`) mit Fehler ab — in der GUI oder in der Quell-Tabelle ändern. `table-replace` ohne `--column` überspringt diese Spalten und nennt sie auf stderr.
@@ -23,7 +23,7 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Skripte: `table-scriptexecute <tabelle> --name <skript>` führt ein Tabellen-Skript aus (Zeilen-Skripte mit `--rowkey`), `table-scriptedit <tabelle> --name <skript> --file <datei>` legt ein Skript an oder ersetzt den Text komplett (bei Syntax-Fehlern wird nichts geändert), `script-syntax [filter]` listet die Syntax aller Skript-Befehle auf.
 - Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (CLI-Recht `Change cell values` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
-- Ist die Spalte SYS_ROWSORTINDEX vorhanden, ist nur EIN Kapitel möglich — `table-cellset` weist \r in der Kapitelspalte dann mit Fehler ab. Ansonsten kann eine Zeile mehreren Kapiteln zugeordnet werden. Getrennt mit \r
+- Eine Zeile kann mehreren Kapiteln zugeordnet werden. Getrennt mit \r
 - Fragment-Tabellen: `.mbdb` (TableFragments) ist bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten); `.mtblj` (TableJsonFragments) bleibt für Bearbeitungen gesperrt. Lesen (`table-info` etc.) geht überall.
 - Datenüberprüfung: Geänderte Zeilen werden invalidiert und beim Freigeben der Tabelle geprüft — vor dem Entladen, ohne Neuladen. Row-Skripte laufen dabei; Meldungen erscheinen über das normale Meldungswesen auf stderr.
 - Mehrdeutige Aufträge (z. B. „unter Kapitel X“ = nur Position oder auch Kapitelwert setzen?) niemals raten — vor der Ausführung kurz nachfragen. Betroffene Spalten/Werte explizit nennen lassen, wenn der Auftrag sie nicht nennt.
@@ -44,17 +44,16 @@ Automatisierung und schnelle Änderungen ohne GUI.
 
 Wichtige Stolperfalle:
 - **FirstValue = Wert der Erstspalte (Primärschlüssel), NICHT die erste Spalte eines CSV-Exports** — der Export nutzt die Speicherreihenfolge und lässt Spalten mit `WirdGespeichert: nein` weg.
-- Die Systemspalte `SYS_ROWSORTINDEX` existiert nur, wenn die benutzerdefinierte Sortierung aktiviert ist. Dann ist sie eine ganz normale Spalte (in `--columnnames` sichtbar, per `--column` abfragbar, mit im Export); ohne aktive Sortierung existiert sie nicht.
+- Die Systemspalte `SYS_ROWSORTINDEX` hält die Sortiernummern der Zeilen lückenlos: Werte werden beim Anlegen neuer Zeilen aufgefüllt und beim Setzen verschoben. Sie ist eine ganz normale Spalte (in `--columnnames` sichtbar, per `--column` abfragbar, mit im Export) und existiert nur, wenn sie angelegt wurde. Ändern ihres Werts braucht das CLI-Recht `Move rows`; sie sortiert die Ansicht NICHT automatisch.
 - Zeilen-Keys sind Zeitstempel-artige Longs, sie ändern sich nie — nach einmaligem Ermitteln wiederverwendbar.
 
 ## Kurzbefehle (Tabellen)
 
 - `bcr table-addrow <tabelle> [--firstvalue <w>] [--set <spalte>=<wert>]` — Zeile anlegen, Wert setzt die Erstspalte; `--set` ist wiederholbar und setzt weitere Spalten direkt beim Anlegen (speichert)
 - `bcr table-cellget <tabelle> --column <c>` + Zeilenadressierung — Zelle lesen (Zeile muss eindeutig adressiert sein)
-- `bcr table-cellset <tabelle> --column <c> --value <w>` + Zeilenadressierung — Zelle setzen (speichert); `--dry-run` zeigt nur die betroffenen Zeilen-Keys
+- `bcr table-cellset <tabelle> --column <c> --value <w>` + Zeilenadressierung — Zelle setzen (speichert); `--dry-run` zeigt nur die betroffenen Zeilen-Keys; mit `--column SYS_ROWSORTINDEX` wird die Sortiernummer gesetzt und Nachbarzeilen werden lückenlos verschoben (CLI-Recht `Move rows`)
 - `bcr table-replace <tabelle> --find <text> --replace <ersatz> [--column <c>] [+ Zeilenadressierung]` — Suchen & Ersetzen über Zellen, entity-bewusst (Suche auf dekodiertem Text: 'gewürfelten' trifft auch gew&#252;rfelten); `--dry-run` zeigt Fundstellen ohne zu ändern (speichert)
 - `bcr table-delrow <tabelle>` + Zeilenadressierung — Zeilen löschen (speichert); `--dry-run` zeigt nur die Keys
-- `bcr table-swaprows <tabelle> --rowkey <key1> --rowkey2 <key2>` — Positionen zweier Zeilen tauschen (nur wenn die benutzerdefinierte Sortierung aktiv ist; braucht das CLI-Recht `Change cell values`; speichert); `--dry-run` möglich
 - `bcr table-search <tabelle> --value <w> [--column <c>] [--max <n>] [--context <zeichen>]` — Suche auf dekodiertem Text (Umlaut-Entities werden mitgefunden, Groß-/Kleinschreibung egal); Ausgabe pro Treffer: `Spalte <c> Zeile <key>: <treffer>` — zeichenbasierter Kontext (Standard 40 Zeichen je Seite, reißt nicht mitten im Wort ab); Key direkt als `--rowkey` verwendbar
 - `bcr table-columncontent <tabelle> --column <c> [--max <n>]` — alle Werte einer Spalte
 - `bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader] [--no-system-columns] [--decode] [+ Zeilenadressierung]` — CSV auf stdout; `--decode` gibt echte Umlaute statt Entities aus (gut für Diffs/Reviews, nicht für Rückverarbeitung); Zeilenadressierung begrenzt die Auswahl
@@ -70,7 +69,7 @@ Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>`
 
 ## Fragment-Tabellen bearbeiten (.mbdb)
 
-Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-replace`, `table-delrow`, `table-swaprows`, `table-addcolumn`, `table-delcolumn`, `table-head`) arbeiten auch auf `.mbdb` (TableFragments) — ohne Zusatzschalter:
+Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-replace`, `table-delrow`, `table-addcolumn`, `table-delcolumn`, `table-head`) arbeiten auch auf `.mbdb` (TableFragments) — ohne Zusatzschalter:
 
 - Das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt werden kann: Die letzte sauber geschlossene Fragment-Datei des eigenen Benutzers (jünger als 5 Minuten, endend mit `- EOF`) wird wiederaufgenommen: Der Writer wird direkt im Append-Modus auf diese Datei geöffnet und die neuen Änderungen werden angehängt. Damit bleiben alle Änderungen einer Aufgabenkette in EINER Fragment-Datei gebündelt.
 - Gibt es keine geeignete Fragment-Datei (zu alt, kein EOF, fremder Benutzer), legt der Befehl beim ersten Schreiben selbst eine neue Fragment-Datei an.

@@ -741,6 +741,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var row = GetByKey(rowkey);
             if (row is null) { return OperationResult.Failed("Zeile nicht gefunden!"); }
 
+            var sortOld = tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol
+                ? row.CellGetStringCore(sortCol)
+                : string.Empty;
+
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
             if (reason.HasFlag(ChangeFlags.PostProcess)) {
@@ -756,6 +760,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (!_internal.TryRemove(row.KeyName, out _)) { return OperationResult.Failed("Löschen nicht erfolgreich"); }
 
             row.Dispose();
+
+            // Benutzerdefinierte Sortierung: die Lücke der gelöschten Zeile schließen.
+            if (!string.IsNullOrEmpty(sortOld)) {
+                tb.NormalizeSortIndexRows(null, sortOld, string.Empty, "Zeile gelöscht");
+            }
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
             return OperationResult.SuccessTrue;

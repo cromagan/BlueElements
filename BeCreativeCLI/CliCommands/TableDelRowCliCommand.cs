@@ -14,7 +14,8 @@ public class TableDelRowCliCommand : CliCommand {
     public override List<string> Options => [.. AddressingOptions, "password"];
     public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
 
-    public override string? HelpDetails => "--dry-run zeigt die Keys der Zeilen an, die gelöscht würden — ohne zu löschen und ohne zu speichern.";
+    public override string? HelpDetails => "--dry-run zeigt die Keys der Zeilen an, die gelöscht würden — ohne zu löschen und ohne zu speichern. " +
+            "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen.";
 
     #endregion
 
@@ -58,8 +59,15 @@ public class TableDelRowCliCommand : CliCommand {
         }
 
         if (dryRun) {
-            Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", rows.Select(r => r.KeyName)));
-            Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
+            var deletable = rows.Where(r => !IsLocked(null, r)).ToList();
+
+            if (deletable.Count == 0) {
+                Console.Error.WriteLine("Keine löschbare Zeile getroffen.");
+                return 1;
+            }
+
+            Console.Out.WriteLine("Trockenlauf — gelöscht würden: " + string.Join(", ", deletable.Select(r => r.KeyName)));
+            Console.Out.WriteLine($"{deletable.Count.ToString1()} Zeile(n), nichts gespeichert.");
             return 0;
         }
 
@@ -74,8 +82,15 @@ public class TableDelRowCliCommand : CliCommand {
 
         var deleted = 0;
         var failed = 0;
+        var skipped = 0;
 
         foreach (var r in rows) {
+            if (IsLocked(null, r)) {
+                Console.Error.WriteLine($"Zeile {r.KeyName} ist abgeschlossen — übersprungen.");
+                skipped++;
+                continue;
+            }
+
             var opr = RowCollection.Remove(r, "bcr table-delrow");
 
             if (opr.IsFailed) {
@@ -87,13 +102,17 @@ public class TableDelRowCliCommand : CliCommand {
             }
         }
 
+        if (skipped > 0) {
+            Console.Error.WriteLine(skipped.ToString1() + " abgeschlossene Zeile(n) übersprungen.");
+        }
+
         if (deleted > 0) {
             var sr = SaveTable(tbl);
 
             if (sr != 0) { return sr; }
         }
 
-        return failed > 0 ? 1 : 0;
+        return failed > 0 || deleted == 0 ? 1 : 0;
     }
 
     #endregion

@@ -27,6 +27,8 @@ public static class CliRights {
 
     public const string ExecuteScript = "Execute script";
 
+    public const string MoveRows = "Move rows";
+
     public const string RemoveRowLock = "Remove row lock";
 
     /// <summary>
@@ -36,6 +38,7 @@ public static class CliRights {
     [
         AddRow,
         DeleteRow,
+        MoveRows,
         ChangeCellValues,
         RemoveRowLock,
         EditScript,

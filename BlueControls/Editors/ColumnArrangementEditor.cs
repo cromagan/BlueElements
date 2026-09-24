@@ -55,6 +55,15 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
     }
 
     /// <summary>
+    /// Kapitel einzigartig anzeigen: Kapitel werden zusammengefasst und nur einmal angezeigt.
+    /// Ist false, können Kapitelüberschriften sich wiederholen.
+    /// </summary>
+    public bool ChaptersUnique {
+        get => _cvc?.ChaptersUnique ?? true;
+        set { if (_cvc is { } cvc) { cvc.ChaptersUnique = value; WriteBack(); } }
+    }
+
+    /// <summary>
     /// Legt fest, ob und wie die Spaltenüberschriften angezeigt werden.
     /// </summary>
     public ColumnHeaderMode ColumnHeaderMode {
@@ -196,6 +205,7 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
             new FlexiControlForProperty<ScaleToFitMode>(() => ScaleToFit, ItemsOf(typeof(ScaleToFitMode))),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => ChapterColumn, chapterColumns),
+            new FlexiControlForProperty<bool>(() => ChaptersUnique),
             new FlexiControlForProperty<bool>(() => StartCollapsed),
             new FlexiControlForProperty<string>(() => QuickInfo, 3),
             filterCtrl,

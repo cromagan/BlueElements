@@ -46,6 +46,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string CaptionForEditor => "Spaltenanordnung";
 
     public ColumnItem? ColumnForChapter { get; set; }
+
+    /// <summary>
+    /// Kapitel einzigartig anzeigen: Kapitel werden zusammengefasst und nur einmal angezeigt.
+    /// Ist false, erscheinen die Zeilen in der Reihenfolge der aktuellen Sortierung
+    /// und Kapitelüberschriften können sich wiederholen.
+    /// </summary>
+    public bool ChaptersUnique { get; set; } = true;
+
     public ColumnHeaderMode ColumnHeaderMode { get; set; }
     public int Count => _internal.Count;
 
@@ -279,6 +287,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
         result.ParseableAdd("StartCollapsed", StartCollapsed);
+        result.ParseableAdd("ChaptersUnique", ChaptersUnique);
         result.ParseableAdd("ScaleToFit", ScaleToFit);
 
         result.ParseableAdd("FilterRows", FilterRows);
@@ -302,6 +311,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         json.Set("name", KeyName);
         json.Set("showhead", ShowHead);
         json.Set("startcollapsed", StartCollapsed);
+        json.Set("chaptersunique", ChaptersUnique);
         json.Set("scaletofit", (int)ScaleToFit);
         json.Set("filterrows", FilterRows);
         json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
@@ -333,6 +343,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         KeyName = json.GetString("name", KeyName);
         ShowHead = json.GetBool("showhead", ShowHead);
         StartCollapsed = json.GetBool("startcollapsed", StartCollapsed);
+        ChaptersUnique = json.GetBool("chaptersunique", ChaptersUnique);
         ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
         FilterRows = json.GetInt("filterrows", FilterRows);
         var chapter = json.GetString("chaptercolumn", string.Empty);
@@ -447,6 +458,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "startcollapsed":
                 StartCollapsed = value.FromPlusMinus();
+                return true;
+
+            case "chaptersunique":
+                ChaptersUnique = value.FromPlusMinus();
                 return true;
 
             case "fillwidth":

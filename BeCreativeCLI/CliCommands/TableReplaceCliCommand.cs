@@ -15,6 +15,7 @@ public class TableReplaceCliCommand : CliCommand {
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'gewürfelten' trifft auch als gew&#252;rfelten gespeicherte Werte; --find und --replace dürfen selbst Entities enthalten. " +
             "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den CLI-Rechten 'Change cell values' bzw. 'Remove row lock'), ohne Zeilenadressierung alle Zeilen. " +
+            "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
             "Der neue Zellwert wird wie in der App gespeichert (Sonderzeichen als HTML-Entities). " +
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
 
@@ -108,8 +109,14 @@ public class TableReplaceCliCommand : CliCommand {
             rows = [.. tbl.RowsInSaveOrder()];
         }
 
+        if (rows.Count == 0) {
+            Console.Error.WriteLine("Keine Zeile getroffen.");
+            return 1;
+        }
+
         var changedCells = 0;
         var changedRows = 0;
+        var skippedRows = 0;
 
         // Erst nach allen Prüfungen den Fragment-Writer öffnen: Früh gescheiterte
         // Aufrufe sollen keine leere Fortsetzung mit EOF an die Fragment-Datei hängen.
@@ -124,8 +131,15 @@ public class TableReplaceCliCommand : CliCommand {
 
         foreach (var row in rows) {
             var rowChanged = 0;
+            var rowSkipped = 0;
 
             foreach (var column in columns) {
+                if (IsLocked(column, row)) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName} Spalte {column.KeyName} ist abgeschlossen — übersprungen.");
+                    rowSkipped++;
+                    continue;
+                }
+
                 var searchtext = SearchTextOf(column, row.CellGetString(column));
                 var count = CountOccurrences(searchtext, find);
 
@@ -154,7 +168,15 @@ public class TableReplaceCliCommand : CliCommand {
                 rowChanged++;
             }
 
-            if (rowChanged > 0) { changedRows++; }
+            if (rowChanged > 0) {
+                changedRows++;
+            } else if (rowSkipped > 0) {
+                skippedRows++;
+            }
+        }
+
+        if (skippedRows > 0) {
+            Console.Error.WriteLine(skippedRows.ToString1() + " abgeschlossene Zeile(n) übersprungen.");
         }
 
         if (dryRun) {

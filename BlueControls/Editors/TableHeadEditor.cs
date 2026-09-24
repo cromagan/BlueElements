@@ -273,8 +273,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         rowSortDefinitionEditor.InputItem = tb.SortDefinition;
 
-        UpdateCustomSortButtons();
-
         txbTags.Set(string.Join('\r', tb.Tags), () => tb.Tags);
 
         txbCaption.Set(() => tb.Caption);
@@ -354,52 +352,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         _writeAccessLost = true;
         Notification.Show("Tabellen-Einstellungen werden geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
-    }
-
-    private void btnCustomSortDisable_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) {
-            Forms.MessageBox.Show("Die benutzerdefinierte Sortierung ist nicht aktiv.", ImageCode.Information, "OK");
-            return;
-        }
-
-        if (Forms.MessageBox.Show(
-            "Wenn Sie die benutzerdefinierte Sortierung löschen,<br>" +
-            "wird die Systemspalte <b>Sortierung</b> entfernt.<br><br>" +
-            "Konsequenzen:<br>" +
-            "- Die Tabellensortierung kehrt zum Standardverhalten zurück.<br>" +
-            "- Die bisherigen Sortiernummern gehen verloren.<br><br>" +
-            "Fortfahren?",
-            ImageCode.Warnung, "Löschen", "Abbrechen") != 0) { return; }
-
-        tb.DisableCustomSort();
-
-        UpdateCustomSortButtons();
-    }
-
-    private void btnCustomSortEnable_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            Forms.MessageBox.Show("Die benutzerdefinierte Sortierung ist bereits aktiv.", ImageCode.Information, "OK");
-            return;
-        }
-
-        if (Forms.MessageBox.Show(
-            "Wenn Sie die benutzerdefinierte Sortierung aktivieren,<br>" +
-            "wird eine neue Systemspalte <b>Sortierung</b> erstellt.<br><br>" +
-            "Konsequenzen:<br>" +
-            "- Alle Zeilen erhalten eine fortlaufende Nummer.<br>" +
-            "- Die bisherige Sortierung wird <b>deaktiviert</b>.<br>" +
-            "- Die Tabelle wird immer nach dieser Spalte sortiert.<br>" +
-            "- Neue Zeilen erscheinen am Ende mit der höchsten Nummer.<br><br>" +
-            "Fortfahren?",
-            ImageCode.AZ, "Aktivieren", "Abbrechen") != 0) { return; }
-
-        tb.EnableCustomSort();
-
-        UpdateCustomSortButtons();
     }
 
     private void btnExtractWords_Click(object sender, System.EventArgs e) {
@@ -517,27 +469,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
-    private void UpdateCustomSortButtons() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) {
-            btnCustomSortEnable.Enabled = false;
-            btnCustomSortDisable.Enabled = false;
-            return;
-        }
-
-        var hasSortIndex = tb.Column.SysRowSortIndex is { IsDisposed: false };
-        // Bei TableChunk ist die benutzerdefinierte Sortierung nicht erlaubt,
-        // da die Zeilen über Row-Chunks verteilt sind und keine durchgehende
-        // Sortiernummer pflegen können.
-        var sortActivatable = tb is not TableChunk;
-        btnCustomSortEnable.Enabled = sortActivatable && !hasSortIndex;
-        btnCustomSortDisable.Enabled = hasSortIndex;
-        rowSortDefinitionEditor.Enabled = !hasSortIndex;
-
-        if (!hasSortIndex) {
-            rowSortDefinitionEditor.InputItem = tb.SortDefinition;
-        }
-    }
-
     private void WriteInfosBack() {
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
 
@@ -565,9 +496,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tmp.Remove(Administrator);
         Table.PermissionGroupsNewRow = new(tmp);
 
-        if (Table.Column.SysRowSortIndex is not { IsDisposed: false }) {
-            Table.SortDefinition = ((IIsEditor)rowSortDefinitionEditor).OutputItem as RowSortDefinition;
-        }
+        Table.SortDefinition = ((IIsEditor)rowSortDefinitionEditor).OutputItem as RowSortDefinition;
 
         #region UniqueValues aufräumen
 

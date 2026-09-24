@@ -286,8 +286,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// True für Strategien, die im ColumnEditor nicht wählbar sind, weil sie
-    /// nur vom System gesetzt werden (DragDrop) oder Spezial-Kontexten
-    /// dienen (Text, Line, Caption).
+    /// nur für Spezial-Kontexte dienen (Text, Line, Caption).
     /// </summary>
     public virtual bool IsSpecial => false;
 
@@ -631,8 +630,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     }
 
     /// <summary>
-    /// Erzeugt eine frische Instanz zur übergebenen Strategy (KeyName) —
-    /// inklusive None und DragDrop. Unbekannte Keys liefern die Textfeld-Strategie.
+    /// Erzeugt eine frische Instanz zur übergebenen Strategie (KeyName).
+    /// Unbekannte Keys liefern die Textfeld-Strategie.
     /// </summary>
     public static ControlStrategy CreateNew(string? editStrategyKey) {
         var type = AllStrategies[editStrategyKey]?.GetType();
@@ -697,7 +696,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Erzeugt das Control der Strategie und gibt das anzuzeigende Control
     /// zurück — bei aktivem Rahmen die umgebende GroupBox.
-    /// Strategien ohne Control (None, DragDrop) geben null zurück.
+    /// Strategien ohne Control (None) geben null zurück.
     /// </summary>
     public System.Windows.Forms.Control? CreateControl() {
         if (ControlCore is null) { CreateControlCore(); }

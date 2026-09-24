@@ -29,8 +29,7 @@ public sealed class RowCaptionTableElement : TableElement {
 
     public RowCaptionTableElement(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.ChapterPathParent()) {
         ChapterText = chapterText.ChapterPathNormalize();
-        // Hierarchie-Tiefe als Indent — einheitliche Behandlung aller Strukturen,
-        // unabhängig vom Sortier-Modus (früher wurde NumberStyle flach dargestellt).
+        // Hierarchie-Tiefe als Indent — einheitliche Behandlung aller Strukturen.
         Indent = ChapterText.ChapterPathDepth();
         IsExpanded = true;
     }
@@ -224,7 +223,6 @@ public sealed class RowCaptionTableElement : TableElement {
         var parentPath = oldChapter.ChapterPathParent();
 
         // newChapter: nur das letzte Segment ersetzen (Parent bleibt erhalten).
-        // Einheitliche Behandlung — unabhängig vom NumberStyle.
         var newLastName = value.Replace("\r\n", "\r").ChapterPathNormalize();
         var newChapter = string.IsNullOrEmpty(parentPath)
             ? newLastName

@@ -430,6 +430,19 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
+    /// Liefert true, wenn die Zelle in einer abgeschlossenen Zeile liegt und nicht
+    /// geschrieben werden darf. Ausgenommen sind die Sperrspalte selbst und Spalten
+    /// mit 'Bearbeitbar trotz Zeilensperre'.
+    /// </summary>
+    protected static bool IsLocked(ColumnItem? column, RowItem row) {
+        if (row.Table is not { IsDisposed: false } tb || tb.Column.SysLocked is not { IsDisposed: false } sl) { return false; }
+
+        if (column is { IsDisposed: false } c && (c == sl || c.EditAllowedDespiteLock)) { return false; }
+
+        return row.CellGetBoolean(sl);
+    }
+
+    /// <summary>
     /// Speichert die Tabelle (sofern dateibasiert), nachdem alle in dieser Session
     /// invalidierten Zeilen vollständig abgearbeitet sind.
     /// Liefert den Exit-Code: 0 = Erfolg, 1 = Fehler beim Speichern.
@@ -467,13 +480,18 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Die
     /// Sperrspalte (SYS_LOCKED) beschreibbar nur mit dem Recht 'Remove row lock',
-    /// alle übrigen Systemspalten nur mit 'Change cell values'. Nicht-Systemspalten
-    /// liefert null.
+    /// die Sortierindex-Spalte (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält
+    /// die Nummern lückenlos —, alle übrigen Systemspalten nur mit 'Change cell values'.
     /// </summary>
     protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column) {
-        if (!column.IsSystemColumn()) { return null; }
-
-        var right = tbl.Column.SysLocked == column ? CliRights.RemoveRowLock : CliRights.ChangeCellValues;
+        string right;
+        if (tbl.Column.SysLocked == column) {
+            right = CliRights.RemoveRowLock;
+        } else if (tbl.Column.SysRowSortIndex == column) {
+            right = CliRights.MoveRows;
+        } else {
+            right = CliRights.ChangeCellValues;
+        }
 
         return HasRight(tbl, right)
             ? null

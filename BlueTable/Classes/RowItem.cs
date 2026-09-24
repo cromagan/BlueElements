@@ -937,6 +937,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
 
+        // SYS_ROWSORTINDEX: die Nummern bleiben lückenlos. Erst NACH dem Schreiben auslösen,
+        // damit die Kettenreaktion der Rückungen jeweils ins freigewordene Feld läuft.
+        if (column == tb.Column.SysRowSortIndex) {
+            tb.NormalizeSortIndexRows(this, oldValue, value, comment);
+        }
+
         return string.Empty;
     }
 

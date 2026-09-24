@@ -16,7 +16,9 @@ public class TableCellSetCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "--dry-run zeigt nur die Keys der Zeilen, in denen gesetzt würde — ohne zu ändern und ohne zu speichern. " +
-            "Werte mit Leerzeichen gehören in Anführungszeichen.";
+            "Werte mit Leerzeichen gehören in Anführungszeichen. " +
+            "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
+            "Die Systemspalte SYS_ROWSORTINDEX hält die Sortiernummern lückenlos und braucht das CLI-Recht '" + CliRights.MoveRows + "'.";
 
     #endregion
 
@@ -46,14 +48,6 @@ public class TableCellSetCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
-        var rightProblem = RightProblem(tbl, CliRights.ChangeCellValues);
-
-        if (rightProblem is not null) {
-            Console.Error.WriteLine(rightProblem);
-            return 1;
-        }
-
         // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
         var dryRun = args.Flag("dry-run");
 
@@ -61,6 +55,17 @@ public class TableCellSetCliCommand : CliCommand {
 
         if (column is null) {
             Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
+            return 1;
+        }
+
+        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
+        // SYS_ROWSORTINDEX hält die Sortiernummern lückenlos (Nummern werden verschoben) — dafür ist das eigene Recht 'Move rows' nötig.
+        var neededRight = tbl.Column.SysRowSortIndex == column ? CliRights.MoveRows : CliRights.ChangeCellValues;
+
+        var rightProblem = RightProblem(tbl, neededRight);
+
+        if (rightProblem is not null) {
+            Console.Error.WriteLine(rightProblem);
             return 1;
         }
 
@@ -85,19 +90,19 @@ public class TableCellSetCliCommand : CliCommand {
 
         var value = args.Option("value") ?? string.Empty;
 
-        // Kapitelspalte: \r trennt mehrere Kapitel einer Zeile. Existiert
-        // SYS_ROWSORTINDEX, ist genau ein Kapitel pro Zeile erzwungen.
-        if (value.Contains('\r') && column == ChapterColumnOfView1(tbl) && tbl.Column.SysRowSortIndex is { IsDisposed: false }) {
-            Console.Error.WriteLine("\\r ist in der Kapitelspalte nur erlaubt, wenn die Systemspalte SYS_ROWSORTINDEX nicht vorhanden ist.");
-            return 2;
-        }
-
         // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
         value = StorageTextOf(column, value);
 
         if (dryRun) {
-            Console.Out.WriteLine("Trockenlauf — gesetzt würde in: " + string.Join(", ", rows.Select(r => r.KeyName)));
-            Console.Out.WriteLine($"{rows.Count.ToString1()} Zeile(n), nichts gespeichert.");
+            var settable = rows.Where(r => !IsLocked(column, r)).ToList();
+
+            if (settable.Count == 0) {
+                Console.Error.WriteLine("Keine bearbeitbare Zeile getroffen.");
+                return 1;
+            }
+
+            Console.Out.WriteLine("Trockenlauf — gesetzt würde in: " + string.Join(", ", settable.Select(r => r.KeyName)));
+            Console.Out.WriteLine($"{settable.Count.ToString1()} Zeile(n), nichts gespeichert.");
             return 0;
         }
 
@@ -111,8 +116,15 @@ public class TableCellSetCliCommand : CliCommand {
         }
 
         var done = 0;
+        var skipped = 0;
 
         foreach (var row in rows) {
+            if (IsLocked(column, row)) {
+                Console.Error.WriteLine($"Zeile {row.KeyName} ist abgeschlossen — übersprungen.");
+                skipped++;
+                continue;
+            }
+
             var failed = row.CellSet(column, value, "bcr table-cellset");
 
             if (!string.IsNullOrEmpty(failed)) {
@@ -121,6 +133,10 @@ public class TableCellSetCliCommand : CliCommand {
                 Console.Out.WriteLine($"Wert gesetzt in {row.KeyName}");
                 done++;
             }
+        }
+
+        if (skipped > 0) {
+            Console.Error.WriteLine(skipped.ToString1() + " abgeschlossene Zeile(n) übersprungen.");
         }
 
         if (done == 0) { return 1; }

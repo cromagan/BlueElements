@@ -1935,8 +1935,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 19;
                 _maxCellLength = 19;
                 _sortType = SortierTyp.ZahlenwertInt;
-                _editAllowedDespiteLock = true; // Elementar für Verschiebe funktion
-                _controlStrategy = "DragDrop"; // Elementar für Verschiebe funktion
                 _ignoreAtRowFilter = true;
                 _scriptType = ScriptType.Nicht_vorhanden; // Keine Änderungen an der Zeile erkennen
 
@@ -2464,9 +2462,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private string? ErrorReason_ChapterColumn() {
         if (Table is not { IsDisposed: false } tb) { return null; }
-        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return null; }
         if (!IsChapterColumn()) { return null; }
-        if (_multiLine) { return ChapterColumnMultilineWithRowSort; }
+        if (!_multiLine) { return null; }
+
+        // In Ansichten mit wiederholten Kapiteln darf die Kapitel-Spalte nicht mehrzeilig sein.
+        if (tb.ColumnArrangements.Any(ca => ca is { IsDisposed: false, ChaptersUnique: false } && ca.ColumnForChapter == this)) {
+            return ChapterColumnMultilineWithRepeat;
+        }
         return null;
     }
 
@@ -2673,6 +2675,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private void LinkedTable_Disposed(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
 
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
     /// <summary>
     /// Berechnet eine fehlende ControlStrategy aus den Spaltenattributen.
     /// Läuft nur in Repair(), wenn alle Attribute geparst sind.
@@ -2689,10 +2695,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         var hasItems = _dropDownItems.Count > 0 || _showValuesOfOtherCellsInDropdown;
         _controlStrategy = hasItems ? "TextBoxSuggestions" : "Textbox";
     }
-
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void SubscribeLinkedTableEvents(Table newTable) {
         // Event-Registrierung vor dem Lock

@@ -613,7 +613,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
         }
 
-        if (fehler == ChapterColumnMultilineWithRowSort) {
+        if (fehler == ChapterColumnMultilineWithRepeat) {
             solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 

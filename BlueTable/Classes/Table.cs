@@ -1226,33 +1226,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return result;
     }
 
-    /// <summary>
-    /// Stellt alle Kapitel-Spalten auf einzeilig um, indem MultiLine deaktiviert
-    /// und alle \r in den Zellen durch '; ' ersetzt werden.
-    /// Erforderlich, wenn die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
-    /// </summary>
-    public void ConvertChapterColumnsToSingleLine() {
-        if (IsDisposed) { return; }
-
-        var chapterColumns = new HashSet<ColumnItem>();
-        foreach (var ca in ColumnArrangements) {
-            if (ca.ColumnForChapter is { IsDisposed: false } chapterCol) {
-                chapterColumns.Add(chapterCol);
-            }
-        }
-
-        foreach (var chapterCol in chapterColumns) {
-            chapterCol.MultiLine = false;
-            foreach (var thisRow in Row) {
-                if (thisRow.IsDisposed) { continue; }
-                var val = thisRow.CellGetString(chapterCol);
-                if (val.Contains('\r')) {
-                    thisRow.CellSet(chapterCol, val.Replace("\r\n", "\r").Replace("\r", "; "), "Kapitel-Spalte durch benutzerdefinierte Sortierung auf einzeilig umgestellt");
-                }
-            }
-        }
-    }
-
     public void CopyTo(Table target) {
         if (IsDisposed) { return; }
 
@@ -1434,9 +1407,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Erstellt die Systemspalte SysRowSortIndex für die benutzerdefinierte Sortierung und nummeriert
-    /// alle vorhandenen Zeilen fortlaufend. Die Tabellensortierung wird anschließend
-    /// fixiert auf diese Spalte (aufsteigend) gesetzt.
+    /// Erstellt die Systemspalte SysRowSortIndex und nummeriert alle vorhandenen
+    /// Zeilen in der Reihenfolge der aktuellen Sortierung fortlaufend.
     /// </summary>
     public void EnableCustomSort() {
         if (IsDisposed) { return; }
@@ -1449,8 +1421,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         RepairAfterParse();
 
         RenumberRows(r, "Benutzerdefinierte Sortierung aktiviert");
-
-        ConvertChapterColumnsToSingleLine();
     }
 
     public void EnableScript() {
@@ -2293,6 +2263,67 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Hält die Werte der SysRowSortIndex-Spalte lückenlos und doppelfrei (1, 2, 3, ...):
+    /// Beim Setzen eines Wertes weichen die überbrückten Zeilen Platz machend aus,
+    /// beim Leeren oder Löschen einer Zeile rücken die Nachfolger in die Lücke.
+    /// Wird nach jeder Änderung der Spalte automatisch ausgelöst; die Kettenreaktion
+    /// der Rückungen endet von selbst, weil jede Rückung in ein unmittelbar zuvor
+    /// freigewordenes Feld zielt und weitere Aufrufe keine Änderung mehr finden.
+    /// </summary>
+    /// <param name="editedRow">Die geänderte Zeile, oder null, wenn sie gelöscht wurde.</param>
+    /// <param name="oldValue">Der bisherige Wert der Zelle bzw. der gelöschten Zeile.</param>
+    /// <param name="newValue">Der neue Wert, oder leer bei Löschen/Leeren.</param>
+    /// <param name="reason">Kommentar für die Rückungen.</param>
+    public void NormalizeSortIndexRows(RowItem? editedRow, string oldValue, string newValue, string reason) {
+        if (IsDisposed) { return; }
+        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+
+        var oldIdx = int.TryParse(oldValue, out var oi) ? oi : -1;
+        var newIdx = int.TryParse(newValue, out var ni) ? ni : -1;
+
+        if (oldIdx < 0 && newIdx < 0) { return; }
+
+        // Hochschieben (+1), wenn die Zeile nach oben rückt oder erstmals nummeriert wird;
+        // Heruntschieben (-1), wenn sie nach unten rückt, geleert oder gelöscht wird.
+        var shiftUp = newIdx >= 0 && (oldIdx < 0 || oldIdx > newIdx);
+
+        var toShift = new List<(RowItem Row, int Value)>();
+        foreach (var r in Row) {
+            if (r is not { IsDisposed: false } || ReferenceEquals(r, editedRow)) { continue; }
+            if (!int.TryParse(r.CellGetStringCore(sortCol), out var v)) { continue; }
+
+            bool hit;
+            if (newIdx < 0) {
+                // Lücke durch Leeren oder Löschen: alle Nachfolger rücken nach.
+                hit = v > oldIdx;
+            } else if (shiftUp) {
+                // Platz machen nach oben bzw. Erstvergabe: Nachfolgende weichen nach hinten aus.
+                hit = v >= newIdx && (oldIdx < 0 || v < oldIdx);
+            } else {
+                // Zeile nach unten gezogen: der freigewordene Zwischenraum rückt nach oben.
+                hit = v > oldIdx && v <= newIdx;
+            }
+
+            if (hit) { toShift.Add((r, v)); }
+        }
+
+        if (toShift.Count == 0) { return; }
+
+        // Von der Lücke aus rücken: absteigend beim Hochschieben, aufsteigend beim
+        // Heruntschieben — so trifft jede Rückung auf ein bereits freies Feld.
+        toShift.Sort((x, y) => shiftUp ? y.Value.CompareTo(x.Value) : x.Value.CompareTo(y.Value));
+
+        SuppressEvents();
+        try {
+            foreach (var (r, v) in toShift) {
+                r.CellSet(sortCol, shiftUp ? v + 1 : v - 1, reason);
+            }
+        } finally {
+            ResumeEvents();
+        }
+    }
+
     public virtual void ReorganizeChunks() { }
 
     public virtual void RepairAfterParse() {
@@ -2302,11 +2333,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         Row.Repair();
 
-        if (Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
-            SortDefinition = new RowSortDefinition(this, sortCol, false);
-        } else {
-            SortDefinition ??= new RowSortDefinition(this, null as ColumnItem, false);
-        }
+        SortDefinition ??= new RowSortDefinition(this, null as ColumnItem, false);
 
         SortDefinition?.Repair();
 
