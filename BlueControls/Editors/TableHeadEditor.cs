@@ -298,6 +298,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             ItemOf("Skript ausführen", CliRights.ExecuteScript),
             ItemOf("Spalte erstellen", CliRights.AddColumn),
             ItemOf("Spalte löschen", CliRights.DeleteColumn),
+            ItemOf("Spaltenanordnung ändern", CliRights.ChangeColumnArrangement),
             ItemOf("Tabellenkopf ändern", CliRights.EditTableHead)
         ]);
         lbxCliRights.Check(tb.CliRights, true);

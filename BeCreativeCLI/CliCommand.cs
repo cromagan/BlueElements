@@ -256,14 +256,36 @@ public abstract class CliCommand : IHasKeyName {
     /// Fehlermeldung aus und liefert null.
     /// </summary>
     protected static Table? LoadTable(CliArgs args) {
-        var tbl = LoadTableIgnoreLock(args);
+        if (args[0] is not { Length: > 0 } name) { return null; }
 
-        if (tbl is null) { return null; }
+        // Bewusst ablehnen statt stillschweigend eine gleichnamige Tabelle zu öffnen.
+        var suffix = name.FileSuffix();
+
+        if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblj, .mtblj (oder ganz ohne Endung).");
+            return null;
+        }
+
+        if (!name.IsValidFilepathAndName() && !name.Contains('|')) {
+            try {
+                name = Path.GetFullPath(name);
+            } catch {
+                Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
+                return null;
+            }
+        }
+
+        var tbl = Table.Get(name);
+
+        if (tbl is not { IsDisposed: false }) {
+            Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
+            return null;
+        }
 
         if (!tbl.Unlocked) {
-            var pwd = args.Option("password");
+            var pwd = args.Option("password") ?? string.Empty;
 
-            if (pwd is null) {
+            if (pwd.Length == 0) {
                 Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' ist passwortgeschützt — --password <kennwort> angeben.");
                 tbl.Dispose();
                 return null;
@@ -290,41 +312,6 @@ public abstract class CliCommand : IHasKeyName {
         if (tbl.CheckScriptError() is { Length: > 0 } scriptError) {
             Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' enthält defekte Skripte und wird nicht bearbeitet: " + scriptError);
             tbl.Dispose();
-            return null;
-        }
-
-        return tbl;
-    }
-
-    /// <summary>
-    /// Lädt die Tabelle aus dem ersten Positionsargument, ohne den Kennwortschutz zu prüfen.
-    /// Ohne Pfadangabe wird das aktuelle Verzeichnis als Suchpfad ergänzt.
-    /// Gibt bei Problemen (nicht gefunden) eine Fehlermeldung aus und liefert null.
-    /// </summary>
-    protected static Table? LoadTableIgnoreLock(CliArgs args) {
-        if (args[0] is not { Length: > 0 } name) { return null; }
-
-        // Bewusst ablehnen statt stillschweigend eine gleichnamige Tabelle zu öffnen.
-        var suffix = name.FileSuffix();
-
-        if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblj, .mtblj (oder ganz ohne Endung).");
-            return null;
-        }
-
-        if (!name.IsValidFilepathAndName() && !name.Contains('|')) {
-            try {
-                name = Path.GetFullPath(name);
-            } catch {
-                Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
-                return null;
-            }
-        }
-
-        var tbl = Table.Get(name);
-
-        if (tbl is not { IsDisposed: false }) {
-            Console.Error.WriteLine("Tabelle nicht gefunden: " + name);
             return null;
         }
 

@@ -17,6 +17,8 @@ public static class CliRights {
 
     public const string ChangeCellValues = "Change cell values";
 
+    public const string ChangeColumnArrangement = "Change column arrangement";
+
     public const string DeleteColumn = "Delete column";
 
     public const string DeleteRow = "Delete row";
@@ -45,6 +47,7 @@ public static class CliRights {
         ExecuteScript,
         AddColumn,
         DeleteColumn,
+        ChangeColumnArrangement,
         EditTableHead
     ];
 

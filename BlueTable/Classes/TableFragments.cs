@@ -587,7 +587,7 @@ public class TableFragments : TableFile {
             _writer.WriteLine("- Filename " + Filename);
             _writer.WriteLine("- User " + UserName);
 
-            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
             _writer.WriteLine(l.ParseableItems().FinishParseable());
             CanDeleteWriter = true;
             _writer.Flush();

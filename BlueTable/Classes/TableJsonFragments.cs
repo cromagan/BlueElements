@@ -648,7 +648,7 @@ public class TableJsonFragments : TableJsonFile {
             };
             _writer.WriteLine(header.ToJsonString());
 
-            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
             _writer.WriteLine(l.ParseableJson().ToJsonString());
             CanDeleteWriter = true;
             _writer.Flush();
