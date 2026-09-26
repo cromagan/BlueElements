@@ -34,6 +34,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+    private readonly List<string> _cliRights = [];
     private readonly List<string> _dictionaryWords = [];
 
     private readonly object _eventScriptLock = new();
@@ -41,9 +42,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private readonly List<string> _permissionGroupsNewRow = [];
 
     private readonly List<string> _tableAdmin = [];
-
-    private readonly List<string> _cliRights = [];
-
     private readonly List<string> _tags = [];
 
     private readonly List<ScriptVariable> _variables = [];
@@ -155,8 +153,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     #region Events
 
-    public event EventHandler? AdditionalRepair;
-
     public event EventHandler<CanDoScriptEventArgs>? CanDoScript;
 
     public event EventHandler<CellEventArgs>? CellValueChanged;
@@ -249,6 +245,19 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Die per Kommandozeile (CLI) erlaubten Aktionen. Die CLI vergleicht ausschließlich diese Texte.
+    /// Bekannte Werte siehe <see cref="BlueTable.ClassesStatic.CliRights"/>.
+    /// </summary>
+    public ReadOnlyCollection<string> CliRights {
+        get => new(_cliRights);
+        set {
+            var repaired = value.Where(ClassesStatic.CliRights.AllRights.Contains).ToList();
+            if (!_cliRights.IsDifferentTo(repaired)) { return; }
+            ChangeData(TableDataType.CliRights, null, string.Join('\r', _cliRights), string.Join('\r', repaired));
+        }
+    }
+
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -279,19 +288,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         private set {
             if (_creator == value) { return; }
             ChangeData(TableDataType.Creator, null, _creator, value);
-        }
-    }
-
-    /// <summary>
-    /// Die per Kommandozeile (CLI) erlaubten Aktionen. Die CLI vergleicht ausschließlich diese Texte.
-    /// Bekannte Werte siehe <see cref="BlueTable.ClassesStatic.CliRights"/>.
-    /// </summary>
-    public ReadOnlyCollection<string> CliRights {
-        get => new(_cliRights);
-        set {
-            var repaired = value.Where(ClassesStatic.CliRights.AllRights.Contains).ToList();
-            if (!_cliRights.IsDifferentTo(repaired)) { return; }
-            ChangeData(TableDataType.CliRights, null, string.Join('\r', _cliRights), string.Join('\r', repaired));
         }
     }
 
@@ -1827,6 +1823,67 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return key;
     }
 
+    /// <summary>
+    /// Hält die Werte der SysRowSortIndex-Spalte lückenlos und doppelfrei (1, 2, 3, ...):
+    /// Beim Setzen eines Wertes weichen die überbrückten Zeilen Platz machend aus,
+    /// beim Leeren oder Löschen einer Zeile rücken die Nachfolger in die Lücke.
+    /// Wird nach jeder Änderung der Spalte automatisch ausgelöst; die Kettenreaktion
+    /// der Rückungen endet von selbst, weil jede Rückung in ein unmittelbar zuvor
+    /// freigewordenes Feld zielt und weitere Aufrufe keine Änderung mehr finden.
+    /// </summary>
+    /// <param name="editedRow">Die geänderte Zeile, oder null, wenn sie gelöscht wurde.</param>
+    /// <param name="oldValue">Der bisherige Wert der Zelle bzw. der gelöschten Zeile.</param>
+    /// <param name="newValue">Der neue Wert, oder leer bei Löschen/Leeren.</param>
+    /// <param name="reason">Kommentar für die Rückungen.</param>
+    public void NormalizeSortIndexRows(RowItem? editedRow, string oldValue, string newValue, string reason) {
+        if (IsDisposed) { return; }
+        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+
+        var oldIdx = int.TryParse(oldValue, out var oi) ? oi : -1;
+        var newIdx = int.TryParse(newValue, out var ni) ? ni : -1;
+
+        if (oldIdx < 0 && newIdx < 0) { return; }
+
+        // Hochschieben (+1), wenn die Zeile nach oben rückt oder erstmals nummeriert wird;
+        // Heruntschieben (-1), wenn sie nach unten rückt, geleert oder gelöscht wird.
+        var shiftUp = newIdx >= 0 && (oldIdx < 0 || oldIdx > newIdx);
+
+        var toShift = new List<(RowItem Row, int Value)>();
+        foreach (var r in Row) {
+            if (r is not { IsDisposed: false } || ReferenceEquals(r, editedRow)) { continue; }
+            if (!int.TryParse(r.CellGetStringCore(sortCol), out var v)) { continue; }
+
+            bool hit;
+            if (newIdx < 0) {
+                // Lücke durch Leeren oder Löschen: alle Nachfolger rücken nach.
+                hit = v > oldIdx;
+            } else if (shiftUp) {
+                // Platz machen nach oben bzw. Erstvergabe: Nachfolgende weichen nach hinten aus.
+                hit = v >= newIdx && (oldIdx < 0 || v < oldIdx);
+            } else {
+                // Zeile nach unten gezogen: der freigewordene Zwischenraum rückt nach oben.
+                hit = v > oldIdx && v <= newIdx;
+            }
+
+            if (hit) { toShift.Add((r, v)); }
+        }
+
+        if (toShift.Count == 0) { return; }
+
+        // Von der Lücke aus rücken: absteigend beim Hochschieben, aufsteigend beim
+        // Heruntschieben — so trifft jede Rückung auf ein bereits freies Feld.
+        toShift.Sort((x, y) => shiftUp ? y.Value.CompareTo(x.Value) : x.Value.CompareTo(y.Value));
+
+        SuppressEvents();
+        try {
+            foreach (var (r, v) in toShift) {
+                r.CellSet(sortCol, shiftUp ? v + 1 : v - 1, reason);
+            }
+        } finally {
+            ResumeEvents();
+        }
+    }
+
     public void OnCanDoScript(CanDoScriptEventArgs e) {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
@@ -2263,67 +2320,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    /// <summary>
-    /// Hält die Werte der SysRowSortIndex-Spalte lückenlos und doppelfrei (1, 2, 3, ...):
-    /// Beim Setzen eines Wertes weichen die überbrückten Zeilen Platz machend aus,
-    /// beim Leeren oder Löschen einer Zeile rücken die Nachfolger in die Lücke.
-    /// Wird nach jeder Änderung der Spalte automatisch ausgelöst; die Kettenreaktion
-    /// der Rückungen endet von selbst, weil jede Rückung in ein unmittelbar zuvor
-    /// freigewordenes Feld zielt und weitere Aufrufe keine Änderung mehr finden.
-    /// </summary>
-    /// <param name="editedRow">Die geänderte Zeile, oder null, wenn sie gelöscht wurde.</param>
-    /// <param name="oldValue">Der bisherige Wert der Zelle bzw. der gelöschten Zeile.</param>
-    /// <param name="newValue">Der neue Wert, oder leer bei Löschen/Leeren.</param>
-    /// <param name="reason">Kommentar für die Rückungen.</param>
-    public void NormalizeSortIndexRows(RowItem? editedRow, string oldValue, string newValue, string reason) {
-        if (IsDisposed) { return; }
-        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
-
-        var oldIdx = int.TryParse(oldValue, out var oi) ? oi : -1;
-        var newIdx = int.TryParse(newValue, out var ni) ? ni : -1;
-
-        if (oldIdx < 0 && newIdx < 0) { return; }
-
-        // Hochschieben (+1), wenn die Zeile nach oben rückt oder erstmals nummeriert wird;
-        // Heruntschieben (-1), wenn sie nach unten rückt, geleert oder gelöscht wird.
-        var shiftUp = newIdx >= 0 && (oldIdx < 0 || oldIdx > newIdx);
-
-        var toShift = new List<(RowItem Row, int Value)>();
-        foreach (var r in Row) {
-            if (r is not { IsDisposed: false } || ReferenceEquals(r, editedRow)) { continue; }
-            if (!int.TryParse(r.CellGetStringCore(sortCol), out var v)) { continue; }
-
-            bool hit;
-            if (newIdx < 0) {
-                // Lücke durch Leeren oder Löschen: alle Nachfolger rücken nach.
-                hit = v > oldIdx;
-            } else if (shiftUp) {
-                // Platz machen nach oben bzw. Erstvergabe: Nachfolgende weichen nach hinten aus.
-                hit = v >= newIdx && (oldIdx < 0 || v < oldIdx);
-            } else {
-                // Zeile nach unten gezogen: der freigewordene Zwischenraum rückt nach oben.
-                hit = v > oldIdx && v <= newIdx;
-            }
-
-            if (hit) { toShift.Add((r, v)); }
-        }
-
-        if (toShift.Count == 0) { return; }
-
-        // Von der Lücke aus rücken: absteigend beim Hochschieben, aufsteigend beim
-        // Heruntschieben — so trifft jede Rückung auf ein bereits freies Feld.
-        toShift.Sort((x, y) => shiftUp ? y.Value.CompareTo(x.Value) : x.Value.CompareTo(y.Value));
-
-        SuppressEvents();
-        try {
-            foreach (var (r, v) in toShift) {
-                r.CellSet(sortCol, shiftUp ? v + 1 : v - 1, reason);
-            }
-        } finally {
-            ResumeEvents();
-        }
-    }
-
     public virtual void ReorganizeChunks() { }
 
     public virtual void RepairAfterParse() {
@@ -2362,7 +2358,25 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _eventScript = deduplicated.AsReadOnly();
         }
 
-        OnAdditionalRepair();
+        // Spaltenanordnungen reparieren: verwaiste Einträge entfernen,
+        // Ansicht 0 erhält alle Spalten, mindestens zwei Ansichten sicherstellen.
+        RepairArrangements();
+    }
+
+    /// <summary>
+    /// Liefert reparierte Arbeitskopien aller Spaltenanordnungen: mindestens
+    /// zwei Ansichten, verwaiste Einträge entfernt, Ansicht 0 ausschließlich
+    /// echte Spalten. Die Tabelle selbst ändert sich erst durch Zuweisung an
+    /// ColumnArrangements.
+    /// </summary>
+    public List<ColumnViewCollection> RepairedArrangements() {
+        var tcvc = ColumnViewCollection.ParseAll(this);
+
+        for (var z = 0; z < tcvc.Count; z++) {
+            tcvc[z].Repair(z);
+        }
+
+        return tcvc;
     }
 
     /// <summary>
@@ -2658,12 +2672,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    protected void OnAdditionalRepair() {
-        if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
-        AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
-    }
-
     protected void OnLoaded(bool isFirst, bool affectingHead) {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
@@ -2699,6 +2707,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// IsValueEditable. Letztere bleibt schnell, da sie nur In-Memory-Status prüft.
     /// </summary>
     protected virtual string PrepareForEdit(TableDataType type, string? chunkValue) => string.Empty;
+
+    /// <summary>
+    /// Repariert alle Spaltenanordnungen und schreibt das Ergebnis zurück.
+    /// </summary>
+    protected void RepairArrangements() {
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
+
+        ColumnArrangements = RepairedArrangements().AsReadOnly();
+    }
 
     protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 
@@ -3188,7 +3205,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
 
             // Eigene Events auf null setzen
-            AdditionalRepair = null;
             CanDoScript = null;
             Disposed = null;
             InvalidateView = null;

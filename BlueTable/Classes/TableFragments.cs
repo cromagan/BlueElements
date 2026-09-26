@@ -495,7 +495,7 @@ public class TableFragments : TableFile {
             Interlocked.Increment(ref _doingChanges);
             // Während des Einspielens sind Spaltenschlüssel kurzzeitig nicht
             // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
-            // endgültig entfernen (RepairColumnArrangements), sonst verschwinden
+            // endgültig entfernen (RepairArrangements), sonst verschwinden
             // Spalten dauerhaft aus der Ansicht.
             PauseDataReload();
             try {

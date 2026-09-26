@@ -42,6 +42,10 @@ public class TableReplaceCliCommand : CliCommand {
 
         var replace = System.Net.WebUtility.HtmlDecode(args.Option("replace") ?? string.Empty);
 
+        // Identischer Such-/Ersatztext kann nur die Schreibweise der Treffer verändern
+        // (die Suche ignoriert Groß-/Kleinschreibung) — Datenverlust statt Ersetzung.
+        if (find == replace) { return UsageError("--find und --replace sind identisch — nichts zu ersetzen."); }
+
         // Zeilenadressierung ist optional; nur eine Teilangabe ist ein Fehler.
         if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype")) {
             var problem = RowAddressingProblem(args);

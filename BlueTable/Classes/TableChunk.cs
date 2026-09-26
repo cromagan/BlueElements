@@ -482,7 +482,7 @@ public class TableChunk : TableFile {
 
             // Während des Neuladens sind Spaltenschlüssel kurzzeitig nicht
             // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
-            // endgültig entfernen (RepairColumnArrangements), sonst verschwinden
+            // endgültig entfernen (RepairArrangements), sonst verschwinden
             // Spalten dauerhaft aus der Ansicht.
             PauseDataReload();
             try {
@@ -523,7 +523,7 @@ public class TableChunk : TableFile {
             // Nach dem Reload sind alle Spalten wieder vollständig. Einträge, die
             // jetzt noch nicht auflösbar sind (echt gelöschte Spalten), werden
             // hier endgültig aus den Ansichten entfernt.
-            if (!firstTime) { OnAdditionalRepair(); }
+            if (!firstTime) { RepairArrangements(); }
 
             // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
             // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.

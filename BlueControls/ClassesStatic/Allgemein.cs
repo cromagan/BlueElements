@@ -45,7 +45,6 @@ public static class Allgemein {
 
     private static void Table_Added(object? sender, LiveInstanceEventArgs<Table> e) {
         var tb = e.Instance;
-        tb.AdditionalRepair += TableView.Table_AdditionalRepair;
         tb.CanDoScript += TableView.Table_CanDoScript;
     }
 

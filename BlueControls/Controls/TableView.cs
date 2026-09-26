@@ -403,8 +403,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
             _tableDrawError = null;
             if (field is { IsDisposed: false } tb2) {
-                RepairColumnArrangements(tb2);
-
                 tb2.CellValueChanged += Cell_CellValueChanged;
                 tb2.Loaded += _Table_TableLoaded;
                 tb2.Loading += _Table_StoreView;
@@ -956,12 +954,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
     //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, tb.GlobalScale, column.ConstantHeightOfImageCode);
     //}
-    public static void Table_AdditionalRepair(object? sender, System.EventArgs e) {
-        if (sender is not Table tbl) { return; }
-
-        RepairColumnArrangements(tbl);
-    }
-
     public static void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (!string.IsNullOrEmpty(e.CancelReason)) { return; }
 
@@ -1871,19 +1863,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
         QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
-    }
-
-    internal static void RepairColumnArrangements(Table tb) {
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-
-        for (var z = 0; z < Math.Max(2, tcvc.Count); z++) {
-            if (tcvc.Count < z + 1) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
-            tcvc[z].Repair(z);
-        }
-
-        tb.ColumnArrangements = tcvc.AsReadOnly();
     }
 
     internal static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowTableElement? cellInThisTableRow, bool formatWarnung) {
