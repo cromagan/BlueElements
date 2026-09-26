@@ -53,29 +53,13 @@ public class TableColumnArrangementCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        var tcvc = RepairedArrangements(tbl);
+        var tcvc = tbl.RepairedArrangements();
 
         for (var z = 0; z < tcvc.Count; z++) {
             Console.Out.WriteLine(z + "\t" + tcvc[z].KeyName + "\t" + ColumnList(tcvc[z]));
         }
 
         return 0;
-    }
-
-    /// <summary>
-    /// Parst alle Ansichten und repariert sie wie die GUI beim Öffnen
-    /// (Ansicht 0 erhält immer alle Spalten, verwaiste Einträge fallen raus).
-    /// </summary>
-    private static List<ColumnViewCollection> RepairedArrangements(Table tbl) {
-        var tcvc = ColumnViewCollection.ParseAll(tbl);
-
-        for (var z = 0; z < Math.Max(2, tcvc.Count); z++) {
-            if (tcvc.Count < z + 1) { tcvc.Add(new ColumnViewCollection(tbl, string.Empty)); }
-
-            tcvc[z].Repair(z);
-        }
-
-        return tcvc;
     }
 
     /// <summary>
@@ -91,7 +75,7 @@ public class TableColumnArrangementCliCommand : CliCommand {
 
         if (viewProblem is not null) { return UsageError(viewProblem); }
 
-        Console.Out.WriteLine(ColumnList(RepairedArrangements(tbl)[viewIndex]));
+        Console.Out.WriteLine(ColumnList(tbl.RepairedArrangements()[viewIndex]));
         return 0;
     }
 
@@ -129,7 +113,7 @@ public class TableColumnArrangementCliCommand : CliCommand {
         }
 
         // Reparierte Kopien nehmen; die Tabelle ändert sich erst durch die Zuweisung unten.
-        var tcvc = RepairedArrangements(tbl);
+        var tcvc = tbl.RepairedArrangements();
         var target = tcvc[viewIndex];
 
         target.RemoveAll();

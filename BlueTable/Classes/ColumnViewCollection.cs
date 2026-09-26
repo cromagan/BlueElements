@@ -359,14 +359,27 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
 
         if (Table is not null) {
+            // "columnkeys" (Legacy) und "columns" beschreiben die komplette
+            // Spaltenliste der Ansicht — bei Vorhandensein wird die interne
+            // Liste KOMPLETT ersetzt (inkl. Reihenfolge), nicht gemerged.
+            // So entfernen Partial-Updates (JSON-Fragmente) auch ausgeblendete
+            // Spalten zuverlässig.
+            var columnsReplaced = false;
+
             if (json["columnkeys"] is JsonArray ckArr) {
+                _internal.Clear();
+                columnsReplaced = true;
+
                 foreach (var item in ckArr) {
                     if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) {
                         Add(new ColumnViewItem(c));
                     }
                 }
             }
+
             if (json["columns"] is JsonArray colsArr) {
+                if (!columnsReplaced) { _internal.Clear(); }
+
                 foreach (var item in colsArr) {
                     if (item is not JsonObject jo) { continue; }
                     var colName = jo.GetString("columnname", string.Empty);

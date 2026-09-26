@@ -81,10 +81,11 @@ public static class TableJsonFragmentDiff {
             var oldColumns = ColumnsByName(oldJson);
             var newColumns = ColumnsByName(newJson);
 
-            if (!SameKeys(oldColumns.Keys, newColumns.Keys)) {
-                // Struktur der Ansicht unterschiedlich - komplette Liste synchronisieren.
-                result.Add(("columnarrangements", ArrangementsToJsonArray(newItems)));
-                return;
+            if (!SameKeys(oldColumns.Keys, newColumns.Keys) || !SameColumnOrder(oldJson, newJson)) {
+                // Spalten dieser Ansicht hinzugefügt/entfernt/umsortiert —
+                // nur diese Ansicht komplett synchronisieren statt der ganzen Liste.
+                result.Add(($"columnarrangements[{i}]", newJson));
+                continue;
             }
 
             foreach (var prop in newJson) {
@@ -257,6 +258,27 @@ public static class TableJsonFragmentDiff {
 
     private static bool SameKeys(Dictionary<string, JsonObject>.KeyCollection oldKeys, Dictionary<string, JsonObject>.KeyCollection newKeys) =>
         oldKeys.Count == newKeys.Count && oldKeys.All(newKeys.Contains);
+
+    /// <summary>
+    /// Vergleicht die Reihenfolge der Spaltennamen im "columns"-Array beider Stände.
+    /// Die Reihenfolge steckt in keinem einzelnen Property und würde sonst beim
+    /// Einspielen prop-weiser Zeilen verloren gehen.
+    /// </summary>
+    private static bool SameColumnOrder(JsonObject oldJson, JsonObject newJson) {
+        if (oldJson["columns"] is not JsonArray oldArr) { return newJson["columns"] is not JsonArray; }
+        if (newJson["columns"] is not JsonArray newArr) { return false; }
+
+        if (oldArr.Count != newArr.Count) { return false; }
+
+        for (var i = 0; i < oldArr.Count; i++) {
+            var o = oldArr[i]?.AsObject().GetString("columnname", string.Empty);
+            var n = newArr[i]?.AsObject().GetString("columnname", string.Empty);
+
+            if (!string.Equals(o, n, StringComparison.OrdinalIgnoreCase)) { return false; }
+        }
+
+        return true;
+    }
 
     #endregion
 }

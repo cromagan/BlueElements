@@ -96,6 +96,7 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 
 - **Bestehende Kommentare erhalten** — Kommentare nicht löschen, sondern bei Bedarf überarbeiten/aktualisieren.
 - **Kein redundanter Code** — vor dem Schreiben einer neuen Routine prüfen, ob eine bestehende genutzt oder leicht angepasst werden kann. Auch die Sichtbarkeit darf angepasst werden.
+- **Keine Wrapper** — Methoden nicht in unnötige Wrapper kapseln. Muss eine Methode erweitert werden, einen neuen Parameter ergänzen und die Aufrufer geben den Wert direkt mit. Muss eine Routine verschoben werden, sprechen die Aufrufer die Methode direkt an.
 - **Eine Datei pro Typ** — jede Klasse, Struktur, jedes Enum und jedes Interface kommt in eine eigene Datei (Dateiname = Typname).
   Ausnahme: Ein Interface `IXxx` soll zusammen mit der zugehörigen statischen Erweiterungsklasse `IXxxExtension` (die es per `Extensions`-Muster erweitert) in derselben Datei stehen.
 - **Forms/UserControls brauchen eine Designer-Datei** — visuelle WinForms-Typen besitzen immer eine begleitende `.Designer.cs`-Datei (partial class), auch wenn sie leer ist.

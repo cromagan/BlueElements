@@ -206,7 +206,7 @@ public class UndoItem : IParseable, IJsonParseable {
         TableName = json.GetString("table", TableName);
         if (json["command"] is JsonValue v && v.TryGetValue(out int i)) { Command = (TableDataType)i; }
         var dt = json.GetString("datetimeutc", string.Empty);
-        if (dt is { Length: > 0 }) { DateTimeUtc = DateTimeParse(dt); }
+        if (dt is { Length: > 0 } && DateTimeUtcTryParse(dt, out var parsedUtc)) { DateTimeUtc = parsedUtc; }
         User = json.GetString("user", User);
         ColName = json.GetString("colname", ColName);
         RowKey = json.GetString("rowkey", RowKey);

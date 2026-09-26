@@ -422,7 +422,7 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Gibt den Pfad zum Fragment-Ordner zurück.
     /// </summary>
-    private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
+    public string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.

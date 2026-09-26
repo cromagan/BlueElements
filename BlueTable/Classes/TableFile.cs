@@ -660,6 +660,55 @@ public class TableFile : Table {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Erstellt eine neue Tabellendatei im Format der Ziel-Endung und übernimmt
+    /// die Daten der Quelltabelle. Prüft Zielpfad, Tabellenname und Kollisionen
+    /// mit gleichnamigen Dateien anderer Tabellenformate.
+    /// </summary>
+    public static OperationResult Create(string targetPath, Table? source) {
+        if (string.IsNullOrEmpty(targetPath)) { return OperationResult.Failed("Zielpfad ist leer."); }
+
+        targetPath = targetPath.NormalizeFile();
+
+        // Relative Angaben gegen das Arbeitsverzeichnis auflösen: Filename.FilePath()
+        // liefert bei reinen Dateinamen sonst einen leeren Ordner und jede
+        // Verzeichnis-Prüfung würde fehlschlagen.
+        if (!System.IO.Path.IsPathRooted(targetPath)) { targetPath = System.IO.Path.GetFullPath(targetPath); }
+
+        var targetSuffix = targetPath.FileSuffix().ToLowerInvariant();
+        var suffixTypes = BuildSuffixTypeMap();
+
+        if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblj, .mtblj");
+        }
+
+        var targetBase = targetPath.FileNameWithoutSuffix();
+        var targetDir = targetPath.FilePath();
+
+        // Tabellennamen müssen gültige Systemnamen sein, damit KeyName und Dateiname konsistent bleiben.
+        // BlueBasics.Classes.Formats.SystemNameFormat.MakeValid darf den Namen nicht verändern.
+        var validBase = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(targetBase);
+        if (!string.Equals(targetBase, validBase, StringComparison.OrdinalIgnoreCase) || !Table.IsValidTableName(validBase)) {
+            return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
+        }
+
+        foreach (var ext in suffixTypes.Keys) {
+            if (string.Equals(ext.TrimStart('.'), targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }
+            var collisionFile = targetDir + targetBase + ext;
+            if (FileExists(collisionFile)) {
+                return OperationResult.Failed($"Im Zielverzeichnis existiert bereits eine Datei mit dem gleichen Namen aber anderer Erweiterung: {collisionFile}");
+            }
+        }
+
+        if (FileExists(targetPath)) { return OperationResult.Failed($"Die Datei existiert bereits: {targetPath}"); }
+
+        var target = (TableFile?)Activator.CreateInstance(targetType, targetPath, source);
+
+        if (target is null) { return OperationResult.Failed($"Tabellentyp für '.{targetSuffix}' konnte nicht erstellt werden."); }
+
+        return target.Save();
+    }
+
     private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
         [".bdb"] = typeof(TableFile),
         [".mbdb"] = typeof(TableFragments),

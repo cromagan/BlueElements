@@ -24,7 +24,7 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (CLI-Recht `Change cell values` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
 - Eine Zeile kann mehreren Kapiteln zugeordnet werden. Getrennt mit \r
-- Fragment-Tabellen: `.mbdb` (TableFragments) ist bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten); `.mtblj` (TableJsonFragments) bleibt für Bearbeitungen gesperrt. Lesen (`table-info` etc.) geht überall.
+- Fragment-Tabellen: `.mbdb` (TableFragments) und `.mtblj` (TableJsonFragments) sind bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten). Lesen (`table-info` etc.) geht überall.
 - Datenüberprüfung: Geänderte Zeilen werden invalidiert und beim Freigeben der Tabelle geprüft — vor dem Entladen, ohne Neuladen. Row-Skripte laufen dabei; Meldungen erscheinen über das normale Meldungswesen auf stderr.
 - Mehrdeutige Aufträge (z. B. „unter Kapitel X“ = nur Position oder auch Kapitelwert setzen?) niemals raten — vor der Ausführung kurz nachfragen. Betroffene Spalten/Werte explizit nennen lassen, wenn der Auftrag sie nicht nennt.
 
@@ -69,12 +69,13 @@ Wichtige Stolperfalle:
 - `bcr table-script <tabelle> names` — alle Skripte mit Compare-Ergebnis auflisten (NUR mit dem CLI-Recht `Edit script`)
 - `bcr script-syntax [filter]` — Syntax aller Skript-Befehle auflisten, optional gefiltert
 - `bcr table-rowerrors <tabelle>` + Zeilenadressierung — Datenüberprüfung adressierter Zeilen; Exit-Code 1 bei Fehlern
+- `bcr table-saveas <tabelle> <zieldatei>` — Tabelle als neue, vollständige Datei im Format der Ziel-Endung speichern (.bdb, .mbdb, .tblh, .tblj, .mtblj); ohne Fragment-Historie der Quelle. Beispiel: `bcr table-saveas Test.mbdb Test2.mtblj`
 
 Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>` (optional `--filtertype equals|exact|contains|startswith`). Der Zeilen-Key ist numerisch (Zeitstempel-artiger Long); `--row 123` mit `KEY=Wert`-Syntax ist falsch — Beispiele: `bcr help table-info`.
 
-## Fragment-Tabellen bearbeiten (.mbdb)
+## Fragment-Tabellen bearbeiten (.mbdb/.mtblj)
 
-Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-replace`, `table-delrow`, `table-addcolumn`, `table-delcolumn`, `table-columnarrangement`, `table-head`) arbeiten auch auf `.mbdb` (TableFragments) — ohne Zusatzschalter:
+Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-replace`, `table-delrow`, `table-addcolumn`, `table-delcolumn`, `table-columnarrangement`, `table-head`) arbeiten auch auf `.mbdb` (TableFragments) und `.mtblj` (TableJsonFragments) — ohne Zusatzschalter:
 
 - Das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt werden kann: Die letzte sauber geschlossene Fragment-Datei des eigenen Benutzers (jünger als 5 Minuten, endend mit `- EOF`) wird wiederaufgenommen: Der Writer wird direkt im Append-Modus auf diese Datei geöffnet und die neuen Änderungen werden angehängt. Damit bleiben alle Änderungen einer Aufgabenkette in EINER Fragment-Datei gebündelt.
 - Gibt es keine geeignete Fragment-Datei (zu alt, kein EOF, fremder Benutzer), legt der Befehl beim ersten Schreiben selbst eine neue Fragment-Datei an.

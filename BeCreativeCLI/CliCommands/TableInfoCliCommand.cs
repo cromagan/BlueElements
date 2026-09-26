@@ -204,7 +204,7 @@ public class TableInfoCliCommand : CliCommand {
         foreach (var row in rows) {
             if (max > 0 && count >= max) { break; }
 
-            Console.Out.WriteLine(string.Join("\t", columns.Select(c => row.CellGetString(c))));
+            Console.Out.WriteLine(string.Join("\t", columns.Select(c => row.CellGetString(c).Replace("\r", "\n"))));
             count++;
         }
 

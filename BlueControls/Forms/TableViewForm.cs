@@ -201,49 +201,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     public object? CreateNewItem() => null;
 
-    public OperationResult CreateTable(string targetPath, Table? source) {
-        if (string.IsNullOrEmpty(targetPath)) { return OperationResult.Failed("Zielpfad ist leer."); }
-
-        targetPath = targetPath.NormalizeFile();
-
-        var targetSuffix = targetPath.FileSuffix().ToLowerInvariant();
-        if (targetSuffix is not ("bdb" or "mbdb" or "tblh" or "tblj" or "mtblj")) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblj, .mtblj");
-        }
-
-        var targetBase = targetPath.FileNameWithoutSuffix();
-        var targetDir = targetPath.FilePath();
-
-        // Tabellennamen müssen gültige Systemnamen sein, damit KeyName und Dateiname konsistent bleiben.
-        // BlueBasics.Classes.Formats.SystemNameFormat.MakeValid darf den Namen nicht verändern.
-        var validBase = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(targetBase);
-        if (!string.Equals(targetBase, validBase, StringComparison.OrdinalIgnoreCase) || !Table.IsValidTableName(validBase)) {
-            return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
-        }
-
-        var forbidden = new[] { "bdb", "mbdb", "tblh", "tblj", "mtblj" };
-
-        foreach (var ext in forbidden) {
-            if (string.Equals(ext, targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }
-            var collisionFile = targetDir + targetBase + "." + ext;
-            if (FileExists(collisionFile)) {
-                return OperationResult.Failed($"Im Zielverzeichnis existiert bereits eine Datei mit dem gleichen Namen aber anderer Erweiterung: {collisionFile}");
-            }
-        }
-
-        if (FileExists(targetPath)) { return OperationResult.Failed($"Die Datei existiert bereits: {targetPath}"); }
-
-        TableFile target = targetSuffix switch {
-            "mbdb" => new TableFragments(targetPath, source),
-            "tblh" => new TableChunk(targetPath, source),
-            "tblj" => new TableJsonFile(targetPath, source),
-            "mtblj" => new TableJsonFragments(targetPath, source),
-            _ => new TableFile(targetPath, source)
-        };
-
-        return target.Save();
-    }
-
     // TODO: Unused
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
 
@@ -613,7 +570,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        var createResult = CreateTable(SaveTab.FileName, null);
+        var createResult = TableFile.Create(SaveTab.FileName, null);
         if (createResult.IsFailed) {
             Notification.Show("Fehler beim Erstellen:<br>" + createResult.FailedReason, ImageCode.Warnung);
             return;
@@ -647,7 +604,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            var result = CreateTable(SaveTab.FileName, tbf);
+            var result = TableFile.Create(SaveTab.FileName, tbf);
             if (result.IsFailed) {
                 Notification.Show("Fehler beim Speichern:<br>" + result.FailedReason, ImageCode.Warnung);
                 return;

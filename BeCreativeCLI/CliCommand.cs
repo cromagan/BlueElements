@@ -121,28 +121,29 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Tabelle per Kommandozeile bearbeitet werden kann.
-    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb) führt automatisch die
-    /// jüngste, sauber mit EOF abgeschlossene Fragment-Datei des eigenen Benutzers fort
+    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb) und
+    /// TableJsonFragments (.mtblj) führen automatisch die jüngste, sauber mit
+    /// EOF abgeschlossene Fragment-Datei des eigenen Benutzers fort
     /// (jünger als 5 Minuten; neue Änderungen werden per Append angehängt).
     /// Gibt es keine, legt das System beim ersten Schreiben eine neue Fragment-Datei an.
-    /// Das Öffnen hängt sofort "- CONTINUED" an, damit kein zweiter Prozess dieselbe
-    /// Datei zum Schreiben öffnen kann.
+    /// Das Öffnen hängt sofort einen CONTINUED-Marker an, damit kein zweiter
+    /// Prozess dieselbe Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
         if (tbl is not (TableFragments or TableJsonFragments)) { return null; }
 
-        if (tbl is not TableFragments) {
-            return "Bearbeitungen an JSON-Fragment-Tabellen (TableJsonFragments) werden von der Kommandozeile nicht unterstützt.";
-        }
-
         // Geeignete Fragment-Datei automatisch erkennen (EOF am Ende, eigener Benutzer,
         // jünger als 5 Minuten); ohne Fund startet der Writer eine neue Datei.
-        var fragmentFile = NewestFragmentOf((TableFragments)tbl);
+        var fragmentFile = NewestFragmentOf(tbl);
 
         if (fragmentFile is null) { return null; }
 
-        var f = ((TableFragments)tbl).ContinueFragment(fragmentFile);
+        var f = tbl switch {
+            TableFragments tf => tf.ContinueFragment(fragmentFile),
+            TableJsonFragments tjf => tjf.ContinueFragment(fragmentFile),
+            _ => "Nicht unterstützter Fragment-Tabellentyp."
+        };
 
         return f is { Length: > 0 } ? f : null;
     }
@@ -321,11 +322,27 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Liefert die jüngste, sauber mit EOF abgeschlossene Fragment-Datei der Tabelle,
     /// die dieser Benutzer zuletzt genutzt hat — oder null. Nur Dateien jünger als
-    /// 5 Minuten gelten.
+    /// 5 Minuten gelten. Unterstützt binäre (.frg) und JSON-Fragmente (.frj).
     /// </summary>
-    protected static string? NewestFragmentOf(TableFragments tbl) {
-        var suffix = TableFragments.SuffixOfFragments;
-        var directory = tbl.Filename.FilePath() + "Frgm\\";
+    protected static string? NewestFragmentOf(Table tbl) {
+        string directory;
+        string suffix;
+
+        switch (tbl) {
+            case TableFragments tf:
+                directory = tf.FragmengtsPath();
+                suffix = TableFragments.SuffixOfFragments;
+                break;
+
+            case TableJsonFragments tjf:
+                directory = tjf.FragmengtsPath();
+                suffix = TableJsonFragments.SuffixOfJsonFragments;
+                break;
+
+            default:
+                return null;
+        }
+
         string? newest = null;
         var newestUtc = DateTime.MinValue;
         var limitUtc = DateTime.UtcNow.AddMinutes(-5);

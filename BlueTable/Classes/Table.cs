@@ -1285,6 +1285,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             target.Undo.Clear();
             foreach (var thisUndo in undoSnapshot) {
                 if (thisUndo is null) { continue; }
+
+                // Nur Einträge des Ziel-Tabellennamens übernehmen: Bei Formatwandlung
+                // unter gleichem Namen bleibt die Historie erhalten, bei einer Kopie
+                // unter neuem Namen startet die Datei mit eigener, leerer Historie.
+                // InjectData würde fremd benannte Einträge ohnehin überspringen.
+                if (!string.Equals(thisUndo.TableName, target.KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
+
                 target.Undo.Add(new UndoItem(thisUndo.ParseableItems().FinishParseable()));
             }
         }
@@ -2046,10 +2053,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         json.Set("temporarytablemasteruser", _temporaryTableMasterUser);
 
         json.SetArrayIfNotEmpty("tags", _tags);
-        json.SetArrayIfNotEmpty("dictionarywords", _dictionaryWords);
-        json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow);
-        json.SetArrayIfNotEmpty("tableadmin", _tableAdmin);
-        json.SetArrayIfNotEmpty("clirights", _cliRights);
+
+        // Diese Listen schreibt auch das Binärformat (TableChunk.GenerateMainChunk)
+        // sortiert und dedupliziert — hier identisch halten, damit die Formate
+        // verlustfrei ineinander überführbar sind.
+        json.SetArrayIfNotEmpty("dictionarywords", _dictionaryWords.SortedDistinctList());
+        json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow.SortedDistinctList());
+        json.SetArrayIfNotEmpty("tableadmin", _tableAdmin.SortedDistinctList());
+        json.SetArrayIfNotEmpty("clirights", _cliRights.SortedDistinctList());
 
         if (SortDefinition is { } sd) { json.Set("sortdefinition", sd.ParseableJson()); }
         json.SetArrayIfNotEmpty("uniquevalues", _uniqueValues);
