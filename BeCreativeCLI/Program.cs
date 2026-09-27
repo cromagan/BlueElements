@@ -28,7 +28,7 @@ internal static class Program {
 
         if (args.Length == 0) {
             Console.Error.WriteLine("BeCreative (bcr) — © 2026 Christian Peter, cp33@gmx.de");
-            Console.Error.WriteLine("Kommandozeilen-Werkzeug für BeCreative-Dateien — Tabellen (Befehlspräfix: table-) und der Roundtrip-Test für Layout- und Tabellendateien (roundtrip).");
+            Console.Error.WriteLine("Kommandozeilen-Werkzeug für BeCreative-Dateien (Befehlspräfix: table-).");
             Console.Error.WriteLine();
             Console.Error.WriteLine("Benutzung: bcr <befehl> [optionen]");
             Console.Error.WriteLine("  bcr help              Listet alle verfügbaren Befehle auf.");
@@ -38,9 +38,14 @@ internal static class Program {
             return 2;
         }
 
+        // Interne Befehle (Hidden) verhalten sich gesperrt wie unbekannte Befehle.
+        // Die Prüfung läuft vor dem CliArgs-Parsing, damit nicht einmal ein
+        // ParseError die Existenz dieser Befehle verrät.
+        var devRequested = Array.Exists(args, a => a.Equals("--dev", StringComparison.OrdinalIgnoreCase));
+
         var cmd = CliCommand.ByName(args[0]);
 
-        if (cmd is null) {
+        if (cmd is null || (cmd.Hidden && !devRequested)) {
             Console.Error.WriteLine($"Unbekannter Befehl: '{args[0]}' — 'bcr help' listet alle Befehle.");
             return 2;
         }

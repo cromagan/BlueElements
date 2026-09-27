@@ -78,33 +78,65 @@ public static class TableJsonFragmentDiff {
             var oldJson = oldItems[i].ParseableJson();
             var newJson = newItems[i].ParseableJson();
 
+            // Bei Umbenennung der Ansicht index-basierte Pfade verwenden: Die
+            // Fremd-Instanz kennt den neuen Namen erst nach dem Einspielen der
+            // Name-Zeile — Folgelines mit dem neuen Namen würden ins Leere laufen.
+            var viewKey = string.Equals(oldItems[i].KeyName, newItems[i].KeyName, StringComparison.OrdinalIgnoreCase)
+                ? ArrangementKey(newItems[i], i)
+                : i.ToString1();
+
             var oldColumns = ColumnsByName(oldJson);
             var newColumns = ColumnsByName(newJson);
 
             if (!SameKeys(oldColumns.Keys, newColumns.Keys) || !SameColumnOrder(oldJson, newJson)) {
                 // Spalten dieser Ansicht hinzugefügt/entfernt/umsortiert —
-                // nur diese Ansicht komplett synchronisieren statt der ganzen Liste.
-                result.Add(($"columnarrangements[{i}]", newJson));
+                // nur das Spalten-Array dieser Ansicht synchronisieren statt der
+                // ganzen Ansicht. ParseJson ersetzt die Spaltenliste damit
+                // vollständig (inkl. Reihenfolge und Spalten-Details).
+                result.Add(($"columnarrangements[{viewKey}].columns", newJson["columns"]?.DeepClone() ?? new JsonArray()));
+                continue;
+            }
+
+            // Schlüsselbestand einer einzelnen Ansichtsspalte geändert (z. B.
+            // wegfallendes "isexpanded" beim Aufklappen): Der neue Stand ist
+            // nicht prop-weise ausdrückbar — Spaltenliste synchronisieren.
+            var columnKeysDiverged = newColumns.Any(c => !SameJsonKeys(oldColumns[c.Key], c.Value));
+
+            if (columnKeysDiverged) {
+                result.Add(($"columnarrangements[{viewKey}].columns", newJson["columns"]?.DeepClone() ?? new JsonArray()));
                 continue;
             }
 
             foreach (var prop in newJson) {
                 if (prop.Key == "columns") { continue; }
-                if (!JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) {
-                    result.Add(($"columnarrangements[{i}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+                if (JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) { continue; }
+                result.Add(($"columnarrangements[{viewKey}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+            }
+
+            // Verschollene Array-Keys explizit leer senden (z. B.
+            // "permissiongroups"), damit das Einspielen den alten Stand nicht erhält.
+            foreach (var oldProp in oldJson) {
+                if (oldProp.Value is JsonArray && newJson[oldProp.Key] is null) {
+                    result.Add(($"columnarrangements[{viewKey}].{oldProp.Key}", new JsonArray()));
                 }
             }
 
             foreach (var (colKey, colJson) in newColumns) {
                 var oldColJson = oldColumns[colKey];
                 foreach (var prop in colJson) {
-                    if (!JsonNode.DeepEquals(prop.Value, oldColJson[prop.Key])) {
-                        result.Add(($"columnarrangements[{i}].columns[{colKey}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
-                    }
+                    if (JsonNode.DeepEquals(prop.Value, oldColJson[prop.Key])) { continue; }
+                    result.Add(($"columnarrangements[{viewKey}].columns[{colKey}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
                 }
             }
         }
     }
+
+    /// <summary>
+    /// Pfad-Key einer Ansicht: der Ansichtsname, wenn vorhanden (robust gegen
+    /// unterschiedliche Ansicht-Reihenfolgen bei Multi-User), sonst der Index.
+    /// </summary>
+    private static string ArrangementKey(ColumnViewCollection view, int index) =>
+        view.KeyName is { Length: > 0 } name ? name : index.ToString1();
 
     private static void DiffEventScripts(Table table, string previousValue, string newValue, List<(string Path, JsonNode? Value)> result) {
         var oldItems = ParseScripts(table, previousValue);
@@ -118,10 +150,72 @@ public static class TableJsonFragmentDiff {
         foreach (var (key, newJson) in newItems) {
             var oldJson = oldItems[key];
             foreach (var prop in newJson) {
-                if (!JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) {
-                    result.Add(($"eventscript[{key}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+                if (string.Equals(prop.Key, "savedvariables", StringComparison.OrdinalIgnoreCase)) {
+                    DiffSavedVariables(key, oldJson, prop.Value, result);
+                    continue;
+                }
+
+                if (JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) { continue; }
+                result.Add(($"eventscript[{key}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+            }
+
+            // Verschollene Array-Keys explizit leer senden (z. B. "usergroups"),
+            // damit das Einspielen den alten Stand nicht erhält.
+            foreach (var oldProp in oldJson) {
+                if (oldProp.Value is JsonArray && newJson[oldProp.Key] is null) {
+                    result.Add(($"eventscript[{key}].{oldProp.Key}", new JsonArray()));
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Vergleicht die gespeicherten Variablen eines Skripts verschachtelt:
+    /// Der ReadOnly-Flag und jedes Variablen-Attribut erhalten eine eigene
+    /// Pfad-Zeile. Nur wenn Variablen hinzugefügt/entfernt wurden oder der
+    /// Schlüsselbestand einzelner Variablen wechselt, wird ein größerer
+    /// Ausschnitt (Variablen-Array bzw. das komplette Objekt) synchronisiert.
+    /// </summary>
+    private static void DiffSavedVariables(string scriptKey, JsonObject oldScriptJson, JsonNode? newSavedNode, List<(string Path, JsonNode? Value)> result) {
+        var prefix = $"eventscript[{scriptKey}].savedvariables";
+
+        if (newSavedNode is not JsonObject newSaved || oldScriptJson["savedvariables"] is not JsonObject oldSaved) {
+            result.Add((prefix, newSavedNode?.DeepClone() ?? new JsonObject()));
+            return;
+        }
+
+        if (!JsonNode.DeepEquals(newSaved["readonly"], oldSaved["readonly"])) {
+            result.Add(($"{prefix}.readonly", newSaved["readonly"]?.DeepClone() ?? JsonValue.Create(false)));
+        }
+
+        var oldVars = VariablesByName(oldSaved);
+        var newVars = VariablesByName(newSaved);
+
+        if (!SameKeys(oldVars.Keys, newVars.Keys)) {
+            result.Add(($"{prefix}.variables", VariablesToJsonArray(newSaved)));
+            return;
+        }
+
+        foreach (var (varKey, newVarJson) in newVars) {
+            var oldVarJson = oldVars[varKey];
+
+            // Schlüsselbestand der Variable geändert (z. B. Typwechsel mit
+            // anderem Wert-Key) — nur dann die komplette Variable senden.
+            if (!SameJsonKeys(oldVarJson, newVarJson)) {
+                result.Add(($"{prefix}.variables[{varKey}]", newVarJson.DeepClone()));
+                continue;
+            }
+
+            foreach (var prop in newVarJson) {
+                if (JsonNode.DeepEquals(prop.Value, oldVarJson[prop.Key])) { continue; }
+                result.Add(($"{prefix}.variables[{varKey}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+            }
+        }
+
+        // "variables" als Ganzes verschwunden (leerer Variablenstand): explizit
+        // leer senden, sonst erhält das Einspielen den alten Variablenstand.
+        if (newSaved["variables"] is null && oldSaved["variables"] is not null) {
+            result.Add(($"{prefix}.variables", new JsonArray()));
         }
     }
 
@@ -130,9 +224,26 @@ public static class TableJsonFragmentDiff {
         if (newJson is null) { return; }
 
         var oldJson = ParseSortDefinition(table, previousValue);
-        if (JsonNode.DeepEquals(oldJson, newJson)) { return; }
 
-        result.Add(("sortdefinition", newJson));
+        if (oldJson is null) {
+            // Kein vorheriger Stand — komplette Definition als Partial-Objekt der Tabelle.
+            result.Add(("sortdefinition", newJson));
+            return;
+        }
+
+        foreach (var prop in newJson) {
+            if (!JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) {
+                // Key "x" wird beim Einspielen ignoriert — Table.GetSubItemByKey
+                // liefert für den Container SortDefinition stets die eine Instanz.
+                result.Add(($"sortdefinition[x].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
+            }
+        }
+
+        // Verschollene Keys explizit leeren: ParseJson überspringt fehlende Keys,
+        // ein weggefallenes "columns" würde den alten Stand sonst erhalten.
+        if (newJson["columns"] is null && oldJson["columns"] is not null) {
+            result.Add(("sortdefinition[x].columns", new JsonArray()));
+        }
     }
 
     private static void DiffUniqueValues(Table table, string previousValue, string newValue, List<(string Path, JsonNode? Value)> result) {
@@ -161,9 +272,24 @@ public static class TableJsonFragmentDiff {
             return;
         }
 
+        // Ein Typwechsel kann am bestehenden Variablen-Objekt nicht ausgedrückt
+        // werden (der Typ ist beim Einspielen fest) — dann die komplette Liste.
+        var typeChanged = newItems.Any(v => !string.Equals(
+            oldItems[v.Key].GetString("type", string.Empty),
+            v.Value.GetString("type", string.Empty),
+            StringComparison.OrdinalIgnoreCase));
+
+        if (typeChanged) {
+            var obj = new JsonObject { ["variables"] = ItemsToJsonArray(newItems.Values) };
+            result.Add(("variables", obj));
+            return;
+        }
+
         foreach (var (key, newJson) in newItems) {
-            if (!JsonNode.DeepEquals(oldItems[key], newJson)) {
-                result.Add(($"variables[{key}]", newJson.DeepClone()));
+            var oldJson = oldItems[key];
+            foreach (var prop in newJson) {
+                if (JsonNode.DeepEquals(prop.Value, oldJson[prop.Key])) { continue; }
+                result.Add(($"variables[{key}].{prop.Key}", prop.Value?.DeepClone() ?? JsonValue.Create(string.Empty)));
             }
         }
     }
@@ -188,9 +314,57 @@ public static class TableJsonFragmentDiff {
         return result;
     }
 
+    /// <summary>
+    /// True, wenn beide JSON-Objekte denselben Schlüsselbestand haben. Ein
+    /// unterscheidlicher Bestand ist nicht prop-weise übertragbar.
+    /// </summary>
+    private static bool SameJsonKeys(JsonObject oldJson, JsonObject newJson) {
+        if (oldJson.Count != newJson.Count) { return false; }
+
+        foreach (var prop in oldJson) {
+            if (newJson[prop.Key] is null) { return false; }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst die Variablen eines savedvariables-JSON über ihren Schlüssel auf.
+    /// </summary>
+    private static Dictionary<string, JsonObject> VariablesByName(JsonObject savedJson) {
+        Dictionary<string, JsonObject> result = new(StringComparer.OrdinalIgnoreCase);
+        if (savedJson["variables"] is not JsonArray arr) { return result; }
+
+        foreach (var item in arr) {
+            if (item is not JsonObject jo) { continue; }
+            var key = jo.GetString("key", string.Empty);
+            if (key is not { Length: > 0 }) { continue; }
+            result.TryAdd(key, jo);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Kopiert das Variablen-Array eines savedvariables-JSON (leer, wenn
+    /// nicht vorhanden) — für die Komplett-Sync-Zeile der Variablen.
+    /// </summary>
+    private static JsonArray VariablesToJsonArray(JsonObject savedJson) {
+        JsonArray array = [];
+        if (savedJson["variables"] is not JsonArray arr) { return array; }
+
+        foreach (var item in arr) {
+            array.Add(item?.DeepClone());
+        }
+
+        return array;
+    }
+
     private static (string Path, JsonNode? Value) GetFullSync(Table table, TableDataType type, string newValue) => type switch {
         TableDataType.EventScript => ("eventscript", ItemsToJsonArray(ParseScripts(table, newValue).Values)),
-        TableDataType.SortDefinition => ("sortdefinition", ParseSortDefinition(table, newValue)),
+        // Eine geleerte/strukturlose Sortierung muss als anwendbares Objekt ankommen —
+        // null würde beim Fremd-Replay als No-Op durchlaufen und den alten Stand erhalten.
+        TableDataType.SortDefinition => ("sortdefinition", ParseSortDefinition(table, newValue) ?? new JsonObject { ["reverse"] = false }),
         TableDataType.ColumnArrangement => ("columnarrangements", ArrangementsToJsonArray(ParseArrangements(table, newValue))),
         TableDataType.UniqueValues => ("uniquevalues", ItemsToJsonArray(ParseUniqueValues(table, newValue).Values)),
         _ => ("variables", new JsonObject { ["variables"] = ItemsToJsonArray(ParseVariables(newValue).Values) })

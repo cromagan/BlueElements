@@ -254,16 +254,16 @@ public class TableScriptCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Datei eines Skripts im Ordner der Tabelle: &lt;tabelle&gt;.&lt;skript&gt;.txt.
-    /// </summary>
-    private static string ScriptFile(TableFile tbl, string scriptName) =>
-        tbl.Filename.FilePath() + tbl.Filename.FileNameWithoutSuffix() + "." + scriptName.ToNonCritical() + ".txt";
-
-    /// <summary>
     /// Normalisiert einen Skripttext (CRLF zu CR, nachlaufender Leerraum verworfen),
     /// damit gespeicherter Text und Datei-Inhalt symmetrisch vergleichbar sind.
     /// </summary>
     private static string NormalizeScript(string scriptText) => scriptText.Replace("\r\n", "\r").TrimEnd();
+
+    /// <summary>
+    /// Datei eines Skripts im Ordner der Tabelle: &lt;tabelle&gt;.&lt;skript&gt;.txt.
+    /// </summary>
+    private static string ScriptFile(TableFile tbl, string scriptName) =>
+        tbl.Filename.FilePath() + tbl.Filename.FileNameWithoutSuffix() + "." + scriptName.ToNonCritical() + ".txt";
 
     /// <summary>
     /// Liest eine Skript-Datei und normalisiert den Inhalt mit NormalizeScript.

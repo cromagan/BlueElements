@@ -10,13 +10,14 @@ public class TableSaveAsCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-saveas";
-    public override List<string> Options => ["password"];
-    public override string Syntax => "bcr table-saveas <tabelle> <zieldatei>";
 
     public override string? HelpDetails =>
             "Legt eine neue, vollständige Tabellendatei an und übernimmt die kompletten Daten der Quelltabelle — " +
             "ohne deren Fragment-Historie. Das Zielformat folgt der Endung: .bdb, .mbdb, .tblh, .tblj oder .mtblj. " +
             "Beispiel: bcr table-saveas Test.mbdb Test2.mtblj";
+
+    public override List<string> Options => ["password"];
+    public override string Syntax => "bcr table-saveas <tabelle> <zieldatei>";
 
     #endregion
 

@@ -21,7 +21,8 @@ public class RoundtripCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "roundtrip";
-    public override List<string> Flags => ["full"];
+    public override List<string> Flags => ["full", "dev"];
+    public override bool Hidden => true;
     public override string Syntax => "bcr roundtrip <datei> [--full]";
 
     #endregion

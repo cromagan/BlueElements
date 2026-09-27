@@ -278,8 +278,10 @@ public class TableJsonFragments : TableJsonFile {
                         _writer.WriteLine(line.ToJsonString());
 
                         // Eigene Änderungen in den Hash-Cache aufnehmen, damit das
-                        // Nachladen sie nicht erneut anwendet.
-                        _processedHashes.TryAdd((path + "|" + (node?.ToJsonString() ?? string.Empty)).GetMD5Hash(), default);
+                        // Nachladen sie nicht erneut anwendet. Der Zeitstempel fließt
+                        // ein, damit A→B→A-Folgen (gleicher Pfad und Wert, dazwischen
+                        // ein anderer) nicht fälschlich als Duplikat übersprungen werden.
+                        _processedHashes.TryAdd(JsonLineHash(path, node, line["datetimeutc"]), default);
                     }
                 } else {
                     var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
@@ -472,7 +474,7 @@ public class TableJsonFragments : TableJsonFile {
 
                         // Re-Apply ist idempotent; der Hash verhindert das wiederholte
                         // Verarbeiten bereits bekannter Zeilen bei jedem Nachladen.
-                        if (!_processedHashes.TryAdd((path + "|" + node.ToJsonString()).GetMD5Hash(), default)) { continue; }
+                        if (!_processedHashes.TryAdd(JsonLineHash(path, node, jo["datetimeutc"]), default)) { continue; }
 
                         j.Add((path, JsonSerializer.SerializeToElement(node), timeUtc, thisf));
                         continue;
@@ -496,6 +498,16 @@ public class TableJsonFragments : TableJsonFile {
         } catch { }
         return (null, null, null, true);
     }
+
+    /// <summary>
+    /// Dedup-Hash einer granularen Zeile aus Pfad, Wert und Zeitstempel. Der
+    /// Zeitstempel fließt ein, damit gleiche Werte zu unterschiedlichen Zeiten
+    /// (A→B→A-Folgen) nicht als Duplikat gelten.
+    /// Beide Seiten (Schreiben und Nachladen) erzeugen den Zeitstempel-String
+    /// über ToJsonString desselben JsonNode-Wegs — dadurch byte-identisch.
+    /// </summary>
+    private static string JsonLineHash(string path, JsonNode? node, JsonNode? timeNode) =>
+        (path + "|" + (node?.ToJsonString() ?? string.Empty) + "|" + (timeNode?.ToJsonString() ?? string.Empty)).GetMD5Hash();
 
     /// <summary>
     /// Injiziert die geladenen Fragmentdaten in die aktuelle Tabellenstruktur.
@@ -572,6 +584,8 @@ public class TableJsonFragments : TableJsonFile {
                 // Sie betreffen immer den Tabellenkopf und sind idempotent - die
                 // Reihenfolge zu den UndoItems ist unkritisch.
                 if (jsonChanges is { Count: > 0 }) {
+                    var scriptChanged = false;
+
                     foreach (var (path, jsonValue, _, container) in jsonChanges.OrderBy(c => c.TimeUtc)) {
                         try {
                             this.ApplyPartialJson(path, jsonValue);
@@ -580,9 +594,16 @@ public class TableJsonFragments : TableJsonFile {
                             return OperationResult.Failed("Pfad-Zeile nicht anwendbar: " + path);
                         }
 
+                        if (path.StartsWith("eventscript", StringComparison.OrdinalIgnoreCase)) { scriptChanged = true; }
                         affectingHead = true;
                         _jsonChangesNotIncluded.AddIfNotExists(container);
                     }
+
+                    if (scriptChanged) { OnScriptChanged(); }
+
+                    // Die Pfad-Zeilen umgehen die Blobs, die die abgeleiteten
+                    // Kopf-Caches normalerweise invalidieren.
+                    InvalidateHeadCaches();
                 }
 
                 _isInCache = endTimeUtc;

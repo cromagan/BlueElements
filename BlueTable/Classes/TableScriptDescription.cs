@@ -33,7 +33,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
 
     #region Constructors
 
-    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, List<ScriptVariable>? savedVariables, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason, savedVariables) {
+    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, IEnumerable<ScriptVariable>? savedVariables, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason, savedVariables) {
         Table = table;
         EventTypes = eventTypes;
         NeedRow = needRow;
@@ -311,7 +311,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         return base.ErrorReason();
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
+    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
+        if (string.Equals(containerName, "SavedVariables", StringComparison.OrdinalIgnoreCase)) {
+            return SavedVariables;
+        }
+
+        return null;
+    }
 
     public void OnPropertyChangedExt(string relativePath, object? value) {
         if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
@@ -347,7 +353,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         json.Set("valuesreadonly", ValuesReadOnly);
         json.Set("stoppedtimecount", StoppedTimeCount);
         json.Set("averageruntime", AverageRunTime);
-        json.Set("savedvariables", new VariableCollection(SavedVariables ?? [], false).ParseableJson());
+        json.Set("savedvariables", SavedVariables.ParseableJson());
         json.SetArrayIfNotEmpty("usergroups", UserGroups);
         return json;
     }
@@ -378,9 +384,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         AverageRunTime = json.GetInt("averageruntime", (int)AverageRunTime);
 
         if (json.GetJson("savedvariables") is JsonObject vc) {
-            var collection = new VariableCollection([], false);
-            collection.ParseJson((JsonObject)vc.DeepClone());
-            SavedVariables = collection.ToList();
+            SavedVariables.ParseJson(vc);
         }
 
         if (json["usergroups"] is JsonArray arr) {

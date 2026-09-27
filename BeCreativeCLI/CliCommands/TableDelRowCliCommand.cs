@@ -11,11 +11,12 @@ public class TableDelRowCliCommand : CliCommand {
 
     public override string Command => "table-delrow";
     public override List<string> Flags => ["dry-run"];
-    public override List<string> Options => [.. AddressingOptions, "password"];
-    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
 
     public override string? HelpDetails => "--dry-run zeigt die Keys der Zeilen an, die gelöscht würden — ohne zu löschen und ohne zu speichern. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen.";
+
+    public override List<string> Options => [.. AddressingOptions, "password"];
+    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
 
     #endregion
 

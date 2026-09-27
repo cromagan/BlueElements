@@ -42,6 +42,11 @@ public abstract class CliCommand : IHasKeyName {
     /// </summary>
     public virtual string? HelpDetails => null;
 
+    /// <summary>
+    /// true = interner Befehl; wird in der Hilfe nicht gelistet und nur im besonderen Fall ausgeführt.
+    /// </summary>
+    public virtual bool Hidden => false;
+
     string IHasKeyName.KeyName => Command.ToUpperInvariant();
 
     /// <summary>
@@ -251,6 +256,19 @@ public abstract class CliCommand : IHasKeyName {
         column.TextFormatingAllowed || column.DefaultRenderer.Equals("RichText", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
+    /// Liefert true, wenn die Zelle in einer abgeschlossenen Zeile liegt und nicht
+    /// geschrieben werden darf. Ausgenommen sind die Sperrspalte selbst und Spalten
+    /// mit 'Bearbeitbar trotz Zeilensperre'.
+    /// </summary>
+    protected static bool IsLocked(ColumnItem? column, RowItem row) {
+        if (row.Table is not { IsDisposed: false } tb || tb.Column.SysLocked is not { IsDisposed: false } sl) { return false; }
+
+        if (column is { IsDisposed: false } c && (c == sl || c.EditAllowedDespiteLock)) { return false; }
+
+        return row.CellGetBoolean(sl);
+    }
+
+    /// <summary>
     /// Lädt die Tabelle aus dem ersten Positionsargument und entsperrt sie bei Bedarf
     /// mit --password. Ohne Pfadangabe wird das aktuelle Verzeichnis als Suchpfad ergänzt.
     /// Gibt bei Problemen (nicht gefunden, falsches Kennwort, defekte Skripte) eine
@@ -434,19 +452,6 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Liefert true, wenn die Zelle in einer abgeschlossenen Zeile liegt und nicht
-    /// geschrieben werden darf. Ausgenommen sind die Sperrspalte selbst und Spalten
-    /// mit 'Bearbeitbar trotz Zeilensperre'.
-    /// </summary>
-    protected static bool IsLocked(ColumnItem? column, RowItem row) {
-        if (row.Table is not { IsDisposed: false } tb || tb.Column.SysLocked is not { IsDisposed: false } sl) { return false; }
-
-        if (column is { IsDisposed: false } c && (c == sl || c.EditAllowedDespiteLock)) { return false; }
-
-        return row.CellGetBoolean(sl);
-    }
-
-    /// <summary>
     /// Speichert die Tabelle (sofern dateibasiert), nachdem alle in dieser Session
     /// invalidierten Zeilen vollständig abgearbeitet sind.
     /// Liefert den Exit-Code: 0 = Erfolg, 1 = Fehler beim Speichern.
@@ -483,11 +488,21 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Die
-    /// Sperrspalte (SYS_LOCKED) beschreibbar nur mit dem Recht 'Remove row lock',
-    /// die Sortierindex-Spalte (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält
-    /// die Nummern lückenlos —, alle übrigen Systemspalten nur mit 'Change cell values'.
+    /// Zeilen-Identität (SYS_ROWKEY) sowie Changer/ChangeDate pflegt das
+    /// System selbst und ist nie beschreibbar, die Sperrspalte (SYS_LOCKED)
+    /// beschreibbar nur mit dem Recht 'Remove row lock', die Sortierindex-
+    /// Spalte (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält die Nummern
+    /// lückenlos —, alle übrigen Systemspalten nur mit 'Change cell values'.
     /// </summary>
     protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column) {
+        if (tbl.Column.SysRowKey == column) {
+            return "Die Spalte '" + column.KeyName + "' hält die Zeilen-Identität und wird vom System verwaltet.";
+        }
+
+        if (tbl.Column.SysRowChanger == column || tbl.Column.SysRowChangeDate == column) {
+            return "Die Spalte '" + column.KeyName + "' pflegt das System bei jeder Änderung selbst (Benutzer/Zeitstempel) und ist nicht beschreibbar.";
+        }
+
         string right;
         if (tbl.Column.SysLocked == column) {
             right = CliRights.RemoveRowLock;

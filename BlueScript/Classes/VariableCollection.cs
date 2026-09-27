@@ -225,8 +225,10 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     public void ParseJson(JsonObject json) {
         ReadOnly = json.GetBool("readonly", ReadOnly);
 
-        foreach (var v in json.GetList<ScriptVariable>("variables", false)) {
-            Add(v);
+        // Ein geliefertes "variables"-Array ist der komplette neue Zustand
+        // (inkl. wegfallender Variablen); ohne Array nur den ReadOnly-Flag mergen.
+        if (json["variables"] is JsonArray) {
+            ReplaceWith(json.GetList<ScriptVariable>("variables", false));
         }
     }
 
@@ -273,6 +275,51 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
             originalText = thisvar.ReplaceInText(originalText);
         }
         return originalText;
+    }
+
+    /// <summary>
+    /// Ersetzt den kompletten Inhalt durch die übergebenen Variablen.
+    /// Die Collection-Instanz bleibt erhalten, damit Pfad-Auflösungen
+    /// (IJsonParseable.GetSubItemByKey) stets dasselbe Objekt liefern.
+    /// Gleichnamige Variablen behalten, wenn möglich, ihre Instanz
+    /// (Wert und Kommentar werden übernommen), damit bestehende Referenzen gültig bleiben.
+    /// </summary>
+    public void ReplaceWith(IEnumerable<ScriptVariable>? vars) {
+        var wasReadOnly = ReadOnly;
+        ReadOnly = false;
+
+        List<ScriptVariable> neu = vars is null ? [] : [.. vars.Where(v => v is not null)];
+        var neueKeys = new HashSet<string>(neu.Select(v => v.KeyName), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var v in neu) {
+            if (!_internal.TryGetValue(v.KeyName, out var existing)) {
+                Add(v);
+                continue;
+            }
+
+            if (ReferenceEquals(existing, v)) { continue; }
+
+            // Wert in die bestehende Instanz übernehmen, um die Instanzidentität zu erhalten
+            var existingReadOnly = existing.ReadOnly;
+            existing.ReadOnly = false;
+            var error = existing.GetValueFrom(v);
+            existing.ReadOnly = existingReadOnly;
+
+            if (error is { Length: > 0 }) {
+                // Typ passt nicht → bestehende Instanz doch austauschen
+                Remove(v.KeyName);
+                Add(v);
+                continue;
+            }
+
+            existing.Comment = v.Comment;
+        }
+
+        foreach (var keyName in _internal.Keys.ToList()) {
+            if (!neueKeys.Contains(keyName)) { Remove(keyName); }
+        }
+
+        ReadOnly = wasReadOnly;
     }
 
     /// <summary>

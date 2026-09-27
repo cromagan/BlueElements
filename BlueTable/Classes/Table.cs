@@ -1000,7 +1000,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                                         readOnly is not null && readOnly != existingScript.ValuesReadOnly ||
                                         userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
                                         failedReason is not null && failedReason != existingScript.FailedReason ||
-                                        savedVariables is not null && savedVariables?.ToList() != existingScript.SavedVariables?.ToList() ||
+                                        savedVariables is not null && existingScript.SavedVariables.SortByKeyName().IsDifferentTo(savedVariables.SortByKeyName()) ||
                                         stoppedtimecount is not null && stoppedtimecount != existingScript.StoppedTimeCount ||
                                         averageruntime is not null && averageruntime != existingScript.AverageRunTime;
 
@@ -1018,7 +1018,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                                 needRow ?? existingScript.NeedRow,
                                 readOnly ?? existingScript.ValuesReadOnly,
                                 failedReason ?? existingScript.FailedReason,
-                                savedVariables ?? existingScript.SavedVariables,
+                                savedVariables ?? existingScript.SavedVariables.ToList(),
                                 stoppedtimecount ?? existingScript.StoppedTimeCount,
                                 averageruntime ?? existingScript.AverageRunTime
                             );
@@ -1165,6 +1165,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         var eventsAfterSuccess = type.IsCellValue() && reason.HasFlag(ChangeFlags.RaiseEvents);
         var internalFlags = eventsAfterSuccess ? reason & ~ChangeFlags.RaiseEvents : reason;
 
+        // Bei Spaltenumbenennung die Ansichten VOR der Umbenennung
+        // serialisieren — nur so kann das JSON-Fragment granular diffen,
+        // weil die Ansichten nach der Umbenennung bereits den neuen
+        // Spaltennamen tragen.
+        var arrangementsBeforeRename = type == TableDataType.ColumnKey && column is not null
+            ? _columnArrangements.ToString(false)
+            : string.Empty;
+
         // ERST Speicher setzen
         var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, internalFlags);
         if (!string.IsNullOrEmpty(error)) { return error; }
@@ -1184,7 +1192,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
         if (type == TableDataType.ColumnKey && column is not null) {
-            UpdateColumnArrangementsAfterRename(column);
+            UpdateColumnArrangementsAfterRename(column, arrangementsBeforeRename);
         }
 
         if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
@@ -1718,9 +1726,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         if (string.Equals(containerName, "ColumnArrangements", StringComparison.OrdinalIgnoreCase)) {
-            var idx = 0;
-            if (int.TryParse(key, out var i)) { idx = i; }
-            return idx >= 0 && idx < _columnArrangements.Count ? _columnArrangements[idx] : null;
+            // Index-basiert (ältere Fragmente) oder über den Ansichtsnamen auflösen —
+            // der Name ist gegen unterschiedliche Ansicht-Reihenfolgen bei Multi-User robust.
+            if (int.TryParse(key, out var i)) { return i >= 0 && i < _columnArrangements.Count ? _columnArrangements[i] : null; }
+            return _columnArrangements.FirstOrDefault(c => string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase));
         }
 
         return null;
@@ -2254,10 +2263,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
             scripts.Sort();
             _eventScript = scripts.AsReadOnly();
-            _hasPrepareFormulaScript = null;
-            _hasValueChangedScript = null;
-            _mayAffectUser = null;
-            _changesRowColor = null;
+            InvalidateHeadCaches();
         }
 
         if (json["columnarrangements"] is JsonArray caArr) {
@@ -2361,12 +2367,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 .Select(g => g.OrderByDescending(s => s.Script.Length).First())
                 .ToList();
             deduplicated.Sort();
-
-            _hasPrepareFormulaScript = null;
-            _hasValueChangedScript = null;
-            _mayAffectUser = null;
-            _changesRowColor = null;
             _eventScript = deduplicated.AsReadOnly();
+            InvalidateHeadCaches();
         }
 
         // Spaltenanordnungen reparieren: verwaiste Einträge entfernen,
@@ -2470,7 +2472,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, List<string> debugOutput, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
         var failed = script.FailedReason;
-        var savedVariables = script.SavedVariables;
+        List<ScriptVariable>? savedVariables = [.. script.SavedVariables];
         var runTimeCount = script.StoppedTimeCount;
         // Bereits auf 500 ms gerundet (siehe AverageRunTime-Setter in TableScriptDescription).
         var avgRunTime = script.AverageRunTime;
@@ -2573,6 +2575,21 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             t += "\r\nTable: " + KeyName;
         } catch { /* DevelopWarnung: Fehler beim Abrufen der Debug-Informationen wird ignoriert */ }
         Develop.DebugPrint(t);
+    }
+
+    /// <summary>
+    /// Setzt die abgeleiteten Kopf-Caches (Skript-Merker, Variablen-Serialisierung)
+    /// zurück und meldet neue Sortier-Parameter. Wird nach dem granularen
+    /// Einspielen von Fragment-Zeilen benötigt, da diese die Blobs umgehen,
+    /// die die Caches normalerweise invalidieren.
+    /// </summary>
+    internal void InvalidateHeadCaches() {
+        _hasPrepareFormulaScript = null;
+        _hasValueChangedScript = null;
+        _mayAffectUser = null;
+        _changesRowColor = null;
+        _variableTmp = _variables.ToString(true);
+        OnSortParameterChanged();
     }
 
     internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
@@ -2929,10 +2946,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         return newItem;
                     }).ToList().AsReadOnly();
 
-                    _hasPrepareFormulaScript = null;
-                    _hasValueChangedScript = null;
-                    _mayAffectUser = null;
-                    _changesRowColor = null;
+                    InvalidateHeadCaches();
 
                     // OnScriptChanged() ERST nach der Aktualisierung von _eventScript feuern:
                     // Subscriber (z. B. TableViewForm.UpdateScripts) lesen tb.EventScript und
@@ -2972,8 +2986,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.EventScriptVersion:
                 _eventScriptVersion = DateTimeParse(value);
-                _hasPrepareFormulaScript = null; // Sicherheitshalber
-                _hasValueChangedScript = null; // Sicherheitshalber
+                InvalidateHeadCaches();
                 break;
 
             case TableDataType.UndoInOne:
@@ -3231,14 +3244,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    private void UpdateColumnArrangementsAfterRename(ColumnItem column) {
+    private void UpdateColumnArrangementsAfterRename(ColumnItem column, string previousArrangements) {
         if (_columnArrangements.Count == 0) { return; }
 
         foreach (var arrangement in _columnArrangements) {
             if (arrangement[column] is not null) {
                 var updatedArrangements = _columnArrangements.ToString(false);
-                // Kein vorheriger Stand bekannt - das JSON-Fragment arbeitet mit einer Komplett-Sync-Zeile.
-                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, string.Empty, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, "Automatische Aktualisierung nach Spaltenumbenennung");
+                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, previousArrangements, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, "Automatische Aktualisierung nach Spaltenumbenennung");
                 return;
             }
         }

@@ -46,6 +46,75 @@ public class TableColumnArrangementCliCommand : CliCommand {
     }
 
     /// <summary>
+    /// Löst die Ansicht über Nummer oder Namen auf. Ansicht 0 ist geschützt; unbekannte
+    /// Ansichten werden abgelehnt, da neue Ansichten per CLI nicht angelegt werden können.
+    /// </summary>
+    private static string? ArrangementProblem(Table tbl, string viewSpec, out int viewIndex) {
+        viewIndex = -1;
+
+        if (viewSpec.Length == 0) { return "Es muss eine Ansicht (Nummer ab 1 oder Name) angegeben werden."; }
+
+        var existing = tbl.ColumnArrangements.Count - 1;
+
+        if (viewSpec.IsLong()) {
+            var nr = IntParse(viewSpec);
+
+            if (nr <= 0) { return "Ansicht 0 zeigt immer alle Spalten und darf nicht verändert werden."; }
+            if (nr > existing) { return $"Ansicht {nr} existiert nicht. Neue Ansichten sind per CLI nicht möglich — vorhanden: 1 bis {existing}."; }
+
+            viewIndex = nr;
+            return null;
+        }
+
+        for (var z = 1; z < tbl.ColumnArrangements.Count; z++) {
+            if (string.Equals(tbl.ColumnArrangements[z].KeyName, viewSpec, StringComparison.OrdinalIgnoreCase)) {
+                viewIndex = z;
+                return null;
+            }
+        }
+
+        return $"Keine Spaltenanordnung namens '{viewSpec}'. Neue Ansichten sind per CLI nicht möglich — vorhanden: 1 bis {existing} (Nummer oder Name).";
+    }
+
+    /// <summary>
+    /// Liefert die Spaltennamen der Ansicht in Anzeigereihenfolge, mit | getrennt.
+    /// </summary>
+    private static string ColumnList(ColumnViewCollection view) {
+        List<string> names = [];
+
+        foreach (var item in view) {
+            if (item?.ColumnName is { Length: > 0 } name) { names.Add(name); }
+        }
+
+        return string.Join("|", names);
+    }
+
+    /// <summary>
+    /// Löst die gewünschten Spalten in der Anzeigereihenfolge auf. Die Liste ist vollständig:
+    /// Nicht genannte Spalten verschwinden aus der Ansicht. Unbekannte Namen, Systemspalten
+    /// und Doppel-Eintragungen sind Fehler.
+    /// </summary>
+    private static string? ColumnsProblem(Table tbl, string columnList, out List<ColumnItem> columns) {
+        columns = [];
+
+        var names = columnList.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        if (names.Length == 0) { return "Es muss mindestens eine Spalte angegeben werden (z. B. 'Name|Datum|Status')."; }
+
+        foreach (var name in names) {
+            var column = tbl.Column[name];
+
+            if (column is null) { return "Spalte nicht gefunden: " + name; }
+            //if (column.IsSystemColumn()) { return "Systemspalte '" + name + "' kann nicht in eine Ansicht aufgenommen werden."; }
+            if (columns.Contains(column)) { return "Spalte doppelt angegeben: " + name; }
+
+            columns.Add(column);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Listet alle Ansichten auf: Nummer, Name und Spaltenliste je Zeile (tab-getrennt).
     /// </summary>
     private static int ListArrangements(CliArgs args) {
@@ -63,20 +132,32 @@ public class TableColumnArrangementCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Gibt die Spalten einer Ansicht als 'spalte1|spalte2|...' aus — in derselben Form,
-    /// die das Setzen als Spaltenliste erwartet.
+    /// Löst die Ansicht für das Lesen über Nummer (inklusive 0) oder Namen auf.
     /// </summary>
-    private int ShowArrangement(CliArgs args) {
-        var tbl = LoadTable(args);
+    private static string? ReadViewProblem(Table tbl, string viewSpec, out int viewIndex) {
+        viewIndex = -1;
 
-        if (tbl is null) { return 1; }
+        if (viewSpec.Length == 0) { return "Es muss eine Ansicht (Nummer ab 0 oder Name) angegeben werden."; }
 
-        var viewProblem = ReadViewProblem(tbl, args[1] ?? string.Empty, out var viewIndex);
+        var existing = tbl.ColumnArrangements.Count - 1;
 
-        if (viewProblem is not null) { return UsageError(viewProblem); }
+        if (viewSpec.IsLong()) {
+            var nr = IntParse(viewSpec);
 
-        Console.Out.WriteLine(ColumnList(tbl.RepairedArrangements()[viewIndex]));
-        return 0;
+            if (nr < 0 || nr > existing) { return $"Ansicht {nr} existiert nicht — vorhanden: 0 bis {existing} (Nummer oder Name)."; }
+
+            viewIndex = nr;
+            return null;
+        }
+
+        for (var z = 0; z < tbl.ColumnArrangements.Count; z++) {
+            if (string.Equals(tbl.ColumnArrangements[z].KeyName, viewSpec, StringComparison.OrdinalIgnoreCase)) {
+                viewIndex = z;
+                return null;
+            }
+        }
+
+        return $"Keine Spaltenanordnung namens '{viewSpec}' — vorhanden: 0 bis {existing} (Nummer oder Name).";
     }
 
     /// <summary>
@@ -128,101 +209,20 @@ public class TableColumnArrangementCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Löst die Ansicht für das Lesen über Nummer (inklusive 0) oder Namen auf.
+    /// Gibt die Spalten einer Ansicht als 'spalte1|spalte2|...' aus — in derselben Form,
+    /// die das Setzen als Spaltenliste erwartet.
     /// </summary>
-    private static string? ReadViewProblem(Table tbl, string viewSpec, out int viewIndex) {
-        viewIndex = -1;
+    private int ShowArrangement(CliArgs args) {
+        var tbl = LoadTable(args);
 
-        if (viewSpec.Length == 0) { return "Es muss eine Ansicht (Nummer ab 0 oder Name) angegeben werden."; }
+        if (tbl is null) { return 1; }
 
-        var existing = tbl.ColumnArrangements.Count - 1;
+        var viewProblem = ReadViewProblem(tbl, args[1] ?? string.Empty, out var viewIndex);
 
-        if (viewSpec.IsLong()) {
-            var nr = IntParse(viewSpec);
+        if (viewProblem is not null) { return UsageError(viewProblem); }
 
-            if (nr < 0 || nr > existing) { return $"Ansicht {nr} existiert nicht — vorhanden: 0 bis {existing} (Nummer oder Name)."; }
-
-            viewIndex = nr;
-            return null;
-        }
-
-        for (var z = 0; z < tbl.ColumnArrangements.Count; z++) {
-            if (string.Equals(tbl.ColumnArrangements[z].KeyName, viewSpec, StringComparison.OrdinalIgnoreCase)) {
-                viewIndex = z;
-                return null;
-            }
-        }
-
-        return $"Keine Spaltenanordnung namens '{viewSpec}' — vorhanden: 0 bis {existing} (Nummer oder Name).";
-    }
-
-    /// <summary>
-    /// Liefert die Spaltennamen der Ansicht in Anzeigereihenfolge, mit | getrennt.
-    /// </summary>
-    private static string ColumnList(ColumnViewCollection view) {
-        List<string> names = [];
-
-        foreach (var item in view) {
-            if (item?.ColumnName is { Length: > 0 } name) { names.Add(name); }
-        }
-
-        return string.Join("|", names);
-    }
-
-    /// <summary>
-    /// Löst die Ansicht über Nummer oder Namen auf. Ansicht 0 ist geschützt; unbekannte
-    /// Ansichten werden abgelehnt, da neue Ansichten per CLI nicht angelegt werden können.
-    /// </summary>
-    private static string? ArrangementProblem(Table tbl, string viewSpec, out int viewIndex) {
-        viewIndex = -1;
-
-        if (viewSpec.Length == 0) { return "Es muss eine Ansicht (Nummer ab 1 oder Name) angegeben werden."; }
-
-        var existing = tbl.ColumnArrangements.Count - 1;
-
-        if (viewSpec.IsLong()) {
-            var nr = IntParse(viewSpec);
-
-            if (nr <= 0) { return "Ansicht 0 zeigt immer alle Spalten und darf nicht verändert werden."; }
-            if (nr > existing) { return $"Ansicht {nr} existiert nicht. Neue Ansichten sind per CLI nicht möglich — vorhanden: 1 bis {existing}."; }
-
-            viewIndex = nr;
-            return null;
-        }
-
-        for (var z = 1; z < tbl.ColumnArrangements.Count; z++) {
-            if (string.Equals(tbl.ColumnArrangements[z].KeyName, viewSpec, StringComparison.OrdinalIgnoreCase)) {
-                viewIndex = z;
-                return null;
-            }
-        }
-
-        return $"Keine Spaltenanordnung namens '{viewSpec}'. Neue Ansichten sind per CLI nicht möglich — vorhanden: 1 bis {existing} (Nummer oder Name).";
-    }
-
-    /// <summary>
-    /// Löst die gewünschten Spalten in der Anzeigereihenfolge auf. Die Liste ist vollständig:
-    /// Nicht genannte Spalten verschwinden aus der Ansicht. Unbekannte Namen, Systemspalten
-    /// und Doppel-Eintragungen sind Fehler.
-    /// </summary>
-    private static string? ColumnsProblem(Table tbl, string columnList, out List<ColumnItem> columns) {
-        columns = [];
-
-        var names = columnList.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-        if (names.Length == 0) { return "Es muss mindestens eine Spalte angegeben werden (z. B. 'Name|Datum|Status')."; }
-
-        foreach (var name in names) {
-            var column = tbl.Column[name];
-
-            if (column is null) { return "Spalte nicht gefunden: " + name; }
-            //if (column.IsSystemColumn()) { return "Systemspalte '" + name + "' kann nicht in eine Ansicht aufgenommen werden."; }
-            if (columns.Contains(column)) { return "Spalte doppelt angegeben: " + name; }
-
-            columns.Add(column);
-        }
-
-        return null;
+        Console.Out.WriteLine(ColumnList(tbl.RepairedArrangements()[viewIndex]));
+        return 0;
     }
 
     #endregion

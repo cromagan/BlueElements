@@ -18,6 +18,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     #region Fields
 
+    private readonly VariableCollection _savedVariables = [];
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -28,7 +29,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     public ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty, null) { }
 
-    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, List<ScriptVariable>? savedVariables) {
+    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, IEnumerable<ScriptVariable>? savedVariables) {
         if (string.IsNullOrEmpty(name)) {
             name = "New script";
         }
@@ -40,7 +41,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         Script = script;
         UserGroups = userGroups;
         FailedReason = failedReason;
-        SavedVariables = savedVariables;
+        SavedVariables.ReplaceWith(savedVariables);
     }
 
     #endregion
@@ -125,14 +126,13 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         }
     }
 
-    public List<ScriptVariable>? SavedVariables {
-        get;
-        set {
-            if (field?.SortByKeyName().ToString(true) == value?.SortByKeyName().ToString(true)) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    /// <summary>
+    /// Die beim letzten Skriptlauf gespeicherten Variablen. Die Instanz ist
+    /// fest mit dem Skript verbunden; der Inhalt wird per ReplaceWith
+    /// ausgetauscht, damit Pfad-Auflösungen (IJsonParseable.GetSubItemByKey)
+    /// stets dasselbe Objekt liefern.
+    /// </summary>
+    public VariableCollection SavedVariables => _savedVariables;
 
     public string Script {
         get;
@@ -196,7 +196,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups.SortedDistinctList(), false);
             result.ParseableAdd("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
-            result.ParseableAdd("SavedVariables", SavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
+            result.ParseableAdd("SavedVariables", SavedVariables.SortByKeyName().ToString(true));
 
             return result;
         } catch {
@@ -243,7 +243,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
                 return true;
 
             case "savedvariables":
-                SavedVariables = VariableCollection.ParseVariable(value.FromNonCritical(), true);
+                SavedVariables.ReplaceWith(VariableCollection.ParseVariable(value.FromNonCritical(), true));
                 return true;
 
             case "usergroups":
@@ -300,7 +300,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         Image = other.Image;
         UserGroups = other.UserGroups;
         FailedReason = other.FailedReason;
-        SavedVariables = other.SavedVariables;
+        SavedVariables.ReplaceWith(other.SavedVariables);
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);

@@ -12,6 +12,7 @@ public class HelpCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "help";
+    public override List<string> Flags => ["dev"];
     public override string Syntax => "bcr help [befehl]";
 
     #endregion
@@ -20,7 +21,7 @@ public class HelpCliCommand : CliCommand {
 
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount == 0) {
-            foreach (var command in All) {
+            foreach (var command in All.Where(c => !c.Hidden || args.Flag("dev"))) {
                 Console.Out.WriteLine(command.Command + ": " + Generic.Summary(command.GetType()));
             }
 
@@ -29,7 +30,7 @@ public class HelpCliCommand : CliCommand {
 
         var cmd = ByName(args[0] ?? string.Empty);
 
-        if (cmd is null) {
+        if (cmd is null || (cmd.Hidden && !args.Flag("dev"))) {
             Console.Error.WriteLine("Unbekannter Befehl: " + args[0]);
             return 2;
         }
@@ -38,8 +39,10 @@ public class HelpCliCommand : CliCommand {
         Console.Out.WriteLine("Syntax: " + cmd.Syntax);
         Console.Out.WriteLine("Beschreibung: " + Generic.Summary(cmd.GetType()));
 
-        if (cmd.Flags.Count > 0) {
-            Console.Out.WriteLine("Schalter: " + string.Join(", ", cmd.Flags.Select(f => "--" + f)));
+        var flags = cmd.Flags.Where(f => !f.Equals("dev", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (flags.Count > 0) {
+            Console.Out.WriteLine("Schalter: " + string.Join(", ", flags.Select(f => "--" + f)));
         }
 
         if (cmd.Options.Count > 0) {

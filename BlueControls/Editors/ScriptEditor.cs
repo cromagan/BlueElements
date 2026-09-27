@@ -298,7 +298,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         tbcScriptEigenschaften.Enabled = true;
         Script = sd.Script;
         LastFailedReason = sd.FailedReason;
-        LastVariables = sd.SavedVariables;
+        LastVariables = sd.SavedVariables.ToList();
         return true;
     }
 

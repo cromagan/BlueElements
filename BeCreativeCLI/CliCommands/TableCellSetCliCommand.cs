@@ -11,14 +11,15 @@ public class TableCellSetCliCommand : CliCommand {
 
     public override string Command => "table-cellset";
     public override List<string> Flags => ["dry-run"];
-    public override List<string> Options => [.. AddressingOptions, "column", "value", "password"];
-    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
 
     public override string? HelpDetails =>
             "--dry-run zeigt nur die Keys der Zeilen, in denen gesetzt würde — ohne zu ändern und ohne zu speichern. " +
             "Werte mit Leerzeichen gehören in Anführungszeichen. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
             "Die Systemspalte SYS_ROWSORTINDEX hält die Sortiernummern lückenlos und braucht das CLI-Recht '" + CliRights.MoveRows + "'.";
+
+    public override List<string> Options => [.. AddressingOptions, "column", "value", "password"];
+    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
 
     #endregion
 

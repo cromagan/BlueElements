@@ -268,7 +268,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         chkAuslöser_deletingRow.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.row_deleting));
         Script = value.Script;
         LastFailedReason = value.FailedReason;
-        LastVariables = value.SavedVariables;
+        LastVariables = value.SavedVariables.ToList();
         StoppedTimeCount = value.StoppedTimeCount;
         lstPermissionExecute.ItemClear();
         var l = TableView.Permission_AllUsed(false).ToList();

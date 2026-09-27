@@ -346,13 +346,20 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         ChaptersUnique = json.GetBool("chaptersunique", ChaptersUnique);
         ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
         FilterRows = json.GetInt("filterrows", FilterRows);
-        var chapter = json.GetString("chaptercolumn", string.Empty);
-        if (chapter is { Length: > 0 }) { ColumnForChapter = Table?.Column[chapter]; }
+        // Nur bei vorhandener Key explizit übernehmen: Bei Partial-Updates
+        // (JSON-Fragmente) bedeutet das Fehlen des Keys "unverändert", ein
+        // vorhandener leerer Wert dagegen "Kapitelspalte entfernen".
+        if (json["chaptercolumn"] is not null) {
+            var chapter = json.GetString("chaptercolumn", string.Empty);
+            ColumnForChapter = chapter is { Length: > 0 } ? Table?.Column[chapter] : null;
+        }
         QuickInfo = json.GetString("quickinfo", QuickInfo);
         ColumnHeaderMode = json.GetEnum("columnheadermode", ColumnHeaderMode);
-        Kontextmenu_Skripte = json.GetStringList("contextmenuscripts").AsReadOnly();
-        Ausführbare_Skripte = json.GetStringList("executeablescripts").AsReadOnly();
-        Filter_immer_Anzeigen = json.GetStringList("columnsshowalwaysfilter").AsReadOnly();
+        // Listen nur bei vorhandenem Key übernehmen — Partial-Updates
+        // (JSON-Fragmente) dürfen fehlende Keys nicht als "leer" werten.
+        if (json["contextmenuscripts"] is JsonArray cmsArr) { Kontextmenu_Skripte = cmsArr.ToStringList().AsReadOnly(); }
+        if (json["executeablescripts"] is JsonArray esArr) { Ausführbare_Skripte = esArr.ToStringList().AsReadOnly(); }
+        if (json["columnsshowalwaysfilter"] is JsonArray csafArr) { Filter_immer_Anzeigen = csafArr.ToStringList().AsReadOnly(); }
         if (json["permissiongroups"] is JsonArray parr) {
             _permissionGroups_show.Clear();
             _permissionGroups_show.AddRange(parr.ToStringList());

@@ -76,10 +76,12 @@ public static class JsonParseableExtension {
     #region Methods
 
     /// <summary>
-    /// Löst einen key-basierten Pfad wie <c>Items[btnSubmit].Rotation</c> ausgehend von
+    /// Löst einen key-basierten Pfad wie <c>Items[btnSubmit].Rotation</c> oder
+    /// <c>SavedVariables.Variables[KEY].Comment</c> ausgehend von
     /// <paramref name="root" /> auf und wendet <paramref name="value" /> über
     /// IJsonParseable.ParseJson auf das Blatt an.
     /// Pfad-Segmente: Container-Name, optionaler [<c>KeyName</c>], Punkt als Trenner.
+    /// Container-Segmente ohne Key-Bracket werden abschreitend aufgelöst.
     /// Am Blatt (kein weiterer Punkt im Pfad) wird der letzte Token als Property-Name
     /// zusammen mit dem Wert in ein JsonObject verpackt und an
     /// IJsonParseable.ParseJson übergeben. Endet der Pfad direkt auf
@@ -89,28 +91,56 @@ public static class JsonParseableExtension {
     public static void ApplyPartialJson(this IJsonParseable root, string path, JsonElement value) {
         if (string.IsNullOrEmpty(path)) { return; }
 
-        var bracketPos = path.IndexOf('[');
+        var current = root;
+        var rest = path;
 
-        if (bracketPos < 0) {
-            var leafName = path;
-            var dotPos = path.LastIndexOf('.');
-            if (dotPos >= 0) { leafName = path[(dotPos + 1)..]; }
+        // Vorangestellte Container-Segmente ohne Key-Bracket abschreiten
+        // (z. B. "SavedVariables.Variables[KEY].Comment" über "SavedVariables").
+        while (true) {
+            var bracketPos = rest.IndexOf('[');
+            if (bracketPos < 0) { break; }
+
+            var prefix = rest[..bracketPos];
+            var dot = prefix.LastIndexOf('.');
+            if (dot < 0) { break; }
+
+            current = current.GetSubItemByKey(prefix[..dot], string.Empty);
+            if (current is null) { return; }
+
+            rest = prefix[(dot + 1)..] + rest[bracketPos..];
+        }
+
+        // Blatt ohne Key-Bracket: alle Container-Segmente außer dem letzten
+        // absteigen, den letzten Token als Property anwenden.
+        if (rest.IndexOf('[') < 0) {
+            var leafName = rest;
+
+            while (true) {
+                var dot = leafName.IndexOf('.');
+                if (dot < 0) { break; }
+
+                current = current.GetSubItemByKey(leafName[..dot], string.Empty);
+                if (current is null) { return; }
+
+                leafName = leafName[(dot + 1)..];
+            }
 
             var partial = new JsonObject { [leafName.ToLowerInvariant()] = value.ToJsonNode() };
-            root.ParseJson(partial);
+            current.ParseJson(partial);
             return;
         }
 
-        var containerName = path[..bracketPos];
-        var keyEnd = path.IndexOf(']', bracketPos);
+        var firstBracket = rest.IndexOf('[');
+        var containerName = rest[..firstBracket];
+        var keyEnd = rest.IndexOf(']', firstBracket);
         if (keyEnd < 0) { return; }
 
-        var key = path[(bracketPos + 1)..keyEnd];
-        var child = root.GetSubItemByKey(containerName, key);
+        var key = rest[(firstBracket + 1)..keyEnd];
+        var child = current.GetSubItemByKey(containerName, key);
 
         if (child is null) { return; }
 
-        var dotAfterKey = path.IndexOf('.', keyEnd);
+        var dotAfterKey = rest.IndexOf('.', keyEnd);
 
         if (dotAfterKey < 0) {
             // Kein weiterer Pfad: Das Sub-Item selbst ist das Blatt
@@ -119,9 +149,9 @@ public static class JsonParseableExtension {
             return;
         }
 
-        if (dotAfterKey >= path.Length - 1) { return; }
+        if (dotAfterKey >= rest.Length - 1) { return; }
 
-        child.ApplyPartialJson(path[(dotAfterKey + 1)..], value);
+        child.ApplyPartialJson(rest[(dotAfterKey + 1)..], value);
     }
 
     /// <summary>
