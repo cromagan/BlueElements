@@ -1,6 +1,8 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueScript.Classes;
+using BlueScript.EventArgs;
+using BlueScript.ScriptCommands;
 
 namespace BeCreativeCLI.CliCommands;
 
@@ -22,8 +24,10 @@ public class TableScriptCliCommand : CliCommand {
             "execute führt das Skript aus (Zeilen-Skripte mit --rowkey). " +
             "check prüft das Skript in der Tabelle und meldet den Fehler. " +
             "names listet alle Skripte mit ihrem Compare-Ergebnis. " +
+            "Execute akzeptiert --debugoutput: DebugPrint-Ausgaben des Skripts erscheinen live auf stdout. " +
             "Alle Aktionen außer execute verlangen das CLI-Recht 'Edit script', execute 'Execute script'.";
 
+    public override List<string> Flags => ["debugoutput"];
     public override List<string> Options => ["rowkey", "password"];
     public override string Syntax => "bcr table-script <tabelle> <import|export|compare|execute|check|names> [<skript>]";
 
@@ -270,6 +274,11 @@ public class TableScriptCliCommand : CliCommand {
     /// </summary>
     private static string ScriptTextOfFile(string file) => NormalizeScript(ReadAllText(file));
 
+    /// <summary>
+    /// Gibt eine DebugPrint-Zeile des laufenden Skripts auf stdout aus.
+    /// </summary>
+    private static void DebugPrint_LineAdded(object? sender, TextEventArgs e) => Console.Out.WriteLine("DebugPrint: " + e.Text);
+
     private int Execute(Table tbl, CliArgs args) {
         var script = GetScriptOrError(tbl, args);
 
@@ -288,7 +297,17 @@ public class TableScriptCliCommand : CliCommand {
             }
         }
 
-        var feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false);
+        var debugOutput = args.Flag("debugoutput");
+
+        if (debugOutput) { DebugPrintScriptCommand.LineAdded += DebugPrint_LineAdded; }
+
+        ScriptEndedFeedback feedback;
+
+        try {
+            feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false);
+        } finally {
+            if (debugOutput) { DebugPrintScriptCommand.LineAdded -= DebugPrint_LineAdded; }
+        }
 
         if (feedback.Failed) {
             Console.Error.WriteLine("Skript abgebrochen:\r\n" + feedback.ProtocolText);

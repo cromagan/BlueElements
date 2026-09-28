@@ -35,7 +35,7 @@ public class CellGetRowScriptCommand : TableGenericScriptCommand {
 
         if (tb.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true); }
 
-        var v = RowItem.CellToVariable(c, row, true, false);
+        var v = RowItem.CellToVariable([], c, row, true, false);
         if (v is null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{c.KeyName} 'im Skript vorhanden'?", true); }
 
         var l = new List<string>();

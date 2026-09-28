@@ -32,6 +32,9 @@ public class RowScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*row";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = <Rückgabewert eines Zeilen-Befehls>;";
+
     public override bool IsNullOrEmpty => _row is not { IsDisposed: false };
 
     /// <summary>

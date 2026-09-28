@@ -29,6 +29,9 @@ public class BoolScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*bol";
     public override int CheckOrder => 0;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = true;";
+
     public override bool IsNullOrEmpty => false;
     public override string ReadableText => _valuebool.ToString();
 

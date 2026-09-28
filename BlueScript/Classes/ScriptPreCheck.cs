@@ -136,14 +136,25 @@ public static class ScriptPreCheck {
 
             #endregion
 
-            #region Phase 3: Variablen-Zuweisung (NAME = Wert;)
+            #region Phase 3: Variablen-Zuweisung (NAME = Wert; bzw. NAME[INDEX] = Wert;)
 
             // Unbekannte Variablen sind erlaubt — sie können zur Laufzeit
             // erzeugt werden (z.B. ImportLinked). Nur Command-Namen werden
             // ausgeschlossen, da diese keine Variablen sein können.
-            if (!matched && idEnd > pos && idEnd < text.Length && text[idEnd] == '=') {
-                if (!lookup.ContainsKey(text[pos..idEnd])) {
-                    var f = ScriptCommand.GetEnd(text, idEnd, 1, ";");
+            if (!matched && idEnd > pos && idEnd < text.Length) {
+                var assignPos = -1;
+
+                if (text[idEnd] == '=') {
+                    assignPos = idEnd;
+                } else if (text[idEnd] == '[') {
+                    var (pose, _) = NextText(text, idEnd, BracketSquareClose, false, false, Brackets);
+                    if (pose > idEnd && pose + 1 < text.Length && text[pose + 1] == '=') {
+                        assignPos = pose + 1;
+                    }
+                }
+
+                if (assignPos > 0 && !lookup.ContainsKey(text[pos..idEnd])) {
+                    var f = ScriptCommand.GetEnd(text, assignPos, 1, ";");
                     if (!f.Failed) {
                         newPos = f.ContinuePosition;
                         matched = true;

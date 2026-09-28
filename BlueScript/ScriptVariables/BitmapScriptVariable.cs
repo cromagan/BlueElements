@@ -29,6 +29,9 @@ public class BitmapScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*bmp";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
+
+    public override string InitializationSample => "var Name = <Rückgabewert eines Bild-Befehls>;";
+
     public override bool IsNullOrEmpty => _bmp is null;
 
     public override bool ToStringPossible => false;

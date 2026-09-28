@@ -264,6 +264,12 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             return GetVariableByParsing(txt[(oo + 2)..], varCol, scp);
         }
 
+        // Index-Zugriffe auf Listen-Variablen ersetzen (z.B. MeineListe[1]).
+        // Muss vor ReplaceVariable geschehen, da der Variablenname sonst durch den kompletten Listenwert ersetzt würde.
+        var ti = ReplaceIndexedAccess(txt, varCol, scp);
+        if (ti.Failed) { return new DoItFeedback(ti.FailedReason, ti.NeedsScriptFix); }
+        if (txt != ti.NormalizedText) { return GetVariableByParsing(ti.NormalizedText, varCol, scp); }
+
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
 
         var t = ReplaceVariable(txt, varCol);
@@ -375,6 +381,53 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             txt = string.Concat(txt.AsSpan(0, pos), thisV.ValueForReplace, txt.AsSpan(endz));
             posc = pos;
         } while (true);
+    }
+
+    /// <summary>
+    /// Ersetzt Index-Zugriffe auf Listen-Variablen (Muster: Name[Index-Ausdruck])
+    /// durch den Wert des Elements. Stellen ohne vorhandene Variablen davor bleiben unverändert.
+    /// </summary>
+    public static GetEndFeedback ReplaceIndexedAccess(string txt, VariableCollection varCol, ScriptProperties scp) {
+        var posc = 0;
+        do {
+            var (posb, _) = NextText(txt, posc, BracketSquareOpen, false, false, null);
+            if (posb < 0) { return new GetEndFeedback(0, txt); }
+
+            // Bezeichner unmittelbar vor der [ ermitteln
+            var nameStart = posb;
+            while (nameStart > 0 && AllowedCharsVariableName.Contains(txt[nameStart - 1])) { nameStart--; }
+
+            var thisV = nameStart < posb ? varCol.GetByKey(txt[nameStart..posb]) : null;
+
+            if (thisV is null) {
+                posc = posb + 1;
+                continue;
+            }
+
+            var (pose, _) = NextText(txt, posb, BracketSquareClose, false, false, Brackets);
+            if (pose < 0) { return new GetEndFeedback("Schließende ] für '" + thisV.KeyName + "[...' nicht gefunden.", true); }
+
+            var f = IndexedAccess(thisV, txt[(posb + 1)..pose], varCol, scp);
+            if (f.Failed) { return new GetEndFeedback(f.FailedReason, f.NeedsScriptFix); }
+            if (f.ReturnValue is null) { return new GetEndFeedback("Interner Fehler bei Index-Zugriff.", true); }
+            if (!f.ReturnValue.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", true); }
+
+            txt = string.Concat(txt.AsSpan(0, nameStart), f.ReturnValue.ValueForReplace, txt.AsSpan(pose + 1));
+            posc = nameStart + f.ReturnValue.ValueForReplace.Length;
+        } while (true);
+    }
+
+    /// <summary>
+    /// Wertet den Index-Ausdruck aus und liefert das Element an dieser Position.
+    /// </summary>
+    private static DoItFeedback IndexedAccess(ScriptVariable variable, string indexTxt, VariableCollection varCol, ScriptProperties scp) {
+        var idx = GetVariableByParsing(indexTxt, varCol, scp);
+        if (idx.Failed || idx.ReturnValue is null) {
+            idx.ChangeFailedReason("Der Index von '" + variable.KeyName + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
+            return idx;
+        }
+
+        return variable.GetValueByIndex(idx.ReturnValue);
     }
 
     /// <summary>
@@ -491,6 +544,23 @@ public abstract class ScriptCommand : IReadableTextWithKey {
 
         var varnam = newcommand[..pos];
 
+        #region Index-Zuweisung NAME[INDEX] = WERT erkennen
+
+        var indexTxt = string.Empty;
+
+        if (varnam.EndsWith(']')) {
+            var posb = varnam.IndexOf('[');
+            if (posb < 1) { return new DoItFeedback("Fehlerhafte [ ]-Klammer bei '" + varnam + "'", true); }
+
+            indexTxt = varnam[(posb + 1)..^1];
+            varnam = varnam[..posb];
+
+            if (generateVariable) { return new DoItFeedback("Mit 'var' kann kein Index-Zugriff verwendet werden: " + varnam + "[" + indexTxt + "]", true); }
+            if (indexTxt is not { Length: > 0 }) { return new DoItFeedback("Es wurde kein Index angegeben: " + varnam + "[ ]", true); }
+        }
+
+        #endregion
+
         if (!ScriptVariable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true); }
 
         var vari = varCol.GetByKey(varnam);
@@ -525,6 +595,17 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             if (vari is null) {
                 // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
                 return DoItFeedback.InternerFehler();
+            }
+
+            if (indexTxt is { Length: > 0 }) {
+                var idx = GetVariableByParsing(indexTxt, varCol, scp);
+                if (idx.Failed || idx.ReturnValue is null) {
+                    idx.ChangeFailedReason("Der Index von '" + varnam + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
+                    return idx;
+                }
+
+                var fi = vari.SetValueByIndex(idx.ReturnValue, v);
+                return new DoItFeedback(fi, fi is { Length: > 0 });
             }
 
             var f = vari.GetValueFrom(v);

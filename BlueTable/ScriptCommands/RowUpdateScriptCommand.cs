@@ -29,7 +29,7 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         if (scp.Stufe > 10) {
-            return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true);
+            return new DoItFeedback("'RowUpdate' kann nicht ausgeführt werden: Die maximale Skript-Stufe von 10 ist erreicht. Eine Skript-Stufe ist jede Verschachtelungsebene, z.B. ein If- oder ForEach-Block bzw. ein Unter-Skript-Aufruf.", true);
         }
 
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true); }

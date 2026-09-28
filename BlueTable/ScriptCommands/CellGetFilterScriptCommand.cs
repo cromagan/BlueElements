@@ -51,7 +51,7 @@ public class CellGetFilterScriptCommand : TableGenericScriptCommand {
         if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
         if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2)); }
 
-        var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
+        var v = RowItem.CellToVariable([], returncolumn, r[0], true, false);
         if (v is null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{returncolumn.KeyName} 'im Skript vorhanden'?", true); }
 
         return new DoItFeedback(r[0].CellGetString(returncolumn));

@@ -1313,7 +1313,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (row is { IsDisposed: false }) {
             foreach (var thisCol in Column) {
-                var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
+                var v = RowItem.CellToVariable(vars, thisCol, row, allReadOnly, virtualcolumns);
                 if (v is not null) { vars.Add(v); }
             }
 

@@ -33,6 +33,9 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
     public static string ShortName_Variable => "*tbl";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = <Rückgabewert eines Tabellen-Befehls>;";
+
     public override bool IsNullOrEmpty => _table is null && _pendingTableKey is not { Length: > 0 };
 
     /// <summary>

@@ -290,16 +290,17 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lbxCliRights.ItemClear();
         lbxCliRights.ItemAddRange(
         [
-            ItemOf("Zeile erstellen", CliRights.AddRow),
-            ItemOf("Zeile löschen", CliRights.DeleteRow),
-            ItemOf("Zellwerte ändern", CliRights.ChangeCellValues),
-            ItemOf("Zeilenlock entfernen", CliRights.RemoveRowLock),
-            ItemOf("Skript ändern", CliRights.EditScript),
-            ItemOf("Skript ausführen", CliRights.ExecuteScript),
-            ItemOf("Spalte erstellen", CliRights.AddColumn),
-            ItemOf("Spalte löschen", CliRights.DeleteColumn),
-            ItemOf("Spaltenanordnung ändern", CliRights.ChangeColumnArrangement),
-            ItemOf("Tabellenkopf ändern", CliRights.EditTableHead)
+            ItemOf("Zeile erstellen", CliRights.AddRow, false, "Zeile erstellen"),
+            ItemOf("Zeile löschen", CliRights.DeleteRow, false, "Zeile löschen"),
+            ItemOf("Zeilen verschieben", CliRights.MoveRows, false, "Zeilen verschieben"),
+            ItemOf("Zellwerte ändern", CliRights.ChangeCellValues, false, "Zellwerte ändern"),
+            ItemOf("Zeilenlock entfernen", CliRights.RemoveRowLock, false, "Zeilenlock entfernen"),
+            ItemOf("Skript ändern", CliRights.EditScript, false, "Skript ändern"),
+            ItemOf("Skript ausführen", CliRights.ExecuteScript, false, "Skript ausführen"),
+            ItemOf("Spalte erstellen", CliRights.AddColumn, false, "Spalte erstellen"),
+            ItemOf("Spalte löschen", CliRights.DeleteColumn, false, "Spalte löschen"),
+            ItemOf("Spaltenanordnung ändern", CliRights.ChangeColumnArrangement, false, "Spaltenanordnung ändern"),
+            ItemOf("Tabellenkopf ändern", CliRights.EditTableHead, false, "Tabellenkopf ändern")
         ]);
         lbxCliRights.Check(tb.CliRights, true);
 

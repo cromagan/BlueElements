@@ -11,6 +11,7 @@ namespace BlueScript.ScriptCommands;
 /// Mit Break kann die Schleife vorab verlassen werden.
 /// Variablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.
 /// Die Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.
+/// Der Codeblock wird eine Skript-Stufe tiefer ausgeführt (Verschachtelungslimit: 10).
 /// </summary>
 internal class ForEachRow2ScriptCommand : TableGenericScriptCommand {
 

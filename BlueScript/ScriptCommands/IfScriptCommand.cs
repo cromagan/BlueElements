@@ -4,6 +4,7 @@ namespace BlueScript.ScriptCommands;
 
 /// <summary>
 /// Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Vorsicht zu verwenden - z.B. mit einem Exists-Befehl.
+/// Der Codeblock wird eine Skript-Stufe tiefer ausgeführt (Verschachtelungslimit: 10).
 /// </summary>
 public class IfScriptCommand : ScriptCommand {
 

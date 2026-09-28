@@ -156,15 +156,26 @@ public class Script {
 
         #region Variablen prüfen per Dictionary-Lookup
 
-        if (!expectedvariablefeedback && idEnd > pos && idEnd + 1 < scriptText.Length && scriptText[idEnd] == '=') {
-            var varnam = scriptText[pos..idEnd];
-            if (varCol.GetByKey(varnam) is { } thisV) {
-                var f = ScriptCommand.GetEnd(scriptText, idEnd, 1, ";");
+        if (!expectedvariablefeedback && idEnd > pos && idEnd + 1 < scriptText.Length) {
+            var assignPos = -1;
+
+            if (scriptText[idEnd] == '=') {
+                assignPos = idEnd;
+            } else if (scriptText[idEnd] == '[') {
+                // Index-Zuweisung: NAME[INDEX] = WERT
+                var (pose, _) = NextText(scriptText, idEnd, BracketSquareClose, false, false, Brackets);
+                if (pose > idEnd && pose + 1 < scriptText.Length && scriptText[pose + 1] == '=') {
+                    assignPos = pose + 1;
+                }
+            }
+
+            if (assignPos > 0 && varCol.GetByKey(scriptText[pos..idEnd]) is { } thisV) {
+                var f = ScriptCommand.GetEnd(scriptText, assignPos, 1, ";");
                 if (f.Failed) {
                     return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true);
                 }
 
-                var scx = ScriptCommand.VariablenBerechnung(varCol, scp, varnam + "=" + f.NormalizedText + ";", false);
+                var scx = ScriptCommand.VariablenBerechnung(varCol, scp, scriptText[pos..assignPos] + "=" + f.NormalizedText + ";", false);
                 return new DoItWithEndedPosFeedback(scx, f.ContinuePosition);
             }
         }

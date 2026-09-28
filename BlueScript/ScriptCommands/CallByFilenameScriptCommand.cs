@@ -8,6 +8,7 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.
 /// Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.
+/// Das Unter-Skript wird eine Skript-Stufe tiefer ausgeführt (Verschachtelungslimit: 10).
 /// </summary>
 public class CallByFilenameScriptCommand : ScriptCommand {
 
@@ -40,7 +41,7 @@ public class CallByFilenameScriptCommand : ScriptCommand {
     /// <returns></returns>
     public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<ScriptVariable>? addMe, List<string>? args, string chainlog) {
         if (scp.Stufe > 10) {
-            return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
+            return new ScriptEndedFeedback("'" + subname + "' kann nicht aufgerufen werden: Die maximale Skript-Stufe von 10 ist erreicht. Eine Skript-Stufe ist jede Verschachtelungsebene, z.B. ein If- oder ForEach-Block bzw. ein Unter-Skript-Aufruf.", false, true, subname);
         }
 
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");

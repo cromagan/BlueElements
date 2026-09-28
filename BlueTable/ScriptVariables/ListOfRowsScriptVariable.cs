@@ -37,6 +37,9 @@ public class ListOfRowsScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*lsr";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
+
+    public override string InitializationSample => "var Name = <Rückgabewert eines Zeilenlisten-Befehls>;";
+
     public override bool IsNullOrEmpty => _list.Count == 0;
 
     public override bool ToStringPossible => false;

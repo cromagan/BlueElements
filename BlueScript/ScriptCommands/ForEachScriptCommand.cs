@@ -7,9 +7,11 @@ namespace BlueScript.ScriptCommands;
 /// <summary>
 /// Führt den Codeblock für jeden List-Eintrag aus.
 /// Der aktuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.
+/// Durchlaufen werden kann nur eine vorhandene Listen-Variable; Ausdrücke oder Methoden wie Split() sind nicht erlaubt.
 /// Mit Break kann die Schleife vorab verlassen werden.
-/// Variablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.
+/// Variablen die innerhalb des Codeblocks definiert wurden, sind außerhalb des Codeblocks nicht mehr verfügbar.
 /// Die Variable INDEX zeigt an, bei welchem Eintrag der Zeiger sich gerade befindet.
+/// Der Codeblock wird eine Skript-Stufe tiefer ausgeführt (Verschachtelungslimit: 10).
 /// </summary>
 internal class ForEachScriptCommand : ScriptCommand {
 
@@ -18,7 +20,7 @@ internal class ForEachScriptCommand : ScriptCommand {
     public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
     public override bool GetCodeBlockAfter => true;
-    public override string Syntax => "ForEach(NeueVariable, List) { }";
+    public override string Syntax => "ForEach(NeueVariable, ListenVariable) { }";
 
     #endregion
 

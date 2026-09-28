@@ -49,6 +49,13 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
 
     public string CompareKey => CheckOrder.ToString3() + "|" + KeyName.ToUpperInvariant();
     public abstract bool GetFromStringPossible { get; }
+
+    /// <summary>
+    /// Beispiel im Skript-Format, wie eine Variable dieses Typs erstellt wird.
+    /// Leer, wenn der Typ nicht direkt im Skript erstellt werden kann.
+    /// </summary>
+    public virtual string InitializationSample => string.Empty;
+
     public abstract bool IsNullOrEmpty { get; }
 
     public string KeyName {
@@ -140,6 +147,11 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
 
     public abstract void DisposeContent();
 
+    /// <summary>
+    /// Liefert das Element an der angegebenen Position, z.B. bei Listen.
+    /// </summary>
+    public virtual DoItFeedback GetValueByIndex(ScriptVariable index) => new("Der Variablen-Typ '" + MyClassId + "' unterstützt keinen Index-Zugriff.", true);
+
     public abstract string GetValueFrom(ScriptVariable variable);
 
     public override List<string> ParseableItems() {
@@ -225,10 +237,16 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     }
 
     public string ReplaceInText(string txt) => txt.Contains($"~{KeyName}~", StringComparison.OrdinalIgnoreCase)
-            ? txt.Replace($"~{KeyName}~", ReadableText, RegexOptions.IgnoreCase)
-            : txt;
+                ? txt.Replace($"~{KeyName}~", ReadableText, RegexOptions.IgnoreCase)
+                : txt;
 
     public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
+
+    /// <summary>
+    /// Setzt das Element an der angegebenen Position, z.B. bei Listen.
+    /// Liefert bei Erfolg eine leere Zeichenfolge, sonst die Fehlermeldung.
+    /// </summary>
+    public virtual string SetValueByIndex(ScriptVariable index, ScriptVariable value) => "Der Variablen-Typ '" + MyClassId + "' unterstützt keinen Index-Zugriff.";
 
     public override string ToString() => $"({MyClassId}){KeyName}";
 

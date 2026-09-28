@@ -39,6 +39,9 @@ public class ListOfStringsScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*lst";
     public override int CheckOrder => 3;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = [\"A\", \"B\"];";
+
     public override bool IsNullOrEmpty => _list.Count == 0;
 
     /// <summary>
@@ -85,6 +88,13 @@ public class ListOfStringsScriptVariable : ScriptVariable {
 
     public override void DisposeContent() { }
 
+    public override DoItFeedback GetValueByIndex(ScriptVariable index) {
+        var e = GetIndexPosition(index, out var i);
+        if (e is { Length: > 0 }) { return new DoItFeedback(e, true); }
+
+        return new DoItFeedback(_list[i]);
+    }
+
     public override string GetValueFrom(ScriptVariable variable) {
         if (variable is not ListOfStringsScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
@@ -106,6 +116,17 @@ public class ListOfStringsScriptVariable : ScriptVariable {
         } finally {
             EndInit();
         }
+    }
+
+    public override string SetValueByIndex(ScriptVariable index, ScriptVariable value) {
+        var e = GetIndexPosition(index, out var i);
+        if (e is { Length: > 0 }) { return e; }
+        if (ReadOnly) { return Schreibgschützt(); }
+        if (value is not StringScriptVariable s) { return VerschiedeneTypen(value); }
+
+        _list[i] = s.ValueString;
+        OnPropertyChangedExt("value", _list);
+        return string.Empty;
     }
 
     protected override void SetValue(object? x) {
@@ -140,6 +161,22 @@ public class ListOfStringsScriptVariable : ScriptVariable {
 
         result = null;
         return false;
+    }
+
+    /// <summary>
+    /// Prüft den Index und liefert die Position. Bei Fehlern wird die Meldung zurückgegeben, sonst eine leere Zeichenfolge.
+    /// </summary>
+    private string GetIndexPosition(ScriptVariable index, out int position) {
+        position = -1;
+
+        if (index is not DoubleScriptVariable d) { return "Der Index muss eine Zahl sein."; }
+
+        var i = d.ValueInt;
+        if (Math.Abs(d.ValueNum - i) > 0.0001) { return "Der Index muss eine ganze Zahl sein."; }
+        if (i < 0 || i >= _list.Count) { return "Index " + i + " ist außerhalb des gültigen Bereichs. Die Liste '" + KeyName + "' enthält " + _list.Count + " Elemente."; }
+
+        position = i;
+        return string.Empty;
     }
 
     #endregion

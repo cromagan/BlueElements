@@ -31,6 +31,9 @@ public class DoubleScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*num";
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = 1.23;";
+
     public override bool IsNullOrEmpty => false;
 
     /// <summary>

@@ -1428,9 +1428,32 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return true;
     }
 
+    /// <summary>
+    /// Zerlegt einen ListElement-Spaltennamen im Format NameZahl (z. B. Test5) in den
+    /// Basisnamen der Skript-Liste (Test) und die Elementposition (5).
+    /// Die Nummer ist die nullbasierte Position in der Liste (Test0 ist das erste Element),
+    /// der Basisname ein erlaubter Skript-Variablenname.
+    /// </summary>
+    public static bool TrySplitListElementName(string keyName, out string basename, out int elementNr) {
+        basename = string.Empty;
+        elementNr = 0;
+
+        if (string.IsNullOrEmpty(keyName)) { return false; }
+
+        var z = keyName.Length;
+        while (z > 0 && char.IsAsciiDigit(keyName[z - 1])) { z--; }
+
+        if (z == keyName.Length) { return false; }
+        if (!int.TryParse(keyName[z..], out elementNr) || elementNr < 0) { return false; }
+
+        basename = keyName[..z];
+        return ScriptVariable.IsValidName(basename);
+    }
+
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
         return ErrorReason_KeyAndSizes(tb)
+            ?? ErrorReason_ScriptType(tb)
             ?? ErrorReason_Relations(tb)
             ?? ErrorReason_Filters()
             ?? ErrorReason_NoSaveContent()
@@ -1441,6 +1464,22 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             ?? ErrorReason_PostChecks()
             ?? ErrorReason_ChapterColumn()
             ?? string.Empty;
+    }
+
+    private string? ErrorReason_ScriptType(Table tb) {
+        if (_scriptType is not ScriptType.ListElement) { return null; }
+
+        if (!TrySplitListElementName(_keyName, out var basename, out _)) { return ListElementNameInvalid; }
+
+        // Der Listen-Name darf nicht bereits von einer anderen Skript-Spalte verwendet werden
+        if (tb.Column.Any(otherCol => otherCol != this
+            && otherCol is { IsDisposed: false }
+            && string.Equals(otherCol._keyName, basename, StringComparison.OrdinalIgnoreCase)
+            && otherCol._scriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert))) {
+            return ListElementNameAlreadyUsed;
+        }
+
+        return null;
     }
 
     public List<(string value, RowItem row)> GetCellContentsSortedByLength() {

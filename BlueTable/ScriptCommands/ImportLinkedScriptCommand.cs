@@ -55,10 +55,10 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' der Tabelle '{linkedTable.Caption}' liefert mehrere Ergebnisse.", false); }
 
-            var v = RowItem.CellToVariable(targetColumn, null, true, false);
+            var v = RowItem.CellToVariable([], targetColumn, null, true, false);
 
             if (rows.Count == 1) {
-                v = RowItem.CellToVariable(targetColumn, rows[0], true, false);
+                v = RowItem.CellToVariable([], targetColumn, rows[0], true, false);
             }
             v ??= new UnknownScriptVariable("xxx");
             v.KeyName = "Linked_" + thisColumn.KeyName;

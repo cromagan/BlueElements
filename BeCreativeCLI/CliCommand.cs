@@ -271,7 +271,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Lädt die Tabelle aus dem ersten Positionsargument und entsperrt sie bei Bedarf
     /// mit --password. Ohne Pfadangabe wird das aktuelle Verzeichnis als Suchpfad ergänzt.
-    /// Gibt bei Problemen (nicht gefunden, falsches Kennwort, defekte Skripte) eine
+    /// Gibt bei Problemen (nicht gefunden, falsches Kennwort) eine
     /// Fehlermeldung aus und liefert null.
     /// </summary>
     protected static Table? LoadTable(CliArgs args) {
@@ -323,13 +323,6 @@ public abstract class CliCommand : IHasKeyName {
         // Prozesse seit dem letzten Laden geschrieben haben.
         if (!tbl.BeSureToBeUpToDate(false)) {
             Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' konnte nicht auf den aktuellen Stand gebracht werden (Fragmentspeicher nicht lesbar).");
-            tbl.Dispose();
-            return null;
-        }
-
-        // Defekte Skripte sofort abweisen — kein CLI-Befehl darf eine solche Tabelle bearbeiten.
-        if (tbl.CheckScriptError() is { Length: > 0 } scriptError) {
-            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + "' enthält defekte Skripte und wird nicht bearbeitet: " + scriptError);
             tbl.Dispose();
             return null;
         }

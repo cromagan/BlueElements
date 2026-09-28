@@ -34,6 +34,7 @@ public static partial class Constants {
     public static readonly List<string> BracketRoundClose = [")"];
     public static readonly Dictionary<char, char> Brackets = new() { { '(', ')' }, { '{', '}' }, { '[', ']' } };
     public static readonly List<string> BracketSquareClose = ["]"];
+    public static readonly List<string> BracketSquareOpen = ["["];
     public static readonly string Char_NotFromClip = $"{(char)3}{(char)22}{(char)24}\n";
 
     public static readonly List<string> Comma = [","];

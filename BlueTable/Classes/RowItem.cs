@@ -86,7 +86,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static ScriptVariable? CellToVariable(ColumnItem? column, RowItem? row, bool readOnly, bool virtualcolumns) {
+    /// <summary>
+    /// Erzeugt die Skript-Variable einer Zelle. Bei ListElement-Spalten befüllen Spalten mit
+    /// demselben Basisnamen (z. B. Test2, Test5) gemeinsam die Liste Test in vars, die
+    /// Nummer (hier 2 und 5) ist die nullbasierte Position des Zellwerts. Die Liste ist schreibbar,
+    /// wenn mindestens eine beisteuernde Spalte schreibbar ist; wird eine bereits in vars
+    /// enthaltene Liste ergänzt, ist ein erneutes Add der Rückgabe wirkungslos.
+    /// </summary>
+    public static ScriptVariable? CellToVariable(VariableCollection vars, ColumnItem? column, RowItem? row, bool readOnly, bool virtualcolumns) {
         if (column is not { ScriptType: not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert) }) { return null; }
 
         if (!column.SaveContent) {
@@ -98,6 +105,25 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var value = row?.CellGetString(column) ?? string.Empty;
 
+        if (column.ScriptType is ScriptType.ListElement) {
+            if (!ColumnItem.TrySplitListElementName(column.KeyName, out var basename, out var elementNr)) {
+                Develop.DebugPrint("Ungültiges ListElement-Format (NameZahl): " + column.KeyName);
+                return null;
+            }
+
+            if (vars.GetByKey(basename) is not ListOfStringsScriptVariable list) {
+                return new ListOfStringsScriptVariable(basename, FillListElement(null, elementNr, value), readOnly, "Liste der Spalten " + basename + "0, " + basename + "1, …");
+            }
+
+            if (list.ReadOnly && !readOnly) { list.ReadOnly = false; }
+
+            var wasReadOnly = list.ReadOnly;
+            list.ReadOnly = false; // Der ValueList-Setter blockt sonst auch das Befüllen rein lesbarer Listen
+            list.ValueList = FillListElement(list.ValueList, elementNr, value);
+            list.ReadOnly = wasReadOnly;
+            return list;
+        }
+
         return CellToVariable(column.KeyName, column.ScriptType, value, readOnly, "Spalte: " + column.ReadableText());
     }
 
@@ -108,6 +134,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case ScriptType.List:
                 return new ListOfStringsScriptVariable(varname, [.. value.SplitAndCutByCr()], readOnly, coment);
+
+            case ScriptType.ListElement:
+                if (!ColumnItem.TrySplitListElementName(varname, out var basename, out var elementNr)) {
+                    Develop.DebugPrint("Ungültiges ListElement-Format (NameZahl): " + varname);
+                    return null;
+                }
+                return new ListOfStringsScriptVariable(basename, FillListElement(null, elementNr, value), readOnly, coment);
 
             case ScriptType.Numeral:
                 return new DoubleScriptVariable(varname, DoubleParse(value), readOnly, coment);
@@ -461,7 +494,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
-                                       tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
+                                           tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
     public string LastFailedReason() {
         if (IsDisposed || !RowCollection.FailedRows.TryGetValue(this, out var txt)) { return string.Empty; }
@@ -841,11 +874,23 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
 
-        var columnVar = vars.GetByKey(column.KeyName);
-        if (columnVar is not { ReadOnly: false }) { return; }
+        // Bei ListElement-Spalten zeigt varname auf die Liste (z. B. Spalte Test5 → Liste Test, Position 5)
+        var varname = column.KeyName;
+        var elementNr = 0;
+        if (column.ScriptType is ScriptType.ListElement && !ColumnItem.TrySplitListElementName(column.KeyName, out varname, out elementNr)) { return; }
+
+        if (vars.GetByKey(varname) is not { ReadOnly: false } columnVar) { return; }
         if (!column.CanBeChangedByRules()) { return; }
 
-        CellSet(column, columnVar.ValueForCell, $"Skript '{scriptname}'");
+        string value;
+        if (column.ScriptType is ScriptType.ListElement) {
+            if (columnVar is not ListOfStringsScriptVariable list) { return; }
+            value = list.ValueList.Count > elementNr ? list.ValueList[elementNr] : string.Empty;
+        } else {
+            value = columnVar.ValueForCell;
+        }
+
+        CellSet(column, value, $"Skript '{scriptname}'");
     }
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -1119,6 +1164,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         return allRows;
+    }
+
+    /// <summary>
+    /// Liefert die Liste mit dem Wert an der Elementposition (nullbasiert); fehlende Positionen werden mit Leertexten aufgefüllt.
+    /// </summary>
+    private static List<string> FillListElement(List<string>? list, int elementNr, string value) {
+        list ??= [];
+        while (list.Count <= elementNr) { list.Add(string.Empty); }
+        list[elementNr] = value;
+        return list;
     }
 
     private static void MakeNewRelations(ColumnItem? column, RowItem? row, List<string> oldBz, IEnumerable<string> newBz) {

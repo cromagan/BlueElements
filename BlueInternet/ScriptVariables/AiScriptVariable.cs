@@ -68,6 +68,9 @@ public class AiScriptVariable : ScriptVariable {
     }
 
     public override bool GetFromStringPossible => false;
+
+    public override string InitializationSample => "var Name = <Rückgabewert eines KI-Befehls>;";
+
     public override bool IsNullOrEmpty => string.IsNullOrWhiteSpace(_apiKey) || string.IsNullOrWhiteSpace(_endpoint) || string.IsNullOrWhiteSpace(_model);
 
     public string? Model {

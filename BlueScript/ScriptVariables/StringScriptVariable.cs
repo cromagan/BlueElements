@@ -31,6 +31,9 @@ public class StringScriptVariable : ScriptVariable {
     public static string ShortName_Variable => "*str";
     public override int CheckOrder => 2;
     public override bool GetFromStringPossible => true;
+
+    public override string InitializationSample => "var Name = \"Text\";";
+
     public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
 
     /// <summary>

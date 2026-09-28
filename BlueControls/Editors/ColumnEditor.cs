@@ -634,7 +634,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         //    solutions.Add(CreateSolution("Beschriftung eingeben", () => txbCaption.Text = Column?.Caption ?? string.Empty, txbCaption));
         //}
 
-        if (fehler is ScriptTypeUndefined or LinkedCellScriptInvalid) {
+        if (fehler is ScriptTypeUndefined or LinkedCellScriptInvalid or ListElementNameInvalid or ListElementNameAlreadyUsed) {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(), cbxScriptType));
         }
 

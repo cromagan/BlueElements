@@ -34,6 +34,8 @@ public class FilterScriptVariable : ScriptVariable {
 
     public override bool GetFromStringPossible => false;
 
+    public override string InitializationSample => "var Name = <Rückgabewert eines Filter-Befehls>;";
+
     public override bool IsNullOrEmpty => _filter?.IsOk() != true;
 
     public override string ReadableText => _lastText;

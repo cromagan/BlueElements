@@ -519,6 +519,7 @@ namespace BlueControls.BlueTableDialogs {
             lbxCliRights.AddAllowed = AddType.None;
             lbxCliRights.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lbxCliRights.Appearance = ListBoxAppearance.Listbox_Boxes;
+            lbxCliRights.AutoSort = true;
             lbxCliRights.CheckBehavior = CheckBehavior.MultiSelection;
             lbxCliRights.FilterText = null;
             lbxCliRights.Location = new Point(8, 48);
