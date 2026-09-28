@@ -209,6 +209,10 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         var scc = ScriptChangedByUser ? Math.Min(10, StoppedTimeCount) : StoppedTimeCount;
         ScriptChangedByUser = false;
 
+        // Kein gespeicherter Fehlertext -> PreCheck ausführen und ggf. dessen Fehler speichern.
+        var failedReason = LastFailedReason;
+        if (failedReason is not { Length: > 0 }) { failedReason = PreCheckErrorText(); }
+
         return new TableScriptDescription(
             tb,
             txbName.Text,
@@ -220,7 +224,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             ComputeEventTypes(),
             chkZeile.Checked,
             chkReadOnly.Checked,
-            LastFailedReason,
+            failedReason,
             LastVariables,
             scc,
             _item.AverageRunTime

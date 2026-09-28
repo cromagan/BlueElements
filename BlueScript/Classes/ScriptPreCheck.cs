@@ -99,7 +99,7 @@ public static class ScriptPreCheck {
 
                     if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
-                    ProcessMatchedMethod(thisC, f, result, lookup, emptyStartMethods, context, line);
+                    ProcessMatchedMethod(thisC, f, result, lookup, emptyStartMethods, context, line, text, lineOffset);
                     newPos = f.ContinueOrErrorPosition;
                     matched = true;
                     break;
@@ -127,7 +127,7 @@ public static class ScriptPreCheck {
 
                     if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
-                    ProcessMatchedMethod(thisC, f, result, lookup, emptyStartMethods, context, line);
+                    ProcessMatchedMethod(thisC, f, result, lookup, emptyStartMethods, context, line, text, lineOffset);
                     newPos = f.ContinueOrErrorPosition;
                     matched = true;
                     break;
@@ -201,7 +201,7 @@ public static class ScriptPreCheck {
         return attributText[..eqPos];
     }
 
-    private static void ProcessMatchedMethod(ScriptCommand thisC, CanDoFeedback f, ScriptPreCheckResult result, Dictionary<string, List<ScriptCommand>> lookup, List<ScriptCommand> emptyStartScriptCommand, string context, int line) {
+    private static void ProcessMatchedMethod(ScriptCommand thisC, CanDoFeedback f, ScriptPreCheckResult result, Dictionary<string, List<ScriptCommand>> lookup, List<ScriptCommand> emptyStartScriptCommand, string context, int line, string text, int lineOffset) {
         // var-Deklaration: Variablennamen sammeln — KEINE Attribut-Prüfung,
         // da var VariablenBerechnung nutzt, nicht SplitAttributeToVars.
         if (thisC.Command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
@@ -232,8 +232,11 @@ public static class ScriptPreCheck {
         // Code-Block (if, foreach, do) rekursiv prüfen
         if (!string.IsNullOrEmpty(f.CodeBlockAfterText)) {
             var blockText = f.CodeBlockAfterText;
-            var blockLineOffset = line + blockText.CountChar('¶', blockText.IndexOf('{'));
-            CheckInternal(blockText, lookup, emptyStartScriptCommand, result, context + "/" + thisC.Command, blockLineOffset);
+            // '{' liegt exakt Blocktext-Länge + 2 vor der Position nach '}'.
+            // Damit ist die echte Zeile des Blockbeginns berechenbar - unabhängig
+            // von Umbrüchen zwischen ')' und '{' sowie hinter '{'.
+            var blockStartLine = text.CountChar('¶', f.ContinueOrErrorPosition - blockText.Length - 2) + 1 + lineOffset;
+            CheckInternal(blockText, lookup, emptyStartScriptCommand, result, context + "/" + thisC.Command, blockStartLine - 1);
         }
     }
 

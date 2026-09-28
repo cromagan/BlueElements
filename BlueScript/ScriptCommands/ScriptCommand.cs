@@ -63,7 +63,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     //TODO: 0 implementieren
     public virtual bool MustUseReturnValue => false;
 
-    public string QuickInfo => HintText();
+    public string QuickInfo => HintText(true);
     public virtual string Returns => string.Empty;
     public virtual ScriptCommandType ScriptCommandLevel => ScriptCommandType.Standard;
     public virtual string StartSequence => "(";
@@ -666,7 +666,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     public abstract DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp);
 
     //        feedbackVariables.Add(v);
-    public string HintText() {
+    public string HintText(bool mitVerwendung) {
         var co = "Syntax:\r\n";
         co += "~~~~~~\r\n";
         co = co + Syntax + "\r\n";
@@ -731,7 +731,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         //    co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
         //}
 
-        if (UsesInDB.Count > 0) {
+        if (mitVerwendung && UsesInDB.Count > 0) {
             co += "\r\n";
             co += "Aktuelle Verwendung in TABELLEN-Skripten:\r\n";
             co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";

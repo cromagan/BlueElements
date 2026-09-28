@@ -11,7 +11,7 @@ internal class CountStringScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable], StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], StringVal];
     public override string Command => "countstring";
 
     public override bool MustUseReturnValue => true;

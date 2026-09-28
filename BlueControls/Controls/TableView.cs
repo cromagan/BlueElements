@@ -1392,13 +1392,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         //#endregion
 
-        #region Neue Zeile im selben Kapitel
+        #region Ähnliche Zeilen
 
         if (row is not null) {
-            var canAdd = string.IsNullOrEmpty(tb.IsNowNewRowPossible(row.ChunkValue, true));
-            miniToolbar.Add(ItemOf(string.Empty, "NewRowInChapter",
-                QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.PlusZeichen),
-                ContextMenu_NewRowInChapter, canAdd, "Leere Zeile einfügen"));
+            miniToolbar.Add(ItemOf(string.Empty, "SimilarRows",
+                QuickImage.Get(ImageCode.Lupe, IMiniToolbar.IconSize),
+                ContextMenu_SimilarRows, true, "Ähnliche Zeilen"));
         }
 
         #endregion
@@ -2806,6 +2805,52 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
     }
 
+    private static List<RowTableElement> CalculateAllViewItems_Rows(Dictionary<string, TableElement> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, RowSortDefinition sortused, List<RowItem> filteredRows) {
+        var visibleRowListItems = new List<RowTableElement>(allrows.Count);
+        var pinnedSet = new HashSet<RowItem>(pinnedRows);
+        var filteredSet = new HashSet<RowItem>(filteredRows);
+
+        // Kapitel einzigartig: Kapitel-Pfad als primären Sortierschlüssel voranstellen,
+        // sodass alle Zeilen eines Kapitels (und ihrer Hierarchie) beieinander liegen.
+        // Sonst erscheinen die Zeilen in der Reihenfolge der aktuellen Sortierung
+        // und Kapitelüberschriften können sich wiederholen.
+        var chaptersUnique = arrangement.ChaptersUnique;
+
+        foreach (var thisRow in allrows) {
+            var isPinned = pinnedSet.Contains(thisRow);
+            var isFiltered = filteredSet.Contains(thisRow);
+
+            foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement)) {
+                var id = RowTableElement.Identifier(thisRow, thisCap);
+
+                if (!allItems.TryGetValue(id, out var it2) || it2 is not RowTableElement rowListItem) {
+                    rowListItem = new RowTableElement(thisRow, thisCap, arrangement);
+                    allItems.Add(rowListItem.KeyName, rowListItem);
+                }
+                rowListItem.Arrangement = arrangement;
+
+                // Sortierschlüssel über die Spalten der SortDefinition —
+                // virtuelle Spalten liefern ihren Zellwert generisch über CellGetString.
+                var rowKey = rowListItem.Row.CompareKey(sortused.SortColumns);
+
+                // Kapitel-Gruppierung entfällt bei wiederholten Kapiteln und wenn die
+                // Sortierung virtuelle Spalten enthält — deren Werte sind nicht
+                // kapitelgebunden, der Sortierwert muss dominieren.
+                var chapterPrefix = chaptersUnique && sortused.SortColumns.All(thisColumn => thisColumn.Column is not null);
+                rowListItem.UserDefCompareKey = chapterPrefix
+                    ? thisCap.ChapterPathSortKey() + FirstSortChar + rowKey
+                    : rowKey;
+                rowListItem.Visible = false;
+                rowListItem.MarkYellow = isPinned;
+                visibleRowListItems.Add(rowListItem);
+            }
+        }
+
+        return sortused.Reverse
+              ? visibleRowListItems.OrderByDescending(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList()
+              : visibleRowListItems.OrderBy(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
     /// <summary>
     /// Kapitel-Zuordnungen einer Zeile. Angepinnte Zeilen erhalten zusätzlich einen leeren Marker für die Darstellung ganz oben.
     /// </summary>
@@ -2908,25 +2953,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             pos = chapterText.IndexOf(RowCaptionTableElement.Kapiteltrenner, pos + 1);
         }
         return false;
-    }
-
-    /// <summary>
-    /// Liefert den nächsten freien Default-Wert "NEU_X" für die Spalte.
-    /// </summary>
-    private static string NextNewDefaultValue(Table tb, ColumnItem column) {
-        var n = 1;
-        while (true) {
-            var candidate = "NEU_" + n.ToString1();
-            var exists = false;
-            foreach (var r in tb.Row) {
-                if (r is { IsDisposed: false } && string.Equals(r.CellGetString(column), candidate, StringComparison.OrdinalIgnoreCase)) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) { return candidate; }
-            n++;
-        }
     }
 
     /// <summary>
@@ -3487,52 +3513,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         sortedItems.Add(newRow);
     }
 
-    private static List<RowTableElement> CalculateAllViewItems_Rows(Dictionary<string, TableElement> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, RowSortDefinition sortused, List<RowItem> filteredRows) {
-        var visibleRowListItems = new List<RowTableElement>(allrows.Count);
-        var pinnedSet = new HashSet<RowItem>(pinnedRows);
-        var filteredSet = new HashSet<RowItem>(filteredRows);
-
-        // Kapitel einzigartig: Kapitel-Pfad als primären Sortierschlüssel voranstellen,
-        // sodass alle Zeilen eines Kapitels (und ihrer Hierarchie) beieinander liegen.
-        // Sonst erscheinen die Zeilen in der Reihenfolge der aktuellen Sortierung
-        // und Kapitelüberschriften können sich wiederholen.
-        var chaptersUnique = arrangement.ChaptersUnique;
-
-        foreach (var thisRow in allrows) {
-            var isPinned = pinnedSet.Contains(thisRow);
-            var isFiltered = filteredSet.Contains(thisRow);
-
-            foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement)) {
-                var id = RowTableElement.Identifier(thisRow, thisCap);
-
-                if (!allItems.TryGetValue(id, out var it2) || it2 is not RowTableElement rowListItem) {
-                    rowListItem = new RowTableElement(thisRow, thisCap, arrangement);
-                    allItems.Add(rowListItem.KeyName, rowListItem);
-                }
-                rowListItem.Arrangement = arrangement;
-
-                // Sortierschlüssel über die Spalten der SortDefinition —
-                // virtuelle Spalten liefern ihren Zellwert generisch über CellGetString.
-                var rowKey = rowListItem.Row.CompareKey(sortused.SortColumns);
-
-                // Kapitel-Gruppierung entfällt bei wiederholten Kapiteln und wenn die
-                // Sortierung virtuelle Spalten enthält — deren Werte sind nicht
-                // kapitelgebunden, der Sortierwert muss dominieren.
-                var chapterPrefix = chaptersUnique && sortused.SortColumns.All(thisColumn => thisColumn.Column is not null);
-                rowListItem.UserDefCompareKey = chapterPrefix
-                    ? thisCap.ChapterPathSortKey() + FirstSortChar + rowKey
-                    : rowKey;
-                rowListItem.Visible = false;
-                rowListItem.MarkYellow = isPinned;
-                visibleRowListItems.Add(rowListItem);
-            }
-        }
-
-        return sortused.Reverse
-              ? visibleRowListItems.OrderByDescending(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList()
-              : visibleRowListItems.OrderBy(item => item.CompareKey(), StringComparer.OrdinalIgnoreCase).ToList();
-    }
-
     /// <summary>
     /// Einfüge-Index für Spalten-Drag/Drop anhand der Maus-X-Position.
     /// </summary>
@@ -3763,70 +3743,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         var (column, _, _, _, _) = GetContextData(e.HotItem);
         ColumnsHeadTableElement.ShowDummyColumnDropDown(ca, this, column);
-    }
-
-    private void ContextMenu_NewRowInChapter(object? sender, ContextMenuEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
-
-        var (_, row, _, _, _) = GetContextData(e.HotItem);
-        if (row is not { IsDisposed: false } srcRow) { return; }
-
-        ColumnItem? chapterCol = ca.ColumnForChapter is { IsDisposed: false } cc ? cc : null;
-        var chapterValue = chapterCol is not null ? srcRow.CellGetString(chapterCol) : string.Empty;
-
-        // Filter inkl. Chunk-Filterung übernehmen; Chunk-Wert daraus erkennen.
-        using var fc = new FilterCollection(tb, "Neue Zeile aus Mini-Toolbar");
-        fc.AddIfNotExists(FilterCombined);
-
-        if (chapterValue is { Length: > 0 } && chapterCol is not null) {
-            fc.RemoveOtherAndAdd(new FilterItem(chapterCol, FilterType.Istgleich, chapterValue));
-        } else if (chapterCol is not null) {
-            // Ohne Kapitel: bestehenden Kapitel-Filter entfernen.
-            fc.Remove(chapterCol);
-        }
-
-        // Zwingende Spalten (First, UniqueValue) mit Default-Wert "NEU_X" befüllen. Bestehende Filter haben Vorrang.
-        var defaultColumns = new HashSet<ColumnItem>(ReferenceEqualityComparer.Instance);
-        if (tb.Column.First is { IsDisposed: false } firstCol) {
-            defaultColumns.Add(firstCol);
-        }
-
-        foreach (var uvd in tb.UniqueValues) {
-            foreach (var keyCol in uvd.KeyColumns) {
-                if (keyCol is { IsDisposed: false }) { defaultColumns.Add(keyCol); }
-            }
-        }
-
-        foreach (var col in defaultColumns) {
-            if (fc[col] is not null) { continue; }
-            fc.RemoveOtherAndAdd(new FilterItem(col, FilterType.Istgleich, NextNewDefaultValue(tb, col)));
-        }
-
-        var nr = tb.Row.GenerateAndAdd([.. fc], "Neue Zeile aus Mini-Toolbar");
-        if (nr.IsFailed || nr.Value is not RowItem newRow) {
-            NotEditableInfo(nr.FailedReason);
-            return;
-        }
-
-        // Mit SYS_ROWSORTINDEX: neue Zeile unter der Quell-Zeile einsortieren —
-        // der Kern schiebt die Nachfolger beim Setzen lückenlos nach unten.
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
-            newRow.CellSet(sortCol, srcRow.CellGetInteger(sortCol) + 1, "Neue Zeile aus Mini-Toolbar");
-        }
-
-        if (!FilterCombined.Rows.Contains(newRow)) {
-            if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
-                PinAdd(newRow);
-            }
-        }
-
-        // Cursor auf die neue Zeile setzen. GetRow löst über _ = AllViewItems
-        // den view-Aufbau aus, sodass die neue Zeile in _rowLookup liegt.
-        var newRowItem = GetRow(newRow, null);
-        if (View_ColumnFirst() is { } firstViewCol && newRowItem is not null) {
-            CursorPos_Set(firstViewCol, newRowItem, true);
-        }
     }
 
     private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {

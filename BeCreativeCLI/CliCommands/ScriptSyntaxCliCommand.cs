@@ -6,7 +6,7 @@ using BlueScript.ScriptVariables;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Skripte: Listet die Syntax aller Skript-Befehle auf; optional auf Treffer des Filters eingeschränkt.
+/// Skripte: Listet den Hilfetext aller Skript-Befehle auf (ohne Verwendung); der Filter durchsucht den gesamten Text.
 /// </summary>
 public class ScriptSyntaxCliCommand : CliCommand {
 
@@ -16,7 +16,7 @@ public class ScriptSyntaxCliCommand : CliCommand {
     public override string Syntax => "bcr script-syntax [filter]";
 
     public override string? HelpDetails =>
-            "Der Filter ist ein Teiltext (Groß-/Kleinschreibung egal), z. B. 'bcr script-syntax cell' für alle Zell-Befehle.";
+            "Der Filter ist ein Teiltext (Groß-/Kleinschreibung egal) und wird im gesamten Hilfetext gesucht (Syntax, Argumente, Rückgabe, Beschreibung, Konstanten), z. B. 'bcr script-syntax zelle'.";
 
     #endregion
 
@@ -32,11 +32,12 @@ public class ScriptSyntaxCliCommand : CliCommand {
         Console.Out.WriteLine("Hinweis: Skripte unterstützen keine selbst erstellten Funktionen.");
         Console.Out.WriteLine();
 
-        foreach (var syntax in ScriptCommand.AllMethods.Instances
-                     .Select(m => m.Syntax)
-                     .Where(s => s.Contains(filter, StringComparison.OrdinalIgnoreCase))
+        foreach (var text in ScriptCommand.AllMethods.Instances
+                     .Select(m => m.HintText(false))
+                     .Where(t => t.Contains(filter, StringComparison.OrdinalIgnoreCase))
                      .SortedDistinctList()) {
-            Console.Out.WriteLine(syntax);
+            Console.Out.WriteLine(text);
+            Console.Out.WriteLine();
         }
 
         Console.Out.WriteLine();

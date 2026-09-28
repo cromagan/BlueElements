@@ -39,7 +39,7 @@ public partial class Befehlsreferenz : Form {
         if (e.Item is ReadableListItem { Item: ScriptCommand thisc }) {
             GetUses(thisc, 5);
 
-            co += thisc.HintText();
+            co += thisc.HintText(true);
         }
         txbComms.Text = co;
     }

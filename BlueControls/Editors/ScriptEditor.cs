@@ -248,6 +248,15 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
+    /// <summary>
+    /// Führt den ScriptPreCheck über den aktuellen Skript-Text aus und liefert
+    /// die Syntax-Fehler als Text, oder string.Empty, wenn keine vorhanden sind.
+    /// </summary>
+    protected string PreCheckErrorText() {
+        var preCheck = ScriptPreCheck.Check(Script);
+        return preCheck.HasSyntaxErrors ? string.Join("\r\n", preCheck.SyntaxErrors) : string.Empty;
+    }
+
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
             UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
@@ -374,6 +383,18 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         LastFailedReason = string.Empty;
         LastVariables = null;
         OnPropertyChanged("FailedReason");
+
+        // Im EditItem-Modus den geleerten Fehlertext ins Item zurückschreiben,
+        // damit der nächste Speichervorgang den PreCheck erneut ausführt.
+        if (Mode == EditorMode.EditItem && InputItem is ScriptDescription sd) { sd.FailedReason = string.Empty; }
+
+        // Der gespeicherte Fehlertext ist geleert — der PreCheck kann im
+        // Skript-Text weiterhin Fehler finden, diese anzeigen.
+        if (PreCheckErrorText() is { Length: > 0 } preCheckError) {
+            UpdateState("Fehlertext geleert — PreCheck findet weiterhin Fehler:\r\n" + preCheckError, null, false);
+            return;
+        }
+
         btnAnzeigen_Click(null, System.EventArgs.Empty);
     }
 
@@ -550,7 +571,14 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
     private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) {
         ScriptChangedByUser = true;
-        if (Mode == EditorMode.EditItem && InputItem is ScriptDescription sd) { sd.Script = Script; }
+        if (Mode == EditorMode.EditItem && InputItem is ScriptDescription sd) {
+            sd.Script = Script;
+
+            // Kein Fehlertext gespeichert -> PreCheck ausführen und Fehler speichern.
+            if (string.IsNullOrEmpty(sd.FailedReason) && PreCheckErrorText() is { Length: > 0 } err) {
+                sd.FailedReason = err;
+            }
+        }
     }
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
@@ -560,7 +588,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             foreach (var thisc in ScriptCommand.AllMethods.Instances) {
                 if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
-                    e.ToolTipText = thisc.HintText();
+                    e.ToolTipText = thisc.HintText(true);
                     return;
                 }
             }
