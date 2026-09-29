@@ -366,7 +366,7 @@ public class TableFragments : TableFile {
 
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
-            return;
+
             var f = SaveFullFile(this);
 
             if (!string.IsNullOrEmpty(f)) {
