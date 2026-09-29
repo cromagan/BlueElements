@@ -22,9 +22,7 @@ public sealed class RibbonBar : AbstractTabControl {
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
-        if (e.Control is not TabPage tp) {
-            return;
-        }
+        if (e.Control is not TabPage tp) { return; }
 
         var state = Enabled ? States.Standard : States.Standard_Disabled;
         tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, state);

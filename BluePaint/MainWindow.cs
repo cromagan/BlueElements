@@ -245,13 +245,9 @@ public partial class MainWindow : FormWithStatusBar {
 
     private bool IsSaved() {
         while (true) {
-            if (_isSaved) {
-                return true;
-            }
+            if (_isSaved) { return true; }
 
-            if (string.IsNullOrEmpty(_filename)) {
-                return true;
-            }
+            if (string.IsNullOrEmpty(_filename)) { return true; }
 
             switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
                 case 0:

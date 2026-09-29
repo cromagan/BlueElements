@@ -28,9 +28,7 @@ internal class TrimSuffixScriptCommand : ScriptCommand {
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var suf = attvar.ValueStringGet(z);
-            if (val.Length <= suf.Length) {
-                continue;
-            }
+            if (val.Length <= suf.Length) { continue; }
 
             if (val.EndsWith(suf, StringComparison.OrdinalIgnoreCase)) {
                 var c = val[val.Length - suf.Length - 1];

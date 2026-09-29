@@ -219,9 +219,7 @@ public static partial class Extensions {
         schnitt.Intersect(koord2);
         for (var x = schnitt.Left; x < schnitt.Right; x += accuracy) {
             for (var y = schnitt.Top; y < schnitt.Bottom; y += accuracy) {
-                if (!bmp1.GetPixel(x - koord1.X, y - koord1.Y).IsNearWhite(0.9) && !bmp2.GetPixel(x - koord2.X, y - koord2.Y).IsNearWhite(0.9)) {
-                    return true;
-                }
+                if (!bmp1.GetPixel(x - koord1.X, y - koord1.Y).IsNearWhite(0.9) && !bmp2.GetPixel(x - koord2.X, y - koord2.Y).IsNearWhite(0.9)) { return true; }
             }
         }
         return false;

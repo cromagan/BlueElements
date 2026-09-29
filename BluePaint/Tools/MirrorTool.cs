@@ -29,9 +29,7 @@ public partial class MirrorTool : Tool // System.Windows.Forms.UserControl //
 
         gr.DrawLine(PenRedTransp, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
         gr.DrawLine(PenRedTransp, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
-        if (mouseCurrent.Button != MouseButtons.Left || mouseDown is null) {
-            return;
-        }
+        if (mouseCurrent.Button != MouseButtons.Left || mouseDown is null) { return; }
 
         gr.DrawLine(PenRedTransp, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
         gr.DrawLine(PenRedTransp, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));

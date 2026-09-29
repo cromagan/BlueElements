@@ -758,9 +758,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         foreach (var thisString in ca.Ausführbare_Skripte) {
             if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
-                if (firstButton && leftP + 64 > grpButtons.Width) {
-                    break;
-                }
+                if (firstButton && leftP + 64 > grpButtons.Width) { break; }
 
                 var b = new Button();
 

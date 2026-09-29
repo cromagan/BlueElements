@@ -417,8 +417,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (oldKey == newKey) { return string.Empty; }
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
+        // Zielspalte existiert bereits: Beim Nachspielen von Fragmenten möglich, wenn
+        // der Hauptfile-Stand die Umbenennung schon enthält, das Fragment die Kette
+        // inklusive Neu-Anlage der Quellspalte aber erneut abspielt. Die bestehende
+        // Zielspalte ist die gültige; die Quellspalte ist ein leeres
+        // Wiedereinspiel-Artefakt (Zelldaten liegen in den Zeilen, nicht in der
+        // Spalte) und wird entfernt. Damit ist die Umbenennung idempotent.
+        if (this[newKey] is { IsDisposed: false }) {
+            if (_internal.TryRemove(oldKey.ToUpperInvariant(), out var artifact) && artifact is { IsDisposed: false }) {
+                artifact.Dispose();
+            }
+            return string.Empty;
+        }
+
         var ok = _internal.TryRemove(oldKey.ToUpperInvariant(), out var value);
-        if (!ok || value is null) { return "Entfernen fehlgeschlagen"; }
+        if (!ok || value is null) { return string.Empty; }
 
         ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
         if (!ok) { return "Hinzufügen fehlgeschlagen"; }

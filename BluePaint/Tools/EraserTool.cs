@@ -30,9 +30,7 @@ public partial class EraserTool : Tool {
             DrawPixelExactCircle(gr, zoom, offsetX, offsetY, mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY, _brushSize - 1, BrushRedTranspOverlay);
         }
 
-        if (!DrawBox.Checked || mouseDown is null) {
-            return;
-        }
+        if (!DrawBox.Checked || mouseDown is null) { return; }
 
         var pic = OnNeedCurrentPic();
         if (pic is null) { return; }

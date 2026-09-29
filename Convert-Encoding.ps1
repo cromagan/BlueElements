@@ -166,6 +166,8 @@ $styleTotal = 0
 
 $keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
 
+$simpleStmtPattern = '(?:return\b(?:\s+(?:true|false))?\s*;|(?:continue|break)\s*;)'
+
 $disposableTypes = @('Table', 'RowItem', 'ColumnItem', 'GenericControl', 'RowCollection', 'ColumnCollection', 'FilterCollection', 'ColumnViewCollection', 'CellCollection', 'ColumnViewItem', 'ConnectedFormula', 'AbstractPadItem', 'AbstractListItem', 'BlueFont', 'ExtText', 'PointM', 'ExtChar', 'ScriptDescription', 'FlexiStrategyBase', 'CachedFile', 'BlockableFile', 'PictureView', 'QuickPicSelector', 'Row', 'Column', 'Filter')
 $dispPattern = ($disposableTypes | ForEach-Object { [regex]::Escape($_) }) -join '|'
 
@@ -174,7 +176,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = [System.IO.File]::ReadAllText($file)
     $original = $content
 
-    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7a = $false; $c7b = $false; $c7 = $false; $c8 = $false; $c9a = $false; $c9b = $false; $c10 = $false
+    $c1 = $false; $c3 = $false; $c3b = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7a = $false; $c7b = $false; $c7 = $false; $c8 = $false; $c9a = $false; $c9b = $false; $c10 = $false
 
     # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
     $prev = $content
@@ -185,13 +187,22 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     })
     $c1 = ($content -ne $prev)
 
-    # 3. Return in if ohne Klammern -> if() {return;}
+    # 3. Einfaches return;/return true;/return false;/continue;/break; in if ohne Klammern -> if() { ...; }
     $prev = $content
-    $content = [regex]::Replace($content, '\b(if\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*(return\b[^\r\n;]*;)', {
+    $content = [regex]::Replace($content, "\b(if\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*($simpleStmtPattern)", {
         param($m)
-        return "$($m.Groups[1].Value) {$($m.Groups[2].Value)}"
+        return "$($m.Groups[1].Value) { $($m.Groups[2].Value) }"
     })
     $c3 = ($content -ne $prev)
+
+    # 3b. if-Block mit nur einem return;/return true;/return false;/continue;/break; -> eine Zeile
+    $prev = $content
+    $content = [regex]::Replace($content, "\b(if\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*\{[ \t]*\r?\n[ \t]*($simpleStmtPattern)[ \t]*\r?\n[ \t]*\}", {
+        param($m)
+        return "$($m.Groups[1].Value) { $($m.Groups[2].Value) }"
+    })
+    $c3b = ($content -ne $prev)
+    $c3 = ($c3 -or $c3b)
 
     # 4. Leerzeichen nach ( bei Methodenaufrufen entfernen
     $prev = $content
@@ -285,7 +296,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         $script:styleTotal++
         $changes = @()
         if ($c1) { $changes += "Braces" }
-        if ($c3) { $changes += "IfReturn" }
+        if ($c3) { $changes += "IfOneLine" }
         if ($c4) { $changes += "ParenSpace" }
         if ($c5) { $changes += "NeNull" }
         if ($c6) { $changes += "EqNull" }
@@ -303,7 +314,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
 Write-Host ""
 Write-Host "=== Style Summary ===" -ForegroundColor Cyan
 Write-Host "Empty braces collapsed:     $styleBraces" -ForegroundColor Green
-Write-Host "If-return braced:           $styleReturn" -ForegroundColor Green
+Write-Host "If return/continue/break one-line: $styleReturn" -ForegroundColor Green
 Write-Host "Paren space removed:        $styleParenSpace" -ForegroundColor Green
 Write-Host "!= null -> is not null:    $styleNeNull" -ForegroundColor Green
 Write-Host "== null -> is null:        $styleEqNull" -ForegroundColor Green

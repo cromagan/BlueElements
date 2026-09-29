@@ -100,9 +100,7 @@ public class InvalidatedRowsManager {
         //}
 
         // Prüfe, ob die Zeile bereits als verarbeitet markiert ist
-        if (_invalidatedRows.ContainsKey(rowItem.KeyName)) {
-            return false;
-        }
+        if (_invalidatedRows.ContainsKey(rowItem.KeyName)) { return false; }
 
         Develop.Message(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}", 0);
 

@@ -912,9 +912,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case FilterType.Between:
                 var rangeParts = filterValue.Split(['|'], StringSplitOptions.RemoveEmptyEntries);
-                if (rangeParts.Length != 2) {
-                    return false;
-                }
+                if (rangeParts.Length != 2) { return false; }
 
                 // Wenn kein Datum, dann als numerischen Wert behandeln
                 if (DoubleTryParse(istValue, out var numericValue)) {
@@ -1270,9 +1268,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 .Where(otherRow => otherRow != this && otherRow is { IsDisposed: false })
                 .Any(otherRow => {
                     for (var i = 0; i < uvd.KeyColumns.Count; i++) {
-                        if (otherRow.CellGetStringCore(uvd.KeyColumns[i]) != thisRowValues[i]) {
-                            return false;
-                        }
+                        if (otherRow.CellGetStringCore(uvd.KeyColumns[i]) != thisRowValues[i]) { return false; }
                     }
                     return true;
                 });

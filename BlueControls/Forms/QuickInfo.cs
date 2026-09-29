@@ -72,9 +72,7 @@ public partial class QuickInfo : FloatingForm, IAnimatable {
         // Wurde der Text automatisch geschlossen (z.B. 10 s oder Fokus-Verlust),
         // soll er nicht sofort wieder angezeigt werden — sonst flackert er,
         // solange der Nutzer still über demselben Control hovert.
-        if (!string.IsNullOrEmpty(_autoClosedTxt) && text == _autoClosedTxt) {
-            return;
-        }
+        if (!string.IsNullOrEmpty(_autoClosedTxt) && text == _autoClosedTxt) { return; }
 
         // Alte Instanz sofort entfernen — kein Fade-Out bei Textwechsel,
         // sonst überlagern sich zwei QuickInfos.

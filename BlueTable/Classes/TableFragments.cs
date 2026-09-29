@@ -42,8 +42,10 @@ public class TableFragments : TableFile {
     private readonly List<UndoItem> _changesNotIncluded = [];
 
     /// <summary>
-    /// Cache für bereits verarbeitete Fragmente (Hashes der Undo-Zeilen), um doppelte Verarbeitung zu verhindern.
-    /// Thread-safe durch ConcurrentDictionary; Value wird nicht genutzt (Set-Semantik).
+    /// Hashes bereits verbuchter Items (Set-Semantik), um doppelte Verarbeitung zu verhindern.
+    /// Beim ersten Laden aus der Historie des Hauptfiles befüllt; ein Hash kommt nur hinzu,
+    /// nachdem das Item erfolgreich angewendet wurde. Thread-safe durch ConcurrentDictionary;
+    /// Value wird nicht genutzt.
     /// </summary>
     private readonly ConcurrentDictionary<string, byte> _processedHashes = new();
 
@@ -133,14 +135,10 @@ public class TableFragments : TableFile {
             // Dedup erfolgt über _processedHashes (siehe unten) - sicher gegen
             // PreviousValue-Inkonsistenz zwischen Fragment und lokalem Undo.
 
-            // Hash-Cache aus der Undo-Liste des Hauptfiles aufbauen.
-            // Ersetzt den früheren Zeitstempel-Filter (DateTimeUtc <= LastSaveMainFileUtcDate),
-            // der im Multi-User-Betrieb Daten verlieren konnte: Änderungen, die ein anderer User
-            // während einer Komplettierung in sein Fragment schrieb, wurden dauerhaft ausgefiltert.
-            // Die Hash-basierte Dedup erkennt zuverlässig, welche Daten bereits im Hauptfile stehen.
-            // Verwendet UndoItem.Hash() statt ParseableItems().FinishParseable().GetMD5Hash(),
-            // damit der Hash unabhängig vom Schreibweg ist (Fragment schreibt previousValue="",
-            // lokales Undo schreibt den echten previousValue - der Hash muss trotzdem gleich sein).
+            // Dedup-Grundlage ist die Historie des Hauptfiles: Items, deren Hash dort
+            // steht, gelten als verbucht und werden nicht erneut angewendet. Das ist
+            // korrekt, weil Daten und Historie aus demselben Snapshot gespeichert
+            // werden und die Historie nur um erfolgreich angewendete Items wächst.
             _processedHashes.Clear();
             List<UndoItem> undoSnapshot;
             lock (_undoLock) {
@@ -208,6 +206,11 @@ public class TableFragments : TableFile {
             return ex.Message;
         }
     }
+
+    /// <summary>
+    /// Gibt den Pfad zum Fragment-Ordner zurück.
+    /// </summary>
+    public string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
     /// <summary>
     /// Friert die Tabelle ein und schließt den Writer.
@@ -363,7 +366,7 @@ public class TableFragments : TableFile {
 
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
-
+            return;
             var f = SaveFullFile(this);
 
             if (!string.IsNullOrEmpty(f)) {
@@ -420,11 +423,6 @@ public class TableFragments : TableFile {
     }
 
     /// <summary>
-    /// Gibt den Pfad zum Fragment-Ordner zurück.
-    /// </summary>
-    public string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
-
-    /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.
     /// </summary>
     private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges() {
@@ -446,6 +444,15 @@ public class TableFragments : TableFile {
                 foreach (var thist in fil.SplitAndCutByCr()) {
                     if (!thist.StartsWith('-')) {
                         var u = new UndoItem(thist);
+
+                        // Zeilen, die sicher vor der letzten Hauptdatei-Speicherung lagen,
+                        // sind in deren Komplett-Stand (Datenteil) bereits enthalten -
+                        // unabhängig davon, ob ihr Hash in der Historie steht. Diese wird
+                        // beim Speichern gefiltert und gekürzt (max. 1000 Items, max. 10
+                        // EventScript), ist also keine vollständige Verbuchungsgrundlage.
+                        // Die Toleranz überbrückt das Zeitfenster zwischen dem Lesen der
+                        // Fragmente und dem Speichern der Komplettierung.
+                        if (u.DateTimeUtc.AddSeconds(60) < LastSaveMainFileUtcDate) { continue; }
 
                         // Hash auf Basis der geparsten Werte berechnen (nicht auf der rohen Zeile),
                         // damit der Hash unabhängig vom Serialisationsformat ist und mit den aus
@@ -511,9 +518,7 @@ public class TableFragments : TableFile {
                         // Undo- und UndoInOne-Einträge wurden oben bereits per Undo.Add(thisWork)
                         // in die Liste übernommen. Ein zusätzliche SetValueInternal-Aufruf würde
                         // sie doppelt eintragen (Undo) bzw. die komplette Liste verwerfen (UndoInOne).
-                        if (thisWork.Command == TableDataType.Undo || thisWork.Command == TableDataType.UndoInOne) {
-                            continue;
-                        }
+                        if (thisWork.Command == TableDataType.Undo) { continue; }
 
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);
@@ -527,6 +532,11 @@ public class TableFragments : TableFile {
                         }
 
                         if (!string.IsNullOrEmpty(error)) {
+                            // Bewusst NICHT in Undo/_changesNotIncluded aufnehmen: Ein
+                            // nicht anwendbares Item darf weder in der Historie noch als
+                            // "erledigt" landen, sonst stuft ein späteres Seeding es
+                            // fälschlich als "im Hauptfile enthalten" ein und überspringt
+                            // es dauerhaft (ursprüngliche Ursache des Script-Verlusts).
                             Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
                             return OperationResult.Failed(error);
                         }

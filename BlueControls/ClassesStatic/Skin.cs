@@ -463,12 +463,8 @@ public static class Skin {
 
         if (design.Contour != Contour.None) {
             if (design.BackgroundStyle != BackgroundStyle.None) {
-                if (design.Contour == Contour.Rectangle && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) {
-                    return false;
-                }
-                if (design.Contour == Contour.RoundedRect && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) {
-                    return false;
-                }
+                if (design.Contour == Contour.Rectangle && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { return false; }
+                if (design.Contour == Contour.RoundedRect && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { return false; }
             }
         }
 

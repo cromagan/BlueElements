@@ -24,9 +24,7 @@ public class Line : GenericControl, IBackgroundNone {
     public Orientation Orientation {
         get;
         set {
-            if (value == field) {
-                return;
-            }
+            if (value == field) { return; }
             field = value;
             CheckSize();
             Invalidate();

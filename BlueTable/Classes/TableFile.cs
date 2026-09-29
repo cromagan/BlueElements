@@ -229,9 +229,7 @@ public class TableFile : Table {
         }
 
         if (backupBytes.IsZipped()) {
-            if (backupBytes.UnzipIt() is not { } unzipped) {
-                return false;
-            }
+            if (backupBytes.UnzipIt() is not { } unzipped) { return false; }
             backupBytes = unzipped;
         }
 

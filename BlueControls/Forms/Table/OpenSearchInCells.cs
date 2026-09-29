@@ -105,9 +105,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
                 if (btnAehnliches.Checked) {
                     var ist3 = ist1.StarkeVereinfachung(" ,", true);
                     var searchTxt3 = searchT.StarkeVereinfachung(" ,", true);
-                    if (!string.IsNullOrEmpty(ist3) && ist3.Contains(searchTxt3, StringComparison.OrdinalIgnoreCase)) {
-                        break;
-                    }
+                    if (!string.IsNullOrEmpty(ist3) && ist3.Contains(searchTxt3, StringComparison.OrdinalIgnoreCase)) { break; }
                 }
             }
             if (columnStarted == found) {

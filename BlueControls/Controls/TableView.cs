@@ -2686,9 +2686,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
             _dragItem = null;
 
-            if (Table is not { IsDisposed: false } || CurrentArrangement is not { IsDisposed: false } ca) {
-                return;
-            }
+            if (Table is not { IsDisposed: false } || CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
             var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
             var _mouseOverRow = _mouseOverRowItem as RowTableElement;
@@ -2773,9 +2771,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     protected override void WndProc(ref Message m) {
         const int WM_MOUSEWHEEL = 0x020A;
-        if (m.Msg == WM_MOUSEWHEEL && ActiveControlStrategy is not null) {
-            return;
-        }
+        if (m.Msg == WM_MOUSEWHEEL && ActiveControlStrategy is not null) { return; }
         base.WndProc(ref m);
     }
 
@@ -4087,16 +4083,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void Edit_LostFocus(object? sender, System.EventArgs e) {
         // Während BeginEdit ignorieren (Abbau/Fokus-Übergabe).
-        if (_isBeginningEdit) {
-            return;
-        }
+        if (_isBeginningEdit) { return; }
 
         var active = ActiveControlStrategy;
 
         // Veraltete Meldungen ignorieren: nur das aktuell sichtbare Edit reagiert auf Fokusverlust.
-        if (active is not null && sender is not null && !ReferenceEquals(sender, active)) {
-            return;
-        }
+        if (active is not null && sender is not null && !ReferenceEquals(sender, active)) { return; }
 
         if (active?.Control is { } activeControl) {
             if (FloatingForm.IsShowing(activeControl)) { return; }

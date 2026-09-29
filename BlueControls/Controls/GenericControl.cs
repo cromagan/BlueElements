@@ -422,9 +422,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtended,
     }
 
     private void DoDraw(Graphics gr) {
-        if (Develop.Exited || IsDisposed || !Visible || Width < 1 || Height < 1) {
-            return;
-        }
+        if (Develop.Exited || IsDisposed || !Visible || Width < 1 || Height < 1) { return; }
 
         if (!DoDrawings()) {
             gr.Clear(Color.LightGray);

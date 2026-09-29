@@ -103,9 +103,7 @@ public class LinePadItem : PadItem, IStyleableOne {
 
         if (_tempPoints is not null) {
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) {
-                    return true;
-                }
+                if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) { return true; }
             }
         }
 

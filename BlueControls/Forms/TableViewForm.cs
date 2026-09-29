@@ -108,9 +108,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         get => TableView.Table;
 
         set {
-            if (TableView.Table == value) {
-                return;
-            }
+            if (TableView.Table == value) { return; }
 
             if (TableView.Table is { IsDisposed: false } tbold) {
                 tbold.Loaded -= Tb_Loaded;
@@ -514,9 +512,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
-            return;
-        }
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
         TableView.ImportClipboard();
     }
@@ -540,9 +536,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) {
-            return;
-        }
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         using var x = new ConnectedFormulaEditor(tb.FormulaFileName(), null);
 

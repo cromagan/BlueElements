@@ -84,9 +84,7 @@ public static class MiniToolbarExtension {
     public static void MiniToolbarShow(this IMiniToolbar parent, Point screenPosition, object? hotItem) {
         HideMiniToolbar();
 
-        if (!parent.MiniToolbarEnabled || Equals(_lastHotItems, hotItem)) {
-            return;
-        }
+        if (!parent.MiniToolbarEnabled || Equals(_lastHotItems, hotItem)) { return; }
 
         var thisMiniToolbar = new List<ListItem>();
 

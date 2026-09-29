@@ -2162,17 +2162,21 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
-            case TableDataType.ColumnKey:
-                var oldKey = _keyName;
-                _keyName = value.ToUpperInvariant();
-                var f = Table?.Column.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
+            case TableDataType.ColumnKey: {
+                    // Erst die Sammlung umschlüsseln; _keyName erst bei Erfolg ändern -
+                    // sonst hätte das Item bei Fehlschlag einen Key, unter dem es in
+                    // der Sammlung nicht mehr erreichbar ist.
+                    var newKey = value.ToUpperInvariant();
+                    var f = Table?.Column.ChangeKey(_keyName, newKey) ?? "Tabelle verworfen";
 
-                if (!string.IsNullOrEmpty(f)) {
-                    var reason = $"Schwerer Spaltenkey Umbenennungsfehler, {f}";
-                    Table?.Freeze(reason);
-                    return reason;
+                    if (!string.IsNullOrEmpty(f)) {
+                        var reason = $"Schwerer Spaltenkey Umbenennungsfehler, {f}";
+                        Table?.Freeze(reason);
+                        return reason;
+                    }
+                    _keyName = newKey;
+                    break;
                 }
-                break;
 
             case TableDataType.ColumnCaption:
                 _caption = value;

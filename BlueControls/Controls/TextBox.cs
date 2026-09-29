@@ -631,9 +631,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (keyData is System.Windows.Forms.Keys.Up
                     or System.Windows.Forms.Keys.Down
                     or System.Windows.Forms.Keys.Left
-                    or System.Windows.Forms.Keys.Right) {
-            return true;
-        }
+                    or System.Windows.Forms.Keys.Right) { return true; }
         return base.IsInputKey(keyData);
     }
 
@@ -1368,8 +1366,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                     while (true) {
                         if (SpellChecker.CancellationPending) { return; }
                         pos = Math.Max(woEnd + 1, pos + 1);
-                        if (pos >= _eTxt.Count)
-                            break;
+                        if (pos >= _eTxt.Count) { break; }
 
                         var woStart = _eTxt.WordStart(pos);
                         if (woStart > -1) {

@@ -139,9 +139,7 @@ internal class SendKeysScriptCommand : ScriptCommand {
             _ => KeyCode.VK_SPACE
         };
 
-        if (specialKey == KeyCode.VK_SPACE) {
-            return false;
-        }
+        if (specialKey == KeyCode.VK_SPACE) { return false; }
 
         WindowsRemoteControl.KeyDown(specialKey);
         Pause(0.01, false);

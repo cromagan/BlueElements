@@ -1954,9 +1954,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             ColumnItem? column = null;
             RowItem? row = null;
             do {
-                if (pointer >= data.Length) {
-                    break;
-                }
+                if (pointer >= data.Length) { break; }
 
                 var (i, command, value, columname, rowKey) = Parse(data, pointer);
                 pointer = i;
@@ -2014,9 +2012,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
                     #endregion
 
-                    if (command == TableDataType.EOF) {
-                        break;
-                    }
+                    if (command == TableDataType.EOF) { break; }
 
                     var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, ChangeFlags.IgnoreFreeze);
                     if (!string.IsNullOrEmpty(error)) {
@@ -2989,17 +2985,17 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 InvalidateHeadCaches();
                 break;
 
-            case TableDataType.UndoInOne:
-                lock (_undoLock) {
-                    Undo.Clear();
-                    var uio = value.SplitAndCutByCr();
-                    for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                        var tmpWork = new UndoItem(uio[z]);
-                        Undo.Add(tmpWork);
-                    }
-                }
-                SeedLogTimeFromUndo();
-                break;
+            //case TableDataType.UndoInOne:
+            //    lock (_undoLock) {
+            //        Undo.Clear();
+            //        var uio = value.SplitAndCutByCr();
+            //        for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+            //            var tmpWork = new UndoItem(uio[z]);
+            //            Undo.Add(tmpWork);
+            //        }
+            //    }
+            //    SeedLogTimeFromUndo();
+            //    break;
 
             case TableDataType.CheckPoint:
                 break;

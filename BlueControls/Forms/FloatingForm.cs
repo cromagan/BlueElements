@@ -229,9 +229,7 @@ public partial class FloatingForm : Form {
         #region Methods
 
         public bool PreFilterMessage(ref Message m) {
-            if (m.Msg is not ((int)WndMsg.WM_LBUTTONDOWN or (int)WndMsg.WM_RBUTTONDOWN or (int)WndMsg.WM_MBUTTONDOWN)) {
-                return false;
-            }
+            if (m.Msg is not ((int)WndMsg.WM_LBUTTONDOWN or (int)WndMsg.WM_RBUTTONDOWN or (int)WndMsg.WM_MBUTTONDOWN)) { return false; }
 
             var pt = Cursor.Position;
             FloatingForm? hitForm = null;

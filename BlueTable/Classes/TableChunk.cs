@@ -789,9 +789,7 @@ public class TableChunk : TableFile {
                 newHashes[idLower] = fullHash;
 
                 // Unchanged-Check: bei identischem Inhalt keine neue Datei schreiben
-                if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) {
-                    return;
-                }
+                if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) { return; }
 
                 if (isMainLite) {
                     // Write-once: .tblh nur schreiben, wenn noch kein gültiger Inhalt vorhanden
@@ -1280,9 +1278,7 @@ public class TableChunk : TableFile {
 
             // SkipIfUnusedMinutes-Fenster: Niemand schaut den Chunk mehr an — kein Refresh nötig.
             if (!firstTime && _lastUsed.TryGetValue(chunkId, out var lastUsed)
-                && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= SkipIfUnusedMinutes) {
-                continue;
-            }
+                && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= SkipIfUnusedMinutes) { continue; }
 
             var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
@@ -1294,9 +1290,7 @@ public class TableChunk : TableFile {
 
             // Reload wenn eine andere Datei die neueste ist. Da Chunks write-once
             // sind, bedeutet ein anderer Dateiname zwingend anderen Inhalt.
-            if (string.Equals(processedFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
-                continue;
-            }
+            if (string.Equals(processedFile, newestFile, StringComparison.OrdinalIgnoreCase)) { continue; }
 
             var result = LoadChunkWithChunkId(chunkId, false);
             if (result.IsFailed) {

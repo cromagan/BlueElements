@@ -54,8 +54,10 @@ public class TableJsonFragments : TableJsonFile {
     private readonly List<string> _jsonChangesNotIncluded = [];
 
     /// <summary>
-    /// Cache für bereits verarbeitete Fragmente (Hashes der Undo-Zeilen), um doppelte Verarbeitung zu verhindern.
-    /// Thread-safe durch ConcurrentDictionary; Value wird nicht genutzt (Set-Semantik).
+    /// Hashes bereits verbuchter Items (Set-Semantik), um doppelte Verarbeitung zu verhindern.
+    /// Beim ersten Laden aus der Historie des Hauptfiles befüllt; ein Hash kommt nur hinzu,
+    /// nachdem das Item erfolgreich angewendet wurde. Thread-safe durch ConcurrentDictionary;
+    /// Value wird nicht genutzt.
     /// </summary>
     private readonly ConcurrentDictionary<string, byte> _processedHashes = new();
 
@@ -148,7 +150,9 @@ public class TableJsonFragments : TableJsonFile {
             // Hash-Cache aus der Undo-Liste des Hauptfiles aufbauen.
             // Hash() ist unabhängig vom Serialisationsformat (JSON vs. String),
             // deshalb ist der Hash identisch egal, ob das UndoItem aus dem
-            // JSON-Hauptfile oder aus einem NDJSON-Fragment stammt.
+            // JSON-Hauptfile oder aus einem NDJSON-Fragment stammt. Das ist
+            // korrekt, weil Daten und Historie aus demselben Snapshot gespeichert
+            // werden und die Historie nur um erfolgreich angewendete Items wächst.
             _processedHashes.Clear();
             List<UndoItem> undoSnapshot;
             lock (_undoLock) {
@@ -427,7 +431,7 @@ public class TableJsonFragments : TableJsonFile {
     /// mit dem Key "_meta" (Header/EOF) werden übersprungen. Zeilen mit dem
     /// Key "path" sind granulare Pfad/Wert-Änderungen, alles andere UndoItems.
     /// </summary>
-    private (List<UndoItem>? Changes, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>? JsonChanges, List<string>? Files, bool failed) GetLastChanges() {
+    private (List<UndoItem>? Changes, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container, string Hash)>? JsonChanges, List<string>? Files, bool failed) GetLastChanges() {
         if (!string.IsNullOrEmpty(IsGenericEditable(true))) { return (null, null, null, true); }
         CheckPath();
 
@@ -438,7 +442,14 @@ public class TableJsonFragments : TableJsonFile {
             if (frgma.Count == 0) { return ([], [], [], false); }
 
             var l = new List<UndoItem>();
-            var j = new List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>();
+            var j = new List<(string Path, JsonElement Value, DateTime TimeUtc, string Container, string Hash)>();
+
+            // Lokale Sätze gegen Duplikate innerhalb dieses Lesevorgangs (z. B. dasselbe
+            // Item in Fragmenten mehrerer Maschinen). Der persistente _processedHashes
+            // wird hier nur geprüft - ein neuer Eintrag landet dort erst nach dem
+            // erfolgreichen Anwenden (siehe InjectData).
+            var batchHashes = new HashSet<string>();
+            var jsonBatchHashes = new HashSet<string>();
 
             foreach (var thisf in frgma) {
                 var fil = IO.ReadAllText(thisf, Encoding.UTF8);
@@ -474,9 +485,10 @@ public class TableJsonFragments : TableJsonFile {
 
                         // Re-Apply ist idempotent; der Hash verhindert das wiederholte
                         // Verarbeiten bereits bekannter Zeilen bei jedem Nachladen.
-                        if (!_processedHashes.TryAdd(JsonLineHash(path, node, jo["datetimeutc"]), default)) { continue; }
+                        var lineHash = JsonLineHash(path, node, jo["datetimeutc"]);
+                        if (_processedHashes.ContainsKey(lineHash) || !jsonBatchHashes.Add(lineHash)) { continue; }
 
-                        j.Add((path, JsonSerializer.SerializeToElement(node), timeUtc, thisf));
+                        j.Add((path, JsonSerializer.SerializeToElement(node), timeUtc, thisf, lineHash));
                         continue;
                     }
 
@@ -486,8 +498,7 @@ public class TableJsonFragments : TableJsonFile {
                     // Hash auf Basis der geparsten Werte berechnen (nicht auf der rohen Zeile),
                     // damit der Hash unabhängig vom Serialisationsformat ist und mit den aus
                     // dem Hauptfile-Undo gebildeten Hashes (in BeSureToBeUpToDate) übereinstimmt.
-                    // Atomar als verarbeitet markieren; bei Duplikat sofort überspringen.
-                    if (!_processedHashes.TryAdd(u.Hash(), default)) { continue; }
+                    if (_processedHashes.ContainsKey(u.Hash()) || !batchHashes.Add(u.Hash())) { continue; }
 
                     u.Container = thisf;
                     l.Add(u);
@@ -518,111 +529,156 @@ public class TableJsonFragments : TableJsonFile {
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
     /// <param name="initialload"></param>
-    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container)>? jsonChanges, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
+    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container, string Hash)>? jsonChanges, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data is null && jsonChanges is not { Count: > 0 }) { return OperationResult.Success; }
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 
-        var dataSorted = data.Where(obj => obj?.DateTimeUtc is not null).OrderBy(obj => obj.DateTimeUtc);
+        var dataSorted = (data ?? []).Where(obj => obj?.DateTimeUtc is not null).OrderBy(obj => obj.DateTimeUtc);
         var affectingHead = false;
 
-        try {
-            List<string> myfiles = [];
-            if (checkedDataFiles is not null) {
-                foreach (var thisf in checkedDataFiles) {
-                    if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
-                        myfiles.AddIfNotExists(thisf);
-                    }
-                }
-            }
+        // Bereits verarbeitete Items (erfolgreich geloggt) - verhindert Doppeleinträge
+        // in Undo/_changesNotIncluded, wenn nach einer Exception der komplette
+        // Datenbestand erneut durchlaufen wird.
+        var processed = new HashSet<string>();
 
-            Interlocked.Increment(ref _doingChanges);
-            // Während des Einspielens sind Spaltenschlüssel kurzzeitig nicht
-            // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
-            // endgültig entfernen (RepairArrangements), sonst verschwinden
-            // Spalten dauerhaft aus der Ansicht.
-            PauseDataReload();
+        while (true) {
             try {
-                foreach (var thisWork in dataSorted) {
-                    if (KeyName == thisWork.TableName) {
-                        lock (_undoLock) {
-                            Undo.Add(thisWork);
-                        }
-                        _changesNotIncluded.Add(thisWork);
-
-                        affectingHead |= (!thisWork.Command.IsCellValue() && !thisWork.Command.IsUnimportant());
-
-                        // Undo- und UndoInOne-Einträge wurden oben bereits per Undo.Add(thisWork)
-                        // in die Liste übernommen. Ein zusätzliche SetValueInternal-Aufruf würde
-                        // sie doppelt eintragen (Undo) bzw. die komplette Liste verwerfen (UndoInOne).
-                        if (thisWork.Command == TableDataType.Undo || thisWork.Command == TableDataType.UndoInOne) {
-                            continue;
-                        }
-
-                        var c = Column[thisWork.ColName];
-                        var r = Row.GetByKey(thisWork.RowKey);
-
-                        var error = string.Empty;
-
-                        if (initialload) {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
-                        } else {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.RaiseEvents | ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
-                        }
-
-                        if (!string.IsNullOrEmpty(error)) {
-                            Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableJson().ToJsonString());
-                            return OperationResult.Failed(error);
+                List<string> myfiles = [];
+                if (checkedDataFiles is not null) {
+                    foreach (var thisf in checkedDataFiles) {
+                        if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
+                            myfiles.AddIfNotExists(thisf);
                         }
                     }
                 }
 
-                // Granulare Pfad/Wert-Zeilen anwenden. Der Zeitstempel sorgt dafür,
-                // dass ein neuerer Wert nie von einem älteren überschrieben wird.
-                // Sie betreffen immer den Tabellenkopf und sind idempotent - die
-                // Reihenfolge zu den UndoItems ist unkritisch.
-                if (jsonChanges is { Count: > 0 }) {
-                    var scriptChanged = false;
+                Interlocked.Increment(ref _doingChanges);
+                // Während des Einspielens sind Spaltenschlüssel kurzzeitig nicht
+                // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
+                // endgültig entfernen (RepairArrangements), sonst verschwinden
+                // Spalten dauerhaft aus der Ansicht.
+                PauseDataReload();
+                try {
+                    foreach (var thisWork in dataSorted) {
+                        if (KeyName == thisWork.TableName) {
+                            affectingHead |= (!thisWork.Command.IsCellValue() && !thisWork.Command.IsUnimportant());
 
-                    foreach (var (path, jsonValue, _, container) in jsonChanges.OrderBy(c => c.TimeUtc)) {
-                        try {
-                            this.ApplyPartialJson(path, jsonValue);
-                        } catch {
-                            Freeze("Tabellen-Fehler bei: " + path);
-                            return OperationResult.Failed("Pfad-Zeile nicht anwendbar: " + path);
+                            // Undo-Einträge werden nur in die Undo-Liste übernommen.
+                            // Ein zusätzlicher SetValueInternal-Aufruf würde sie doppelt eintragen.
+                            if (thisWork.Command == TableDataType.Undo) {
+                                if (processed.Add(thisWork.Hash())) {
+                                    lock (_undoLock) {
+                                        Undo.Add(thisWork);
+                                    }
+                                    _changesNotIncluded.Add(thisWork);
+                                    _ = _processedHashes.TryAdd(thisWork.Hash(), default);
+                                }
+                                continue;
+                            }
+
+                            //if (thisWork.Command == TableDataType.UndoInOne) {
+                            //    if (processed.Add(thisWork.Hash())) {
+                            //        lock (_undoLock) {
+                            //            Undo.Add(thisWork);
+                            //        }
+                            //        _changesNotIncluded.Add(thisWork);
+                            //        _ = _processedHashes.TryAdd(thisWork.Hash(), default);
+                            //    }
+                            //    continue;
+                            //}
+
+                            // Veraltete Datentypen (inkl. UndoInOne) haben keinen Dateneffekt
+                            // mehr; sie werden übersprungen, statt einen Anwendungsfehler zu riskieren.
+                            if (thisWork.Command.IsObsolete()) {
+                                if (processed.Add(thisWork.Hash())) {
+                                    Develop.Diagnose("FragmentLoad", $"Veraltetes Item übersprungen: CO={(int)thisWork.Command}, D={thisWork.DateTimeUtc:HH:mm:ss.fff}, CN={thisWork.ColName}, RK={thisWork.RowKey}");
+                                    _ = _processedHashes.TryAdd(thisWork.Hash(), default);
+                                }
+                                continue;
+                            }
+
+                            var c = Column[thisWork.ColName];
+                            var r = Row.GetByKey(thisWork.RowKey);
+
+                            var error = string.Empty;
+
+                            if (initialload) {
+                                error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
+                            } else {
+                                error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.RaiseEvents | ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
+                            }
+
+                            if (!string.IsNullOrEmpty(error)) {
+                                // Bewusst NICHT markieren und nicht in Undo/_changesNotIncluded
+                                // aufnehmen: Ein nicht anwendbares Item bleibt unmarkiert und
+                                // kommt beim nächsten Laden erneut zur Anwendung.
+                                Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableJson().ToJsonString());
+                                return OperationResult.Failed(error);
+                            }
+
+                            // Nach erfolgreichem Anwenden in die Undo-Liste übernehmen und
+                            // als verbucht markieren - ein gescheitertes Item bleibt
+                            // unmarkiert und kommt beim nächsten Laden erneut zur Anwendung.
+                            if (processed.Add(thisWork.Hash())) {
+                                lock (_undoLock) {
+                                    Undo.Add(thisWork);
+                                }
+                                _changesNotIncluded.Add(thisWork);
+                                _ = _processedHashes.TryAdd(thisWork.Hash(), default);
+                            }
                         }
-
-                        if (path.StartsWith("eventscript", StringComparison.OrdinalIgnoreCase)) { scriptChanged = true; }
-                        affectingHead = true;
-                        _jsonChangesNotIncluded.AddIfNotExists(container);
                     }
 
-                    if (scriptChanged) { OnScriptChanged(); }
+                    // Granulare Pfad/Wert-Zeilen anwenden. Der Zeitstempel sorgt dafür,
+                    // dass ein neuerer Wert nie von einem älteren überschrieben wird.
+                    // Sie betreffen immer den Tabellenkopf und sind idempotent - die
+                    // Reihenfolge zu den UndoItems ist unkritisch.
+                    if (jsonChanges is { Count: > 0 }) {
+                        var scriptChanged = false;
 
-                    // Die Pfad-Zeilen umgehen die Blobs, die die abgeleiteten
-                    // Kopf-Caches normalerweise invalidieren.
-                    InvalidateHeadCaches();
+                        foreach (var (path, jsonValue, _, container, hash) in jsonChanges.OrderBy(c => c.TimeUtc)) {
+                            try {
+                                this.ApplyPartialJson(path, jsonValue);
+                            } catch {
+                                Freeze("Tabellen-Fehler bei: " + path);
+                                return OperationResult.Failed("Pfad-Zeile nicht anwendbar: " + path);
+                            }
+
+                            if (path.StartsWith("eventscript", StringComparison.OrdinalIgnoreCase)) { scriptChanged = true; }
+                            affectingHead = true;
+                            _jsonChangesNotIncluded.AddIfNotExists(container);
+
+                            // Erst nach erfolgreichem Anwenden als verbucht markieren.
+                            _ = _processedHashes.TryAdd(hash, default);
+                        }
+
+                        if (scriptChanged) { OnScriptChanged(); }
+
+                        // Die Pfad-Zeilen umgehen die Blobs, die die abgeleiteten
+                        // Kopf-Caches normalerweise invalidieren.
+                        InvalidateHeadCaches();
+                    }
+
+                    _isInCache = endTimeUtc;
+                } finally {
+                    ResumeDataReload();
+                    Interlocked.Decrement(ref _doingChanges);
+                    Column.GetSystems();
+                    DoWorkAfterLastChanges(myfiles, startTimeUtc);
+                    RepairAfterParse();
+                    TryToSetMeTemporaryMaster();
+                    OnInvalidateView();
+                    OnLoaded(false, affectingHead);
                 }
-
-                _isInCache = endTimeUtc;
-            } finally {
-                ResumeDataReload();
-                Interlocked.Decrement(ref _doingChanges);
-                Column.GetSystems();
-                DoWorkAfterLastChanges(myfiles, startTimeUtc);
-                RepairAfterParse();
-                TryToSetMeTemporaryMaster();
-                OnInvalidateView();
-                OnLoaded(false, affectingHead);
+                return OperationResult.Success;
+            } catch (Exception ex) {
+                Develop.AbortAppIfStackOverflow();
+                Develop.Diagnose("FragmentLoad", $"InjectData-Exception, erneuter Versuch: {ex.Message} Stack: {Develop.DiagStack()}");
             }
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return InjectData(checkedDataFiles, data, jsonChanges, startTimeUtc, endTimeUtc, initialload);
         }
-
-        return OperationResult.Success;
     }
 
     /// <summary>
