@@ -17,5 +17,12 @@ public sealed partial class Test : Form {
     [StandaloneInfo("Test", ImageCode.Puzzle, "Admin", "Test", 900)]
     public static System.Windows.Forms.Form Start() => new Test();
 
+    private void Button3_Click(object sender, System.EventArgs e) {
+        _ = InputBox.Show("Test", string.Empty, BlueTable.ColumnFormats.TextOneLineColumnFormat.Instance);
+    }
+
+    private void slideOutPanel1_ExpandedChanged(object sender, System.EventArgs e) {
+    }
+
     #endregion
 }

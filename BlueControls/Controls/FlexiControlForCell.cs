@@ -15,7 +15,7 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : GenericControlReciver {
+public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
 
     #region Fields
 

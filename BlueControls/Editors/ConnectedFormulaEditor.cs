@@ -29,6 +29,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnBild.SetFormulaButtonInfo(new EasyPicPadItem());
 
+        btnTextfeld.SetFormulaButtonInfo(new EasyTextPadItem());
+
         btnTable.SetFormulaButtonInfo(new TableViewPadItem());
 
         btnDropdownmenu.SetFormulaButtonInfo(new DropDownSelectRowPadItem());
@@ -161,7 +163,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is ReciverSenderPadItem && x is ReciverPadItem iaf) {
+        // Elemente ohne Eingang (AllowedInputFilter.None) dürfen keine Parents bekommen,
+        // sie könnten sonst nicht mehr aus dem Fehlerzustand befreit werden.
+        if (l is ReciverSenderPadItem && x is ReciverPadItem { AllowedInputFilter: not AllowedInputFilter.None } iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
@@ -212,6 +216,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnButton_Click(object sender, System.EventArgs e) {
         var x = new ScriptButtonPadItem();
+        AddCentered(x);
+    }
+
+    private void btnTextfeld_Click(object sender, System.EventArgs e) {
+        var x = new EasyTextPadItem();
         AddCentered(x);
     }
 

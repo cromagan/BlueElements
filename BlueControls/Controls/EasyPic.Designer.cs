@@ -38,7 +38,7 @@ namespace BlueControls.Controls
             this.EditPanelFrame.Controls.Add(this.btnLoad);
             this.EditPanelFrame.Controls.Add(this.btnScreenshot);
             this.EditPanelFrame.Controls.Add(this.btnDeleteImage);
-            this.EditPanelFrame.GroupBoxStyle = GroupBoxStyle.Nothing;
+            this.EditPanelFrame.GroupBoxStyle = GroupBoxStyle.RoundRect;
             this.EditPanelFrame.Location = new Point(0, 0);
             this.EditPanelFrame.Name = "EditPanelFrame";
             this.EditPanelFrame.Size = new Size(472, 40);

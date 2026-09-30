@@ -30,6 +30,7 @@ namespace BlueControls.Forms {
             btnPfeileAusblenden = new Button();
             grpFelder = new GroupBox();
             btnWeitereCF = new Button();
+            btnTextfeld = new Button();
             btnRegionAdd = new Button();
             btnButton = new Button();
             btnBild = new Button();
@@ -179,13 +180,14 @@ namespace BlueControls.Forms {
             grpFelder.Controls.Add(btnRegionAdd);
             grpFelder.Controls.Add(btnButton);
             grpFelder.Controls.Add(btnBild);
+            grpFelder.Controls.Add(btnTextfeld);
             grpFelder.Controls.Add(btnFileExplorer);
             grpFelder.Controls.Add(btnFeldHinzu);
             grpFelder.Dock = DockStyle.Left;
             grpFelder.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpFelder.Location = new Point(504, 0);
             grpFelder.Name = "grpFelder";
-            grpFelder.Size = new Size(344, 81);
+            grpFelder.Size = new Size(448, 81);
             grpFelder.TabIndex = 0;
             grpFelder.TabStop = false;
             grpFelder.Text = "Felder";
@@ -232,6 +234,17 @@ namespace BlueControls.Forms {
             btnBild.TabIndex = 5;
             btnBild.Text = "Bild";
             btnBild.Click += btnBild_Click;
+            //
+            // btnTextfeld
+            //
+            btnTextfeld.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnTextfeld.ImageCode = "Textfeld|24";
+            btnTextfeld.Location = new Point(248, 2);
+            btnTextfeld.Name = "btnTextfeld";
+            btnTextfeld.Size = new Size(104, 22);
+            btnTextfeld.TabIndex = 9;
+            btnTextfeld.Text = "Textfeld";
+            btnTextfeld.Click += btnTextfeld_Click;
             // 
             // btnFileExplorer
             // 
@@ -580,6 +593,7 @@ namespace BlueControls.Forms {
         private GroupBox grpOptik;
         private Button btnRegisterKarte;
         private Button btnBild;
+        private Button btnTextfeld;
         private Button btnSpeichern;
         private Button btnButton;
         private Button btnTable;

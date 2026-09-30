@@ -51,6 +51,8 @@ public class TextControlStrategy : ControlStrategy {
         => [.. base.GetProperties(widthOfControl),
             new FlexiControlForProperty<string>(() => ImageCode, "Bildcode")];
 
+    public override bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) => true;
+
     public override string ReadableText() => "Reine Textanzeige";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;

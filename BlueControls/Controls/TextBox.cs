@@ -286,6 +286,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         set {
             _markStart = Math.Clamp(value, 0, _eTxt.Count);
             _markEnd = -1;
+            EnsureCursorVisible();
             Invalidate();
         }
     }
@@ -381,6 +382,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             pos = Insert(pos, t, false);
         }
 
+        EnsureCursorVisible();
         RaiseEventIfTextChanged(false);
         Invalidate();
 
@@ -473,6 +475,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
 
         if (keyAscii != AsciiKey.StrgA) { ScheduleIncrementalSpellCheck(); }
+        EnsureCursorVisible();
     }
 
     internal void UpdateOrAddMark(string markKey, int first, int last, Color? overrideColor) {
@@ -513,7 +516,13 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (IsDisposed) { return RectangleF.Empty; }
         if (Verhalten == SteuerelementVerhalten.Steuerelement_Anpassen) { return RectangleF.Empty; }
         if (_lastCanvasSize.IsEmpty) { return RectangleF.Empty; }
-        return new RectangleF(0, 0, _lastCanvasSize.Width, _lastCanvasSize.Height);
+
+        // Minimale rechte Reserve (2 * PaddingSmal): Ohne sie endet der
+        // OffsetX-Clamp (SliderX.Maximum) exakt am Textende und würde den
+        // letzten Scroll-Schritt abschneiden - der Cursor (steht rechts NEBEN
+        // dem letzten Zeichen, Textzeichnung bei +Padding) bliebe außen.
+        var reserve = Skin.PaddingSmal * 2 / Zoom;
+        return new RectangleF(0, 0, _lastCanvasSize.Width + reserve, _lastCanvasSize.Height);
     }
 
     protected override void Dispose(bool disposing) {
@@ -582,20 +591,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
 
-        // Gemessene Textgröße cachen, damit CalculateCanvasMaxBounds beim nächsten
-        // UpdateSliderBounds-Aufruf korrekte Werte liefert.
-        var measured = new Size(_eTxt.WidthControl, _eTxt.HeightControl);
-        if (measured != _lastCanvasSize) {
-            _lastCanvasSize = measured;
-            Invalidate_MaxBounds();
-            // SliderX-Grenzen mit der aktualisierten Canvas-Größe neu berechnen,
-            // damit EnsureCursorVisible im selben Draw-Zyklus korrekt clampt.
-            // Ohne diesen Aufruf scrollt der Cursor beim Tippen immer einen
-            // Frame zu spät nach (SliderX-Min/Max basieren sonst noch auf der
-            // Textbreite des vorherigen Frames).
-            UpdateSliderBounds();
-        }
-
+        // Gemessene Textgröße cachen und SliderX-Grenzen auffrischen,
+        // damit EnsureCursorVisible im selben Draw-Zyklus korrekt clampt.
+        RefreshCanvasBounds();
         EnsureCursorVisible();
 
         var drawOffsetX = OffsetX + Skin.PaddingSmal;
@@ -1050,6 +1048,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         _markStart = Math.Max(0, _markStart);
         _markEnd = -1;
         _cursorVisible = true;
+        EnsureCursorVisible();
     }
 
     private void Cursor_Show(Graphics gr, int offsetX, int offsetY) {
@@ -1074,6 +1073,9 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     /// <summary>
     /// Passt den horizontalen Scroll-Offset so an, dass der Cursor im sichtbaren
     /// Bereich bleibt. Nur im Singleline-Modus ohne Textumbruch aktiv.
+    /// Wird direkt bei Cursor-Änderungen (Tippen, Pfeiltasten) aufgerufen,
+    /// nicht erst im Draw-Zyklus - WinForms koalesziert Paints, sonst
+    /// rutscht der Text erst nach, wenn der Cursor längst außen ist.
     /// </summary>
     private void EnsureCursorVisible() {
         if (IsDisposed) { return; }
@@ -1085,6 +1087,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
 
         if (_markStart < 0) { return; }
+
+        RefreshCanvasBounds();
 
         var controlArea = AvailableControlPaintArea;
         var padding = Skin.PaddingSmal;
@@ -1101,24 +1105,19 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         var cursorRect = _eTxt.CursorCanvasPosX(_markStart);
         var cursorXControl = (cursorRect.Left * Zoom) + OffsetX + padding;
 
-        // Sichtbarer Bereich (Control-Koordinaten) mit margin-Vorlauf.
-        // Der Cursor wird schon nachgeschoben, sobald er in den margin-Bereich
-        // am Rand kommt - nicht erst, wenn er vollständig verschwunden ist.
-        // Rechts werden 3 * PaddingSmal abgezogen (analog zur Breitenberechnung
-        // der TextBox): Padding + Cursor-Platz + Border.
-        const float margin = 15f;
+        // Minimal-Scrolling: Der Text rutscht nur so weit, bis der Cursor
+        // knapp innen am Rand steht. Kein Vorlauf/Margin - sonst springt
+        // der Text sichtbar um mehrere Pixel nach.
         var visibleLeft = (float)padding;
-        var visibleRight = controlArea.Width - padding * 3;
+        var visibleRight = controlArea.Width - padding;
 
         var newOffset = OffsetX;
-        if (cursorXControl < visibleLeft + margin) {
-            // Cursor nähert sich dem linken Rand - nach rechts scrollen,
-            // bis er margin-Abstand vom linken Rand hat
-            newOffset += (int)Math.Ceiling(visibleLeft + margin - cursorXControl);
-        } else if (cursorXControl > visibleRight - margin) {
-            // Cursor nähert sich dem rechten Rand - nach links scrollen,
-            // bis er margin-Abstand vom rechten Rand hat
-            newOffset -= (int)Math.Ceiling(cursorXControl - (visibleRight - margin));
+        if (cursorXControl < visibleLeft) {
+            // Cursor hinter dem linken Rand - minimal nach rechts scrollen
+            newOffset += (int)Math.Ceiling(visibleLeft - cursorXControl);
+        } else if (cursorXControl > visibleRight) {
+            // Cursor hinter dem rechten Rand - minimal nach links scrollen
+            newOffset -= (int)Math.Ceiling(cursorXControl - visibleRight);
         }
 
         // Begrenzungen übernimmt der OffsetX-Setter (via SliderX-Min/Max in UpdateSliderBounds)
@@ -1241,6 +1240,18 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             _blinkCount = 0;
             OnTextChanged(System.EventArgs.Empty);
         }
+    }
+
+    /// <summary>
+    /// Misst die aktuelle Textgröße neu und aktualisiert die Slider-Grenzen,
+    /// damit OffsetX-Änderungen nicht an veralteten Canvas-Grenzen clampen.
+    /// </summary>
+    private void RefreshCanvasBounds() {
+        var measured = new Size(_eTxt.WidthControl, _eTxt.HeightControl);
+        if (measured == _lastCanvasSize) { return; }
+        _lastCanvasSize = measured;
+        Invalidate_MaxBounds();
+        UpdateSliderBounds();
     }
 
     private void ScheduleIncrementalSpellCheck() {

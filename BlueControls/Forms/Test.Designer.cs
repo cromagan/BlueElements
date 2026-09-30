@@ -34,6 +34,7 @@ namespace BlueControls.Forms {
             slideOutPanel1 = new BlueControls.Controls.SlideOutPanel();
             button2 = new BlueControls.Controls.Button();
             button1 = new BlueControls.Controls.Button();
+            button3 = new BlueControls.Controls.Button();
             groupBox1 = new BlueControls.Controls.GroupBox();
             slideOutPanel2 = new BlueControls.Controls.SlideOutPanel();
             slideOutPanel1.SuspendLayout();
@@ -45,10 +46,12 @@ namespace BlueControls.Forms {
             slideOutPanel1.BackColor = Color.FromArgb(240, 240, 240);
             slideOutPanel1.Controls.Add(button2);
             slideOutPanel1.Controls.Add(button1);
+            slideOutPanel1.Controls.Add(button3);
             slideOutPanel1.Location = new Point(48, 40);
             slideOutPanel1.Name = "slideOutPanel1";
             slideOutPanel1.Size = new Size(384, 184);
             slideOutPanel1.Text = "slideOutPanel1";
+            slideOutPanel1.ExpandedChanged += slideOutPanel1_ExpandedChanged;
             // 
             // button2
             // 
@@ -65,6 +68,15 @@ namespace BlueControls.Forms {
             button1.Size = new Size(128, 22);
             button1.TabIndex = 0;
             button1.Text = "button1";
+            // 
+            // button3
+            // 
+            button3.Location = new Point(24, 100);
+            button3.Name = "button3";
+            button3.Size = new Size(136, 22);
+            button3.TabIndex = 2;
+            button3.Text = "InputBox";
+            button3.Click += Button3_Click;
             // 
             // groupBox1
             // 
@@ -103,6 +115,7 @@ namespace BlueControls.Forms {
         private Controls.SlideOutPanel slideOutPanel1;
         private Controls.Button button2;
         private Controls.Button button1;
+        private Controls.Button button3;
         private Controls.GroupBox groupBox1;
         private Controls.SlideOutPanel slideOutPanel2;
     }

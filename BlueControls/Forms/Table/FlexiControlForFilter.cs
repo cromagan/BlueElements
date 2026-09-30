@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSettings, IHasFieldVariable {
+public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSettings, IHasFieldVariable, IAutoNext {
 
     #region Fields
 
