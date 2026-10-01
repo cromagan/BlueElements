@@ -192,9 +192,28 @@ Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor
 mache weitere optimerungen des Buttons "Tabelle optimieren"
 
 ## Aufgabe
-TableControlStrategy ist defekt. Die Bescheibung ist unleserlich für einen Benutzer
-Und es werden viel zu viele Zeilen nach einem Doppelklcok angezeigt. Kann es sein, dass die Tateblle nihct richtig resetted wird?
-Und die Breite wird falsch berechnete. Es wird leider zwingend auf die Spaltenbreite geachtet. Das Controll darf größer werden als die Ansicht, wenn nötigt
+Tool Aufräumen, und einzigartige Zeilen im TableHeadEditor:
+Beim Beenden ded TableHeadEditors soll geprüft werden, ob die unqiese verändert worden sind.
+Wenn ja, soll über jede Unique Definiton eine Reparatur laufen (Tool Aufräumnen). Mit eine Meldung, wenn eine Zeile mehr als 3x vorhanden ist und abbruch oder weiter.
+Hat der Befehl ImportLinked ein Problem, soll ebenfalls das Aufräumen gestartet werden. ohne Rückfragen dann.
+
+## Aufgabe
+ColumnEditor eine neue Fehlerprüfung:
+Alle Spalten, die für verlinkte Zellen benutzt werden, müssen im TableHead Editor eine UniqueDefinition haben
+
+## Aufgabe
+ScritStrategyControl.
+Wie schaffe ich es, dass je nach TableView ein anderes Script ausgeführt wird?
+Ich will im Script irgendwie Feldvariablen benutzen. Aber die werden von einem anderen Ort gesetzt.
+
+## Aufgabe
+            foreach (var thisItem in item) {
+                thisItem?.UntrimmedCanvasSize(itemDesign);
+            }
+            //Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
+
+mit Paralell stürzt es ab. Kann es sein, wenn mehrere Tabellen geladen werden müssen, dass das der Grund ist?
+
 
 
 

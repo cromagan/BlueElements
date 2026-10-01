@@ -333,7 +333,10 @@ public static class ListItemExtension {
 
     public static void PreComputeSize(this IEnumerable<ListItem> item, Design itemDesign) {
         try {
-            Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
+            foreach (var thisItem in item) {
+                thisItem?.UntrimmedCanvasSize(itemDesign);
+            }
+            //Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
         } catch {
             Develop.AbortAppIfStackOverflow();
             item.PreComputeSize(itemDesign);
