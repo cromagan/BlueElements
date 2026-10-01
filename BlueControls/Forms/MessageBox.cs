@@ -170,6 +170,9 @@ public partial class MessageBox : Form {
                 b.Visible = true;
                 b.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
                 Controls.Add(b);
+                // capText wird zuerst hinzugefügt (Index 0 = oberste Z-Order) und
+                // überdeckt bei langem Text die Buttonfläche — Button nach vorn holen.
+                b.BringToFront();
                 buts.Add(b);
             }
         }

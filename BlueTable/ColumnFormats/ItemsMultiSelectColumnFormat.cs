@@ -4,24 +4,24 @@ using Formats = BlueBasics.Classes.Formats;
 
 namespace BlueTable.ColumnFormats;
 
-public class ItemsSelectColumnFormat : ColumnFormat {
+public class ItemsMultiSelectColumnFormat : ColumnFormat {
 
     #region Fields
 
-    private static readonly string _keyname = "ItemsSelect";
+    private static readonly string _keyname = "ItemsMultiSelect";
 
     #endregion
 
     #region Constructors
 
-    public ItemsSelectColumnFormat() : base(Formats.TextFormat.Instance) {
+    public ItemsMultiSelectColumnFormat() : base(Formats.TextFormat.Instance) {
         KeyName = _keyname;
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Übersetzen;
         AfterEditQuickSortRemoveDouble = true;
         ScriptType = ScriptType.String;
-        ControlStrategy = "Combobox";
+        ControlStrategy = "Listbox";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = true;

@@ -9,6 +9,7 @@ using BlueTable.ClassesStatic;
 using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using SpellDictionary = BlueControls.ClassesStatic.Dictionary;
@@ -338,6 +339,15 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         return UnknownWords([.. words]);
     }
 
+    /// <summary>
+    /// Vergleicht die bestehenden Unique-Definitionen mit der neuen Arbeitskopie.
+    /// </summary>
+    private static bool UniquesChanged(ReadOnlyCollection<UniqueValueDefinition> oldDefinitions, List<UniqueValueDefinition> newDefinitions) {
+        HashSet<string> oldKeys = [.. oldDefinitions.Select(x => x.KeyName)];
+        HashSet<string> newKeys = [.. newDefinitions.Select(x => x.KeyName)];
+        return !oldKeys.SetEquals(newKeys);
+    }
+
     private static List<string> UnknownWords(IEnumerable<string> words) {
         var result = words.Where(w => !SpellDictionary.ContainsWord(w)).ToList();
         result.Sort(StringComparer.OrdinalIgnoreCase);
@@ -411,6 +421,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         c.ShowDialog();
     }
 
+    private void btnUniqueAufräumen_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        RepairUniquesInteractive();
+    }
+
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
@@ -471,6 +487,56 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
+    /// <summary>
+    /// Räumt die Duplikate aller Unique-Definitionen auf — gleiche Logik wie im
+    /// Zeilenbereinigungs-Dialog: Dupe-Suche per RowCollection.DuplicateGroups,
+    /// dann Combine + RemoveYoungest. Bei mehr als 3 gleichen Zeilen wird
+    /// nachgefragt.
+    /// </summary>
+    private void RepairUniquesInteractive() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        var error = string.Empty;
+
+        // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events.
+        // SuppressEvents bündelt alles, ResumeEvents macht am Ende einen
+        // einzigen Aufbau. Die frühen `return` im Loop werden über finally
+        // sicher wieder freigegeben.
+        tb.SuppressEvents();
+        try {
+            foreach (var thisDef in tb.UniqueValues) {
+
+                #region Spalten der Definition, inkl. Chunk-Spalte
+
+                // Ohne Filter auf die Chunk-Spalte liefert die Dupe-Suche bei
+                // gechunkten Tabellen keine Zeilen (siehe RowCleanUp).
+                var keyColumns = thisDef.KeyColumns.Where(c => c is { IsDisposed: false }).ToList();
+                if (keyColumns.Count == 0) { continue; }
+                var columns = new List<ColumnItem>(keyColumns);
+                if (tb.Column.ChunkValueColumn is { IsDisposed: false } chk && !columns.Contains(chk)) { columns.Add(chk); }
+
+                #endregion
+
+                foreach (var rows in tb.Row.DuplicateGroups(columns, null)) {
+                    if (rows.Count > 5) {
+                        var t = $"Der Wert <b>{string.Join("; ", keyColumns.Select(c => rows[0].CellGetString(c)))}</b> ist in der Definition <b>{thisDef.ReadableText()}</b> {rows.Count}x vorhanden.<br>Reparatur fortsetzen?";
+                        if (Forms.MessageBox.Show(t, ImageCode.Warnung, "Weiter", "Abbrechen") != 0) { return; }
+                    }
+
+                    error = tb.Row.Combine(rows).FailedReason;
+                    if (string.IsNullOrEmpty(error)) { error = tb.Row.RemoveYoungest(rows, true).FailedReason; }
+
+                    if (!string.IsNullOrEmpty(error)) {
+                        Forms.MessageBox.Show($"Abbruch:<br>{error}", ImageCode.Warnung, "OK");
+                        return;
+                    }
+                }
+            }
+        } finally {
+            tb.ResumeEvents();
+        }
+    }
+
     private void WriteInfosBack() {
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
 
@@ -505,11 +571,18 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // Arbeitskopie (OutputItem) ins Backend übernehmen. Früher geschah das
         // bei jeder Änderung über das ItemsModified-Event — jetzt zentral beim
         // Schließen. Definitionen ohne Schlüsselspalten werden herausgefiltert.
-        Table.UniqueValues = (lstUniqueValues.OutputItem ?? [])
+        var neueDefinitions = (lstUniqueValues.OutputItem ?? [])
             .Cast<UniqueValueDefinition>()
             .Where(x => x.KeyColumns.Count > 0)
-            .ToList()
-            .AsReadOnly();
+            .ToList();
+
+        var uniquesChanged = UniquesChanged(Table.UniqueValues, neueDefinitions);
+
+        Table.UniqueValues = neueDefinitions.AsReadOnly();
+
+        // Hat der Benutzer die Unique-Definitionen verändert, werden die
+        // Zeilen-Duplikate aller Definitionen repariert.
+        if (uniquesChanged) { RepairUniquesInteractive(); }
 
         #endregion
 

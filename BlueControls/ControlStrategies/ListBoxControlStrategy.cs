@@ -34,10 +34,14 @@ public class ListBoxControlStrategy : ControlStrategy {
     /// Reserve für einen eventuellen Scrollbalken). Die Höhe summiert alle
     /// sichtbaren Items, damit nichts abgeschnitten ist — mindestens das
     /// ganze Feld, höchstens bis zum 2,5-Fachen der Zeilenhöhe.
+    /// Bei aktivem Rahmen kommt der Rahmen-Zuschlag hinzu, damit das
+    /// eingebettete Control voll sichtbar bleibt.
     /// </summary>
     public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        var extra = BorderExtraSize;
+
         if (_control is not { } c || c.Items is not { Count: > 0 } items) {
-            return new Rectangle(bounds.Location, new Size(bounds.Width, Math.Min(bounds.Height, MaxSingleLineFillHeight)));
+            return new Rectangle(bounds.Location, new Size(bounds.Width + extra.Width, Math.Min(bounds.Height, MaxSingleLineFillHeight) + extra.Height));
         }
 
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(c.ItemDesign);
@@ -60,7 +64,7 @@ public class ListBoxControlStrategy : ControlStrategy {
             biggestItemX += 20; // Platz für den Scrollbalken.
         }
 
-        return new Rectangle(bounds.Location, new Size(biggestItemX, heightAdded));
+        return new Rectangle(bounds.Location, new Size(biggestItemX + extra.Width, heightAdded + extra.Height));
     }
 
     public override string ReadableText() => "Listbox";

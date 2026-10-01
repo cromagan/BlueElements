@@ -113,9 +113,9 @@ public class TableRenderer : Renderer {
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() => "Text mit Überschriften";
+    public override string ReadableText() => "Tabellenansicht";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Tabelle);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         var html = BuildHtml(content, 0);

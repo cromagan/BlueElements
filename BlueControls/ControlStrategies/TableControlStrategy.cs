@@ -9,16 +9,9 @@ namespace BlueControls.ControlStrategies;
 
 /// <summary>
 /// Zeigt eine kleine Tabelle mit eigenen Spalten.
-/// Columns enthält die Spaltenbeschriftungen; die internen
-/// Spalten-Schlüssel sind "Column_" + laufende Nummer. Der Value ist CSV-serialisiert:
+/// Der Wert ist CSV-serialisiert:
 /// Spalten getrennt mit ";", Zeilen getrennt mit CR.
-/// Im Value markiert eine "## Text"-Zeile ein Kapitel: Beim Import wird der Text
-/// in die Kapitel-Spalte der folgenden Zeilen geschrieben, beim Export wird bei
-/// einem Wechsel der Kapitel-Spalte eine eigene "## Text"-Zeile ausgegeben.
-/// Das Kontextmenü einer Zeile wird durch die Skripte
-/// "Zeile löschen" und "Überschrift hinzufügen" ersetzt. Bei
-/// ControlStrategy.AutoSort == false werden Zeilennummern über die
-/// Systemspalte SYS_ROWSORTINDEX eingeblendet.
+/// Eine "## Text"-Zeile ein Kapitel.
 /// </summary>
 public class TableControlStrategy : ControlStrategy {
 

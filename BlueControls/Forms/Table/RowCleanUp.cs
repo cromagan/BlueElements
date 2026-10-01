@@ -154,40 +154,19 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         // sicher wieder freigegeben.
         tb.SuppressEvents();
         try {
-            foreach (var thisR in r) {
-                if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
+            foreach (var rows in tb.Row.DuplicateGroups(columns, r)) {
+                if (optFülle.Checked) {
+                    error = tb.Row.Combine(rows).FailedReason;
+                } else if (optLöschen.Checked) {
+                    error = tb.Row.RemoveYoungest(rows, false).FailedReason;
+                } else {
+                    MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
+                    return;
+                }
 
-                    #region Filtercol erstellen
-
-                    var f = new FilterCollection(tb, "Dupe Suche");
-
-                    foreach (var thisc in columns) {
-                        f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
-                    }
-
-                    #endregion
-
-                    #region Zeilen ermitteln (rows)
-
-                    var rows = f.Rows.Intersect(r).ToList();
-
-                    #endregion
-
-                    if (rows.Count > 1) {
-                        if (optFülle.Checked) {
-                            error = tb.Row.Combine(rows).FailedReason;
-                        } else if (optLöschen.Checked) {
-                            error = tb.Row.RemoveYoungest(rows, false).FailedReason;
-                        } else {
-                            MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
-                            return;
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(error)) {
-                        MessageBox.Show($"Abbruch:\r\n{error}", ImageCode.Information, "OK");
-                        return;
-                    }
+                if (!string.IsNullOrEmpty(error)) {
+                    MessageBox.Show($"Abbruch:\r\n{error}", ImageCode.Information, "OK");
+                    return;
                 }
             }
         } finally {

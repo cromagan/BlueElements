@@ -1173,6 +1173,28 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return !illegalNames.Contains(name, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Zerlegt einen ListElement-Spaltennamen im Format NameZahl (z. B. Test5) in den
+    /// Basisnamen der Skript-Liste (Test) und die Elementposition (5).
+    /// Die Nummer ist die nullbasierte Position in der Liste (Test0 ist das erste Element),
+    /// der Basisname ein erlaubter Skript-Variablenname.
+    /// </summary>
+    public static bool TrySplitListElementName(string keyName, out string basename, out int elementNr) {
+        basename = string.Empty;
+        elementNr = 0;
+
+        if (string.IsNullOrEmpty(keyName)) { return false; }
+
+        var z = keyName.Length;
+        while (z > 0 && char.IsAsciiDigit(keyName[z - 1])) { z--; }
+
+        if (z == keyName.Length) { return false; }
+        if (!int.TryParse(keyName[z..], out elementNr) || elementNr < 0) { return false; }
+
+        basename = keyName[..z];
+        return ScriptVariable.IsValidName(basename);
+    }
+
     public void AddSystemInfo(string type, string user) {
         var t = ColumnSystemInfo.SplitAndCutByCr().ToList();
         t.Add(type + ": " + user);
@@ -1388,6 +1410,26 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         target.LinkedTableTableName = LinkedTableTableName;
     }
 
+    /// <summary>
+    /// Legt die fehlende Unique-Definition für die Schlüsselspalten-Kombination
+    /// der verlinkten Zelle im Tabellenkopf an. Liefert true, wenn eine
+    /// Definition neu angelegt wurde.
+    /// </summary>
+    public bool CreateLinkedCellUniqueDefinition() {
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return false; }
+
+        var keys = LinkedCellFilterKeyNames(tb);
+        if (keys.Count == 0) { return false; }
+        if (tb.UniqueValues.Any(uvd => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName)))) { return false; }
+
+        var cols = tb.Column.Where(cc => cc is { IsDisposed: false } occ && keys.Contains(occ._keyName)).ToList();
+        var newList = tb.UniqueValues.ToList();
+        newList.Add(new UniqueValueDefinition(tb, cols));
+        tb.UniqueValues = newList.AsReadOnly();
+        return true;
+    }
+
     public string DefaultValueForColumn() {
         if (ScriptType is ScriptType.Numeral or ScriptType.Numeral_Readonly) { return "0"; }
 
@@ -1428,28 +1470,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return true;
     }
 
-    /// <summary>
-    /// Zerlegt einen ListElement-Spaltennamen im Format NameZahl (z. B. Test5) in den
-    /// Basisnamen der Skript-Liste (Test) und die Elementposition (5).
-    /// Die Nummer ist die nullbasierte Position in der Liste (Test0 ist das erste Element),
-    /// der Basisname ein erlaubter Skript-Variablenname.
-    /// </summary>
-    public static bool TrySplitListElementName(string keyName, out string basename, out int elementNr) {
-        basename = string.Empty;
-        elementNr = 0;
-
-        if (string.IsNullOrEmpty(keyName)) { return false; }
-
-        var z = keyName.Length;
-        while (z > 0 && char.IsAsciiDigit(keyName[z - 1])) { z--; }
-
-        if (z == keyName.Length) { return false; }
-        if (!int.TryParse(keyName[z..], out elementNr) || elementNr < 0) { return false; }
-
-        basename = keyName[..z];
-        return ScriptVariable.IsValidName(basename);
-    }
-
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
         return ErrorReason_KeyAndSizes(tb)
@@ -1464,22 +1484,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             ?? ErrorReason_PostChecks()
             ?? ErrorReason_ChapterColumn()
             ?? string.Empty;
-    }
-
-    private string? ErrorReason_ScriptType(Table tb) {
-        if (_scriptType is not ScriptType.ListElement) { return null; }
-
-        if (!TrySplitListElementName(_keyName, out var basename, out _)) { return ListElementNameInvalid; }
-
-        // Der Listen-Name darf nicht bereits von einer anderen Skript-Spalte verwendet werden
-        if (tb.Column.Any(otherCol => otherCol != this
-            && otherCol is { IsDisposed: false }
-            && string.Equals(otherCol._keyName, basename, StringComparison.OrdinalIgnoreCase)
-            && otherCol._scriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert))) {
-            return ListElementNameAlreadyUsed;
-        }
-
-        return null;
     }
 
     public List<(string value, RowItem row)> GetCellContentsSortedByLength() {
@@ -2644,6 +2648,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 if (linkCheck.IsFailed) {
                     return $"{CellLinkError}: {linkCheck.FailedReason}";
                 }
+
+                // Alle im Zell-Filter referenzierten Schlüsselspalten dieser Tabelle sammeln
+                var keys = LinkedCellFilterKeyNames(tb);
+
+                // Die referenzierte Kombination muss exakt als Unique-Definition existieren
+                if (keys.Count > 0 && !tb.UniqueValues.Any(uvd => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName)))) {
+                    return LinkedCellCombinationNeedsUniqueDefinition;
+                }
             }
         } else {
             if (!string.IsNullOrEmpty(_columnKeyOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
@@ -2656,6 +2668,22 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (!_relationship_to_First) { return null; }
         if (!_multiLine) { return RelationRequiresMultiline; }
         if (tb.Column.First == this) { return RelationNotAllowedOnFirstColumn; }
+        return null;
+    }
+
+    private string? ErrorReason_ScriptType(Table tb) {
+        if (_scriptType is not ScriptType.ListElement) { return null; }
+
+        if (!TrySplitListElementName(_keyName, out var basename, out _)) { return ListElementNameInvalid; }
+
+        // Der Listen-Name darf nicht bereits von einer anderen Skript-Spalte verwendet werden
+        if (tb.Column.Any(otherCol => otherCol != this
+            && otherCol is { IsDisposed: false }
+            && string.Equals(otherCol._keyName, basename, StringComparison.OrdinalIgnoreCase)
+            && otherCol._scriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert))) {
+            return ListElementNameAlreadyUsed;
+        }
+
         return null;
     }
 
@@ -2714,6 +2742,23 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 tableToCleanup.Disposed -= LinkedTable_Disposed;
             } catch { }
         }
+    }
+
+    /// <summary>
+    /// Sammelt die Schlüsselnamen aller Spalten dieser Tabelle, die im
+    /// Zell-Filter referenziert werden (~KeyName~ im Werteteil).
+    /// </summary>
+    private HashSet<string> LinkedCellFilterKeyNames(Table tb) {
+        var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var thisitem in LinkedCellFilter) {
+            var tmp = thisitem.SplitBy("|");
+            if (tmp.Length < 3) { continue; }
+            foreach (var cc in tb.Column) {
+                if (cc is not { IsDisposed: false } occ) { continue; }
+                if (tmp[2].Contains($"~{occ._keyName}~", StringComparison.OrdinalIgnoreCase)) { keys.Add(occ._keyName); }
+            }
+        }
+        return keys;
     }
 
     private void LinkedTable_Disposed(object? sender, System.EventArgs e) => Invalidate_LinkedTable();

@@ -53,7 +53,17 @@ public class ImportLinkedScriptCommand : TableGenericScriptCommand {
             linkedTable.TouchChunk(fc.ChunkVal);
 
             var rows = fc.Rows;
-            if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' der Tabelle '{linkedTable.Caption}' liefert mehrere Ergebnisse.", false); }
+            if (rows.Count > 1 && rows.Count < 6) {
+                // Mehrere Treffer sind Zeilen-Duplikate. Wie im Zeilenbereinigungs-Dialog
+                // (RowCleanUp) leere Zellen füllen und die Gruppe auf eine Zeile
+                // reduzieren — ohne Rückfragen. Danach das Ergebnis neu prüfen.
+                _ = linkedTable.Row.Combine(rows);
+                _ = linkedTable.Row.RemoveYoungest(rows, true);
+
+                fc.Invalidate_FilteredRows();
+                rows = fc.Rows;
+                if (rows.Count > 1) { return new DoItFeedback($"Suchergebnis der Spalte '{thisColumn.KeyName}' der Tabelle '{linkedTable.Caption}' liefert weiterhin mehrere Ergebnisse.", false); }
+            }
 
             var v = RowItem.CellToVariable([], targetColumn, null, true, false);
 

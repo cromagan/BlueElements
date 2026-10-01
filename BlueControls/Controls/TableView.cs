@@ -2070,6 +2070,11 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 c = fallbackControl;
             }
 
+            // Wert-State der wiederverwendeten Strategie leeren: Das Control trägt
+            // noch den checked-Zustand der vorherigen Zelle. ApplyStyle würde diesen
+            // sonst als Geister-Items in die neue Auswahlliste übernehmen.
+            strategy.Value = string.Empty;
+
             // Style, MultiLine und QuickInfo aus der Style-Quelle ableiten.
             strategy.BeginInit();
             if (styleSource is not null) { strategy.GetStyleFrom(styleSource); }

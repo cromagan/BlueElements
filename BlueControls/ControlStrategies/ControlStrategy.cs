@@ -684,13 +684,20 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// Überschriften (z. B. Tabellen) beginnen über der Zelllinie. Die
     /// TableView begrenzt das Ergebnis auf den sichtbaren Bereich.
     /// </summary>
+    /// <summary>
+    /// Zusätzliche Größe, die der Rahmen gegenüber dem eingebetteten
+    /// Control benötigt. Size.Empty ohne aktiven Rahmen.
+    /// </summary>
+    protected Size BorderExtraSize =>
+        Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box
+            ? Size.Empty
+            : new Size(box.Width - box.DisplayRectangle.Width, box.Height - box.DisplayRectangle.Height);
+
     public virtual Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        if (Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box) { return bounds; }
+        if (Border == GroupBoxStyle.Nothing) { return bounds; }
 
         // Rahmen-Insets ausgleichen, damit das eingebettete Control voll sichtbar bleibt.
-        var display = box.DisplayRectangle;
-        return new Rectangle(bounds.Location,
-            new Size(bounds.Width + box.Width - display.Width, bounds.Height + box.Height - display.Height));
+        return new Rectangle(bounds.Location, bounds.Size + BorderExtraSize);
     }
 
     /// <summary>

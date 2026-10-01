@@ -281,7 +281,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
     }
 
     private async Task ActivateMarker() {
-        if (IsDisposed || !Visible || !Enabled) { return; }
+        if (IsDisposed) { return; }
         if (!f.Strategy.SupportsWordHighlighting) { return; }
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (string.IsNullOrEmpty(f.Value)) { return; }
@@ -299,13 +299,16 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
         var ownWord = _lastrow.CellFirstString();
         if (string.IsNullOrEmpty(ownWord)) { return; }
 
-        // Alten Task abbrechen
-        _markerCancellation?.Cancel();
-        _markerCancellation?.Dispose();
-        _markerCancellation = new CancellationTokenSource();
+        // Alten Task abbrechen. Tausch zuerst, damit parallele Läufe nie dieselbe CTS Canceln/Disposen
+        var cts = new CancellationTokenSource();
+        var oldCts = Interlocked.Exchange(ref _markerCancellation, cts);
+        if (oldCts is not null) {
+            oldCts.Cancel();
+            oldCts.Dispose();
+        }
 
         try {
-            await f.HighlightWordsAsync(names, ownWord, _markerCancellation.Token);
+            await f.HighlightWordsAsync(names, ownWord, cts.Token);
         } catch (OperationCanceledException) {
             // Normal bei Cancel
         } catch (Exception ex) {
@@ -374,6 +377,13 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
 
     private void RestartMarker() {
         if (!f.Strategy.SupportsWordHighlighting) { return; }
+        // Visible/Enabled nur am UI-Thread lesen — der Getter des Hintergrundtasks wirft sonst NRE bei parallelem Dispose
+        try {
+            if (IsDisposed || Disposing || !Visible || !Enabled) { return; }
+        } catch {
+            // Kann dank Multitasking disposed sein
+            return;
+        }
         // Fire-and-forget Pattern für Event-Handler
         Task.Run(async () => {
             try {

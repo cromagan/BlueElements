@@ -664,6 +664,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Filter definieren", () => { }, tblFilterliste));
         }
 
+        if (fehler == LinkedCellCombinationNeedsUniqueDefinition) {
+            solutions.Add(CreateSolution("Fehlende Unique-Definition im Tabellenkopf anlegen", () => (InputItem as ColumnItem)?.CreateLinkedCellUniqueDefinition()));
+        }
+
         if (fehler is RelationRequiresMultiline or SortOnlyMultiline) {
             solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => chkMultiline.Checked = true, chkMultiline));
         }

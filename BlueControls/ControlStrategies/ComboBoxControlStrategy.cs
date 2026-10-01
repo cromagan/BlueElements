@@ -34,13 +34,14 @@ public class ComboBoxControlStrategy : ControlStrategy {
     /// <summary>
     /// Vergrößert die Breite um den Dropdown-Knopf, damit der Zell-Text
     /// beim Edit nicht vom Knopf überdeckt wird. Einzeilig bleibt die
-    /// Combobox auf Zeilenhöhe.
+    /// Combobox auf Zeilenhöhe, zzgl. des Rahmen-Zuschlags, damit das
+    /// eingebettete Control voll sichtbar bleibt.
     /// </summary>
     public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
         var required = base.CalculateRequiredBounds(bounds);
         return new Rectangle(required.Location,
             new Size(required.Width + (_control?.btnDropDown.Width ?? 0),
-                MultiLine ? required.Height : Math.Min(required.Height, SingleLineHeight.CanvasToControl(Zoom))));
+                MultiLine ? required.Height : Math.Min(required.Height, SingleLineHeight.CanvasToControl(Zoom) + BorderExtraSize.Height)));
     }
 
     public override void HandleCaptionClick() {

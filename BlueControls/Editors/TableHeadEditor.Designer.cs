@@ -60,6 +60,7 @@ namespace BlueControls.BlueTableDialogs {
             capAdditional = new Caption();
             btnSpaltenuebersicht = new Button();
             tabRechte = new TabPage();
+            grpCLI = new GroupBox();
             lbxCliRights = new ListBox();
             capCliRights = new Caption();
             tabSortierung = new TabPage();
@@ -68,6 +69,7 @@ namespace BlueControls.BlueTableDialogs {
             capUniqueInfo = new Caption();
             uniqueValueDefinitionEditor = new UniqueValueDefinitionEditor();
             lstUniqueValues = new EditorForIEnumerable();
+            btnUniqueAufräumen = new Button();
             tabVariablen = new TabPage();
             variableEditor = new VariableEditor();
             tabDictionary = new TabPage();
@@ -76,19 +78,18 @@ namespace BlueControls.BlueTableDialogs {
             capDictionary = new Caption();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
-            grpCLI = new GroupBox();
             pnlStatusBar.SuspendLayout();
             grpBenutzergruppen.SuspendLayout();
             grpKennwort.SuspendLayout();
             GlobalTab.SuspendLayout();
             tabAllgemein.SuspendLayout();
             tabRechte.SuspendLayout();
+            grpCLI.SuspendLayout();
             tabSortierung.SuspendLayout();
             tabUniqueValues.SuspendLayout();
             tabVariablen.SuspendLayout();
             tabDictionary.SuspendLayout();
             tabUndo.SuspendLayout();
-            grpCLI.SuspendLayout();
             SuspendLayout();
             // 
             // capStatusBar
@@ -514,12 +515,25 @@ namespace BlueControls.BlueTableDialogs {
             tabRechte.TabIndex = 4;
             tabRechte.Text = "Rechte";
             // 
+            // grpCLI
+            // 
+            grpCLI.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            grpCLI.BackColor = Color.FromArgb(255, 255, 255);
+            grpCLI.CausesValidation = false;
+            grpCLI.Controls.Add(lbxCliRights);
+            grpCLI.Controls.Add(capCliRights);
+            grpCLI.Location = new Point(664, 8);
+            grpCLI.Name = "grpCLI";
+            grpCLI.Size = new Size(320, 664);
+            grpCLI.TabIndex = 3;
+            grpCLI.TabStop = false;
+            grpCLI.Text = "CLI-Rechte:";
+            // 
             // lbxCliRights
             // 
             lbxCliRights.AddAllowed = AddType.None;
             lbxCliRights.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lbxCliRights.Appearance = ListBoxAppearance.Listbox_Boxes;
-            lbxCliRights.AutoSort = true;
             lbxCliRights.CheckBehavior = CheckBehavior.MultiSelection;
             lbxCliRights.FilterText = null;
             lbxCliRights.Location = new Point(8, 48);
@@ -562,6 +576,7 @@ namespace BlueControls.BlueTableDialogs {
             tabUniqueValues.Controls.Add(capUniqueInfo);
             tabUniqueValues.Controls.Add(uniqueValueDefinitionEditor);
             tabUniqueValues.Controls.Add(lstUniqueValues);
+            tabUniqueValues.Controls.Add(btnUniqueAufräumen);
             tabUniqueValues.Location = new Point(4, 25);
             tabUniqueValues.Name = "tabUniqueValues";
             tabUniqueValues.Padding = new Padding(3);
@@ -584,7 +599,7 @@ namespace BlueControls.BlueTableDialogs {
             uniqueValueDefinitionEditor.Location = new Point(720, 8);
             uniqueValueDefinitionEditor.Mode = EditorMode.EditCopy;
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
-            uniqueValueDefinitionEditor.Size = new Size(452, 664);
+            uniqueValueDefinitionEditor.Size = new Size(452, 624);
             uniqueValueDefinitionEditor.TabIndex = 1;
             // 
             // lstUniqueValues
@@ -596,6 +611,18 @@ namespace BlueControls.BlueTableDialogs {
             lstUniqueValues.Size = new Size(696, 592);
             lstUniqueValues.TabIndex = 0;
             lstUniqueValues.AddClicked += lstUniqueValues_AddClicked;
+            // 
+            // btnUniqueAufräumen
+            // 
+            btnUniqueAufräumen.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnUniqueAufräumen.ImageCode = "Zeile||||||||||Pinsel";
+            btnUniqueAufräumen.Location = new Point(720, 640);
+            btnUniqueAufräumen.Name = "btnUniqueAufräumen";
+            btnUniqueAufräumen.QuickInfo = "Bereinigt Zeilen-Duplikate gemäß den Unique-Definitionen.\r\nLeere Zellen werden gefüllt, von jeder Gruppe bleibt die älteste Zeile übrig.\r\nBei mehr als 3 gleichen Zeilen wird nachgefragt.";
+            btnUniqueAufräumen.Size = new Size(452, 32);
+            btnUniqueAufräumen.TabIndex = 2;
+            btnUniqueAufräumen.Text = "Duplikate aufräumen";
+            btnUniqueAufräumen.Click += btnUniqueAufräumen_Click;
             // 
             // tabVariablen
             // 
@@ -680,20 +707,6 @@ namespace BlueControls.BlueTableDialogs {
             tblUndo.TabIndex = 0;
             tblUndo.Text = "UndoTab";
             // 
-            // grpCLI
-            // 
-            grpCLI.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            grpCLI.BackColor = Color.FromArgb(255, 255, 255);
-            grpCLI.CausesValidation = false;
-            grpCLI.Controls.Add(lbxCliRights);
-            grpCLI.Controls.Add(capCliRights);
-            grpCLI.Location = new Point(664, 8);
-            grpCLI.Name = "grpCLI";
-            grpCLI.Size = new Size(320, 664);
-            grpCLI.TabIndex = 3;
-            grpCLI.TabStop = false;
-            grpCLI.Text = "CLI-Rechte:";
-            // 
             // TableHeadEditor
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -714,12 +727,12 @@ namespace BlueControls.BlueTableDialogs {
             GlobalTab.ResumeLayout(false);
             tabAllgemein.ResumeLayout(false);
             tabRechte.ResumeLayout(false);
+            grpCLI.ResumeLayout(false);
             tabSortierung.ResumeLayout(false);
             tabUniqueValues.ResumeLayout(false);
             tabVariablen.ResumeLayout(false);
             tabDictionary.ResumeLayout(false);
             tabUndo.ResumeLayout(false);
-            grpCLI.ResumeLayout(false);
             ResumeLayout(false);
 
         }
@@ -770,6 +783,7 @@ namespace BlueControls.BlueTableDialogs {
         private EditorForIEnumerable lstUniqueValues;
         private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;
         private Caption capUniqueInfo;
+        private Button btnUniqueAufräumen;
         private TabPage tabDictionary;
         private TextBox txbDictionary;
         private Caption capDictionary;

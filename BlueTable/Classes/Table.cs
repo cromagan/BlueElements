@@ -1601,11 +1601,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         TableScriptDescription? script = null;
         if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
-            if (!IsThisScriptOk(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+            var l = EventScript.Get(ev);
+
+            if (!IsThisScriptOk(ev, true)) {
+                var namen = string.Join(", ", l.Select(s => s.KeyName));
+                return new ScriptEndedFeedback($"Skript '{namen}' defekt", false, false, namen);
+            }
 
             Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Ereignis ausgelöst: {eventname}", 0);
-
-            var l = EventScript.Get(ev);
 
             if (l.Count == 1) {
                 script = l[0];
@@ -1618,7 +1621,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         if (script is null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-        if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+        if (!script.IsOk()) { return new ScriptEndedFeedback($"Skript '{script.KeyName}' defekt", false, false, script.KeyName); }
 
         if (retrySeconds <= 0) {
             return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);

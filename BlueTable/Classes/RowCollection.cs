@@ -673,6 +673,41 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         #endregion
     }
 
+    /// <summary>
+    /// Liefert lazy die Duplikat-Gruppen der Spalten: Zeilen mit gleichen Werten
+    /// in allen Spalten ("Dupe Suche"-Filter wie im RowCleanUp). rows begrenzt
+    /// die Suche auf diese Zeilen; null = alle Zeilen der Tabelle prüfen.
+    /// </summary>
+    public IEnumerable<List<RowItem>> DuplicateGroups(List<ColumnItem> columns, IEnumerable<RowItem>? rows) {
+        if (Table is not { IsDisposed: false } tb) { yield break; }
+
+        var cols = columns.Where(c => c is { IsDisposed: false }).ToList();
+        if (cols.Count == 0) { yield break; }
+
+        foreach (var thisR in tb.Row) {
+            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
+
+                #region Filtercol erstellen
+
+                using var f = new FilterCollection(tb, "Dupe Suche");
+
+                foreach (var thisc in cols) {
+                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                }
+
+                #endregion
+
+                #region Zeilen ermitteln (rows)
+
+                var group = rows is null ? f.Rows.ToList() : f.Rows.Intersect(rows).ToList();
+
+                #endregion
+
+                if (group.Count > 1) { yield return group; }
+            }
+        }
+    }
+
     public OperationResult UniqueRow(string value, string comment) {
         //TODO: unbenutzt
         if (string.IsNullOrWhiteSpace(value)) { return OperationResult.Failed("Kein Initialwert angekommen"); }
