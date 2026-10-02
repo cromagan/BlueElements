@@ -1411,22 +1411,26 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Legt die fehlende Unique-Definition für die Schlüsselspalten-Kombination
-    /// der verlinkten Zelle im Tabellenkopf an. Liefert true, wenn eine
+    /// Legt die fehlende Unique-Definition für die im Zell-Filter gefilterten
+    /// Spalten im Tabellenkopf der Ziel-Tabelle an. Liefert true, wenn eine
     /// Definition neu angelegt wurde.
     /// </summary>
     public bool CreateLinkedCellUniqueDefinition() {
-        if (Table is not { IsDisposed: false } tb) { return false; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return false; }
+        if (LinkedTable is not { IsDisposed: false } l_tb) { return false; }
+        if (!string.IsNullOrEmpty(l_tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return false; }
 
-        var keys = LinkedCellFilterKeyNames(tb);
+        var keys = LinkedCellFilterTargetColumnNames(l_tb);
         if (keys.Count == 0) { return false; }
-        if (tb.UniqueValues.Any(uvd => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName)))) { return false; }
+        if (l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(l_tb, uvd, keys))) { return false; }
 
-        var cols = tb.Column.Where(cc => cc is { IsDisposed: false } occ && keys.Contains(occ._keyName)).ToList();
-        var newList = tb.UniqueValues.ToList();
-        newList.Add(new UniqueValueDefinition(tb, cols));
-        tb.UniqueValues = newList.AsReadOnly();
+        // Chunk-Spalte analog UniqueValueDefinition.Repair aufnehmen, damit die
+        // Definition bei nachfolgenden Reparaturen stabil bleibt
+        var cols = l_tb.Column.Where(cc => cc is { IsDisposed: false } occ && keys.Contains(occ._keyName)).ToList();
+        if (l_tb.Column.ChunkValueColumn is { IsDisposed: false } cvc && !cols.Contains(cvc)) { cols.Add(cvc); }
+
+        var newList = l_tb.UniqueValues.ToList();
+        newList.Add(new UniqueValueDefinition(l_tb, cols));
+        l_tb.UniqueValues = newList.AsReadOnly();
         return true;
     }
 
@@ -2469,6 +2473,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return txt;
     }
 
+    /// <summary>
+    /// Prüft, ob eine Unique-Definition exakt die referenzierten Schlüssel
+    /// abdeckt. Die Chunk-Spalte der Ziel-Tabelle wird toleriert, da Repair
+    /// sie jeder Definition hinzufügt.
+    /// </summary>
+    private static bool UniqueDefinitionMatchesKeys(Table linkedTable, UniqueValueDefinition uvd, HashSet<string> keys) {
+        var relevant = linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc
+                ? uvd.KeyColumns.Where(kc => kc != cvc)
+                : uvd.KeyColumns;
+        return relevant.Count() == keys.Count && relevant.All(kc => keys.Contains(kc._keyName));
+    }
+
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     private void CheckIfIAmAKeyColumn() {
@@ -2649,11 +2665,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     return $"{CellLinkError}: {linkCheck.FailedReason}";
                 }
 
-                // Alle im Zell-Filter referenzierten Schlüsselspalten dieser Tabelle sammeln
-                var keys = LinkedCellFilterKeyNames(tb);
+                // Alle im Zell-Filter referenzierten Spalten der Ziel-Tabelle sammeln
+                var keys = LinkedCellFilterTargetColumnNames(l_tb);
 
-                // Die referenzierte Kombination muss exakt als Unique-Definition existieren
-                if (keys.Count > 0 && !tb.UniqueValues.Any(uvd => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName)))) {
+                // Die referenzierte Kombination muss exakt als Unique-Definition in der Ziel-Tabelle existieren
+                if (keys.Count > 0 && !l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(l_tb, uvd, keys))) {
                     return LinkedCellCombinationNeedsUniqueDefinition;
                 }
             }
@@ -2745,18 +2761,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Sammelt die Schlüsselnamen aller Spalten dieser Tabelle, die im
-    /// Zell-Filter referenziert werden (~KeyName~ im Werteteil).
+    /// Sammelt die Schlüsselnamen der Ziel-Tabellen-Spalten, nach denen der
+    /// Zell-Filter filtert (linke Seite der Filter-Definitionen).
     /// </summary>
-    private HashSet<string> LinkedCellFilterKeyNames(Table tb) {
+    private HashSet<string> LinkedCellFilterTargetColumnNames(Table linkedTable) {
         var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var thisitem in LinkedCellFilter) {
             var tmp = thisitem.SplitBy("|");
             if (tmp.Length < 3) { continue; }
-            foreach (var cc in tb.Column) {
-                if (cc is not { IsDisposed: false } occ) { continue; }
-                if (tmp[2].Contains($"~{occ._keyName}~", StringComparison.OrdinalIgnoreCase)) { keys.Add(occ._keyName); }
-            }
+            if (linkedTable.Column[tmp[0]] is { IsDisposed: false } c) { keys.Add(c._keyName); }
         }
         return keys;
     }

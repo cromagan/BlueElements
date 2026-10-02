@@ -348,6 +348,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         return !oldKeys.SetEquals(newKeys);
     }
 
+    /// <summary>
+    /// Liefert die bereinigte Arbeitskopie der Unique-Definitionen aus dem Editor.
+    /// </summary>
+    private List<UniqueValueDefinition> WorkingCopyUniques() => (lstUniqueValues.OutputItem ?? [])
+        .Cast<UniqueValueDefinition>()
+        .Where(x => x.KeyColumns.Count > 0)
+        .ToList();
+
     private static List<string> UnknownWords(IEnumerable<string> words) {
         var result = words.Where(w => !SpellDictionary.ContainsWord(w)).ToList();
         result.Sort(StringComparer.OrdinalIgnoreCase);
@@ -422,7 +430,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void btnUniqueAufräumen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        // Die Arbeitskopie zuerst ins Backend zurückschreiben, damit die
+        // Duplikat-Suche die aktuellen (ggf. im Dialog geänderten) Definitionen nutzt.
+        tb.UniqueValues = WorkingCopyUniques().AsReadOnly();
 
         RepairUniquesInteractive();
     }
@@ -568,13 +580,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         #region UniqueValues aufräumen
 
-        // Arbeitskopie (OutputItem) ins Backend übernehmen. Früher geschah das
-        // bei jeder Änderung über das ItemsModified-Event — jetzt zentral beim
-        // Schließen. Definitionen ohne Schlüsselspalten werden herausgefiltert.
-        var neueDefinitions = (lstUniqueValues.OutputItem ?? [])
-            .Cast<UniqueValueDefinition>()
-            .Where(x => x.KeyColumns.Count > 0)
-            .ToList();
+        // Arbeitskopie (OutputItem) ins Backend übernehmen. Definitionen
+        // ohne Schlüsselspalten werden herausgefiltert.
+        var neueDefinitions = WorkingCopyUniques();
 
         var uniquesChanged = UniquesChanged(Table.UniqueValues, neueDefinitions);
 
