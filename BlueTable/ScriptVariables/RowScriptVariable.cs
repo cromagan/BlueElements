@@ -44,7 +44,12 @@ public class RowScriptVariable : ScriptVariable {
 
     public override bool ToStringPossible => true;
 
-    public override string ValueForCell => string.Empty;
+    public override string ValueForCell {
+        get => ReadableText;
+        set {
+            // Zeilen sind nicht aus einem Zelltext wiederherstellbar - der Aufruf wird ignoriert.
+        }
+    }
 
     public override string ValueForReplace {
         get {

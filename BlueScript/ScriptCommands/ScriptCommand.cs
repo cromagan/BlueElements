@@ -208,7 +208,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                     return scx;
                 }
                 if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true);
+                    scx.ChangeFailedReason(NichtBerechenbarMeldung(scx.ReturnValue, txt[1..pose]), true);
                     return scx;
                 }
                 return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt[(pose + 1)..], varCol, scp);
@@ -287,7 +287,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             var (pose, _) = NextText(txt, posa, BracketRoundClose, false, false, Brackets);
             if (pose <= posa) { return new DoItFeedback("Klammer-Fehler", true); }
 
-            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+            var tmptxt = txt[(posa + 1)..pose];
             if (!string.IsNullOrEmpty(tmptxt)) {
                 var scx = GetVariableByParsing(tmptxt, varCol, scp);
                 if (scx.Failed) {
@@ -299,11 +299,11 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                     return scx;
                 }
                 if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true);
+                    scx.ChangeFailedReason(NichtBerechenbarMeldung(scx.ReturnValue, txt), true);
                     return scx;
                 }
                 // WICHTIG: Hier muss der neue String wieder von vorne geparsed werden
-                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), varCol, scp);
+                return GetVariableByParsing(txt[..posa] + scx.ReturnValue.ValueForReplace + txt[(pose + 1)..], varCol, scp);
             }
         }
 
@@ -355,35 +355,6 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     }
 
     /// <summary>
-    /// Ersetzt eine Variable an Stelle 0, falls dort eine ist.
-    /// Gibt dann den ersetzten Text zurück.
-    /// Achtung: nur Stringable Variablen werden berücksichtigt.
-    /// </summary>
-    /// <param name="txt"></param>
-    /// <param name="varCol"></param>
-    /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol) {
-        if (varCol is null) { return new GetEndFeedback("Interner Variablen-Fehler", true); }
-
-        var posc = 0;
-        var allVarNames = varCol.AllStringableNames();
-
-        do {
-            var (pos, which) = NextText(txt, posc, allVarNames, true, true, Brackets);
-
-            if (pos < 0) { return new GetEndFeedback(0, txt); }
-
-            var thisV = varCol.GetByKey(which);
-            var endz = pos + which.Length;
-
-            if (thisV is null) { return new GetEndFeedback("Variablen-Fehler " + which, true); }
-
-            txt = string.Concat(txt.AsSpan(0, pos), thisV.ValueForReplace, txt.AsSpan(endz));
-            posc = pos;
-        } while (true);
-    }
-
-    /// <summary>
     /// Ersetzt Index-Zugriffe auf Listen-Variablen (Muster: Name[Index-Ausdruck])
     /// durch den Wert des Elements. Stellen ohne vorhandene Variablen davor bleiben unverändert.
     /// </summary>
@@ -418,23 +389,39 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     }
 
     /// <summary>
-    /// Wertet den Index-Ausdruck aus und liefert das Element an dieser Position.
+    /// Ersetzt eine Variable an Stelle 0, falls dort eine ist.
+    /// Gibt dann den ersetzten Text zurück.
+    /// Achtung: nur Stringable Variablen werden berücksichtigt.
     /// </summary>
-    private static DoItFeedback IndexedAccess(ScriptVariable variable, string indexTxt, VariableCollection varCol, ScriptProperties scp) {
-        var idx = GetVariableByParsing(indexTxt, varCol, scp);
-        if (idx.Failed || idx.ReturnValue is null) {
-            idx.ChangeFailedReason("Der Index von '" + variable.KeyName + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
-            return idx;
-        }
+    /// <param name="txt"></param>
+    /// <param name="varCol"></param>
+    /// <returns></returns>
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol) {
+        if (varCol is null) { return new GetEndFeedback("Interner Variablen-Fehler", true); }
 
-        return variable.GetValueByIndex(idx.ReturnValue);
+        var posc = 0;
+        var allVarNames = varCol.AllStringableNames();
+
+        do {
+            var (pos, which) = NextText(txt, posc, allVarNames, true, true, Brackets);
+
+            if (pos < 0) { return new GetEndFeedback(0, txt); }
+
+            var thisV = varCol.GetByKey(which);
+            var endz = pos + which.Length;
+
+            if (thisV is null) { return new GetEndFeedback("Variablen-Fehler " + which, true); }
+
+            txt = string.Concat(txt.AsSpan(0, pos), thisV.ValueForReplace, txt.AsSpan(endz));
+            posc = pos;
+        } while (true);
     }
 
     /// <summary>
     /// Splittet den AttributText an Kommas auf Top-Level (Klammern werden respektiert).
     /// </summary>
     public static List<string>? SplitAttributeToString(string attributtext) {
-        if (string.IsNullOrEmpty(attributtext)) { return null; }
+        if (string.IsNullOrWhiteSpace(attributtext)) { return null; }
 
         List<string> attributes = [];
 
@@ -459,6 +446,8 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         if (countError is { Length: > 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, countError, true); }
 
         if (types.Count == 0) { return new SplittedAttributesFeedback([]); }
+
+        if (attributes is null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Keine Attribute trotz geforderter Argumente.", true); }
 
         //  Variablen und Routinen ersetzen
         List<ScriptVariable> feedbackVariables = [];
@@ -492,13 +481,14 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                 if (tmp2.ReturnValue is UnknownScriptVariable vukn) {
                     foreach (var thisC in AllMethods.Instances) {
                         // Subname/Line werden hier nicht benötigt, das Feedback dient nur der Prüfung auf mögliche Befehle.
-                        var f = thisC.CanDo(attributes[n], 0, false, string.Empty, 0);
+                        // true, damit auch Befehle mit MustUseReturnValue erkannt werden.
+                        var f = thisC.CanDo(attributes[n], 0, true, string.Empty, 0);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
                             if (command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
                                 return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
                             }
 
-                            return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{command}' kann in diesen Skript nicht verwendet werden.", true);
+                            return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{thisC.Syntax}' ist in diesem Skript nicht erlaubt.", true);
                         }
                     }
                 }
@@ -744,6 +734,35 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     public string ReadableText() => Syntax;
 
     public QuickImage? SymbolForReadableText() => null;
+
+    /// <summary>
+    /// Wertet den Index-Ausdruck aus und liefert das Element an dieser Position.
+    /// </summary>
+    private static DoItFeedback IndexedAccess(ScriptVariable variable, string indexTxt, VariableCollection varCol, ScriptProperties scp) {
+        var idx = GetVariableByParsing(indexTxt, varCol, scp);
+        if (idx.Failed || idx.ReturnValue is null) {
+            idx.ChangeFailedReason("Der Index von '" + variable.KeyName + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
+            return idx;
+        }
+
+        return variable.GetValueByIndex(idx.ReturnValue);
+    }
+
+    /// <summary>
+    /// Baut eine verständliche Meldung, wenn ein Teilausdruck keine textverwendbare Variable liefert.
+    /// </summary>
+    private static string NichtBerechenbarMeldung(ScriptVariable v, string ausdruck) {
+        if (v is not UnknownScriptVariable) { return "Der Wert vom Typ '" + v.MyClassId + "' kann hier nicht als Text verwendet werden: " + ausdruck; }
+
+        foreach (var thisC in AllMethods.Instances) {
+            // Subname/Line werden hier nicht benötigt, das Feedback dient nur der Prüfung auf mögliche Befehle.
+            if (string.IsNullOrEmpty(thisC.CanDo(ausdruck, 0, true, string.Empty, 0).FailedReason)) {
+                return "Der Befehl '" + thisC.Syntax + "' ist in diesem Skript nicht erlaubt.";
+            }
+        }
+
+        return "Der Ausdruck '" + ausdruck + "' konnte nicht aufgelöst werden (unbekannte Variable oder unbekannter Befehl).";
+    }
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp) {
         if (ScriptVariable.TryParseValue<BoolScriptVariable>(txt, out var result) && result is bool b) { return b; }

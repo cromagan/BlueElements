@@ -42,8 +42,19 @@ public class ListOfRowsScriptVariable : ScriptVariable {
 
     public override bool IsNullOrEmpty => _list.Count == 0;
 
+    /// <summary>
+    /// Gibt den Text "Rowlist: Anzahl" zurück.
+    /// </summary>
+    public override string ReadableText => _list.Count == 0 ? "Rowlist: [LEER]" : "Rowlist: " + _list.Count + " Zeilen";
+
     public override bool ToStringPossible => false;
-    public override string ValueForCell => string.Empty;
+
+    public override string ValueForCell {
+        get => ReadableText;
+        set {
+            // Zeilenlisten sind nicht aus einem Zelltext wiederherstellbar - der Aufruf wird ignoriert.
+        }
+    }
 
     public List<RowItem> ValueList {
         get => _list;

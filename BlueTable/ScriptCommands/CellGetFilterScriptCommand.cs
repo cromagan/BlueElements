@@ -13,7 +13,7 @@ namespace BlueScript.ScriptCommands;
 /// Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.
 /// Ein Filter kann mit dem Befehl 'Filter' erstellt werden.
 /// 
-/// Ähnlichr Befehle: CellGetRow, ImportLinked
+/// Ähnliche Befehle: CellGetRow, ImportLinked
 /// </summary>
 public class CellGetFilterScriptCommand : TableGenericScriptCommand {
 

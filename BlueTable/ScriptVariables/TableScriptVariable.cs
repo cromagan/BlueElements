@@ -50,7 +50,12 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
 
     public override bool ToStringPossible => true;
 
-    public override string ValueForCell => string.Empty;
+    public override string ValueForCell {
+        get => ReadableText;
+        set {
+            // Tabellen sind nicht aus einem Zelltext wiederherstellbar - der Aufruf wird ignoriert.
+        }
+    }
 
     public override string ValueForReplace {
         get {

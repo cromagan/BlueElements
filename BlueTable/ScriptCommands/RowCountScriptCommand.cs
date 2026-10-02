@@ -16,7 +16,7 @@ public class RowCountScriptCommand : TableGenericScriptCommand {
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => DoubleScriptVariable.ShortName_Plain;
-    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
+    public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Standard;
     public override string Syntax => "RowCount(Filter, ...)";
 
     #endregion
