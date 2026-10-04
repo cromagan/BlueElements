@@ -140,12 +140,6 @@ public class TableJsonFragments : TableJsonFile {
 
         if (firstTime) {
             _isInCache = LastSaveMainFileUtcDate;
-            MainChunkLoadDone = true; // TODO: DIRTY FIX ENTFERNEN!
-            // Wird benötigt, weil unten GetLastChanges/InjectData aufgerufen werden,
-            // die wiederum IsGenericEditable prüfen. MainChunkLoadDone=true verhindert,
-            // dass die Tabelle während des ersten Ladens als "nicht editierbar" gilt.
-            // Dedup erfolgt über _processedHashes (siehe unten) - sicher gegen
-            // PreviousValue-Inkonsistenz zwischen Fragment und lokalem Undo.
 
             // Hash-Cache aus der Undo-Liste des Hauptfiles aufbauen.
             // Hash() ist unabhängig vom Serialisationsformat (JSON vs. String),
@@ -531,7 +525,11 @@ public class TableJsonFragments : TableJsonFile {
     /// <param name="initialload"></param>
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, List<(string Path, JsonElement Value, DateTime TimeUtc, string Container, string Hash)>? jsonChanges, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data is null && jsonChanges is not { Count: > 0 }) { return OperationResult.Success; }
-        var f = IsGenericEditable(false);
+
+        // Bei initialload die MainChunkLoadDone-Sperre umgehen - die Tabelle
+        // befindet sich gerade im ersten Ladevorgang (IsGenericEditable prüft
+        // mit isloading=true). Freeze- und Prozess-Prüfungen bleiben aktiv.
+        var f = IsGenericEditable(initialload);
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }

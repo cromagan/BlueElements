@@ -128,12 +128,6 @@ public class TableFragments : TableFile {
 
         if (firstTime) {
             _isInCache = LastSaveMainFileUtcDate;
-            MainChunkLoadDone = true; // TODO: DIRTY FIX ENTFERNEN!
-            // Wird benötigt, weil unten GetLastChanges/InjectData aufgerufen werden,
-            // die wiederum IsGenericEditable prüfen. MainChunkLoadDone=true verhindert,
-            // dass die Tabelle während des ersten Ladens als "nicht editierbar" gilt.
-            // Dedup erfolgt über _processedHashes (siehe unten) - sicher gegen
-            // PreviousValue-Inkonsistenz zwischen Fragment und lokalem Undo.
 
             // Dedup-Grundlage ist die Historie des Hauptfiles: Items, deren Hash dort
             // steht, gelten als verbucht und werden nicht erneut angewendet. Das ist
@@ -481,7 +475,11 @@ public class TableFragments : TableFile {
     /// <param name="initialload"></param>
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data is null) { return OperationResult.Success; }
-        var f = IsGenericEditable(false);
+
+        // Bei initialload die MainChunkLoadDone-Sperre umgehen - die Tabelle
+        // befindet sich gerade im ersten Ladevorgang (IsGenericEditable prüft
+        // mit isloading=true). Freeze- und Prozess-Prüfungen bleiben aktiv.
+        var f = IsGenericEditable(initialload);
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
