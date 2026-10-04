@@ -9,10 +9,10 @@ internal class FileExistsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
     public override string Command => "fileexists";
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "FileExists(FilePath)";
 

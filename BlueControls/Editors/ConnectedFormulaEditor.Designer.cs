@@ -16,7 +16,6 @@ namespace BlueControls.Forms {
         /// </summary>
         private IContainer components = null;
 
-
         #region Windows Form Designer generated code
 
         /// <summary>

@@ -30,7 +30,6 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
     #region Properties
 
     public static string ClassId => "tbl";
-    public static string ShortName_Variable => "*tbl";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
 

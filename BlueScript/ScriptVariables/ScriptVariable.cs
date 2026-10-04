@@ -35,7 +35,6 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     #region Properties
 
     public static string Any_Plain => "any";
-    public static string Any_Variable => "*any";
     public abstract int CheckOrder { get; }
 
     public string Comment {

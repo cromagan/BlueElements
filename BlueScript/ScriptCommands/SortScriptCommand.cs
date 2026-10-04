@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.
 /// </summary>
@@ -10,7 +9,7 @@ internal class SortScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, BoolVal];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [BoolScriptVariable.ClassId]];
     public override string Command => "sort";
     public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 

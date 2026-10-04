@@ -7,11 +7,6 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     #region Fields
 
     public static readonly AssemblyAwareCache<ScriptCommand> AllMethods = new();
-    public static readonly List<string> BoolVal = [BoolScriptVariable.ShortName_Plain];
-    public static readonly List<string> FloatVal = [DoubleScriptVariable.ShortName_Plain];
-    public static readonly List<string> ListStringVar = [ListOfStringsScriptVariable.ShortName_Variable];
-    public static readonly List<string> StringVal = [StringScriptVariable.ShortName_Plain];
-    public static readonly List<string> StringVar = [StringScriptVariable.ShortName_Variable];
 
     #endregion
 
@@ -221,7 +216,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                 var tl = txt[1..pose];
 
                 if (!string.IsNullOrWhiteSpace(tl)) {
-                    var l = SplitAttributeToVars("?", varCol, tl, [[StringScriptVariable.ShortName_Plain]], LastArgMinCountTypeScriptCommand.MinOnce, scp);
+                    var l = SplitAttributeToVars("?", varCol, tl, [[StringScriptVariable.ClassId]], LastArgMinCountTypeScriptCommand.MinOnce, scp);
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix);
                     }
@@ -439,6 +434,17 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         return attributes;
     }
 
+    /// <summary>
+    /// Zerlegt den Attribut-Text eines Befehls in einzelne, typgeprüfte Variablen.
+    /// Ist ein Attribut exakt ein vorhandener Variablenname, wird die Instanz direkt übergeben;
+    /// alles andere (Literale, Ausdrücke, noch nicht vorhandene Namen) wird neu berechnet.
+    /// </summary>
+    /// <param name="command">Befehlsname, nur für Fehlermeldungen.</param>
+    /// <param name="varcol">Aktuelle Variablen-Sammlung.</param>
+    /// <param name="attributText">Der rohe Attribut-Text zwischen den Klammern.</param>
+    /// <param name="types">Erwarteter Typ je Argument; der letzte Eintrag gilt für Endlos-Argumente.</param>
+    /// <param name="lastArgMinCount">Wiederholbarkeit des letzten Arguments.</param>
+    /// <param name="scp">Skript-Eigenschaften zum Auflösen von Ausdrücken und Befehlen.</param>
     public static SplittedAttributesFeedback SplitAttributeToVars(string command, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountTypeScriptCommand lastArgMinCount, ScriptProperties? scp) {
         var attributes = SplitAttributeToString(attributText);
 
@@ -460,16 +466,9 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
             ScriptVariable? v;
 
-            var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith('*');
-
-            if (mustBeVar) {
-                var varn = attributes[n];
-                if (!ScriptVariable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), true); }
-
-                v = varcol?.GetByKey(varn);
-                if (v is null) {
-                    return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true);
-                }
+            if (varcol is not null && ScriptVariable.IsValidName(attributes[n]) && varcol.GetByKey(attributes[n]) is { } vorhandene) {
+                // Vorhandene Variable direkt als Instanz übergeben, ohne Serialisierungs-Roundtrip.
+                v = vorhandene;
             } else {
                 if (varcol is null || scp is null) {
                     return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Interner Fehler: Null-Parameter", true);
@@ -500,8 +499,8 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             var ok = false;
 
             foreach (var thisAt in exceptetType) {
-                if (thisAt.TrimStart('*') == v.MyClassId) { ok = true; break; }
-                if (thisAt.TrimStart('*') == ScriptVariable.Any_Plain) { ok = true; break; }
+                if (thisAt == v.MyClassId) { ok = true; break; }
+                if (thisAt == ScriptVariable.Any_Plain) { ok = true; break; }
             }
 
             if (!ok) {
@@ -573,36 +572,50 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             return new DoItFeedback("Der Wert '" + value + "' für Variable '" + varnam + "' konnte nicht aufgelöst werden (unbekannte Methode oder Variable im Ausdruck).", true);
         }
 
-        if (attvar.Attributes[0] is { } v) {
-            if (generateVariable) {
-                if (vari is UnknownScriptVariable) { varCol.Remove(vari.KeyName); }
-                v.KeyName = varnam;
-                v.ReadOnly = false;
-                varCol.Add(v);
-                return new DoItFeedback(v);
-            }
-
-            if (vari is null) {
-                // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
-                return DoItFeedback.InternerFehler();
-            }
-
-            if (indexTxt is { Length: > 0 }) {
-                var idx = GetVariableByParsing(indexTxt, varCol, scp);
-                if (idx.Failed || idx.ReturnValue is null) {
-                    idx.ChangeFailedReason("Der Index von '" + varnam + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
-                    return idx;
-                }
-
-                var fi = vari.SetValueByIndex(idx.ReturnValue, v);
-                return new DoItFeedback(fi, fi is { Length: > 0 });
-            }
-
-            var f = vari.GetValueFrom(v);
-            return new DoItFeedback(f, !string.IsNullOrWhiteSpace(f));
+        if (attvar.Attributes[0] is not { } vQuelle) {
+            // attvar.Attributes[0] müsste immer eine Variable sein...
+            return DoItFeedback.InternerFehler();
         }
-        // attvar.Attributes[0] müsste immer eine Variable sein...
-        return DoItFeedback.InternerFehler();
+
+        ScriptVariable v;
+        if (varCol.GetByKey(vQuelle.KeyName) == vQuelle) {
+            // Der Wert ist die Instanz einer vorhandenen Variable: Serialisieren und neu parsen (Deserialize),
+            // damit Ziel und Quelle nicht aliasen.
+            var kopie = GetVariableByParsing(vQuelle.ValueForReplace, varCol, scp);
+            if (kopie.Failed || kopie.ReturnValue is not { } kopieVar) {
+                return new DoItFeedback($"Der Wert der Variable '{vQuelle.KeyName}' konnte nicht kopiert werden: {kopie.FailedReason}", kopie.NeedsScriptFix);
+            }
+            v = kopieVar;
+        } else {
+            v = vQuelle; // Frisch berechnete Instanz, kein Alias-Risiko
+        }
+
+        if (generateVariable) {
+            if (vari is UnknownScriptVariable) { varCol.Remove(vari.KeyName); }
+            v.KeyName = varnam;
+            v.ReadOnly = false;
+            varCol.Add(v);
+            return new DoItFeedback(v);
+        }
+
+        if (vari is null) {
+            // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
+            return DoItFeedback.InternerFehler();
+        }
+
+        if (indexTxt is { Length: > 0 }) {
+            var idx = GetVariableByParsing(indexTxt, varCol, scp);
+            if (idx.Failed || idx.ReturnValue is null) {
+                idx.ChangeFailedReason("Der Index von '" + varnam + "[...]' konnte nicht berechnet werden: " + idx.FailedReason, true);
+                return idx;
+            }
+
+            var fi = vari.SetValueByIndex(idx.ReturnValue, v);
+            return new DoItFeedback(fi, fi is { Length: > 0 });
+        }
+
+        var f = vari.GetValueFrom(v);
+        return new DoItFeedback(f, !string.IsNullOrWhiteSpace(f));
     }
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, string subname, int line) {
@@ -665,9 +678,6 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
             var a = string.Join(", ", Args[z]);
-            if (a.Contains('*')) {
-                a = a.Replace("*", string.Empty) + " (muss eine vorhandene Variable sein)";
-            }
 
             co = co + "  - Argument " + (z + 1) + ": " + a;
 

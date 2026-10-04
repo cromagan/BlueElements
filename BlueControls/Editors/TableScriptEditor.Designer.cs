@@ -513,7 +513,6 @@ namespace BlueControls.BlueTableDialogs {
 
         }
 
-
         private GroupBox grpRow;
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;

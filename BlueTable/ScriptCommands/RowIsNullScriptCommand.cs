@@ -11,10 +11,10 @@ public class RowIsNullScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [RowVar];
+    public override List<List<string>> Args => [[RowScriptVariable.ClassId]];
     public override string Command => "rowisnull";
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override string Syntax => "RowIsNull(Row)";
 
     #endregion

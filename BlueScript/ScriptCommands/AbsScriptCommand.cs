@@ -9,12 +9,12 @@ internal class AbsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId]];
 
     public override string Command => "abs";
 
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "Abs(Number)";
 
     #endregion

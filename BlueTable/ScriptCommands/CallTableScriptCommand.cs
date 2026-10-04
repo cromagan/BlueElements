@@ -14,11 +14,11 @@ public class CallTableScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, StringVal, StringVal];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "calltable";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
     public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 

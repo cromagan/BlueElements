@@ -19,11 +19,11 @@ public class CellGetFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
     public override string Command => "cellgetfilter";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "CellGetFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, Filter, ...)";
 

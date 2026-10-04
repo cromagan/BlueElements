@@ -14,11 +14,11 @@ internal class AddDaysScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "adddays";
     public override List<string> Constants => [.. DateTimeFormats];
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Variable;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "AddDays(DateTimeString, Days, Format)";
 
     #endregion

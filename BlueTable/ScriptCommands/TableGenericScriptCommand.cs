@@ -8,12 +8,6 @@ public abstract class TableGenericScriptCommand : ScriptCommand {
 
     #region Fields
 
-    public static readonly List<string> FilterVar = [FilterScriptVariable.ShortName_Variable];
-
-    public static readonly List<string> RowVar = [RowScriptVariable.ShortName_Variable];
-
-    public static readonly List<string> TableVar = [TableScriptVariable.ShortName_Variable];
-
     #endregion
 
     #region Methods

@@ -18,7 +18,7 @@ internal class ExecuteScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
 
     public override string Command => "execute";
 

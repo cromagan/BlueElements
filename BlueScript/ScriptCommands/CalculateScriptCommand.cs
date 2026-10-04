@@ -9,10 +9,10 @@ internal class CalculateScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "calculate";
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "Calculate(string, NaNValue)";
 
     #endregion

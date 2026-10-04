@@ -5,7 +5,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-
 namespace BlueBasics.ClassesStatic;
 
 public static class IO {

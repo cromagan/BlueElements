@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Gibt von den angegebenen Werten den mit dem höchsten Wert zurück.
 /// Ein Text wird - wenn möglich - als Zahl interpretiert.
@@ -13,12 +12,12 @@ internal class MaxScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[DoubleScriptVariable.ShortName_Plain, StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId, StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId]];
     public override string Command => "max";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "Max(Value1, Value2, ...)";
 
     #endregion

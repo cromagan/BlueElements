@@ -10,7 +10,7 @@ internal class AddScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain, DoubleScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId, DoubleScriptVariable.ClassId]];
     public override string Command => "add";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "Add(ListVariable, Value1, Value2, ...);";

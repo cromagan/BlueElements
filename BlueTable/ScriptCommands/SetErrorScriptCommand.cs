@@ -21,7 +21,7 @@ public class SetErrorScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, [ScriptVariable.Any_Variable]];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [ScriptVariable.Any_Plain]];
     public override string Command => "seterror";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
@@ -40,7 +40,7 @@ public class SetErrorScriptCommand : TableGenericScriptCommand {
         var attributes = SplitAttributeToString(infos.AttributText);
         if (attributes is not { Count: > 1 }) { return new DoItFeedback("SetError benötigt eine Nachricht und mindestens eine Spalte.", true); }
 
-        var msg = SplitAttributeToVars(Command, varCol, attributes[0], [StringVal], LastArgMinCountTypeScriptCommand.ExactlyOnce, scp);
+        var msg = SplitAttributeToVars(Command, varCol, attributes[0], [[StringScriptVariable.ClassId]], LastArgMinCountTypeScriptCommand.ExactlyOnce, scp);
         if (msg.Failed) { return DoItFeedback.AttributFehler(msg); }
 
         var message = msg.ValueStringGet(0).Replace("|", "").Replace("\r", "").Replace("\n", "");

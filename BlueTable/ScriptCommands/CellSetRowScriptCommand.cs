@@ -12,10 +12,10 @@ public class CellSetRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain, DoubleScriptVariable.ShortName_Plain], StringVal, RowVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId, DoubleScriptVariable.ClassId], [StringScriptVariable.ClassId], [RowScriptVariable.ClassId]];
     public override string Command => "cellsetrow";
 
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
     public override string Syntax => "CellSetRow(Value, Column, Row)";
 

@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.
 /// </summary>
@@ -10,11 +9,11 @@ internal class TrimSuffixScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "trimsuffix";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "TrimSuffix(string, suffix, ...)";
 
     #endregion

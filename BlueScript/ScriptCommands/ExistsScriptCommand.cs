@@ -9,10 +9,10 @@ internal class ExistsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[ScriptVariable.Any_Variable]];
+    public override List<List<string>> Args => [[ScriptVariable.Any_Plain]];
     public override string Command => "exists";
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
 
     public override string Syntax => "Exists(Variable)";
 
@@ -26,6 +26,10 @@ internal class ExistsScriptCommand : ScriptCommand {
         if (attvar.Failed) {
             return DoItFeedback.Falsch();
         }
+
+        // Nicht vorhandene Variablen kommen als UnknownScriptVariable an - also nicht vorhanden.
+        if (attvar.Attributes[0] is UnknownScriptVariable) { return DoItFeedback.Falsch(); }
+
         return DoItFeedback.Wahr();
     }
 

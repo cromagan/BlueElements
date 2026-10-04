@@ -56,7 +56,6 @@ namespace BlueControls.Forms {
 
         #endregion
 
-
         private TableView _tableView;
     }
 }

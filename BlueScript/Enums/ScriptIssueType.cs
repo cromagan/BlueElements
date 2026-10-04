@@ -12,6 +12,5 @@ public enum ScriptIssueType {
     /// </summary>
     BerechnungFehlgeschlagen = 3,
 
-    VariableNichtGefunden = 4,
-    VariableErwartet = 5
+    VariableNichtGefunden = 4
 }

@@ -18,7 +18,7 @@ public class BlinkScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, RowVar, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [RowScriptVariable.ClassId], [StringScriptVariable.ClassId]];
 
     public override string Command => "blink";
 

@@ -23,7 +23,7 @@ public class IfScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [BoolVal];
+    public override List<List<string>> Args => [[BoolScriptVariable.ClassId]];
     public override string Command => "if";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "if (true) { Code zum Ausführen }";

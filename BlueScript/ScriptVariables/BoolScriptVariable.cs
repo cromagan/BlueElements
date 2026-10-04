@@ -25,8 +25,6 @@ public class BoolScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "bol";
-    public static string ShortName_Plain => "bol";
-    public static string ShortName_Variable => "*bol";
     public override int CheckOrder => 0;
     public override bool GetFromStringPossible => true;
 

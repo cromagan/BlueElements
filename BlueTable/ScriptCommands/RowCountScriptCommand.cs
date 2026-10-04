@@ -11,11 +11,11 @@ public class RowCountScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [FilterVar];
+    public override List<List<string>> Args => [[FilterScriptVariable.ClassId]];
     public override string Command => "rowcount";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Standard;
     public override string Syntax => "RowCount(Filter, ...)";
 

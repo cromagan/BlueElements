@@ -18,7 +18,7 @@ public class ShowFormulaFormScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, RowVar, StringVal, BoolVal, BoolVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [RowScriptVariable.ClassId], [StringScriptVariable.ClassId], [BoolScriptVariable.ClassId], [BoolScriptVariable.ClassId]];
     public override string Command => "showformulaform";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;

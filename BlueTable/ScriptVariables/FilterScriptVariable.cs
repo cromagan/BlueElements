@@ -29,7 +29,6 @@ public class FilterScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "fil";
-    public static string ShortName_Variable => "*fil";
     public override int CheckOrder => 99;
 
     public override bool GetFromStringPossible => false;

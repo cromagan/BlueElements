@@ -133,7 +133,6 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
-
         if (row?.Table is { IsDisposed: false } rowTb) {
             generatedVars.AddRange(rowTb.CreateVariableCollection(row, false, false, produktiv, true, filterItems));
         } else if (table is { IsDisposed: false }) {

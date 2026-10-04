@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als StringScriptCommand weitergegeben.
 /// </summary>
@@ -10,10 +9,10 @@ internal class StringScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[DoubleScriptVariable.ShortName_Plain, StringScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId, StringScriptVariable.ClassId]];
     public override string Command => "string";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "String(numeral)";
 
     #endregion

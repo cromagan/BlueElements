@@ -11,7 +11,7 @@ internal class ExtractTagsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "extracttags";
 
     public override string Syntax => "ExtractTags(String, Delemiter);";

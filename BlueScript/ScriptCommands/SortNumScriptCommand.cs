@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.
 /// </summary>
@@ -10,7 +9,7 @@ internal class SortNumScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, FloatVal];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "sortnum";
 
     public override string Syntax => "SortNum(ListVariable, Defaultwert);";

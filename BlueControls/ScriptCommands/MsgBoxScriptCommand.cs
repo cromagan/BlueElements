@@ -15,10 +15,10 @@ public class MsgBoxScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "msgbox";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
-    public override string Returns => DoubleScriptVariable.ShortName_Variable;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
     public override string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";
 

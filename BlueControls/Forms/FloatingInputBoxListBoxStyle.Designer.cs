@@ -18,7 +18,6 @@ namespace BlueControls.Forms
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
 
-
         #region Windows Form Designer generated code
         /// <summary>
         /// Required method for Designer support - do not modify

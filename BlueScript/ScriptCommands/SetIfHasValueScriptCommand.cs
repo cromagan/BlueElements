@@ -13,7 +13,7 @@ internal class SetIfHasValueScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable, DoubleScriptVariable.ShortName_Variable, BoolScriptVariable.ShortName_Variable], [ScriptVariable.Any_Plain]];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId, DoubleScriptVariable.ClassId, BoolScriptVariable.ClassId], [ScriptVariable.Any_Plain]];
     public override string Command => "setifhasvalue";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "SetIfHasValue(Variable, Werte, ...);";

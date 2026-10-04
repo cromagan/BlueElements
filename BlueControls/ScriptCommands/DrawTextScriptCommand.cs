@@ -2,7 +2,6 @@
 
 using BlueScript.Classes;
 using BlueScript.ScriptVariables;
-using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
@@ -13,7 +12,7 @@ public class DrawTextScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, StringVal, FloatVal, FloatVal, StringVal, FloatVal];
+    public override List<List<string>> Args => [[BitmapScriptVariable.ClassId], [StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "drawtext";
     public override string Syntax => "DrawText(Bild, Text, x, y, Farbe, Schriftgröße);";
 

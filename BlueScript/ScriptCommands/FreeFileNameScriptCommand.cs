@@ -4,7 +4,6 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.
 /// Wird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.
@@ -15,11 +14,11 @@ internal class FreeFileNameScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "freefilename";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "FreeFileName(Path, PreferedName, Suffix)";
 
     #endregion

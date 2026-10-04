@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-
 namespace BlueControls.Controls;
 
     partial class FlexiControlForRowSelector {
@@ -42,7 +41,6 @@ namespace BlueControls.Controls;
         }
 
         #endregion
-
 
         private FlexiControl f;
     }

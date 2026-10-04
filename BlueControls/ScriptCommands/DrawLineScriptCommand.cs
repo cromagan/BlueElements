@@ -2,7 +2,6 @@
 
 using BlueScript.Classes;
 using BlueScript.ScriptVariables;
-using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
@@ -13,7 +12,7 @@ public class DrawLineScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[BitmapScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "drawline";
     public override string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
 

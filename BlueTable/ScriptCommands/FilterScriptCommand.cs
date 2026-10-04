@@ -14,14 +14,14 @@ public class FilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "filter";
 
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => FilterScriptVariable.ShortName_Variable;
+    public override string Returns => FilterScriptVariable.ClassId;
     public override string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
 
     #endregion

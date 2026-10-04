@@ -11,11 +11,11 @@ internal class LoadImageScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
     public override string Command => "loadimage";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => BitmapScriptVariable.ShortName_Variable;
+    public override string Returns => BitmapScriptVariable.ClassId;
     public override string Syntax => "LoadImage(Filename)";
 
     #endregion

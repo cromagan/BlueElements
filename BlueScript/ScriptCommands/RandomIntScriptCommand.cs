@@ -10,10 +10,10 @@ internal class RandomIntScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId]];
     public override string Command => "randomint";
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "RandomInt(maxValue)";
 
     #endregion

@@ -14,11 +14,11 @@ public class SumFilterScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FilterVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
     public override string Command => "sumfilter";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "SumFilter(Colum, Filter, ...)";
 

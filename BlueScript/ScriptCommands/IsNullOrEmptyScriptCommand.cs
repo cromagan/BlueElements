@@ -9,10 +9,10 @@ internal class IsNullOrEmptyScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[ScriptVariable.Any_Variable]];
+    public override List<List<string>> Args => [[ScriptVariable.Any_Plain]];
     public override string Command => "isnullorempty";
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
 
     public override string Syntax => "isNullOrEmpty(Variable)";
 

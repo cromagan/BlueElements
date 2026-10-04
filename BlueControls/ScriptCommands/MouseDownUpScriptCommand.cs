@@ -13,7 +13,7 @@ internal class MouseDownUpScriptCommand : ScriptCommand, ICommandBuilder {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal, FloatVal, FloatVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
 
     public override string Command => "mousedownup";
 

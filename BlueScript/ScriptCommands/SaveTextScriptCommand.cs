@@ -12,7 +12,7 @@ internal class SaveTextScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "savetext";
     public override List<string> Constants => ["UTF8", "WIN1252"];
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

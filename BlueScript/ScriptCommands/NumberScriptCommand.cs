@@ -9,10 +9,10 @@ internal class NumberScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "number";
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "Number(string, NaNValue)";
 
     #endregion

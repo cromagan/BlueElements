@@ -14,12 +14,12 @@ public class CallByFilenameScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "callbyfilename";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
 
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
     public override string Syntax => "CallByFilename(Filename, Attribute0, ...);";
 

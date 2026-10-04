@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Entfernt aus der Liste die angegebenen Werte.
 /// Ist der Wert nicht in der Liste, wird kein Fehler ausgelöst.
@@ -11,7 +10,7 @@ internal class RemoveScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [BoolScriptVariable.ClassId], [StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId]];
     public override string Command => "remove";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";

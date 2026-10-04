@@ -11,7 +11,7 @@ public class SoftMessageScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
 
     public override string Command => "softmessage";
 

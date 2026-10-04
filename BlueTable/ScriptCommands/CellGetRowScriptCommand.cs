@@ -12,10 +12,10 @@ public class CellGetRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, RowVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [RowScriptVariable.ClassId]];
     public override string Command => "cellgetrow";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "CellGetRow(Column, Row)";
 

@@ -10,10 +10,10 @@ internal class DateTimeDifferenceInDaysScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "datetimedifferenceindays";
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
 
     #endregion

@@ -124,7 +124,6 @@ namespace BlueControls.Controls {
 
         }
 
-
         #endregion
 
         private SplitContainer splitContainer1;

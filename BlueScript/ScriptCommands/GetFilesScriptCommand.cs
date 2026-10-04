@@ -11,11 +11,11 @@ internal class GetFilesScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "getfiles";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
+    public override string Returns => ListOfStringsScriptVariable.ClassId;
     public override string Syntax => "GetFiles(Path, Suffix)";
 
     #endregion

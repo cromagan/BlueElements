@@ -12,12 +12,12 @@ public class LinkifyScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [TableScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "linkify";
 
     public override bool MustUseReturnValue => true;
 
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
 
     #endregion

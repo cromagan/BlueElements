@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using static BlueScript.ScriptVariables.AiScriptVariable;
-using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
@@ -12,11 +11,11 @@ internal class AskAiBmpScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [AiVal, StringVal, BmpVar];
+    public override List<List<string>> Args => [[AiScriptVariable.ClassId], [StringScriptVariable.ClassId], [BitmapScriptVariable.ClassId]];
     public override string Command => "askaibmp";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "AskAiBmp(Ai, text, image)";
 
     #endregion

@@ -29,7 +29,6 @@ public class RowScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "row";
-    public static string ShortName_Variable => "*row";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
 

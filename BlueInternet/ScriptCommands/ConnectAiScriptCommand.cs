@@ -9,10 +9,10 @@ internal class ConnectAiScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "ai";
     public override bool MustUseReturnValue => true;
-    public override string Returns => AiScriptVariable.ShortName_Variable;
+    public override string Returns => AiScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "Ai(APIKey, Endpoint, Model)";
 

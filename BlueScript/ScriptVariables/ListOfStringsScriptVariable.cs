@@ -35,8 +35,6 @@ public class ListOfStringsScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "lst";
-    public static string ShortName_Plain => "lst";
-    public static string ShortName_Variable => "*lst";
     public override int CheckOrder => 3;
     public override bool GetFromStringPossible => true;
 

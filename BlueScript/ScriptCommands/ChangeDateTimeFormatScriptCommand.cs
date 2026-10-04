@@ -13,11 +13,11 @@ internal class ChangeDateTimeFormatScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "changedatetimeformat";
     public override List<string> Constants => [.. DateTimeFormats];
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 
     #endregion

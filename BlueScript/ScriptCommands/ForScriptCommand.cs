@@ -13,7 +13,7 @@ internal class ForScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], FloatVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[UnknownScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "for";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "For(Variable, Min, Max, Step) { }";

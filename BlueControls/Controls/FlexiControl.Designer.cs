@@ -7,7 +7,6 @@ using System.Drawing;
 namespace BlueControls.Controls {
     public partial class FlexiControl {
 
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.

@@ -3,8 +3,6 @@
 using System.Drawing.Imaging;
 using static BlueBasics.ClassesStatic.IO;
 
-using static BlueScript.ScriptVariables.BitmapScriptVariable;
-
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
@@ -14,7 +12,7 @@ internal class SaveImageScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, BmpVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [BitmapScriptVariable.ClassId]];
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

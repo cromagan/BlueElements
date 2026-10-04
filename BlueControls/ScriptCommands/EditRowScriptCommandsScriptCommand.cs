@@ -15,7 +15,7 @@ public class EditRowScriptCommandsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [RowVar];
+    public override List<List<string>> Args => [[RowScriptVariable.ClassId]];
     public override string Command => "editrow";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;

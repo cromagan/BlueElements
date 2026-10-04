@@ -56,8 +56,6 @@ partial class RowAdder {
 
     }
 
-
-
     #endregion
 
     public ListBoxCore f;

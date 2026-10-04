@@ -13,11 +13,11 @@ internal class ContainsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId], [BoolScriptVariable.ClassId], [StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId]];
     public override string Command => "contains";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
 
     public override string Syntax => "Contains(String/Liste, CaseSensitive, Value1, Value2, ...)";
 

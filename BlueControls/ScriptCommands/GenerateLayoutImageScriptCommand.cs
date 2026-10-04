@@ -14,10 +14,10 @@ public class GenerateLayoutImageScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "generatelayoutimage";
     public override bool MustUseReturnValue => true;
-    public override string Returns => BitmapScriptVariable.ShortName_Variable;
+    public override string Returns => BitmapScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
 

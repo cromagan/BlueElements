@@ -11,10 +11,10 @@ internal class MatchColumnFormatScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain], [ScriptVariable.Any_Variable]];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId], [ScriptVariable.Any_Plain]];
     public override string Command => "matchcolumnformat";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "MatchColumnFormat(Value, Column)";
 
     #endregion

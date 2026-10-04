@@ -11,11 +11,11 @@ internal class AskAiScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [AiVal, StringVal];
+    public override List<List<string>> Args => [[AiScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "askai";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "AskAi(Ai, text)";
 
     #endregion

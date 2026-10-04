@@ -6,7 +6,6 @@ public class BitmapScriptVariable : ScriptVariable {
 
     #region Fields
 
-    public static readonly List<string> BmpVar = [ShortName_Variable];
     private System.Drawing.Bitmap? _bmp;
 
     #endregion
@@ -26,7 +25,6 @@ public class BitmapScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "bmp";
-    public static string ShortName_Variable => "*bmp";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
 

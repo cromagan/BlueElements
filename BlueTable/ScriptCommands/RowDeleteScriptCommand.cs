@@ -12,13 +12,13 @@ public class RowDeleteScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [RowVar];
+    public override List<List<string>> Args => [[RowScriptVariable.ClassId]];
 
     public override string Command => "rowdelete";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "RowDelete(Row)";
 

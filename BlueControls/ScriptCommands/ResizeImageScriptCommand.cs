@@ -13,11 +13,11 @@ public class ResizeImageScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [BitmapScriptVariable.BmpVar, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[BitmapScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "resizeimage";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => BitmapScriptVariable.ShortName_Variable;
+    public override string Returns => BitmapScriptVariable.ClassId;
     public override string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
 
     #endregion

@@ -14,12 +14,12 @@ internal class IndexOfScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[StringScriptVariable.ShortName_Variable, ListOfStringsScriptVariable.ShortName_Variable], BoolVal, [StringScriptVariable.ShortName_Plain, ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId, StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId], [BoolScriptVariable.ClassId], [StringScriptVariable.ClassId, ListOfStringsScriptVariable.ClassId]];
 
     public override string Command => "indexof";
 
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "IndexOf(ListVariable/StringVariable, CaseSensitive, Value)";
 
     #endregion

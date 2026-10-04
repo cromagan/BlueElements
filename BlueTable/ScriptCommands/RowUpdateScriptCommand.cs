@@ -13,13 +13,13 @@ public class RowUpdateScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [RowVar, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[RowScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
 
     public override string Command => "rowupdate";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "RowUpdate(Row, MinAgeInDays, MaxAgeInDays)";
 

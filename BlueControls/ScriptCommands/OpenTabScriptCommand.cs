@@ -15,7 +15,7 @@ internal class OpenTabScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, BoolVal, StringVal];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId], [BoolScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "opentab";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
     public override string Syntax => "OpenTab(Table, AktuellerTabÜberschreiben, WindowID);";

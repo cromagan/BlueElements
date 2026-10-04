@@ -9,10 +9,10 @@ internal class ElementScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, FloatVal];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "element";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "Element(VariableListe, Indexnummer)";
 
     #endregion

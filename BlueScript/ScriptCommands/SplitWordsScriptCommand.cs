@@ -2,7 +2,6 @@
 
 namespace BlueScript.ScriptCommands;
 
-
 /// <summary>
 /// Gibt eine Liste aller Wörter zurück.
 /// Die Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.
@@ -12,10 +11,10 @@ internal class SplitWordsScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
     public override string Command => "splitwords";
     public override bool MustUseReturnValue => true;
-    public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
+    public override string Returns => ListOfStringsScriptVariable.ClassId;
     public override string Syntax => "SplitWords(String)";
 
     #endregion

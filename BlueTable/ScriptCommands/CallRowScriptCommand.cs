@@ -14,12 +14,12 @@ public class CallRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, RowVar, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [RowScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "callrow";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
 
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;
     public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 

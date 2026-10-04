@@ -16,11 +16,11 @@ public class InputBoxScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "inputbox";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.GUI;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "InputBox(Text, Vorgabetext, Vorschlag1, Vorschlag2, ...);";
 
     #endregion

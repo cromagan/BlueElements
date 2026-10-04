@@ -11,10 +11,10 @@ internal class TableScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
     public override string Command => "table";
     public override bool MustUseReturnValue => true;
-    public override string Returns => TableScriptVariable.ShortName_Variable;
+    public override string Returns => TableScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "Table(Filename/Tablename)";
 

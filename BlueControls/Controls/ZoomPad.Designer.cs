@@ -15,7 +15,6 @@ namespace BlueControls.Controls
         /// </summary>
         private IContainer components = null;
 
-
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 

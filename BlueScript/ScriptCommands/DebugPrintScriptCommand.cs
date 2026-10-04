@@ -17,7 +17,7 @@ public class DebugPrintScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId]];
 
     public override string Command => "debugprint";
 

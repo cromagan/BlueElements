@@ -11,10 +11,10 @@ public class SortedRowsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId]];
     public override string Command => "sortedrows";
     public override bool MustUseReturnValue => true;
-    public override string Returns => ListOfRowsScriptVariable.ShortName_Variable;
+    public override string Returns => ListOfRowsScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "SortedRows(table);";
 

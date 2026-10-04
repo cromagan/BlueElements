@@ -9,10 +9,10 @@ internal class SubstringScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId]];
     public override string Command => "substring";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "Substring(String, Start, Anzahl)";
 
     #endregion

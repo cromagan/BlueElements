@@ -12,8 +12,6 @@ namespace BlueControls.Controls {
         /// </summary>
         private IContainer components = null;
 
-
-
         #region Vom Komponenten-Designer generierter Code
 
         /// <summary> 
@@ -75,7 +73,6 @@ namespace BlueControls.Controls {
         }
 
         #endregion
-
 
         private Button btnScript;
         private Button btnDetach;

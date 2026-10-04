@@ -17,7 +17,7 @@ internal class ForEachScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], ListStringVar];
+    public override List<List<string>> Args => [[UnknownScriptVariable.ClassId], [ListOfStringsScriptVariable.ClassId]];
     public override string Command => "foreach";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "ForEach(NeueVariable, ListenVariable) { }";

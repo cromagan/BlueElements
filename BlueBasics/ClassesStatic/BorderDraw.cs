@@ -6,7 +6,6 @@ namespace BlueBasics.ClassesStatic;
 
 public static class BorderDraw {
 
-
     #region Fields
 
     private static readonly ConcurrentCache<BorderGradientKey, LinearGradientBrush> _borderGradientCache = new(200);

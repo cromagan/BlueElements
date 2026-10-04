@@ -13,11 +13,11 @@ internal class LoadTextFileScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "loadtextfile";
     public override List<string> Constants => ["UTF8", "WIN1252"];
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Variable;
+    public override string Returns => StringScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
 

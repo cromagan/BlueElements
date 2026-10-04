@@ -9,11 +9,11 @@ internal class StartsWithScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [BoolScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "startswith";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override string Syntax => "StartsWith(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion

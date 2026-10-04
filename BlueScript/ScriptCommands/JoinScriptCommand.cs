@@ -15,10 +15,10 @@ internal class JoinScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ShortName_Plain], StringVal];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "join";
     public override bool MustUseReturnValue => true;
-    public override string Returns => StringScriptVariable.ShortName_Plain;
+    public override string Returns => StringScriptVariable.ClassId;
     public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
 
     #endregion

@@ -6,7 +6,6 @@ public class ListOfRowsScriptVariable : ScriptVariable {
 
     #region Fields
 
-    public static readonly List<string> ListRowVar = [ShortName_Variable];
     private List<RowItem> _list;
 
     #endregion
@@ -33,8 +32,6 @@ public class ListOfRowsScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "lsr";
-    public static string ShortName_Plain => "lsr";
-    public static string ShortName_Variable => "*lsr";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
 

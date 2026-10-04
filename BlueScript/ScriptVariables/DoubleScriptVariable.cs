@@ -27,8 +27,6 @@ public class DoubleScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "num";
-    public static string ShortName_Plain => "num";
-    public static string ShortName_Variable => "*num";
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
 

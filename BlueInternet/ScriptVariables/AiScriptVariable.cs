@@ -12,8 +12,6 @@ public class AiScriptVariable : ScriptVariable {
 
     #region Fields
 
-    public static readonly List<string> AiVal = [ShortName_Variable];
-
     // Ein einzelner, statischer HttpClient ist die empfohlene Vorgehensweise in .NET.
     // Er wird für alle OpenAI-kompatiblen Endpunkte wiederverwendet.
     // Authentifizierung und Ziel-URL werden pro Anfrage gesetzt, nicht am Client.
@@ -47,7 +45,6 @@ public class AiScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "ari";
-    public static string ShortName_Variable => "*ari";
 
     public string? ApiKey {
         get => _apiKey;

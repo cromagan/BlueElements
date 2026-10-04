@@ -13,7 +13,7 @@ public class AddRowsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, FloatVal, ListStringVar, FilterVar];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [ListOfStringsScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
     public override string Command => "addrows";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.Optional;

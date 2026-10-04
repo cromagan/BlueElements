@@ -29,13 +29,13 @@ public class RowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal, FilterVar];
+    public override List<List<string>> Args => [[DoubleScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
 
     public override string Command => "row";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
 
-    public override string Returns => RowScriptVariable.ShortName_Variable;
+    public override string Returns => RowScriptVariable.ClassId;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.Sub;

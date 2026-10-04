@@ -9,7 +9,7 @@ internal class ClearScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId]];
     public override string Command => "clear";
     public override string Syntax => "Clear(VariableListe);";
 

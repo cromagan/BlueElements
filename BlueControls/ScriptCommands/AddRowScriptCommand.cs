@@ -18,11 +18,11 @@ public class AddRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, StringVal, [ListOfStringsScriptVariable.ShortName_Plain]];
+    public override List<List<string>> Args => [[TableScriptVariable.ClassId], [StringScriptVariable.ClassId], [ListOfStringsScriptVariable.ClassId]];
     public override string Command => "addrow";
 
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
-    public override string Returns => RowScriptVariable.ShortName_Variable;
+    public override string Returns => RowScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.ManipulatesUser;
     public override string Syntax => "AddRow(Table, Text, Suggestions);";
 

@@ -27,8 +27,6 @@ public class UnknownScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "ukn";
-    public static string ShortName_Plain => "ukn";
-    public static string ShortName_Variable => "*ukn";
     public override int CheckOrder => 100;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;

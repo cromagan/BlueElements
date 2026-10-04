@@ -11,11 +11,11 @@ internal class GenerateAiBmpScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [AiVal, StringVal, StringVal];
+    public override List<List<string>> Args => [[AiScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "generateaibmp";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;
-    public override string Returns => BitmapScriptVariable.ShortName_Variable;
+    public override string Returns => BitmapScriptVariable.ClassId;
     public override string Syntax => "GenerateAiBmp(Ai, text, imagemodel)";
 
     #endregion

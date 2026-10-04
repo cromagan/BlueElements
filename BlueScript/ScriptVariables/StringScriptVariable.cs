@@ -27,8 +27,6 @@ public class StringScriptVariable : ScriptVariable {
     #region Properties
 
     public static string ClassId => "str";
-    public static string ShortName_Plain => "str";
-    public static string ShortName_Variable => "*str";
     public override int CheckOrder => 2;
     public override bool GetFromStringPossible => true;
 

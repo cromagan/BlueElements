@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueScript.Classes;
-using static BlueScript.ScriptVariables.ListOfRowsScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
@@ -17,7 +16,7 @@ internal class ForEachRow2ScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], ListRowVar];
+    public override List<List<string>> Args => [[UnknownScriptVariable.ClassId], [ListOfRowsScriptVariable.ClassId]];
     public override string Command => "foreachrow2";
     public override bool GetCodeBlockAfter => true;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;

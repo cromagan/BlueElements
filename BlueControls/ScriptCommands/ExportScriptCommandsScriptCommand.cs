@@ -15,7 +15,7 @@ internal class ExportScriptCommandsScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
 
     public override string Command => "export";
 

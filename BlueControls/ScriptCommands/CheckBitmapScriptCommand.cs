@@ -4,7 +4,6 @@ using BlueControls.DrawingHelpers;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.ScriptVariables;
-using static BlueScript.ScriptVariables.BitmapScriptVariable;
 
 namespace BlueScript.ScriptCommands;
 
@@ -15,12 +14,12 @@ internal class CheckBitmapScriptCommand : ScriptCommand, ICommandBuilder {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, StringVal];
+    public override List<List<string>> Args => [[BitmapScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [DoubleScriptVariable.ClassId], [StringScriptVariable.ClassId]];
 
     public override string Command => "checkbitmap";
 
     public override bool MustUseReturnValue => true;
-    public override string Returns => BoolScriptVariable.ShortName_Plain;
+    public override string Returns => BoolScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
 

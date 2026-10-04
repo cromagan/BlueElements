@@ -16,7 +16,7 @@ internal class ForEachRowScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[UnknownScriptVariable.ShortName_Plain], FilterVar];
+    public override List<List<string>> Args => [[UnknownScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
     public override string Command => "foreachrow";
     public override bool GetCodeBlockAfter => true;
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;

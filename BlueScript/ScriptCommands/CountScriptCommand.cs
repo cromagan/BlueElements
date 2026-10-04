@@ -9,10 +9,10 @@ internal class CountScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar];
+    public override List<List<string>> Args => [[ListOfStringsScriptVariable.ClassId]];
     public override string Command => "count";
     public override bool MustUseReturnValue => true;
-    public override string Returns => DoubleScriptVariable.ShortName_Plain;
+    public override string Returns => DoubleScriptVariable.ClassId;
     public override string Syntax => "Count(ListVariable)";
 
     #endregion

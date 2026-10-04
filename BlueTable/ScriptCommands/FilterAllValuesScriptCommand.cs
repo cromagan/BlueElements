@@ -17,11 +17,11 @@ public class FilterAllValuesScriptCommand : TableGenericScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal, FilterVar];
+    public override List<List<string>> Args => [[StringScriptVariable.ClassId], [BoolScriptVariable.ClassId], [FilterScriptVariable.ClassId]];
     public override string Command => "filterallvalues";
     public override LastArgMinCountTypeScriptCommand LastArgMinCount => LastArgMinCountTypeScriptCommand.MinOnce;
     public override bool MustUseReturnValue => true;
-    public override string Returns => ListOfStringsScriptVariable.ShortName_Plain;
+    public override string Returns => ListOfStringsScriptVariable.ClassId;
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override string Syntax => "FilterAllValues(ReturnColumn, Sort, Filter, ...)";
 
