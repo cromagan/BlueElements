@@ -16,7 +16,7 @@ public class TableDelRowCliCommand : CliCommand {
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen.";
 
     public override List<string> Options => [.. AddressingOptions, "password"];
-    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run]";
+    public override string Syntax => "bcr table-delrow <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run] [--password <kennwort>]";
 
     #endregion
 

@@ -21,15 +21,16 @@ public class TableScriptCliCommand : CliCommand {
             "(legt es an, falls neu; bei Syntax-Fehlern wird nichts geändert). " +
             "export schreibt den Skripttext zurück in diese Datei. " +
             "compare vergleicht Datei und Skript und meldet 'Identisch' oder 'Nicht identisch' (Exit-Code 1 bei Abweichung). " +
-            "execute führt das Skript aus (Zeilen-Skripte mit --rowkey). " +
+            "execute führt das Skript aus (Zeilen-Skripte per --rowkey oder --filtercolumn/--filtervalue [--filtertype]; ein Filter führt das Skript je getroffener Zeile aus und läuft bei Fehlern weiter). " +
             "check prüft das Skript in der Tabelle und meldet den Fehler. " +
             "names listet alle Skripte mit ihrem Compare-Ergebnis. " +
             "Execute akzeptiert --debugoutput: DebugPrint-Ausgaben des Skripts erscheinen live auf stdout. " +
-            "Alle Aktionen außer execute verlangen das CLI-Recht 'Edit script', execute 'Execute script'.";
+            "Ansehen und Fehlertesten (export, compare, check, names) ist ohne CLI-Recht erlaubt. " +
+            "Import verlangt das CLI-Recht 'Edit script', execute 'Execute script'.";
 
     public override List<string> Flags => ["debugoutput"];
-    public override List<string> Options => ["rowkey", "password"];
-    public override string Syntax => "bcr table-script <tabelle> <import|export|compare|execute|check|names> [<skript>]";
+    public override List<string> Options => [.. AddressingOptions, "password"];
+    public override string Syntax => "bcr table-script <tabelle> <import|export|compare|execute|check|names> [<skript>] (bei execute zusätzlich: --rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--password <kennwort>]";
 
     #endregion
 
@@ -64,11 +65,24 @@ public class TableScriptCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
-        var rightProblem = RightProblem(tbl, action == "EXECUTE" ? CliRights.ExecuteScript : CliRights.EditScript);
+        // Ansehen und Fehlertesten (export, compare, check, names) sind ohne Recht erlaubt.
+        string? neededRight = null;
 
-        if (rightProblem is not null) {
-            Console.Error.WriteLine(rightProblem);
-            return 1;
+        switch (action) {
+            case "IMPORT":
+                neededRight = CliRights.EditScript;
+                break;
+            case "EXECUTE":
+                neededRight = CliRights.ExecuteScript;
+                break;
+        }
+
+        if (neededRight is not null) {
+            var rightProblem = RightProblem(tbl, neededRight);
+            if (rightProblem is not null) {
+                Console.Error.WriteLine(rightProblem);
+                return 1;
+            }
         }
 
         if (action == "CHECK") { return Check(tbl, args); }
@@ -164,6 +178,12 @@ public class TableScriptCliCommand : CliCommand {
         }
 
         Console.Out.WriteLine("Skript exportiert: " + file);
+
+        // Hinweis, wenn die Datei ohne Recht zum Rückimport exportiert wurde.
+        if (!HasRight(tbl, CliRights.EditScript)) {
+            Console.Out.WriteLine("Hinweis: Das CLI-Recht '" + CliRights.EditScript + "' fehlt — die Datei kann nicht per table-script import zurückgespielt werden.");
+        }
+
         return 0;
     }
 
@@ -275,28 +295,62 @@ public class TableScriptCliCommand : CliCommand {
     private static string ScriptTextOfFile(string file) => NormalizeScript(ReadAllText(file));
 
     /// <summary>
-    /// Gibt eine DebugPrint-Zeile des laufenden Skripts auf stdout aus.
+    /// Gibt eine DebugPrint-Zeile des laufenden Skripts auf stdout aus. Wird auch von table-refresh genutzt.
     /// </summary>
-    private static void DebugPrint_LineAdded(object? sender, TextEventArgs e) => Console.Out.WriteLine("DebugPrint: " + e.Text);
+    internal static void DebugPrint_LineAdded(object? sender, TextEventArgs e) => Console.Out.WriteLine("DebugPrint: " + e.Text);
 
     private int Execute(Table tbl, CliArgs args) {
         var script = GetScriptOrError(tbl, args);
 
         if (script is null) { return 1; }
 
-        RowItem? row = null;
+        var hasRowKey = args.HasOption("rowkey");
+        var hasFilter = args.HasOption("filtercolumn") || args.HasOption("filtervalue");
 
-        if (script.NeedRow) {
-            if (!args.HasOption("rowkey")) { return UsageError("Das Skript ist ein Zeilen-Skript — es fehlt --rowkey <key>."); }
+        if (!script.NeedRow) {
+            return hasRowKey || hasFilter
+                ? UsageError("Das Skript ist ein Tabellen-Skript — keine Zeilenadressierung (--rowkey, --filtercolumn/--filtervalue) erforderlich.")
+                : ExecuteOnce(tbl, script, args, null);
+        }
 
-            row = tbl.Row.GetByKey(args.Option("rowkey") ?? string.Empty);
+        if (!hasRowKey && !hasFilter) {
+            return UsageError("Das Skript ist ein Zeilen-Skript — Zeilenadressierung fehlt: --rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert>.");
+        }
+
+        var addressingProblem = RowAddressingProblem(args);
+
+        if (addressingProblem is not null) {
+            Console.Error.WriteLine(addressingProblem);
+            return 2;
+        }
+
+        if (hasRowKey) {
+            var row = tbl.Row.GetByKey(args.Option("rowkey") ?? string.Empty);
 
             if (row is null) {
                 Console.Error.WriteLine("Zeile nicht gefunden: " + args.Option("rowkey"));
                 return 1;
             }
+
+            return ExecuteOnce(tbl, script, args, row);
         }
 
+        var (rows, error) = ResolveRows(tbl, args);
+
+        if (error is not null) {
+            Console.Error.WriteLine(error);
+            return 1;
+        }
+
+        if (rows.Count == 0) {
+            Console.Error.WriteLine("Keine Zeile getroffen.");
+            return 1;
+        }
+
+        return ExecuteBatch(tbl, script, args, rows);
+    }
+
+    private static int ExecuteOnce(Table tbl, TableScriptDescription script, CliArgs args, RowItem? row) {
         var debugOutput = args.Flag("debugoutput");
 
         if (debugOutput) { DebugPrintScriptCommand.LineAdded += DebugPrint_LineAdded; }
@@ -315,6 +369,38 @@ public class TableScriptCliCommand : CliCommand {
         }
 
         Console.Out.WriteLine("Skript ausgeführt: " + script.KeyName);
+
+        // Werte-Änderungen des Skripts speichern; reine Lese-Skripte nicht.
+        return script.ValuesReadOnly ? 0 : SaveTable(tbl);
+    }
+
+    /// <summary>
+    /// Führt das Skript je adressierter Zeile aus, läuft bei Fehlern weiter und
+    /// speichert einmal am Ende, wenn mindestens ein Lauf erfolgreich war.
+    /// </summary>
+    private static int ExecuteBatch(Table tbl, TableScriptDescription script, CliArgs args, List<RowItem> rows) {
+        var debugOutput = args.Flag("debugoutput");
+
+        if (debugOutput) { DebugPrintScriptCommand.LineAdded += DebugPrint_LineAdded; }
+
+        var done = 0;
+
+        try {
+            foreach (var row in rows) {
+                var feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false);
+
+                if (feedback.Failed) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName} — Skript abgebrochen:\r\n" + feedback.ProtocolText);
+                } else {
+                    Console.Out.WriteLine($"Skript ausgeführt in {row.KeyName}: " + script.KeyName);
+                    done++;
+                }
+            }
+        } finally {
+            if (debugOutput) { DebugPrintScriptCommand.LineAdded -= DebugPrint_LineAdded; }
+        }
+
+        if (done == 0) { return 1; }
 
         // Werte-Änderungen des Skripts speichern; reine Lese-Skripte nicht.
         return script.ValuesReadOnly ? 0 : SaveTable(tbl);

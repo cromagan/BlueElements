@@ -10,11 +10,7 @@ using BlueControls.PadItems;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Roundtrip-Test: Lädt eine Datei, serialisiert sie in ihr Gegenstück-Format
-/// (altes Format &lt;-&gt; JSON), lädt das Ergebnis erneut und vergleicht die Bytes
-/// bit-genau mit dem Original. Die Ausgabe protokolliert jeden Schritt und
-/// codiert Steuerzeichen als Escapes - damit das Ergebnis verlustfrei kopierbar
-/// ist und Abweichungen ohne GUI analysiert werden können.
+/// Intern: Lädt eine Datei, serialisiert sie ins Gegenstück-Format (alt &lt;-&gt; JSON), lädt das Ergebnis erneut und vergleicht bit-genau mit dem Original.
 /// </summary>
 public class RoundtripCliCommand : CliCommand {
 
@@ -24,6 +20,10 @@ public class RoundtripCliCommand : CliCommand {
     public override List<string> Flags => ["full", "dev"];
     public override bool Hidden => true;
     public override string Syntax => "bcr roundtrip <datei> [--full]";
+
+    public override string? HelpDetails =>
+        "--full gibt bei Abweichung zusätzlich den kompletten Inhalt beider Dateien aus (Steuerzeichen escaped). " +
+        "ZIP-Container (.bdb/.mbdb) werden zusätzlich entpackt verglichen (Main.bin), da deren Eintrags-Zeitstempel keine Tabellendaten sind.";
 
     #endregion
 

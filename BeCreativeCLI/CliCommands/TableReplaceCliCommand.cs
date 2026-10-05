@@ -20,7 +20,7 @@ public class TableReplaceCliCommand : CliCommand {
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
 
     public override List<string> Options => [.. AddressingOptions, "find", "replace", "column", "password"];
-    public override string Syntax => "bcr table-replace <tabelle> --find <text> --replace <ersatz> [--column <spalte>] [+ optionale Zeilenadressierung] [--dry-run]";
+    public override string Syntax => "bcr table-replace <tabelle> --find <text> --replace <ersatz> [--column <spalte>] [+ optionale Zeilenadressierung] [--dry-run] [--password <kennwort>]";
 
     #endregion
 

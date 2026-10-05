@@ -3,8 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Legt eine neue Zeile an. Der Wert setzt die erste Spalte (Primärschlüssel) der Tabelle.
-/// Weitere Spalten füllt --set Spalte=Wert direkt beim Anlegen.
+/// Tabellen: Legt eine Zeile an; --firstvalue setzt die Erstspalte, wiederholbares --set füllt weitere Spalten direkt beim Anlegen.
 /// </summary>
 public class TableAddRowCliCommand : CliCommand {
 
@@ -12,9 +11,10 @@ public class TableAddRowCliCommand : CliCommand {
 
     public override string Command => "table-addrow";
     public override List<string> Options => ["firstvalue", "set", "password"];
-    public override string Syntax => "bcr table-addrow <tabelle> [--firstvalue <wert>] [--set <spalte>=<wert>]";
+    public override string Syntax => "bcr table-addrow <tabelle> [--firstvalue <wert>] [--set <spalte>=<wert>] [--password <kennwort>]";
 
     public override string? HelpDetails =>
+            "--firstvalue setzt den Wert der Erstspalte (Standard: leer). " +
             "--set füllt weitere Spalten direkt beim Anlegen und darf mehrfach angegeben werden: --set KATEGORIE=Regeln --set ANLEITUNG=\"Text mit Leerzeichen\". " +
             "Format: <spalte>=<wert>; der Wert darf leer sein. Leerzeichen und Sonderzeichen in Anführungszeichen setzen. " +
             "Beispiel: bcr table-addrow Test.tblh --firstvalue NeuerEintrag --set KATEGORIE=Glossar.";

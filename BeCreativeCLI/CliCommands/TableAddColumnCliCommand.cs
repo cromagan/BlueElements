@@ -5,8 +5,7 @@ using BlueTable.ColumnFormats;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Legt eine neue Spalte an (nur mit dem CLI-Recht 'Add column'). Standardformat TextOneLine;
-/// Format, Beschriftung und Quickinfo per Option. Alle Formate listet 'bcr table-columnformats'.
+/// Tabellen: Legt eine neue Spalte an (nur mit dem CLI-Recht 'Add column'); Format, Beschriftung und Quickinfo per Option.
 /// </summary>
 public class TableAddColumnCliCommand : CliCommand {
 
@@ -14,7 +13,13 @@ public class TableAddColumnCliCommand : CliCommand {
 
     public override string Command => "table-addcolumn";
     public override List<string> Options => ["caption", "format", "quickinfo", "password"];
-    public override string Syntax => "bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>]";
+    public override string Syntax => "bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>] [--password <kennwort>]";
+
+    public override string? HelpDetails =>
+            "--caption setzt die Beschriftung, --quickinfo die Quickinfo (ohne Angabe leer). " +
+            "--format erwartet einen Format-Key, Standard ist TextOneLine; alle Formate listet bcr table-columnformats. " +
+            "stdout: der Key der neuen Spalte. " +
+            "Beispiel: bcr table-addcolumn Test.tblh PREIS --format Double --caption Preis --quickinfo \"Netto in Euro\".";
 
     #endregion
 

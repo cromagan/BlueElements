@@ -17,7 +17,7 @@ public class TableSaveAsCliCommand : CliCommand {
             "Beispiel: bcr table-saveas Test.mbdb Test2.mtblj";
 
     public override List<string> Options => ["password"];
-    public override string Syntax => "bcr table-saveas <tabelle> <zieldatei>";
+    public override string Syntax => "bcr table-saveas <tabelle> <zieldatei> [--password <kennwort>]";
 
     #endregion
 

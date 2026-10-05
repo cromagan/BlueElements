@@ -8,12 +8,7 @@ using BlueScript.ScriptVariables;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Fragment-Test: Ändert alle internen Tabellenklassen (Skripte inkl. gespeicherter
-/// Variablen, Sortierung, Spaltenanordnungen, Spalten, Unique-Definitionen) über die
-/// offiziellen APIs und prüft, dass die JSON-Fragmente nur die tatsächlich geänderten
-/// Werte enthalten. Anschließend werden alle Fragmente in eine frische zweite
-/// Tabellen-Instanz eingespielt und das Ergebnis verifiziert. Die Originaldatei
-/// bleibt unverändert; gearbeitet wird auf Kopien im Temp-Bereich.
+/// Intern: Prüft an Kopien einer .mtblj-Tabelle, dass JSON-Fragmente nur die tatsächlich geänderten Werte enthalten, und verifiziert das Einspielen in einer zweiten Instanz.
 /// </summary>
 public class FragmentTestCliCommand : CliCommand {
 

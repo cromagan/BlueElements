@@ -5,7 +5,7 @@ using BlueTable.ColumnFormats;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Listet alle Spaltenformate auf, die 'table-addcolumn' über --format akzeptiert.
+/// Tabellen: Listet alle Spaltenformate auf, die 'table-addcolumn' über --format akzeptiert.
 /// </summary>
 public class TableColumnFormatsCliCommand : CliCommand {
 
@@ -13,6 +13,8 @@ public class TableColumnFormatsCliCommand : CliCommand {
 
     public override string Command => "table-columnformats";
     public override string Syntax => "bcr table-columnformats";
+
+    public override string? HelpDetails => "Je Zeile der Format-Key, bei vorhandenem Quickinfo nach einem Doppelpunkt; der Key ist der Wert für table-addcolumn --format.";
 
     #endregion
 

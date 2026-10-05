@@ -11,7 +11,9 @@ public class TableColumnContentCliCommand : CliCommand {
 
     public override string Command => "table-columncontent";
     public override List<string> Options => ["column", "max", "password"];
-    public override string Syntax => "bcr table-columncontent <tabelle> --column <spalte> [--max <anzahl>]";
+    public override string Syntax => "bcr table-columncontent <tabelle> --column <spalte> [--max <anzahl>] [--password <kennwort>]";
+
+    public override string? HelpDetails => "Gibt je Wert der Spalte eine Ausgabezeile; --max begrenzt die Anzahl (ohne --max alle Werte).";
 
     #endregion
 

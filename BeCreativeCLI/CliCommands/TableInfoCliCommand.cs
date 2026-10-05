@@ -3,25 +3,34 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Zeigt Informationen zur Tabelle an: Übersicht, Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Werte adressierter Zeilen.
+/// Tabellen: Zeigt die Tabellen-Übersicht oder Details: Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Zellwerte adressierter Zeilen.
 /// </summary>
 public class TableInfoCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-info";
-    public override List<string> Flags => ["columnnames", "rowkeys", "row", "firstvalues", "rows"];
+    public override List<string> Flags => ["columnnames", "rowkeys", "rowvalues", "firstvalues", "rows", "withrowkey"];
     public override List<string> Options => [.. AddressingOptions, "column", "max", "password"];
-    public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--row + Zeilenadressierung [--max <anzahl>]]";
+    public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--rowvalues + Zeilenadressierung [--max <anzahl>] [--withrowkey]] [--password <kennwort>]";
 
     public override string? HelpDetails =>
-            "Zeilenadressierung (für --row und alle schreibenden Befehle):\n" +
+            "Modi (genau einen wählen, ohne Angabe gibt es die Übersicht):\n" +
+            "  (kein Modus)                Übersicht: Name, Typ, Datei, Zeilen- und Spaltenzahl, Tags.\n" +
+            "  --columnnames               Spaltennamen mit Beschriftung und Funktion (Erstspalte, Chunkspalte, Kapitelspalte).\n" +
+            "  --rowkeys                   nur die Zeilen-Keys — direkt als --rowkey anderer Befehle verwendbar.\n" +
+            "  --rows [--max <anzahl>]     je Zeile Key und FirstValue.\n" +
+            "  --firstvalues [--max <anzahl>]  nur die Erstwerte.\n" +
+            "  --column <spalte>           Metadaten der Spalte (Bezeichnung, Mehrzeilig, ErsteSpalte, Schluesselspalte, Kapitelspalte, WirdGespeichert, QuickInfo, ...).\n" +
+            "  --rowvalues + Zeilenadressierung [--max <anzahl>] [--withrowkey]  Zellwerte der adressierten Zeilen, tab-getrennt mit Spaltennamen-Kopfzeile.\n" +
+            "Zeilenadressierung:\n" +
             "  --rowkey <key>                genau eine Zeile; der Key ist der numerische Zeitstempel-Key aus --rowkeys (nicht KEY=Wert).\n" +
             "  --filtercolumn <spalte> --filtervalue <wert> [--filtertype equals|exact|contains|startswith]\n" +
+            "--withrowkey wirkt nur mit --rowvalues und stellt den Zeilen-Key als erste Tab-Spalte (SYS_ROWKEY) voran.\n" +
             "Beispiele:\n" +
             "  bcr table-info X --rowkeys\n" +
-            "  bcr table-info X --row --rowkey 638009530362930000\n" +
-            "  bcr table-info X --row --filtercolumn KATEGORIE --filtervalue Glossar\n" +
+            "  bcr table-info X --rowvalues --rowkey 638009530362930000\n" +
+            "  bcr table-info X --rowvalues --filtercolumn KATEGORIE --filtervalue Glossar\n" +
             "  bcr table-info X --rows --max 20";
 
     #endregion
@@ -44,15 +53,20 @@ public class TableInfoCliCommand : CliCommand {
         if (args.Flag("rows")) { detailCount++; }
         if (args.Flag("firstvalues")) { detailCount++; }
         if (args.HasOption("column")) { detailCount++; }
-        if (args.Flag("row")) { detailCount++; }
+        if (args.Flag("rowvalues")) { detailCount++; }
 
         if (detailCount > 1) {
             Console.Error.WriteLine("Die Optionen dürfen nicht kombiniert werden, bitte genau eine wählen.");
             return 2;
         }
 
-        if (!args.Flag("row") && (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype"))) {
-            Console.Error.WriteLine("Zeilenadressierung wirkt nur zusammen mit --row.");
+        if (!args.Flag("rowvalues") && (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype"))) {
+            Console.Error.WriteLine("Zeilenadressierung wirkt nur zusammen mit --rowvalues.");
+            return 2;
+        }
+
+        if (args.Flag("withrowkey") && !args.Flag("rowvalues")) {
+            Console.Error.WriteLine("--withrowkey wirkt nur zusammen mit --rowvalues.");
             return 2;
         }
 
@@ -61,7 +75,7 @@ public class TableInfoCliCommand : CliCommand {
         if (args.Flag("rows")) { return WriteRowsWithFirstValue(tbl, args); }
         if (args.Flag("firstvalues")) { return WriteFirstValues(tbl, args); }
         if (args.HasOption("column")) { return WriteColumnDetails(tbl, args); }
-        if (args.Flag("row")) { return WriteRowValues(tbl, args); }
+        if (args.Flag("rowvalues")) { return WriteRowValues(tbl, args); }
 
         WriteSummary(tbl);
         return 0;
@@ -196,15 +210,32 @@ public class TableInfoCliCommand : CliCommand {
             return 1;
         }
 
+        var withRowKey = args.Flag("withrowkey");
         var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
-        Console.Out.WriteLine(string.Join("\t", columns.Select(c => c.KeyName)));
+
+        if (withRowKey) {
+            // Der Key steht vorne; die Systemspalte wäre doppelt in der Ausgabe.
+            columns.RemoveAll(c => tbl.Column.SysRowKey == c);
+        }
+
+        List<string> head = [];
+
+        if (withRowKey) { head.Add(SystemColumnKeys.RowKey); }
+
+        head.AddRange(columns.Select(c => c.KeyName));
+        Console.Out.WriteLine(string.Join("\t", head));
 
         var count = 0;
 
         foreach (var row in rows) {
             if (max > 0 && count >= max) { break; }
 
-            Console.Out.WriteLine(string.Join("\t", columns.Select(c => row.CellGetString(c).Replace("\r", "\n"))));
+            List<string> values = [];
+
+            if (withRowKey) { values.Add(row.KeyName); }
+
+            values.AddRange(columns.Select(c => row.CellGetString(c).Replace("\r", "\n")));
+            Console.Out.WriteLine(string.Join("\t", values));
             count++;
         }
 

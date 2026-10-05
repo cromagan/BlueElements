@@ -3,20 +3,25 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Exportiert die Tabelle als CSV auf die Standardausgabe; optional ohne Systemspalten, auf adressierte Zeilen begrenzt und mit dekodierten Sonderzeichen.
+/// Tabellen: Exportiert die Tabelle oder die adressierten Zeilen als CSV auf die Standardausgabe.
 /// </summary>
 public class TableExportCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-export";
-    public override List<string> Flags => ["noheader", "no-system-columns", "decode"];
-    public override List<string> Options => [.. AddressingOptions, "sep", "password"];
-    public override string Syntax => "bcr table-export <tabelle> [--sep <trennzeichen>] [--noheader] [--no-system-columns] [--decode] [+ optionale Zeilenadressierung]";
+    public override List<string> Flags => ["no-system-columns", "decode", "withrowkey", "escape"];
+    public override List<string> Options => [.. AddressingOptions, "sep", "columns", "password"];
+    public override string Syntax => "bcr table-export <tabelle> [--sep <trennzeichen>] [--no-system-columns] [--withrowkey] [--columns <spalten>] [--decode] [--escape] [+ optionale Zeilenadressierung] [--password <kennwort>]";
 
     public override string? HelpDetails =>
             "--no-system-columns lässt Systemspalten (z. B. SYS_ROWSORTINDEX) weg. " +
+            "--withrowkey stellt den Zeilen-Key als erste CSV-Spalte (SYS_ROWKEY) voran. " +
+            "--columns wählt Komma-getrennte Spalten in genau der angegebenen Reihenfolge (auch Systemspalten; nicht mit --no-system-columns kombinierbar). " +
             "--decode gibt echte Umlaute statt HTML-Entities aus — gut für Diffs und Reviews; zum Weiterverarbeiten mit bcr-Befehlen besser ohne, da die App Entities speichert. " +
+            "Standard: Mehrzeilige Zellen werden RFC-4180-konform gequotet (Anführungszeichen, CRLF-Zeilenumbrüche). " +
+            "--escape ersetzt echte Zeilenumbrüche in Zellen durch Literal \\n (Backslashes werden zu \\\\ verdoppelt) — der Output bleibt zeilenstabil und ist Zeile für Zeile in Shell-Schleifen verarbeitbar. " +
+            "Das Gegenstück --unescape ist bewusst nicht implementiert: Die Rückwandlung (\\\\ → \\, \\n → Zeilenumbruch) gehört in den Import, z. B. vor table-cellset. " +
             "Mit Zeilenadressierung (--rowkey oder --filtercolumn/--filtervalue) wird nur die adressierte Auswahl exportiert.";
 
     #endregion
@@ -40,6 +45,10 @@ public class TableExportCliCommand : CliCommand {
             separator = sep[0];
         }
 
+        if (args.HasOption("columns") && args.Flag("no-system-columns")) {
+            return UsageError("--columns wählt die Spalten explizit und kann nicht mit --no-system-columns kombiniert werden.");
+        }
+
         // Zeilenadressierung ist optional; nur eine Teilangabe ist ein Fehler.
         if (args.HasOption("rowkey") || args.HasOption("filtercolumn") || args.HasOption("filtervalue") || args.HasOption("filtertype")) {
             var problem = RowAddressingProblem(args);
@@ -54,10 +63,30 @@ public class TableExportCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        var columns = tbl.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+        List<ColumnItem> columns;
 
-        if (args.Flag("no-system-columns")) {
-            columns = [.. columns.Where(c => !c.IsSystemColumn())];
+        if (args.HasOption("columns")) {
+            var (selected, columnError) = ResolveColumns(tbl, args.Option("columns") ?? string.Empty);
+
+            if (columnError is not null) {
+                Console.Error.WriteLine(columnError);
+                return 1;
+            }
+
+            columns = selected;
+        } else {
+            columns = tbl.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+
+            if (args.Flag("no-system-columns")) {
+                columns = [.. columns.Where(c => !c.IsSystemColumn())];
+            }
+        }
+
+        var withRowKey = args.Flag("withrowkey");
+
+        if (withRowKey) {
+            // Der Key steht vorne; die Systemspalte wäre doppelt in der Ausgabe.
+            columns.RemoveAll(c => tbl.Column.SysRowKey == c);
         }
 
         List<RowItem> rows;
@@ -82,35 +111,81 @@ public class TableExportCliCommand : CliCommand {
             return 1;
         }
 
-        Console.Out.Write(BuildCsv(columns, rows, separator, !args.Flag("noheader"), args.Flag("decode")));
+        Console.Out.Write(BuildCsv(columns, rows, separator, args.Flag("decode"), withRowKey, args.Flag("escape")));
         return 0;
     }
 
     /// <summary>
-    /// Baut das CSV nach den Regeln des Standardexports (Escaping, CRLF), plus
-    /// Spalten-/Zeilenauswahl und optionaler Entity-Dekodierung formatierter Spalten.
+    /// Baut das CSV nach den Regeln des Standardexports (RFC-4180-Escaping, CRLF), plus
+    /// Spalten-/Zeilenauswahl, optionalem Zeilen-Key als erste Spalte, optionaler
+    /// Entity-Dekodierung formatierter Spalten und optionaler \\n-Escapung der Zellen.
     /// </summary>
-    private static string BuildCsv(List<ColumnItem> columns, List<RowItem> rows, char separator, bool header, bool decode) {
+    private static string BuildCsv(List<ColumnItem> columns, List<RowItem> rows, char separator, bool decode, bool withRowKey, bool escape) {
         var sb = new StringBuilder();
 
-        if (header && columns.Count > 0) {
-            sb.AppendJoin(separator, columns.Select(c => CsvHelper.EscapeCSVField(c.KeyName, separator))).AppendLine();
+        if (withRowKey || columns.Count > 0) {
+            List<string> names = [];
+
+            if (withRowKey) { names.Add(SystemColumnKeys.RowKey); }
+
+            names.AddRange(columns.Select(c => c.KeyName));
+            sb.AppendJoin(separator, names.Select(n => CsvHelper.EscapeCSVField(n, separator))).AppendLine();
         }
 
         foreach (var row in rows) {
-            var fields = columns.Select(c => CsvHelper.EscapeCSVField(CellTextOf(row, c, decode), separator));
+            List<string> fields = [];
+
+            if (withRowKey) { fields.Add(CsvHelper.EscapeCSVField(row.KeyName, separator)); }
+
+            fields.AddRange(columns.Select(c => CsvHelper.EscapeCSVField(CellTextOf(row, c, decode, escape), separator)));
             sb.AppendJoin(separator, fields).AppendLine();
         }
 
         return sb.ToString();
     }
 
-    private static string CellTextOf(RowItem row, ColumnItem column, bool decode) {
+    /// <summary>
+    /// Löst die per --columns angegebene, Komma-getrennte Spaltenliste auf.
+    /// Reihenfolge und Mehrfachnennungen bleiben erhalten.
+    /// </summary>
+    private static (List<ColumnItem> Columns, string? Error) ResolveColumns(Table tbl, string columnList) {
+        List<ColumnItem> columns = [];
+
+        foreach (var name in columnList.Split(',')) {
+            var key = name.Trim();
+
+            if (key.Length == 0) {
+                return ([], "Die Option --columns enthält einen leeren Spaltennamen.");
+            }
+
+            var column = tbl.Column[key];
+
+            if (column is not { IsDisposed: false }) {
+                return ([], "Spalte nicht gefunden: " + key);
+            }
+
+            columns.Add(column);
+        }
+
+        return (columns, null);
+    }
+
+    /// <summary>
+    /// Liefert den Zelltext für den Export: optional dekodiert. Ohne Escape werden
+    /// Zeilentrenner zu CRLF normiert (RFC-4180-Quoting), mit Escape als Literal \n
+    /// ersetzt (Backslash verdoppelt), damit jede CSV-Zeile einem Datensatz entspricht.
+    /// </summary>
+    private static string CellTextOf(RowItem row, ColumnItem column, bool decode, bool escape) {
         var value = row.CellGetString(column);
 
         if (decode) { value = System.Net.WebUtility.HtmlDecode(value); }
 
-        return value;
+        if (escape) {
+            // Erst den Backslash verdoppeln, dann die Umbrüche — so bleibt \n eindeutig rückführbar.
+            return value.Replace("\\", "\\\\").Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
+        }
+
+        return value.Replace("\r\n", "\n").Replace('\r', '\n').Replace("\n", "\r\n");
     }
 
     #endregion

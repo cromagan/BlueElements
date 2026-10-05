@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Löscht eine Spalte permanent (nur mit dem CLI-Recht 'Delete column'). Systemspalten sind geschützt.
+/// Tabellen: Löscht eine Spalte permanent (nur mit dem CLI-Recht 'Delete column'); Systemspalten sind geschützt.
 /// </summary>
 public class TableDelColumnCliCommand : CliCommand {
 
@@ -11,7 +11,9 @@ public class TableDelColumnCliCommand : CliCommand {
 
     public override string Command => "table-delcolumn";
     public override List<string> Options => ["password"];
-    public override string Syntax => "bcr table-delcolumn <tabelle> <spaltenname>";
+    public override string Syntax => "bcr table-delcolumn <tabelle> <spaltenname> [--password <kennwort>]";
+
+    public override string? HelpDetails => "Systemspalten (SYS_*) können nicht gelöscht werden; stdout nennt den Key der gelöschten Spalte.";
 
     #endregion
 

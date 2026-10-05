@@ -446,7 +446,9 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Speichert die Tabelle (sofern dateibasiert), nachdem alle in dieser Session
-    /// invalidierten Zeilen vollständig abgearbeitet sind.
+    /// invalidierten Zeilen vollständig abgearbeitet sind, und gibt die Tabelle frei:
+    /// Beim Freigeben schreibt der Fragment-Writer den EOF-Marker, sodass der nächste
+    /// Aufruf dieselbe Fragment-Datei fortsetzen kann, statt eine neue anzulegen.
     /// Liefert den Exit-Code: 0 = Erfolg, 1 = Fehler beim Speichern.
     /// </summary>
     protected static int SaveTable(Table tbl) {
@@ -461,6 +463,7 @@ public abstract class CliCommand : IHasKeyName {
             }
         }
 
+        tbl.Dispose();
         return 0;
     }
 

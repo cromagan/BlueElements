@@ -3,9 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Liest oder setzt die Spalten einer bestehenden Spaltenanordnung.
-/// Setzen nur mit dem CLI-Recht 'Change column arrangement'; Ansicht 0 ist
-/// schreibgeschützt, neue Ansichten sind per CLI nicht möglich.
+/// Tabellen: Liest oder setzt die Spalten einer bestehenden Spaltenanordnung; Setzen nur mit dem CLI-Recht 'Change column arrangement'.
 /// </summary>
 public class TableColumnArrangementCliCommand : CliCommand {
 
@@ -23,7 +21,7 @@ public class TableColumnArrangementCliCommand : CliCommand {
 
     public override List<string> Options => ["password"];
 
-    public override string Syntax => "bcr table-columnarrangement <tabelle> [<ansicht> [<spalten, mit | getrennt>]]";
+    public override string Syntax => "bcr table-columnarrangement <tabelle> [<ansicht> [<spalten, mit | getrennt>]] [--password <kennwort>]";
 
     #endregion
 

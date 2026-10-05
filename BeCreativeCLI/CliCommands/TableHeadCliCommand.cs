@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Bearbeitet den Tabellenkopf. Aktuell: Tags setzen (nur mit dem CLI-Recht 'Edit table head'); leerer Wert entfernt alle Tags.
+/// Tabellen: Setzt die Tags des Tabellenkopfs (nur mit dem CLI-Recht 'Edit table head'); leerer Wert entfernt alle Tags.
 /// </summary>
 public class TableHeadCliCommand : CliCommand {
 
@@ -11,11 +11,10 @@ public class TableHeadCliCommand : CliCommand {
 
     public override string Command => "table-head";
     public override List<string> Options => ["password"];
-    public override string Syntax => "bcr table-head <tabelle> tags <tags, mit | getrennt>";
+    public override string Syntax => "bcr table-head <tabelle> tags <tags, mit | getrennt> [--password <kennwort>]";
 
     public override string? HelpDetails =>
-            "Leerer Wert entfernt alle Tags. Je Shell ist ein leeres Argument anders zu übergeben: " +
-            "cmd.exe: bcr table-head X.mbdb tags \"\" — PowerShell 5.1 verwirft leere Argumente, dort eine Dateiumleitung oder cmd /c nutzen.";
+            "Leerer Wert entfernt alle Tags.";
 
     #endregion
 

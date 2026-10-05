@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Durchsucht alle Spalten oder nur die mit --column gewählte Spalte — auf dekodiertem Text (Entities wie &#246; werden mitgefunden). Pro Treffer eine Ausgabezeile: Spalte, Zeilen-Key und der Treffer mit zeichenbasiertem Kontext, der nicht mitten im Wort abreißt. Groß-/Kleinschreibung wird ignoriert.
+/// Tabellen: Durchsucht Spalten auf dekodiertem Text; je Treffer Spalte, Zeilen-Key und Kontext, optional mit Wert einer Kontextspalte oder nur den Zeilen-Keys.
 /// </summary>
 public class TableSearchCliCommand : CliCommand {
 
@@ -19,12 +19,16 @@ public class TableSearchCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-search";
-    public override List<string> Options => ["value", "column", "max", "context", "password"];
-    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>] [--max <anzahl>] [--context <zeichen>]";
+    public override List<string> Flags => ["rowkeys-only", "decode"];
+    public override List<string> Options => ["value", "column", "max", "context", "contextcolumn", "password"];
+    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>] [--max <anzahl>] [--context <zeichen>] [--contextcolumn <spalte>] [--rowkeys-only] [--decode] [--password <kennwort>]";
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'möglich' findet auch als m&#246;glich gespeicherte Werte; der Suchtext darf beide Formen enthalten. " +
-            "Der Kontext umfasst standardmäßig 40 Zeichen je Seite und wird an Wortgrenzen ergänzt, statt Wörter abzureißen; --context <zeichen> ändert die Länge, --max <anzahl> begrenzt die Trefferzahl.";
+            "Der Kontext umfasst standardmäßig 40 Zeichen je Seite und wird an Wortgrenzen ergänzt, statt Wörter abzureißen; --context <zeichen> ändert die Länge, --max <anzahl> begrenzt die Trefferzahl. " +
+            "--contextcolumn <spalte> blendet je Treffer den Wert dieser Spalte derselben Zeile ein (z. B. KATEGORIE) — Titel sind mehrfach vergeben, so bleibt der Treffer der Ziel-Kategorie zuordenbar. " +
+            "--rowkeys-only gibt nur die Zeilen-Keys der Treffer aus (einer je Zeile; nicht mit --contextcolumn kombinierbar), um sie z. B. gegen die Key-Liste einer Ziel-Kategorie zu schneiden. " +
+            "--decode dekodiert Zelltext und Kontextspalte vollständig vor der Suche und in der Ausgabe (echte Umlaute statt Entities, wie table-export --decode).";
 
     #endregion
 
@@ -54,6 +58,10 @@ public class TableSearchCliCommand : CliCommand {
             if (context <= 0) { return UsageError("--context erwartet eine positive Zeichenzahl."); }
         }
 
+        if (args.Flag("rowkeys-only") && args.HasOption("contextcolumn")) {
+            return UsageError("--rowkeys-only und --contextcolumn dürfen nicht kombiniert werden.");
+        }
+
         var tbl = LoadTable(args);
 
         if (tbl is null) { return 1; }
@@ -73,6 +81,19 @@ public class TableSearchCliCommand : CliCommand {
             columns = [.. tbl.Column.Where(c => c is { IsDisposed: false })];
         }
 
+        ColumnItem? contextColumn = null;
+
+        if (args.HasOption("contextcolumn")) {
+            contextColumn = tbl.Column[args.Option("contextcolumn") ?? string.Empty];
+
+            if (contextColumn is null) {
+                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("contextcolumn"));
+                return 1;
+            }
+        }
+
+        var withRowKeysOnly = args.Flag("rowkeys-only");
+        var decode = args.Flag("decode");
         var matches = 0;
         var limitReached = false;
 
@@ -84,7 +105,29 @@ public class TableSearchCliCommand : CliCommand {
 
                 var cellText = SearchTextOf(column, row.CellGetString(column));
 
+                if (decode) { cellText = System.Net.WebUtility.HtmlDecode(cellText); }
+
                 var index = cellText.IndexOf(searchValue, StringComparison.OrdinalIgnoreCase);
+
+                if (index < 0) { continue; }
+
+                if (withRowKeysOnly) {
+                    // Ein Key je Treffer-Zeile genügt; weitere Vorkommen in derselben Zeile würden nur doppeln.
+                    if (max > 0 && matches >= max) {
+                        limitReached = true;
+                        break;
+                    }
+
+                    Console.Out.WriteLine(row.KeyName);
+                    matches++;
+                    break;
+                }
+
+                var contextRaw = contextColumn is null ? string.Empty : SearchTextOf(contextColumn, row.CellGetString(contextColumn));
+
+                if (decode) { contextRaw = System.Net.WebUtility.HtmlDecode(contextRaw); }
+
+                var contextValue = string.Join(' ', contextRaw.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
 
                 while (index >= 0) {
                     if (max > 0 && matches >= max) {
@@ -92,7 +135,9 @@ public class TableSearchCliCommand : CliCommand {
                         break;
                     }
 
-                    Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + ": " + BuildContext(cellText, index, searchValue.Length, context));
+                    var prefix = contextColumn is null ? string.Empty : " [" + contextColumn.KeyName + "=" + contextValue + "]";
+
+                    Console.Out.WriteLine("Spalte " + column.KeyName + " Zeile " + row.KeyName + prefix + ": " + BuildContext(cellText, index, searchValue.Length, context));
                     matches++;
 
                     index = cellText.IndexOf(searchValue, index + searchValue.Length, StringComparison.OrdinalIgnoreCase);

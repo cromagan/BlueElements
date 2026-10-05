@@ -3,15 +3,20 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Zeigt den Wert einer Zelle an. Die Zeile muss eindeutig adressiert sein.
+/// Tabellen: Zeigt den Wert einer Zelle; die Zeile muss eindeutig adressiert sein.
 /// </summary>
 public class TableCellGetCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-cellget";
+    public override List<string> Flags => ["decode"];
     public override List<string> Options => [.. AddressingOptions, "column", "password"];
-    public override string Syntax => "bcr table-cellget <tabelle> --column <spalte> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override string Syntax => "bcr table-cellget <tabelle> --column <spalte> [--decode] + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--password <kennwort>]";
+
+    public override string? HelpDetails =>
+            "--decode gibt echte Umlaute statt HTML-Entities aus (wie table-export --decode); ohne den Schalter erscheint der Wert im Speicherformat. " +
+            "Zeilentrenner innerhalb der Zelle werden als \\n ausgegeben.";
 
     #endregion
 
@@ -55,7 +60,11 @@ public class TableCellGetCliCommand : CliCommand {
         }
 
         // Zellen trennen Zeilen mit \r; für die Konsole/Ausgabe in \n überführen.
-        Console.Out.WriteLine(rows[0].CellGetString(column).Replace("\r", "\n"));
+        var value = rows[0].CellGetString(column);
+
+        if (args.Flag("decode")) { value = System.Net.WebUtility.HtmlDecode(value); }
+
+        Console.Out.WriteLine(value.Replace("\r", "\n"));
         return 0;
     }
 

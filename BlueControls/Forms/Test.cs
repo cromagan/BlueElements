@@ -21,8 +21,7 @@ public sealed partial class Test : Form {
         _ = InputBox.Show("Test", string.Empty, BlueTable.ColumnFormats.TextOneLineColumnFormat.Instance);
     }
 
-    private void slideOutPanel1_ExpandedChanged(object sender, System.EventArgs e) {
-    }
+    private void slideOutPanel1_ExpandedChanged(object sender, System.EventArgs e) {}
 
     #endregion
 }

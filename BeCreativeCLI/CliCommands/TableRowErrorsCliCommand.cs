@@ -3,16 +3,22 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Prüft die adressierten Zeilen mit dem prepare_formula-Skript und gibt die Fehler aus. Exit-Code 1, wenn eine Zeile Fehler hat oder das Skript scheitert.
-/// Ein Fehlerfund wird vor der Meldung per kompletter Datenüberprüfung bestätigt; erweist sich die Zeile dabei als fehlerfrei, wird sie als fehlerfrei gemeldet.
+/// Tabellen: Prüft adressierte Zeilen per prepare_formula-Skript und meldet die Zeilen mit Problemen; Exit-Code 1, wenn eine Zeile Fehler hat oder das Skript scheitert.
 /// </summary>
 public class TableRowErrorsCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-rowerrors";
-    public override List<string> Options => [.. AddressingOptions, "password"];
-    public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>])";
+    public override List<string> Flags => ["allrows", "nodetails"];
+    public override List<string> Options => [.. AddressingOptions, "max", "password"];
+    public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--allrows] [--nodetails] [--max <anzahl>] [--password <kennwort>]";
+
+    public override string? HelpDetails =>
+            "Standard werden nur die Zeilen mit Problemen gemeldet, inkl. fehlerhafter Spalten samt Meldung; --allrows zeigt zusätzlich die fehlerfreien Zeilen ('Fehlerfrei'), " +
+            "--nodetails blendet die fehlerhaften Spalten samt Meldung aus (nur die Zeilen-Keys). " +
+            "--max <anzahl> gibt höchstens so viele fehlerhafte Zeilen aus und bricht dann ab (ohne --max unbegrenzt). " +
+            "Jeder Fehlerfund wird vor der Meldung per kompletter Datenüberprüfung bestätigt; erweist sich die Zeile dabei als fehlerfrei, gilt sie als fehlerfrei.";
 
     #endregion
 
@@ -30,6 +36,10 @@ public class TableRowErrorsCliCommand : CliCommand {
             return 2;
         }
 
+        var (max, maxError) = ResolveMax(args);
+
+        if (maxError is not null) { return UsageError(maxError); }
+
         var tbl = LoadTable(args);
 
         if (tbl is null) { return 1; }
@@ -46,27 +56,46 @@ public class TableRowErrorsCliCommand : CliCommand {
             return 1;
         }
 
+        var showAll = args.Flag("allrows");
+        var noDetails = args.Flag("nodetails");
         var withErrors = 0;
 
         foreach (var row in rows) {
             var check = VerifiedCheckRow(row);
 
-            Console.Out.WriteLine("Zeile: " + row.KeyName);
+            // Sobald das Ausgabelimit erreicht ist, ist eine weitere (teure) Prüfung sinnlos.
+            if (check.ColumnsWithErrors is not { Count: 0 } && max > 0 && withErrors >= max) { break; }
 
-            if (check.ColumnsWithErrors is null) {
-                Console.Out.WriteLine("Skript fehlgeschlagen: " + check.PrepareFormulaFeedback.FailedReason);
-                withErrors++;
-            } else if (check.ColumnsWithErrors.Count == 0) {
-                Console.Out.WriteLine("Fehlerfrei");
-            } else {
-                foreach (var colError in check.ColumnsWithErrors) {
-                    var parts = colError.SplitBy("|");
-                    Console.Out.WriteLine("Spalte " + parts[0] + ": " + (parts.Length > 1 ? parts[1] : string.Empty));
-                }
-                withErrors++;
+            switch (check.ColumnsWithErrors) {
+                case null:
+                    withErrors++;
+                    Console.Out.WriteLine("Zeile: " + row.KeyName);
+                    if (!noDetails) {
+                        Console.Out.WriteLine("Skript fehlgeschlagen: " + check.PrepareFormulaFeedback.FailedReason);
+                    }
+                    Console.Out.WriteLine();
+                    break;
+
+                case { Count: > 0 } columns:
+                    withErrors++;
+                    Console.Out.WriteLine("Zeile: " + row.KeyName);
+                    if (!noDetails) {
+                        foreach (var colError in columns) {
+                            var parts = colError.SplitBy("|");
+                            Console.Out.WriteLine("Spalte " + parts[0] + ": " + (parts.Length > 1 ? parts[1] : string.Empty));
+                        }
+                    }
+                    Console.Out.WriteLine();
+                    break;
+
+                default:
+                    if (showAll) {
+                        Console.Out.WriteLine("Zeile: " + row.KeyName);
+                        Console.Out.WriteLine("Fehlerfrei");
+                        Console.Out.WriteLine();
+                    }
+                    break;
             }
-
-            Console.Out.WriteLine();
         }
 
         return withErrors > 0 ? 1 : 0;
