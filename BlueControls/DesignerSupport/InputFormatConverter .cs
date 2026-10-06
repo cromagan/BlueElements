@@ -14,13 +14,13 @@ public class InputFormatConverter : TypeConverter {
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
     public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value) {
-        if (value is string stringValue) {
+        if (value is string StringVal) {
             foreach (var format in Format.AllFormats.Instances) {
-                if (format.KeyName.Equals(stringValue, StringComparison.OrdinalIgnoreCase)) {
+                if (format.KeyName.Equals(StringVal, StringComparison.OrdinalIgnoreCase)) {
                     return format;
                 }
             }
-            throw Develop.DebugError($"Cannot convert '{stringValue}' to type {typeof(IInputFormat)}.");
+            throw Develop.DebugError($"Cannot convert '{StringVal}' to type {typeof(IInputFormat)}.");
         }
         var result = base.ConvertFrom(context, culture, value);
         return result ?? throw Develop.DebugError("Conversion failed.");
