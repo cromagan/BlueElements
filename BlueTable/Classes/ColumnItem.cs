@@ -1421,7 +1421,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         var keys = LinkedCellFilterTargetColumnNames(l_tb);
         if (keys.Count == 0) { return false; }
-        if (l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(l_tb, uvd, keys))) { return false; }
+        if (l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(uvd, keys))) { return false; }
 
         // Chunk-Spalte analog UniqueValueDefinition.Repair aufnehmen, damit die
         // Definition bei nachfolgenden Reparaturen stabil bleibt
@@ -2474,16 +2474,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Prüft, ob eine Unique-Definition exakt die referenzierten Schlüssel
-    /// abdeckt. Die Chunk-Spalte der Ziel-Tabelle wird toleriert, da Repair
-    /// sie jeder Definition hinzufügt.
+    /// Prüft, ob eine Unique-Definition exakt die referenzierten Schlüssel abdeckt.
     /// </summary>
-    private static bool UniqueDefinitionMatchesKeys(Table linkedTable, UniqueValueDefinition uvd, HashSet<string> keys) {
-        var relevant = linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc
-                ? uvd.KeyColumns.Where(kc => kc != cvc)
-                : uvd.KeyColumns;
-        return relevant.Count() == keys.Count && relevant.All(kc => keys.Contains(kc._keyName));
-    }
+    private static bool UniqueDefinitionMatchesKeys(UniqueValueDefinition uvd, HashSet<string> keys) => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName));
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
@@ -2669,7 +2662,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 var keys = LinkedCellFilterTargetColumnNames(l_tb);
 
                 // Die referenzierte Kombination muss exakt als Unique-Definition in der Ziel-Tabelle existieren
-                if (keys.Count > 0 && !l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(l_tb, uvd, keys))) {
+                if (keys.Count > 0 && !l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(uvd, keys))) {
                     return LinkedCellCombinationNeedsUniqueDefinition;
                 }
             }
