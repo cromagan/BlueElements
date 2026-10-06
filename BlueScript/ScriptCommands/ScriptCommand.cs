@@ -136,22 +136,26 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     /// </summary>
     /// <param name="scriptText"></param>
     /// <param name="start"></param>
+    /// <param name="line">Absolute Zeile des Befehls (inkl. Offset geschachtelter Blöcke), für die Fehlermeldungen.</param>
     /// <returns>Ein OperationResult, dessen OperationResult.Value bei Erfolg den Codeblock enthält.</returns>
-    public static OperationResult GetCodeBlockText(string scriptText, int start) {
+    public static OperationResult GetCodeBlockText(string scriptText, int start, int line) {
         var maxl = scriptText.Length;
 
         var tmp = start;
 
         do {
-            if (tmp >= maxl) { return OperationResult.Failed("Keinen nachfolgenden Codeblock gefunden."); }
+            if (tmp >= maxl) { return OperationResult.Failed($"Keinen nachfolgenden Codeblock gefunden: Ab Zeile {line} wird '{{' erwartet, aber das Skript endet vorher."); }
             if (scriptText[tmp] == '{') { break; }
-            if (scriptText[tmp] != '¶') { return OperationResult.Failed("Keinen nachfolgenden Codeblock gefunden."); }
+            if (scriptText[tmp] != '¶') {
+                var fehlerzeile = line + scriptText.CountChar('¶', tmp) - scriptText.CountChar('¶', start);
+                return OperationResult.Failed($"Keinen nachfolgenden Codeblock gefunden: Ab Zeile {fehlerzeile} wird '{{' erwartet.");
+            }
             tmp++;
         } while (true);
 
         var (posek, _) = NextText(scriptText, start, BracketCurlyClose, false, false, Brackets);
         if (posek < start) {
-            return OperationResult.Failed("Kein Codeblock Ende gefunden.");
+            return OperationResult.Failed($"Kein Codeblock Ende gefunden: Die '{{' in Zeile {line} wird nicht durch '}}' geschlossen.");
         }
 
         var s = scriptText[start..tmp] + scriptText[(tmp + 1)..posek];
@@ -264,6 +268,18 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         var ti = ReplaceIndexedAccess(txt, varCol, scp);
         if (ti.Failed) { return new DoItFeedback(ti.FailedReason, ti.NeedsScriptFix); }
         if (txt != ti.NormalizedText) { return GetVariableByParsing(ti.NormalizedText, varCol, scp); }
+
+        // Klare Meldung, wenn eine Variable wie ein Befehl mit runden Klammern aufgerufen wird (z.B. Name(5) statt Name[5]).
+        // Muss vor ReplaceVariable geschehen, da dort der Variablenname durch den Wert ersetzt würde.
+        var (posr, _) = NextText(txt, 0, ["("], false, false, Brackets);
+        if (posr > 0) {
+            var nameEnd = posr;
+            while (nameEnd > 0 && AllowedCharsVariableName.Contains(txt[nameEnd - 1])) { nameEnd--; }
+
+            if (nameEnd < posr && varCol.GetByKey(txt[nameEnd..posr]) is { } vFalsch) {
+                return new DoItFeedback("'" + vFalsch.KeyName + "' ist eine Variable und kann nicht wie ein Befehl mit ( ) aufgerufen werden. Für den Index-Zugriff eckige Klammern verwenden: " + vFalsch.KeyName + "[...]", true);
+            }
+        }
 
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
 
@@ -631,6 +647,12 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         var l = commandtext.Length;
         if (pos + l < maxl) {
             if (scriptText.AsSpan(pos, l).Equals(commandtext.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
+                // Ein Block-Befehl ohne Start-Klammer (z.B. do) braucht eine Wortgrenze,
+                // damit er nicht als Präfix eines Variablennamens erkannt wird (z.B. 'do' in 'doit').
+                if (StartSequence.Length == 0 && GetCodeBlockAfter && AllowedCharsVariableName.Contains(scriptText[pos + l])) {
+                    return new CanDoFeedback(pos, "Kann nicht geparst werden", false, subname, line);
+                }
+
                 var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence);
                 if (f.Failed) {
                     return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, subname, line);
@@ -638,8 +660,8 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                 var cont = f.ContinuePosition;
                 var codebltxt = string.Empty;
                 if (GetCodeBlockAfter) {
-                    var cbr = GetCodeBlockText(scriptText, cont);
-                    if (cbr.IsFailed) { return new CanDoFeedback(f.ContinuePosition, cbr.FailedReason, true, subname, line); }
+                    var cbr = GetCodeBlockText(scriptText, cont, line);
+                    if (cbr.IsFailed) { return new CanDoFeedback(f.ContinuePosition, "Fehler bei '" + commandtext + "': " + cbr.FailedReason, true, subname, line); }
                     codebltxt = cbr.Value as string ?? string.Empty;
                     cont = cont + codebltxt.Length + 2;
                 }
