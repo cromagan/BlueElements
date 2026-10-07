@@ -114,13 +114,21 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             freezed = closingTb.IsFreezed;
             closingTb.WriteAccessChanged -= _table_WriteAccessChanged;
         }
-        base.OnFormClosing(e);
-        if (_writeAccessLost || freezed) { return; }
+
+        // AllOk vor base.OnFormClosing: Der Basis-Aufruf setzt IsClosed,
+        // und Column_DatenZurückschreiben darf nicht mehr abbrechen, bevor geschrieben wurde.
+        if (_writeAccessLost || freezed) {
+            base.OnFormClosing(e);
+            return;
+        }
+
         if (!AllOk()) {
             e.Cancel = true;
             return;
         }
+
         InputItem = null;
+        base.OnFormClosing(e);
     }
 
     private static string ColumnUsage(ColumnItem? column) {
@@ -245,9 +253,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (string.IsNullOrEmpty(feh)) {
-            Column_DatenZurückschreiben();
+            var grund = Column_DatenZurückschreiben();
 
-            if (string.IsNullOrEmpty(feh) && InputItem is ColumnItem { IsDisposed: false } col2) {
+            if (!string.IsNullOrEmpty(grund)) {
+                if (Forms.MessageBox.Show($"<b><u>Zurückschreiben nicht möglich:</u></b><br>{grund}<br><br>Sollen die Änderungen verworfen werden?", ImageCode.Warnung, "Verwerfen", "Abbruch") != 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            if (InputItem is ColumnItem { IsDisposed: false } col2) {
                 feh = col2.ErrorReason();
 
                 if (string.IsNullOrEmpty(feh) && _strategyOptions is { IsDisposed: false } strat) {
@@ -493,11 +508,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         capInfos.Text = ColumnUsage(c);
     }
 
-    private void Column_DatenZurückschreiben() {
-        if (TableViewForm.EditableErrorMessage((InputItem as ColumnItem)?.Table, null)) { return; }
+    /// <summary>
+    /// Schreibt die Dialogwerte zurück in die Spalte.
+    /// Liefert leer bei Erfolg, sonst den Grund, warum das Zurückschreiben nicht möglich war.
+    /// </summary>
+    private string Column_DatenZurückschreiben() {
+        if (TableViewForm.EditableErrorMessage((InputItem as ColumnItem)?.Table, null)) { return "Die Tabelle ist momentan nicht editierbar."; }
 
-        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
-        if (IsClosed) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return "Die Spalte wurde verworfen."; }
+        if (IsClosed) { return "Das Fenster wurde bereits geschlossen."; }
 
         if (c.ColumNameAllowed(txbName.Text)) {
             c.KeyName = txbName.Text;
@@ -585,6 +604,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.Repair();
 
         //cbxRenderer.Text = string.Empty;
+        return string.Empty;
     }
 
     private TextListItem CreateSolution(string text, Action action, params Control[]? focusControls) {
@@ -639,6 +659,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == KeyColumnScriptReadonly) {
+            solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(), cbxScriptType));
+        }
+
+        if (fehler == ChunkScriptReadonly) {
             solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(), cbxScriptType));
         }
 

@@ -442,6 +442,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
                     showDelFilterButton = MaxTextLengthReached(f.Value, column);
                 } else if (Einschnappen == SnapFilterMode.Wenn_Format_Stimmt_UND_Maximallänge_erreicht) {
                     showDelFilterButton = f.Value.IsFormat(column, column.MultiLine) is { Length: 0 } && MaxTextLengthReached(f.Value, column);
+                } else if (Einschnappen == SnapFilterMode.Wenn_Format_Stimmt_ODER_Maximallänge_erreicht) {
+                    showDelFilterButton = f.Value.IsFormat(column, column.MultiLine) is { Length: 0 } || MaxTextLengthReached(f.Value, column);
                 } else if (filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit) {
                     using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 

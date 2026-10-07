@@ -30,5 +30,10 @@ public enum SnapFilterMode {
     /// <summary>
     /// Es schnappt ein, sobald der Text dem Spaltenformat entspricht und zugleich die maximale Textlänge erreicht ist.
     /// </summary>
-    Wenn_Format_Stimmt_UND_Maximallänge_erreicht = 4
+    Wenn_Format_Stimmt_UND_Maximallänge_erreicht = 4,
+
+    /// <summary>
+    /// Es schnappt ein, sobald der Text dem Spaltenformat entspricht oder die maximale Textlänge erreicht ist.
+    /// </summary>
+    Wenn_Format_Stimmt_ODER_Maximallänge_erreicht = 5
 }
