@@ -86,7 +86,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         #region Zutaten für ExecuteScript sammeln
 
-        var row = RowSingleOrNull();
+        // Eine Zeile wird nur übergeben, wenn der Knopf genau bei einer Zeile drückbar ist.
+        var row = Drückbar_wenn == ButtonArgs.Genau_eine_Zeile ? RowSingleOrNull() : null;
         Table? tb = row?.Table is { IsDisposed: false } rowTb ? rowTb : FilterInput?.Table is { IsDisposed: false } fiTb ? fiTb : null;
 
         // Field-Variablen-Quellen: Parent selbst (falls IHasFieldVariable) und

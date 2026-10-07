@@ -338,9 +338,13 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
     /// <summary>
     /// Führt das Skript für den Testmodus im Editor aus.
     /// Der Test läuft mit Beispiel-Werten statt mit echten Daten.
+    /// Eine Beispiel-Zeile wird nur bei 'genau eine Zeile' übergeben.
     /// </summary>
     private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
-        var row = TableInput?.Row?.First();
+        RowItem? row = null;
+        if (Drückbar_wenn == ButtonArgs.Genau_eine_Zeile && TableInput?.Row is { Count: > 0 } rows) {
+            row = rows.First();
+        }
 
         List<FilterItem>? fi = null;
         if (Parents.Count > 0 && TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
