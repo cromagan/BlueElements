@@ -471,6 +471,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             if (IsDisposed) { return null; }
             if (!_mustDoAllViewItems) { return _allViewItems; }
 
+            // Während des Reloads sind die Daten inkonsistent — Recalc aufschieben.
+            // _mustDoAllViewItems bleibt gesetzt; der Neuaufbau erfolgt nach dem Loaded-Event.
+            if (Table is { IsDisposed: false } tbr && tbr.IsDataReloading) { return _allViewItems; }
+
             try {
                 _mustDoAllViewItems = false;
                 CalculateAllViewItems(_allViewItems);
@@ -2382,7 +2386,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         if (_tableDrawError is { } dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 5) {
-                DrawWaitScreen(gr, "5 Sekunden Sperre");
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("5 Sekunden Sperre"));
                 return;
             }
             _tableDrawError = null;
@@ -2395,11 +2399,18 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         //}
 
         if (Table is not { IsDisposed: false } tb) {
-            DrawWaitScreen(gr, "Keine Tabelle geladen.");
+            DrawWaitScreen(gr, LanguageTool.DoTranslate("Keine Tabelle geladen."));
             return;
         }
 
         tb.LastUsedDate = DateTime.UtcNow;
+
+        // Während des Nachladens (Reload) werden keine ViewItems berechnet oder gezeichnet —
+        // konsistent sind die Daten erst nach dem Loaded-Event.
+        if (tb.IsDataReloading) {
+            DrawWaitScreen(gr, LanguageTool.DoTranslate("Daten werden geladen."));
+            return;
+        }
 
         if (DesignMode || ShowWaitScreen) {
             DrawWaitScreen(gr, string.Empty);
@@ -2408,16 +2419,16 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         try {
             if (CurrentArrangement is not { IsDisposed: false } ca) {
-                DrawWaitScreen(gr, "Ansicht nicht definiert");
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("Ansicht nicht definiert"));
                 return;
             }
 
             if (!ca.RenderingItems.Any()) {
                 if (tb.Column.Count > 0) {
-                    DrawWaitScreen(gr, "Ansicht nicht definiert");
+                    DrawWaitScreen(gr, LanguageTool.DoTranslate("Ansicht nicht definiert"));
                     return;
                 }
-                DrawWaitScreen(gr, "Keine Spalten vorhanden");
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("Keine Spalten vorhanden"));
                 return;
             }
 
@@ -2427,19 +2438,19 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
 
             if (FilterCombined.Table is not null && Table != FilterCombined.Table) {
-                DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Table.Caption);
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("Filter fremder Tabelle: {0}", true, FilterCombined.Table.Caption));
                 return;
             }
 
             if (AllViewItems is not { } avi) {
-                DrawWaitScreen(gr, "Fehler der angezeigten Zeilen");
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("Fehler der angezeigten Zeilen"));
                 return;
             }
 
             avi.TryGetValue(TableEndTableElement.Identifier, out var teli);
 
             if (teli is not TableEndTableElement || !teli.Visible) {
-                DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
+                DrawWaitScreen(gr, LanguageTool.DoTranslate("Fehler in der Zeilenberechung"));
                 _tableDrawError = DateTime.UtcNow; // Cooldown aktivieren statt Invalidate-Loop
                 return;
             }
@@ -2448,7 +2459,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 avi.TryGetValue(ColumnsHeadTableElement.Identifier, out var rcli);
 
                 if (rcli is not ColumnsHeadTableElement rowcap || !rowcap.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
-                    DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
+                    DrawWaitScreen(gr, LanguageTool.DoTranslate("Fehler in der Zeilenberechung"));
                     _tableDrawError = DateTime.UtcNow; // Cooldown aktivieren statt Invalidate-Loop
                     return;
                 }
@@ -2995,6 +3006,15 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     private void _Table_TableLoaded(object? sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
 
+        // Das Loaded-Event kann vom Background-Thread kommen (TableUpdater-Timer stößt
+        // Reloads an). WinForms-Zugriffe gehören auf den UI-Thread.
+        if (InvokeRequired) {
+            try {
+                Invoke(new Action(() => _Table_TableLoaded(sender, e)));
+            } catch { }
+            return;
+        }
+
         if (e.IsFirst) {
             if (_storedView is not null) {
                 SetView(_storedView);
@@ -3004,9 +3024,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             }
         } else {
             _storedView = null;
+            Invalidate_AllViewItems(true); // Reload hat Daten ersetzt — View auf den neuen Daten neu aufbauen
         }
 
-        //Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
         InvalidateCurrentArrangement(); // Spaltenbreite, Slider
         CheckView();
     }

@@ -384,6 +384,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    /// <summary>
+    /// Gibt an, ob gerade Daten neu eingespielt werden (Chunk-Reload, Fragment-Merge).
+    /// Dabei sind Spaltenschlüssel kurzzeitig nicht auflösbar; Ansichten dürfen
+    /// in diesem Fenster keine Einträge endgültig entfernen und nicht neu berechnet werden.
+    /// </summary>
+    public bool IsDataReloading => _dataReloadPaused > 0;
+
     public bool IsDisposed => _isDisposedFlag == 1;
 
     public bool IsEventsSuppressed => _suppressEvents > 0;
@@ -598,13 +605,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             ChangeData(TableDataType.TableVariables, null, _variableTmp, serialized);
         }
     }
-
-    /// <summary>
-    /// Gibt an, ob gerade Daten neu eingespielt werden (Chunk-Reload, Fragment-Merge).
-    /// Dabei sind Spaltenschlüssel kurzzeitig nicht auflösbar; Ansichten dürfen
-    /// in diesem Fenster keine Einträge endgültig entfernen.
-    /// </summary>
-    internal bool IsDataReloading => _dataReloadPaused > 0;
 
     /// <summary>
     /// Gibt an, ob der Instanz-Timer dieser Tabelle pausiert ist (Zähler &gt; 0).
