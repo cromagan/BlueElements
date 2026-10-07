@@ -180,7 +180,13 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     public virtual string ErrorReason() {
         if (!IsValidName(KeyName)) { return "Ungültiger Name"; }
-        if (!string.IsNullOrEmpty(FailedReason)) { return "Das Skript enthält Syntax-Fehler."; }
+
+        // Aktueller Syntax-Zustand per PreCheck — FailedReason ist nur das
+        // Diagnose-Snapshot der letzten Live-Ausführung und blockiert OK nicht.
+        var preCheck = ScriptPreCheck.Check(Script);
+        if (preCheck.HasSyntaxErrors) { return string.Join("\r\n", preCheck.SyntaxErrors); }
+
+        if (!string.IsNullOrEmpty(FailedReason)) { return "Das Skript enthält einen gespeicherten Syntax-Fehler."; }
         return string.Empty;
     }
 

@@ -248,15 +248,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
-    /// <summary>
-    /// Führt den ScriptPreCheck über den aktuellen Skript-Text aus und liefert
-    /// die Syntax-Fehler als Text, oder string.Empty, wenn keine vorhanden sind.
-    /// </summary>
-    protected string PreCheckErrorText() {
-        var preCheck = ScriptPreCheck.Check(Script);
-        return preCheck.HasSyntaxErrors ? string.Join("\r\n", preCheck.SyntaxErrors) : string.Empty;
-    }
-
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
             UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
@@ -290,6 +281,15 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     /// an ein hostendes EditorForIEnumerable zu melden.
     /// </summary>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    /// <summary>
+    /// Führt den ScriptPreCheck über den aktuellen Skript-Text aus und liefert
+    /// die Syntax-Fehler als Text, oder string.Empty, wenn keine vorhanden sind.
+    /// </summary>
+    protected string PreCheckErrorText() {
+        var preCheck = ScriptPreCheck.Check(Script);
+        return preCheck.HasSyntaxErrors ? string.Join("\r\n", preCheck.SyntaxErrors) : string.Empty;
+    }
 
     /// <summary>
     /// Lädt das übergebene ScriptDescription-Item in die Oberfläche.
@@ -573,11 +573,6 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         ScriptChangedByUser = true;
         if (Mode == EditorMode.EditItem && InputItem is ScriptDescription sd) {
             sd.Script = Script;
-
-            // Kein Fehlertext gespeichert -> PreCheck ausführen und Fehler speichern.
-            if (string.IsNullOrEmpty(sd.FailedReason) && PreCheckErrorText() is { Length: > 0 } err) {
-                sd.FailedReason = err;
-            }
         }
     }
 
