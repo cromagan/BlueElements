@@ -427,6 +427,41 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Liefert lazy die Duplikat-Gruppen der Spalten: Zeilen mit gleichen Werten
+    /// in allen Spalten ("Dupe Suche"-Filter wie im RowCleanUp). rows begrenzt
+    /// die Suche auf diese Zeilen; null = alle Zeilen der Tabelle prüfen.
+    /// </summary>
+    public IEnumerable<List<RowItem>> DuplicateGroups(List<ColumnItem> columns, IEnumerable<RowItem>? rows) {
+        if (Table is not { IsDisposed: false } tb) { yield break; }
+
+        var cols = columns.Where(c => c is { IsDisposed: false }).ToList();
+        if (cols.Count == 0) { yield break; }
+
+        foreach (var thisR in tb.Row) {
+            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
+
+                #region Filtercol erstellen
+
+                using var f = new FilterCollection(tb, "Dupe Suche");
+
+                foreach (var thisc in cols) {
+                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                }
+
+                #endregion
+
+                #region Zeilen ermitteln (rows)
+
+                var group = rows is null ? f.Rows.ToList() : f.Rows.Intersect(rows).ToList();
+
+                #endregion
+
+                if (group.Count > 1) { yield return group; }
+            }
+        }
+    }
+
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
     /// <summary>
@@ -452,22 +487,36 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
+        // Muss-Spalten: Erste Spalte, Chunk-Spalten und alle Spalten der Unique-Definitionen
+        // müssen per Filter gesetzt sein, sonst kann die neue Zeile mit einer vorhandenen kollidieren.
+        List<ColumnItem> mustFilterColumns = [];
+        foreach (var thisColumn in tb.Column) {
+            if (thisColumn is not { IsDisposed: false }) { continue; }
+            if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None) { mustFilterColumns.Add(thisColumn); }
+        }
+
+        foreach (var uvd in tb.UniqueValues) {
+            foreach (var kc in uvd.KeyColumns) {
+                if (kc is { IsDisposed: false } && !mustFilterColumns.Contains(kc)) { mustFilterColumns.Add(kc); }
+            }
+        }
+
         var s = tb.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return OperationResult.FailedRetryable("Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
 
         var chunkval = string.Empty;
         foreach (var thisColum in tb.Column) {
-            if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
-                if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
-                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
-                }
+            if (!mustFilterColumns.Contains(thisColum)) { continue; }
 
-                if (thisColum.Value_for_Chunk != ChunkType.None) {
-                    chunkval = inval;
-                    var loadResult = tb.BeSureRowIsLoaded(inval, false);
-                    if (loadResult.IsFailed) {
-                        return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
-                    }
+            if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
+                return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
+            }
+
+            if (thisColum.Value_for_Chunk != ChunkType.None) {
+                chunkval = inval;
+                var loadResult = tb.BeSureRowIsLoaded(inval, false);
+                if (loadResult.IsFailed) {
+                    return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
                 }
             }
         }
@@ -671,41 +720,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.SuccessTrue;
 
         #endregion
-    }
-
-    /// <summary>
-    /// Liefert lazy die Duplikat-Gruppen der Spalten: Zeilen mit gleichen Werten
-    /// in allen Spalten ("Dupe Suche"-Filter wie im RowCleanUp). rows begrenzt
-    /// die Suche auf diese Zeilen; null = alle Zeilen der Tabelle prüfen.
-    /// </summary>
-    public IEnumerable<List<RowItem>> DuplicateGroups(List<ColumnItem> columns, IEnumerable<RowItem>? rows) {
-        if (Table is not { IsDisposed: false } tb) { yield break; }
-
-        var cols = columns.Where(c => c is { IsDisposed: false }).ToList();
-        if (cols.Count == 0) { yield break; }
-
-        foreach (var thisR in tb.Row) {
-            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
-
-                #region Filtercol erstellen
-
-                using var f = new FilterCollection(tb, "Dupe Suche");
-
-                foreach (var thisc in cols) {
-                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
-                }
-
-                #endregion
-
-                #region Zeilen ermitteln (rows)
-
-                var group = rows is null ? f.Rows.ToList() : f.Rows.Intersect(rows).ToList();
-
-                #endregion
-
-                if (group.Count > 1) { yield return group; }
-            }
-        }
     }
 
     public OperationResult UniqueRow(string value, string comment) {

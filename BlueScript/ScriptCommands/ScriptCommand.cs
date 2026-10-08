@@ -647,9 +647,11 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         var l = commandtext.Length;
         if (pos + l < maxl) {
             if (scriptText.AsSpan(pos, l).Equals(commandtext.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
-                // Ein Block-Befehl ohne Start-Klammer (z.B. do) braucht eine Wortgrenze,
-                // damit er nicht als Präfix eines Variablennamens erkannt wird (z.B. 'do' in 'doit').
-                if (StartSequence.Length == 0 && GetCodeBlockAfter && AllowedCharsVariableName.Contains(scriptText[pos + l])) {
+                // Befehle ohne Start-Klammer brauchen eine Wortgrenze, damit sie nicht als
+                // Präfix eines Variablennamens erkannt werden (z.B. 'do' in 'doit' oder 'stop' in 'stoppbandgeschwindigkeit').
+                // Befehle mit Attributen (z.B. var, return) sind ausgenommen, da die Normalisierung
+                // Leerzeichen entfernt ('var t="x"' → 'vart="x"').
+                if (StartSequence.Length == 0 && Args.Count == 0 && AllowedCharsVariableName.Contains(scriptText[pos + l])) {
                     return new CanDoFeedback(pos, "Kann nicht geparst werden", false, subname, line);
                 }
 

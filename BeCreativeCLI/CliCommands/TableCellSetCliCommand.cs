@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Setzt den Wert einer Zelle in allen adressierten Zeilen und speichert die Tabelle.
+/// Tabellen: Setzt Werte einer oder mehrerer Spalten in allen adressierten Zeilen und speichert die Tabelle.
 /// </summary>
 public class TableCellSetCliCommand : CliCommand {
 
@@ -12,14 +12,16 @@ public class TableCellSetCliCommand : CliCommand {
     public override string Command => "table-cellset";
     public override List<string> Flags => ["dry-run"];
 
+    public override List<string> Options => [.. AddressingOptions, "set", "password"];
+
+    public override string Syntax => "bcr table-cellset <tabelle> --set <spalte>=<wert> [--set <spalte>=<wert> ...] + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run] [--password <kennwort>]";
+
     public override string? HelpDetails =>
+            "--set setzt eine Spalte und darf mehrfach angegeben werden, um mehrere Spalten in einem Aufruf zu ändern: --set KATEGORIE=Regeln --set ANLEITUNG=\"Text mit Leerzeichen\". " +
             "--dry-run zeigt nur die Keys der Zeilen, in denen gesetzt würde — ohne zu ändern und ohne zu speichern. " +
-            "Werte mit Leerzeichen gehören in Anführungszeichen. " +
+            "Werte mit Leerzeichen gehören in Anführungszeichen; der Wert darf leer sein. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
             "Die Systemspalte SYS_ROWSORTINDEX hält die Sortiernummern lückenlos und braucht das CLI-Recht '" + CliRights.MoveRows + "'.";
-
-    public override List<string> Options => [.. AddressingOptions, "column", "value", "password"];
-    public override string Syntax => "bcr table-cellset <tabelle> --column <spalte> --value <wert> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--dry-run] [--password <kennwort>]";
 
     #endregion
 
@@ -28,14 +30,6 @@ public class TableCellSetCliCommand : CliCommand {
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount != 1) {
             return UsageError($"Erwartet wird genau 1 Positionsargument (<tabelle>), erhalten: {args.PositionalCount}.");
-        }
-
-        if (!args.HasOption("column")) {
-            return UsageError("Es fehlt --column <spalte>. Werte mit Leerzeichen gehören in Anführungszeichen.");
-        }
-
-        if (!args.HasOption("value")) {
-            return UsageError("Es fehlt --value <wert>. Werte mit Leerzeichen gehören in Anführungszeichen.");
         }
 
         var problem = RowAddressingProblem(args);
@@ -49,32 +43,49 @@ public class TableCellSetCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
-        var dryRun = args.Flag("dry-run");
+        // Zielspalten einsammeln: wiederholbare --set-Angaben.
+        List<(ColumnItem Column, string Value)> targets = [];
 
-        var column = ColumnOfOption(tbl, args);
+        foreach (var set in args.AllOptions("set")) {
+            var eq = set.IndexOf('=');
 
-        if (column is null) {
-            Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("column"));
-            return 1;
+            if (eq <= 0) {
+                return UsageError("--set erwartet <spalte>=<wert>, erhalten: " + set);
+            }
+
+            var columnName = set[..eq];
+            var column = tbl.Column[columnName];
+
+            if (column is not { IsDisposed: false }) {
+                return UsageError("Spalte nicht gefunden: " + columnName);
+            }
+
+            targets.Add((column, set[(eq + 1)..]));
+        }
+
+        if (targets.Count == 0) {
+            return UsageError("Es fehlt mindestens ein --set <spalte>=<wert>. Werte mit Leerzeichen gehören in Anführungszeichen; der Wert darf leer sein.");
+        }
+
+        // Spalten- und Rechteprüfung vorab für alle Zielspalten.
+        foreach (var (column, _) in targets) {
+            var columnProblem = ColumnWriteProblem(tbl, column);
+
+            if (columnProblem is not null) {
+                Console.Error.WriteLine(columnProblem);
+                return 1;
+            }
         }
 
         // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
         // SYS_ROWSORTINDEX hält die Sortiernummern lückenlos (Nummern werden verschoben) — dafür ist das eigene Recht 'Move rows' nötig.
-        var neededRight = tbl.Column.SysRowSortIndex == column ? CliRights.MoveRows : CliRights.ChangeCellValues;
+        foreach (var neededRight in targets.Select(t => tbl.Column.SysRowSortIndex == t.Column ? CliRights.MoveRows : CliRights.ChangeCellValues).Distinct()) {
+            var rightProblem = RightProblem(tbl, neededRight);
 
-        var rightProblem = RightProblem(tbl, neededRight);
-
-        if (rightProblem is not null) {
-            Console.Error.WriteLine(rightProblem);
-            return 1;
-        }
-
-        var columnProblem = ColumnWriteProblem(tbl, column);
-
-        if (columnProblem is not null) {
-            Console.Error.WriteLine(columnProblem);
-            return 1;
+            if (rightProblem is not null) {
+                Console.Error.WriteLine(rightProblem);
+                return 1;
+            }
         }
 
         var (rows, error) = ResolveRows(tbl, args);
@@ -89,20 +100,20 @@ public class TableCellSetCliCommand : CliCommand {
             return 1;
         }
 
-        var value = args.Option("value") ?? string.Empty;
+        // Werte in das Speicherformat der jeweiligen Spalte überführen (z. B. HTML-Entities).
+        var prepared = targets.ConvertAll(t => (Column: t.Column, Value: StorageTextOf(t.Column, t.Value)));
 
-        // Wert in das Speicherformat der Spalte überführen (z. B. HTML-Entities).
-        value = StorageTextOf(column, value);
-
-        if (dryRun) {
-            var settable = rows.Where(r => !IsLocked(column, r)).ToList();
+        // Ein Trockenlauf schreibt nichts und braucht daher den Fragment-Writer nicht.
+        if (args.Flag("dry-run")) {
+            var settable = rows.Where(r => !prepared.Exists(t => IsLocked(t.Column, r))).ToList();
 
             if (settable.Count == 0) {
                 Console.Error.WriteLine("Keine bearbeitbare Zeile getroffen.");
                 return 1;
             }
 
-            Console.Out.WriteLine("Trockenlauf — gesetzt würde in: " + string.Join(", ", settable.Select(r => r.KeyName)));
+            Console.Out.WriteLine("Trockenlauf — Spalten: " + string.Join(", ", prepared.Select(t => t.Column.KeyName)));
+            Console.Out.WriteLine("Gesetzt würde in: " + string.Join(", ", settable.Select(r => r.KeyName)));
             Console.Out.WriteLine($"{settable.Count.ToString1()} Zeile(n), nichts gespeichert.");
             return 0;
         }
@@ -120,18 +131,27 @@ public class TableCellSetCliCommand : CliCommand {
         var skipped = 0;
 
         foreach (var row in rows) {
-            if (IsLocked(column, row)) {
-                Console.Error.WriteLine($"Zeile {row.KeyName} ist abgeschlossen — übersprungen.");
+            var lockedColumns = prepared.Where(t => IsLocked(t.Column, row)).Select(t => t.Column.KeyName).ToList();
+
+            if (lockedColumns.Count > 0) {
+                Console.Error.WriteLine($"Zeile {row.KeyName} ist abgeschlossen ({string.Join(", ", lockedColumns)}) — übersprungen.");
                 skipped++;
                 continue;
             }
 
-            var failed = row.CellSet(column, value, "bcr table-cellset");
+            var failedColumns = 0;
 
-            if (!string.IsNullOrEmpty(failed)) {
-                Console.Error.WriteLine($"Zeile {row.KeyName} konnte nicht gesetzt werden: {failed}");
-            } else {
-                Console.Out.WriteLine($"Wert gesetzt in {row.KeyName}");
+            foreach (var (column, value) in prepared) {
+                var failed = row.CellSet(column, value, "bcr table-cellset");
+
+                if (!string.IsNullOrEmpty(failed)) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName}, Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
+                    failedColumns++;
+                }
+            }
+
+            if (failedColumns == 0) {
+                Console.Out.WriteLine($"Wert(e) gesetzt in {row.KeyName}");
                 done++;
             }
         }

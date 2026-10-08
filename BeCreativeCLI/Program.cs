@@ -58,7 +58,23 @@ internal static class Program {
             return 2;
         }
 
-        return cmd.DoIt(cliArgs);
+        var ergebnis = cmd.DoIt(cliArgs);
+
+        ReleaseTables();
+
+        return ergebnis;
+    }
+
+    private static void ReleaseTables() {
+        // Offene Tabellen freigeben: Der Fragment-Writer schreibt dabei den
+        // EOF-Marker. Ohne diesen Schritt bleiben Fragment-Dateien ohne Abschluss
+        // liegen (z. B. nach gescheitertem table-script execute), werden nie
+        // fortgeführt und verhindern das Bündeln folgender Änderungen.
+        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+
+        foreach (var tbl in Table.AllInstances().ToList()) {
+            if (tbl is { IsDisposed: false }) { tbl.Dispose(); }
+        }
     }
 
     private static void Program_MessageDG(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {

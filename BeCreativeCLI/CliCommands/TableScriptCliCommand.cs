@@ -24,13 +24,14 @@ public class TableScriptCliCommand : CliCommand {
             "execute führt das Skript aus (Zeilen-Skripte per --rowkey oder --filtercolumn/--filtervalue [--filtertype]; ein Filter führt das Skript je getroffener Zeile aus und läuft bei Fehlern weiter). " +
             "check prüft das Skript in der Tabelle und meldet den Fehler. " +
             "names listet alle Skripte mit ihrem Compare-Ergebnis. " +
+            "export akzeptiert --stdout: Der Skripttext erscheint auf stdout, statt eine .txt-Datei im Tabellen-Ordner zu schreiben (auch für nicht dateibasierte Tabellen; Umleitung > datei.txt nach Bedarf). " +
             "Execute akzeptiert --debugoutput: DebugPrint-Ausgaben des Skripts erscheinen live auf stdout. " +
             "Ansehen und Fehlertesten (export, compare, check, names) ist ohne CLI-Recht erlaubt. " +
             "Import verlangt das CLI-Recht 'Edit script', execute 'Execute script'.";
 
-    public override List<string> Flags => ["debugoutput"];
+    public override List<string> Flags => ["debugoutput", "stdout"];
     public override List<string> Options => [.. AddressingOptions, "password"];
-    public override string Syntax => "bcr table-script <tabelle> <import|export|compare|execute|check|names> [<skript>] (bei execute zusätzlich: --rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--password <kennwort>]";
+    public override string Syntax => "bcr table-script <tabelle> <import|export|compare|execute|check|names> [<skript>] (bei execute zusätzlich: --rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]; bei export: --stdout) [--password <kennwort>]";
 
     #endregion
 
@@ -58,6 +59,10 @@ public class TableScriptCliCommand : CliCommand {
 
             default:
                 return UsageError("Unbekannte Aktion '" + args[1] + "'. Gültig: import, export, compare, execute, check, names.");
+        }
+
+        if (args.Flag("stdout") && action != "EXPORT") {
+            return UsageError("--stdout wirkt nur mit der Aktion export.");
         }
 
         var tbl = LoadTable(args);
@@ -88,6 +93,9 @@ public class TableScriptCliCommand : CliCommand {
         if (action == "CHECK") { return Check(tbl, args); }
 
         if (action != "EXECUTE") {
+            // Mit --stdout genügt das Skript in der Tabelle; die Skript-Datei wird nicht gebraucht.
+            if (action == "EXPORT" && args.Flag("stdout")) { return ExportToStdout(tbl, args); }
+
             if (tbl is not TableFile fileTable || fileTable.Filename is not { Length: > 0 }) {
                 Console.Error.WriteLine("Die Tabelle ist nicht dateibasiert — Skript-Dateien sind nicht verfügbar.");
                 return 1;
@@ -183,6 +191,23 @@ public class TableScriptCliCommand : CliCommand {
         if (!HasRight(tbl, CliRights.EditScript)) {
             Console.Out.WriteLine("Hinweis: Das CLI-Recht '" + CliRights.EditScript + "' fehlt — die Datei kann nicht per table-script import zurückgespielt werden.");
         }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Gibt den Skripttext auf stdout aus, statt eine Skript-Datei zu schreiben.
+    /// </summary>
+    private static int ExportToStdout(Table tbl, CliArgs args) {
+        var script = GetScriptOrError(tbl, args);
+
+        if (script is null) { return 1; }
+
+        var text = script.Script.Replace("\r\n", "\n").Replace('\r', '\n');
+
+        Console.Out.Write(text);
+
+        if (text.Length > 0 && !text.EndsWith('\n')) { Console.Out.WriteLine(); }
 
         return 0;
     }

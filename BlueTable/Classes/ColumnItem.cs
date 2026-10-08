@@ -1954,18 +1954,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxCellLength = 1;
                 _editableWithTextInput = false;
 
-                if (_controlStrategy != "None") {
+
+                if (allDefaultValues) {
+                    this.GetStyleFrom(BitColumnFormat.Instance); // HIer ColumnFormat
                     _quickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
                     _controlStrategy = "Listbox";
                     _editAllowedDespiteLock = true;
                     _dropDownItems.AddIfNotExists("+");
                     _dropDownItems.AddIfNotExists("-");
-                } else {
-                    _dropDownItems.Clear();
-                }
 
-                if (allDefaultValues) {
-                    this.GetStyleFrom(BitColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Abgeschlossen";
                     ForeColor = System.Drawing.Color.FromArgb(128, 0, 0);
                     BackColor = System.Drawing.Color.FromArgb(255, 185, 185);

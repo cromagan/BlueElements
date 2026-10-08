@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Durchsucht Spalten auf dekodiertem Text; je Treffer Spalte, Zeilen-Key und Kontext, optional mit Wert einer Kontextspalte oder nur den Zeilen-Keys.
+/// Tabellen: Durchsucht Spalten auf dekodiertem Text; je Treffer Spalte, Zeilen-Key und Kontext; Suchbereich per Zeilenfilter beschränkbar.
 /// </summary>
 public class TableSearchCliCommand : CliCommand {
 
@@ -20,12 +20,13 @@ public class TableSearchCliCommand : CliCommand {
 
     public override string Command => "table-search";
     public override List<string> Flags => ["rowkeys-only", "decode"];
-    public override List<string> Options => ["value", "column", "max", "context", "contextcolumn", "password"];
-    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>] [--max <anzahl>] [--context <zeichen>] [--contextcolumn <spalte>] [--rowkeys-only] [--decode] [--password <kennwort>]";
+    public override List<string> Options => ["value", "column", "max", "context", "contextcolumn", "filtercolumn", "filtervalue", "filtertype", "password"];
+    public override string Syntax => "bcr table-search <tabelle> --value <suchtext> [--column <spalte>] [--filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]] [--max <anzahl>] [--context <zeichen>] [--contextcolumn <spalte>] [--rowkeys-only] [--decode] [--password <kennwort>]";
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'möglich' findet auch als m&#246;glich gespeicherte Werte; der Suchtext darf beide Formen enthalten. " +
             "Der Kontext umfasst standardmäßig 40 Zeichen je Seite und wird an Wortgrenzen ergänzt, statt Wörter abzureißen; --context <zeichen> ändert die Länge, --max <anzahl> begrenzt die Trefferzahl. " +
+            "--filtercolumn mit --filtervalue (optional --filtertype) durchsucht nur die getroffenen Zeilen — 'Zeilen der Kategorie X mit Token Y' ist dann --filtercolumn KATEGORIE --filtervalue X --value Y; --column wählt demgegenüber nur die zu durchsuchende Spalte. " +
             "--contextcolumn <spalte> blendet je Treffer den Wert dieser Spalte derselben Zeile ein (z. B. KATEGORIE) — Titel sind mehrfach vergeben, so bleibt der Treffer der Ziel-Kategorie zuordenbar. " +
             "--rowkeys-only gibt nur die Zeilen-Keys der Treffer aus (einer je Zeile; nicht mit --contextcolumn kombinierbar), um sie z. B. gegen die Key-Liste einer Ziel-Kategorie zu schneiden. " +
             "--decode dekodiert Zelltext und Kontextspalte vollständig vor der Suche und in der Ausgabe (echte Umlaute statt Entities, wie table-export --decode).";
@@ -62,6 +63,17 @@ public class TableSearchCliCommand : CliCommand {
             return UsageError("--rowkeys-only und --contextcolumn dürfen nicht kombiniert werden.");
         }
 
+        var hasFilterColumn = args.HasOption("filtercolumn");
+        var hasFilterValue = args.HasOption("filtervalue");
+
+        if (hasFilterColumn != hasFilterValue) {
+            return UsageError("--filtercolumn und --filtervalue müssen zusammen angegeben werden.");
+        }
+
+        if (args.HasOption("filtertype") && !hasFilterColumn) {
+            return UsageError("--filtertype benötigt --filtercolumn/--filtervalue.");
+        }
+
         var tbl = LoadTable(args);
 
         if (tbl is null) { return 1; }
@@ -92,12 +104,31 @@ public class TableSearchCliCommand : CliCommand {
             }
         }
 
+        List<RowItem> searchRows;
+
+        if (hasFilterColumn) {
+            var filterTypeProblem = FilterTypeProblem(args);
+
+            if (filterTypeProblem is not null) { return UsageError(filterTypeProblem); }
+
+            var filterColumn = tbl.Column[args.Option("filtercolumn") ?? string.Empty];
+
+            if (filterColumn is null) {
+                Console.Error.WriteLine("Spalte nicht gefunden: " + args.Option("filtercolumn"));
+                return 1;
+            }
+
+            searchRows = FilterCollection.CalculateFilteredRows(tbl, false, new FilterItem(filterColumn, GetFilterType(args), args.Option("filtervalue") ?? string.Empty));
+        } else {
+            searchRows = [.. tbl.RowsInSaveOrder()];
+        }
+
         var withRowKeysOnly = args.Flag("rowkeys-only");
         var decode = args.Flag("decode");
         var matches = 0;
         var limitReached = false;
 
-        foreach (var row in tbl.RowsInSaveOrder()) {
+        foreach (var row in searchRows) {
             if (limitReached) { break; }
 
             foreach (var column in columns) {

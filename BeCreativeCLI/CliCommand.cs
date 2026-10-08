@@ -2,6 +2,7 @@
 
 using System.IO;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using BlueTable.EventArgs;
 
 namespace BeCreativeCLI;
@@ -72,6 +73,31 @@ public abstract class CliCommand : IHasKeyName {
     public abstract int DoIt(CliArgs args);
 
     /// <summary>
+    /// Liefert den Zelltext für Tab-/CSV-Ausgaben: optional dekodiert. Ohne Escape
+    /// werden Zeilentrenner zu CRLF normiert (RFC-4180-Quoting), mit Escape als
+    /// Literal \n ersetzt, damit jede Ausgabezeile einem Datensatz entspricht.
+    /// </summary>
+    protected static string CellTextOf(RowItem row, ColumnItem column, bool decode, bool escape) {
+        var value = row.CellGetString(column);
+
+        if (decode) { value = DecodedCellText(column, value); }
+
+        return escape ? EscapeLineBreaks(value) : value.Replace("\r\n", "\n").Replace('\r', '\n').Replace("\n", "\r\n");
+    }
+
+    /// <summary>
+    /// Dekodiert einen Zelltext lesbar: Entities aufgelöst; bei Spalten mit HTML-Inhalt
+    /// gilt &lt;br&gt; als Zeilentrenner und wird zum echten Umbruch.
+    /// </summary>
+    protected static string DecodedCellText(ColumnItem column, string value) {
+        value = System.Net.WebUtility.HtmlDecode(value);
+
+        if (IsHtmlContent(column)) { value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase); }
+
+        return value;
+    }
+
+    /// <summary>
     /// Liefert die Kapitelspalte der Ansicht 1 oder null, wenn keine definiert ist.
     /// </summary>
     protected static ColumnItem? ChapterColumnOfView1(Table tbl) =>
@@ -104,6 +130,13 @@ public abstract class CliCommand : IHasKeyName {
 
         return null;
     }
+
+    /// <summary>
+    /// Ersetzt Zeilenumbrüche durch Literal \n (Backslashes vorher verdoppelt),
+    /// damit jede Ausgabezeile genau einem Datensatz entspricht.
+    /// </summary>
+    protected static string EscapeLineBreaks(string value) =>
+        value.Replace("\\", "\\\\").Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
 
     /// <summary>
     /// Liefert null, wenn --filtertype einen bekannten Vergleichstyp enthält,
@@ -374,6 +407,32 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
+    /// Löst die Komma-getrennte Spaltenliste (z. B. Option --columns) auf.
+    /// Reihenfolge und Mehrfachnennungen bleiben erhalten.
+    /// </summary>
+    protected static (List<ColumnItem> Columns, string? Error) ResolveColumns(Table tbl, string columnList) {
+        List<ColumnItem> columns = [];
+
+        foreach (var name in columnList.Split(',')) {
+            var key = name.Trim();
+
+            if (key.Length == 0) {
+                return ([], "Die Spaltenliste enthält einen leeren Spaltennamen.");
+            }
+
+            var column = tbl.Column[key];
+
+            if (column is not { IsDisposed: false }) {
+                return ([], "Spalte nicht gefunden: " + key);
+            }
+
+            columns.Add(column);
+        }
+
+        return (columns, null);
+    }
+
+    /// <summary>
     /// Liest die Option --max (0 = unbegrenzt). Liefert null, wenn die Angabe gültig ist, ansonsten die Fehlerbeschreibung.
     /// </summary>
     protected static (int Max, string? Error) ResolveMax(CliArgs args) {
@@ -385,20 +444,30 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Ermittelt die adressierten Zeilen. Vorausgesetzt wird eine zuvor mit
+    /// Ermittelt die adressierten Zeilen. --rowkey akzeptiert Komma-getrennte
+    /// Key-Listen (auch mehrfach angegeben). Vorausgesetzt wird eine zuvor mit
     /// RowAddressingProblem geprüfte Zeilenadressierung. Eine leere Liste bedeutet:
     /// keine Zeile getroffen — ob das ein Fehler ist, entscheidet der Aufrufer.
     /// </summary>
     protected static (List<RowItem> Rows, string? Error) ResolveRows(Table tbl, CliArgs args) {
         if (args.HasOption("rowkey")) {
-            var key = args.Option("rowkey") ?? string.Empty;
-            var row = tbl.Row.GetByKey(key);
+            List<RowItem> keyed = [];
 
-            if (row is not null) { return ([row], null); }
+            foreach (var name in args.AllOptions("rowkey").SelectMany(v => v.Split(','))) {
+                var key = name.Trim();
 
-            return key.IsLong()
-                ? ([], $"Zeile nicht gefunden: {key}")
-                : ([], $"Zeilen-Key muss numerisch sein (Zeilen-Keys sind Zeitstempel-artige Longs): {key}");
+                if (key.Length == 0) { return ([], "Die Zeilen-Keys enthalten einen leeren Eintrag."); }
+
+                var row = tbl.Row.GetByKey(key);
+
+                if (row is null) {
+                    return ([], $"Zeile nicht gefunden: {key}");
+                }
+
+                keyed.AddIfNotExists(row);
+            }
+
+            return (keyed, null);
         }
 
         var columnName = args.Option("filtercolumn") ?? string.Empty;

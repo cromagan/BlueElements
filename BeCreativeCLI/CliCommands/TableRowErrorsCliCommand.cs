@@ -12,11 +12,12 @@ public class TableRowErrorsCliCommand : CliCommand {
     public override string Command => "table-rowerrors";
     public override List<string> Flags => ["allrows", "nodetails"];
     public override List<string> Options => [.. AddressingOptions, "max", "password"];
-    public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key> oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--allrows] [--nodetails] [--max <anzahl>] [--password <kennwort>]";
+    public override string Syntax => "bcr table-rowerrors <tabelle> + Zeilenadressierung (--rowkey <key>[,<key>...] oder --filtercolumn <spalte> --filtervalue <wert> [--filtertype <typ>]) [--allrows] [--nodetails] [--max <anzahl>] [--password <kennwort>]";
 
     public override string? HelpDetails =>
             "Standard werden nur die Zeilen mit Problemen gemeldet, inkl. fehlerhafter Spalten samt Meldung; --allrows zeigt zusätzlich die fehlerfreien Zeilen ('Fehlerfrei'), " +
             "--nodetails blendet die fehlerhaften Spalten samt Meldung aus (nur die Zeilen-Keys). " +
+            "--rowkey akzeptiert Komma-getrennte Key-Listen — mehrere geänderte Zeilen in einem Aufruf prüfen statt je Zeile einen Aufruf. " +
             "--max <anzahl> gibt höchstens so viele fehlerhafte Zeilen aus und bricht dann ab (ohne --max unbegrenzt). " +
             "Jeder Fehlerfund wird vor der Meldung per kompletter Datenüberprüfung bestätigt; erweist sich die Zeile dabei als fehlerfrei, gilt sie als fehlerfrei.";
 

@@ -15,9 +15,9 @@ public class TableExportCliCommand : CliCommand {
     public override string Syntax => "bcr table-export <tabelle> [--sep <trennzeichen>] [--no-system-columns] [--withrowkey] [--columns <spalten>] [--decode] [--escape] [+ optionale Zeilenadressierung] [--password <kennwort>]";
 
     public override string? HelpDetails =>
-            "--no-system-columns lässt Systemspalten (z. B. SYS_ROWSORTINDEX) weg. " +
-            "--withrowkey stellt den Zeilen-Key als erste CSV-Spalte (SYS_ROWKEY) voran. " +
-            "--columns wählt Komma-getrennte Spalten in genau der angegebenen Reihenfolge (auch Systemspalten; nicht mit --no-system-columns kombinierbar). " +
+            "--no-system-columns lässt Systemspalten (z. B. SYS_ROWSORTINDEX) weg — auch aus einer --columns-Auswahl. " +
+            "--columns wählt Komma-getrennte Spalten in genau der angegebenen Reihenfolge (auch Systemspalten). " +
+            "--withrowkey stellt den Zeilen-Key als erste CSV-Spalte (SYS_ROWKEY) voran; ist SYS_ROWKEY zusätzlich in --columns genannt, wird sie dort entfernt, damit der Key nicht doppelt erscheint. " +
             "--decode gibt echte Umlaute statt HTML-Entities aus — gut für Diffs und Reviews; zum Weiterverarbeiten mit bcr-Befehlen besser ohne, da die App Entities speichert. " +
             "Standard: Mehrzeilige Zellen werden RFC-4180-konform gequotet (Anführungszeichen, CRLF-Zeilenumbrüche). " +
             "--escape ersetzt echte Zeilenumbrüche in Zellen durch Literal \\n (Backslashes werden zu \\\\ verdoppelt) — der Output bleibt zeilenstabil und ist Zeile für Zeile in Shell-Schleifen verarbeitbar. " +
@@ -43,10 +43,6 @@ public class TableExportCliCommand : CliCommand {
             if (sep.Length != 1) { return UsageError("--sep erwartet genau ein Trennzeichen, erhalten: '" + sep + "'."); }
 
             separator = sep[0];
-        }
-
-        if (args.HasOption("columns") && args.Flag("no-system-columns")) {
-            return UsageError("--columns wählt die Spalten explizit und kann nicht mit --no-system-columns kombiniert werden.");
         }
 
         // Zeilenadressierung ist optional; nur eine Teilangabe ist ein Fehler.
@@ -76,9 +72,14 @@ public class TableExportCliCommand : CliCommand {
             columns = selected;
         } else {
             columns = tbl.ColumnsInSaveOrder().Where(c => c.SaveContent).ToList();
+        }
 
-            if (args.Flag("no-system-columns")) {
-                columns = [.. columns.Where(c => !c.IsSystemColumn())];
+        if (args.Flag("no-system-columns")) {
+            columns = [.. columns.Where(c => !c.IsSystemColumn())];
+
+            if (columns.Count == 0) {
+                Console.Error.WriteLine("Nach --no-system-columns bleibt keine Spalte übrig.");
+                return 1;
             }
         }
 
@@ -142,50 +143,6 @@ public class TableExportCliCommand : CliCommand {
         }
 
         return sb.ToString();
-    }
-
-    /// <summary>
-    /// Löst die per --columns angegebene, Komma-getrennte Spaltenliste auf.
-    /// Reihenfolge und Mehrfachnennungen bleiben erhalten.
-    /// </summary>
-    private static (List<ColumnItem> Columns, string? Error) ResolveColumns(Table tbl, string columnList) {
-        List<ColumnItem> columns = [];
-
-        foreach (var name in columnList.Split(',')) {
-            var key = name.Trim();
-
-            if (key.Length == 0) {
-                return ([], "Die Option --columns enthält einen leeren Spaltennamen.");
-            }
-
-            var column = tbl.Column[key];
-
-            if (column is not { IsDisposed: false }) {
-                return ([], "Spalte nicht gefunden: " + key);
-            }
-
-            columns.Add(column);
-        }
-
-        return (columns, null);
-    }
-
-    /// <summary>
-    /// Liefert den Zelltext für den Export: optional dekodiert. Ohne Escape werden
-    /// Zeilentrenner zu CRLF normiert (RFC-4180-Quoting), mit Escape als Literal \n
-    /// ersetzt (Backslash verdoppelt), damit jede CSV-Zeile einem Datensatz entspricht.
-    /// </summary>
-    private static string CellTextOf(RowItem row, ColumnItem column, bool decode, bool escape) {
-        var value = row.CellGetString(column);
-
-        if (decode) { value = System.Net.WebUtility.HtmlDecode(value); }
-
-        if (escape) {
-            // Erst den Backslash verdoppeln, dann die Umbrüche — so bleibt \n eindeutig rückführbar.
-            return value.Replace("\\", "\\\\").Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
-        }
-
-        return value.Replace("\r\n", "\n").Replace('\r', '\n').Replace("\n", "\r\n");
     }
 
     #endregion

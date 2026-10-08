@@ -3,16 +3,16 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Zeigt die Tabellen-Übersicht oder Details: Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Zellwerte adressierter Zeilen.
+/// Tabellen: Zeigt die Tabellen-Übersicht oder Details: Spaltennamen, Zeilen-Keys, Zeilen mit Erstwert, Erstwerte, Spaltenmetadaten oder Zellwerte adressierter Zeilen (Spalten wählbar).
 /// </summary>
 public class TableInfoCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-info";
-    public override List<string> Flags => ["columnnames", "rowkeys", "rowvalues", "firstvalues", "rows", "withrowkey"];
-    public override List<string> Options => [.. AddressingOptions, "column", "max", "password"];
-    public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--rowvalues + Zeilenadressierung [--max <anzahl>] [--withrowkey]] [--password <kennwort>]";
+    public override List<string> Flags => ["columnnames", "rowkeys", "rowvalues", "firstvalues", "rows", "withrowkey", "decode", "escape"];
+    public override List<string> Options => [.. AddressingOptions, "column", "columns", "max", "password"];
+    public override string Syntax => "bcr table-info <tabelle> [--columnnames] | [--rowkeys] | [--rows [--max <anzahl>]] | [--firstvalues [--max <anzahl>]] | [--column <spalte>] | [--rowvalues + Zeilenadressierung [--max <anzahl>] [--columns <spalten>] [--withrowkey] [--decode] [--escape]] [--password <kennwort>]";
 
     public override string? HelpDetails =>
             "Modi (genau einen wählen, ohne Angabe gibt es die Übersicht):\n" +
@@ -22,15 +22,17 @@ public class TableInfoCliCommand : CliCommand {
             "  --rows [--max <anzahl>]     je Zeile Key und FirstValue.\n" +
             "  --firstvalues [--max <anzahl>]  nur die Erstwerte.\n" +
             "  --column <spalte>           Metadaten der Spalte (Bezeichnung, Mehrzeilig, ErsteSpalte, Schluesselspalte, Kapitelspalte, WirdGespeichert, QuickInfo, ...).\n" +
-            "  --rowvalues + Zeilenadressierung [--max <anzahl>] [--withrowkey]  Zellwerte der adressierten Zeilen, tab-getrennt mit Spaltennamen-Kopfzeile.\n" +
+            "  --rowvalues + Zeilenadressierung [--max <anzahl>] [--columns <spalten>] [--withrowkey] [--decode] [--escape]  Zellwerte der adressierten Zeilen, tab-getrennt mit Spaltennamen-Kopfzeile; --columns wählt Komma-getrennt eigene Spalten in der angegebenen Reihenfolge (auch Systemspalten), statt aller Spalten — Riesen-Dumps vermeiden. " +
+            "--decode gibt echte Umlaute statt HTML-Entities aus, --escape ersetzt Umbrüche durch Literal \\n (Backslash verdoppelt) — der Zeilen-Dump bleibt so Zeile für Zeile parsebar.\n" +
             "Zeilenadressierung:\n" +
-            "  --rowkey <key>                genau eine Zeile; der Key ist der numerische Zeitstempel-Key aus --rowkeys (nicht KEY=Wert).\n" +
+            "  --rowkey <key>[,<key>...]    eine oder mehrere Zeilen (Komma-getrennt); der Key ist der numerische Zeitstempel-Key aus --rowkeys (nicht KEY=Wert).\n" +
             "  --filtercolumn <spalte> --filtervalue <wert> [--filtertype equals|exact|contains|startswith]\n" +
             "--withrowkey wirkt nur mit --rowvalues und stellt den Zeilen-Key als erste Tab-Spalte (SYS_ROWKEY) voran.\n" +
             "Beispiele:\n" +
             "  bcr table-info X --rowkeys\n" +
             "  bcr table-info X --rowvalues --rowkey 638009530362930000\n" +
             "  bcr table-info X --rowvalues --filtercolumn KATEGORIE --filtervalue Glossar\n" +
+            "  bcr table-info X --rowvalues --rowkey 638009530362930000 --columns KATEGORIE,TITEL\n" +
             "  bcr table-info X --rows --max 20";
 
     #endregion
@@ -67,6 +69,16 @@ public class TableInfoCliCommand : CliCommand {
 
         if (args.Flag("withrowkey") && !args.Flag("rowvalues")) {
             Console.Error.WriteLine("--withrowkey wirkt nur zusammen mit --rowvalues.");
+            return 2;
+        }
+
+        if (args.HasOption("columns") && !args.Flag("rowvalues")) {
+            Console.Error.WriteLine("--columns wirkt nur zusammen mit --rowvalues.");
+            return 2;
+        }
+
+        if ((args.Flag("decode") || args.Flag("escape")) && !args.Flag("rowvalues")) {
+            Console.Error.WriteLine("--decode und --escape wirken nur zusammen mit --rowvalues.");
             return 2;
         }
 
@@ -211,7 +223,22 @@ public class TableInfoCliCommand : CliCommand {
         }
 
         var withRowKey = args.Flag("withrowkey");
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
+        var decode = args.Flag("decode");
+        var escape = args.Flag("escape");
+        List<ColumnItem> columns;
+
+        if (args.HasOption("columns")) {
+            var (selected, columnError) = ResolveColumns(tbl, args.Option("columns") ?? string.Empty);
+
+            if (columnError is not null) {
+                Console.Error.WriteLine(columnError);
+                return 1;
+            }
+
+            columns = selected;
+        } else {
+            columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
+        }
 
         if (withRowKey) {
             // Der Key steht vorne; die Systemspalte wäre doppelt in der Ausgabe.
@@ -234,7 +261,14 @@ public class TableInfoCliCommand : CliCommand {
 
             if (withRowKey) { values.Add(row.KeyName); }
 
-            values.AddRange(columns.Select(c => row.CellGetString(c).Replace("\r", "\n")));
+            foreach (var c in columns) {
+                var value = row.CellGetString(c);
+
+                if (decode) { value = DecodedCellText(c, value); }
+
+                values.Add(escape ? EscapeLineBreaks(value) : value.Replace("\r", "\n"));
+            }
+
             Console.Out.WriteLine(string.Join("\t", values));
             count++;
         }
