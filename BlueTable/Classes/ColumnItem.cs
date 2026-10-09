@@ -1954,7 +1954,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxCellLength = 1;
                 _editableWithTextInput = false;
 
-
                 if (allDefaultValues) {
                     this.GetStyleFrom(BitColumnFormat.Instance); // HIer ColumnFormat
                     _quickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -2618,6 +2617,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_relationType != RelationType.None && Table?.UniqueValues is { } uv) {
             if (uv.Any(uvd => uvd.KeyColumns.Contains(this))) { return LinkedColumnInUniqueDefinition; }
+        }
+
+        if (Table?.UniqueValues is { } uniqueValues && uniqueValues.Any(uvd => uvd.KeyColumns.Contains(this)) &&
+            _scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden) {
+            return UniqueColumnScriptReadonly;
         }
 
         if (_allowedChars is { Length: > 0 } && _forbiddenChars is { Length: > 0 } && _allowedChars.Intersect(_forbiddenChars).Any()) {

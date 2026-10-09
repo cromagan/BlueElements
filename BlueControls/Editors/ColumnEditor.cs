@@ -658,11 +658,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(), cbxScriptType));
         }
 
-        if (fehler == KeyColumnScriptReadonly) {
-            solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(), cbxScriptType));
-        }
-
-        if (fehler == ChunkScriptReadonly) {
+        if (fehler is KeyColumnScriptReadonly or
+                      ChunkScriptReadonly or
+                      UniqueColumnScriptReadonly) {
             solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(), cbxScriptType));
         }
 
