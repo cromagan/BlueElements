@@ -116,6 +116,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Methods
 
+    /// <summary>
+    /// Liefert alle nicht verworfenen Spalten, die in mindestens einer Unique-Definition der Tabelle enthalten sind.
+    /// </summary>
+    public HashSet<ColumnItem> ColumnsUsedInUniqueDefinition() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return []; }
+        return [.. tb.UniqueValues.SelectMany(uvd => uvd.KeyColumns).Where(kc => kc is { IsDisposed: false })];
+    }
+
     public void DisableAllEditing() {
         if (Table is not { IsDisposed: false } tb) { return; }
         foreach (var thisColumn in tb.Column) {

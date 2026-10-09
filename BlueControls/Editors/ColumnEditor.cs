@@ -914,7 +914,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                     r.CellSet("visible", false, string.Empty);
                 }
 
-                if (col == col.Table?.Column.ChunkValueColumn) {
+                if (col == col.Table?.Column.ChunkValueColumn || col.IsInUniqueDefinition) {
                     r.CellSet("info", "Warnung", string.Empty);
                 } else {
                     r.CellSet("info", string.Empty, string.Empty);

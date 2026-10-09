@@ -66,7 +66,7 @@ public class ReadableListItem : ListItem {
 
     #region Methods
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || _text.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || _text.Contains(filterText, StringComparison.OrdinalIgnoreCase) || QuickInfo.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         var firstH = Skin.GetBlueFont(itemdesign, States.Standard).FormatedText_NeededSize(_text, _symbol, SymbolSize).Height;

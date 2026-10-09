@@ -710,6 +710,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
+    /// Gibt an, ob diese Spalte in mindestens einer Unique-Definition ihrer Tabelle enthalten ist.
+    /// </summary>
+    public bool IsInUniqueDefinition => Table is { IsDisposed: false } tb && tb.Column.ColumnsUsedInUniqueDefinition().Contains(this);
+
+    /// <summary>
     /// Zeigt an, dass die Werte dieser Spalte jede Zeile eindeutig kennzeichnen.
     /// </summary>
     public bool IsKeyColumn {
@@ -2619,8 +2624,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (uv.Any(uvd => uvd.KeyColumns.Contains(this))) { return LinkedColumnInUniqueDefinition; }
         }
 
-        if (Table?.UniqueValues is { } uniqueValues && uniqueValues.Any(uvd => uvd.KeyColumns.Contains(this)) &&
-            _scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden) {
+        if (IsInUniqueDefinition && _scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden) {
             return UniqueColumnScriptReadonly;
         }
 
@@ -2665,6 +2669,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 // Die referenzierte Kombination muss exakt als Unique-Definition in der Ziel-Tabelle existieren
                 if (keys.Count > 0 && !l_tb.UniqueValues.Any(uvd => UniqueDefinitionMatchesKeys(uvd, keys))) {
                     return LinkedCellCombinationNeedsUniqueDefinition;
+                }
+
+                // Jede Ziel-Spalte, die in einer Unique-Definition steht, muss vom Zell-Filter erfasst werden
+
+                foreach (var kc in l_tb.Column.ColumnsUsedInUniqueDefinition()) {
+                    if (!keys.Contains(kc._keyName)) {
+                        return LinkedCellFilterMissingUniqueColumn;
+                    }
                 }
             }
         } else {

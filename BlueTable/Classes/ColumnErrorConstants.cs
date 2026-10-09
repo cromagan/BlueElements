@@ -47,6 +47,7 @@ public static class ColumnErrorConstants {
     public const string KeyColumnNoRowRelation = "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
     public const string KeyColumnScriptReadonly = "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
     public const string LinkedCellCombinationNeedsUniqueDefinition = "Die Schlüsselspalten-Kombination der verlinkten Zelle muss im Tabellenkopf als Unique-Definition vorhanden sein.";
+    public const string LinkedCellFilterMissingUniqueColumn = "Der Zell-Filter muss jede Spalte der Ziel-Tabelle filtern, die in einer Unique-Definition enthalten ist.";
     public const string LinkedCellScriptInvalid = "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
     public const string LinkedColumnInUniqueDefinition = "Verlinkte Spalten können nicht in einer Unique-Definition sein.";
     public const string LinkedDataOnlyWithLinkedCells = "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten.";

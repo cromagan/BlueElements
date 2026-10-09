@@ -495,10 +495,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None) { mustFilterColumns.Add(thisColumn); }
         }
 
-        foreach (var uvd in tb.UniqueValues) {
-            foreach (var kc in uvd.KeyColumns) {
-                if (kc is { IsDisposed: false } && !mustFilterColumns.Contains(kc)) { mustFilterColumns.Add(kc); }
-            }
+        foreach (var kc in tb.Column.ColumnsUsedInUniqueDefinition()) {
+            if (!mustFilterColumns.Contains(kc)) { mustFilterColumns.Add(kc); }
         }
 
         var s = tb.NextRowKey();
@@ -901,10 +899,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         // Alle Spalten der Unique-Definitionen
-        HashSet<ColumnItem> uniqueColumns = tb.UniqueValues
-            .SelectMany(uvd => uvd.KeyColumns)
-            .Where(kc => kc is { IsDisposed: false })
-            .ToHashSet();
+        HashSet<ColumnItem> uniqueColumns = tb.Column.ColumnsUsedInUniqueDefinition();
 
         // Reguläre Prüfungen: Chunk-Wert bestimmen und validieren, bevor wir fortfahren
         var chunkvalue = string.Empty;
