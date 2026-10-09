@@ -465,15 +465,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
     /// <summary>
-    /// Erstellt eine neue Zeile mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
-    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
-    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
-    /// Am Schluss wird noch das Skript ausgeführt.
-    /// REPARIERT: Exception-Handling und sichere Initialwert-Setzung
+    /// Erstellt eine neue Zeile inkl. Initialwerten aus den Filterkriterien. Nur IstGleich-Filter werden unterstützt.
+    /// Kollidiert die Kombination mit einer Unique-Definition, wird die vorhandene Zeile zurückgegeben (Get-or-Create).
+    /// Muss-Spalten (erste Spalte, Chunk- und Unique-Spalten) müssen per Filter gesetzt sein; leere Filterwerte sind erlaubt.
     /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="comment"></param>
-    /// <returns></returns>
     public OperationResult GenerateAndAdd(FilterItem[] filter, string comment) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabellen verworfen"); }
 
@@ -487,42 +482,127 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        // Muss-Spalten: Erste Spalte, Chunk-Spalten und alle Spalten der Unique-Definitionen
-        // müssen per Filter gesetzt sein, sonst kann die neue Zeile mit einer vorhandenen kollidieren.
-        List<ColumnItem> mustFilterColumns = [];
-        foreach (var thisColumn in tb.Column) {
-            if (thisColumn is not { IsDisposed: false }) { continue; }
-            if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None) { mustFilterColumns.Add(thisColumn); }
-        }
-
-        foreach (var kc in tb.Column.ColumnsUsedInUniqueDefinition()) {
-            if (!mustFilterColumns.Contains(kc)) { mustFilterColumns.Add(kc); }
-        }
-
         var s = tb.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return OperationResult.FailedRetryable("Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
+        if (GetByKey(s) is not null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
+
+        // Initialwerte aller Spalten einmalig ermitteln, Chunk-Spalte zuerst
+        List<ColumnItem> orderedColumns = [.. tb.Column];
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+            orderedColumns.Remove(spc);
+            orderedColumns.Insert(0, spc);
+        }
+
+        // Alle Spalten der Unique-Definitionen
+        HashSet<ColumnItem> uniqueColumns = tb.Column.ColumnsUsedInUniqueDefinition();
+
+        // Muss-Spalten: Erste Spalte, Chunk-Spalten und alle Spalten der Unique-Definitionen
+        // müssen per Filter gesetzt sein, sonst kann die neue Zeile mit einer vorhandenen kollidieren.
+        HashSet<ColumnItem> mustFilterColumns = [];
+        foreach (var thisColumn in orderedColumns) {
+            if (thisColumn is not { IsDisposed: false }) { continue; }
+            if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None || uniqueColumns.Contains(thisColumn)) { mustFilterColumns.Add(thisColumn); }
+        }
+
+        Dictionary<ColumnItem, string?> initValues = new();
+        foreach (var thisColumn in orderedColumns) {
+            if (thisColumn is not { IsDisposed: false }) { continue; }
+            initValues.Add(thisColumn, FilterCollection.InitValue(thisColumn, true, false, filter));
+        }
+
+        // Einmalige Prüfung: Der Filter muss gesetzt sein (null = Filter fehlt), leere Werte sind erlaubt.
+        foreach (var thisColumn in mustFilterColumns) {
+            if (initValues[thisColumn] is null) {
+                return OperationResult.Failed($"Filter der Spalte '{thisColumn.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
+            }
+        }
 
         var chunkval = string.Empty;
-        foreach (var thisColum in tb.Column) {
-            if (!mustFilterColumns.Contains(thisColum)) { continue; }
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
+            chunkval = initValues[cvc] ?? string.Empty;
 
-            if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval) {
-                return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
+            var loadResult = tb.BeSureRowIsLoaded(chunkval, false);
+            if (loadResult.IsFailed) {
+                return OperationResult.FailedRetryable($"Chunk '{chunkval}' der Spalte '{cvc.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
             }
 
-            if (thisColum.Value_for_Chunk != ChunkType.None) {
-                chunkval = inval;
-                var loadResult = tb.BeSureRowIsLoaded(inval, false);
-                if (loadResult.IsFailed) {
-                    return OperationResult.FailedRetryable($"Chunk '{inval}' der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' konnte nicht geladen werden:\r\n{loadResult.FailedReason}");
-                }
-            }
+            var f = tb.IsValueEditable(TableDataType.Command_AddRow, chunkval);
+            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
         }
 
         var m = tb.IsNowNewRowPossible(chunkval, false);
         if (!string.IsNullOrEmpty(m)) { return OperationResult.Failed($"In der Tabelle sind keine neuen Zeilen möglich: {m}"); }
 
-        return GenerateAndAddInternal(s, filter, comment);
+        var u = UserName;
+        var d = DateTime.UtcNow;
+
+        // Get-or-create: Kollidiert die neue Zeile mit einer Unique-Definition,
+        // wird die vorhandene Zeile verwendet statt sie zu erzeugen und wieder zu entfernen.
+        using var uniqueFilter = new FilterCollection(tb, "Unique Get-or-Create");
+        foreach (var thisColumn in orderedColumns) {
+            if (thisColumn is not { IsDisposed: false } || !uniqueColumns.Contains(thisColumn) ||
+                initValues[thisColumn] is not { } fv) { continue; }
+            uniqueFilter.Add(new FilterItem(thisColumn, FilterType.Istgleich, fv));
+        }
+
+        if (uniqueFilter.Count > 0 && uniqueFilter.Rows.Count > 0) {
+            var existingRow = uniqueFilter.Rows[0];
+            uniqueFilter.Dispose();
+            Develop.Diagnose("Initialwert-Unique", $"Vorhandene Zeile '{existingRow.KeyName}' in Tabelle '{tb.Caption}' verwendet, Stack: {Develop.DiagStack()}");
+            return new OperationResult(existingRow);
+        }
+        uniqueFilter.Dispose();
+
+        // Fehlerbehandlung für Zeilen-Erstellung
+        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, s, u, d, comment, ChangeFlags.UserCommand);
+        if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
+
+        if (GetByKey(s) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {s}"); }
+
+        Develop.Diagnose("Initialwert", $"Zeile erstellt: Tabelle '{tb.Caption}', Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
+
+        // Sichere Setzung der Initial-Werte mit Fehlerbehandlung
+        var initErrors = new List<string>();
+
+        foreach (var thisColumn in orderedColumns) {
+            if (thisColumn is not { IsDisposed: false } || initValues[thisColumn] is not { } val) { continue; }
+            try {
+                var cellResult = nRow.CellSet(thisColumn, val, "Initialwert neuer Zeile");
+                if (!string.IsNullOrEmpty(cellResult)) {
+                    Develop.Diagnose("Initialwert-Fehler", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {cellResult}, Stack: {Develop.DiagStack()}");
+                    initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
+                }
+            } catch (Exception ex) {
+                Develop.Diagnose("Initialwert", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {ex.GetType().Name}: {ex.Message}\r\n{ex.StackTrace}\r\nStack: {Develop.DiagStack()}");
+                initErrors.Add($"Spalte {thisColumn.KeyName}: Exception - {ex.Message}");
+            }
+        }
+
+        // Bei kritischen Initialwert-Fehlern Zeile wieder löschen
+        if (initErrors.Count > 0) {
+            Develop.Diagnose("Initialwert-Cleanup", $"Entferne Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
+            Remove(nRow, "Cleanup nach Initialwert-Fehler");
+            return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
+        }
+
+        // Benutzerdefinierte Sortierung: neue Zeile erhält höchste Nummer
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            var maxIndex = 0;
+            foreach (var thisRow in this) {
+                if (thisRow is null || thisRow.IsDisposed || thisRow == nRow) { continue; }
+                var v = thisRow.CellGetStringCore(sortCol);
+                if (int.TryParse(v, out var iv) && iv > maxIndex) { maxIndex = iv; }
+            }
+            nRow.CellSet(sortCol, maxIndex + 1, "SortIndex neue Zeile");
+        }
+
+        Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.ReadableText()}", 0);
+
+        tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f);
+
+        InvalidatedRowsManager.AddInvalidatedRow(nRow);
+
+        return new OperationResult(nRow);
     }
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
@@ -874,123 +954,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             _internal.Clear();
         } catch { }
-    }
-
-    /// <summary>
-    /// Erstellt eine Zeile inkl. Initialwerten. Kollidiert die Kombination mit einer
-    /// Unique-Definition, wird die vorhandene Zeile zurückgegeben (Get-or-Create).
-    /// </summary>
-    private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
-        if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
-
-        if (GetByKey(key) is not null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
-
-        // Initialwerte aller Spalten einmalig ermitteln, Chunk-Spalte zuerst
-        List<ColumnItem> orderedColumns = [.. tb.Column];
-        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            orderedColumns.Remove(spc);
-            orderedColumns.Insert(0, spc);
-        }
-
-        Dictionary<ColumnItem, string?> initValues = new();
-        foreach (var thisColumn in orderedColumns) {
-            if (thisColumn is not { IsDisposed: false }) { continue; }
-            initValues.Add(thisColumn, FilterCollection.InitValue(thisColumn, true, false, fc));
-        }
-
-        // Alle Spalten der Unique-Definitionen
-        HashSet<ColumnItem> uniqueColumns = tb.Column.ColumnsUsedInUniqueDefinition();
-
-        // Für jede Unique-Spalte muss ein Filterwert angekommen sein,
-        // sonst kann eine Kollision mit einer vorhandenen Zeile nicht sicher erkannt werden.
-        foreach (var thisColumn in orderedColumns) {
-            if (thisColumn is not { IsDisposed: false } || !uniqueColumns.Contains(thisColumn) ||
-                initValues[thisColumn] is { Length: > 0 }) { continue; }
-            return OperationResult.Failed($"Filter für Unique-Spalte '{thisColumn.KeyName}' fehlt.");
-        }
-
-        // Reguläre Prüfungen: Chunk-Wert bestimmen und validieren, bevor wir fortfahren
-        var chunkvalue = string.Empty;
-        if (tb.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            chunkvalue = initValues[cvc] ?? string.Empty;
-
-            if (string.IsNullOrEmpty(chunkvalue)) { return OperationResult.Failed("Chunk-Wert konnte nicht ermittelt werden"); }
-
-            var f = tb.IsValueEditable(TableDataType.Command_AddRow, chunkvalue);
-            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
-        }
-
-        var u = UserName;
-        var d = DateTime.UtcNow;
-
-        // Get-or-create: Kollidiert die neue Zeile mit einer Unique-Definition,
-        // wird die vorhandene Zeile verwendet statt sie zu erzeugen und wieder zu entfernen.
-        using var uniqueFilter = new FilterCollection(tb, "Unique Get-or-Create");
-        foreach (var thisColumn in orderedColumns) {
-            if (thisColumn is not { IsDisposed: false } || !uniqueColumns.Contains(thisColumn) ||
-                initValues[thisColumn] is not { Length: > 0 } fv) { continue; }
-            uniqueFilter.Add(new FilterItem(thisColumn, FilterType.Istgleich, fv));
-        }
-
-        if (uniqueFilter.Count > 0 && uniqueFilter.Rows.Count > 0) {
-            var existingRow = uniqueFilter.Rows[0];
-            uniqueFilter.Dispose();
-            Develop.Diagnose("Initialwert-Unique", $"Vorhandene Zeile '{existingRow.KeyName}' in Tabelle '{tb.Caption}' verwendet, Stack: {Develop.DiagStack()}");
-            return new OperationResult(existingRow);
-        }
-        uniqueFilter.Dispose();
-
-        // Fehlerbehandlung für Zeilen-Erstellung
-        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, ChangeFlags.UserCommand);
-        if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
-
-        if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }
-
-        Develop.Diagnose("Initialwert", $"Zeile erstellt: Tabelle '{tb.Caption}', Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
-
-        // Sichere Setzung der Initial-Werte mit Fehlerbehandlung
-        var initErrors = new List<string>();
-
-        foreach (var thisColumn in orderedColumns) {
-            if (thisColumn is not { IsDisposed: false } || initValues[thisColumn] is not { } val) { continue; }
-            try {
-                var cellResult = nRow.CellSet(thisColumn, val, "Initialwert neuer Zeile");
-                if (!string.IsNullOrEmpty(cellResult)) {
-                    Develop.Diagnose("Initialwert-Fehler", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {cellResult}, Stack: {Develop.DiagStack()}");
-                    initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
-                }
-            } catch (Exception ex) {
-                Develop.Diagnose("Initialwert", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {ex.GetType().Name}: {ex.Message}\r\n{ex.StackTrace}\r\nStack: {Develop.DiagStack()}");
-                initErrors.Add($"Spalte {thisColumn.KeyName}: Exception - {ex.Message}");
-            }
-        }
-
-        // Bei kritischen Initialwert-Fehlern Zeile wieder löschen
-        if (initErrors.Count > 0) {
-            // Kritische Fehler - Zeile wieder entfernen
-            Develop.Diagnose("Initialwert-Cleanup", $"Entferne Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
-            Remove(nRow, "Cleanup nach Initialwert-Fehler");
-            return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
-        }
-
-        // Benutzerdefinierte Sortierung: neue Zeile erhält höchste Nummer
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
-            var maxIndex = 0;
-            foreach (var thisRow in this) {
-                if (thisRow is null || thisRow.IsDisposed || thisRow == nRow) { continue; }
-                var v = thisRow.CellGetStringCore(sortCol);
-                if (int.TryParse(v, out var iv) && iv > maxIndex) { maxIndex = iv; }
-            }
-            nRow.CellSet(sortCol, maxIndex + 1, "SortIndex neue Zeile");
-        }
-
-        Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.ReadableText()}", 0);
-
-        tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f);
-
-        InvalidatedRowsManager.AddInvalidatedRow(nRow);
-
-        return new OperationResult(nRow);
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
