@@ -901,6 +901,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Alle Spalten der Unique-Definitionen
         HashSet<ColumnItem> uniqueColumns = tb.Column.ColumnsUsedInUniqueDefinition();
 
+        // Für jede Unique-Spalte muss ein Filterwert angekommen sein,
+        // sonst kann eine Kollision mit einer vorhandenen Zeile nicht sicher erkannt werden.
+        foreach (var thisColumn in orderedColumns) {
+            if (thisColumn is not { IsDisposed: false } || !uniqueColumns.Contains(thisColumn) ||
+                initValues[thisColumn] is { Length: > 0 }) { continue; }
+            return OperationResult.Failed($"Filter für Unique-Spalte '{thisColumn.KeyName}' fehlt.");
+        }
+
         // Reguläre Prüfungen: Chunk-Wert bestimmen und validieren, bevor wir fortfahren
         var chunkvalue = string.Empty;
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
