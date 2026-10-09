@@ -3,6 +3,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -18,6 +19,7 @@ public static class Develop {
     internal static readonly Stopwatch _diagSw = Stopwatch.StartNew();
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
     private static readonly object SyncLockObject = new();
+    private static readonly object _diagFileLock = new();
     private static string _currentTraceLogFile = string.Empty;
     private static bool _deleteTraceLog = true;
     private static ErrorType? _isTraceLogging;
@@ -308,18 +310,24 @@ public static class Develop {
     public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
     /// <summary>
-    /// Liefert Diagnose Daten in die Direktausgabe.
+    /// Liefert Diagnose Daten in die Direktausgabe und in die Datei 'Diagnose.txt' neben der Exe.
     /// Der Stack kann mit 'Stack: {Develop.DiagStack()}' ergänzt werden.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="msg"></param>
     public static void Diagnose(string type, string msg) {
         if (!DiagFlag) { return; }
-        Debug.WriteLine($"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+        var line = $"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}";
+        Debug.WriteLine(line);
+        try {
+            lock (_diagFileLock) {
+                File.AppendAllText(AppPath() + "Diagnose.txt", DateTime.Now.ToString1() + " " + line + Environment.NewLine);
+            }
+        } catch { /* Schreibfehler der Diagnose-Datei ignorieren */ }
     }
 
     /// <summary>
-    /// Kompakter Aufruf-Stack für Diagnose-Ausgaben: Methodennamen durch " <- " getrennt.
+    /// Kompakter Aufruf-Stack für Diagnose-Ausgaben: Methodennamen durch " &lt;- " getrennt.
     /// </summary>
     public static string DiagStack(int skipFrames = 1, int maxFrames = 8) {
         if (!DiagFlag) { return string.Empty; }

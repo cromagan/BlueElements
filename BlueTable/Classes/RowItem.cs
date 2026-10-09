@@ -978,7 +978,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, UserName, DateTime.UtcNow, comment, reason) is { Length: > 0 } message) { return message; }
 
-        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
+        var checkValue = CellGetStringCore(column);
+        if (value != checkValue) {
+            Develop.Diagnose("Nachprüfung", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Soll(L={value.Length})='{value.Left(120)}', Ist(L={checkValue.Length})='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
+            return "Nachprüfung fehlgeschlagen";
+        }
 
         // SYS_ROWSORTINDEX: die Nummern bleiben lückenlos. Erst NACH dem Schreiben auslösen,
         // damit die Kettenreaktion der Rückungen jeweils ins freigewordene Feld läuft.
@@ -1027,6 +1031,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
 
+            Develop.Diagnose("CellWrite", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}', Wert(L={value.Length})='{value.Left(120)}', Stack: {Develop.DiagStack(1, 12)}");
             return string.Empty;
         }
     }
@@ -1058,8 +1063,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tbf.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
         if (tbf.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
+        if (IsDisposed) { return false; } // Zeile kann seit dem Eingangscheck zwischendurch disposed worden sein
+
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
         if (mastertoo && tbf.AmITemporaryMaster(MasterTry, MasterUntil, true) && t.TotalMinutes > MyRowLost) { return true; }
+
+        if (IsDisposed) { return false; } // Zweite Prüfung, da weiterer Zellzugriff folgt
 
         if (!string.Equals(CellGetString(src), UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 

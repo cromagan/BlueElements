@@ -915,6 +915,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }
 
+        Develop.Diagnose("Initialwert", $"Zeile erstellt: Tabelle '{tb.Caption}', Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
+
         // Sichere Setzung der Initial-Werte mit Fehlerbehandlung
         var initErrors = new List<string>();
 
@@ -923,9 +925,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 try {
                     var cellResult = nRow.CellSet(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {
+                        Develop.Diagnose("Initialwert-Fehler", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {cellResult}, Stack: {Develop.DiagStack()}");
                         initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
                     }
                 } catch (Exception ex) {
+                    Develop.Diagnose("Initialwert", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {ex.GetType().Name}: {ex.Message}\r\n{ex.StackTrace}\r\nStack: {Develop.DiagStack()}");
                     initErrors.Add($"Spalte {thisColumn.KeyName}: Exception - {ex.Message}");
                 }
             }
@@ -934,6 +938,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Bei kritischen Initialwert-Fehlern Zeile wieder löschen
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
+            Develop.Diagnose("Initialwert-Cleanup", $"Entferne Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
             Remove(nRow, "Cleanup nach Initialwert-Fehler");
             return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
         }
