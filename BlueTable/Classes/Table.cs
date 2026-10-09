@@ -1484,13 +1484,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         try {
-            var rowstamp = string.Empty;
+            var startValues = row is { IsDisposed: false } ? row.CellStartValues() : [];
             object addinfo = this;
 
-            if (row is { IsDisposed: false }) {
-                rowstamp = row.RowStamp();
-                addinfo = row;
-            }
+            if (row is { IsDisposed: false }) { addinfo = row; }
 
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             AddAttributes(vars, args ?? []);
@@ -1544,12 +1541,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (row is not null && !script.ValuesReadOnly) {
                 if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
                 if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
-                if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
+                if (row.FirstChangedCell(startValues) is { } changedColumn) {
+                    Develop.Diagnose("Zeile verändert", $"Tabelle '{Caption}', Skript '{script.KeyName}', Spalte '{changedColumn.KeyName}' wurde während des Skriptes verändert. Stack: {Develop.DiagStack()}");
+                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
+                }
             }
 
             #endregion
 
-            WriteBackVariables(row, vars, script.VirtalColumns, tableHeadVariables, script.KeyName, produktivphase && !script.ValuesReadOnly);
+            var wb = WriteBackVariables(row, vars, script.VirtalColumns, tableHeadVariables, script.KeyName, produktivphase && !script.ValuesReadOnly, startValues);
+            if (wb is { Length: > 0 }) { return new ScriptEndedFeedback(wb, false, false, script.KeyName); }
 
             //  Erfolgreicher Abschluss
             // Vor dem Count-Check entfernen, damit die Prüfung korrekt ist.
@@ -2544,11 +2545,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, savedVariables, isDisposed, readOnly, stoppedtimecount, averageruntime);
     }
 
-    public void WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool tableHeadVariables, string comment, bool doWriteBack) {
+    /// <summary>
+    /// Schreibt Skript-Variablen in Zeile und Kopf zurück.
+    /// Liefert eine Fehlermeldung, wenn eine Zelle gegenüber startValues fremderseits geändert wurde (WriteBack abgebrochen).
+    /// </summary>
+    public string WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool tableHeadVariables, string comment, bool doWriteBack, Dictionary<ColumnItem, string> startValues) {
         if (doWriteBack) {
             if (row is { IsDisposed: false }) {
                 foreach (var thisCol in Column) {
-                    row.VariableToCell(thisCol, vars, comment);
+                    if (row.VariableToCell(thisCol, vars, comment, startValues)) { return "Zeile wurde während des Skriptes verändert."; }
                 }
             }
             if (tableHeadVariables) {
@@ -2560,11 +2565,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (row is { IsDisposed: false } ro) {
                 foreach (var thisCol in Column) {
                     if (!thisCol.SaveContent) {
-                        ro.VariableToCell(thisCol, vars, comment);
+                        if (ro.VariableToCell(thisCol, vars, comment, startValues)) { return "Zeile wurde während des Skriptes verändert."; }
                     }
                 }
             }
         }
+
+        return string.Empty;
     }
 
     internal void DevelopWarnung(string t) {
@@ -2595,7 +2602,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (column.Relationship_to_First) { rowItem.RepairRelationText(column, previewsValue); }
 
         if (column.Am_A_Key_For.Count > 0) {
-            foreach (var linkedColumnName in column.Am_A_Key_For) {
+            // Snapshot: Verkettete Zelländerungen können Am_A_Key_For neu aufbauen (CheckIfIAmAKeyColumn).
+            foreach (var linkedColumnName in column.Am_A_Key_For.ToArray()) {
                 if (Column[linkedColumnName] is { IsDisposed: false } thisColumn) {
                     rowItem.LinkedCellData(thisColumn, true, true, false);
                 }

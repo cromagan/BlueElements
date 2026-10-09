@@ -297,6 +297,31 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns></returns>
     public string CellSet(ColumnItem? column, string value, string comment) => CellSet(column, value, comment, ChangeFlags.UserCommand);
 
+    /// <summary>
+    /// Sichert die aktuellen Zellwerte aller Skript-relevanten Spalten, um beim Zurückschreiben von
+    /// Skript-Variablen konkurrierende Änderungen spaltengenau zu erkennen. Von den Systemspalten nur
+    /// die fremd änderbaren (RowKey, Correct, Locked, CellNote); Changer, DateChanged und RowState
+    /// pflegt die eigene Schreib-Pipeline und sind kein Konkurrenz-Hinweis.
+    /// </summary>
+    public Dictionary<ColumnItem, string> CellStartValues() {
+        var result = new Dictionary<ColumnItem, string>();
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return result; }
+
+        foreach (var column in tb.Column) {
+            if (column is not { IsDisposed: false } col) { continue; }
+
+            if (col == tb.Column.SysRowKey ||
+               col != tb.Column.SysCorrect ||
+               col != tb.Column.SysRowChangeDate ||
+               col != tb.Column.SysRowChanger) { continue; }
+            if (col.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
+
+            result.Add(col, CellGetStringCore(col));
+        }
+
+        return result;
+    }
+
     public RowPrepareFormulaEventArgs CheckRow() {
         if (_lastCheckedEventArgs is not null) {
             if (_lastCheckedEventArgs.PrepareFormulaFeedback.NeedsScriptFix || !_lastCheckedEventArgs.PrepareFormulaFeedback.Failed) {
@@ -409,6 +434,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Liefert die erste Spalte, deren Zellwert vom gesicherten Startwert abweicht (null = keine Änderung).
+    /// </summary>
+    public ColumnItem? FirstChangedCell(Dictionary<ColumnItem, string> startValues) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
+
+        foreach (var (column, startValue) in startValues) {
+            if (CellGetStringCore(column) != startValue) { return column; }
+        }
+
+        return null;
     }
 
     public string GetQuickInfo() {
@@ -872,28 +910,38 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || column is null) { return; }
+    /// <summary>
+    /// Schreibt eine Skript-Variable zurück in die Zelle.
+    /// Liefert true, wenn die Zelle gegenüber startValues von fremder Seite geändert wurde; dann wird nicht geschrieben.
+    /// </summary>
+    public bool VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname, Dictionary<ColumnItem, string> startValues) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || column is null) { return false; }
 
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return false; }
 
         // Bei ListElement-Spalten zeigt varname auf die Liste (z. B. Spalte Test5 → Liste Test, Position 5)
         var varname = column.KeyName;
         var elementNr = 0;
-        if (column.ScriptType is ScriptType.ListElement && !ColumnItem.TrySplitListElementName(column.KeyName, out varname, out elementNr)) { return; }
+        if (column.ScriptType is ScriptType.ListElement && !ColumnItem.TrySplitListElementName(column.KeyName, out varname, out elementNr)) { return false; }
 
-        if (vars.GetByKey(varname) is not { ReadOnly: false } columnVar) { return; }
-        if (!column.CanBeChangedByRules()) { return; }
+        if (vars.GetByKey(varname) is not { ReadOnly: false } columnVar) { return false; }
+        if (!column.CanBeChangedByRules()) { return false; }
 
         string value;
         if (column.ScriptType is ScriptType.ListElement) {
-            if (columnVar is not ListOfStringsScriptVariable list) { return; }
+            if (columnVar is not ListOfStringsScriptVariable list) { return false; }
             value = list.ValueList.Count > elementNr ? list.ValueList[elementNr] : string.Empty;
         } else {
             value = columnVar.ValueForCell;
         }
 
+        // Konkurrierende Änderung: Die Zelle wurde nach der Sicherung der Startwerte von fremder
+        // Seite geändert → eigenen (veralteten) Wert nicht schreiben. Welche Systemspalten erfasst
+        // sind, steuert CellStartValues; selbst gepflegte fehlen dort und werden ungeprüft geschrieben.
+        if (startValues.TryGetValue(column, out var startValue) && CellGetStringCore(column) != startValue) { return true; }
+
         CellSet(column, value, $"Skript '{scriptname}'");
+        return false;
     }
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -983,8 +1031,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var checkValue = CellGetStringCore(column);
         if (value != checkValue) {
-            Develop.Diagnose("Nachprüfung", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Soll(L={value.Length})='{value.Left(120)}', Ist(L={checkValue.Length})='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
-            return "Nachprüfung fehlgeschlagen";
+            // Nach dem erfolgreichen Schreiben kann ein paralleler Schreiber (z. B. Skript-WriteBack)
+            // die Zelle bereits geändert haben. Nur wenn noch der alte Wert steht, ist der
+            // eigene Schreibvorgang verloren gegangen.
+            if (checkValue == oldValue) {
+                Develop.Diagnose("Nachprüfung", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Soll(L={value.Length})='{value.Left(120)}', Ist(L={checkValue.Length})='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
+                return "Nachprüfung fehlgeschlagen";
+            }
+            Develop.Diagnose("Konkurrierender Schreibzugriff", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Geschrieben='{value.Left(120)}', Überschrieben durch='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
         }
 
         // SYS_ROWSORTINDEX: die Nummern bleiben lückenlos. Erst NACH dem Schreiben auslösen,

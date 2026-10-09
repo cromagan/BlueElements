@@ -109,16 +109,16 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
             ScriptText = scripttext
         };
 
-        var rowstamp = row?.RowStamp();
+        var startValues = row?.CellStartValues() ?? [];
 
         var t = sc.Parse(0, "Main", null);
 
         if (!t.Failed && !readOnly && produktiv && t.Variables is { } vars) {
-            if (row?.RowStamp() != rowstamp) {
+            if (row is not null && row.FirstChangedCell(startValues) is not null) {
                 return new ScriptEndedFeedback(vars, "Die Zeile wurde während des Ausführens verändert.");
             }
             if (row?.Table is { IsDisposed: false } wtb) {
-                wtb.WriteBackVariables(row, vars, false, false, "Skript ausführen", true);
+                wtb.WriteBackVariables(row, vars, false, false, "Skript ausführen", true, startValues);
             }
         }
 

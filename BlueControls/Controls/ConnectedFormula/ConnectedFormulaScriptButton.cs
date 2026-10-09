@@ -103,7 +103,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             }
         }
 
-        var rowstamp = row?.RowStamp();
+        var startValues = row?.CellStartValues() ?? [];
 
         #endregion
 
@@ -111,7 +111,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         var errorreason = string.Empty;
 
-        if (row?.RowStamp() != rowstamp) { errorreason = "Die Zeile wurde während des Ausführens verändert."; }
+        if (row?.FirstChangedCell(startValues) is not null) { errorreason = "Die Zeile wurde während des Ausführens verändert."; }
 
         if (t.Failed) { errorreason = t.ProtocolText; }
 
@@ -126,7 +126,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
                     }
                 }
             }
-            tb?.WriteBackVariables(row, vars, false, true, "Script-Button-Press", !t.Failed);
+            tb?.WriteBackVariables(row, vars, false, true, "Script-Button-Press", !t.Failed, startValues);
 
             #endregion
         } else {
