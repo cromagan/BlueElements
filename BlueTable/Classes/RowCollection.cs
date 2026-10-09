@@ -508,7 +508,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisColum in tb.Column) {
             if (!mustFilterColumns.Contains(thisColum)) { continue; }
 
-            if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
+            if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval) {
                 return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb.KeyName}' fehlt.");
             }
 
