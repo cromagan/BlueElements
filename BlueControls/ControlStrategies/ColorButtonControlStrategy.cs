@@ -26,6 +26,11 @@ public class ColorButtonControlStrategy : ControlStrategy {
 
     #region Methods
 
+    /// <summary>
+    /// Die Farbauswahl funktioniert unabhängig von Texteditierbarkeit oder Dropdown-Items der Spalte.
+    /// </summary>
+    public override bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) => true;
+
     public override string ReadableText() => "Farbauswahl";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;

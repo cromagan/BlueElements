@@ -1035,10 +1035,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             // die Zelle bereits geändert haben. Nur wenn noch der alte Wert steht, ist der
             // eigene Schreibvorgang verloren gegangen.
             if (checkValue == oldValue) {
-                Develop.Diagnose("Nachprüfung", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Soll(L={value.Length})='{value.Left(120)}', Ist(L={checkValue.Length})='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
                 return "Nachprüfung fehlgeschlagen";
             }
-            Develop.Diagnose("Konkurrierender Schreibzugriff", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}': Geschrieben='{value.Left(120)}', Überschrieben durch='{checkValue.Left(120)}', Stack: {Develop.DiagStack()}");
         }
 
         // SYS_ROWSORTINDEX: die Nummern bleiben lückenlos. Erst NACH dem Schreiben auslösen,
@@ -1088,7 +1086,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
 
-            Develop.Diagnose("CellWrite", $"Tabelle '{tb.Caption}', Spalte '{column.KeyName}', Zeile '{KeyName}', Wert(L={value.Length})='{value.Left(120)}', Stack: {Develop.DiagStack(1, 12)}");
             return string.Empty;
         }
     }

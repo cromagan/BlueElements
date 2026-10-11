@@ -187,6 +187,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         // Ersetzungen durchführen
         var replaceCount = 0;
         var progress = Progressbar.Show("Ersetze...", targetRows.Count);
+        progress.CancelSupported = true;
 
         // Jeder CellSet löst synchron Events aus, die die UI neu aufbauen.
         // Bei vielen Ersetzungen entsteht pro Zelle ein voller Layout-Durchlauf.
@@ -196,6 +197,14 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         try {
             for (var i = 0; i < targetRows.Count; i++) {
                 progress.Update(i + 1);
+                Develop.DoEvents();
+
+                if (progress.IsCancelRequested) {
+                    progress.Close();
+                    QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                    _isWorking = false;
+                    return;
+                }
 
                 foreach (var column in columns) {
                     var originalText = targetRows[i].CellGetString(column);

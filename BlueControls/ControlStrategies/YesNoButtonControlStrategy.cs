@@ -26,6 +26,11 @@ public class YesNoButtonControlStrategy : ControlStrategy {
 
     #region Methods
 
+    /// <summary>
+    /// Der Ja/Nein-Knopf funktioniert unabhängig von Texteditierbarkeit oder Dropdown-Items der Spalte.
+    /// </summary>
+    public override bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) => true;
+
     public override string ReadableText() => "Ja/Nein-Knopf";
 
     public override void SubscribeEvents() {

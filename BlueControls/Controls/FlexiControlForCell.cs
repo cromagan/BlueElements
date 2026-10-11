@@ -133,6 +133,10 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
                 f.TextInputAllowed = backcolumn.EditableWithTextInput;
                 f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
                 f.GetStyleFrom(backcolumn);
+
+                // Mehrfachauswahl erzeugt CR-getrennte Werte — nur erlaubt,
+                // wenn die Spalte mehrzeilige Werte fassen kann.
+                f.CheckBehavior = backcolumn.MultiLine ? CheckBehavior.MultiSelection : CheckBehavior.SingleSelection;
                 f.CustomContextMenuItems = new([
                     ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
                     ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)

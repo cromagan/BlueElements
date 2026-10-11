@@ -1541,8 +1541,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (row is not null && !script.ValuesReadOnly) {
                 if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
                 if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
-                if (row.FirstChangedCell(startValues) is { } changedColumn) {
-                    Develop.Diagnose("Zeile verändert", $"Tabelle '{Caption}', Skript '{script.KeyName}', Spalte '{changedColumn.KeyName}' wurde während des Skriptes verändert. Stack: {Develop.DiagStack()}");
+                if (row.FirstChangedCell(startValues) is not null) {
                     return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
                 }
             }

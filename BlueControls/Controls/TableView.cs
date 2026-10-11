@@ -2099,7 +2099,9 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             // Dropdown: Mehrfachauswahl und Auto-Sortierung aktivieren.
             // Spalten, deren Zelle nur ein Einzelzeichen fassen kann (z. B. Bool),
             // bleiben bei Einzelauswahl, sonst entstehen Mischwerte wie «+-».
-            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown() && cc.MaxTextLength > 1) {
+            // Ohne Multiline kann die Zelle mehrere Werte (CR-getrennt) nicht
+            // fassen — daher ebenfalls nur Einzelauswahl.
+            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown() && cc.MaxTextLength > 1 && cc.MultiLine) {
                 strategy.CheckBehavior = CheckBehavior.MultiSelection;
                 strategy.AutoSort = true;
             } else if (strategy.SupportsSuggestions) {
@@ -2510,6 +2512,7 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         switch (keyData) {
             case Keys.Up or Keys.Down or Keys.Left or Keys.Right:
+            case Keys.W or Keys.A or Keys.S or Keys.D: // WASD-Navigation
                 return true;
 
             default:
@@ -2558,18 +2561,22 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
             try {
                 switch (e.KeyCode) {
                     case Keys.Left:
+                    case Keys.A: // WASD
                         Cursor_Move(Direction.Links);
                         break;
 
                     case Keys.Right:
+                    case Keys.D:
                         Cursor_Move(Direction.Rechts);
                         break;
 
                     case Keys.Up:
+                    case Keys.W:
                         Cursor_Move(Direction.Oben);
                         break;
 
                     case Keys.Down:
+                    case Keys.S:
                         Cursor_Move(Direction.Unten);
                         break;
 
@@ -4308,8 +4315,10 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
     private void OnPinnedChanged() {
         // Pin-Spalte erscheint/verschwindet abhängig davon, ob Zeilen angepinnt
-        // sind — daher Anordnung (inkl. virtueller Spalten) neu aufbauen.
-        InvalidateCurrentArrangement();
+        // sind — ReconcileVirtualColumns erledigt das beim nächsten Zugriff auf
+        // CurrentArrangement auf der laufenden Instanz. Diese darf nicht verworfen
+        // werden, sonst gehen Laufzeitspalten-Zustände (z. B. eingeklappte Spalten) verloren.
+        Invalidate_AllViewItems(false);
         PinnedChanged?.Invoke(this, System.EventArgs.Empty);
     }
 

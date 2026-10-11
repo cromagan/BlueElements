@@ -548,7 +548,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (uniqueFilter.Count > 0 && uniqueFilter.Rows.Count > 0) {
             var existingRow = uniqueFilter.Rows[0];
             uniqueFilter.Dispose();
-            Develop.Diagnose("Initialwert-Unique", $"Vorhandene Zeile '{existingRow.KeyName}' in Tabelle '{tb.Caption}' verwendet, Stack: {Develop.DiagStack()}");
             return new OperationResult(existingRow);
         }
         uniqueFilter.Dispose();
@@ -559,8 +558,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (GetByKey(s) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {s}"); }
 
-        Develop.Diagnose("Initialwert", $"Zeile erstellt: Tabelle '{tb.Caption}', Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
-
         // Sichere Setzung der Initial-Werte mit Fehlerbehandlung
         var initErrors = new List<string>();
 
@@ -569,11 +566,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             try {
                 var cellResult = nRow.CellSet(thisColumn, val, "Initialwert neuer Zeile");
                 if (!string.IsNullOrEmpty(cellResult)) {
-                    Develop.Diagnose("Initialwert-Fehler", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {cellResult}, Stack: {Develop.DiagStack()}");
                     initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
                 }
             } catch (Exception ex) {
-                Develop.Diagnose("Initialwert", $"Tabelle '{tb.Caption}', Spalte '{thisColumn.KeyName}': {ex.GetType().Name}: {ex.Message}\r\n{ex.StackTrace}\r\nStack: {Develop.DiagStack()}");
                 initErrors.Add($"Spalte {thisColumn.KeyName}: Exception - {ex.Message}");
             }
         }

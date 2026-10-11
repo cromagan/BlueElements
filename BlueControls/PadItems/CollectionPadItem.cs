@@ -489,13 +489,34 @@ public sealed class CollectionPadItem : SizeableRectanglePadItem, IEnumerable<Pa
                 if (!its[tocheck].CanScaleHeightTo(scaleY)) {
                     //var pos = PositioOf(tocheck);
 
+                    // Nur der unmittelbare Nachfolger in derselben Spalte wird angezogen.
+                    // Weitere Items behalten ihre skalierte Position, sonst werden sie
+                    // auf unskalierte Editor-Koordinaten zurückgesetzt.
+                    var follower = -1;
+
                     for (var coll = tocheck + 1; coll < its.Count; coll++) {
                         //var poscoll = PositioOf(coll);
 
                         if (its[coll].CanvasUsedArea.Y >= its[tocheck].CanvasUsedArea.Bottom && its[coll].CanvasUsedArea.IntersectsVericalyWith(its[tocheck].CanvasUsedArea)) {
-                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].CanvasUsedArea.Top - its[tocheck].CanvasUsedArea.Bottom;
-                            //pos = PositioOf(tocheck);
+                            if (follower < 0 || its[coll].CanvasUsedArea.Y < its[follower].CanvasUsedArea.Y) {
+                                follower = coll;
+                            }
                         }
+                    }
+
+                    if (follower >= 0) {
+                        var neuerY = newY[tocheck] + newH[tocheck] + its[follower].CanvasUsedArea.Top - its[tocheck].CanvasUsedArea.Bottom;
+
+                        // Die komplette Editor-Zeile des Nachfolgers mitziehen,
+                        // damit Zeilen nicht auseinanderreißen, wenn nur ein
+                        // Teil der Zeile unter fixen Items liegt.
+                        for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                            if (Math.Abs(its[coll].CanvasUsedArea.Y - its[follower].CanvasUsedArea.Y) < 1) {
+                                newY[coll] = neuerY;
+                            }
+                        }
+
+                        //pos = PositioOf(tocheck);
                     }
                 }
             }

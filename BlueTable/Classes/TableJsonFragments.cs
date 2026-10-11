@@ -173,6 +173,56 @@ public class TableJsonFragments : TableJsonFile {
     }
 
     /// <summary>
+    /// Bereitet die Fortführung einer sauber mit einem JSON-EOF-Marker
+    /// abgeschlossenen Fragment-Datei vor. Öffnet den Writer im Append-Modus
+    /// auf diese Datei und markiert sie sofort mit einem "_meta":"continued"-
+    /// Eintrag, damit kein zweiter Prozess Schreibzugriff auf dieselbe Datei erhält.
+    /// Liefert bei Problemen die Fehlermeldung, sonst leer.
+    /// </summary>
+    public string ContinueFragment(string fragmentFilename) {
+        if (!fragmentFilename.StartsWith(FragmengtsPath(), StringComparison.OrdinalIgnoreCase)) { return "Die Datei liegt nicht im Fragment-Ordner der Tabelle: " + fragmentFilename; }
+        if (!IO.FileExists(fragmentFilename)) { return "Fragment-Datei nicht gefunden: " + fragmentFilename; }
+
+        // Ggf. bereits offenen Writer schließen (z. B. Master-Eintrag beim Laden):
+        // Diese (fast leere) Neue-Datei darf das Aufräumen dann entsorgen.
+        CloseWriter();
+
+        // Ab sofort als eigene Datei führen: hält sie beim Nachladen aus den
+        // Fremd-Fragmenten heraus und schützt sie vor Aufräum-Löschungen.
+        _myFragmentsFilename = fragmentFilename;
+        CanDeleteWriter = false;
+
+        if (Develop.AllReadOnly) { return string.Empty; }
+
+        System.IO.FileStream? fileStream = null;
+        try {
+            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
+            fileStream = null;
+
+            _writer.AutoFlush = true;
+
+            // Sofort als "in Bearbeitung" markieren: Die Datei endet damit nicht
+            // mehr auf dem EOF-Marker, also wählt kein weiterer Prozess sie zur Fortführung.
+            var cont = new JsonObject { ["_meta"] = "continued" };
+            _writer.WriteLine(cont.ToJsonString());
+
+            return string.Empty;
+        } catch (Exception ex) {
+            fileStream?.Dispose();
+            _writer?.Dispose();
+            _writer = null;
+
+            return ex.Message;
+        }
+    }
+
+    /// <summary>
+    /// Gibt den Pfad zum Fragment-Ordner zurück.
+    /// </summary>
+    public string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "FrgmJ\\";
+
+    /// <summary>
     /// Friert die Tabelle ein und schließt den Writer.
     /// </summary>
     public override void Freeze(string reason) {
@@ -301,6 +351,16 @@ public class TableJsonFragments : TableJsonFile {
     }
 
     /// <summary>
+    /// Dedup-Hash einer granularen Zeile aus Pfad, Wert und Zeitstempel. Der
+    /// Zeitstempel fließt ein, damit gleiche Werte zu unterschiedlichen Zeiten
+    /// (A→B→A-Folgen) nicht als Duplikat gelten.
+    /// Beide Seiten (Schreiben und Nachladen) erzeugen den Zeitstempel-String
+    /// über ToJsonString desselben JsonNode-Wegs — dadurch byte-identisch.
+    /// </summary>
+    private static string JsonLineHash(string path, JsonNode? node, JsonNode? timeNode) =>
+        (path + "|" + (node?.ToJsonString() ?? string.Empty) + "|" + (timeNode?.ToJsonString() ?? string.Empty)).GetMD5Hash();
+
+    /// <summary>
     /// Überprüft und erstellt den Pfad für Fragmente.
     /// </summary>
     private void CheckPath() {
@@ -415,11 +475,6 @@ public class TableJsonFragments : TableJsonFile {
     }
 
     /// <summary>
-    /// Gibt den Pfad zum Fragment-Ordner zurück.
-    /// </summary>
-    public string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "FrgmJ\\";
-
-    /// <summary>
     /// Ermittelt die neuesten Änderungen aus den JSON-Fragmentdateien.
     /// Jede Zeile ist ein eigenständiges JSON-Objekt (NDJSON). Steuerzeilen
     /// mit dem Key "_meta" (Header/EOF) werden übersprungen. Zeilen mit dem
@@ -505,16 +560,6 @@ public class TableJsonFragments : TableJsonFile {
     }
 
     /// <summary>
-    /// Dedup-Hash einer granularen Zeile aus Pfad, Wert und Zeitstempel. Der
-    /// Zeitstempel fließt ein, damit gleiche Werte zu unterschiedlichen Zeiten
-    /// (A→B→A-Folgen) nicht als Duplikat gelten.
-    /// Beide Seiten (Schreiben und Nachladen) erzeugen den Zeitstempel-String
-    /// über ToJsonString desselben JsonNode-Wegs — dadurch byte-identisch.
-    /// </summary>
-    private static string JsonLineHash(string path, JsonNode? node, JsonNode? timeNode) =>
-        (path + "|" + (node?.ToJsonString() ?? string.Empty) + "|" + (timeNode?.ToJsonString() ?? string.Empty)).GetMD5Hash();
-
-    /// <summary>
     /// Injiziert die geladenen Fragmentdaten in die aktuelle Tabellenstruktur.
     /// </summary>
     /// <param name="checkedDataFiles"></param>
@@ -592,7 +637,6 @@ public class TableJsonFragments : TableJsonFile {
                             // mehr; sie werden übersprungen, statt einen Anwendungsfehler zu riskieren.
                             if (thisWork.Command.IsObsolete()) {
                                 if (processed.Add(thisWork.Hash())) {
-                                    Develop.Diagnose("FragmentLoad", $"Veraltetes Item übersprungen: CO={(int)thisWork.Command}, D={thisWork.DateTimeUtc:HH:mm:ss.fff}, CN={thisWork.ColName}, RK={thisWork.RowKey}");
                                     _ = _processedHashes.TryAdd(thisWork.Hash(), default);
                                 }
                                 continue;
@@ -672,55 +716,9 @@ public class TableJsonFragments : TableJsonFile {
                     OnLoaded(false, affectingHead);
                 }
                 return OperationResult.Success;
-            } catch (Exception ex) {
+            } catch {
                 Develop.AbortAppIfStackOverflow();
-                Develop.Diagnose("FragmentLoad", $"InjectData-Exception, erneuter Versuch: {ex.Message} Stack: {Develop.DiagStack()}");
             }
-        }
-    }
-
-    /// <summary>
-    /// Bereitet die Fortführung einer sauber mit einem JSON-EOF-Marker
-    /// abgeschlossenen Fragment-Datei vor. Öffnet den Writer im Append-Modus
-    /// auf diese Datei und markiert sie sofort mit einem "_meta":"continued"-
-    /// Eintrag, damit kein zweiter Prozess Schreibzugriff auf dieselbe Datei erhält.
-    /// Liefert bei Problemen die Fehlermeldung, sonst leer.
-    /// </summary>
-    public string ContinueFragment(string fragmentFilename) {
-        if (!fragmentFilename.StartsWith(FragmengtsPath(), StringComparison.OrdinalIgnoreCase)) { return "Die Datei liegt nicht im Fragment-Ordner der Tabelle: " + fragmentFilename; }
-        if (!IO.FileExists(fragmentFilename)) { return "Fragment-Datei nicht gefunden: " + fragmentFilename; }
-
-        // Ggf. bereits offenen Writer schließen (z. B. Master-Eintrag beim Laden):
-        // Diese (fast leere) Neue-Datei darf das Aufräumen dann entsorgen.
-        CloseWriter();
-
-        // Ab sofort als eigene Datei führen: hält sie beim Nachladen aus den
-        // Fremd-Fragmenten heraus und schützt sie vor Aufräum-Löschungen.
-        _myFragmentsFilename = fragmentFilename;
-        CanDeleteWriter = false;
-
-        if (Develop.AllReadOnly) { return string.Empty; }
-
-        System.IO.FileStream? fileStream = null;
-        try {
-            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
-            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
-            fileStream = null;
-
-            _writer.AutoFlush = true;
-
-            // Sofort als "in Bearbeitung" markieren: Die Datei endet damit nicht
-            // mehr auf dem EOF-Marker, also wählt kein weiterer Prozess sie zur Fortführung.
-            var cont = new JsonObject { ["_meta"] = "continued" };
-            _writer.WriteLine(cont.ToJsonString());
-
-            return string.Empty;
-        } catch (Exception ex) {
-            fileStream?.Dispose();
-            _writer?.Dispose();
-            _writer = null;
-
-            return ex.Message;
         }
     }
 
