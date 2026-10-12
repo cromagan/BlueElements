@@ -101,8 +101,11 @@ public class RowScriptCommand : TableGenericScriptCommand {
         }
 
         if (newrow is { IsDisposed: false } r) {
+            var currentState = r.CellGetString(srs);
             var v = r.CellGetDateTime(srs);
-            if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
+            if (string.IsNullOrEmpty(currentState)) {
+                //Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile bereits invalidiert ist.", scp.Stufe);
+            } else if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
                 var f = Table.IsCellEditable(srs, r, fic.ChunkVal, false);
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
