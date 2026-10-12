@@ -29,6 +29,35 @@ public class SwapListBoxControlStrategy : ControlStrategy {
 
     #region Methods
 
+    /// <summary>
+    /// Fordert Platz für beide Listen an: fester Bereich der Hauptliste,
+    /// Filterzeile und alle Vorschläge — höchstens 70 % der Bildschirmgröße.
+    /// </summary>
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+        var required = base.CalculateRequiredBounds(bounds);
+        if (_control is not { IsDisposed: false } c) { return required; }
+
+        var estimated = c.GetEstimatedSize();
+
+        var primary = System.Windows.Forms.Screen.PrimaryScreen;
+        var maxWi = (int)((primary?.Bounds.Width ?? 1920) * 0.7);
+        var maxHe = (int)((primary?.Bounds.Height ?? 1080) * 0.7);
+
+        var width = Math.Max(required.Width, estimated.Width);
+        var height = Math.Max(required.Height, estimated.Height);
+
+        // Optik: das ganze Feld ausfüllen, auch bei leeren Listen.
+        height = Math.Max(height, Math.Min(bounds.Height, MaxSingleLineFillHeight));
+
+        if (width > maxWi) { width = maxWi; }
+        if (height > maxHe) {
+            height = maxHe;
+            width += 20; // Platz für den Scrollbalken.
+        }
+
+        return new Rectangle(required.Location, new Size(width, height));
+    }
+
     public override string ReadableText() => "Listbox mit separaten Werten";
 
     /// <summary>

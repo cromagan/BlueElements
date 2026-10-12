@@ -362,7 +362,8 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             }
         }
 
-        return ExecuteScript(script, "Testmodus", !testmode, row, TableInput, fi, fieldSources);
+        // testmode wird bewusst ignoriert: Der Editor-Test läuft immer im Testmodus, damit Stop funktioniert.
+        return ExecuteScript(script, "Testmodus", false, row, TableInput, fi, fieldSources);
     }
 
     #endregion

@@ -380,7 +380,8 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
             return new ScriptEndedFeedback("Keine Eingangs-Zeile zum Testen vorhanden.", false, false, "Allgemein");
         }
 
-        return RowAdder.ExecuteScript(script, !testmode, "Testmodus", EntityID, row, true);
+        // testmode wird bewusst ignoriert: Der Editor-Test läuft immer im Testmodus, damit Stop funktioniert.
+        return RowAdder.ExecuteScript(script, false, "Testmodus", EntityID, row, true);
     }
 
     #endregion

@@ -308,7 +308,7 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
     /// Führt das Skript für den Testmodus im Editor aus.
     /// </summary>
     private static ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) =>
-        ExecuteScript(script, "Testmodus", string.Empty, string.Empty, string.Empty, !testmode, null);
+        ExecuteScript(script, "Testmodus", string.Empty, string.Empty, string.Empty, false, null); // testmode wird bewusst ignoriert: Der Editor-Test läuft immer im Testmodus, damit Stop funktioniert.
 
     #endregion
 

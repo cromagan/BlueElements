@@ -16,6 +16,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
+    /// <summary>Marker in der SysRowState-Spalte für "bereits invalidiert, nur Neuberechnung offen".</summary>
+    public const string InvalidatedStateValue = "01.01.1900";
+
     private volatile int _isDisposedFlag;
     private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
 
@@ -500,7 +503,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         // Neuinitialisierung (leerer Status) oder nur Neuberechnung (Status unter die Skript-Version setzen)
-        var newState = sourceColumn is null or { IsKeyColumn: true } ? string.Empty : "01.01.1900";
+        var newState = sourceColumn is null or { IsKeyColumn: true } ? string.Empty : InvalidatedStateValue;
 
         // Eine bereits komplett invalidierte Zeile nicht auf "nur Neuberechnung" herunterstufen
         if (newState == currentState) {

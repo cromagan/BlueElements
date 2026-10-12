@@ -33,6 +33,14 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Setzt die Scroll-Position beider Listen auf den Anfang zurück.
+    /// </summary>
+    public void ResetScroll() {
+        Main.ResetScroll();
+        Suggest.ResetScroll();
+    }
+
     internal void Check(ICollection<string> toCheck) {
         var didChange = false;
 
@@ -49,6 +57,19 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
 
         if (didChange) { OnItemCheckedChanged(); }
+    }
+
+    /// <summary>
+    /// Liefert die vom Inhalt benötigte Größe: fester Bereich der Hauptliste,
+    /// Filterzeile und die Platzanforderung der Vorschlagsliste.
+    /// </summary>
+    internal Size GetEstimatedSize() {
+        var (mainWidth, _, _, _) = Main.Items.CanvasItemData(Main.ItemDesign);
+        var (suggestWidth, _, suggestHeight, _) = Suggest.Items.CanvasItemData(Suggest.ItemDesign);
+
+        suggestHeight++; // Reserve, damit kein vertikaler Slider entsteht.
+
+        return new Size(Math.Max(mainWidth, suggestWidth), splitContainer1.SplitterDistance + splitContainer1.SplitterWidth + txbFilter.Height + suggestHeight);
     }
 
     internal void SuggestionsAdd(List<ListItem>? item) {
@@ -73,14 +94,6 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
 
         if (didChange) { OnItemCheckedChanged(); }
-    }
-
-    /// <summary>
-    /// Setzt die Scroll-Position beider Listen auf den Anfang zurück.
-    /// </summary>
-    public void ResetScroll() {
-        Main.ResetScroll();
-        Suggest.ResetScroll();
     }
 
     protected override void DrawControl(Graphics gr, States state) {

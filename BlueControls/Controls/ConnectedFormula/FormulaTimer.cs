@@ -8,8 +8,8 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 {
     #region Fields
 
-    private int _last;
     private readonly Timer? _main;
+    private int _last;
     private string _value0 = string.Empty;
     private string _value1 = string.Empty;
     private string _value2 = string.Empty;
@@ -21,6 +21,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
     public FormulaTimer() : base(false, false, false) {
         InitializeComponent();
+        chkAktiv.CheckedChanged += ChkAktiv_CheckedChanged;
         _last = -1;
         _main = new Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(Main_Tick)); }
@@ -63,12 +64,6 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
     #region Methods
 
-    protected override void OnHandleCreated(System.EventArgs e) {
-        base.OnHandleCreated(e);
-        chkAktiv.Visible = Deaktivierbar;
-        chkAktiv.Text = ItemText;
-    }
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -80,6 +75,22 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
+    }
+
+    protected override void OnHandleCreated(System.EventArgs e) {
+        base.OnHandleCreated(e);
+        chkAktiv.Visible = Deaktivierbar;
+        chkAktiv.Text = ItemText;
+    }
+
+    /// <summary>
+    /// Setzt den Timer bei erneuter Aktivierung zurück, damit ein fehlgeschlagener Durchlauf nicht dauerhaft blockiert.
+    /// </summary>
+    private void ChkAktiv_CheckedChanged(object? sender, System.EventArgs e) {
+        if (!chkAktiv.Checked) { return; }
+        _wasok = true;
+        _last = 0;
+        capMessage.Text = "Timer aktiv.";
     }
 
     private void Main_Tick() {
