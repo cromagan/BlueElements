@@ -202,17 +202,23 @@ ColumnEditor eine neue Fehlerprüfung:
 Alle Spalten, die für verlinkte Zellen benutzt werden, müssen im TableHead Editor eine UniqueDefinition haben
 
 ## Aufgabe
-ScritStrategyControl.
+ScriptStrategyControl.
 Wie schaffe ich es, dass je nach TableView ein anderes Script ausgeführt wird?
 Ich will im Script irgendwie Feldvariablen benutzen. Aber die werden von einem anderen Ort gesetzt.
 
 ## Aufgabe
-            foreach (var thisItem in item) {
-                thisItem?.UntrimmedCanvasSize(itemDesign);
-            }
-            //Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
+Der Stop Befehl Funktioniert in Script-Button nicht.
 
-mit Paralell stürzt es ab. Kann es sein, wenn mehrere Tabellen geladen werden müssen, dass das der Grund ist?
+## Aufgabe
+Das Timer-Script element reagiert nicht, wenn ich es anhacke
+
+## Aufgabe
+SwapListBoxControlStratgey wird zu klein Dargestellt in TableView.Es muss mehr Platz für die zweite Listbox berücksichtigt werden.
+
+## Aufgabe
+prüfe, ob BCR Dokumente bei eine externen Änderung nachgeladen werden und ob dann das Formular richtig aufgebaut wird.
+
+
 
 
 

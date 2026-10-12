@@ -5,9 +5,9 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.ScriptCommands;
 
 /// <summary>
-/// Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.
+/// Gibt einen kompletten Pfad mit Dateinamen zurück, der im angebenen Verzeichnis nicht existiert.
 /// Wird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.
-/// Wird dieser befüllt, wird eine laufende Nummer hinzugefügt
+/// Wird dieser befüllt, wird eine laufende Nummer hinzugefügt.
 /// Hashtag: #ID #einzigartig #filename
 /// </summary>
 internal class FreeFileNameScriptCommand : ScriptCommand {
