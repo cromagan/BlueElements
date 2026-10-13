@@ -179,11 +179,9 @@ Prüfe die OnLoaded Logik von Tabellen.
 TableFragments wirft ein "First=false" (BeSureUptoDate) vor dem ersten echten Laden.
 Brauchen wir OnLoaded wirklich oder kann man das sogar wegkürzen?
 
-
 ## Aufgabe
 IInputFormat um eine `TextCase`-Eigenschaft ergänzen (None/Upper/Lower/Title), die die Groß-/Kleinschreibung bei der Eingabe erzwingt.
 Alle TextBox-basierten Controls (insb. `TextBox`, `TextBoxSuggestions`, `FlexiControl`) müssen dies bei der Eingabe und beim `AfterEdit` berücksichtigen.
-
 
 ## Aufgabe
 Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor ein
@@ -192,33 +190,16 @@ Manche Benutzer einstellungen nutzen einen Bildcode. bette den QuickImage-Editor
 mache weitere optimerungen des Buttons "Tabelle optimieren"
 
 ## Aufgabe
-Tool Aufräumen, und einzigartige Zeilen im TableHeadEditor:
-Beim Beenden ded TableHeadEditors soll geprüft werden, ob die unqiese verändert worden sind.
-Wenn ja, soll über jede Unique Definiton eine Reparatur laufen (Tool Aufräumnen). Mit eine Meldung, wenn eine Zeile mehr als 3x vorhanden ist und abbruch oder weiter.
-Hat der Befehl ImportLinked ein Problem, soll ebenfalls das Aufräumen gestartet werden. ohne Rückfragen dann.
-
-## Aufgabe
-ColumnEditor eine neue Fehlerprüfung:
-Alle Spalten, die für verlinkte Zellen benutzt werden, müssen im TableHead Editor eine UniqueDefinition haben
-
-## Aufgabe
 ScriptStrategyControl.
 Wie schaffe ich es, dass je nach TableView ein anderes Script ausgeführt wird?
 Ich will im Script irgendwie Feldvariablen benutzen. Aber die werden von einem anderen Ort gesetzt.
 
 ## Aufgabe
-Der Stop Befehl Funktioniert in Script-Button nicht.
-
-## Aufgabe
-Das Timer-Script element reagiert nicht, wenn ich es anhacke
-
-## Aufgabe
-SwapListBoxControlStratgey wird zu klein Dargestellt in TableView.Es muss mehr Platz für die zweite Listbox berücksichtigt werden.
-
-## Aufgabe
 prüfe, ob BCR Dokumente bei eine externen Änderung nachgeladen werden und ob dann das Formular richtig aufgebaut wird.
 
-
+## Aufgabe
+ControlStrategies benötigen einen Check, ob sie Multiline Unterstützen.
+Dann muss der ColumnEditor bei Inkonsistenz einen Fehler ausgeben.
 
 
 
