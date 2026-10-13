@@ -354,13 +354,7 @@ public class ScriptButtonPadItem : ReciverPadItem, IItemToControl, IAutosizable,
             }
         }
 
-        List<IHasFieldVariable>? fieldSources = null;
-        if (Parent is CollectionPadItem { IsDisposed: false } icpi) {
-            fieldSources = [];
-            foreach (var thisCon in icpi) {
-                if (thisCon is IHasFieldVariable hfv) { fieldSources.Add(hfv); }
-            }
-        }
+        var fieldSources = IHasFieldVariableExtension.GetFieldSources(this);
 
         // testmode wird bewusst ignoriert: Der Editor-Test läuft immer im Testmodus, damit Stop funktioniert.
         return ExecuteScript(script, "Testmodus", false, row, TableInput, fi, fieldSources);

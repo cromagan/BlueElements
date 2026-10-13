@@ -128,15 +128,7 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
 
     #region Methods
 
-    /// <summary>
-    /// IHasScript: Liefert das Timer-Skript.
-    /// </summary>
-    public IEnumerable<ScriptDescription> GetAllScripts() {
-        if (Script is not { Length: > 0 } s) { return []; }
-        return [new ScriptDescription(KeyName, s)];
-    }
-
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, List<string>? args) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, IEnumerable<IHasFieldVariable>? fieldSources, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -156,6 +148,12 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         ];
 
         BlueScript.Classes.Script.AddAttributes(vars, args ?? []);
+
+        if (fieldSources is not null) {
+            foreach (var hfv in fieldSources) {
+                if (hfv.GetFieldVariable() is { } v) { vars.Add(v); }
+            }
+        }
 
         var scp = new ScriptProperties("Timer", ScriptCommand.AllMethods.Instances, produktivPhase, [], null, "Timer", "Timer in Formular");
 
@@ -181,6 +179,14 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         //con.DoDefaultSettings(parent, this, mode);
 
         return con;
+    }
+
+    /// <summary>
+    /// IHasScript: Liefert das Timer-Skript.
+    /// </summary>
+    public IEnumerable<ScriptDescription> GetAllScripts() {
+        if (Script is not { Length: > 0 } s) { return []; }
+        return [new ScriptDescription(KeyName, s)];
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -307,10 +313,10 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
     /// <summary>
     /// Führt das Skript für den Testmodus im Editor aus.
     /// </summary>
-    private static ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) =>
-        ExecuteScript(script, "Testmodus", string.Empty, string.Empty, string.Empty, false, null); // testmode wird bewusst ignoriert: Der Editor-Test läuft immer im Testmodus, damit Stop funktioniert.
+    private ScriptEndedFeedback ExecuteScriptTest(string script, bool testmode) {
+        var fieldSources = IHasFieldVariableExtension.GetFieldSources(this);
+        return ExecuteScript(script, "Testmodus", string.Empty, string.Empty, string.Empty, false, fieldSources, null);
+    }
 
     #endregion
-
-    //base.DrawExplicit(gr,visibleArea, positionControl, zoom, offsetX, offsetY);//DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
 }

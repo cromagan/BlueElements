@@ -113,11 +113,14 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
             return;
         }
 
-        var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2, true, null);
+        var fieldSources = IHasFieldVariableExtension.GetFieldSources(this);
+
+        var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2, true, fieldSources, null);
 
         if (t.Failed) {
             _wasok = false;
             capMessage.Text = "Skript-Fehler: " + t.FailedReason;
+            Develop.Message(ErrorType.Info, null, "Formular Timer", ImageCode.Warnung, "Skript-Fehler: " + t.FailedReason, 0);
             return;
         }
 
@@ -127,6 +130,8 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
         _value1 = t.Variables?.GetString("value1") ?? string.Empty;
         _value2 = t.Variables?.GetString("value2") ?? string.Empty;
         _last = 0;
+
+        IHasFieldVariableExtension.WriteBackFieldSources(fieldSources, t.Variables);
     }
 
     #endregion

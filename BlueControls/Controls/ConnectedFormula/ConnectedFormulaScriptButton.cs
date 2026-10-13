@@ -90,18 +90,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         var row = Drückbar_wenn == ButtonArgs.Genau_eine_Zeile ? RowSingleOrNull() : null;
         Table? tb = row?.Table is { IsDisposed: false } rowTb ? rowTb : FilterInput?.Table is { IsDisposed: false } fiTb ? fiTb : null;
 
-        // Field-Variablen-Quellen: Parent selbst (falls IHasFieldVariable) und
-        // alle Child-Controls, die IHasFieldVariable implementieren.
-        List<IHasFieldVariable>? fieldSources = null;
-        if (Parent is not null) {
-            fieldSources = [];
-            if (Parent is IHasFieldVariable hfvp) { fieldSources.Add(hfvp); }
-            if (Parent.Controls is { } pControls) {
-                foreach (var thisCon in pControls) {
-                    if (thisCon is IHasFieldVariable hfv) { fieldSources.Add(hfv); }
-                }
-            }
-        }
+        var fieldSources = IHasFieldVariableExtension.GetFieldSources(this);
 
         var startValues = row?.CellStartValues() ?? [];
 
@@ -119,13 +108,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
             #region Variablen zurückschreiben
 
-            if (fieldSources is not null) {
-                foreach (var hfv in fieldSources) {
-                    if (vars.GetByKey(hfv.FieldName) is { ReadOnly: false } v) {
-                        hfv.SetValueFromVariable(v);
-                    }
-                }
-            }
+            IHasFieldVariableExtension.WriteBackFieldSources(fieldSources, vars);
+
             tb?.WriteBackVariables(row, vars, false, true, "Script-Button-Press", !t.Failed, startValues);
 
             #endregion

@@ -74,12 +74,12 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
 
         var words = text.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         if (words.Length > 3) {
-            Develop.DebugPrint($"MouseNotification erlaubt maximal drei Wörter: {text}" + text);
+            Develop.DebugPrint($"QuickNote erlaubt maximal drei Wörter: {text}" + text);
             return;
         }
 
         if (text.Contains('{') || text.Contains('}')) {
-            Develop.DebugPrint("MouseNotification erlaubt keine Platzhalter '{}': {text}" + text);
+            Develop.DebugPrint("QuickNote erlaubt keine Platzhalter '{}': {text}" + text);
             return;
         }
 
