@@ -67,8 +67,6 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// </summary>
     public string Creator { get; private set; } = string.Empty;
 
-    public override bool ExtendedSave => true;
-
     /// <summary>
     /// Gibt an, ob die Klasse die Rohdaten bereits verarbeitet hat.
     /// Wird automatisch auf false gesetzt, wenn die Datei veraltet ist (Invalidate).
@@ -232,19 +230,6 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         ClearPages();
         IsParsed = false;
         base.Invalidate();
-    }
-
-    /// <summary>
-    /// Stellt sicher, dass der Dateiinhalt verarbeitet ist.
-    /// Bei leerem oder nicht parsebarem Inhalt werden die Standard-Reparaturen
-    /// (Default-Head, RowEntryItem) über ParseFinished dennoch ausgeführt.
-    /// </summary>
-    private void EnsureParsed() {
-        if (IsParsed || IsDisposed) { return; }
-        var c = Win1252.GetString(Content);
-        if (!this.Parse(c)) {
-            ParseFinished(c);
-        }
     }
 
     /// <summary>
@@ -520,6 +505,19 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
             page.Dispose();
         }
         _pages.Clear();
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass der Dateiinhalt verarbeitet ist.
+    /// Bei leerem oder nicht parsebarem Inhalt werden die Standard-Reparaturen
+    /// (Default-Head, RowEntryItem) über ParseFinished dennoch ausgeführt.
+    /// </summary>
+    private void EnsureParsed() {
+        if (IsParsed || IsDisposed) { return; }
+        var c = Win1252.GetString(Content);
+        if (!this.Parse(c)) {
+            ParseFinished(c);
+        }
     }
 
     /// <summary>

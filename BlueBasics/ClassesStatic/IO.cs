@@ -571,31 +571,35 @@ public static class IO {
             if (result.IsFailed) { return result; }
 
             if (!FileExists(filename)) {
-                // 2a. Erstspeicherung: Datei existiert noch nicht — kein Backup nötig,
-                //     kein File.Replace möglich (Zieldatei fehlt). Direktes Verschieben.
-                if (!MoveFile(tempfile, filename, false)) {
-                    return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                // Erstspeicherung: kein Backup nötig und File.Replace nicht möglich.
+                if (MoveFile(tempfile, filename, false)) {
+                    return OperationResult.Success;
+                } else {
+                    return OperationResult.Failed("Erstspeicherung fehlgeschlagen");
                 }
-            } else {
-                // 2b. Datei existiert — atomares Ersetzen mit Backup-Rotation.
-                //     File.Replace führt Replace+Backup in einem Syscall aus.
-                try {
-                    File.Replace(tempfile, filename, backup, ignoreMetadataErrors: true);
-                } catch {
-                    // Fallback bei exotischen Filesystems, die File.Replace nicht unterstützen
-                    if (FileExists(backup) && !DeleteFile(backup, false)) {
-                        return OperationResult.Failed("Backup konnte nicht gelöscht werden");
-                    }
+            }
 
-                    if (!MoveFile(filename, backup, false)) {
-                        return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
-                    }
+            // File.Replace führt Ersetzen+Backup atomar aus. Eine IOException ist
+            // meist eine transiente Kollision mit einem parallelen Schreibvorgang
+            // (z. B. SMB-Share) — kurz retryen, bevor der Move-Fallback greift.
+            try {
+                File.Replace(tempfile, filename, backup, ignoreMetadataErrors: true);
+                return OperationResult.Success;
+            } catch {
+                // Fallback bei exotischen Filesystems, die File.Replace nicht unterstützen
+            }
 
-                    if (!MoveFile(tempfile, filename, false)) {
-                        MoveFile(backup, filename, false);
-                        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-                    }
-                }
+            if (FileExists(backup) && !DeleteFile(backup, false)) {
+                return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+            }
+
+            if (!MoveFile(filename, backup, false)) {
+                return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+            }
+
+            if (!MoveFile(tempfile, filename, false)) {
+                MoveFile(backup, filename, false);
+                return OperationResult.Failed("Speichervorgang fehlgeschlagen");
             }
 
             return OperationResult.Success;

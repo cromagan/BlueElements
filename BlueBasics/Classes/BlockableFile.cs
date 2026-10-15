@@ -231,18 +231,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
         }
     }
 
-    public abstract bool ExtendedSave { get; }
-
-    public FileInfo? FileInfo {
-        get {
-            if (_fileInfo is null) {
-                _fileInfo = GetFileInfo(Filename);
-            }
-
-            return _fileInfo;
-        }
-    }
-
     /// <summary>
     /// Der vollständige Dateipfad dieser gecachten Datei.
     /// </summary>
@@ -501,13 +489,16 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
 
     /// <summary>
     /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// Berücksichtigt: IsDisposed, LoadFailed.
+    /// Berücksichtigt: IsDisposed, LoadFailed und Fremdänderung der Datei seit dem Laden.
     /// </summary>
     public virtual string IsSaveAbleNow() {
         if (IsNowEditable() is { Length: > 0 } f) { return f; }
 
         if (_content is null) { return "Byte-Fehler"; }
-        return string.Empty;
+
+        return IsStale()
+            ? "Datei wurde zwischenzeitlich von einem anderen Benutzer geändert oder gelöscht — bitte neu laden."
+            : string.Empty;
     }
 
     /// <summary>
@@ -681,25 +672,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             var dataToWrite = MustZipped ? data.ZipIt() : data;
             if (dataToWrite is null || dataToWrite.Length == 0) { return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern"); }
 
-            var backup = BackupName(filename);
-            var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
-
-            var result = WriteAllBytes(tmpFile, dataToWrite);
-            if (result.IsFailed) {
-                DeleteFile(tmpFile, false);
-                return result;
-            }
-
-            if (FileExists(backup)) { DeleteFile(backup, false); }
-            if (FileExists(filename)) { MoveFile(filename, backup, false); }
-
-            if (!MoveFile(tmpFile, filename, false)) {
-                if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
-                DeleteFile(tmpFile, false);
-                return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-            }
-
-            return OperationResult.Success;
+            return SaveExtended(filename, dataToWrite);
         } finally {
             if (acquired) {
                 try {
@@ -956,7 +929,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             var retries = 0;
             do {
                 var fileInfo1 = GetFileInfo(Filename, false, 0.1f);
-                if (fileInfo1 is null) { return ([], null, false); }
 
                 var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
                 var fileInfo2 = GetFileInfo(Filename, false, 2f);
@@ -976,16 +948,14 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// <summary>
     /// Schreibt den Content auf die Festplatte und aktualisiert danach die
     /// Instanz-Zustände (Hashes, FileInfo) sowie löst OnSaved aus.
-    /// Für ExtendedSave = true wird SaveExtended
+    /// Für ExtendedSave = true wird ReplaceWithBackup
     /// (Backup-Rotation, atomares Ersetzen) genutzt, sonst ein direkter Schreibvorgang.
     /// </summary>
     private OperationResult SaveToDisk(byte[] contentToWrite, string savedContentHash) {
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
-            var result = ExtendedSave
-                ? SaveExtended(Filename, contentToWrite)
-                : WriteAllBytes(Filename, contentToWrite);
+            var result = SaveExtended(Filename, contentToWrite);
 
             if (result.IsFailed) { return result; }
 
