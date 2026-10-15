@@ -342,16 +342,11 @@ public sealed class RowTableElement : TableElement {
 
         if (mouseOverColumn?.Column is { IsDisposed: false } col && Row is { IsDisposed: false }) {
             // Instant-Action-Strategien (z. B. "Skript ausführen") führen den
-            // einfachen Klick sofort aus — ohne CellClicked-Event und Mini-Toolbar.
+            // einfachen Klick sofort aus — ohne CellClicked-Event.
             if (ControlStrategy.InstantActionClicked(tableView, col, Row)) { return; }
 
             tableView.OnCellClicked(new CellEventArgs(col, Row));
             tableView.Invalidate();
-
-            // Mini-Toolbar anzeigen. Ob sie tatsächlich erscheint oder
-            // bei einem erneuten Klick auf dieselbe Zelle ausgeblendet
-            // bleibt, entscheidet MiniToolbarShow anhand des HotItems.
-            tableView.ShowMiniToolbarAt(mouseOverColumn, this, Row);
         }
     }
 

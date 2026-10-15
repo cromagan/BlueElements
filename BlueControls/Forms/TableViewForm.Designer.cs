@@ -394,7 +394,7 @@ namespace BlueControls.Forms {
             btnEinstellungen.ImageCode = "Zahnrad";
             btnEinstellungen.Location = new Point(80, 2);
             btnEinstellungen.Name = "btnEinstellungen";
-            btnEinstellungen.QuickInfo = "Allgemeine Einstellungen, z. B. MiniToolbar und Zellen-Klick-Verhalten.";
+            btnEinstellungen.QuickInfo = "Allgemeine Einstellungen, z. B. Zellen-Klick-Verhalten.";
             btnEinstellungen.Size = new Size(56, 66);
             btnEinstellungen.TabIndex = 13;
             btnEinstellungen.Text = "Einstell-ungen";

@@ -42,6 +42,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public bool Ansichtbearbeitung { get; set; }
 
+    /// <summary>
+    /// Ansichten-Button (gespeicherte Ansichten) in der Filterleiste anzeigen.
+    /// </summary>
+    public bool Ansicht_anzeigen { get; set; } = true;
+
+    /// <summary>
+    /// Ähnlichkeits-Spalte und Ähnlich-Button der Ähnlichen-Zeilen-Suche anzeigen.
+    /// </summary>
+    public bool Ähnliche_anzeigen { get; set; } = true;
+
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
 
@@ -53,6 +63,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// und Kapitelüberschriften können sich wiederholen.
     /// </summary>
     public bool ChaptersUnique { get; set; } = true;
+
+    /// <summary>
+    /// Kapitel-Button (alle Kapitel auf-/zuklappen) in der Filterleiste anzeigen.
+    /// </summary>
+    public bool CollapseButton_anzeigen { get; set; } = true;
 
     public ColumnHeaderMode ColumnHeaderMode { get; set; }
     public int Count => _internal.Count;
@@ -80,6 +95,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             }
         }
     }
+
+    /// <summary>
+    /// Pin-Spalte und Pin-Buttons in der Filterleiste anzeigen.
+    /// </summary>
+    public bool Pin_anzeigen { get; set; } = true;
 
     public string QuickInfo { get; set; } = string.Empty;
 
@@ -289,6 +309,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("StartCollapsed", StartCollapsed);
         result.ParseableAdd("ChaptersUnique", ChaptersUnique);
         result.ParseableAdd("ScaleToFit", ScaleToFit);
+        result.ParseableAdd("PinAnzeigen", Pin_anzeigen);
+        result.ParseableAdd("AnsichtAnzeigen", Ansicht_anzeigen);
+        result.ParseableAdd("AehnlicheAnzeigen", Ähnliche_anzeigen);
+        result.ParseableAdd("CollapseButtonAnzeigen", CollapseButton_anzeigen);
 
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
@@ -313,14 +337,18 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         json.Set("startcollapsed", StartCollapsed);
         json.Set("chaptersunique", ChaptersUnique);
         json.Set("scaletofit", (int)ScaleToFit);
+        json.Set("showpin", Pin_anzeigen);
+        json.Set("showviews", Ansicht_anzeigen);
+        json.Set("showsimilarity", Ähnliche_anzeigen);
+        json.Set("showcollapsebutton", CollapseButton_anzeigen);
         json.Set("filterrows", FilterRows);
         json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
         json.Set("quickinfo", QuickInfo);
         json.Set("columnheadermode", (int)ColumnHeaderMode);
         json.SetArrayIfNotEmpty("columns", _internal.Cast<IJsonStringable>());
         json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
-        json.SetArrayIfNotEmpty("executeablescripts", Ausführbare_Skripte);
-        json.SetArrayIfNotEmpty("columnsshowalwaysfilter", Filter_immer_Anzeigen);
+        json.SetArrayIfNotEmpty("executables", Ausführbare_Skripte);
+        json.SetArrayIfNotEmpty("showalwaysfilters", Filter_immer_Anzeigen);
         var perm = PermissionGroups_Show.SortedDistinctList();
         perm.RemoveString(Administrator, false);
         json.SetArrayIfNotEmpty("permissiongroups", perm);
@@ -344,6 +372,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         ShowHead = json.GetBool("showhead", ShowHead);
         StartCollapsed = json.GetBool("startcollapsed", StartCollapsed);
         ChaptersUnique = json.GetBool("chaptersunique", ChaptersUnique);
+        Pin_anzeigen = json.GetBool("showpin", Pin_anzeigen);
+        Ansicht_anzeigen = json.GetBool("showviews", Ansicht_anzeigen);
+        Ähnliche_anzeigen = json.GetBool("showsimilarity", Ähnliche_anzeigen);
+        CollapseButton_anzeigen = json.GetBool("showcollapsebutton", CollapseButton_anzeigen);
         ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
         FilterRows = json.GetInt("filterrows", FilterRows);
         // Nur bei vorhandener Key explizit übernehmen: Bei Partial-Updates
@@ -358,8 +390,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         // Listen nur bei vorhandenem Key übernehmen — Partial-Updates
         // (JSON-Fragmente) dürfen fehlende Keys nicht als "leer" werten.
         if (json["contextmenuscripts"] is JsonArray cmsArr) { Kontextmenu_Skripte = cmsArr.ToStringList().AsReadOnly(); }
-        if (json["executeablescripts"] is JsonArray esArr) { Ausführbare_Skripte = esArr.ToStringList().AsReadOnly(); }
-        if (json["columnsshowalwaysfilter"] is JsonArray csafArr) { Filter_immer_Anzeigen = csafArr.ToStringList().AsReadOnly(); }
+        if (json["executables"] is JsonArray exArr) { Ausführbare_Skripte = exArr.ToStringList().AsReadOnly(); }
+        if (json["showalwaysfilters"] is JsonArray safArr) { Filter_immer_Anzeigen = safArr.ToStringList().AsReadOnly(); }
         if (json["permissiongroups"] is JsonArray parr) {
             _permissionGroups_show.Clear();
             _permissionGroups_show.AddRange(parr.ToStringList());
@@ -482,6 +514,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "chaptersunique":
                 ChaptersUnique = value.FromPlusMinus();
+                return true;
+
+            case "pinanzeigen":
+                Pin_anzeigen = value.FromPlusMinus();
+                return true;
+
+            case "ansichtanzeigen":
+                Ansicht_anzeigen = value.FromPlusMinus();
+                return true;
+
+            case "aehnlicheanzeigen":
+                Ähnliche_anzeigen = value.FromPlusMinus();
+                return true;
+
+            case "collapsebuttonanzeigen":
+                CollapseButton_anzeigen = value.FromPlusMinus();
                 return true;
 
             case "fillwidth":

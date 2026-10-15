@@ -146,9 +146,6 @@ CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, Spli
 ##Aufgabe
 Alle ListItemAbstract Ableitungen komplett entfernen. Nur noch ein List-Item. Das aussehen wird durch die (vorhandenen) Renderer gemacht. Evtl. die Renderer erweitern. Evtl. neue Renderer einrichten.
 
-##Aufgabe 
-MiniToolbar: Kapitel ändern
-
 ##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
 

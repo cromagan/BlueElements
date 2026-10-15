@@ -250,7 +250,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
         if (mouseOverColumn is not { IsDisposed: false } clickedColumn) { return; }
         if (Arrangement is not { IsDisposed: false } ca) { return; }
 
-        #region Kopf-Button (Ähnlichkeits-Sortierung ausschalten, Spalte reparieren/bearbeiten)
+        #region Kopf-Button (Spalte reparieren/bearbeiten)
 
         if (clickedColumn.ButtonImage is not null) {
             if (IsMouseOverHeadButton(clickedColumn, tableView, e)) {

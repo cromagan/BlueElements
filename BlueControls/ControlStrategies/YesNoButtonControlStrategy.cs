@@ -31,6 +31,14 @@ public class YesNoButtonControlStrategy : ControlStrategy {
     /// </summary>
     public override bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) => true;
 
+    /// <summary>
+    /// Die Spalte darf nicht mehrzeilig sein.
+    /// </summary>
+    public override string ErrorReason(bool mayHaveDropDown, bool multiLine) {
+        if (multiLine) { return ColumnErrorConstants.NoMultilineAllowed; }
+        return string.Empty;
+    }
+
     public override string ReadableText() => "Ja/Nein-Knopf";
 
     public override void SubscribeEvents() {

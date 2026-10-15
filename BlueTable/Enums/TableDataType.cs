@@ -180,6 +180,11 @@ public enum TableDataType : byte {
     FixedColumnWidth = 116, // co_FilterOption = 116
     DropDownItems = 117,
 
+    /// <summary>
+    /// Gewicht der Spalte bei der Ähnlichkeits-Suche (Float 0–1).
+    /// </summary>
+    SimilarityWeight = 118,
+
     IsFirst = 119, // co_SteuerelementName = 119
     Relationship_to_First = 120, // co_BezugsSpalte = 120
     DefaultRenderer = 121,

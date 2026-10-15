@@ -153,10 +153,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     /// <summary>
     /// Zusätzlicher Abstand (in Pixeln) zwischen den Items — wird in
-    /// CalculateItemPosition zwischen aufeinanderfolgende
-    /// Items eingefügt. Wirkt sich auf alle Appearance-Modi aus, nicht
-    /// nur auf ListBoxAppearance.MiniToolbar. Default ist 0
-    /// (Items liegen bündig aneinander, wie bisher).
+    /// CalculateItemPosition zwischen aufeinanderfolgenden
+    /// Items eingefügt. Default ist 0 (Items liegen bündig aneinander).
     /// </summary>
     [DefaultValue(0)]
     public int ItemPadding {
@@ -318,10 +316,6 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
             case ListBoxAppearance.KontextMenu:
                 ItemDesign = Design.Item_ContextMenu;
-                break;
-
-            case ListBoxAppearance.MiniToolbar:
-                ItemDesign = Design.Item_MiniToolbar;
                 break;
 
             case ListBoxAppearance.ComboBox_Textbox:
@@ -728,7 +722,6 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         ListBoxAppearance.Gallery => (area.Width < 5 ? 200 : Math.Min(200, area.Width), area.Width < 5 ? 200 : Math.Min(200, area.Width)),
         ListBoxAppearance.FileSystem => (110, 110),
         ListBoxAppearance.ButtonList => (64, 80),
-        ListBoxAppearance.MiniToolbar => (IMiniToolbar.IconSize, IMiniToolbar.IconSize),
         _ => CalculateDefaultDimensions(area, biggestX)
     };
 

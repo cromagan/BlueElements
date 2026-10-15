@@ -16,7 +16,6 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Interfaces.MiniToolbarExtension;
 using static BlueTable.Classes.Table;
 
 namespace BlueControls.Controls;
@@ -25,7 +24,7 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(SelectedRowChanged))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslateable, IHasTable, IStyleable, IColumnHeadButtonHost {
+public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IStyleable, IColumnHeadButtonHost {
 
     #region Fields
 
@@ -233,11 +232,12 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
                 // On-demand virtuelle Spalten: Hinzufügen bei Admins, Pin bei angepinnten
                 // Zeilen, Ähnlichkeits-Spalte nur, wenn ein Vergleich Scores geliefert hat.
+                // Pin und Ähnlichkeits-Spalte sind über die Ansicht abschaltbar.
                 var needAdd = tb.IsAdministrator()
                     && (IsAnsicht0(ca) || Ansichtbearbeitung || (tb.Column.Count > 0 && ca.First() is null));
-                var needPin = PinnedRows.Count > 0;
+                var needPin = ca.Pin_anzeigen && PinnedRows.Count > 0;
 
-                ca.ReconcileVirtualColumns(needPin, needAdd, SimilarityColumnItem.HasScores(tb));
+                ca.ReconcileVirtualColumns(needPin, needAdd, ca.Ähnliche_anzeigen && SimilarityColumnItem.HasScores(tb));
             } else if (ca is { IsDisposed: true }) {
                 field = null;
                 return null;
@@ -295,9 +295,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     /// Fixfilter von übergeordneten Elementen (ConnectedFormula), nicht vom Benutzer änderbar.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
-
-    [DefaultValue(false)]
-    public bool MiniToolbarEnabled { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1331,7 +1328,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                 contextMenu.Add(ItemOf("Zeile", true));
 
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Zeile, IContextMenu.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
-                contextMenu.Add(ItemOf("Ähnliche Zeilen", QuickImage.Get(ImageCode.Lupe, IContextMenu.IconSize), ContextMenu_SimilarRows, true, string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, IContextMenu.IconSize), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
@@ -1349,63 +1345,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         return contextMenu;
-    }
-
-    public List<ListItem>? GetMiniToolbarItems(object? hotItem) {
-        List<ListItem> miniToolbar = [];
-
-        if (Table is not { IsDisposed: false } tb) { return miniToolbar; }
-
-        var (column, row, _, _, _) = GetContextData(hotItem);
-
-        #region Pinnen
-
-        if (row is not null) {
-            if (PinnedRows.Contains(row)) {
-                miniToolbar.Add(ItemOf(string.Empty, "Unpin", QuickImage.Get(ImageCode.Pinnadel, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_Unpin, true, "Zeile nicht mehr pinnen"));
-            } else {
-                miniToolbar.Add(ItemOf(string.Empty, "Pin", QuickImage.Get(ImageCode.Pinnadel, IMiniToolbar.IconSize, ImageCode.Häkchen), ContextMenu_Pin, true, "Zeile anpinnen"));
-            }
-        }
-
-        #endregion
-
-        if (!IsAdministrator()) { return miniToolbar; }
-
-        #region Notiz
-
-        if (column is not null && row is not null) {
-            var notenabled = tb.Column.SysCellNote is not null;
-            var existingNote = CellNoteHelper.GetNoteData(column, row);
-            if (existingNote is null) {
-                miniToolbar.Add(ItemOf(string.Empty, "NoteEdit", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, notenabled, "Notiz bearbeiten"));
-            } else {
-                miniToolbar.Add(ItemOf(string.Empty, "NoteRemove", QuickImage.Get(ImageCode.Textdatei, IMiniToolbar.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, notenabled, "Notiz entfernen"));
-            }
-        }
-
-        #endregion
-
-        //#region Zeile löschen
-
-        //if (row is not null) {
-        //    var canDelete = tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true);
-        //    miniToolbar.Add(ItemOf(string.Empty, "DeleteRow", QuickImage.Get(ImageCode.Zeile, IMiniToolbar.IconSize, ImageCode.Kreuz), ContextMenu_DeleteRow, canDelete, "Zeile löschen"));
-        //}
-
-        //#endregion
-
-        #region Ähnliche Zeilen
-
-        if (row is not null) {
-            miniToolbar.Add(ItemOf(string.Empty, "SimilarRows",
-                QuickImage.Get(ImageCode.Lupe, IMiniToolbar.IconSize),
-                ContextMenu_SimilarRows, true, "Ähnliche Zeilen"));
-        }
-
-        #endregion
-
-        return miniToolbar;
     }
 
     public void ImportClipboard() {
@@ -1606,6 +1545,25 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         base.ParseView(view);
 
         CheckView();
+    }
+
+    /// <summary>
+    /// Ähnlichkeits-Suche: vergleicht alle Zeilen mit der Referenzzeile,
+    /// blendet die Score-Spalte ein und sortiert absteigend nach Score.
+    /// </summary>
+    public void SimilarRows(RowItem? referenceRow) {
+        if (Table is not { IsDisposed: false } tb || referenceRow is null) { return; }
+
+        var (scores, cellScores) = RowSimilarity.Scores(tb, referenceRow);
+        SimilarityColumnItem.SetScores(tb, scores, cellScores);
+
+        // Die Score-Spalte wird wie eine normale Spalte sortiert.
+        if (CurrentArrangement?[SimilarityColumnItem.ClassId] is not { IsDisposed: false } scoreColumn) { return; }
+
+        // Bei erneutem Aufruf bleibt die Sortierdefinition gleich, nur die Scores
+        // ändern sich — die alte Definition verwerfen, damit neu sortiert wird.
+        SortDefinitionTemporary = null;
+        SortDefinitionTemporary = new RowSortDefinition(tb, scoreColumn, true);
     }
 
     /// <summary>
@@ -2298,20 +2256,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
     }
 
     /// <summary>
-    /// Zeigt die Mini-Toolbar unter der übergebenen Zelle an.
-    /// </summary>
-    internal void ShowMiniToolbarAt(ColumnViewItem column, TableElement? rowItem, RowItem row) {
-        if (column.Column is not { IsDisposed: false }) { return; }
-
-        var screenOrigin = PointToScreen(Point.Empty);
-        var posX = screenOrigin.X + column.ControlColumnLeft(OffsetX);
-        var posY = screenOrigin.Y + (rowItem?.ControlPosition(Zoom, OffsetX, OffsetY).Bottom ?? 0) + 2;
-
-        this.MiniToolbarShow(new Point(posX, posY),
-             ContextMenuItemGenerate(this, column, column.Column, row, RowsVisibleUnique()));
-    }
-
-    /// <summary>
     /// Schaltet den Auf-/Zuklapp-Zustand eines Kapitel-Headers um.
     /// </summary>
     internal void ToggleChapterExpanded(RowCaptionTableElement rcli) => SetChapterExpanded(rcli, IsChapterCollapsed(rcli));
@@ -2585,7 +2529,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
                     case Keys.Home:
                     case Keys.End:
                         CursorPos_Reset();
-                        HideMiniToolbar();
                         break;
 
                     case Keys.F:
@@ -3610,7 +3553,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
 
         Edit_Close();
         AutoFilter_Close();
-        HideMiniToolbar();
 
         if (Table is not { IsDisposed: false }) { return; }
         FloatingForm.Close(this);
@@ -3795,26 +3737,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         OpenSearchAndReplaceInCells();
     }
 
-    /// <summary>
-    /// Ähnlichkeits-Suche: vergleicht alle Zeilen mit der angeklickten Zeile,
-    /// blendet die Score-Spalte ein und sortiert absteigend nach Score.
-    /// </summary>
-    private void ContextMenu_SimilarRows(object? sender, ContextMenuEventArgs e) {
-        var (_, row, _, _, _) = GetContextData(e.HotItem);
-        if (Table is not { IsDisposed: false } tb || row is null) { return; }
-
-        var (scores, cellScores) = RowSimilarity.Scores(tb, row);
-        SimilarityColumnItem.SetScores(tb, scores, cellScores);
-
-        // Die Score-Spalte wird wie eine normale Spalte sortiert.
-        if (CurrentArrangement?[SimilarityColumnItem.ClassId] is not { IsDisposed: false } scoreColumn) { return; }
-
-        // Bei erneutem Aufruf bleibt die Sortierdefinition gleich, nur die Scores
-        // ändern sich — die alte Definition verwerfen, damit neu sortiert wird.
-        SortDefinitionTemporary = null;
-        SortDefinitionTemporary = new RowSortDefinition(tb, scoreColumn, true);
-    }
-
     private void ContextMenu_SortAZ(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
@@ -3892,10 +3814,6 @@ public partial class TableView : ZoomPad, IContextMenu, IMiniToolbar, ITranslate
         }
 
         CursorPos_Set(newColumn, newRow, true);
-
-        // Die Mini-Toolbar erscheint ausschließlich bei Mausklick auf eine
-        // Zelle. Tastatur-Navigation blendet sie lediglich aus.
-        HideMiniToolbar();
     }
 
     private void DoColumnSortReorder(ColumnViewItem sourceCvi, int insertIndex) {

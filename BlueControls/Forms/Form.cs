@@ -162,7 +162,7 @@ public partial class Form : System.Windows.Forms.Form {
         // WM_ACTIVATEAPP (wParam=false) wird nur gesendet, wenn ein Fenster
         // EINER ANDEREN Anwendung aktiviert wird — nicht bei Fokuswechseln
         // innerhalb der eigenen App (z.B. Klick auf eine FloatingForm wie
-        // AutoFilter, MiniToolbar oder Dropdown). Genau dann müssen die
+        // AutoFilter oder Dropdown). Genau dann müssen die
         // automatisch-schließenden Popups geschlossen werden, da sie über
         // EX_TOPMOST verfügen und sonst über dem verdeckten Programm stehen
         // bleiben. QuickInfo/Notification/Progressbar (ManualOnly) bleiben unberührt.

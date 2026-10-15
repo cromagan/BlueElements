@@ -130,6 +130,8 @@ namespace BlueControls.BlueTableDialogs {
             capMaxTextLength = new Caption();
             txbMinTextLength = new TextBox();
             capMinTextLength = new Caption();
+            txbSimilarityWeight = new TextBox();
+            capSimilarityWeight = new Caption();
             tabSpaltenVerlinkung = new TabPage();
             cbxRelationType = new ComboBox();
             capOtherTable = new Caption();
@@ -1143,6 +1145,8 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(capMaxTextLength);
             tabDatenFormat.Controls.Add(txbMinTextLength);
             tabDatenFormat.Controls.Add(capMinTextLength);
+            tabDatenFormat.Controls.Add(txbSimilarityWeight);
+            tabDatenFormat.Controls.Add(capSimilarityWeight);
             tabDatenFormat.Controls.Add(txbAllowedChars);
             tabDatenFormat.Controls.Add(cbxSort);
             tabDatenFormat.Controls.Add(capSortiermaske);
@@ -1274,6 +1278,24 @@ namespace BlueControls.BlueTableDialogs {
             capMinTextLength.QuickInfo = "Mindestanzahl Zeichen, die in der Zelle stehen müssen.\r\n0 bedeutet: kein Pflichtfeld.\r\nLeer bedeutet, kein String; Zahlenwerte wie z.B. 0 zählen als befüllt.";
             capMinTextLength.Size = new Size(112, 24);
             capMinTextLength.Text = "Min. Text-Länge:";
+            // 
+            // txbSimilarityWeight
+            // 
+            txbSimilarityWeight.Cursor = Cursors.IBeam;
+            txbSimilarityWeight.Location = new Point(840, 40);
+            txbSimilarityWeight.Name = "txbSimilarityWeight";
+            txbSimilarityWeight.RegexCheck = null;
+            txbSimilarityWeight.Size = new Size(96, 24);
+            txbSimilarityWeight.TabIndex = 56;
+            // 
+            // capSimilarityWeight
+            // 
+            capSimilarityWeight.CausesValidation = false;
+            capSimilarityWeight.Location = new Point(656, 40);
+            capSimilarityWeight.Name = "capSimilarityWeight";
+            capSimilarityWeight.QuickInfo = "Wie stark fließt diese Spalte in die Ähnlichkeits-Suche (Ähnliche Zeilen) ein?\r\n0 = Spalte ignorieren, 1 = volles Gewicht. Leer = volles Gewicht.";
+            capSimilarityWeight.Size = new Size(176, 24);
+            capSimilarityWeight.Text = "Gewicht bei Ähnlichkeit:";
             // 
             // tabSpaltenVerlinkung
             // 
@@ -1445,6 +1467,8 @@ namespace BlueControls.BlueTableDialogs {
         private TextBox txbAuswaehlbareWerte;
         private TextBox txbMinTextLength;
         private Caption capMinTextLength;
+        private TextBox txbSimilarityWeight;
+        private Caption capSimilarityWeight;
         private Caption capUserGroupEdit;
         private Caption capTags;
         private ComboBox cbxRandRechts;

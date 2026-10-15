@@ -34,10 +34,7 @@ public class TextListItem : ListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
-        if (style == ListBoxAppearance.MiniToolbar) { return columnWidth; }
-        return UntrimmedCanvasSize(itemdesign).Height;
-    }
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override bool IsClickable() => !IsCaption && base.IsClickable();
 
@@ -48,8 +45,7 @@ public class TextListItem : ListItem {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, tmpd, state, positionControl.ToRect(), null, false);
         }
-        var align = itemdesign == Design.Item_MiniToolbar ? Alignment.Horizontal_Vertical_Center : Alignment.VerticalCenter_Left;
-        Skin.Draw_FormatedText(gr, Text, Symbol, align, positionControl.ToRect(), Skin.GetBlueFont(tmpd, state).Scale(zoom), translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionControl.ToRect(), Skin.GetBlueFont(tmpd, state).Scale(zoom), translate);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, tmpd, state, positionControl.ToRect());
         }

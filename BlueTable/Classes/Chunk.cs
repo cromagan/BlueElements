@@ -273,6 +273,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.ColumnKeyOfLinkedTable, c.ColumnKeyOfLinkedTable, name);
         SaveToByteList(bytes, TableDataType.ColumnAlign, ((int)c.Align).ToString1(), name);
         SaveToByteList(bytes, TableDataType.SortType, ((int)c.SortType).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.SimilarityWeight, c.SimilarityWeight.ToString1_5(), name);
     }
 
     public static void SaveToByteList(List<byte> bytes, RowItem thisRow) {

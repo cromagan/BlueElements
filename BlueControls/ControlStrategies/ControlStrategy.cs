@@ -644,7 +644,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Führt bei Instant-Action-Strategien (IsInstantAction) den
-    /// einfachen Klick auf eine Zelle aus — die Rechte der Spalte werden geprüft.
+    /// einfachen Klick auf eine Zelle aus — mit der regulären
+    /// Bearbeitungsprüfung (Rechte, Zeilensperre) wie bei einer Zellbearbeitung.
     /// Liefert True, wenn der Klick verarbeitet wurde.
     /// </summary>
     /// <param name="source">Das TableView-Control, in dem geklickt wurde.</param>
@@ -652,7 +653,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <param name="row"></param>
     public static bool InstantActionClicked(TableView source, ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false } col || row is not { IsDisposed: false }) { return false; }
-        if (col.Table is not { IsDisposed: false } tb) { return false; }
+        if (col.Table is not { IsDisposed: false }) { return false; }
 
         // Fähigkeitsabfrage über den Prototyp; die konfigurierte Instanz wird frisch erzeugt.
         if (!Cached(col.ControlStrategy).IsInstantAction) { return false; }
@@ -662,8 +663,8 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
         if (strategy is ScriptExecuteControlStrategy scriptExecute) { scriptExecute.OwnerForm = source.FindForm(); }
 
-        if (!tb.PermissionCheck(col.PermissionGroupsChangeCell, row, true)) {
-            TableView.NotEditableInfo("Sie haben nicht die nötigen Rechte, um diese Aktion auszuführen.");
+        if (TableView.IsCellEditable(col, row, row.ChunkValue) is { Length: > 0 } notEditable) {
+            TableView.NotEditableInfo(notEditable);
             return true;
         }
 

@@ -109,6 +109,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _saveContent;
     private ScriptType _scriptType;
     private bool _showValuesOfOtherCellsInDropdown;
+
+    private float _similarityWeight;
+
     private SortierTyp _sortType;
     private ChunkType _value_for_Chunk;
 
@@ -186,6 +189,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _forbiddenChars = string.Empty;
         _autoFilterJoker = string.Empty;
         _saveContent = true;
+        _similarityWeight = 1f;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
         //_CompactView = true;
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -1055,6 +1059,22 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
+    /// Gewicht dieser Spalte bei der Ähnlichkeits-Suche (0–1).
+    /// 0 ignoriert die Spalte, 1 ist volles Gewicht.
+    /// </summary>
+    public float SimilarityWeight {
+        get => _similarityWeight;
+        set {
+            if (IsDisposed) { return; }
+            value = Math.Clamp(value, 0f, 1f);
+            if (_similarityWeight == value) { return; }
+
+            Table?.ChangeData(TableDataType.SimilarityWeight, this, _similarityWeight.ToString1_5(), value.ToString1_5());
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
     /// Art, wie die Spalte sortiert wird.
     /// </summary>
     public SortierTyp SortType {
@@ -1610,6 +1630,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("editalloweddespitelock", _editAllowedDespiteLock);
         json.Set("mintextlength", _minTextLength);
         json.Set("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
+        json.Set("similarityweight", _similarityWeight);
         json.Set("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
         json.Set("aftereditround", _afterEditRound);
         json.Set("aftereditautocorrect", _afterEditAutoCorrect);
@@ -1673,6 +1694,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _minTextLength = json.GetInt("mintextlength", 0);
 
         _showValuesOfOtherCellsInDropdown = json.GetBool("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
+        _similarityWeight = Math.Clamp(json.GetFloat("similarityweight", _similarityWeight), 0f, 1f);
         _afterEditQuickSortRemoveDouble = json.GetBool("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
         _afterEditRound = json.GetInt("aftereditround", _afterEditRound);
         _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
@@ -2403,6 +2425,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.SortType:
                 _sortType = string.IsNullOrEmpty(value) ? SortierTyp.Original_String : (SortierTyp)LongParse(value);
+                break;
+
+            case TableDataType.SimilarityWeight:
+                _similarityWeight = Math.Clamp(FloatParse(value), 0f, 1f);
                 break;
 
             case TableDataType.ColumnAlign:

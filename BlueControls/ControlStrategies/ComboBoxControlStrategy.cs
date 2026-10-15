@@ -50,11 +50,13 @@ public class ComboBoxControlStrategy : ControlStrategy {
     }
 
     /// <summary>
-    /// Die Spalte braucht auswählbare Werte: Dropdown-Items, die Werte der
-    /// anderen Zellen oder eine Beziehung mit Dropdown-Werten.
+    /// Die Spalte braucht auswählbare Werte und darf nicht mehrzeilig sein.
     /// </summary>
-    public override string ErrorReason(bool mayHaveDropDown, bool multiLine) =>
-        mayHaveDropDown ? string.Empty : ColumnErrorConstants.NoDropdownItems;
+    public override string ErrorReason(bool mayHaveDropDown, bool multiLine) {
+        if (!mayHaveDropDown) { return ColumnErrorConstants.NoDropdownItems; }
+        if (multiLine) { return ColumnErrorConstants.NoMultilineAllowed; }
+        return string.Empty;
+    }
 
     public override string ReadableText() => "Textfeld mit Auswahlknopf";
 

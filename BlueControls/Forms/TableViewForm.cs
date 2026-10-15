@@ -484,8 +484,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void Ansicht_ExpandAll(object? sender, ContextMenuEventArgs e) => TableView.ExpandAll();
 
-    private void Ansicht_ToggleMiniToolbar(object? sender, ContextMenuEventArgs e) => TableView.MiniToolbarEnabled = !TableView.MiniToolbarEnabled;
-
     private void Ansicht_ZoomFit(object? sender, ContextMenuEventArgs e) => TableView.Zoom = 1f;
 
     private void Ansicht_ZoomIn(object? sender, ContextMenuEventArgs e) => TableView.DoZoom(true);
@@ -525,13 +523,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             "clipboard",
             QuickImage.Get(_zellenClickInsClipboard ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 14),
             Einstellungen_ToggleClipboard, true, string.Empty));
-
-        //btnAnsichtZoom.ItemAdd(Separator());
-        btnEinstellungen.ItemAdd(ItemOf(
-            " MiniToolbar aktiv",
-            "MiniToolbar",
-            QuickImage.Get(TableView.MiniToolbarEnabled ? ImageCode.CheckBox_Checked : ImageCode.CheckBox, 14),
-            Ansicht_ToggleMiniToolbar, true, string.Empty));
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {

@@ -478,6 +478,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxControlStrategy_TextChanged(cbxControlStrategy, System.EventArgs.Empty);
         btnEditableStandard.SetChecked(() => c.EditableWithTextInput);
         txbMinTextLength.Set(() => c.MinTextLength);
+        txbSimilarityWeight.Set(c.SimilarityWeight.ToString1_5(), () => c.SimilarityWeight);
         btnAutoEditAutoSort.SetChecked(() => c.AfterEditQuickSortRemoveDouble);
         txbRunden.Set(c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty, () => c.AfterEditRound);
         txbFixedColumnWidth.Set(c.FixedColumnWidth > 0 ? c.FixedColumnWidth.ToString1() : string.Empty, () => c.FixedColumnWidth);
@@ -576,6 +577,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.ControlStrategyParameter = _strategyOptions?.ControlStrategyParameter ?? new JsonObject();
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
+        c.SimilarityWeight = txbSimilarityWeight.Text.IsDouble() ? Math.Clamp(FloatParse(txbSimilarityWeight.Text), 0f, 1f) : 1f;
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         c.AllowedChars = txbAllowedChars.Text.DecodeControlChars();

@@ -31,6 +31,14 @@ public class ColorButtonControlStrategy : ControlStrategy {
     /// </summary>
     public override bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) => true;
 
+    /// <summary>
+    /// Die Spalte darf nicht mehrzeilig sein.
+    /// </summary>
+    public override string ErrorReason(bool mayHaveDropDown, bool multiLine) {
+        if (multiLine) { return ColumnErrorConstants.NoMultilineAllowed; }
+        return string.Empty;
+    }
+
     public override string ReadableText() => "Farbauswahl";
 
     public override void SubscribeEvents() => _control?.LostFocus += Control_LostFocus;

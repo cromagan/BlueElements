@@ -8,7 +8,9 @@ namespace BlueTable.ClassesStatic;
 /// Zahlen über den Abstand, Datumsangaben über den Tagesabstand und
 /// einzeilige Texte über die gemeinsamen Zeichen verglichen. Zahlen zählen
 /// 5-fach, mehrzeilige Einträge 3-fach, Datumsangaben 2-fach und Texte
-/// einfach. Die Referenzzeile ist identisch mit sich selbst und erhält
+/// einfach, jeweils multipliziert mit dem Gewicht der Spalte
+/// (ColumnItem.SimilarityWeight). Spalten mit Gewicht 0 werden ignoriert.
+/// Die Referenzzeile ist identisch mit sich selbst und erhält
 /// dadurch 100.
 /// </summary>
 public static class RowSimilarity {
@@ -16,28 +18,35 @@ public static class RowSimilarity {
     #region Methods
 
     /// <summary>
-    /// Similarität zweier Zelleninhalte (0,0–1,0) gemäß dem Format der Spalte.
-    /// Identische Werte erhalten 1,0, bei Groß-/Kleinschreibung
-    /// identische Werte 0,9.
+    /// Similarität zweier Zelleninhalte (0,0–1,0) gemäß dem Format der Spalte,
+    /// Groß-/Kleinschreibung ignoriert. Unterscheiden sich die Werte nur in
+    /// der Groß-/Kleinschreibung, wird das Ergebnis mit 0,9 multipliziert.
     /// </summary>
     public static double CellSimilarity(ColumnItem column, string valueReference, string value) {
         if (valueReference == value) { return 1.0; }
         if (valueReference.Length == 0 || value.Length == 0) { return 0.0; }
-        if (string.Equals(valueReference, value, StringComparison.OrdinalIgnoreCase)) { return 0.9; }
 
-        if (column.MultiLine) { return EntriesSimilarity(valueReference, value); }
+        double sim;
+        if (column.MultiLine) {
+            sim = EntriesSimilarity(valueReference, value);
+        } else {
+            switch (column.SortType) {
+                case SortierTyp.ZahlenwertInt:
+                case SortierTyp.ZahlenwertFloat:
+                    sim = NumberSimilarity(DoubleParse(valueReference), DoubleParse(value));
+                    break;
 
-        switch (column.SortType) {
-            case SortierTyp.ZahlenwertInt:
-            case SortierTyp.ZahlenwertFloat:
-                return NumberSimilarity(DoubleParse(valueReference), DoubleParse(value));
+                case SortierTyp.Datum_Uhrzeit:
+                    sim = DateSimilarity(DateTimeParse(valueReference), DateTimeParse(value));
+                    break;
 
-            case SortierTyp.Datum_Uhrzeit:
-                return DateSimilarity(DateTimeParse(valueReference), DateTimeParse(value));
-
-            default:
-                return TextSimilarity(valueReference, value);
+                default:
+                    sim = TextSimilarity(valueReference, value);
+                    break;
+            }
         }
+
+        return string.Equals(valueReference, value, StringComparison.OrdinalIgnoreCase) ? sim * 0.9 : sim;
     }
 
     /// <summary>
@@ -54,7 +63,8 @@ public static class RowSimilarity {
         foreach (var thisColumn in table.Column) {
             if (thisColumn is { IsDisposed: false } &&
                 !thisColumn.IsSystemColumn() &&
-                !thisColumn.IsFirst) { columns.Add(thisColumn); }
+                !thisColumn.IsFirst &&
+                thisColumn.SimilarityWeight > 0) { columns.Add(thisColumn); }
         }
 
         if (columns.Count == 0) {
@@ -90,23 +100,6 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Ähnlichkeit der Einträge zweier mehrzeiliger Zellen: gemittelte
-    /// beste Übereinstimmung der Einträge in beide Richtungen.
-    /// </summary>
-    private static double AverageBestMatch(List<string> source, List<string> target) {
-        var sum = 0.0;
-        foreach (var thisSource in source) {
-            var best = 0.0;
-            foreach (var thisTarget in target) {
-                var sim = TextSimilarity(thisSource, thisTarget);
-                if (sim > best) { best = sim; }
-            }
-            sum += best;
-        }
-        return sum / source.Count;
-    }
-
-    /// <summary>
     /// Ähnlichkeit zweier Datumswerte: ein Jahr Abstand entspricht 0.
     /// </summary>
     private static double DateSimilarity(DateTime dateReference, DateTime date) {
@@ -117,12 +110,16 @@ public static class RowSimilarity {
     private static List<string> Entries(string cellText) {
         List<string> result = [];
         foreach (var thisEntry in cellText.Split('\r')) {
-            var t = thisEntry.Trim().ToUpperInvariant();
+            var t = thisEntry.Trim();
             if (t.Length > 0) { result.Add(t); }
         }
         return result;
     }
 
+    /// <summary>
+    /// Ähnlichkeit der Einträge zweier mehrzeiliger Zellen per 1:1-Zuordnung;
+    /// fehlende und überzählige Einträge mindern das Ergebnis beidseitig gleich.
+    /// </summary>
     private static double EntriesSimilarity(string valueReference, string value) {
         var entriesReference = Entries(valueReference);
         var entries = Entries(value);
@@ -130,7 +127,35 @@ public static class RowSimilarity {
         if (entriesReference.Count == 0 && entries.Count == 0) { return 1.0; }
         if (entriesReference.Count == 0 || entries.Count == 0) { return 0.0; }
 
-        return (AverageBestMatch(entriesReference, entries) + AverageBestMatch(entries, entriesReference)) / 2.0;
+        var matchedReference = new bool[entriesReference.Count];
+        var matched = new bool[entries.Count];
+        var sum = 0.0;
+
+        for (var round = 0; round < Math.Min(entriesReference.Count, entries.Count); round++) {
+            var bestSim = 0.0;
+            var bestReferenceIndex = -1;
+            var bestIndex = -1;
+            for (var r = 0; r < entriesReference.Count; r++) {
+                if (matchedReference[r]) { continue; }
+                for (var i = 0; i < entries.Count; i++) {
+                    if (matched[i]) { continue; }
+                    var sim = TextSimilarity(entriesReference[r], entries[i]);
+                    if (sim > bestSim) {
+                        bestSim = sim;
+                        bestReferenceIndex = r;
+                        bestIndex = i;
+                    }
+                }
+            }
+
+            if (bestReferenceIndex < 0) { break; }
+
+            matchedReference[bestReferenceIndex] = true;
+            matched[bestIndex] = true;
+            sum += bestSim;
+        }
+
+        return 2.0 * sum / (entriesReference.Count + entries.Count);
     }
 
     /// <summary>
@@ -142,8 +167,8 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Ähnlichkeit zweier einzeiliger Texte: Anteil der gemeinsamen Zeichen
-    /// an der Gesamtlänge (Dice-Koeffizient), Groß-/Kleinschreibung ignoriert.
+    /// Ähnlichkeit zweier Texte: Anteil der gemeinsamen Zeichen an der
+    /// Gesamtlänge (Dice-Koeffizient), Groß-/Kleinschreibung wird ignoriert.
     /// </summary>
     private static double TextSimilarity(string valueReference, string value) {
         var upperReference = valueReference.ToUpperInvariant();
@@ -151,6 +176,8 @@ public static class RowSimilarity {
 
         if (upperReference.Length == 0 && upperValue.Length == 0) { return 1.0; }
         if (upperReference.Length == 0 || upperValue.Length == 0) { return 0.0; }
+
+        if (upperReference == upperValue) { return 1.0; }
 
         var charsReference = upperReference.ToCharArray();
         var charsValue = upperValue.ToCharArray();
@@ -176,22 +203,25 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Gewicht der Spalte im Gesamtscore: Zahlen 5, mehrzeilige Einträge 3,
-    /// Datum 2, Text 1.
+    /// Gewicht der Spalte im Gesamtscore: das Spalten-Gewicht
+    /// (ColumnItem.SimilarityWeight) multipliziert mit dem Format-Faktor
+    /// (Zahlen 5, mehrzeilige Einträge 3, Datum 2, Text 1).
     /// </summary>
     private static double Weight(ColumnItem column) {
-        if (column.MultiLine) { return 3.0; }
+        var w = column.SimilarityWeight;
+
+        if (column.MultiLine) { return 3.0 * w; }
 
         switch (column.SortType) {
             case SortierTyp.ZahlenwertInt:
             case SortierTyp.ZahlenwertFloat:
-                return 5.0;
+                return 5.0 * w;
 
             case SortierTyp.Datum_Uhrzeit:
-                return 2.0;
+                return 2.0 * w;
 
             default:
-                return 1.0;
+                return w;
         }
     }
 

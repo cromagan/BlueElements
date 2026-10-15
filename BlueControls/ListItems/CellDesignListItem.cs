@@ -49,17 +49,11 @@ public class CellDesignListItem : ListItem {
     }
 
     protected override string GetCompareKey() {
-        // Die Hauptklasse fragt nach diesem Compare-Key
-        //if (_cellRenderer is null) {
-        //    // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
-        //    return string.Empty;
-        //}
-        // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
-        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _translate);
-        // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
-        var compareKey = txt.CompareKey(_sortType);
-        // Rückgabe des Compare-Keys mit dem internen Wert
-        return $"{compareKey}|{KeyName}";
+        // Bei Zahlenwerten den Rohwert nutzen, die Anzeige-Formatierung (z. B. 1.000) zerstört das Parsen.
+        var txt = _sortType is SortierTyp.ZahlenwertInt or SortierTyp.ZahlenwertFloat
+            ? KeyName
+            : _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _translate);
+        return $"{txt.CompareKey(_sortType)}|{KeyName}";
     }
 
     #endregion

@@ -39,6 +39,22 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
     #region Properties
 
     /// <summary>
+    /// Ähnlichkeits-Spalte und Ähnlich-Button der Ähnlichen-Zeilen-Suche anzeigen.
+    /// </summary>
+    public bool Ähnliche_anzeigen {
+        get => _cvc?.Ähnliche_anzeigen ?? true;
+        set { if (_cvc is { } cvc) { cvc.Ähnliche_anzeigen = value; WriteBack(); } }
+    }
+
+    /// <summary>
+    /// Ansichten-Button (gespeicherte Ansichten) in der Filterleiste anzeigen.
+    /// </summary>
+    public bool Ansicht_anzeigen {
+        get => _cvc?.Ansicht_anzeigen ?? true;
+        set { if (_cvc is { } cvc) { cvc.Ansicht_anzeigen = value; WriteBack(); } }
+    }
+
+    /// <summary>
     /// Skripte, die der Benutzer über diese Ansicht starten darf.
     /// </summary>
     public ReadOnlyCollection<string> Ausführbare_Skripte {
@@ -61,6 +77,14 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
     public bool ChaptersUnique {
         get => _cvc?.ChaptersUnique ?? true;
         set { if (_cvc is { } cvc) { cvc.ChaptersUnique = value; WriteBack(); } }
+    }
+
+    /// <summary>
+    /// Kapitel-Button (alle Kapitel auf-/zuklappen) in der Filterleiste anzeigen.
+    /// </summary>
+    public bool CollapseButton_anzeigen {
+        get => _cvc?.CollapseButton_anzeigen ?? true;
+        set { if (_cvc is { } cvc) { cvc.CollapseButton_anzeigen = value; WriteBack(); } }
     }
 
     /// <summary>
@@ -112,6 +136,14 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => _cvc?.PermissionGroups_Show ?? _emptyStrings;
         set { if (_cvc is { } cvc) { cvc.PermissionGroups_Show = value; WriteBack(); } }
+    }
+
+    /// <summary>
+    /// Pin-Spalte und Pin-Buttons in der Filterleiste anzeigen.
+    /// </summary>
+    public bool Pin_anzeigen {
+        get => _cvc?.Pin_anzeigen ?? true;
+        set { if (_cvc is { } cvc) { cvc.Pin_anzeigen = value; WriteBack(); } }
     }
 
     /// <summary>
@@ -207,6 +239,10 @@ public sealed class ColumnArrangementEditor : IIsEditor, ISimpleEditor, IHasQuic
             new FlexiControlForProperty<string>(() => ChapterColumn, chapterColumns),
             new FlexiControlForProperty<bool>(() => ChaptersUnique),
             new FlexiControlForProperty<bool>(() => StartCollapsed),
+            new FlexiControlForProperty<bool>(() => CollapseButton_anzeigen, "Kapitel-Button anzeigen"),
+            new FlexiControlForProperty<bool>(() => Pin_anzeigen, "Pin anzeigen"),
+            new FlexiControlForProperty<bool>(() => Ansicht_anzeigen, "Ansichten-Button anzeigen"),
+            new FlexiControlForProperty<bool>(() => Ähnliche_anzeigen, "Ähnliche anzeigen"),
             new FlexiControlForProperty<string>(() => QuickInfo, 3),
             filterCtrl,
             scriptCtrl,

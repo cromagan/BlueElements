@@ -4,6 +4,7 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.TableElements;
+using BlueTable.Classes;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
@@ -23,6 +24,16 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private bool _scriptButtonsCorrect;
 
     private Table? _subscribedTable;
+
+    /// <summary>
+    /// Referenzzeile der aktiven Ähnlichkeits-Suche (für das Speichern in Ansichten).
+    /// </summary>
+    private RowItem? _similarityReferenceRow;
+
+    /// <summary>
+    /// Noch nicht wiederhergestellter Referenzzeilen-Key aus einer geladenen Ansicht.
+    /// </summary>
+    private string? _similarityLoadKey;
 
     #endregion
 
@@ -178,12 +189,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             Invalidate();
         }
     } = GroupBoxStyle.Nothing;
-
-    [DefaultValue(false)]
-    public bool MiniToolbarEnabled {
-        get => TableInternal.MiniToolbarEnabled;
-        set => TableInternal.MiniToolbarEnabled = value;
-    }
 
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
@@ -443,6 +448,29 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Filter.Clear();
     }
 
+    private void btnÄhnlich_Click(object? sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+
+        if (btnÄhnlich.Checked) {
+            _similarityReferenceRow = TableInternal.CursorPosRow?.Row;
+            TableInternal.SimilarRows(_similarityReferenceRow);
+            if (!SimilarityColumnItem.HasScores(Table)) {
+                // Keine Referenzzeile gewählt: Aktivierung zurücknehmen.
+                _similarityReferenceRow = null;
+                btnÄhnlich.Checked = false;
+            }
+        } else {
+            // Ähnlichkeits-Suche beenden: Scores verwerfen,
+            // Score-Spalte ausblenden und Sortierung zurücksetzen.
+            _similarityReferenceRow = null;
+            SimilarityColumnItem.Reset();
+            SortDefinitionTemporary = null;
+            TableInternal.InvalidateCurrentArrangement();
+        }
+
+        Invalidate_Controls();
+    }
+
     private void btnCollapseChapters_Click(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         TableInternal.ToggleAllChapters();
@@ -529,6 +557,25 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         btnAlleFilterAus.Enabled = hasTB;
         btnCollapseChapters.Enabled = hasTB && CurrentArrangement?.ColumnForChapter is { IsDisposed: false };
         btnViewManager.Enabled = Table is TableFile { IsDisposed: false };
+
+        // Status des Ähnlich-Buttons: Aktiv, solange Scores vorliegen;
+        // ohne aktive Suche braucht er eine markierte Referenzzeile.
+        var similarityActive = SimilarityColumnItem.HasScores(Table);
+
+        // Gespeicherte Ähnlichkeits-Suche aus geladener Ansicht wiederherstellen,
+        // sobald die Ansicht (inkl. Arrangement) vollständig aufgebaut ist.
+        if (!similarityActive && _similarityLoadKey is { Length: > 0 } loadKey && Table is { IsDisposed: false } tbi) {
+            _similarityLoadKey = null;
+            if (tbi.Row.GetByKey(loadKey) is { IsDisposed: false } refRow) {
+                _similarityReferenceRow = refRow;
+                TableInternal.SimilarRows(refRow);
+                similarityActive = SimilarityColumnItem.HasScores(Table);
+            }
+        }
+
+        btnÄhnlich.Checked = similarityActive;
+        btnÄhnlich.QuickInfo = similarityActive ? "Ähnlichkeits-Suche beenden" : "Ähnliche Zeilen zur markierten Zeile suchen";
+        btnÄhnlich.Enabled = hasTB && (similarityActive || TableInternal.CursorPosRow?.Row is { IsDisposed: false });
 
         // Text im ZeilenFilter aktualisieren
         if (hasTB && TableInternal.Filter.IsRowFilterActiv()) {
@@ -958,16 +1005,26 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             btnCollapseChapters.Top = firstRowY;
             btnViewManager.Top = firstRowY;
 
-            // Button-Kette dynamisch aufbauen. Pin-Buttons sind immer sichtbar.
-            // Der Kapitel-Button nur bei Kapitel-Spalte.
-            btnPin.Visible = true;
-            btnPinZurück.Visible = true;
+            // Button-Kette dynamisch aufbauen. Pin-, Ähnlich- und
+            // Ansichten-Button sind über die Ansicht ("Sichtbare Elemente")
+            // abschaltbar. Der Kapitel-Button nur bei Kapitel-Spalte und wenn
+            // er nicht über die Ansicht ausgeblendet wurde.
+            var showPin = cu?.Pin_anzeigen ?? true;
+            btnPin.Visible = showPin;
+            btnPinZurück.Visible = showPin;
             btnPin.Left = btnAlleFilterAus.Right + 8;
             btnPinZurück.Left = btnPin.Right;
 
-            var nextLeft = btnPinZurück.Right;
+            var nextLeft = showPin ? btnPinZurück.Right : btnAlleFilterAus.Right;
 
-            if (cu?.ColumnForChapter is { IsDisposed: false }) {
+            var showÄhnlich = cu?.Ähnliche_anzeigen ?? true;
+            btnÄhnlich.Visible = showÄhnlich;
+            if (showÄhnlich) {
+                btnÄhnlich.Left = nextLeft + 8;
+                nextLeft = btnÄhnlich.Right;
+            }
+
+            if (cu?.ColumnForChapter is { IsDisposed: false } && (cu?.CollapseButton_anzeigen ?? true)) {
                 btnCollapseChapters.Left = nextLeft + 8;
                 btnCollapseChapters.Visible = true;
                 nextLeft = btnCollapseChapters.Right;
@@ -975,7 +1032,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 btnCollapseChapters.Visible = false;
             }
 
-            btnViewManager.Left = nextLeft + 8;
+            var showAnsicht = cu?.Ansicht_anzeigen ?? true;
+            btnViewManager.Visible = showAnsicht;
+            if (showAnsicht) {
+                btnViewManager.Left = nextLeft + 8;
+            }
 
             grpFilter.Left = left;
             grpFilter.Top = tableTop;
@@ -1024,7 +1085,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void TableInternal_SelectedCellChanged(object? sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
 
-    private void TableInternal_SelectedRowChanged(object? sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
+    private void TableInternal_SelectedRowChanged(object? sender, RowNullableEventArgs e) {
+        // Zeilenwechsel kann den Ähnlich-Button aktivieren/deaktivieren.
+        Invalidate_Controls();
+        OnSelectedRowChanged(e);
+    }
 
     private void TableInternal_TableChanged(object? sender, System.EventArgs e) {
         // Loaded- und InvalidateView-Events der jeweiligen Table weiterleiten.
@@ -1067,6 +1132,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             FilterFix.ChangeTo(temp);
         }
 
+        // Gespeicherte Ähnlichkeits-Suche merken; die Wiederherstellung erfolgt
+        // erst nach vollständigem Aufbau der Ansicht (siehe CheckButtons).
+        _similarityLoadKey = e.JsonData?.GetString("SimilarityRow") is { Length: > 0 } k ? k : null;
+
         OnViewLoading(e);
     }
 
@@ -1074,6 +1143,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         // Eigenen Fixfilter speichern (nicht den kombinierten TableInternal.FilterFix).
         if (FilterFix is { IsDisposed: false } ff && ff.Count > 0) {
             e.JsonData.Add("Filter", ff.ParseableItems().FinishParseable());
+        }
+
+        // Aktive Ähnlichkeits-Suche inkl. Referenzzeile speichern.
+        if (SimilarityColumnItem.HasScores(Table) && _similarityReferenceRow is { IsDisposed: false } refRow) {
+            e.JsonData.Add("SimilarityRow", refRow.KeyName);
         }
 
         OnViewSaving(e);

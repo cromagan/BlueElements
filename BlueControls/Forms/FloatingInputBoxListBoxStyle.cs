@@ -13,23 +13,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private FloatingInputBoxListBoxStyle(List<ListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<ListItem>? customContextMenuItems, object? hotItem) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
 
-        // Mini-Toolbar: weniger Innenabstand als andere Menüs, damit die
-        // Icons bündig mit der Zelle abschließen und das Fenster weniger
-        // "protzig" wirkt. Das Position-Offset (Skin.PaddingSmal) entfällt
-        // ebenfalls, damit die Toolbar exakt an der übergebenen Position
-        // (Spaltenrand) erscheint.
-        // Anchor wird auf Top|Left gesetzt, weil die lstbx sonst durch den
-        // Wechsel von Location=(8,8) auf (2,2) ohne gleichzeitige Size-
-        // Anpassung eine viel zu kleine Fläche erhält (Anker hält den
-        // ursprünglichen Randabstand von 14 px bei). Die Größe wird in
-        // Generate_ListBox1 explizit zugewiesen.
-        if (controlDesign == ListBoxAppearance.MiniToolbar) {
-            lstbx.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            lstbx.Location = new Point(Skin.PaddingSmal, Skin.PaddingSmal);
-        } else {
-            xpos -= Skin.PaddingSmal;
-            ypos -= Skin.PaddingSmal;
-        }
+        xpos -= Skin.PaddingSmal;
+        ypos -= Skin.PaddingSmal;
 
         Generate_ListBox1(items, checkBehavior, check, steuerWi, addAllowed, moveAllowed, itemEditAllowed, translate, controlDesign, itemDesign, autosort, removeAllowed, customContextMenuItems);
 
@@ -114,13 +99,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(List<ListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
             translate, controlDesign, itemDesign, autosort, removeAllowed, addAllowed, moveAllowed, false, null, null);
 
-    /// <summary>
-    /// Zeigt eine Mini-Toolbar an der übergebenen Bildschirm-Position.
-    /// Wird von IMiniToolbar.MiniToolbarShow verwendet.
-    /// </summary>
-    public static FloatingInputBoxListBoxStyle ShowAtPosition(List<ListItem> items, Point screenPosition, Control? connectedControl, object? hotItem) => new(items, CheckBehavior.NoSelection, null, screenPosition.X, screenPosition.Y, -1, connectedControl,
-            false, ListBoxAppearance.MiniToolbar, Design.Item_MiniToolbar, false, false, AddType.None, false, false, null, hotItem);
-
     public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<ListItem> items, string? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, ReadOnlyCollection<ListItem>? customContextMenuItems) => new(items, check is null ? CheckBehavior.NoSelection : CheckBehavior.SingleSelection, check is null ? null : [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, AddType.None, false, false, customContextMenuItems, null);
 
     public static FloatingInputBoxListBoxStyle ShowComboBoxDropDown(List<ListItem> items, string? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, bool autosort, bool removeAllowed, AddType addAllowed, bool moveAllowed, bool itemEditAllowed, ReadOnlyCollection<ListItem>? customContextMenuItems) => new(items, check is null ? CheckBehavior.NoSelection : CheckBehavior.SingleSelection, check is null ? null : [check], xpos, ypos, steuerWi, connectedControl, translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, autosort, removeAllowed, addAllowed, moveAllowed, itemEditAllowed, customContextMenuItems, null);
@@ -128,19 +106,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public void Generate_ListBox1(List<ListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool moveAllowed, bool itemEditAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<ListItem>? customContextMenuItems) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 26; }
-
-        // MiniToolbar: horizontales Layout — Breite = Summe aller Item-Breiten.
-        // ItemPadding erzeugt den gewünschten Abstand zwischen den Icons
-        // (Skin.PaddingSmal), ohne dass dafür zusätzliche Platzhalter-Items
-        // oder eigene Zeichnungsroutinen nötig sind.
-        var pad = 0;
-        if (controlDesign == ListBoxAppearance.MiniToolbar) {
-            pad = Skin.PaddingSmal;
-            var itemSize = IMiniToolbar.IconSize;
-            var visibleCount = items.Count;
-            biggestItemX = Math.Max(biggestItemX, visibleCount * itemSize + Math.Max(0, visibleCount - 1) * pad);
-            heightAdded = itemSize;
-        }
 
         lstbx.Appearance = controlDesign;
         lstbx.Translate = translate;
@@ -150,16 +115,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         lstbx.MoveAllowed = moveAllowed;
         lstbx.ItemEditAllowed = itemEditAllowed;
         lstbx.CustomContextMenuItems = customContextMenuItems;
-        lstbx.ItemPadding = pad;
 
         AdjustFormSize(biggestItemX, heightAdded, minWidth);
-
-        // MiniToolbar: lstbx hat Anchor=Top|Left (siehe Konstruktor) und wird
-        // daher nicht automatisch an die Form-Größe angepasst. Size explizit
-        // setzen, damit die Icons den vollen Innenbereich ausfüllen.
-        if (controlDesign == ListBoxAppearance.MiniToolbar) {
-            lstbx.Size = new Size(Size.Width - (lstbx.Left * 2), Size.Height - (lstbx.Top * 2));
-        }
 
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
         lstbx.ItemAddRange(items);
@@ -248,14 +205,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private void RecalcFormSize() {
         var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
         if (lstbx.AddAllowed != AddType.None) { heightAdded += 26; }
-        if (lstbx.Appearance != ListBoxAppearance.MiniToolbar) {
-            var visibleCount = lstbx.Items.Count;
-            heightAdded += Math.Max(0, visibleCount - 1) * lstbx.ItemPadding;
-        }
+        var visibleCount = lstbx.Items.Count;
+        heightAdded += Math.Max(0, visibleCount - 1) * lstbx.ItemPadding;
         AdjustFormSize(biggestItemX, heightAdded, Width - (lstbx.Left * 2));
-        if (lstbx.Appearance == ListBoxAppearance.MiniToolbar) {
-            lstbx.Size = new Size(Size.Width - (lstbx.Left * 2), Size.Height - (lstbx.Top * 2));
-        }
     }
 
     #endregion
