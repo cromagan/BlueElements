@@ -1315,8 +1315,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     }
 
                     contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
-                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
-                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt anzeigen", ImageCode.Lupe, ContextMenu_ShowAll, tb.IsAdministrator()));
                     contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, IContextMenu.IconSize), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
                     contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
                 }
@@ -3627,33 +3626,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenü");
     }
 
-    private void ContextMenu_CopyAll(object? sender, ContextMenuEventArgs e) {
+    private void ContextMenu_ShowAll(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
-        if (CopytoClipboard(txt)) {
-            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
-        } else {
-            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
-        }
-    }
 
-    private void ContextMenu_CopyAllSorted(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _, _) = GetContextData(e.HotItem);
-        if (column is null) { return; }
-
-        var txt = Export_CSV(FirstRow.Without, column);
-        txt = txt.Replace("|", "\r\n");
-        txt = txt.Replace(";", string.Empty);
-        var l = string.Join('\r', txt.SplitAndCutByCr().SortedDistinctList());
-        if (CopytoClipboard(l)) {
-            QuickNote.Show(NoteSymbols.Ok, "In Zwischenablage");
-        } else {
-            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
-        }
+        var tv = new Forms.TextView(txt, column.Caption);
+        tv.Show();
     }
 
     private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
@@ -3759,7 +3741,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column.MultiLine) {
             split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
         }
-        column.Statistik(_rowsVisibleUnique, !split);
+
+        var txt = column.Statistik(_rowsVisibleUnique, !split);
+        if (string.IsNullOrEmpty(txt)) { return; }
+
+        var tv = new Forms.TextView(txt, "Statistik");
+        tv.Show();
     }
 
     private void ContextMenu_Sum(object? sender, ContextMenuEventArgs e) {

@@ -1,7 +1,5 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using static BlueBasics.ClassesStatic.IO;
-
 namespace BlueControls.BlueTableDialogs;
 
 internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow {
@@ -109,7 +107,8 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
             }
         }
 
-        txt.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+        var tv = new TextView(string.Join("\r\n", txt), "Skript-Suche");
+        tv.Show();
         _isWorking = false;
     }
 

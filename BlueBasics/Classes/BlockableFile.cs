@@ -929,6 +929,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
             var retries = 0;
             do {
                 var fileInfo1 = GetFileInfo(Filename, false, 0.1f);
+                if (fileInfo1 is null) { return ([], null, false); }
 
                 var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
                 var fileInfo2 = GetFileInfo(Filename, false, 2f);

@@ -370,7 +370,11 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         dropDown?.ItemClicked += ScriptEditorDropDown_ItemClicked;
     }
 
-    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
+    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+
+        IUniqueWindowExtension.ShowOrCreate<ColumnOverview>(tb);
+    }
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
 

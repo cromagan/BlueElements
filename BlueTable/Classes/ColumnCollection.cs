@@ -1,11 +1,9 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueBasics.Formats;
 using BlueTable.EventArgs;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading;
-using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
@@ -183,50 +181,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 GenerateAndAddSystem(thisstring);
             }
         }
-    }
-
-    public void GenerateOverView() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        var da = new Html(tb.KeyName);
-        da.AddCaption("Spaltenliste von: " + tb.Caption);
-        da.Add("  <Font face=\"Arial\" Size=\"4\">" + tb.KeyName + "</h1><br>");
-        da.TableBeginn();
-        da.RowBeginn();
-        da.CellAdd("#");
-        da.CellAdd("Name");
-        da.CellAdd("Beschriftung");
-        da.CellAdd("Überschriften");
-        da.CellAdd("Datenformat");
-        da.CellAdd("Quickinfo");
-        da.CellAdd("Admin-Info");
-        da.CellAdd("Tags");
-        da.CellAdd("Änderungs-Rechte");
-        da.RowEnd();
-        var lfdn = 0;
-        foreach (var thisColumnItem in this) {
-            if (thisColumnItem is not null) {
-                lfdn++;
-                da.RowBeginn();
-                da.CellAdd(lfdn.ToString1());
-                da.CellAdd(thisColumnItem.KeyName);
-                da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
-                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd('/'));
-                var name = string.Empty;
-                foreach (var thisFormat in Format.AllFormats.Instances) {
-                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.KeyName; }
-                }
-                da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");
-                da.CellAdd(thisColumnItem.QuickInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(string.Join("<br>", thisColumnItem.ColumnTags));
-                da.CellAdd(string.Join("<br>", thisColumnItem.PermissionGroupsChangeCell));
-                da.RowEnd();
-            }
-        }
-
-        da.TableEnd();
-        da.AddFoot();
-        da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();

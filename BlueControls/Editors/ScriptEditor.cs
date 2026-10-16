@@ -151,6 +151,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public List<ListItem>? GetContextMenuItems(object? hotItem) {
         List<ListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
+            contextMenu.Add(ItemOf("Variableninhalt anzeigen", ImageCode.Lupe, Contextmenu_ShowVariableContent, true));
             contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true));
         }
         return contextMenu;
@@ -432,6 +433,13 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedSets.Count > 0);
         dropDown.ItemRemoved += VariablesManagerDropDown_ItemRemoved;
+    }
+
+    private void Contextmenu_ShowVariableContent(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not string content) { return; }
+
+        var tv = new TextView(content, "Variableninhalt");
+        tv.Show();
     }
 
     private void Contextmenu_CopyVariableContent(object? sender, ContextMenuEventArgs e) {

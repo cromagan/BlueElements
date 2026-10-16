@@ -5,10 +5,8 @@ using BlueTable.ColumnFormats;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using static BlueBasics.ClassesStatic.IO;
 using static BlueTable.Classes.ColumnErrorConstants;
 using static BlueTable.Classes.Table;
 using Formats = BlueBasics.Classes.Formats;
@@ -2033,10 +2031,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return true;
     }
 
-    public void Statistik(ICollection<RowItem> rows, bool ignoreMultiLine) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+    /// <summary>
+    /// Erstellt einen Statistikbericht der vorkommenden Werte dieser Spalte,
+    /// absteigend sortiert nach Häufigkeit.
+    /// </summary>
+    public string Statistik(ICollection<RowItem> rows, bool ignoreMultiLine) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return string.Empty; }
 
-        if (rows.Count < 1) { return; }
+        if (rows.Count < 1) { return string.Empty; }
 
         var d = new Dictionary<string, int>();
 
@@ -2086,7 +2088,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             l.Add(maxCount + " - " + keyValue);
         } while (d.Count > 0);
 
-        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
+        return string.Join("\r\n", l);
     }
 
     public double? Summe(FilterCollection fc) => Summe(fc.Rows);

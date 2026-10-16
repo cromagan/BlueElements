@@ -604,7 +604,11 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         Table.BeSureToBeUpToDate([.. Table.AllInstances()]);
     }
 
-    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
+    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) {
+        if (TableView.Table is not { IsDisposed: false } tb) { return; }
+
+        IUniqueWindowExtension.ShowOrCreate<ColumnOverview>(tb);
+    }
 
     private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
         if (!IsAdministrator()) { return; }
