@@ -467,15 +467,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     /// Zentrale Invalidierung des Zeilenstatus. Mit ChangeFlags.LogUndo läuft der Schreibzugriff durch die
     /// Änderungs-Pipeline, ansonsten wird nur im Speicher gesetzt (Automatik während laufender Zelländerungen).
-    /// SysRowChanger und SysRowChangeDate werden als Paar mit dem ausführenden Benutzer und dem Zeitstempel gesetzt.
+    /// SysRowChanger und SysRowChangeDate werden als Paar mit dem übergebenen Benutzer und dem Zeitstempel gesetzt.
     /// Schlüsselspalten und zeilenweite Invalidierung erzwingen die Neuinitialisierung (leerer Status),
-    /// Änderungen in Skript-Spalten nur die Neuberechnung.
+    /// Änderungen in Skript-Spalten nur die Neuberechnung. Meldungen erscheinen nur bei LogUndo.
     /// </summary>
     /// <param name="sourceColumn">Spalte, die die Invalidierung auslöst; null bei zeilenweiter Invalidierung.</param>
     /// <param name="comment">Grund der Invalidierung für Log/Meldungen.</param>
     /// <param name="datetimeutc">Zeitstempel für die Änderungs-Spalte.</param>
+    /// <param name="user">Benutzer, der als Änderer gestempelt wird; bei Nachladungen der Original-Autor.</param>
     /// <param name="changeFlags">LogUndo = geloggt über die Änderungs-Pipeline, ansonsten nur im Speicher.</param>
-    public void InvalidateRowState(ColumnItem? sourceColumn, string comment, DateTime datetimeutc, ChangeFlags changeFlags) {
+    public void InvalidateRowState(ColumnItem? sourceColumn, string comment, DateTime datetimeutc, string user, ChangeFlags changeFlags) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return; }
@@ -498,7 +499,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // Frisch erstellte, bereits invalidierte Zeile nicht erneut stempeln
         var currentState = CellGetStringCore(srs);
         if (string.IsNullOrEmpty(currentState)) {
-            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
+            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
             return;
         }
 
@@ -507,17 +508,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         // Eine bereits komplett invalidierte Zeile nicht auf "nur Neuberechnung" herunterstufen
         if (newState == currentState) {
-            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
+            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
             return;
         }
 
         if (changeFlags.HasFlag(ChangeFlags.LogUndo)) {
             var writeReason = ChangeFlags.UserCommand | ChangeFlags.IgnoreSystemColumns;
-            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSet(src, UserName, comment, writeReason); }
+            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSet(src, user, comment, writeReason); }
             CellSet(srs, newState, comment, writeReason);
             CellSet(scd, datetimeutc, comment, writeReason);
         } else {
-            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, UserName); }
+            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, user); }
             CellSetInMemory(srs, newState);
             CellSetInMemory(scd, datetimeutc.ToString5());
         }
@@ -525,7 +526,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // Erst stempeln, dann einreihen — der Manager prüft den Status über NeedsRowUpdate()
         RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
+        if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
     }
 
     string IEditable.IsNowEditable() {
@@ -1110,7 +1111,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
         if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
 
-        InvalidateRowState(column, "Automatische Invalidierung nach Zelländerung", datetimeutc, ChangeFlags.None);
+        // user durchreichen: Bei nachgeladenen Fragmenten ist das der Original-Autor,
+        // nicht der lokale Benutzer. Sonst würde der Stempel den Autor überschreiben.
+        InvalidateRowState(column, "Automatische Invalidierung nach Zelländerung", datetimeutc, user, ChangeFlags.None);
     }
 
     internal bool IsMyRow(double maxminutes, bool mastertoo) {

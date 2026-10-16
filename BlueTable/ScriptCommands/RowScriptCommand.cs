@@ -109,7 +109,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
                 var f = Table.IsCellEditable(srs, r, fic.ChunkVal, false);
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
-                r.InvalidateRowState(null, coment, DateTime.UtcNow, ChangeFlags.LogUndo);
+                r.InvalidateRowState(null, coment, DateTime.UtcNow, UserName, ChangeFlags.LogUndo);
             } else {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }

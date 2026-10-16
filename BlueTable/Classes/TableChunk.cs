@@ -1062,7 +1062,8 @@ public class TableChunk : TableFile {
         var creator = ExtractUserNameFromFileName(newestFile);
         var creatorHash = ExtractMachineInstanceHashFromFileName(newestFile);
         var creatorDisplay = string.IsNullOrEmpty(creatorHash) ? creator : $"{creator} - {creatorHash}";
-        return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(fileDate.Value).TotalSeconds:0} Sekunden von '{creatorDisplay}' bearbeitet";
+        var lockUntil = fileDate.Value.AddSeconds(EditLockSeconds).ToLocalTime();
+        return $"Der Chunk '{chunkId}' wird bis {lockUntil:HH:mm} Uhr von '{creatorDisplay}' bearbeitet";
     }
 
     /// <summary>

@@ -1782,7 +1782,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             ScriptEndedFeedback? fb;
             if (generic) {
-                rows[0].InvalidateRowState(null, $"TableView, Kontextmenü, {info}", DateTime.UtcNow, ChangeFlags.LogUndo);
+                rows[0].InvalidateRowState(null, $"TableView, Kontextmenü, {info}", DateTime.UtcNow, UserName, ChangeFlags.LogUndo);
                 fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
             } else {
                 fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
@@ -3630,11 +3630,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, _, _, _, _) = GetContextData(e.HotItem);
         if (column is null) { return; }
 
-        var txt = Export_CSV(FirstRow.Without, column);
-        txt = txt.Replace("|", "\r\n");
-        txt = txt.Replace(";", string.Empty);
+        var sb = new StringBuilder();
+        foreach (var t in column.Contents()) {
+            sb.AppendLine((column.TextFormatingAllowed ? t.HtmlToPlain() : t).Replace("|", "\r\n"));
+        }
 
-        var tv = new Forms.TextView(txt, column.Caption);
+        var tv = new Forms.TextView(sb.ToString(), column.Caption);
         tv.Show();
     }
 
