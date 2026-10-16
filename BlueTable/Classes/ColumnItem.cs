@@ -1064,7 +1064,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         get => _similarityWeight;
         set {
             if (IsDisposed) { return; }
-            value = Math.Clamp(value, 0f, 1f);
+            value = Math.Clamp(value, 0f, 2f);
             if (_similarityWeight == value) { return; }
 
             Table?.ChangeData(TableDataType.SimilarityWeight, this, _similarityWeight.ToString1_5(), value.ToString1_5());
@@ -1692,7 +1692,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _minTextLength = json.GetInt("mintextlength", 0);
 
         _showValuesOfOtherCellsInDropdown = json.GetBool("showvaluesofothercellsindropdown", _showValuesOfOtherCellsInDropdown);
-        _similarityWeight = Math.Clamp(json.GetFloat("similarityweight", _similarityWeight), 0f, 1f);
+        _similarityWeight = Math.Clamp(json.GetFloat("similarityweight", _similarityWeight), 0f, 2f);
         _afterEditQuickSortRemoveDouble = json.GetBool("aftereditquicksortremovedouble", _afterEditQuickSortRemoveDouble);
         _afterEditRound = json.GetInt("aftereditround", _afterEditRound);
         _afterEditAutoCorrect = json.GetBool("aftereditautocorrect", _afterEditAutoCorrect);
@@ -2430,7 +2430,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.SimilarityWeight:
-                _similarityWeight = Math.Clamp(FloatParse(value), 0f, 1f);
+                _similarityWeight = Math.Clamp(FloatParse(value), 0f, 2f);
                 break;
 
             case TableDataType.ColumnAlign:
