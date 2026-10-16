@@ -577,7 +577,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.ControlStrategyParameter = _strategyOptions?.ControlStrategyParameter ?? new JsonObject();
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
-        c.SimilarityWeight = txbSimilarityWeight.Text.IsDouble() ? Math.Clamp(FloatParse(txbSimilarityWeight.Text), 0f, 1f) : 1f;
+        c.SimilarityWeight = txbSimilarityWeight.Text.IsDouble() ? Math.Clamp(FloatParse(txbSimilarityWeight.Text), 0f, 2f) : 1f;
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         c.AllowedChars = txbAllowedChars.Text.DecodeControlChars();
