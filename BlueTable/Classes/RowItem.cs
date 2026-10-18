@@ -16,7 +16,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
-    /// <summary>Marker in der SysRowState-Spalte für "bereits invalidiert, nur Neuberechnung offen".</summary>
+    /// <summary>
+    /// Marker in der SysRowState-Spalte für "bereits invalidiert, nur Neuberechnung offen".
+    /// </summary>
     public const string InvalidatedStateValue = "01.01.1900";
 
     private volatile int _isDisposedFlag;

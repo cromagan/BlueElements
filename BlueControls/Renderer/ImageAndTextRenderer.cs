@@ -17,7 +17,8 @@ public class ImageAndTextRenderer : Renderer {
     private string _defaultImage = string.Empty;
     private List<string> _imagereplacement = [];
     private string _imgpräfix = string.Empty;
-    private List<string> _opticalReplace = [];
+    private List<(string Search, string Replace)> _opticalReplace = [];
+    private string _textersatz = string.Empty;
     private bool _text_anzeigen = true;
 
     #endregion
@@ -158,12 +159,17 @@ public class ImageAndTextRenderer : Renderer {
     /// Der gespeicherte Wert bleibt dabei unverändert.
     /// </summary>
     public string Text_ersetzen {
-        get => string.Join('\r', _opticalReplace);
+        get => _textersatz;
         set {
-            var old = Text_ersetzen;
+            var old = _textersatz;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
 
-            _opticalReplace = [.. value.SplitByCr()];
+            // Rohstring verlustfrei halten (wie Bild_ersetzen), damit unvollständig
+            // getippte Regeln beim Editieren nicht aus dem Feld gelöscht werden.
+            // Für das Rendering wird daraus separiert die gültige Regelmenge geparst.
+            _textersatz = value;
+            _opticalReplace = LanguageTool.ParseOpticalReplace(value.SplitByCr());
 
             OnPropertyChanged();
 
@@ -247,7 +253,7 @@ public class ImageAndTextRenderer : Renderer {
 
         // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
         if (_text_anzeigen) {
-            result.ParseableAdd("TextReplace", _opticalReplace, true);
+            result.ParseableAdd("TextReplace", _opticalReplace.SelectMany(r => new[] { r.Search, r.Replace }), true);
         }
 
         // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
@@ -284,7 +290,15 @@ public class ImageAndTextRenderer : Renderer {
 
             case "replace":
             case "textreplace":
-                _opticalReplace = value.SplitBy("|").FromNonCritical().ToList();
+                // Gespeichert wird flach als Search|Replace-Paare — diese wieder zu Regelzeilen paaren,
+                // da ParseOpticalReplace zeilenweise komplette Regeln erwartet.
+                var items = value.SplitBy("|").FromNonCritical().ToArray();
+                List<string> lines = [];
+                for (var z = 0; z < items.Length - 1; z += 2) {
+                    lines.Add($"{items[z]}|{items[z + 1]}");
+                }
+                _opticalReplace = LanguageTool.ParseOpticalReplace([.. lines]);
+                _textersatz = string.Join('\r', lines);
                 return true;
 
             case "imagereplace":

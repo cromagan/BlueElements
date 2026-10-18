@@ -412,10 +412,10 @@ public sealed class RowTableElement : TableElement {
     /// <summary>
     /// Overlay-Farbe eines Zell-Scores: 100 (identisch) grün, 0 komplett unterschiedlich rot.
     /// </summary>
-    private static Color ScoreOverlayColor(int score) {
+    private static Color ScoreOverlayColor(double score) {
         var s = Math.Clamp(score, 0, 100);
-        var r = s <= 50 ? 255 : 255 - (s - 50) * 255 / 50;
-        var g = s <= 50 ? s * 255 / 50 : 255;
+        var r = s <= 50 ? 255 : (int)(255 - (s - 50) * 255 / 50);
+        var g = s <= 50 ? (int)(s * 255 / 50) : 255;
         return Color.FromArgb(90, r, g, 0);
     }
 

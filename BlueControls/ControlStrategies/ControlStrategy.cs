@@ -374,6 +374,19 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     public virtual string NotEditableReason => string.Empty;
 
     /// <summary>
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Wird die Strategie als Textfeld dargestellt, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
+    /// </summary>
+    public string OpticalReplace {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            if (!IsEventsSuppressed) { ApplyStyle(); }
+        }
+    } = string.Empty;
+
+    /// <summary>
     /// Höhe des umgebenden Bereichs, z. B. der Tabellenzelle.
     /// </summary>
     public int ParentHeight {
@@ -553,6 +566,23 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     } = 1f;
 
     /// <summary>
+    /// Berechnet den benötigten Bereich des Controls anhand der aktuell
+    /// gesetzten Eigenschaften (z. B. ListItems oder die
+    /// Chip-Fläche der Suggestions). Strategien ohne besondere Anforderungen
+    /// geben den übergebenen Bereich unverändert zurück; Strategien mit
+    /// Überschriften (z. B. Tabellen) beginnen über der Zelllinie. Die
+    /// TableView begrenzt das Ergebnis auf den sichtbaren Bereich.
+    /// </summary>
+    /// <summary>
+    /// Zusätzliche Größe, die der Rahmen gegenüber dem eingebetteten
+    /// Control benötigt. Size.Empty ohne aktiven Rahmen.
+    /// </summary>
+    protected Size BorderExtraSize =>
+        Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box
+            ? Size.Empty
+            : new Size(box.Width - box.DisplayRectangle.Width, box.Height - box.DisplayRectangle.Height);
+
+    /// <summary>
     /// Das von der konkreten Strategie erzeugte Control ohne Rahmen.
     /// </summary>
     protected abstract System.Windows.Forms.Control? ControlCore { get; }
@@ -676,23 +706,6 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         if (IsDisposed) { return; }
         _suspendCount++;
     }
-
-    /// <summary>
-    /// Berechnet den benötigten Bereich des Controls anhand der aktuell
-    /// gesetzten Eigenschaften (z. B. ListItems oder die
-    /// Chip-Fläche der Suggestions). Strategien ohne besondere Anforderungen
-    /// geben den übergebenen Bereich unverändert zurück; Strategien mit
-    /// Überschriften (z. B. Tabellen) beginnen über der Zelllinie. Die
-    /// TableView begrenzt das Ergebnis auf den sichtbaren Bereich.
-    /// </summary>
-    /// <summary>
-    /// Zusätzliche Größe, die der Rahmen gegenüber dem eingebetteten
-    /// Control benötigt. Size.Empty ohne aktiven Rahmen.
-    /// </summary>
-    protected Size BorderExtraSize =>
-        Border == GroupBoxStyle.Nothing || _borderBox is not { IsDisposed: false } box
-            ? Size.Empty
-            : new Size(box.Width - box.DisplayRectangle.Width, box.Height - box.DisplayRectangle.Height);
 
     public virtual Rectangle CalculateRequiredBounds(Rectangle bounds) {
         if (Border == GroupBoxStyle.Nothing) { return bounds; }

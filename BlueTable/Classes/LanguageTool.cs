@@ -54,6 +54,20 @@ public static class LanguageTool {
     }
 
     /// <summary>
+    /// Parst Ersetzungsregeln im Format "Alt|Neu", eine Regel pro Zeile.
+    /// Ungültige Regeln und Regeln ohne Suchtext werden verworfen.
+    /// </summary>
+    public static List<(string Search, string Replace)> ParseOpticalReplace(string[] rules) {
+        List<(string Search, string Replace)> result = [];
+        foreach (var thisRule in rules) {
+            var parts = thisRule.SplitBy("|");
+            if (parts.Length != 2 || parts[0].Length == 0) { continue; }
+            result.Add((parts[0], parts[1]));
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
     /// </summary>
     /// <param name="txt">Der Basistext.</param>
@@ -61,8 +75,8 @@ public static class LanguageTool {
     /// <param name="prefix">Ein optionaler Präfix.</param>
     /// <param name="suffix">Ein optionaler Suffix.</param>
     /// <param name="doOpticalTranslation">Bestimmt, ob eine optische Übersetzung stattfinden soll.</param>
-    /// <param name="opticalReplace">Liste von Ersetzungsregeln (Format: "Alt|Neu").</param>
-    public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
+    /// <param name="opticalRules">Bereits geparste Ersetzungsregeln.</param>
+    public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<(string Search, string Replace)>? opticalRules) {
         if (!string.IsNullOrEmpty(txt)) {
             if (Translation is not null && doOpticalTranslation is TranslationType.Übersetzen) {
                 txt = DoTranslate(txt, true);
@@ -73,25 +87,13 @@ public static class LanguageTool {
             if (!string.IsNullOrEmpty(suffix)) { txt = $"{txt} {suffix}"; }
         }
 
-        if (opticalReplace is not { Count: > 0 } || style is ShortenStyle.Unreplaced) { return txt; }
+        if (opticalRules is not { Count: > 0 } || style is ShortenStyle.Unreplaced) { return txt; }
 
         var originalText = txt;
         var sb = new StringBuilder(txt);
 
-        foreach (var entry in opticalReplace) {
-            var parts = entry.SplitBy("|");
-            if (parts.Length != 2) { continue; }
-
-            var (oldVal, newVal) = (parts[0], parts[1]);
-
-            if (string.IsNullOrEmpty(oldVal)) {
-                if (string.IsNullOrEmpty(txt)) {
-                    txt = newVal;
-                    sb.Clear().Append(newVal);
-                }
-            } else {
-                sb.Replace(oldVal, newVal);
-            }
+        foreach (var (oldVal, newVal) in opticalRules) {
+            sb.Replace(oldVal, newVal);
         }
 
         txt = sb.ToString();

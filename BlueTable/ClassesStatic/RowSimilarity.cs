@@ -50,13 +50,14 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Gesamtscore (0–100) je Zeile sowie Zell-Score (0–100) je Zelle
-    /// der berücksichtigten Spalten. Spalten, die der Vergleich ignoriert
-    /// (System-Spalten, erste Spalte), erhalten keinen Zell-Score.
+    /// Gesamtscore (0–100, ungerundet) je Zeile sowie Zell-Score
+    /// (0–100, ungerundet) je Zelle der berücksichtigten Spalten. Spalten,
+    /// die der Vergleich ignoriert (System-Spalten, erste Spalte),
+    /// erhalten keinen Zell-Score.
     /// </summary>
-    public static (Dictionary<RowItem, int> Scores, Dictionary<RowItem, Dictionary<ColumnItem, int>> CellScores) Scores(Table table, RowItem referenceRow) {
-        var scores = new Dictionary<RowItem, int>();
-        var cellScores = new Dictionary<RowItem, Dictionary<ColumnItem, int>>();
+    public static (Dictionary<RowItem, double> Scores, Dictionary<RowItem, Dictionary<ColumnItem, double>> CellScores) Scores(Table table, RowItem referenceRow) {
+        var scores = new Dictionary<RowItem, double>();
+        var cellScores = new Dictionary<RowItem, Dictionary<ColumnItem, double>>();
         if (table.IsDisposed || referenceRow is not { IsDisposed: false }) { return (scores, cellScores); }
 
         List<ColumnItem> columns = [];
@@ -85,14 +86,14 @@ public static class RowSimilarity {
             if (thisRow is not { IsDisposed: false }) { continue; }
 
             var sum = 0.0;
-            Dictionary<ColumnItem, int> cells = new(columns.Count);
+            Dictionary<ColumnItem, double> cells = new(columns.Count);
             foreach (var thisColumn in columns) {
                 var sim = CellSimilarity(thisColumn, referenceValues[thisColumn], thisRow.CellGetString(thisColumn));
                 sum += sim * Weight(thisColumn);
-                cells.Add(thisColumn, (int)Math.Round(sim * 100.0));
+                cells.Add(thisColumn, sim * 100.0);
             }
 
-            scores.Add(thisRow, (int)Math.Round(100.0 * sum / weightSum));
+            scores.Add(thisRow, 100.0 * sum / weightSum);
             cellScores.Add(thisRow, cells);
         }
 
@@ -167,8 +168,10 @@ public static class RowSimilarity {
     }
 
     /// <summary>
-    /// Ähnlichkeit zweier Texte: Anteil der gemeinsamen Zeichen an der
-    /// Gesamtlänge (Dice-Koeffizient), Groß-/Kleinschreibung wird ignoriert.
+    /// Ähnlichkeit zweier Texte (0,0–1,0), Groß-/Kleinschreibung wird ignoriert:
+    /// das Minimum aus dem Anteil der gemeinsamen Zeichen (Dice-Koeffizient)
+    /// und dem Anteil der positionsgleichen Zeichen. Gleiche Buchstaben in
+    /// anderer Reihenfolge werden dadurch schlechter bewertet.
     /// </summary>
     private static double TextSimilarity(string valueReference, string value) {
         var upperReference = valueReference.ToUpperInvariant();
@@ -199,7 +202,15 @@ public static class RowSimilarity {
             }
         }
 
-        return 2.0 * common / (charsReference.Length + charsValue.Length);
+        var samePosition = 0;
+        for (var p = 0; p < Math.Min(upperReference.Length, upperValue.Length); p++) {
+            if (upperReference[p] == upperValue[p]) { samePosition++; }
+        }
+
+        var dice = 2.0 * common / (charsReference.Length + charsValue.Length);
+        var position = (double)samePosition / Math.Max(upperReference.Length, upperValue.Length);
+
+        return Math.Min(dice, position);
     }
 
     /// <summary>

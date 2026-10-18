@@ -161,7 +161,12 @@ public class ColorRangeRenderer : Renderer {
         return contentSize;
     }
 
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) => content;
+    /// <summary>
+    /// Stellt Zahlenwerte optisch immer abgerundet (abgeschnitten) dar;
+    /// der zugrunde liegende Wert bleibt ungerundet erhalten.
+    /// </summary>
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) =>
+        DoubleTryParse(content, out var value) ? ((int)Math.Floor(value)).ToString1() : content;
 
     /// <summary>
     /// Interpoliert die Hintergrundfarbe zwischen MinColor und MaxColor.

@@ -308,19 +308,33 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
 
+    /// <summary>
+    /// Löscht den Bereich ohne die geschützten Zeichen. Diese bleiben erhalten und
+    /// wandern an den Bereichsanfang. Rückgabe ist die Position dahinter.
+    /// </summary>
     public int Delete(int first, int last) {
         if (first >= _internal.Count || first > last) { return first; }
 
-        var (s1, _) = GetCellLinkBounds(first);
-        if (s1 >= 0) { first = s1; }
+        last = Math.Min(last, _internal.Count - 1);
+        if (first > last) { return first; }
 
-        var (_, e2) = GetCellLinkBounds(last + 1);
-        if (e2 >= 0) { last = e2; }
+        var deleted = false;
+        var protectedCount = 0;
+        var i = last;
+        while (i >= first) {
+            if (_internal[i].IsProtected) {
+                i--;
+                protectedCount++;
+                continue;
+            }
+            var end = i;
+            while (i >= first && !_internal[i].IsProtected) { i--; }
+            _internal.RemoveRange(i + 1, end - i);
+            deleted = true;
+        }
 
-        var count = Math.Min(last - first + 1, _internal.Count - first);
-        _internal.RemoveRange(first, count);
-        ResetPosition(true);
-        return first;
+        if (deleted) { ResetPosition(true); }
+        return first + protectedCount;
     }
 
     public void Dispose() {
@@ -352,32 +366,25 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    public (int start, int end) GetCellLinkBounds(int position) {
-        if (position < 1 || position >= _internal.Count) { return (-1, -1); }
-
-        // Cursor auf CellLinkStart = VOR dem Link, nicht innerhalb
-        if (_internal[position] is CellLinkStartChar) { return (-1, -1); }
-
-        var s = position;
-
-        // Cursor auf CellLinkEnd = noch innerhalb des Links, Suche ab davor
-        if (_internal[s] is CellLinkCharEndChar) { s--; }
-
-        while (s > 0 && _internal[s] is not CellLinkStartChar) {
-            if (_internal[s] is CellLinkCharEndChar) { return (-1, -1); }
-            s--;
-        }
-        if (_internal[s] is not CellLinkStartChar) { return (-1, -1); }
-        var e = s + 1;
-        while (e < _internal.Count && _internal[e] is not CellLinkCharEndChar) { e++; }
-        return e >= _internal.Count ? (-1, -1) : (s, e);
-    }
-
     public bool Insert(int position, Char c) {
         if (position < 0 || position > _internal.Count) { return false; }
         _internal.Insert(position, c);
         ResetPosition(true);
         return true;
+    }
+
+    /// <summary>
+    /// Entfernt alle OpticalReplaceChar aus dem Text.
+    /// </summary>
+    internal void RemoveOpticalReplaceChars() {
+        var removed = false;
+        for (var i = _internal.Count - 1; i >= 0; i--) {
+            if (_internal[i] is OpticalReplaceChar) {
+                _internal.RemoveAt(i);
+                removed = true;
+            }
+        }
+        if (removed) { ResetPosition(true); }
     }
 
     public Size LastSize() {
@@ -776,13 +783,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (created is not Char instance) { return; }
             instance.InitFromTag(this, tags, attribut);
             _internal.Add(instance);
-
-            if (instance is CellLinkCharEndChar) {
-                var startIdx = _internal.Count - 2;
-                while (startIdx >= 0 && _internal[startIdx] is not CellLinkStartChar) {
-                    startIdx--;
-                }
-            }
         } else {
             _internal.Add(new AsciiChar(this, tags, '<'));
             foreach (var c in cod)

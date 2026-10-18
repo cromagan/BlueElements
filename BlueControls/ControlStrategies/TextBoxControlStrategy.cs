@@ -137,11 +137,19 @@ public class TextBoxControlStrategy : ControlStrategy {
 
     /// <summary>
     /// Begrenzt einzeilig die Höhe auf das 2,5-Fache der Zeilenhöhe, mehrzeilig
-    /// bleibt die Feldhöhe unverändert.
+    /// bleibt die Feldhöhe unverändert. Reicht die Höhe für den Text nicht,
+    /// erscheint der vertikale Scrollbalken — die Breite wächst um SliderSize,
+    /// damit der Balken den Text nicht zusätzlich verengt.
     /// </summary>
     public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
         if (!MultiLine) { bounds.Height = Math.Min(bounds.Height, MaxSingleLineFillHeight); }
-        return base.CalculateRequiredBounds(bounds);
+        var required = base.CalculateRequiredBounds(bounds);
+
+        if (_control is { IsDisposed: false } c && c.NeedsVerticalScrollbar(required.Size)) {
+            required.Width += ZoomPad.SliderSize;
+        }
+
+        return required;
     }
 
     public override string ReadableText() => "Textfeld";
@@ -173,6 +181,7 @@ public class TextBoxControlStrategy : ControlStrategy {
         _control?.GetStyleFrom(this);
         _control?.CustomVocabulary = CustomVocabulary;
         _control?.Suffix = Suffix;
+        _control?.OpticalReplace = OpticalReplace;
         _control?.SpellCheckingEnabled = SpellCheckingEnabled;
         _control?.TextFormatingAllowed = TextFormatingAllowed;
         _control?.MultiLine = MultiLine;

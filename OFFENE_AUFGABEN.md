@@ -97,7 +97,6 @@ Trotz Freeze müssen Scripte, die nix ändern, ausgeführt werden.
 ##Aufgabe
 Befehle wie Import Linked liefern Feedback in Form einer Fehlermeldung im Ausgabelog des Editors.
 Ergänze, dass Klickbare Felder zurückgegeben werden. Im Falle von ImportLinked, soll eine TableView mit der Filterung aufgehen.
-Orientiere dich an CellLink in ExtText
 
 ##Aufgabe
 Alle IEditable müssen PropertyChanged unterstützen, so dass der Editor sofort den OK-Button bei Fehlern deaktiviern kann.

@@ -256,9 +256,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             var grund = Column_DatenZurückschreiben();
 
             if (!string.IsNullOrEmpty(grund)) {
-                if (Forms.MessageBox.Show($"<b><u>Zurückschreiben nicht möglich:</u></b><br>{grund}<br><br>Sollen die Änderungen verworfen werden?", ImageCode.Warnung, "Verwerfen", "Abbruch") != 0) {
-                    return false;
-                }
+                if (Forms.MessageBox.Show($"<b><u>Zurückschreiben nicht möglich:</u></b><br>{grund}<br><br>Sollen die Änderungen verworfen werden?", ImageCode.Warnung, "Verwerfen", "Abbruch") != 0) { return false; }
                 return true;
             }
 

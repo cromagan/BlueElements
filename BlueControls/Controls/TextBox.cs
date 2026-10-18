@@ -44,6 +44,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     private bool _mustCheck = true;
 
+    private List<(string Search, string Replace)> _opticalRules = [];
+
     private int _raiseChangeDelay;
 
     #endregion
@@ -169,6 +171,23 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     }
 
+    /// <summary>
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Zu jedem Treffer wird ein nicht löschbarer OpticalReplaceChar eingefügt,
+    /// der den Ersatz halb so groß und hellgrau anzeigt.
+    /// </summary>
+    [DefaultValue("")]
+    public string OpticalReplace {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            _opticalRules = LanguageTool.ParseOpticalReplace(value.SplitByCr());
+            UpdateOpticalReplaceChars();
+            Invalidate();
+        }
+    } = string.Empty;
+
     [DefaultValue(0)]
     public int RaiseChangeDelay {
         get => _raiseChangeDelay / 2; // Umrechnung aus Sekunden
@@ -240,8 +259,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             } else {
                 _eTxt.PlainText = processedValue;
             }
-
-            CreateCellLinkZones();
 
             _mustCheck = true;
             Invalidate();
@@ -358,7 +375,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, System.Windows.Forms.Clipboard.ContainsText() && Enabled));
 
             if (TextFormatingAllowed) {
-                contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste_Link, System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
                 contextMenu.Add(Separator());
                 contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, true));
 
@@ -400,6 +416,24 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         _zones.Add(new ZoneMarkRenderer(renderer, first, end, overrideColor));
     }
 
+    /// <summary>
+    /// True, wenn der Text bei der gegebenen Control-Größe nicht passt und
+    /// der vertikale Scrollbalken (SliderSize breit) erscheinen wird.
+    /// </summary>
+    public bool NeedsVerticalScrollbar(Size controlSize) {
+        if (IsDisposed || Verhalten != SteuerelementVerhalten.Scrollen_mit_Textumbruch) { return false; }
+
+        // Umbruchbreite in Canvas-Koordinaten, identisch zur Berechnung im DrawControl.
+        var wrapWidth = Math.Max(1, (int)((controlSize.Width - (Skin.PaddingSmal * 2)) / Zoom));
+
+        var oldDimensions = _eTxt.TextDimensions;
+        _eTxt.TextDimensions = new Size(wrapWidth, -1);
+        var neededHeight = _eTxt.HeightControl * Zoom;
+        _eTxt.TextDimensions = oldDimensions;
+
+        return neededHeight > controlSize.Height;
+    }
+
     internal void ProcessKey(AsciiKey keyAscii) {
         _blinkCount = 0;
         // http://www.manderby.com/informatik/allgemeines/ascii.php
@@ -408,15 +442,14 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         switch (keyAscii) {
             case AsciiKey.DEL:
                 // Eigentlich auch noch Ascii Code - steht bei ISO als Del
-                //if (_markEnd < 0 && _markStart > 0) {
-                //    var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart - 1);
-                //    if (clStart >= 0 && clEnd + 1 == _markStart) {
-                //        _markStart = Char_DelBereich(clStart, clEnd + 1, true);
-                //        _markEnd = -1;
-                //        break;
-                //    }
-                //}
-                _markStart = Char_DelBereich(_markStart, Math.Max(_markStart + 1, _markEnd), true);
+                if (_markEnd < 0) {
+                    // Ein einzelnes geschütztes Zeichen wird nicht gelöscht
+                    if (_markStart < _eTxt.Count && _eTxt[_markStart].IsProtected) { break; }
+                    _markStart = Char_DelBereich(_markStart, _markStart + 1, true);
+                } else {
+                    // Geschützte Zeichen in der Markierung wandern an den Anfang der Markierung
+                    _markStart = Char_DelBereich(_markStart, _markEnd, true);
+                }
                 _markEnd = -1;
                 break;
 
@@ -430,8 +463,11 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
             case AsciiKey.BackSpace:
                 if (_markEnd < 0) {
+                    // Ein einzelnes geschütztes Zeichen wird nicht gelöscht
+                    if (_markStart > 0 && _eTxt[_markStart - 1].IsProtected) { break; }
                     _markStart = Char_DelBereich(Math.Max(_markStart - 1, 0), _markStart, true);
                 } else {
+                    // Geschützte Zeichen in der Markierung wandern an den Anfang der Markierung
                     _markStart = Char_DelBereich(_markStart, _markEnd, true);
                 }
                 _markEnd = -1;
@@ -444,7 +480,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             case AsciiKey.StrgV:
                 _markStart = Char_DelBereich(_markStart, _markEnd, false);
                 _markEnd = -1;
-                _markStart = InsertClipboard(_markStart, false);
+                _markStart = InsertClipboard(_markStart);
                 break;
 
             case AsciiKey.StrgX:
@@ -637,14 +673,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (IsDisposed) { return; }
         base.OnDoubleClick(e);
 
-        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
-
-        if (clStart >= 0) {
-            _markStart = clStart;
-            _markEnd = clEnd;
-        } else {
-            Selection_WortMarkieren(_markStart);
-        }
+        Selection_WortMarkieren(_markStart);
 
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         _doubleClicked = true;
@@ -871,7 +900,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         var actualFirst = _eTxt.Delete(von, bis - 1);
         var deletedCount = countBefore - _eTxt.Count;
         if (deletedCount > 0) { ShiftZones(actualFirst + deletedCount, -deletedCount); }
-        CreateCellLinkZones();
 
         if (raiseEvent) {
             RaiseEventIfTextChanged(false);
@@ -893,6 +921,44 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         dataObject.SetData(ExtCharFormat, html);
         dataObject.SetText(_eTxt.BuildPlainText(_markStart, _markEnd - 1));
         System.Windows.Forms.Clipboard.SetDataObject(dataObject, true);
+    }
+
+    /// <summary>
+    /// Ermittelt alle Regel-Treffer im sichtbaren Text. Die Positionen beziehen sich
+    /// auf die Zeichenliste ohne OpticalReplaceChar und geben die Einfügeposition
+    /// direkt hinter dem Treffer an.
+    /// </summary>
+    private List<(int Pos, string Text)> ComputeOpticalReplacePositions() {
+        List<(int Pos, string Text)> result = [];
+        if (_opticalRules is not { Count: > 0 }) { return result; }
+
+        var sb = new System.Text.StringBuilder(_eTxt.Count);
+        var offsetToCharPos = new List<int>(_eTxt.Count);
+        var cleanedPos = 0;
+        for (var i = 0; i < _eTxt.Count; i++) {
+            if (_eTxt[i] is OpticalReplaceChar) { continue; }
+            var pt = _eTxt[i].PlainText();
+            for (var z = 0; z < pt.Length; z++) { offsetToCharPos.Add(cleanedPos); }
+            sb.Append(pt);
+            cleanedPos++;
+        }
+
+        if (sb.Length == 0) { return result; }
+        var text = sb.ToString();
+
+        foreach (var (search, replace) in _opticalRules) {
+            var cap = 0;
+            while (true) {
+                var fo = text.IndexOf(search, cap, StringComparison.Ordinal);
+                if (fo < 0) { break; }
+                var endOff = fo + search.Length - 1;
+                result.Add((offsetToCharPos[endOff] + 1, replace));
+                cap = fo + search.Length;
+            }
+        }
+
+        result.Sort();
+        return result;
     }
 
     private void Contextmenu_Bold(object? sender, ContextMenuEventArgs e) {
@@ -947,14 +1013,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markEnd = -1;
-        _markStart = InsertClipboard(_markStart, false);
-    }
-
-    private void Contextmenu_Paste_Link(object? sender, ContextMenuEventArgs e) {
-        var (markStart, markEnd, _) = GetContextData(e.HotItem);
-        _markStart = Char_DelBereich(markStart, markEnd, false);
-        _markEnd = -1;
-        _markStart = InsertClipboard(_markStart, true);
+        _markStart = InsertClipboard(_markStart);
     }
 
     private void Contextmenu_Sonderzeichen(object? sender, ContextMenuEventArgs e) {
@@ -978,19 +1037,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, new IconChar(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
-    private void CreateCellLinkZones() {
-        Unmark(CellLinkMarkRenderer.Type);
-        for (var i = 0; i < _eTxt.Count; i++) {
-            if (_eTxt[i] is not CellLinkStartChar) { continue; }
-            var startIdx = i + 1;
-            var endIdx = startIdx;
-            while (endIdx < _eTxt.Count && _eTxt[endIdx] is not CellLinkCharEndChar) { endIdx++; }
-            if (endIdx < _eTxt.Count && endIdx > startIdx) {
-                Mark(CellLinkMarkRenderer.Type, startIdx, endIdx - 1, null);
-            }
-        }
-    }
-
     /// <summary>
     /// Sucht den aktuellen Buchstaben, der unter den angegeben Control-Koordinaten liegt.
     /// Wird auf die hintere Hälfte eines Zeichens gewählt, wird der nächste Buchstabe angegeben.
@@ -1007,13 +1053,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             return c;
         }
 
-        var pos = c < _eTxt.Count && canvasX > _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
-
-        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
-
-        if (clStart >= 0) { pos = (pos - clStart) <= (clEnd + 1 - pos) ? clStart + 1 : clEnd + 1; }
-
-        return pos;
+        return c < _eTxt.Count && canvasX > _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }
 
     private void Cursor_Richtung(short x, short y) {
@@ -1038,11 +1078,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
             _markStart = _markStart >= _eTxt.Count && y < 0
                 ? (_eTxt.Count > 0 ? Cursor_PosAt(controlX, controlY) : 0)
                 : Cursor_PosAt(controlX, controlY);
-        }
-
-        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
-        if (clStart >= 0) {
-            _markStart = x > 0 ? clEnd + 1 : clStart;
         }
 
         _markStart = Math.Max(0, _markStart);
@@ -1167,24 +1202,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         return pos;
     }
 
-    private int InsertClipboard(int pos, bool linkAllowed) {
+    private int InsertClipboard(int pos) {
         if (TextFormatingAllowed) {
-            if (linkAllowed && System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat)) {
-                if (System.Windows.Forms.Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
-                    var t = sd.SplitByCr();
-                    var start = new CellLinkStartChar(_eTxt, pos, t[0], t[1], t[2]);
-                    var linkStartIdx = pos;
-                    pos = Insert(pos, start, true);
-                    if (!string.IsNullOrEmpty(start.DisplayText)) {
-                        foreach (var c in start.DisplayText)
-                            pos = Insert(pos, new AsciiChar(_eTxt, pos, c), true);
-                    }
-                    pos = Insert(pos, new CellLinkCharEndChar(_eTxt, pos), true);
-                    Mark(CellLinkMarkRenderer.Type, linkStartIdx + 1, pos - 2, null);
-                    return pos;
-                }
-            }
-
             if (System.Windows.Forms.Clipboard.ContainsData(ExtCharFormat)) {
                 if (System.Windows.Forms.Clipboard.GetData(ExtCharFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     var parsedChars = _eTxt.ParseHtmlToChars(sd);
@@ -1228,6 +1247,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
         if (IsDisposed) { return; }
+        UpdateOpticalReplaceChars();
 
         var newtext = Text;
         if (newtext == _lastCheckedText) {
@@ -1288,27 +1308,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
         if (swapThem && _markStart > _markEnd && _markEnd > -1) {
             Swap(ref _markStart, ref _markEnd);
-        }
-
-        if (_markEnd >= 0 && _markStart >= 0) {
-            var mas = Math.Min(_markStart, _markEnd);
-            var mae = Math.Max(_markStart, _markEnd);
-
-            var (s1, _) = _eTxt.GetCellLinkBounds(mas);
-            var (_, e2) = _eTxt.GetCellLinkBounds(mae);
-
-            if (s1 >= 0 || e2 >= 0) {
-                if (s1 >= 0) { mas = s1; }
-                if (e2 >= 0) { mae = e2 + 1; }
-
-                if (_markStart <= _markEnd) {
-                    _markStart = mas;
-                    _markEnd = mae;
-                } else {
-                    _markStart = mae;
-                    _markEnd = mas;
-                }
-            }
         }
     }
 
@@ -1417,6 +1416,40 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     }
 
     private void SpellChecker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => IsSpellChecking = false;
+
+    /// <summary>
+    /// Gleicht die OpticalReplaceChar mit den aktuellen Regeln und dem Text ab.
+    /// Da die Zeichen nichts zum Text beitragen, entsteht keine Änderungsrückkopplung.
+    /// </summary>
+    private void UpdateOpticalReplaceChars() {
+        if (IsDisposed) { return; }
+
+        // Bestehende Vorschauzeichen sammeln (aufsteigend, Positionen ohne OpticalReplaceChar)
+        List<(int Pos, string Text)> existing = [];
+        var cleanedPos = 0;
+        for (var i = 0; i < _eTxt.Count; i++) {
+            if (_eTxt[i] is OpticalReplaceChar c) {
+                existing.Add((cleanedPos, c.ReplacementText));
+                continue;
+            }
+            cleanedPos++;
+        }
+
+        var desired = ComputeOpticalReplacePositions();
+
+        var same = existing.Count == desired.Count;
+        for (var i = 0; same && i < existing.Count; i++) {
+            same = existing[i].Pos == desired[i].Pos && existing[i].Text == desired[i].Text;
+        }
+        if (same) { return; }
+
+        _eTxt.RemoveOpticalReplaceChars();
+        for (var i = desired.Count - 1; i >= 0; i--) {
+            var pos = Math.Min(desired[i].Pos, _eTxt.Count);
+            _eTxt.Insert(pos, new OpticalReplaceChar(_eTxt, pos, desired[i].Text));
+        }
+        Invalidate();
+    }
 
     private void UpdateRingelchenZone(int startPos, int endPos, string expectedWord, bool markAsError) {
         if (IsDisposed || SpellChecker.IsBusy) { return; }

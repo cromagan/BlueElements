@@ -56,6 +56,12 @@ public abstract class Char : IDisposableExtended {
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
+
+    /// <summary>
+    /// Geschützte Zeichen werden von Delete nicht entfernt und können vom Benutzer nicht gelöscht werden.
+    /// </summary>
+    public virtual bool IsProtected => false;
+
     public List<string> OverrideTags { get; private set; } = [];
     public PointF PosCanvas { get; set; } = PointF.Empty;
     public virtual bool ResetsYPosition => false;
@@ -185,7 +191,7 @@ public abstract class Char : IDisposableExtended {
         _parent = parent;
     }
 
-    internal void InvalidateFont() {
+    internal virtual void InvalidateFont() {
         Font = null;
         _size = SizeF.Empty;
     }

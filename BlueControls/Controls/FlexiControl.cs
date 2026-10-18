@@ -339,12 +339,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; Invalidate(); }));
+                Invoke(new Action(() => { field = value; DoInfoTextCaption(DisabledReason); }));
                 return;
             }
 
             field = value;
-            Invalidate();
+            DoInfoTextCaption(DisabledReason);
         }
     } = string.Empty;
 
@@ -534,6 +534,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             field = value;
             _strategy?.Suffix = value;
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Wird der Wert in einem Textfeld bearbeitet, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
+    /// </summary>
+    [DefaultValue("")]
+    public string OpticalReplace {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.OpticalReplace = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.OpticalReplace = value;
         }
     } = string.Empty;
 
@@ -757,6 +777,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.RegexCheck = RegexCheck;
             _strategy.CustomVocabulary = CustomVocabulary;
             _strategy.Suffix = Suffix;
+            _strategy.OpticalReplace = OpticalReplace;
             _strategy.ParentHeight = Height;
             _strategy.QuickInfo = QuickInfo;
             _strategy.ListItems = ListItems;

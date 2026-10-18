@@ -28,8 +28,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Fields
 
-    public const string CellDataFormat = "BlueElements.CellLink";
-
     private readonly Dictionary<string, TableElement> _allViewItems = [];
 
     /// <summary>
@@ -596,17 +594,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung, Point cellScreen = default) {
         try {
-            if (row is not null && column is not null && column.Table is { IsDisposed: false } tb) {
+            if (row is not null && column is not null && column.Table is { IsDisposed: false }) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
 
                 var dataObject = new DataObject();
 
-                if (tb is TableFile) {
-                    dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
-                }
-                dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
+                dataObject.SetText(c);// Als Plain Text (für externe Anwendungen)
                 Clipboard.SetDataObject(dataObject, true);
 
                 //_ = CopytoClipboard(c);
@@ -650,14 +645,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var tb = Get();
         var colFirst = tb.Column.GenerateAndAdd("ID", "ID", TextOneLineColumnFormat.Instance);
-        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", DateTimeColumnFormat.Instance);
+        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änder-\rdatum", DateTimeColumnFormat.Instance);
         var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", TextOneLineColumnFormat.Instance);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
+
 
         if (colText is { IsDisposed: false }) {
             colText.DefaultRenderer = column.DefaultRenderer;
             colText.RendererSettings = column.RendererSettings;
             colText.MultiLine = column.MultiLine;
+            colText.ScriptType = ScriptType.Nicht_vorhanden;
         }
 
         if (colFirst is { IsDisposed: false }) {
@@ -690,7 +687,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Aenderdatum", "Aenderer", "VorherigerText");
+        tcvc[1].ScaleToFit = ScaleToFitMode.Aggressiv;
         tb.ColumnArrangements = tcvc.AsReadOnly();
+        
 
         tb.SortDefinition = new RowSortDefinition(tb, colDate, true);
 
@@ -1315,7 +1314,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     }
 
                     contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
-                    contextMenu.Add(ItemOf("Gesamten Spalteninhalt anzeigen", ImageCode.Lupe, ContextMenu_ShowAll, tb.IsAdministrator()));
+                    contextMenu.Add(ItemOf("Spalteninhalt anzeigen", ImageCode.Lupe, ContextMenu_ShowAll, tb.IsAdministrator()));
                     contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, IContextMenu.IconSize), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
                     contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
                 }
@@ -3631,8 +3630,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column is null) { return; }
 
         var sb = new StringBuilder();
-        foreach (var t in column.Contents()) {
-            sb.AppendLine((column.TextFormatingAllowed ? t.HtmlToPlain() : t).Replace("|", "\r\n"));
+        foreach (var t in column.Contents(FilterCombined, PinnedRows)) {
+            sb.AppendLine((column.TextFormatingAllowed ? t.HtmlToPlain() : t));
         }
 
         var tv = new Forms.TextView(sb.ToString(), column.Caption);

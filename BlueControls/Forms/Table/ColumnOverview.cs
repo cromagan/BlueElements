@@ -29,10 +29,14 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         "ERSTSPALTE", "KEYCOLUMN", "MULTILINE", "SAVECONTENT", "IGNOREATROWFILTER", "RECHTE"
     ];
 
-    /// <summary>Ordnet den Zeilenschlüssel der Übersichtstabelle der echten Spalte zu.</summary>
+    /// <summary>
+    /// Ordnet den Zeilenschlüssel der Übersichtstabelle der echten Spalte zu.
+    /// </summary>
     private readonly Dictionary<string, ColumnItem> _columnByRowKey = [];
 
-    /// <summary>true, während die Übersicht selbst Zellwerte setzt (Zurücksetzen/Auffrischen), um Rekursion zu vermeiden.</summary>
+    /// <summary>
+    /// true, während die Übersicht selbst Zellwerte setzt (Zurücksetzen/Auffrischen), um Rekursion zu vermeiden.
+    /// </summary>
     private bool _internalCellSet;
 
     #endregion
@@ -214,7 +218,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         }
     }
 
-    /// <summary>Liefert den Namen des zum Spaltenkern passenden Formats.</summary>
+    /// <summary>
+    /// Liefert den Namen des zum Spaltenkern passenden Formats.
+    /// </summary>
     private static string FormatNameOf(ColumnItem c) {
         var formatName = string.Empty;
         foreach (var thisFormat in ColumnFormat.AllFormats.Instances) {
@@ -223,7 +229,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         return formatName;
     }
 
-    /// <summary>Erzeugt eine Auswahlspalte für die Werte eines Enums.</summary>
+    /// <summary>
+    /// Erzeugt eine Auswahlspalte für die Werte eines Enums.
+    /// </summary>
     private static void GenerateEnumSpalte(Table tb, string keyName, string caption, Type enumType) {
         var c = tb.Column.GenerateAndAdd(keyName, caption, TextOneLineColumnFormat.Instance);
         if (c is not { IsDisposed: false } col) { return; }
@@ -313,7 +321,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         tblColumns.ColumnMoveAllowed = false;
     }
 
-    /// <summary>Liefert den Anzeigewert einer Übersichtsspalte aus der echten Spalte.</summary>
+    /// <summary>
+    /// Liefert den Anzeigewert einer Übersichtsspalte aus der echten Spalte.
+    /// </summary>
     private static string OverviewValue(ColumnItem c, string key) {
         switch (key) {
             case "NAME":
@@ -402,7 +412,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         }
     }
 
-    /// <summary>Parst die Ähnlichkeits-Gewichtung (Trennzeichen Punkt oder Komma).</summary>
+    /// <summary>
+    /// Parst die Ähnlichkeits-Gewichtung (Trennzeichen Punkt oder Komma).
+    /// </summary>
     private static float? ParseWeight(string value) {
         var v = value.Trim().Replace(',', '.');
         return float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var w) ? w : null;
@@ -434,7 +446,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         }
     }
 
-    /// <summary>Öffnet den Spalten-Editor zur Korrektur und frischt die Übersichtszeile anschließend auf.</summary>
+    /// <summary>
+    /// Öffnet den Spalten-Editor zur Korrektur und frischt die Übersichtszeile anschließend auf.
+    /// </summary>
     private void RepairWithEditor(ColumnItem realColumn, RowItem row) {
         if (realColumn.Table is not { IsDisposed: false } rt) { return; }
 

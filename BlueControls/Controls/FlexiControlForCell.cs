@@ -10,7 +10,6 @@ using BlueTable.EventArgs;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Controls;
 
@@ -127,6 +126,10 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
                     NumberRenderer rn => rn.Suffix,
                     _ => string.Empty
                 };
+                f.OpticalReplace = r switch {
+                    ImageAndTextRenderer iat => iat.Text_ersetzen,
+                    _ => string.Empty
+                };
 
                 // Back Column
                 f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
@@ -137,14 +140,14 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
                 // Mehrfachauswahl erzeugt CR-getrennte Werte — nur erlaubt,
                 // wenn die Spalte mehrzeilige Werte fassen kann.
                 f.CheckBehavior = backcolumn.MultiLine ? CheckBehavior.MultiSelection : CheckBehavior.SingleSelection;
-                f.CustomContextMenuItems = new([
-                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
-                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
-                ]);
+
+                // Undo-Historie existiert nur, wenn der Zellinhalt gespeichert wird.
+                f.CustomContextMenuItems = backcolumn.SaveContent && backcolumn.CanBeChangedByRules() && IsAdministrator()
+                    ? new([ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, IContextMenu.IconSize), Contextmenu_RestorePreviousContent, true, string.Empty)])
+                    : null;
             } else {
                 f.ListItems = null;
                 f.RaiseChangeDelay = 1;
-                f.CustomContextMenuItems = null;
             }
 
             f.Caption = Caption;
@@ -269,21 +272,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
         f.InfoText = sb.ToString();
     }
 
-    private static void Contextmenu_BildÖffnen(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is not BitmapListItem bi) { return; }
-        if (bi.ImageLoaded()) {
-            PictureView x = new(bi.Bitmap);
-            x.Show();
-        }
-    }
-
-    private static void Contextmenu_DateiÖffnen(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is not TextListItem t) { return; }
-        if (FileExists(t.KeyName)) {
-            ExecuteFile(t.KeyName);
-        }
-    }
-
     private async Task ActivateMarker() {
         if (IsDisposed) { return; }
         if (!f.Strategy.SupportsWordHighlighting) { return; }
@@ -347,6 +335,13 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
         }
 
         f.DisabledReason = TableView.IsCellEditable(column, row, row.ChunkValue); // Rechteverwaltung einfliesen lassen.
+    }
+
+    private void Contextmenu_RestorePreviousContent(object? sender, ContextMenuEventArgs e) {
+        if (_column is not { IsDisposed: false } column) { return; }
+        if (_lastrow is not { IsDisposed: false } row) { return; }
+        if (TableViewForm.EditableErrorMessage(row.Table, row)) { return; }
+        TableView.DoUndo(column, row);
     }
 
     private void F_ControlAdded(object? sender, ControlEventArgs e) {

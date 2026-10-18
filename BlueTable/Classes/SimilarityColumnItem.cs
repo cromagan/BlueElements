@@ -5,18 +5,18 @@ using System.Runtime.CompilerServices;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// Virtuelle Spalte der Ähnlichkeits-Suche: zeigt pro Zeile den Score
-/// (0–100) des letzten „Ähnliche Zeilen“-Vergleichs der Tabelle. Hat kein
-/// eigenes ColumnItem; die Scores sind Laufzeitzustand und verfallen mit
-/// den Zeilen-Objekten. Die Spalte ist nur vorhanden, solange ein
+/// Virtuelle Spalte der Ähnlichkeits-Suche: zeigt pro Zeile den ungerundeten
+/// Score (0–100) des letzten „Ähnliche Zeilen“-Vergleichs der Tabelle. Hat
+/// kein eigenes ColumnItem; die Scores sind Laufzeitzustand und verfallen
+/// mit den Zeilen-Objekten. Die Spalte ist nur vorhanden, solange ein
 /// Vergleich Scores geliefert hat.
 /// </summary>
 public sealed class SimilarityColumnItem : ColumnViewItem {
 
     #region Fields
 
-    private static readonly ConditionalWeakTable<RowItem, Dictionary<ColumnItem, int>> _cellScores = [];
-    private static readonly ConditionalWeakTable<RowItem, StrongBox<int>> _scores = [];
+    private static readonly ConditionalWeakTable<RowItem, Dictionary<ColumnItem, double>> _cellScores = [];
+    private static readonly ConditionalWeakTable<RowItem, StrongBox<double>> _scores = [];
     private static bool _hasScores;
     private static Table? _scoredTable;
 
@@ -40,7 +40,7 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
 
     public override string? Renderer => "ColorRange";
     public override string RendererSettings => "{ClassId=\"ColorRange\", MinValue=0, MaxValue=100, MinColor=#FF0000, MaxColor=#00FF00}";
-    public override SortierTyp SortType => SortierTyp.ZahlenwertInt;
+    public override SortierTyp SortType => SortierTyp.ZahlenwertFloat;
     public override string? StorageKey => ClassId;
 
     #endregion
@@ -65,14 +65,14 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
     /// <summary>
     /// Speichert die Scores der Ähnlichkeits-Suche einer Tabelle.
     /// </summary>
-    public static void SetScores(Table table, Dictionary<RowItem, int> scores, Dictionary<RowItem, Dictionary<ColumnItem, int>> cellScores) {
+    public static void SetScores(Table table, Dictionary<RowItem, double> scores, Dictionary<RowItem, Dictionary<ColumnItem, double>> cellScores) {
         _scores.Clear();
         _cellScores.Clear();
         _scoredTable = table;
         _hasScores = true;
 
         foreach (var thisPair in scores) {
-            _scores.Add(thisPair.Key, new StrongBox<int>(thisPair.Value));
+            _scores.Add(thisPair.Key, new StrongBox<double>(thisPair.Value));
         }
 
         foreach (var thisPair in cellScores) {
@@ -81,10 +81,11 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
     }
 
     /// <summary>
-    /// Liefert den Zell-Score (0–100) der Spalte bezogen auf die Referenzzeile;
-    /// false, wenn kein Vergleichswert vorliegt (z. B. ignorierte Spalte).
+    /// Liefert den ungerundeten Zell-Score (0–100) der Spalte bezogen auf die
+    /// Referenzzeile; false, wenn kein Vergleichswert vorliegt
+    /// (z. B. ignorierte Spalte).
     /// </summary>
-    public static bool TryGetCellScore(RowItem? row, ColumnItem? column, out int score) {
+    public static bool TryGetCellScore(RowItem? row, ColumnItem? column, out double score) {
         if (row is { IsDisposed: false } && column is { IsDisposed: false } && _scoredTable == row.Table
             && _cellScores.TryGetValue(row, out var cells)) {
             return cells.TryGetValue(column, out score);
@@ -98,7 +99,7 @@ public sealed class SimilarityColumnItem : ColumnViewItem {
     /// </summary>
     public override string CellGetString(RowItem? row, bool isPinned) {
         if (row is not { IsDisposed: false } || _scoredTable != row.Table) { return string.Empty; }
-        return _scores.TryGetValue(row, out var score) ? score.Value.ToString1() : string.Empty;
+        return _scores.TryGetValue(row, out var score) ? score.Value.ToString1_2() : string.Empty;
     }
 
     #endregion
