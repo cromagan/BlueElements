@@ -12,10 +12,14 @@ using System.Threading.Tasks;
 namespace BlueTable.Classes;
 
 public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable, IJsonParseable {
+    /// <summary>
+    /// Fehlergrund einer fehlgeschlagenen Zeile samt Zeitpunkt des Fehlschlags.
+    /// </summary>
+    public readonly record struct FailedRowEntry(string Reason, DateTime FailedUtc);
 
     #region Fields
 
-    public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
+    public static readonly ConcurrentDictionary<RowItem, FailedRowEntry> FailedRows = [];
 
     public static readonly InvalidatedRowsManager InvalidatedRowsManager = new();
 
@@ -65,6 +69,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Headless-Anwendungen (z. B. CLI) setzen dies auf false, damit in jedem Fall alle Zeilen bearbeitet werden.
     /// </summary>
     public static bool AllowProcessingAborts { get; set; } = true;
+
+    /// <summary>
+    /// Wert in Minuten. Nach dieser Zeit wird eine Zeile aus FailedRows entfernt und neu geprüft.
+    /// </summary>
+    public static double FailedRowExpireMinutes { get; set; } = 45;
 
     /// <summary>
     /// Wert in Minuten.
@@ -311,6 +320,35 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand);
 
         return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
+    }
+
+    /// <summary>
+    /// Entfernt FailedRows-Einträge, deren Sperrzeit abgelaufen ist.
+    /// </summary>
+    public static void RemoveExpiredFailedRows() {
+        var limit = DateTime.UtcNow.AddMinutes(-FailedRowExpireMinutes);
+        foreach (var kvp in FailedRows.ToArray()) {
+            if (kvp.Value.FailedUtc < limit) {
+                FailedRows.TryRemove(kvp.Key, out _);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Liefert den Fehlergrund der Zeile; nach Ablauf der Sperrzeit wird der Eintrag entfernt.
+    /// </summary>
+    public static bool TryGetFailedReason(RowItem row, out string reason) {
+        if (FailedRows.TryGetValue(row, out var entry)) {
+            if (DateTime.UtcNow - entry.FailedUtc < TimeSpan.FromMinutes(FailedRowExpireMinutes)) {
+                reason = entry.Reason;
+                return true;
+            }
+
+            FailedRows.TryRemove(row, out _);
+        }
+
+        reason = string.Empty;
+        return false;
     }
 
     public static string UniqueKeyValue() {
@@ -663,6 +701,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (Table is not { IsDisposed: false } tb) { return null; }
 
         if (!tb.CanDoValueChangedScript(false)) { return null; }
+
+        RemoveExpiredFailedRows();
 
         var rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck is not null) { return rowToCheck; }

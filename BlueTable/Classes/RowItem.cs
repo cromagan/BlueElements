@@ -350,7 +350,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
+        if (RowCollection.TryGetFailedReason(this, out var reason)) {
             _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, reason, b);
             return _lastCheckedEventArgs;
         }
@@ -541,7 +541,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                                            tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
     public string LastFailedReason() {
-        if (IsDisposed || !RowCollection.FailedRows.TryGetValue(this, out var txt)) { return string.Empty; }
+        if (IsDisposed || !RowCollection.TryGetFailedReason(this, out var txt)) { return string.Empty; }
 
         return txt;
     }

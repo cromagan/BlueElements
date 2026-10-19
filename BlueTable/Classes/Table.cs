@@ -1464,7 +1464,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (script.NeedRow && row is null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, script.KeyName); }
         if (!script.NeedRow) { row = null; }
 
-        if (!ignoreError && row is not null && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
+        if (!ignoreError && row is not null && RowCollection.TryGetFailedReason(row, out var reason)) {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
@@ -2508,7 +2508,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         if (row is not null && !string.IsNullOrEmpty(scf.FailedReason)) {
-            RowCollection.FailedRows[row] = scf.FailedReason;
+            RowCollection.FailedRows[row] = new(scf.FailedReason, DateTime.UtcNow);
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
 
             // Sperr-Feature deaktiviert: Das Skript wird nicht mehr nach zu vielen
