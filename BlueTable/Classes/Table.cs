@@ -2511,15 +2511,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             RowCollection.FailedRows[row] = scf.FailedReason;
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
 
-            // Ab zu vielen Fehlerzeilen das Skript selbst als fehlerhaft markieren,
-            // damit nicht jede weitere Zeile denselben Fehler einzeln produziert.
-            if (!ignoreError && produktivphase && string.IsNullOrEmpty(failed)) {
-                var failedCount = RowCollection.FailedRows.Keys.Count(thisRow => thisRow.Table == this);
-                if (failedCount > 19) {
-                    failed = $"Zu viele Zeilen mit Skript-Fehlern ({failedCount})." + DebugPrintSuffix(debugOutput);
-                    savedVariables = scf.Variables?.ToList();
-                }
-            }
+            // Sperr-Feature deaktiviert: Das Skript wird nicht mehr nach zu vielen
+            // Fehlerzeilen als fehlerhaft markiert.
+            //if (!ignoreError && produktivphase && string.IsNullOrEmpty(failed)) {
+            //    var failedCount = RowCollection.FailedRows.Keys.Count(thisRow => thisRow.Table == this);
+            //    if (failedCount > 19) {
+            //        failed = $"Zu viele Zeilen mit Skript-Fehlern ({failedCount})." + DebugPrintSuffix(debugOutput);
+            //        savedVariables = scf.Variables?.ToList();
+            //    }
+            //}
         }
 
         var failedChanged = failed != script.FailedReason;
