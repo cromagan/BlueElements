@@ -1766,6 +1766,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isFirst) { _minTextLength = 1; }
         }
 
+        // Ähnlichkeits-Gewichtung: First- und Unique-Spalten fließen nie in die
+        // Ähnlichkeits-Suche ein; Systemspalten setzt ResetSystemToDefault auf 0
+        if (_isFirst || tb.UniqueValues.Any(uvd => uvd.KeyColumns.Contains(this))) {
+            _similarityWeight = 0f;
+        }
+
         RepairControlStrategy();
 
         ResetSystemToDefault(false);
@@ -1788,6 +1794,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         _saveContent = true;
+        _similarityWeight = 0f; // Systemspalten zählen nie zur Ähnlichkeits-Suche
 
         //_relationType = RelationType.None;
 

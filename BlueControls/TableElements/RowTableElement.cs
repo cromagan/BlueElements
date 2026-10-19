@@ -18,6 +18,7 @@ public sealed class RowTableElement : TableElement {
     #region Fields
 
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+    public static readonly SolidBrush BrushWhiteSimilarity = new(Color.FromArgb(180, 255, 255, 255));
     public static readonly HatchBrush RedStripesBrush1 = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(30, 255, 0, 0), Color.FromArgb(5, 255, 0, 0));
     public static readonly HatchBrush RedStripesBrush2 = new HatchBrush(HatchStyle.DarkVertical, Color.FromArgb(80, 255, 100, 0), Color.FromArgb(80, 255, 0, 0));
 
@@ -239,6 +240,15 @@ public sealed class RowTableElement : TableElement {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
 
         ColumnOverlay(gr, viewItem, positionControl);
+
+        if (viewItem.Column is { IsDisposed: false } column
+            && column.Table is { IsDisposed: false } scoredTable
+            && SimilarityColumnItem.HasScores(scoredTable)
+            && column.SimilarityWeight <= 0) {
+            // Bei aktiver Ähnlichkeits-Suche Spalten ohne Gewicht weiß
+            // überpinseln — sie fließen nicht in den Vergleich ein.
+            lock (BrushWhiteSimilarity) { gr.FillRectangle(BrushWhiteSimilarity, positionControl); }
+        }
     }
 
     /// <summary>

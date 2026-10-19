@@ -52,8 +52,8 @@ public static class RowSimilarity {
     /// <summary>
     /// Gesamtscore (0–100, ungerundet) je Zeile sowie Zell-Score
     /// (0–100, ungerundet) je Zelle der berücksichtigten Spalten. Spalten,
-    /// die der Vergleich ignoriert (System-Spalten, erste Spalte),
-    /// erhalten keinen Zell-Score.
+    /// die der Vergleich ignoriert (System-Spalten, erste Spalte,
+    /// Unique-Spalten), erhalten keinen Zell-Score.
     /// </summary>
     public static (Dictionary<RowItem, double> Scores, Dictionary<RowItem, Dictionary<ColumnItem, double>> CellScores) Scores(Table table, RowItem referenceRow) {
         var scores = new Dictionary<RowItem, double>();
