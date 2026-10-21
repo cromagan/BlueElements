@@ -33,8 +33,8 @@ public class SwapListBoxControlStrategy : ControlStrategy {
     /// Fordert Platz für beide Listen an: fester Bereich der Hauptliste,
     /// Filterzeile und alle Vorschläge — höchstens 70 % der Bildschirmgröße.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        var required = base.CalculateRequiredBounds(bounds);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
+        var required = base.CalculateRequiredBounds(bounds, visibleArea);
         if (_control is not { IsDisposed: false } c) { return required; }
 
         var estimated = c.GetEstimatedSize();

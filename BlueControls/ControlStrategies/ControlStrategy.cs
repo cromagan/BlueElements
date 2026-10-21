@@ -707,7 +707,12 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
         _suspendCount++;
     }
 
-    public virtual Rectangle CalculateRequiredBounds(Rectangle bounds) {
+    /// <summary>
+    /// Berechnet den benötigten Bereich für das Control. <paramref name="bounds"/> ist der
+    /// verfügbare Bereich (z. B. die Zelle), <paramref name="visibleArea"/> der sichtbare
+    /// Bereich, in dem das Control liegen bleiben muss.
+    /// </summary>
+    public virtual Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
         if (Border == GroupBoxStyle.Nothing) { return bounds; }
 
         // Rahmen-Insets ausgleichen, damit das eingebettete Control voll sichtbar bleibt.

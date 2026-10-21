@@ -136,17 +136,28 @@ public class TextBoxControlStrategy : ControlStrategy {
     }
 
     /// <summary>
-    /// Begrenzt einzeilig die Höhe auf das 2,5-Fache der Zeilenhöhe, mehrzeilig
-    /// bleibt die Feldhöhe unverändert. Reicht die Höhe für den Text nicht,
-    /// erscheint der vertikale Scrollbalken — die Breite wächst um SliderSize,
-    /// damit der Balken den Text nicht zusätzlich verengt.
+    /// Kürzt einzeilig die Höhe auf das 2,5-Fache der Zeilenhöhe. Reicht die
+    /// Höhe für den Text nicht, wächst die Breite um SliderSize, damit der
+    /// vertikale Scrollbalken außerhalb der Zelle liegt. Fehlt dafür am
+    /// rechten Rand der Platz, bleibt die volle Zellhöhe erhalten und der
+    /// Balken liegt in der Zelle.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        if (!MultiLine) { bounds.Height = Math.Min(bounds.Height, MaxSingleLineFillHeight); }
-        var required = base.CalculateRequiredBounds(bounds);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
+        var required = base.CalculateRequiredBounds(bounds, visibleArea);
 
-        if (_control is { IsDisposed: false } c && c.NeedsVerticalScrollbar(required.Size)) {
-            required.Width += ZoomPad.SliderSize;
+        if (_control is not { IsDisposed: false } c) { return required; }
+
+        // Einzeilig: Höhe auf das 2,5-Fache der Zeilenhöhe begrenzen.
+        var shortened = MultiLine
+            ? required
+            : new Rectangle(required.Location, new Size(required.Width, Math.Min(required.Height, MaxSingleLineFillHeight)));
+
+        if (!c.NeedsVerticalScrollbar(shortened.Size)) { return shortened; }
+
+        // Text passt nicht: Platz für den Balken außerhalb der Zelle vorhanden,
+        // sonst volle Zellhöhe, damit der Balken in der Zelle liegen kann.
+        if (shortened.Right + ZoomPad.SliderSize <= visibleArea.Right) {
+            return new Rectangle(shortened.Location, new Size(shortened.Width + ZoomPad.SliderSize, shortened.Height));
         }
 
         return required;

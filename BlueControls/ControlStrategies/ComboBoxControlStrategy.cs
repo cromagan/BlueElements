@@ -37,8 +37,8 @@ public class ComboBoxControlStrategy : ControlStrategy {
     /// Combobox auf Zeilenhöhe, zzgl. des Rahmen-Zuschlags, damit das
     /// eingebettete Control voll sichtbar bleibt.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        var required = base.CalculateRequiredBounds(bounds);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
+        var required = base.CalculateRequiredBounds(bounds, visibleArea);
         return new Rectangle(required.Location,
             new Size(required.Width + (_control?.btnDropDown.Width ?? 0),
                 MultiLine ? required.Height : Math.Min(required.Height, SingleLineHeight.CanvasToControl(Zoom) + BorderExtraSize.Height)));

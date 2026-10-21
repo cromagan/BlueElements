@@ -91,8 +91,8 @@ public class TextBoxSuggestionsControlStrategy : ControlStrategy {
     /// und nicht abgeschnitten wird; das umbrechende Verhalten nach unten
     /// bleibt unverändert.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        var required = base.CalculateRequiredBounds(bounds);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
+        var required = base.CalculateRequiredBounds(bounds, visibleArea);
         if (_control is not { } c) { return required; }
         var width = Math.Max(required.Width, c.GetEstimatedWidth());
         c.TextboxSize = new Size(width, required.Height);

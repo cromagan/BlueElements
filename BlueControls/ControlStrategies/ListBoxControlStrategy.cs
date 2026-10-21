@@ -37,7 +37,7 @@ public class ListBoxControlStrategy : ControlStrategy {
     /// Bei aktivem Rahmen kommt der Rahmen-Zuschlag hinzu, damit das
     /// eingebettete Control voll sichtbar bleibt.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
         var extra = BorderExtraSize;
 
         if (_control is not { } c || c.Items is not { Count: > 0 } items) {

@@ -2073,12 +2073,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             strategy.Value = value;
 
             // Strategie-spezifischer Bereich, ggf. über der Zelllinie beginnend.
-            var required = strategy.CalculateRequiredBounds(bounds);
+            // Der sichtbare Bereich fließt ein, damit Strategien z. B. Platz für
+            // einen Scrollbalken außerhalb der Zelle einplanen können.
+            var area = AvailableControlPaintArea;
+            var required = strategy.CalculateRequiredBounds(bounds, area);
 
             // TableView hat das letzte Wort: das Control darf nicht über den
             // sichtbaren Bereich hinausragen — nie weiter oben als der
             // sichtbare Bereich.
-            var area = AvailableControlPaintArea;
             var top = Math.Max(area.Top, required.Y);
 
             c.Bounds = new Rectangle(required.X, top,

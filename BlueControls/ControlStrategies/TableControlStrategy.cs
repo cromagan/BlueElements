@@ -68,11 +68,11 @@ public class TableControlStrategy : ControlStrategy {
     /// Teil der View-Items. Der Bereich beginnt um die Höhe der Kopfleisten
     /// über der Zelllinie, damit die Spaltenköpfe über der Zelle liegen;
     /// unterhalb der Linie wird mindestens die volle Zellhöhe aufgefüllt. Die
-    /// TableView begrenzt das Ergebnis nicht auf den sichtbaren Bereich
-    /// (MayExceedVisibleWidth): Die Spalten behalten ihre Inhaltsbreiten.
+    /// TableView begrenzt das Ergebnis nicht auf den sichtbaren Bereich:
+    /// Die Spalten behalten ihre Inhaltsbreiten.
     /// </summary>
-    public override Rectangle CalculateRequiredBounds(Rectangle bounds) {
-        var required = base.CalculateRequiredBounds(bounds);
+    public override Rectangle CalculateRequiredBounds(Rectangle bounds, Rectangle visibleArea) {
+        var required = base.CalculateRequiredBounds(bounds, visibleArea);
 
         if (_control is not { IsDisposed: false } tv || _table is not { IsDisposed: false }) { return required; }
         if (tv.CurrentArrangement is not { } ca) { return required; }
