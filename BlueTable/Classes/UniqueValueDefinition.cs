@@ -143,9 +143,9 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
         _internal.RemoveAll(c => c is not { IsDisposed: false });
 
-        if (tb.Column.ChunkValueColumn is { } cvc && !_internal.Contains(cvc)) {
-            _internal.Add(cvc);
-        }
+        var repaired = ColumnCollection.ColumnsIncludingChunk(tb, _internal);
+        _internal.Clear();
+        _internal.AddRange(repaired);
 
         // Muss hier gemacht werden!
         // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.

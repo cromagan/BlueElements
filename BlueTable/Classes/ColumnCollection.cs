@@ -11,6 +11,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
+    // Trennzeichen für ValuesKey: Steuerzeichen, das in Zellinhalten praktisch nie vorkommt.
+    private const char KeySeparator = '\u001e';
+
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
 
     private volatile int _isDisposedFlag;
@@ -52,7 +55,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public bool IsDisposed => _isDisposedFlag == 1;
 
     public ColumnItem? SysCellNote { get; private set; }
+
     public ColumnItem? SysCorrect { get; private set; }
+
     public ColumnItem? SysLocked { get; private set; }
 
     /// <summary>
@@ -305,7 +310,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
-                                                                            && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand));
+                                                                                && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand));
 
     public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, ChangeFlags reason) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -373,6 +378,28 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         foreach (var thisColumn in this) {
             thisColumn.Repair();
         }
+    }
+
+    /// <summary>
+    /// Ergänzt die Chunk-Spalte zur Spaltenliste, falls vorhanden und nicht enthalten.
+    /// Ohne die Chunk-Spalte liefern Duplikat-/Unique-Suchen bei gechunkten Tabellen keine Treffer.
+    /// </summary>
+    internal static List<ColumnItem> ColumnsIncludingChunk(Table tb, IEnumerable<ColumnItem> columns) {
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } chk && !columns.Contains(chk)) {
+            return [.. columns, chk];
+        }
+        return columns.ToList();
+    }
+
+    /// <summary>
+    /// Verkettet die Zellwerte einer Zeile über alle gegebenen Spalten zu einem Schlüssel zum Vergleichen/Gruppieren.
+    /// </summary>
+    internal static string ValuesKey(RowItem row, IEnumerable<ColumnItem> columns) {
+        var sb = new System.Text.StringBuilder();
+        foreach (var column in columns) {
+            sb.Append(row.CellGetStringCore(column)).Append(KeySeparator);
+        }
+        return sb.ToString();
     }
 
     internal string ChangeKey(string oldKey, string newKey) {

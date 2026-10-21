@@ -28,6 +28,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static int _executingchangedrows;
 
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
+
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -82,6 +83,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static double NewRowTolerance { get; set; } = 1;
 
     public static int WaitDelay { get; set; }
+
     public int Count => _internal.Count;
 
     public bool IsDisposed => _isDisposedFlag == 1;
@@ -163,6 +165,49 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         l.RunWorkerAsync(row);
 
         Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.ReadableText(), 0);
+    }
+
+    /// <summary>
+    /// Liefert die Duplikat-Gruppen der Spalten: Zeilen mit gleichen Werten
+    /// in allen Spalten ("Dupe Suche" wie im RowCleanUp), leere Werte
+    /// zählen als Treffer. Die Chunk-Spalte wird automatisch ergänzt.
+    /// Jede Gruppe wird nur einmal geliefert, in der Reihenfolge ihrer ersten Zeile.
+    /// rows begrenzt die gelieferten Zeilen auf diese Auswahl; null = alle Zeilen.
+    /// ignoreCase: Vergleich ohne Groß-/Kleinschreibung.
+    /// </summary>
+    public static IEnumerable<List<RowItem>> DuplicateGroups(Table? table, List<ColumnItem> columns, IEnumerable<RowItem>? rows, bool ignoreCase) {
+        if (table is not { IsDisposed: false } tb) { yield break; }
+
+        var cols = columns.Where(c => c is { IsDisposed: false }).ToList();
+        if (cols.Count == 0) { yield break; }
+        cols = ColumnCollection.ColumnsIncludingChunk(tb, cols);
+
+        HashSet<RowItem>? allowed = null;
+        if (rows is not null) {
+            allowed = [];
+            foreach (var thisRow in rows) {
+                _ = allowed.Add(thisRow);
+            }
+        }
+
+        // Ein Durchlauf: Wertekombination je Zeile als Join-Key; Gruppen entstehen in der Reihenfolge ihres ersten Mitglieds.
+        var groups = new Dictionary<string, List<RowItem>>(ignoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+        foreach (var thisR in tb.Row) {
+            if (thisR.IsDisposed) { continue; }
+
+            var key = ColumnCollection.ValuesKey(thisR, cols);
+            if (!groups.TryGetValue(key, out var group)) {
+                group = [];
+                groups.Add(key, group);
+            }
+            group.Add(thisR);
+        }
+
+        foreach (var group in groups.Values) {
+            var deliver = allowed is null ? group : [.. group.Where(allowed.Contains)];
+            if (deliver.Count > 1) { yield return deliver; }
+        }
     }
 
     /// <summary>
@@ -335,6 +380,49 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
+    /// Räumt die Duplikate aller Unique-Definitionen auf: Dupe-Suche per
+    /// RowCollection.DuplicateGroups, dann Combine + RemoveYoungest.
+    /// Mit dryRun wird nichts geändert; false bedeutet, dass eine Gruppe
+    /// maxRows überschreitet und der Aufrufer rückfragen muss. Ohne dryRun
+    /// werden übergroße Gruppen bei warn mitrepariert, sonst abgebrochen.
+    /// true bei erfolgreicher bzw. für möglich befundener Reparatur.
+    /// </summary>
+    public static bool RepairUniques(Table? table, bool abortIfToMany, int maxRows, bool dryRun) {
+        if (table is not { IsDisposed: false } tb) { return false; }
+
+        // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events.
+        // SuppressEvents bündelt alles, ResumeEvents macht am Ende einen
+        // einzigen Aufbau. Die frühen `return` im Loop werden über finally
+        // sicher wieder freigegeben. Im Trockenlauf bleibt die Tabelle unangetastet.
+        if (!dryRun) { tb.SuppressEvents(); }
+        try {
+            foreach (var thisDef in tb.UniqueValues) {
+                // Spalten der Definition; die Chunk-Spalte ergänzt DuplicateGroups selbst.
+                var keyColumns = thisDef.KeyColumns.Where(c => c is { IsDisposed: false }).ToList();
+                if (keyColumns.Count == 0) { continue; }
+
+                foreach (var rows in DuplicateGroups(tb, keyColumns, null, true)) {
+                    if (rows.Count > maxRows) {
+                        // Trockenlauf: abbrechen, damit der Aufrufer die Rückfrage stellen kann.
+                        if (dryRun || abortIfToMany) { return false; }
+                    }
+
+                    if (dryRun) { continue; }
+
+                    var error = tb.Row.Combine(rows).FailedReason;
+                    if (string.IsNullOrEmpty(error)) { error = tb.Row.RemoveYoungest(rows, true).FailedReason; }
+
+                    if (!string.IsNullOrEmpty(error)) { return false; }
+                }
+            }
+        } finally {
+            if (!dryRun) { tb.ResumeEvents(); }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Liefert den Fehlergrund der Zeile; nach Ablauf der Sperrzeit wird der Eintrag entfernt.
     /// </summary>
     public static bool TryGetFailedReason(RowItem row, out string reason) {
@@ -463,41 +551,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Liefert lazy die Duplikat-Gruppen der Spalten: Zeilen mit gleichen Werten
-    /// in allen Spalten ("Dupe Suche"-Filter wie im RowCleanUp). rows begrenzt
-    /// die Suche auf diese Zeilen; null = alle Zeilen der Tabelle prüfen.
-    /// </summary>
-    public IEnumerable<List<RowItem>> DuplicateGroups(List<ColumnItem> columns, IEnumerable<RowItem>? rows) {
-        if (Table is not { IsDisposed: false } tb) { yield break; }
-
-        var cols = columns.Where(c => c is { IsDisposed: false }).ToList();
-        if (cols.Count == 0) { yield break; }
-
-        foreach (var thisR in tb.Row) {
-            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
-
-                #region Filtercol erstellen
-
-                using var f = new FilterCollection(tb, "Dupe Suche");
-
-                foreach (var thisc in cols) {
-                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
-                }
-
-                #endregion
-
-                #region Zeilen ermitteln (rows)
-
-                var group = rows is null ? f.Rows.ToList() : f.Rows.Intersect(rows).ToList();
-
-                #endregion
-
-                if (group.Count > 1) { yield return group; }
-            }
-        }
     }
 
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
@@ -763,8 +816,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public OperationResult Remove(FilterItem fi, string comment) =>
-            //TODO: unbenutzt
-            Remove(FilterCollection.CalculateFilteredRows(Table, false, fi), comment);
+                //TODO: unbenutzt
+                Remove(FilterCollection.CalculateFilteredRows(Table, false, fi), comment);
 
     public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -850,6 +903,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         fic.Add(fi);
 
         return UniqueRow(fic, comment);
+    }
+
+    /// <summary>
+    /// Prüft, ob die Zeile in allen Spalten exakt die gegebenen Werte hat;
+    /// leere Werte zählen als Treffer.
+    /// </summary>
+    internal static bool RowMatchesValues(RowItem row, List<ColumnItem> columns, List<string> values, bool ignoreCase) {
+        var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        for (var i = 0; i < columns.Count; i++) {
+            if (!string.Equals(row.CellGetStringCore(columns[i]), values[i], comparison)) { return false; }
+        }
+        return true;
     }
 
     internal void CopyTo(RowCollection target) {

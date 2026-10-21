@@ -11,7 +11,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
-    public sealed partial class ImportCsvScriptCommand {
+    public sealed partial class ImportCsv {
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.

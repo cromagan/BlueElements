@@ -154,7 +154,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         // sicher wieder freigegeben.
         tb.SuppressEvents();
         try {
-            foreach (var rows in tb.Row.DuplicateGroups(columns, r)) {
+            foreach (var rows in RowCollection.DuplicateGroups(tb, columns, r, chkGroßKlein.Checked)) {
                 if (optFülle.Checked) {
                     error = tb.Row.Combine(rows).FailedReason;
                 } else if (optLöschen.Checked) {

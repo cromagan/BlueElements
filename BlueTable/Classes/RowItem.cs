@@ -842,29 +842,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Ignoriert dabei System-Spalten und Spalten mit ungültigen ScriptTypes.
     /// </summary>
     /// <returns>
-    /// Ein String mit allen Spaltenwerten getrennt durch "|", oder ein leerer String wenn die Zeile oder Tabelle disposed ist.
+    /// Ein String mit allen Spaltenwerten, oder ein leerer String wenn die Zeile oder Tabelle disposed ist.
     /// </returns>
     public string RowStamp() {
-        // Frühe Rückgabe wenn Objekt disposed oder Tabelle ungültig ist
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        // Null-Prüfung für Column-Collection
-        if (tb.Column is null) { return string.Empty; }
-
-        var resultBuilder = new StringBuilder();
-
-        // LINQ-basierte Filterung und Verarbeitung der Spalten
-        var validColumns = tb.Column
-            .Where(column => column is { IsDisposed: false })
-            .Where(column => column.ScriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert))
-            .Where(column => column != tb.Column.SysRowState);
-
-        // Spaltenwerte sammeln und verketten
-        foreach (var column in validColumns) {
-            resultBuilder.Append(CellGetString(column)).Append('|');
-        }
-
-        return resultBuilder.ToString();
+        return ColumnCollection.ValuesKey(this, tb.Column.Where(column => column is { IsDisposed: false }
+            && column.ScriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert)
+            && column != tb.Column.SysRowState));
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
@@ -1326,30 +1310,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    /// <summary>
+    /// Prüft, ob das Schreiben von newValue eine Unique-Definition verletzen würde.
+    /// Nutzt dasselbe Wert-Matching wie RowCollection.DuplicateGroups; die Zeilen
+    /// werden parallel geprüft, mit Abbruch beim ersten Treffer.
+    /// </summary>
     private string CheckUniqueValueConstraint(ColumnItem column, string newValue) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         foreach (var uvd in tb.UniqueValues) {
-            if (uvd.KeyColumns.All(c => c.KeyName != column.KeyName)) { continue; }
-
-            var thisRowValues = uvd.KeyColumns.Select(c =>
-                c.KeyName == column.KeyName ? newValue : CellGetStringCore(c)).ToList();
-
-            var hasViolation = tb.Row.AsParallel()
-                .Where(otherRow => otherRow != this && otherRow is { IsDisposed: false })
-                .Any(otherRow => {
-                    for (var i = 0; i < uvd.KeyColumns.Count; i++) {
-                        if (otherRow.CellGetStringCore(uvd.KeyColumns[i]) != thisRowValues[i]) { return false; }
-                    }
-                    return true;
-                });
-
-            if (hasViolation) {
-                var valuePairs = uvd.KeyColumns.Select((c, i) => $"{c.Caption}='{thisRowValues[i]}'");
-                return $"Unique-Wert-Verletzung in Tabelle '{tb.Caption}': Die Kombination aus {string.Join(", ", valuePairs)} muss einzigartig sein.";
-            }
+            var fehler = UniqueViolationReason(tb, uvd, column, newValue);
+            if (fehler.Length > 0) { return fehler; }
         }
-
         return string.Empty;
     }
 
@@ -1461,6 +1433,34 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Liefert den Fehlertext, wenn eine andere Zeile bereits die Wertekombination der Definition hat.
+    /// </summary>
+    private string UniqueViolationReason(Table tb, UniqueValueDefinition uvd, ColumnItem column, string newValue) {
+        if (uvd.KeyColumns.All(c => c != column)) { return string.Empty; }
+
+        var cols = ColumnCollection.ColumnsIncludingChunk(tb, uvd.KeyColumns);
+        var thisRowValues = new List<string>(cols.Count);
+        foreach (var thisc in cols) {
+            thisRowValues.Add(thisc == column ? newValue : CellGetStringCore(thisc));
+        }
+
+        // Paralleles Any mit Abbruch beim ersten Treffer.
+        var hasViolation = tb.Row.AsParallel()
+            .AsUnordered()
+            .Any(otherRow => otherRow != this
+                && otherRow is { IsDisposed: false }
+                && RowCollection.RowMatchesValues(otherRow, cols, thisRowValues, true));
+
+        if (!hasViolation) { return string.Empty; }
+
+        var valuePairs = new List<string>(uvd.KeyColumns.Count);
+        for (var i = 0; i < cols.Count; i++) {
+            if (uvd.KeyColumns.Contains(cols[i])) { valuePairs.Add($"{cols[i].Caption}='{thisRowValues[i]}'"); }
+        }
+        return $"Unique-Wert-Verletzung in Tabelle '{tb.Caption}': Die Kombination aus [{string.Join(", ", valuePairs)}] muss einzigartig sein.";
     }
 
     #endregion

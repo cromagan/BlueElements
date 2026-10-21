@@ -33,6 +33,12 @@ internal class ImportCsvScriptCommand : TableGenericScriptCommand {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(); }
 
+        // Vor dem Import die Duplikate der Unique-Definitionen reparieren;
+        // ohne Rückfrage wird bei mehr als 5 gleichen Zeilen abgebrochen.
+        if (!RowCollection.RepairUniques(tb, true, 5, false)) {
+            return new DoItFeedback("Import abgebrochen: Die Zeilen verletzen eine Unique-Definition und konnten nicht automatisch repariert werden.", false);
+        }
+
         // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
         // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.
         tb.SuppressEvents();

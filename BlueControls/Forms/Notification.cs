@@ -53,13 +53,16 @@ public partial class Notification : FloatingForm, IAnimatable {
         if (lines.Length >= 2 && lines[0].Length >= lines[1].Length - 5) {
             needsWider = true;
         }
-        var btnNeededWidth = btnClose.Width + 8;
+
+        // Einzeiliger Text: Das rote X oben rechts würde den Text überdecken,
+        // daher die Box um die Breite des X-Feldes erweitern.
+        if (lines.Length == 1) { needsWider = true; }
         var primaryScreen = Screen.PrimaryScreen;
         _screenWidth = primaryScreen?.Bounds.Size.Width ?? 1920;
         _screenHeight = primaryScreen?.Bounds.Size.Height ?? 1080;
         var wi = Math.Min((int)(_screenWidth * 0.5), capText.Right + Skin.Padding);
         if (needsWider) {
-            wi = Math.Max(wi, btnNeededWidth + Skin.Padding * 2);
+            wi += btnClose.Width + Skin.PaddingSmal;
         }
         var he = Math.Min((int)(_screenHeight * 0.5), capText.Bottom + Skin.Padding);
         Size = new Size(wi, he);

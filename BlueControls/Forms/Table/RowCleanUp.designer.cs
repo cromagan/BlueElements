@@ -27,6 +27,7 @@ namespace BlueControls.BlueTableDialogs
             grpVerhalten = new GroupBox();
             optLöschen = new Button();
             optFülle = new Button();
+            chkGroßKlein = new Button();
             pnlStatusBar.SuspendLayout();
             grpVerhalten.SuspendLayout();
             SuspendLayout();
@@ -99,9 +100,10 @@ namespace BlueControls.BlueTableDialogs
             grpVerhalten.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
             grpVerhalten.Controls.Add(optLöschen);
             grpVerhalten.Controls.Add(optFülle);
+            grpVerhalten.Controls.Add(chkGroßKlein);
             grpVerhalten.Location = new Point(288, 56);
             grpVerhalten.Name = "grpVerhalten";
-            grpVerhalten.Size = new Size(432, 128);
+            grpVerhalten.Size = new Size(432, 152);
             grpVerhalten.TabIndex = 102;
             grpVerhalten.TabStop = false;
             grpVerhalten.Text = "Verhalten";
@@ -126,6 +128,17 @@ namespace BlueControls.BlueTableDialogs
             optFülle.Size = new Size(416, 40);
             optFülle.TabIndex = 1;
             optFülle.Text = "Leere Zellen mit Werten anderer Zeilen <b>befüllen</b><br><i>Dardurch entstehen evtl. doppelte Zeilen.";
+            //
+            // chkGroßKlein
+            //
+            chkGroßKlein.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkGroßKlein.Checked = true;
+            chkGroßKlein.CustomContextMenuItems = null;
+            chkGroßKlein.Location = new Point(8, 128);
+            chkGroßKlein.Name = "chkGroßKlein";
+            chkGroßKlein.Size = new Size(416, 16);
+            chkGroßKlein.TabIndex = 3;
+            chkGroßKlein.Text = "Groß-/Kleinschreibung ignorieren";
             // 
             // RowCleanUp
             // 
@@ -162,5 +175,6 @@ namespace BlueControls.BlueTableDialogs
         private GroupBox grpVerhalten;
         private Button optLöschen;
         private Button optFülle;
+        private Button chkGroßKlein;
     }
 }

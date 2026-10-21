@@ -649,7 +649,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", TextOneLineColumnFormat.Instance);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
 
-
         if (colText is { IsDisposed: false }) {
             colText.DefaultRenderer = column.DefaultRenderer;
             colText.RendererSettings = column.RendererSettings;
@@ -689,7 +688,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         tcvc[1].ShowColumns("Aenderdatum", "Aenderer", "VorherigerText");
         tcvc[1].ScaleToFit = ScaleToFitMode.Aggressiv;
         tb.ColumnArrangements = tcvc.AsReadOnly();
-        
 
         tb.SortDefinition = new RowSortDefinition(tb, colDate, true);
 
@@ -718,7 +716,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ImportCsv(Table table, string csvtxt) {
-        using ImportCsvScriptCommand x = new(table, csvtxt);
+        using ImportCsv x = new(table, csvtxt);
         x.ShowDialog();
     }
 
@@ -3625,19 +3623,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenü");
     }
 
-    private void ContextMenu_ShowAll(object? sender, ContextMenuEventArgs e) {
-        var (column, _, _, _, _) = GetContextData(e.HotItem);
-        if (column is null) { return; }
-
-        var sb = new StringBuilder();
-        foreach (var t in column.Contents(FilterCombined, PinnedRows)) {
-            sb.AppendLine((column.TextFormatingAllowed ? t.HtmlToPlain() : t));
-        }
-
-        var tv = new Forms.TextView(sb.ToString(), column.Caption);
-        tv.Show();
-    }
-
     private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
         var (column, _, _, _, viewItem) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
@@ -3717,6 +3702,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void ContextMenu_SearchAndReplace(object? sender, ContextMenuEventArgs e) {
         if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
+    }
+
+    private void ContextMenu_ShowAll(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _, _) = GetContextData(e.HotItem);
+        if (column is null) { return; }
+
+        var sb = new StringBuilder();
+        foreach (var t in column.Contents(FilterCombined, PinnedRows)) {
+            sb.AppendLine((column.TextFormatingAllowed ? t.HtmlToPlain() : t));
+        }
+
+        var tv = new Forms.TextView(sb.ToString(), column.Caption);
+        tv.Show();
     }
 
     private void ContextMenu_SortAZ(object? sender, ContextMenuEventArgs e) {

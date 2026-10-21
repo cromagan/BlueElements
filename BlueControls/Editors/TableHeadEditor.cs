@@ -348,14 +348,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         return !oldKeys.SetEquals(newKeys);
     }
 
-    /// <summary>
-    /// Liefert die bereinigte Arbeitskopie der Unique-Definitionen aus dem Editor.
-    /// </summary>
-    private List<UniqueValueDefinition> WorkingCopyUniques() => (lstUniqueValues.OutputItem ?? [])
-        .Cast<UniqueValueDefinition>()
-        .Where(x => x.KeyColumns.Count > 0)
-        .ToList();
-
     private static List<string> UnknownWords(IEnumerable<string> words) {
         var result = words.Where(w => !SpellDictionary.ContainsWord(w)).ToList();
         result.Sort(StringComparer.OrdinalIgnoreCase);
@@ -440,7 +432,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // Duplikat-Suche die aktuellen (ggf. im Dialog geänderten) Definitionen nutzt.
         tb.UniqueValues = WorkingCopyUniques().AsReadOnly();
 
-        RepairUniquesInteractive();
+        // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
+        var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true)
+            || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
+
+        if (fortsetzen) { RowCollection.RepairUniques(tb, false, 5, false); }
     }
 
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
@@ -504,54 +500,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     /// <summary>
-    /// Räumt die Duplikate aller Unique-Definitionen auf — gleiche Logik wie im
-    /// Zeilenbereinigungs-Dialog: Dupe-Suche per RowCollection.DuplicateGroups,
-    /// dann Combine + RemoveYoungest. Bei mehr als 3 gleichen Zeilen wird
-    /// nachgefragt.
+    /// Liefert die bereinigte Arbeitskopie der Unique-Definitionen aus dem Editor.
     /// </summary>
-    private void RepairUniquesInteractive() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var error = string.Empty;
-
-        // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events.
-        // SuppressEvents bündelt alles, ResumeEvents macht am Ende einen
-        // einzigen Aufbau. Die frühen `return` im Loop werden über finally
-        // sicher wieder freigegeben.
-        tb.SuppressEvents();
-        try {
-            foreach (var thisDef in tb.UniqueValues) {
-
-                #region Spalten der Definition, inkl. Chunk-Spalte
-
-                // Ohne Filter auf die Chunk-Spalte liefert die Dupe-Suche bei
-                // gechunkten Tabellen keine Zeilen (siehe RowCleanUp).
-                var keyColumns = thisDef.KeyColumns.Where(c => c is { IsDisposed: false }).ToList();
-                if (keyColumns.Count == 0) { continue; }
-                var columns = new List<ColumnItem>(keyColumns);
-                if (tb.Column.ChunkValueColumn is { IsDisposed: false } chk && !columns.Contains(chk)) { columns.Add(chk); }
-
-                #endregion
-
-                foreach (var rows in tb.Row.DuplicateGroups(columns, null)) {
-                    if (rows.Count > 5) {
-                        var t = $"Der Wert <b>{string.Join("; ", keyColumns.Select(c => rows[0].CellGetString(c)))}</b> ist in der Definition <b>{thisDef.ReadableText()}</b> {rows.Count}x vorhanden.<br>Reparatur fortsetzen?";
-                        if (Forms.MessageBox.Show(t, ImageCode.Warnung, "Weiter", "Abbrechen") != 0) { return; }
-                    }
-
-                    error = tb.Row.Combine(rows).FailedReason;
-                    if (string.IsNullOrEmpty(error)) { error = tb.Row.RemoveYoungest(rows, true).FailedReason; }
-
-                    if (!string.IsNullOrEmpty(error)) {
-                        Forms.MessageBox.Show($"Abbruch:<br>{error}", ImageCode.Warnung, "OK");
-                        return;
-                    }
-                }
-            }
-        } finally {
-            tb.ResumeEvents();
-        }
-    }
+    private List<UniqueValueDefinition> WorkingCopyUniques() => (lstUniqueValues.OutputItem ?? [])
+        .Cast<UniqueValueDefinition>()
+        .Where(x => x.KeyColumns.Count > 0)
+        .ToList();
 
     private void WriteInfosBack() {
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
@@ -593,8 +547,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.UniqueValues = neueDefinitions.AsReadOnly();
 
         // Hat der Benutzer die Unique-Definitionen verändert, werden die
-        // Zeilen-Duplikate aller Definitionen repariert.
-        if (uniquesChanged) { RepairUniquesInteractive(); }
+        // Zeilen-Duplikate aller Definitionen repariert (Warnung ab mehr als 5 gleichen Zeilen).
+        if (uniquesChanged) {
+            // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
+            var fortsetzen = RowCollection.RepairUniques(Table, true, 5, true)
+                || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
+
+            if (fortsetzen) { RowCollection.RepairUniques(Table, false, 5, false); }
+        }
 
         #endregion
 

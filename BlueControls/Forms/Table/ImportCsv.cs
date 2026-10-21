@@ -5,7 +5,7 @@ using BlueTable.Interfaces;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class ImportCsvScriptCommand : FormWithStatusBar, IHasTable {
+public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
 
     #region Fields
 
@@ -15,7 +15,7 @@ public sealed partial class ImportCsvScriptCommand : FormWithStatusBar, IHasTabl
 
     #region Constructors
 
-    public ImportCsvScriptCommand(Table? table, string importtext) : base() {
+    public ImportCsv(Table? table, string importtext) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -77,6 +77,16 @@ public sealed partial class ImportCsvScriptCommand : FormWithStatusBar, IHasTabl
         var m = "Tabellen-Fehler";
 
         if (Table is { IsDisposed: false } tb) {
+            // Vor dem Import die Duplikate der Unique-Definitionen reparieren
+            // (Warnung ab mehr als 5 gleichen Zeilen); bei Abbruch kein Import.
+            // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
+            var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true)
+                || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
+
+            if (!fortsetzen) { return; }
+
+            RowCollection.RepairUniques(tb, false, 5, false);
+
             // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
             // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.
             // SuppressEvents bündelt sie, ResumeEvents macht am Ende einen Aufbau.

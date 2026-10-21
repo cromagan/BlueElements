@@ -2663,6 +2663,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             return UniqueColumnScriptReadonly;
         }
 
+        if (IsInUniqueDefinition && _multiLine) {
+            return UniqueColumnNoMultiline;
+        }
+
         if (_allowedChars is { Length: > 0 } && _forbiddenChars is { Length: > 0 } && _allowedChars.Intersect(_forbiddenChars).Any()) {
             return AllowedAndForbiddenOverlap;
         }

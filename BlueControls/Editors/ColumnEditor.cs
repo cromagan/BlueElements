@@ -711,7 +711,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("\\r aus verbotenen Zeichen entfernen", () => txbAutoRemove.Text = txbAutoRemove.Text.DecodeControlChars().Replace("\r", string.Empty).EncodeControlChars(), txbAutoRemove));
         }
 
-        if (fehler is MultilineButCrForbidden or NoMultilineAllowed) {
+        if (fehler is MultilineButCrForbidden or NoMultilineAllowed or UniqueColumnNoMultiline) {
             solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 
