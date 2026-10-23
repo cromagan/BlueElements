@@ -18,7 +18,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
     private Bitmap? _bitmap;
 
     /// <summary>
-    /// Das Bild als Text gespeichert. Wird erst bei Bedarf in ein Bild umgewandelt,
+    /// Das Bild als Base64-Text. Wird beim Laden gelesen und erst beim Serialisieren neu erzeugt,
     /// damit Speichern und Laden ohne Veränderung gelingen.
     /// </summary>
     private string _rawImageBase64 = string.Empty;
@@ -71,7 +71,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         }
         set {
             if (_bitmap == value) { return; }
-            _rawImageBase64 = value is null ? string.Empty : BitmapToBase64(value, ImageFormat.Png);
+            _rawImageBase64 = string.Empty; // Wird erst beim Serialisieren aus dem aktuellen Bild erzeugt
             _bitmap = value;
             OnPropertyChanged();
         }
@@ -208,6 +208,16 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         return result;
     }
 
+    /// <summary>
+    /// Liefert das Bild als Base64-Text und erzeugt diesen bei Bedarf aus dem aktuellen Bild.
+    /// </summary>
+    private string RawImageBase64() {
+        if (_rawImageBase64 is { Length: > 0 }) { return _rawImageBase64; }
+        if (BitmapValue is not { } bmp) { return string.Empty; }
+        _rawImageBase64 = BitmapToBase64(bmp, ImageFormat.Png);
+        return _rawImageBase64;
+    }
+
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
@@ -216,7 +226,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
         result.ParseableAdd("PixelPerfect", PixelGenau);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
-        result.ParseableAdd("Image", _rawImageBase64);
+        result.ParseableAdd("Image", RawImageBase64());
         result.ParseableAdd("Style", Style);
 
         return result;
@@ -228,7 +238,7 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
         json.Set("placeholder", Platzhalter_Für_Layout);
         json.Set("pixelperfect", PixelGenau);
         json.Set("whiteback", Hintergrund_Weiß_Füllen);
-        json.Set("image", _rawImageBase64);
+        json.Set("image", RawImageBase64());
         json.Set("style", (int)Style);
         return json;
     }

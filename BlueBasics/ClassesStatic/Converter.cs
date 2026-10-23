@@ -24,9 +24,14 @@ public static class Converter {
         if (bmp is null) { return string.Empty; }
         if (bmp.PixelFormat != PixelFormat.Format32bppPArgb) { bmp = Bitmap_ChangePixelFormat(bmp); }
         if (bmp is null) { return string.Empty; }
-        using var memory = new System.IO.MemoryStream();
-        bmp.Save(memory, bFormat);
-        return Convert.ToBase64String(memory.ToArray());
+        try {
+            using var memory = new System.IO.MemoryStream();
+            bmp.Save(memory, bFormat);
+            return Convert.ToBase64String(memory.ToArray());
+        } catch (Exception ex) {
+            Develop.Diagnose("BitmapToBase64", $"Kodierung fehlgeschlagen: {bmp.Width}x{bmp.Height}, {bFormat}; {ex.Message}");
+            return string.Empty;
+        }
     }
 
     public static Color ColorParse(string input) {

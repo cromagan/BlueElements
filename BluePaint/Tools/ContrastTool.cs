@@ -106,10 +106,14 @@ public partial class ContrastTool : Tool //System.Windows.Forms.UserControl //
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((BrightnessImageFilter.Instance, sldHelligkeit.Value)); }
         picPreview.ApplyFilter(filters.ToArray());
 
-        OnOverridePic(picPreview, false);
-        sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
+        try {
+            OnOverridePic(picPreview, false);
+        } finally {
+            // Regler immer neutral stellen, damit die Vorschau nicht über einem evtl. nicht ersetzten Bild stehen bleibt
+            sldGamma.Value = 1f;
+            sldKontrast.Value = 0f;
+            sldHelligkeit.Value = 1f;
+        }
     }
 
     private void sldGamma_ValueChanged(object sender, EventArgs e) {
