@@ -40,6 +40,18 @@ public static partial class Extensions {
         }
     }
 
+    /// <summary>
+    /// Liefert eine Kopie des Bildes, dessen transparente Bereiche weiß gefüllt sind,
+    /// z. B. um ein Halbtransparentes Bild ohne Doppeltes Mischen über sich selbst zu zeichnen.
+    /// </summary>
+    public static Bitmap FlattenOnWhite(this Bitmap sourceBmp) {
+        var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height);
+        using var gr = Graphics.FromImage(bmp);
+        gr.Clear(Color.White);
+        gr.DrawImageUnscaled(sourceBmp, 0, 0);
+        return bmp;
+    }
+
     public static Bitmap Crop(this Bitmap sourceBmp, Rectangle re) {
         var bmp = new Bitmap(re.Width, re.Height);
         using var gr = Graphics.FromImage(bmp);

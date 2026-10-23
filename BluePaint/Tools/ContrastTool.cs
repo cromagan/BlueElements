@@ -19,12 +19,14 @@ public partial class ContrastTool : Tool //System.Windows.Forms.UserControl //
         var originalPic = OnNeedCurrentPic();
         if (originalPic?.IsValid() != true) { return; }
 
-        using var picPreview = originalPic.CloneFromBitmap();
-
         var filters = new List<(ImageFilter filter, object? parameter)>();
         if (sldKontrast.Value != 0) { filters.Add((ContrastImageFilter.Instance, sldKontrast.Value)); }
         if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((GammaImageFilter.Instance, sldGamma.Value)); }
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((BrightnessImageFilter.Instance, sldHelligkeit.Value)); }
+        if (filters.Count == 0) { return; } // Kein Filter aktiv → das bereits gezeichnete Bild lassen
+
+        // Auf Weiß decken, damit das halbtransparente Bild nicht ein zweites Mal über sich selbst gemischt wird
+        using var picPreview = originalPic.FlattenOnWhite();
         picPreview.ApplyFilter(filters.ToArray());
 
         var ctrlRect = new RectangleF(0, 0, picPreview.Width, picPreview.Height).CanvasToControl(zoom, offsetX, offsetY, false);

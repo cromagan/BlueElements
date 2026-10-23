@@ -27,7 +27,8 @@ public class AllePixelZuSchwarzImageFilter : ImageFilter {
 
             // Überprüfen, ob die Helligkeit nahe dem Weißwert liegt
             if (brightness < threshold) {
-                // Wenn nicht, setzen Sie die Farbe auf Schwarz (Alpha bleibt unverändert)
+                // Hartes Schwarz schreiben, damit der Effekt auch bei alpha-kodierten Grauwerten sichtbar ist
+                bits[i + 3] = 255;
                 bits[i] = 0;       // Blau
                 bits[i + 1] = 0;   // Grün
                 bits[i + 2] = 0;   // Rot
