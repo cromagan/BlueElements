@@ -746,15 +746,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 .FirstOrDefault();
 
             if (largest is { KeyColumns: { Count: > 0 } cols }) {
-                var sb = new StringBuilder();
-                foreach (var c in cols) {
-                    if (c is not { IsDisposed: false }) { continue; }
-                    if (CellGetString(c) is { Length: > 0 } v) {
-                        if (sb.Length > 0) { sb.Append(' '); }
-                        sb.Append(v);
-                    }
-                }
-                if (sb.Length > 0) { return sb.ToString(); }
+                var txt = ColumnCollection.ValuesKey(this, cols, ' ').TrimEnd(' ');
+                if (txt.Length > 0) { return txt; }
             }
         }
 
@@ -848,7 +841,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
         return ColumnCollection.ValuesKey(this, tb.Column.Where(column => column is { IsDisposed: false }
             && column.ScriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert)
-            && column != tb.Column.SysRowState));
+            && column != tb.Column.SysRowState), KeySeparator);
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);

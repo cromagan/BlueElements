@@ -878,6 +878,7 @@ namespace BlueControls.BlueTableDialogs {
             txbAdminInfo.Size = new Size(473, 528);
             txbAdminInfo.SpellCheckingEnabled = true;
             txbAdminInfo.TabIndex = 3;
+            txbAdminInfo.TextFormatingAllowed = true;
             txbAdminInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickinfo
@@ -891,6 +892,7 @@ namespace BlueControls.BlueTableDialogs {
             txbQuickinfo.Size = new Size(601, 528);
             txbQuickinfo.SpellCheckingEnabled = true;
             txbQuickinfo.TabIndex = 0;
+            txbQuickinfo.TextFormatingAllowed = true;
             txbQuickinfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capAdminInfo

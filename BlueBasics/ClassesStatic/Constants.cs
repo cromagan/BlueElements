@@ -26,6 +26,10 @@ public static partial class Constants {
     public const string KeyExtendend = "Extended";
     public const string KeyInputRowKey = "CurrentRowKey";
     public const string KeyScriptNo = "ScriptNo";
+
+    // Trennzeichen für zusammengesetzte Schlüssel: Steuerzeichen, das in Zellinhalten praktisch nie vorkommt.
+    public const char KeySeparator = '\u001e';
+
     public const string KeyTestZeile = "TestZeile";
     public const char SecondSortChar = '-';
     public const string Win11 = "Windows 11";
@@ -140,11 +144,17 @@ public static partial class Constants {
 
     #region Methods
 
+    [GeneratedRegex(@"<br\s*/?\s*>|</(p|div|li|tr)\s*>", RegexOptions.IgnoreCase)]
+    public static partial Regex HtmlBreakTagRegex();
+
     [GeneratedRegex(@"<[^>]+>", RegexOptions.IgnoreCase)]
     public static partial Regex HtmlTagRegex();
 
-    [GeneratedRegex(@"<br\s*/?\s*>|</(p|div|li|tr)\s*>", RegexOptions.IgnoreCase)]
-    public static partial Regex HtmlBreakTagRegex();
+    /// <summary>
+    /// Erkennt '&lt;', das keinen HTML-Code einleitet (nicht gefolgt von Buchstabe, '/', '&lt;' oder '&gt;').
+    /// </summary>
+    [GeneratedRegex(@"<(?![A-Za-z/<>])")]
+    public static partial Regex HtmlBareLowerThanRegex();
 
     [GeneratedRegex(@"\p{L}+")]
     public static partial Regex WordPatternRegex();

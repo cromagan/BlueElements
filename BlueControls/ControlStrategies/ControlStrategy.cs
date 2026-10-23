@@ -634,7 +634,7 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
                 return YesNoButtonControlStrategy.ClassId;
 
             case 5:
-                return ColorButtonControlStrategy.ClassId;
+                return ColorDialogControlStrategy.ClassId;
 
             case 22:
                 return TextControlStrategy.ClassId;

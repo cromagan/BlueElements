@@ -14,12 +14,12 @@ public class ColorColumnFormat : ColumnFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        ControlStrategy = "Color";
+        ControlStrategy = "ColorDialog";
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = true;
         DefaultRenderer = "Color";
-        RendererSettings = "{ClassId=\"Color\", ShowSymbol=+, ShowHex=+, ShowName=+}";
+        RendererSettings = "{ClassId=\"Color\", ShowSymbol=+, ShowHex=-, ShowName=-}";
     }
 
     #endregion

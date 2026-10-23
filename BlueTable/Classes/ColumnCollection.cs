@@ -11,9 +11,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
-    // Trennzeichen für ValuesKey: Steuerzeichen, das in Zellinhalten praktisch nie vorkommt.
-    private const char KeySeparator = '\u001e';
-
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
 
     private volatile int _isDisposedFlag;
@@ -392,12 +389,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     /// <summary>
-    /// Verkettet die Zellwerte einer Zeile über alle gegebenen Spalten zu einem Schlüssel zum Vergleichen/Gruppieren.
+    /// Verkettet die Zellwerte einer Zeile über alle gegebenen Spalten mit dem gegebenen Trennzeichen.
     /// </summary>
-    internal static string ValuesKey(RowItem row, IEnumerable<ColumnItem> columns) {
+    internal static string ValuesKey(RowItem row, IEnumerable<ColumnItem> columns, char separator) {
         var sb = new System.Text.StringBuilder();
         foreach (var column in columns) {
-            sb.Append(row.CellGetStringCore(column)).Append(KeySeparator);
+            sb.Append(row.CellGetStringCore(column)).Append(separator);
         }
         return sb.ToString();
     }

@@ -196,7 +196,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisR in tb.Row) {
             if (thisR.IsDisposed) { continue; }
 
-            var key = ColumnCollection.ValuesKey(thisR, cols);
+            var key = ColumnCollection.ValuesKey(thisR, cols, KeySeparator);
             if (!groups.TryGetValue(key, out var group)) {
                 group = [];
                 groups.Add(key, group);

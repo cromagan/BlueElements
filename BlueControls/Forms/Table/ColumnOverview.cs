@@ -132,6 +132,14 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
                 c.CaptionGroup3 = value;
                 return true;
 
+            case "QUICKINFO":
+                c.QuickInfo = value.Replace("\r", "<br>");
+                return true;
+
+            case "ADMININFO":
+                c.AdminInfo = value.Replace("\r", "<br>");
+                return true;
+
             case "MAXZEICHEN":
                 if (!int.TryParse(value, out var maxLen) || maxLen < 1) { RejectValue(value); return false; }
                 c.MaxCellLength = maxLen;
@@ -252,7 +260,7 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         }
 
         tb.Column.GenerateAndAdd("NAME", "Name", TextOneLineColumnFormat.Instance);
-        var cCap = tb.Column.GenerateAndAdd("BESCHRIFTUNG", "Beschriftung", TextOneLineColumnFormat.Instance);
+        var cCap = tb.Column.GenerateAndAdd("BESCHRIFTUNG", "Beschriftung", TextMultilineColumnFormat.Instance);
         tb.Column.GenerateAndAdd("UEBERSCHRIFT1", "Überschrift 1", TextOneLineColumnFormat.Instance);
         tb.Column.GenerateAndAdd("UEBERSCHRIFT2", "Überschrift 2", TextOneLineColumnFormat.Instance);
         tb.Column.GenerateAndAdd("UEBERSCHRIFT3", "Überschrift 3", TextOneLineColumnFormat.Instance);
@@ -263,9 +271,9 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
         tb.Column.GenerateAndAdd("MAXZEICHEN", "Max.<br>Zeichen", LongOnlyPositiveColumnFormat.Instance);
         tb.Column.GenerateAndAdd("FARBE", "Farbe", ColorColumnFormat.Instance);
         tb.Column.GenerateAndAdd("SCHRIFTFARBE", "Schrift-<br>farbe", ColorColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("QUICKINFO", "Quickinfo", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("ADMININFO", "Admin-Info", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("TAGS", "Tags", TextOneLineColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("QUICKINFO", "Quickinfo", RichTextColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("ADMININFO", "Admin-Info", RichTextColumnFormat.Instance);
+        tb.Column.GenerateAndAdd("TAGS", "Tags", TextMultilineColumnFormat.Instance);
 
         GenerateEnumSpalte(tb, "SKRIPTDATENTYP", "Skript-<br>Datentyp", typeof(ScriptType));
         GenerateEnumSpalte(tb, "SORTIERUNG", "Sortierung", typeof(SortierTyp));
@@ -288,13 +296,11 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
             if (thisColumn.IsSystemColumn()) { continue; }
 
             switch (thisColumn.KeyName) {
-                case "BESCHRIFTUNG":
                 case "UEBERSCHRIFT1":
                 case "UEBERSCHRIFT2":
                 case "UEBERSCHRIFT3":
                 case "QUICKINFO":
                 case "ADMININFO":
-                case "TAGS":
                 case "AUTOREPLACE":
                 case "RECHTE":
                     thisColumn.MultiLine = true;

@@ -124,10 +124,11 @@ public sealed class RowTableElement : TableElement {
         if (col?.Table is not { IsDisposed: false }) { return string.Empty; }
 
         var T = string.Empty;
-        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
+        // Nackte '<' als Entity sichern, damit Fließtext den Tag-Parser nicht irritiert; echte Codes (<br>, <b> …) bleiben aktiv
+        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += HtmlBareLowerThanRegex().Replace(col.QuickInfo, "&lt;"); }
 
         if (col.Table.IsAdministrator()) {
-            if (!string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
+            if (!string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + HtmlBareLowerThanRegex().Replace(col.AdminInfo, "&lt;"); }
             //if (col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
             //T = T + "<br><br>" + ColumnEditor.ColumnUsage(col);
         }

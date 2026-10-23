@@ -43,6 +43,7 @@ namespace BlueControls.BlueTableDialogs {
             //
             tblSpalten.Ansichtbearbeitung = false;
             tblSpalten.ColumnMoveAllowed = false;
+            tblSpalten.ContextMenuDefault = false;
             tblSpalten.Dock = DockStyle.Fill;
             tblSpalten.Location = new Point(0, 0);
             tblSpalten.Name = "tblSpalten";

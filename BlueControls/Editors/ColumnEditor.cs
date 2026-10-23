@@ -287,6 +287,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
+        ColorDia.CustomColors = CustomColors(true);
         ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
     }
@@ -335,6 +336,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
+        ColorDia.CustomColors = CustomColors(false);
         ColorDia.ShowDialog();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
     }
@@ -620,6 +622,31 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         item.LeftClickExecute = (sender, e) => combinedAction();
 
         return item;
+    }
+
+    /// <summary>
+    /// Baut die benutzerdefinierten Farben des Farbauswahl-Dialogs neu:
+    /// Bei jedem Öffnen werden die Hintergrund- bzw. Textfarben aller Nicht-Systemspalten
+    /// der Tabelle frisch aufgenommen; alte Einträge werden verworfen.
+    /// Format: COLORREF (0x00BBGGRR), maximal 16 Einträge (Dialog-Grenze).
+    /// </summary>
+    private int[] CustomColors(bool hintergrundFarben) {
+        List<int> ergebnis = [];
+
+        if (InputItem is ColumnItem { IsDisposed: false } c && c.Table is { IsDisposed: false } tb) {
+            foreach (var thisColumn in tb.Column) {
+                if (!thisColumn.IsSystemColumn()) {
+                    var farbe = hintergrundFarben ? thisColumn.BackColor : thisColumn.ForeColor;
+
+                    if (farbe.IsEmpty) { continue; }
+
+                    var cr = farbe.R | (farbe.G << 8) | (farbe.B << 16);
+                    if (!ergebnis.Contains(cr)) { ergebnis.Add(cr); }
+                }
+            }
+        }
+
+        return [.. ergebnis.Take(16)];
     }
 
     private List<ListItem> GenerateSolutions(string fehler) {
