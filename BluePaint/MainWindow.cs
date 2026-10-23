@@ -88,10 +88,13 @@ public partial class MainWindow : FormWithStatusBar {
         }
     }
 
+    /// <summary>
+    /// Gibt eine Kopie des Bildes zurück, da das Original beim Freigeben des Fensters mitdisposed wird.
+    /// </summary>
     public new Bitmap? ShowDialog() {
         if (Visible) { Visible = false; }
         base.ShowDialog();
-        return P.Bmp;
+        return P.Bmp?.CloneFromBitmap();
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {

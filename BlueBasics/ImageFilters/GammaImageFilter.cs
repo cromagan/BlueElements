@@ -24,15 +24,12 @@ public class GammaImageFilter : ImageFilter {
 
         // Schleife über alle Pixel im Bild
         for (var i = 0; i < bits.Length; i += 4) {
-            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-            var r = bits[i + 2];
-            var g = bits[i + 1];
-            var b = bits[i];
+            var alpha = bits[i + 3];
 
-            // GammaImageFilter-Korrektur für jede Farbkomponente
-            bits[i + 2] = gammaArray[r]; // Rot-Komponente
-            bits[i + 1] = gammaArray[g]; // Grün-Komponente
-            bits[i] = gammaArray[b];      // Blau-Komponente
+            // GammaImageFilter-Korrektur der sichtbaren Farbkomponenten
+            bits[i + 2] = ChannelFromVisible(gammaArray[VisibleFromChannel(bits[i + 2], alpha)], alpha); // Rot-Komponente
+            bits[i + 1] = ChannelFromVisible(gammaArray[VisibleFromChannel(bits[i + 1], alpha)], alpha); // Grün-Komponente
+            bits[i] = ChannelFromVisible(gammaArray[VisibleFromChannel(bits[i], alpha)], alpha);         // Blau-Komponente
             // Alpha-Kanal bleibt unverändert (bits[i + 3])
         }
     }

@@ -29,5 +29,23 @@ public abstract class ImageFilter {
         }
     }
 
+    /// <summary>
+    /// Liefert den sichtbaren Farbwert eines Kanals über weißem Untergrund.
+    /// </summary>
+    protected static byte VisibleFromChannel(byte value, byte alpha) {
+        if (alpha == 255) { return value; }
+        if (alpha == 0) { return 255; }
+        return (byte)((value * alpha + 255 * (255 - alpha) + 127) / 255);
+    }
+
+    /// <summary>
+    /// Rechnet einen gefilterten sichtbaren Farbwert unter Erhalt des Alphas in den Kanalwert zurück: c' = (v − (255 − a)) · 255 / a.
+    /// </summary>
+    protected static byte ChannelFromVisible(byte visible, byte alpha) {
+        if (alpha == 255) { return visible; }
+        if (alpha == 0) { return 0; }
+        return (byte)Math.Clamp((visible - (255 - alpha)) * 255 / alpha, 0, 255);
+    }
+
     #endregion
 }

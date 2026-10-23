@@ -234,9 +234,14 @@ public static partial class Extensions {
         x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsMagentaOrTransparent(data.GetPixelIndex(x, y));
 
     public static bool IsNearBlack(this byte[] bits, int index, double maxBrightness) {
-        if (bits[index + 3] == 0) { return false; }
+        var alpha = bits[index + 3];
+        if (alpha == 0) { return false; }
         if (bits[index] == 0 && bits[index + 1] == 0 && bits[index + 2] == 0) { return true; }
-        return (0.3f * bits[index + 2] + 0.59f * bits[index + 1] + 0.11f * bits[index]) / 255.0f <= maxBrightness;
+        var white = 255 - alpha;
+        var brightness = (0.3f * (bits[index + 2] * alpha + 255 * white)
+                        + 0.59f * (bits[index + 1] * alpha + 255 * white)
+                        + 0.11f * (bits[index] * alpha + 255 * white)) / (255f * 255f);
+        return brightness <= maxBrightness;
     }
 
     public static bool IsNearBlack(this BitmapData data, byte[] bits, int x, int y, double maxBrightness) =>
@@ -246,9 +251,14 @@ public static partial class Extensions {
         x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearBlack(data.GetPixelIndex(x, y), maxBrightness);
 
     public static bool IsNearWhite(this byte[] bits, int index, double minBrightness) {
-        if (bits[index + 3] == 0) { return true; }
+        var alpha = bits[index + 3];
+        if (alpha == 0) { return true; }
         if (bits[index] == 255 && bits[index + 1] == 255 && bits[index + 2] == 255) { return true; }
-        return (0.3f * bits[index + 2] + 0.59f * bits[index + 1] + 0.11f * bits[index]) / 255.0f >= minBrightness;
+        var white = 255 - alpha;
+        var brightness = (0.3f * (bits[index + 2] * alpha + 255 * white)
+                        + 0.59f * (bits[index + 1] * alpha + 255 * white)
+                        + 0.11f * (bits[index] * alpha + 255 * white)) / (255f * 255f);
+        return brightness >= minBrightness;
     }
 
     public static bool IsNearWhite(this BitmapData data, byte[] bits, int x, int y, double minBrightness) =>

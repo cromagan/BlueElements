@@ -41,10 +41,11 @@ namespace BluePaint
             // 
             // btnAlleFarbenSchwarz
             // 
+            this.btnAlleFarbenSchwarz.Dock = DockStyle.Top;
             this.btnAlleFarbenSchwarz.ImageCode = "Kontrast";
-            this.btnAlleFarbenSchwarz.Location = new Point(8, 328);
+            this.btnAlleFarbenSchwarz.Location = new Point(0, 312);
             this.btnAlleFarbenSchwarz.Name = "btnAlleFarbenSchwarz";
-            this.btnAlleFarbenSchwarz.Size = new Size(336, 48);
+            this.btnAlleFarbenSchwarz.Size = new Size(360, 48);
             this.btnAlleFarbenSchwarz.TabIndex = 8;
             this.btnAlleFarbenSchwarz.Text = "Alle Farben zu Schwarz";
             this.btnAlleFarbenSchwarz.Click += new EventHandler(this.btnAlleFarbenSchwarz_Click);
@@ -61,30 +62,33 @@ namespace BluePaint
             // 
             // btnGraustufen
             // 
+            this.btnGraustufen.Dock = DockStyle.Top;
             this.btnGraustufen.ImageCode = "Graustufen";
-            this.btnGraustufen.Location = new Point(8, 272);
+            this.btnGraustufen.Location = new Point(0, 264);
             this.btnGraustufen.Name = "btnGraustufen";
-            this.btnGraustufen.Size = new Size(336, 48);
+            this.btnGraustufen.Size = new Size(360, 48);
             this.btnGraustufen.TabIndex = 7;
             this.btnGraustufen.Text = "In Graustufen umwandeln";
             this.btnGraustufen.Click += new EventHandler(this.btnGraustufen_Click);
             // 
             // btnPixelHinzu
             // 
+            this.btnPixelHinzu.Dock = DockStyle.Top;
             this.btnPixelHinzu.ImageCode = "Gewicht|30";
-            this.btnPixelHinzu.Location = new Point(8, 384);
+            this.btnPixelHinzu.Location = new Point(0, 360);
             this.btnPixelHinzu.Name = "btnPixelHinzu";
-            this.btnPixelHinzu.Size = new Size(336, 48);
+            this.btnPixelHinzu.Size = new Size(360, 48);
             this.btnPixelHinzu.TabIndex = 9;
             this.btnPixelHinzu.Text = "Schwarze Pixel hinzufügen";
             this.btnPixelHinzu.Click += new EventHandler(this.btnPixelHinzu_Click);
             // 
             // btnAusdünnen
             // 
+            this.btnAusdünnen.Dock = DockStyle.Top;
             this.btnAusdünnen.ImageCode = "Feder|30";
-            this.btnAusdünnen.Location = new Point(8, 440);
+            this.btnAusdünnen.Location = new Point(0, 408);
             this.btnAusdünnen.Name = "btnAusdünnen";
-            this.btnAusdünnen.Size = new Size(336, 48);
+            this.btnAusdünnen.Size = new Size(360, 48);
             this.btnAusdünnen.TabIndex = 10;
             this.btnAusdünnen.Text = "Schwarze Pixel entfernen";
             this.btnAusdünnen.Click += new EventHandler(this.btnAusdünnen_Click);
@@ -198,15 +202,15 @@ namespace BluePaint
             // 
             // Kontrast
             // 
-            this.Controls.Add(this.grpHelligkeit);
-            this.Controls.Add(this.grpGamma);
-            this.Controls.Add(this.grpKontrast);
             this.Controls.Add(this.btnAusdünnen);
             this.Controls.Add(this.btnPixelHinzu);
             this.Controls.Add(this.btnAlleFarbenSchwarz);
             this.Controls.Add(this.btnGraustufen);
+            this.Controls.Add(this.grpHelligkeit);
+            this.Controls.Add(this.grpGamma);
+            this.Controls.Add(this.grpKontrast);
             this.Name = "Kontrast";
-            this.Size = new Size(360, 505);
+            this.Size = new Size(360, 456);
             this.grpKontrast.ResumeLayout(false);
             this.grpGamma.ResumeLayout(false);
             this.grpHelligkeit.ResumeLayout(false);

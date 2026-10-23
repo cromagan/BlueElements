@@ -18,18 +18,16 @@ public class AllePixelZuSchwarzImageFilter : ImageFilter {
 
         // Schleife über alle Pixel im Bild
         for (var i = 0; i < bits.Length; i += 4) {
-            // Extrahieren der ARGB-Komponenten aus dem Integer-Wert
-            //var a = bits[i + 3]; // Alpha-Komponente
-            var r = bits[i + 2]; // Rot-Komponente
-            var g = bits[i + 1]; // Grün-Komponente
-            var b = bits[i];     // Blau-Komponente
+            var alpha = bits[i + 3];
 
-            // Berechnen der Helligkeit des Pixels
-            var brightness = 0.3f * r + 0.59f * g + 0.11f * b;
+            // Berechnen der sichtbaren Helligkeit des Pixels
+            var brightness = 0.3f * VisibleFromChannel(bits[i + 2], alpha)
+                           + 0.59f * VisibleFromChannel(bits[i + 1], alpha)
+                           + 0.11f * VisibleFromChannel(bits[i], alpha);
 
             // Überprüfen, ob die Helligkeit nahe dem Weißwert liegt
             if (brightness < threshold) {
-                // Wenn nicht, setzen Sie die Farbe auf Schwarz
+                // Wenn nicht, setzen Sie die Farbe auf Schwarz (Alpha bleibt unverändert)
                 bits[i] = 0;       // Blau
                 bits[i + 1] = 0;   // Grün
                 bits[i + 2] = 0;   // Rot
