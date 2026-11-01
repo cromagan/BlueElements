@@ -23,10 +23,10 @@ public class BrightnessImageFilter : ImageFilter {
                 var index = y * bitmapData.Stride + x * 4; // 4 Bytes pro Pixel (RGBA)
                 var alpha = bits[index + 3];
 
-                // Anpassen der sichtbaren Helligkeit für jede Farbkomponente (RGB)
-                bits[index] = ChannelFromVisible((byte)Math.Clamp(VisibleFromChannel(bits[index], alpha) * factor, 0, 255), alpha); // Blau
-                bits[index + 1] = ChannelFromVisible((byte)Math.Clamp(VisibleFromChannel(bits[index + 1], alpha) * factor, 0, 255), alpha); // Grün
-                bits[index + 2] = ChannelFromVisible((byte)Math.Clamp(VisibleFromChannel(bits[index + 2], alpha) * factor, 0, 255), alpha); // Rot
+                // Anpassen der sichtbaren Helligkeit für jede Farbkomponente (RGB) und exaktes Zurückrechnen
+                bits[index] = ChannelFromVisible(VisibleFromChannel(bits[index], alpha) * factor, alpha); // Blau
+                bits[index + 1] = ChannelFromVisible(VisibleFromChannel(bits[index + 1], alpha) * factor, alpha); // Grün
+                bits[index + 2] = ChannelFromVisible(VisibleFromChannel(bits[index + 2], alpha) * factor, alpha); // Rot
                 // Alpha-Kanal bleibt unverändert (bits[index + 3])
             }
         }

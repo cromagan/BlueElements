@@ -21,20 +21,15 @@ public class ContrastImageFilter : ImageFilter {
         for (var i = 0; i < bits.Length; i += 4) {
             var alpha = bits[i + 3];
 
-            // Extrahieren der sichtbaren Farbkomponenten aus dem Pixel
-            var r = VisibleFromChannel(bits[i + 2], alpha);
-            var g = VisibleFromChannel(bits[i + 1], alpha);
-            var b = VisibleFromChannel(bits[i], alpha);
+            // Anpassen des Kontrasts der sichtbaren Farbkomponenten und exaktes Zurückrechnen in die Kanalwerte
+            var r = ((VisibleFromChannel(bits[i + 2], alpha) / 255f - 0.5f) * factor + 0.5f) * 255f;
+            var g = ((VisibleFromChannel(bits[i + 1], alpha) / 255f - 0.5f) * factor + 0.5f) * 255f;
+            var b = ((VisibleFromChannel(bits[i], alpha) / 255f - 0.5f) * factor + 0.5f) * 255f;
 
-            // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
-            r = (byte)Math.Clamp(((r / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
-            g = (byte)Math.Clamp(((g / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
-            b = (byte)Math.Clamp(((b / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
-
-            // Zurückrechnen in die Kanalwerte (Alpha bleibt unverändert)
             bits[i + 2] = ChannelFromVisible(r, alpha);
             bits[i + 1] = ChannelFromVisible(g, alpha);
             bits[i] = ChannelFromVisible(b, alpha);
+            // Alpha-Kanal bleibt unverändert (bits[i + 3])
         }
     }
 

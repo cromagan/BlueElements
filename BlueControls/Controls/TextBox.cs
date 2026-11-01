@@ -926,7 +926,8 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     /// <summary>
     /// Ermittelt alle Regel-Treffer im sichtbaren Text. Die Positionen beziehen sich
     /// auf die Zeichenliste ohne OpticalReplaceChar und geben die Einfügeposition
-    /// direkt hinter dem Treffer an.
+    /// direkt hinter dem Treffer an. Überlappende Treffer werden verworfen,
+    /// die zuerst passende Regel gewinnt.
     /// </summary>
     private List<(int Pos, string Text)> ComputeOpticalReplacePositions() {
         List<(int Pos, string Text)> result = [];
@@ -946,14 +947,29 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         if (sb.Length == 0) { return result; }
         var text = sb.ToString();
 
+        // Bereits belegte Bereiche merken, damit sich kürzere Regeln nicht in
+        // längere Treffer hineinhängen (z. B. "Forschung #1" in "Forschung #101").
+        var belegt = new bool[text.Length];
+
         foreach (var (search, replace) in _opticalRules) {
             var cap = 0;
             while (true) {
                 var fo = text.IndexOf(search, cap, StringComparison.Ordinal);
                 if (fo < 0) { break; }
-                var endOff = fo + search.Length - 1;
-                result.Add((offsetToCharPos[endOff] + 1, replace));
-                cap = fo + search.Length;
+                var bis = fo + search.Length;
+                cap = bis;
+
+                var frei = true;
+                for (var p = fo; p < bis; p++) {
+                    if (belegt[p]) {
+                        frei = false;
+                        break;
+                    }
+                }
+                if (!frei) { continue; }
+
+                for (var p = fo; p < bis; p++) { belegt[p] = true; }
+                result.Add((offsetToCharPos[bis - 1] + 1, replace));
             }
         }
 

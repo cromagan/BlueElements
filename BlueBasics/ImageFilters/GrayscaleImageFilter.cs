@@ -17,10 +17,10 @@ public class GrayscaleImageFilter : ImageFilter {
         for (var i = 0; i < bits.Length; i += 4) {
             var alpha = bits[i + 3];
 
-            // Berechnung des Grauwerts mit der Luma-Formel aus den sichtbaren Farbkomponenten
-            var gray = (byte)(0.3 * VisibleFromChannel(bits[i + 2], alpha)
-                            + 0.59 * VisibleFromChannel(bits[i + 1], alpha)
-                            + 0.11 * VisibleFromChannel(bits[i], alpha));
+            // Berechnung des Grauwerts mit der Luma-Formel aus den exakten sichtbaren Farbkomponenten
+            var gray = 0.3f * VisibleFromChannel(bits[i + 2], alpha)
+                     + 0.59f * VisibleFromChannel(bits[i + 1], alpha)
+                     + 0.11f * VisibleFromChannel(bits[i], alpha);
 
             // Setzen der Graustufenwerte für alle Farbkanäle
             bits[i] = ChannelFromVisible(gray, alpha);       // Blau

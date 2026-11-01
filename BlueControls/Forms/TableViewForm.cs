@@ -1,6 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.BlueTableDialogs;
+using BlueControls.ClassesStatic;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
@@ -738,11 +739,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             isAdmin = tb.IsAdministrator();
             isEditable = string.IsNullOrEmpty(tb.IsGenericEditable(false));
 
-            TableView.ShowWaitScreen = false;
             tbcTableSelector.Enabled = true;
             TableView.Enabled = true;
         } else {
-            TableView.ShowWaitScreen = true;
             TableView.Enabled = false;
             tb = null;
         }

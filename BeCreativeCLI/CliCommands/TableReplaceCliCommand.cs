@@ -14,7 +14,7 @@ public class TableReplaceCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'gewürfelten' trifft auch als gew&#252;rfelten gespeicherte Werte; --find und --replace dürfen selbst Entities enthalten. " +
-            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den CLI-Rechten 'Change cell values' bzw. 'Remove row lock'), ohne Zeilenadressierung alle Zeilen. " +
+            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den passenden CLI-Rechten: 'Change cell values'; Sperrspalte je Zielwert '" + CliRights.LockRow + "'/'" + CliRights.RemoveRowLock + "'), ohne Zeilenadressierung alle Zeilen. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
             "Der neue Zellwert wird wie in der App gespeichert (Sonderzeichen als HTML-Entities). " +
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
@@ -79,7 +79,7 @@ public class TableReplaceCliCommand : CliCommand {
                 return 1;
             }
 
-            var columnProblem = ColumnWriteProblem(tbl, column);
+            var columnProblem = ColumnWriteProblem(tbl, column, replace);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -90,9 +90,9 @@ public class TableReplaceCliCommand : CliCommand {
         } else {
             // Systemspalten nur mit passendem CLI-Recht einschließen; alle
             // übrigen nicht änderbaren Spalten dem Benutzer melden.
-            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c) is null)];
+            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c, string.Empty) is null)];
 
-            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c) is not null).ToList();
+            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c, string.Empty) is not null).ToList();
 
             if (skipped.Count > 0) {
                 Console.Error.WriteLine("Übersprungen (nicht per CLI änderbar): " + string.Join(", ", skipped.Select(c => c.KeyName)));

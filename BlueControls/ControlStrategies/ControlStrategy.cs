@@ -783,13 +783,13 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
 
     /// <summary>
     /// Prüft, ob die Strategie zu einer Spalte mit den übergebenen
-    /// Bearbeitungs-Fähigkeiten passt. Basis-Implementierung vergleicht
-    /// gegen SupportsTextEdit und SupportsSuggestions; Strategien mit
-    /// Sonderrolle überschreiben die Methode.
+    /// Bearbeitungs-Fähigkeiten passt. Strategien mit auswählbaren Werten
+    /// brauchen eine Dropdown-Quelle, reine Textstrategien brauchen
+    /// Texteingabe; Strategien mit Sonderrolle überschreiben die Methode.
     /// </summary>
     public virtual bool IsAllowed(bool textEditable, bool mayHaveDropdownItems) {
-        if (SupportsTextEdit) { return textEditable; }
         if (SupportsSuggestions) { return mayHaveDropdownItems; }
+        if (SupportsTextEdit) { return textEditable; }
         return false;
     }
 

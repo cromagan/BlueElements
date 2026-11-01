@@ -21,6 +21,7 @@ public class TableCellSetCliCommand : CliCommand {
             "--dry-run zeigt nur die Keys der Zeilen, in denen gesetzt würde — ohne zu ändern und ohne zu speichern. " +
             "Werte mit Leerzeichen gehören in Anführungszeichen; der Wert darf leer sein. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
+            "Die Sperrspalte SYS_LOCKED ist je Zielwert änderbar: auf gesperrt nur mit dem CLI-Recht '" + CliRights.LockRow + "', auf ungesperrt mit '" + CliRights.RemoveRowLock + "'. " +
             "Die Systemspalte SYS_ROWSORTINDEX hält die Sortiernummern lückenlos und braucht das CLI-Recht '" + CliRights.MoveRows + "'.";
 
     #endregion
@@ -68,8 +69,8 @@ public class TableCellSetCliCommand : CliCommand {
         }
 
         // Spalten- und Rechteprüfung vorab für alle Zielspalten.
-        foreach (var (column, _) in targets) {
-            var columnProblem = ColumnWriteProblem(tbl, column);
+        foreach (var (column, value) in targets) {
+            var columnProblem = ColumnWriteProblem(tbl, column, value);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -146,6 +147,17 @@ public class TableCellSetCliCommand : CliCommand {
 
                 if (!string.IsNullOrEmpty(failed)) {
                     Console.Error.WriteLine($"Zeile {row.KeyName}, Spalte {column.KeyName} konnte nicht gesetzt werden: {failed}");
+                    failedColumns++;
+                    continue;
+                }
+
+                // Gegenprobe im Speicherformat der Spalte: Legitime Umformungen
+                // (Großbuchstaben, Runden) fließen hier ein und lösen keinen Fehlalarm aus.
+                var target = column.AutoCorrect(value, true);
+                var stored = row.CellGetStringCore(column);
+
+                if (target != stored) {
+                    Console.Error.WriteLine($"Zeile {row.KeyName}, Spalte {column.KeyName}: Wert wurde nicht übernommen (aktuell: \"{stored}\").");
                     failedColumns++;
                 }
             }

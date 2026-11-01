@@ -96,7 +96,8 @@ public class TableImportCliCommand : CliCommand {
         }
 
         foreach (var column in mapping) {
-            var columnProblem = ColumnWriteProblem(tbl, column);
+            // Systemspalten sind in der Zuordnung ausgeschlossen — der Wert ist hier ohne Bedeutung.
+            var columnProblem = ColumnWriteProblem(tbl, column, string.Empty);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);

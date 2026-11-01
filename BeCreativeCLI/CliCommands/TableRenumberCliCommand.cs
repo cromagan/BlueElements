@@ -89,7 +89,7 @@ public class TableRenumberCliCommand : CliCommand {
             return 1;
         }
 
-        var columnProblem = ColumnWriteProblem(tbl, numberColumn);
+        var columnProblem = ColumnWriteProblem(tbl, numberColumn, string.Empty);
 
         if (columnProblem is not null) {
             Console.Error.WriteLine(columnProblem);

@@ -295,13 +295,15 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             ItemOf("Zeile löschen", CliRights.DeleteRow, false, "Zeile löschen"),
             ItemOf("Zeilen verschieben", CliRights.MoveRows, false, "Zeilen verschieben"),
             ItemOf("Zellwerte ändern", CliRights.ChangeCellValues, false, "Zellwerte ändern"),
+            ItemOf("Zeilenlock setzen", CliRights.LockRow, false, "Zeilenlock setzen"),
             ItemOf("Zeilenlock entfernen", CliRights.RemoveRowLock, false, "Zeilenlock entfernen"),
             ItemOf("Skript ändern", CliRights.EditScript, false, "Skript ändern"),
             ItemOf("Skript ausführen", CliRights.ExecuteScript, false, "Skript ausführen"),
             ItemOf("Spalte erstellen", CliRights.AddColumn, false, "Spalte erstellen"),
             ItemOf("Spalte löschen", CliRights.DeleteColumn, false, "Spalte löschen"),
             ItemOf("Spaltenanordnung ändern", CliRights.ChangeColumnArrangement, false, "Spaltenanordnung ändern"),
-            ItemOf("Tabellenkopf ändern", CliRights.EditTableHead, false, "Tabellenkopf ändern")
+            ItemOf("Tabellenkopf ändern", CliRights.EditTableHead, false, "Tabellenkopf ändern"),
+            ItemOf("Spaltenkopf ändern", CliRights.EditColumnHead, false, "Spaltenkopf ändern (QuickInfo, Admin-Info)")
         ]);
         lbxCliRights.Check(tb.CliRights, true);
 

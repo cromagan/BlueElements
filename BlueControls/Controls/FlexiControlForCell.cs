@@ -142,9 +142,16 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
                 f.CheckBehavior = backcolumn.MultiLine ? CheckBehavior.MultiSelection : CheckBehavior.SingleSelection;
 
                 // Undo-Historie existiert nur, wenn der Zellinhalt gespeichert wird.
-                f.CustomContextMenuItems = backcolumn.SaveContent && backcolumn.CanBeChangedByRules() && IsAdministrator()
-                    ? new([ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, IContextMenu.IconSize), Contextmenu_RestorePreviousContent, true, string.Empty)])
-                    : null;
+                List<ListItem> contextMenu = [];
+                if (backcolumn.SaveContent && backcolumn.CanBeChangedByRules() && IsAdministrator()) {
+                    contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, IContextMenu.IconSize), Contextmenu_RestorePreviousContent, true, string.Empty));
+                }
+
+                if (backcolumn.Table is { IsDisposed: false } tbl && tbl.IsAdministrator()) {
+                    contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", QuickImage.Get(ImageCode.Spalte, IContextMenu.IconSize, ImageCode.Stift), Contextmenu_EditColumnProperties, true));
+                }
+
+                f.CustomContextMenuItems = contextMenu.Count > 0 ? new([.. contextMenu]) : null;
             } else {
                 f.ListItems = null;
                 f.RaiseChangeDelay = 1;
@@ -342,6 +349,11 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
         if (_lastrow is not { IsDisposed: false } row) { return; }
         if (TableViewForm.EditableErrorMessage(row.Table, row)) { return; }
         TableView.DoUndo(column, row);
+    }
+
+    private void Contextmenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
+        if (_column is not { IsDisposed: false } column) { return; }
+        TableView.EditColumnProperties(column, _lastrow is { IsDisposed: false } row ? row : null, null);
     }
 
     private void F_ControlAdded(object? sender, ControlEventArgs e) {

@@ -28,8 +28,7 @@ public static class Converter {
             using var memory = new System.IO.MemoryStream();
             bmp.Save(memory, bFormat);
             return Convert.ToBase64String(memory.ToArray());
-        } catch (Exception ex) {
-            Develop.Diagnose("BitmapToBase64", $"Kodierung fehlgeschlagen: {bmp.Width}x{bmp.Height}, {bFormat}; {ex.Message}");
+        } catch {
             return string.Empty;
         }
     }

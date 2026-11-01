@@ -523,42 +523,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, tableView, _) = GetContextData(e.HotItem);
-
-        if (column is not { IsDisposed: false }) { return; }
-
-        if (TableViewForm.EditableErrorMessage(column.Table, null)) { return; }
-
-        ColumnItem? columnLinked = null;
-        var posError = false;
-
-        if (column.RelationType == RelationType.CellValues && row is not null) {
-            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false, false);
-            posError = true;
-        }
-
-        var bearbColumn = column;
-        if (columnLinked is not null) {
-            columnLinked.Repair();
-            if (!columnLinked.IsOk()) {
-                bearbColumn = columnLinked;
-                Forms.MessageBox.Show("Zuerst muss die verlinkte Spalte\rrepariert werden.", ImageCode.Information, "Ok");
-            } else if (Forms.MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
-                bearbColumn = columnLinked;
-            }
-        } else {
-            if (posError) {
-                Notification.Show(
-                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
-                    ImageCode.Information);
-            }
-        }
-
-        column.Repair();
-
-        using var w = new ColumnEditor(bearbColumn, tableView);
-        w.ShowDialog();
-
-        bearbColumn.Repair();
+        EditColumnProperties(column, row, tableView);
     }
 
     public static void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
@@ -701,6 +666,47 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var chosenValue = selected.CellGetString(colText);
         row.CellSet(column, chosenValue, "Undo-Befehl");
         tb.Dispose();
+    }
+
+    /// <summary>
+    /// Öffnet den Spalten-Editor; bei verlinkten Zellspalten wird vorab geklärt, welche Spalte bearbeitet wird.
+    /// </summary>
+    public static void EditColumnProperties(ColumnItem? column, RowItem? row, TableView? tableView) {
+        if (column is not { IsDisposed: false }) { return; }
+
+        if (TableViewForm.EditableErrorMessage(column.Table, null)) { return; }
+
+        ColumnItem? columnLinked = null;
+        var posError = false;
+
+        if (column.RelationType == RelationType.CellValues && row is not null) {
+            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false, false);
+            posError = true;
+        }
+
+        var bearbColumn = column;
+        if (columnLinked is not null) {
+            columnLinked.Repair();
+            if (!columnLinked.IsOk()) {
+                bearbColumn = columnLinked;
+                Forms.MessageBox.Show("Zuerst muss die verlinkte Spalte\rrepariert werden.", ImageCode.Information, "Ok");
+            } else if (Forms.MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
+                bearbColumn = columnLinked;
+            }
+        } else {
+            if (posError) {
+                Notification.Show(
+                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
+                    ImageCode.Information);
+            }
+        }
+
+        column.Repair();
+
+        using var w = new ColumnEditor(bearbColumn, tableView);
+        w.ShowDialog();
+
+        bearbColumn.Repair();
     }
 
     public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView, ColumnViewItem? viewItem) GetContextData(object? context) {
@@ -2185,6 +2191,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     internal void Invalidate_AllViewItems(bool andclear) {
         _mustDoAllViewItems = true;
+
+        // Während eines Daten-Reloads bleibt der aufgebaute Stand erhalten —
+        // er wird eingefroren weitergezeichnet, bis das Loaded-Event den
+        // Neuaufbau auslöst. Sonst bricht die Ansicht je Lade-Batch zusammen.
+        if (Table is { IsDisposed: false } tbr && tbr.IsDataReloading) {
+            Invalidate_MaxBounds();
+            return;
+        }
+
         _sortedViewItems = [];
         _cachedRowViewItems = [];
         _drawnRowViewItems = [];
@@ -2349,9 +2364,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         tb.LastUsedDate = DateTime.UtcNow;
 
-        // Während des Nachladens (Reload) werden keine ViewItems berechnet oder gezeichnet —
-        // konsistent sind die Daten erst nach dem Loaded-Event.
-        if (tb.IsDataReloading) {
+        // Während des Nachladens (Reload) werden ViewItems nicht neu berechnet —
+        // konsistent sind die Daten erst nach dem Loaded-Event. Ein bereits
+        // aufgebauter Stand bleibt eingefroren stehen, damit die Ansicht nicht
+        // bei jedem Lade-Batch zwischen Wartescreen und Tabelle wechselt.
+        if (tb.IsDataReloading && _sortedViewItems is not { Count: > 0 }) {
             DrawWaitScreen(gr, LanguageTool.DoTranslate("Daten werden geladen."));
             return;
         }
@@ -2417,10 +2434,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             ca.ComputeAllColumnPositions(Math.Max(16, availWidth), Zoom);
 
             // Haupt-Aufbau: Zeilen zeichnen, dann Kopfzeilen darüber. Lazy Where-Enumeratoren.
+            // Disposete Zeilen überspringen — im eingefrorenen Reload-Stand können sie noch enthalten sein.
+            List<TableElement> drawList = [.. _sortedViewItems.Where(i => i is not RowTableElement { Row.IsDisposed: true })];
             var rowsTop = RowsAreaTop();
             _drawnRowViewItems.Clear();
-            DrawItems(_sortedViewItems.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, rowsTop);
-            DrawItems(_sortedViewItems.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, 0);
+            DrawItems(drawList.Where(i => !i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, rowsTop);
+            DrawItems(drawList.Where(i => i.IgnoreYOffset), gr, AvailableControlPaintArea, OffsetX, OffsetY, state, Design.Table_And_Pad, Design.Item_ListBox, Zoom, 0);
 
             if (!string.IsNullOrEmpty(Table.FreezedReason)) {
                 var i = QuickImage.Get(ImageCode.Schloss, 48);
@@ -2704,13 +2723,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     protected override void OnSliderVisibilityChanged() {
         // Wenn ein Slider ein-/ausgeblendet wird, ändert sich die
-        // AvailableControlPaintArea-Breite. Die View-Items müssen neu
-        // aufgebaut werden, damit CanvasPosition.Width jeder Zeile mit der
-        // nun gültigen ControlColumnsWidth berechnet wird. Ohne diesen
-        // Reset würde DrawExplicit (RowBackground) beim späteren Zeichnen
-        // das rechte Ende der letzten Spalte mit der Hintergrundfarbe übermalen.
+        // AvailableControlPaintArea-Breite. Die View-Items werden beim nächsten
+        // Zugriff neu aufgebaut, damit CanvasPosition.Width jeder Zeile mit der
+        // nun gültigen ControlColumnsWidth berechnet wird. Der bisherige Stand
+        // bleibt bis dahin eingefroren stehen; nur am Rand zum Slider kann
+        // kurzzeitig mit Hintergrundfarbe übermalt sein.
         _mustDoAllViewItems = true;
-        _sortedViewItems = [];
     }
 
     protected void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
@@ -2945,7 +2963,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void _table_Disposed(object? sender, System.EventArgs e) => Table = null;
+    private void _table_Disposed(object? sender, System.EventArgs e) {
+        Table = null;
+    }
 
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 
@@ -2977,6 +2997,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         InvalidateCurrentArrangement(); // Spaltenbreite, Slider
         CheckView();
+
+        // Sofort neu aufbauen, solange kein Reload läuft. Zwischen zwei Lade-Batches
+        // steht dann immer ein fertiger Stand bereit, und ein Paint während des
+        // nächsten Batches zeigt den eingefrorenen Stand statt eines Wartescreens.
+        if (Table is { IsDisposed: false } tbr && !tbr.IsDataReloading) {
+            _ = AllViewItems;
+        }
     }
 
     private void _Table_ViewChanged(object? sender, System.EventArgs e) {
@@ -3131,7 +3158,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             || allItems is null
             || CurrentArrangement is not { } arrangement) {
             _rowsVisibleUnique = new([]);
-            allItems?.Clear();
+            // Bestehenden Stand einfrieren statt leeren: Eine kurze Abmeldephase
+            // (Tab-Wechsel, Instanztausch beim Reload) darf die Ansicht nicht ins
+            // Leere laufen lassen. Der Neuaufbau erfolgt, sobald Table und
+            // Arrangement wieder gültig sind.
+            _mustDoAllViewItems = true;
             return;
         }
 
@@ -4284,10 +4315,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// nur das Zeitbudget abgearbeitet; der Rest kommt beim nächsten Aufbau dran.
     /// </summary>
     private void RepairVisibleRowsAfterDraw() {
-        _drawnRowViewItems.Shuffle();
+        // Kopie: Die Reparatur kann Zelländerungen mit synchronem Rebuild auslösen, die _drawnRowViewItems während der Enumeration ändern.
+        List<RowTableElement> toRepair = [.. _drawnRowViewItems];
+        toRepair.Shuffle();
         var start = DateTime.UtcNow;
 
-        foreach (var rowElement in _drawnRowViewItems) {
+        foreach (var rowElement in toRepair) {
             if (rowElement is not { IsDisposed: false, Visible: true }) { continue; }
             CellCollection.RepairLinkedCellIfDue(rowElement.Row, true);
             if (DateTime.UtcNow.Subtract(start) > CellCollection.LinkedCellRepairTimeBudget) { return; }

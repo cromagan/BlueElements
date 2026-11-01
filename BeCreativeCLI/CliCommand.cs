@@ -109,15 +109,15 @@ public abstract class CliCommand : IHasKeyName {
     protected static ColumnItem? ColumnOfOption(Table tbl, CliArgs args) => tbl.Column[args.Option("column") ?? string.Empty];
 
     /// <summary>
-    /// Liefert null, wenn die Spalte per CLI beschreibbar ist, ansonsten die Fehlermeldung.
-    /// Systemspalten durchlaufen die separate SystemColumnWriteProblem-Prüfung.
-    /// Verknüpfte Spalten (Werte aus anderer Tabelle) leiten Schreibvorgänge in die
-    /// Fremdtabelle um und nicht gespeicherte Spalten verlieren Änderungen beim Entladen —
-    /// beides meldet CellSet fälschlich als Erfolg. Die CLI lehnt solche Spalten ab.
+    /// Liefert null, wenn die Spalte per CLI mit dem gewünschten Wert beschreibbar
+    /// ist, ansonsten die Fehlermeldung. Systemspalten durchlaufen die separate
+    /// SystemColumnWriteProblem-Prüfung. Verknüpfte Spalten (Werte aus anderer
+    /// Tabelle) schreiben in die Fremdtabelle und nicht gespeicherte Spalten
+    /// verlieren Änderungen beim Entladen — beides lehnt die CLI ab.
     /// </summary>
-    protected static string? ColumnWriteProblem(Table tbl, ColumnItem column) {
+    protected static string? ColumnWriteProblem(Table tbl, ColumnItem column, string newValue) {
         if (column.IsSystemColumn()) {
-            return SystemColumnWriteProblem(tbl, column);
+            return SystemColumnWriteProblem(tbl, column, newValue);
         }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -555,11 +555,12 @@ public abstract class CliCommand : IHasKeyName {
     /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Die
     /// Zeilen-Identität (SYS_ROWKEY) sowie Changer/ChangeDate pflegt das
     /// System selbst und ist nie beschreibbar, die Sperrspalte (SYS_LOCKED)
-    /// beschreibbar nur mit dem Recht 'Remove row lock', die Sortierindex-
-    /// Spalte (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält die Nummern
+    /// beschreibbar je Zielwert nur mit 'Lock row' (gesperrt) bzw.
+    /// 'Remove row lock' (ungesperrt), die Sortierindex-Spalte
+    /// (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält die Nummern
     /// lückenlos —, alle übrigen Systemspalten nur mit 'Change cell values'.
     /// </summary>
-    protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column) {
+    protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column, string newValue) {
         if (tbl.Column.SysRowKey == column) {
             return "Die Spalte '" + column.KeyName + "' hält die Zeilen-Identität und wird vom System verwaltet.";
         }
@@ -570,7 +571,7 @@ public abstract class CliCommand : IHasKeyName {
 
         string right;
         if (tbl.Column.SysLocked == column) {
-            right = CliRights.RemoveRowLock;
+            right = newValue.FromPlusMinus() ? CliRights.LockRow : CliRights.RemoveRowLock;
         } else if (tbl.Column.SysRowSortIndex == column) {
             right = CliRights.MoveRows;
         } else {

@@ -96,7 +96,7 @@ public partial class ContrastTool : Tool //System.Windows.Forms.UserControl //
 
     private void DoPic() {
         var pic = OnNeedCurrentPic();
-        if (pic is null) { return; }
+        if (pic?.IsValid() != true) { return; }
 
         var picPreview = pic.CloneFromBitmap();
 
@@ -104,16 +104,15 @@ public partial class ContrastTool : Tool //System.Windows.Forms.UserControl //
         if (sldKontrast.Value != 0) { filters.Add((ContrastImageFilter.Instance, sldKontrast.Value)); }
         if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((GammaImageFilter.Instance, sldGamma.Value)); }
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((BrightnessImageFilter.Instance, sldHelligkeit.Value)); }
+        if (filters.Count == 0) { return; }
         picPreview.ApplyFilter(filters.ToArray());
 
-        try {
-            OnOverridePic(picPreview, false);
-        } finally {
-            // Regler immer neutral stellen, damit die Vorschau nicht über einem evtl. nicht ersetzten Bild stehen bleibt
-            sldGamma.Value = 1f;
-            sldKontrast.Value = 0f;
-            sldHelligkeit.Value = 1f;
-        }
+        // Regler vor dem Austausch neutral stellen, damit kein Zwischen-Paint mit alten Werten doppelt filtern kann
+        sldGamma.Value = 1f;
+        sldKontrast.Value = 0f;
+        sldHelligkeit.Value = 1f;
+
+        OnOverridePic(picPreview, false);
     }
 
     private void sldGamma_ValueChanged(object sender, EventArgs e) {

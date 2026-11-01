@@ -23,11 +23,15 @@ public static class CliRights {
 
     public const string DeleteRow = "Delete row";
 
+    public const string EditColumnHead = "Edit column head";
+
     public const string EditScript = "Edit script";
 
     public const string EditTableHead = "Edit table head";
 
     public const string ExecuteScript = "Execute script";
+
+    public const string LockRow = "Lock row";
 
     public const string MoveRows = "Move rows";
 
@@ -42,13 +46,15 @@ public static class CliRights {
         DeleteRow,
         MoveRows,
         ChangeCellValues,
+        LockRow,
         RemoveRowLock,
         EditScript,
         ExecuteScript,
         AddColumn,
         DeleteColumn,
         ChangeColumnArrangement,
-        EditTableHead
+        EditTableHead,
+        EditColumnHead
     ];
 
     #endregion

@@ -79,6 +79,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public void AddFileName(string? fileName, string additionalText) {
         if (fileName is null) { return; }
 
+        EnsureUniqueSettingsFilename();
+
         if (!MustExist || FileExists(fileName)) {
             this.SettingsAdd($"{fileName}|{additionalText}");
         }
@@ -93,6 +95,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     protected override void OnCreateControl() {
         base.OnCreateControl();
+        EnsureUniqueSettingsFilename();
         this.LoadSettingsFromDisk(false);
         GenerateMenu();
     }
@@ -156,6 +159,16 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
 
         Enabled = validEntries.Count > 0;
+    }
+
+
+    /// <summary>
+    /// Stellt sicher, dass die Historie pro umgebendem Form getrennt gespeichert wird.
+    /// </summary>
+    private void EnsureUniqueSettingsFilename() {
+        if (SettingsManualFilename is { Length: > 0 }) { return; }
+        if (FindForm() is not { } form) { return; }
+        SettingsManualFilename = $"%appdocumentpath%\\{form.GetType().Name}_{Name}.ini";
     }
 
     private void SetLastFilesStyle() {

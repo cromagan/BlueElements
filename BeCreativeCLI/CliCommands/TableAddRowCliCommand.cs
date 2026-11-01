@@ -3,21 +3,21 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Legt eine Zeile an; --firstvalue setzt die Erstspalte, wiederholbares --set füllt weitere Spalten direkt beim Anlegen.
+/// Tabellen: Legt eine Zeile an; wiederholbares --set füllt Spalten (auch die Erstspalte) direkt beim Anlegen.
 /// </summary>
 public class TableAddRowCliCommand : CliCommand {
 
     #region Properties
 
     public override string Command => "table-addrow";
-    public override List<string> Options => ["firstvalue", "set", "password"];
-    public override string Syntax => "bcr table-addrow <tabelle> [--firstvalue <wert>] [--set <spalte>=<wert>] [--password <kennwort>]";
+    public override List<string> Options => ["set", "password"];
+    public override string Syntax => "bcr table-addrow <tabelle> [--set <spalte>=<wert>] [--password <kennwort>]";
 
     public override string? HelpDetails =>
-            "--firstvalue setzt den Wert der Erstspalte (Standard: leer). " +
-            "--set füllt weitere Spalten direkt beim Anlegen und darf mehrfach angegeben werden: --set KATEGORIE=Regeln --set ANLEITUNG=\"Text mit Leerzeichen\". " +
+            "--set füllt Spalten direkt beim Anlegen und darf mehrfach angegeben werden: --set KATEGORIE=Regeln --set ANLEITUNG=\"Text mit Leerzeichen\". " +
+            "Die --set-Werte dienen beim Anlegen zugleich als Filter: Alle Pflicht-Spalten (Erstspalte, Chunk- und Unique-Spalten) müssen daher per --set mitgegeben werden. " +
             "Format: <spalte>=<wert>; der Wert darf leer sein. Leerzeichen und Sonderzeichen in Anführungszeichen setzen. " +
-            "Beispiel: bcr table-addrow Test.tblh --firstvalue NeuerEintrag --set KATEGORIE=Glossar.";
+            "Beispiel: bcr table-addrow Test.tblh --set <erstspalte>=NeuerEintrag --set KATEGORIE=Glossar.";
 
     #endregion
 
@@ -48,29 +48,15 @@ public class TableAddRowCliCommand : CliCommand {
                 return UsageError("Spalte nicht gefunden: " + columnName);
             }
 
-            var columnProblem = ColumnWriteProblem(tbl, column);
+            var value = set[(eq + 1)..];
+            var columnProblem = ColumnWriteProblem(tbl, column, value);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
                 return 1;
             }
 
-            sets.Add((column, set[(eq + 1)..]));
-        }
-
-        // Bevorzugt die als 'First' markierte Spalte, ansonsten die erste Spalte der Speicherreihenfolge.
-        var firstColumn = tbl.Column.First ?? tbl.ColumnsInSaveOrder().FirstOrDefault();
-
-        if (firstColumn is not { IsDisposed: false }) {
-            Console.Error.WriteLine("Die Tabelle hat keine erste Spalte.");
-            return 1;
-        }
-
-        var firstProblem = ColumnWriteProblem(tbl, firstColumn);
-
-        if (firstProblem is not null) {
-            Console.Error.WriteLine(firstProblem);
-            return 1;
+            sets.Add((column, value));
         }
 
         // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
@@ -90,10 +76,17 @@ public class TableAddRowCliCommand : CliCommand {
             return 2;
         }
 
-        // Wert in das Speicherformat der ersten Spalte überführen (z. B. HTML-Entities).
-        var value = StorageTextOf(firstColumn, args.Option("firstvalue") ?? string.Empty);
+        // Filter für GenerateAndAdd: alle --set-Spalten als Istgleich-Filter.
+        // GenerateAndAdd verlangt, dass alle Pflicht-Spalten (Erstspalte, Chunk- und Unique-Spalten)
+        // im Filter stehen; die --set-Werte dienen zugleich als Initialwerte und Unique-Abgleich.
+        // Die Werte werden je Spalte in das Speicherformat überführt (z. B. HTML-Entities).
+        List<FilterItem> filter = [];
 
-        var opr = tbl.Row.GenerateAndAdd([new FilterItem(firstColumn, FilterType.Istgleich, value)], "bcr table-addrow");
+        foreach (var (column, setValue) in sets) {
+            filter.Add(new FilterItem(column, FilterType.Istgleich, StorageTextOf(column, setValue)));
+        }
+
+        var opr = tbl.Row.GenerateAndAdd([.. filter], "bcr table-addrow");
 
         if (opr.IsFailed || opr.Value is not RowItem row) {
             Console.Error.WriteLine("Zeile konnte nicht angelegt werden: " + opr.FailedReason);

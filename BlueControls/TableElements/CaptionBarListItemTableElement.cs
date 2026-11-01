@@ -14,6 +14,11 @@ public sealed class CaptionBarListItemTableElement : TableElement {
 
     public static readonly int CaptionHeight = 22;
 
+    /// <summary>
+    /// Sichtbare Breite des Zeichenbereichs während des laufenden Paint-Vorgangs.
+    /// </summary>
+    private int paintVisibleWidth;
+
     private string prevCaptionGroup = string.Empty;
 
     private ColumnViewItem? prevViewItem;
@@ -73,13 +78,13 @@ public sealed class CaptionBarListItemTableElement : TableElement {
         var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
 
         if (isEdit) {
-            Draw_Column_Head_Captions_Now(gr, positionControl, newCaptionGroup, scale);
+            Draw_Column_Head_Captions_Now(gr, positionControl, newCaptionGroup, scale, int.MaxValue);
         } else if (newCaptionGroup != prevCaptionGroup) {
 
             #region Ende einer Gruppierung gefunden
 
             if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
-                Draw_Column_Head_Captions_Now(gr, positionControl, prevCaptionGroup, scale);
+                Draw_Column_Head_Captions_Now(gr, positionControl, prevCaptionGroup, scale, paintVisibleWidth);
             }
 
             prevViewItemWithOtherCaption = viewItem;
@@ -90,13 +95,6 @@ public sealed class CaptionBarListItemTableElement : TableElement {
 
         prevViewItem = viewItem;
         prevCaptionGroup = newCaptionGroup;
-
-        if (!isEdit) {
-            // Zeichen-Routine für das letzte Element aufrufen
-            if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
-                Draw_Column_Head_Captions_Now(gr, Rectangle.Empty, prevCaptionGroup, scale);
-            }
-        }
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) {
@@ -181,6 +179,40 @@ public sealed class CaptionBarListItemTableElement : TableElement {
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 
     /// <summary>
+    /// Schließt nach dem Zeichnen aller Spalten die letzte Gruppierung ab.
+    /// Diese endet an der rechten Kante der letzten Spalte und besitzt keine
+    /// Folge-Spalte, die das Zeichnen im Spalten-Loop auslösen würde.
+    /// </summary>
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        paintVisibleWidth = visibleAreaControl.Width;
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
+
+        if (Arrangement is not { IsDisposed: false, Ansichtbearbeitung: false } arrangement) { return; }
+        if (string.IsNullOrEmpty(prevCaptionGroup) || prevViewItem is not { IsDisposed: false } lastColumn || prevViewItemWithOtherCaption is null) { return; }
+
+        var items = arrangement.RenderingItems.ToList();
+        var lastIndex = items.IndexOf(lastColumn);
+        if (lastIndex < 0) { return; }
+
+        // Rechte Kante der Gruppierung — auch über noch nicht gezeichnete
+        // (außerhalb des sichtbaren Bereichs liegende) Spalten hinaus suchen.
+        var right = lastColumn.ControlColumnRight(offsetX);
+        for (var i = lastIndex + 1; i < items.Count; i++) {
+            if (items[i] is not { IsDisposed: false } item || item.Column?.CaptionGroup(Caption) != prevCaptionGroup) { break; }
+            right = item.ControlColumnRight(offsetX);
+        }
+
+        // Endet die Gruppierung an lastColumn und wurde die Folge-Spalte bereits
+        // gezeichnet, hat der Spalten-Loop die Überschrift schon abgeschlossen.
+        if (right == lastColumn.ControlColumnRight(offsetX) && lastIndex + 1 < items.Count) {
+            var next = items[lastIndex + 1];
+            if (next is { IsDisposed: false } && next.ControlColumnLeft(offsetX) <= visibleAreaControl.Width && next.ControlColumnLeft(offsetX) + next.ControlColumnWidth() >= 0) { return; }
+        }
+
+        Draw_Column_Head_Captions_Now(gr, new RectangleF(right, positionControl.Top, 0, positionControl.Height), prevCaptionGroup, zoom, visibleAreaControl.Width);
+    }
+
+    /// <summary>
     /// Übernimmt die neue Überschrift der Caption-Gruppe (Ebene
     /// Caption). Commit-Callback aus
     /// HandleDoubleClick, der an
@@ -210,26 +242,29 @@ public sealed class CaptionBarListItemTableElement : TableElement {
         tableView.InvalidateCurrentArrangement();
     }
 
-    private void Draw_Column_Head_Captions_Now(Graphics gr, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom) {
+    private void Draw_Column_Head_Captions_Now(Graphics gr, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom, int visibleWidth) {
         var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
 
+        RectangleF r;
         if (isEdit) {
             if (string.IsNullOrEmpty(prevCaptionGroup)) { return; }
-            var capTranslated = ColumnsHeadTableElement.CaptionTranslated(prevCaptionGroup);
-            var r = new RectangleF(positionControlOfNextItem.Left + 4, positionControlOfNextItem.Top, positionControlOfNextItem.Width - 8, positionControlOfNextItem.Height);
-            Skin.Draw_FormatedText(gr, capTranslated, null, Alignment.Horizontal_Vertical_Center, r.ToRect(), null, false, Font_Head_Default.Scale(_zoom), false);
-            return;
+            r = new RectangleF(positionControlOfNextItem.Left + 4, positionControlOfNextItem.Top, positionControlOfNextItem.Width - 8, positionControlOfNextItem.Height);
+        } else {
+            if (prevViewItemWithOtherCaptionLe >= positionControlOfNextItem.Left) { return; }
+            r = new RectangleF(prevViewItemWithOtherCaptionLe, positionControlOfNextItem.Top, positionControlOfNextItem.Left - prevViewItemWithOtherCaptionLe, positionControlOfNextItem.Height);
         }
 
-        if (prevViewItemWithOtherCaptionLe < positionControlOfNextItem.Left) {
-            var capTranslated = ColumnsHeadTableElement.CaptionTranslated(prevCaptionGroup);
+        var capTranslated = ColumnsHeadTableElement.CaptionTranslated(prevCaptionGroup);
 
-            var r = new RectangleF(prevViewItemWithOtherCaptionLe, positionControlOfNextItem.Top, positionControlOfNextItem.Left - prevViewItemWithOtherCaptionLe, positionControlOfNextItem.Height);
-            //gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor_ColumnHead), r);
-            //gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
-            gr.DrawRectangle(Skin.PenLinieKräftig, r);
-            Skin.Draw_FormatedText(gr, capTranslated, null, Alignment.Horizontal_Vertical_Center, r.ToRect(), null, false, Font_Head_Default.Scale(_zoom), false);
-        }
+        // Reicht die Gruppierung über den rechten Rand hinaus, den Text
+        // mittig in der sichtbaren Restbreite einpassen.
+        var visibleLeft = Math.Max(r.Left, 0);
+        var visibleRight = Math.Min(r.Right, visibleWidth);
+        if (visibleRight <= visibleLeft) { return; }
+        var rText = new RectangleF(visibleLeft, r.Top, visibleRight - visibleLeft, r.Height);
+
+        if (!isEdit) { gr.DrawRectangle(Skin.PenLinieKräftig, r); }
+        Skin.Draw_FormatedText(gr, capTranslated, null, Alignment.Horizontal_Vertical_Center, rText.ToRect(), null, false, Font_Head_Default.Scale(_zoom), false);
     }
 
     #endregion

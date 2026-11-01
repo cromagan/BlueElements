@@ -993,8 +993,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value), false);
 
             //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
-            return string.Empty;
+
+            // Fehlt die Zielzelle, ist ein Leerschreiben erfolgreich (Zustand erreicht), ein Wert-Schreiben ein stiller Verlust.
+            if (lcolumn is not { IsDisposed: false } || lrow is not { IsDisposed: false }) {
+                if (string.IsNullOrEmpty(value)) { return string.Empty; }
+
+                return "Verknüpfte Zelle nicht erreichbar: " + column.KeyName;
+            }
+
+            return lrow.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
         }
 
         value = column.AutoCorrect(value, true);

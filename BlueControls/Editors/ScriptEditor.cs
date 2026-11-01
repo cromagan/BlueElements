@@ -109,6 +109,9 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             if (normalizedText == txtSkript.Text.Replace("\r\n", "\r")) { return; }
 
             txtSkript.Text = normalizedText;
+
+            // Der geladene Text ist die neue Undo-Basis; das Setzen selbst darf nicht rückgängig gemacht werden.
+            txtSkript.ClearUndo();
             ScriptChangedByUser = false;
         }
     }
