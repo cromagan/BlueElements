@@ -35,23 +35,23 @@
 <ItemGroup>
   <!-- Code-Analyzer -->
   <PackageReference Include="LoxSmoke.DocXml" Version="3.9.0" />
-  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.403">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PackageReference>
 
-  <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PackageReference>
   
-  <PackageReference Include="System.Text.Json" Version="10.0.6" />
+  <PackageReference Include="System.Text.Json" Version="10.0.14" />
 
 </ItemGroup>
 
 <ItemGroup>
-  <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
-  <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  <PackageReference Include="System.Runtime.Caching" Version="10.0.14" />
+  <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.14" />
 </ItemGroup>
 
   <ItemGroup>

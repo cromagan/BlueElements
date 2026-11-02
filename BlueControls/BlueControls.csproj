@@ -33,12 +33,12 @@
 
 <ItemGroup>
   <!-- Code-Analyzer -->
-  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.403">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PackageReference>
   
-  <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PackageReference>
@@ -65,7 +65,7 @@
 
   <!-- NuGet-Pakete -->
   <PackageReference Include="FCTB" Version="2.16.24" />
-  <PackageReference Include="System.Text.Json" Version="10.0.6" />
+  <PackageReference Include="System.Text.Json" Version="10.0.14" />
   
   <!-- App Manifest -->
 
