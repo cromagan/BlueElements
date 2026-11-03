@@ -51,9 +51,11 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     public TabPage? HotTab { get; private set; }
 
     [Category("Verhalten")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public TabPage? TabDefault { get; set; }
 
     [Category("Verhalten")]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string[]? TabDefaultOrder { get; set; }
 
     protected override bool ScaleChildren => false;

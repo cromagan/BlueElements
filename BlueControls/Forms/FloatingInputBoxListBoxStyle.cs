@@ -67,6 +67,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Properties
 
     /// <inheritdoc cref="Controls.ListBox.ItemPadding"/>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int ItemPadding {
         get => lstbx.ItemPadding;
         set {

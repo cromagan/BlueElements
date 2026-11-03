@@ -386,17 +386,19 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     public virtual string NotEditableReason => string.Empty;
 
     /// <summary>
-    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", längster Suchtext zuerst.
     /// Wird die Strategie als Textfeld dargestellt, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
     /// </summary>
-    public string OpticalReplace {
+    public ReadOnlyCollection<string> OpticalReplace {
         get;
         set {
-            if (IsDisposed || field == value) { return; }
-            field = value;
+            if (IsDisposed) { return; }
+            var v = LanguageTool.SortReplaceRules(value);
+            if (!field.IsDifferentTo(v)) { return; }
+            field = v;
             if (!IsEventsSuppressed) { ApplyStyle(); }
         }
-    } = string.Empty;
+    } = new([]);
 
     /// <summary>
     /// Höhe des umgebenden Bereichs, z. B. der Tabellenzelle.

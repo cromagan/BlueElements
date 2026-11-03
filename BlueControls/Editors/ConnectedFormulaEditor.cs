@@ -82,6 +82,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? InputItem {
         get;
         set {
@@ -96,6 +97,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
 
     public virtual EditorMode SupportedModes => EditorMode.EditItem;

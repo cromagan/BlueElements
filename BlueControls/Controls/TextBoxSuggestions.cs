@@ -126,6 +126,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.MaxTextLength = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int MinTextLength {
         get => _textBox.MinTextLength;
         set => _textBox.MinTextLength = value;

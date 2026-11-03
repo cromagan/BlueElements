@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.BlueTableDialogs;
-using BlueControls.ClassesStatic;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
@@ -90,6 +89,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     public Type? EditorFor => typeof(TableFile);
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? InputItem {
         get => field;
         set {
@@ -102,9 +102,11 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
     public EditorMode SupportedModes => EditorMode.EditItem; // EditNew/EditCopy nicht möglich: Tabellenansicht ist an bestehende Tabelle gebunden
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Table? Table {
         get => TableView.Table;
 

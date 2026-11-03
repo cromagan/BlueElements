@@ -121,6 +121,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public PadItem? LastClickedItem {
         get;
         set {
@@ -136,6 +137,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     /// über allen Items eingeblendet und jegliche Bearbeitung (Maus, Tastatur,
     /// Kontextmenü) wird unterbunden. Zoom und Verschieben bleiben möglich.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string NotEditableReason {
         get;
         set {

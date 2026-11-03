@@ -25,6 +25,7 @@ public partial class TextView : Form {
     /// <summary>
     /// Der angezeigte bzw. bearbeitbare Text.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string TextContent {
         get => txbText.Text;
         set => txbText.Text = value;

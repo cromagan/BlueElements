@@ -211,6 +211,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Parameter der ControlStrategie als Json — analog zu RendererSettings beim Renderer.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public JsonObject ControlStrategyParameter {
         get;
         set {
@@ -454,24 +455,25 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     /// <summary>
-    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", längster Suchtext zuerst.
     /// Wird der Wert in einem Textfeld bearbeitet, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
     /// </summary>
-    [DefaultValue("")]
-    public string OpticalReplace {
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> OpticalReplace {
         get;
         set {
-            if (field == value) { return; }
+            var v = LanguageTool.SortReplaceRules(value);
+            if (!field.IsDifferentTo(v)) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { OpticalReplace = value; }));
+                Invoke(new Action(() => { OpticalReplace = v; }));
                 return;
             }
 
-            field = value;
-            _strategy?.OpticalReplace = value;
+            field = v;
+            _strategy?.OpticalReplace = v;
         }
-    } = string.Empty;
+    } = new([]);
 
     [DefaultValue(1)]
     [Browsable(false)]

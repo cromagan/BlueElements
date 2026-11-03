@@ -27,6 +27,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object {
         get => _tableView;
 

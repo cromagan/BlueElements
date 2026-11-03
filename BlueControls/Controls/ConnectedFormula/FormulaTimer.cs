@@ -29,6 +29,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ConnectedFormulaView? ConnectedFormula { get; internal init; }
 
     [Browsable(false)]
@@ -46,15 +47,19 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Seconds { get; init; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool Deaktivierbar { get; init; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool IsActive {
         get => !Deaktivierbar || chkAktiv.Checked;
         init => chkAktiv.Checked = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal string ItemText { get; init; } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal int MinIdleSekunden { get; init; }
 
     #endregion

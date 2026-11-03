@@ -59,12 +59,14 @@ public partial class FloatingForm : Form {
     /// <summary>
     /// Bestimmt, ob die FloatingForm automatisch geschlossen wird, wenn außerhalb geklickt wird.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DismissMode DismissMode { get; protected set; } = DismissMode.OnOutsideClick;
 
     /// <summary>
     /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
     /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool TopMost {
         get => false;
 

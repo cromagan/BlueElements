@@ -20,6 +20,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public AddType AddAllowed {
         get => Main.AddAllowed;
         set => Main.AddAllowed = value;

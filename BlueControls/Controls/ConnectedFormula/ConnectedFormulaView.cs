@@ -77,6 +77,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CollectionPadItem? Page {
         get;
         set {

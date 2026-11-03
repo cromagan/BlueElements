@@ -267,15 +267,16 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
-    /// Textersetzungen, die nach der Eingabe automatisch ausgeführt werden.
+    /// Textersetzungen, die nach der Eingabe automatisch ausgeführt werden; längster Suchtext zuerst.
     /// </summary>
     public ReadOnlyCollection<string> AfterEditAutoReplace {
         get => new(_afterEditAutoReplace);
         set {
             if (IsDisposed) { return; }
-            if (!_afterEditAutoReplace.IsDifferentTo(value)) { return; }
+            var v = LanguageTool.SortReplaceRules(value);
+            if (!_afterEditAutoReplace.IsDifferentTo(v)) { return; }
 
-            Table?.ChangeData(TableDataType.AutoReplaceAfterEdit, this, string.Join('\r', _afterEditAutoReplace), string.Join('\r', value));
+            Table?.ChangeData(TableDataType.AutoReplaceAfterEdit, this, string.Join('\r', _afterEditAutoReplace), string.Join('\r', v));
             OnPropertyChanged();
         }
     }
@@ -1703,7 +1704,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
 
         _afterEditAutoReplace.Clear();
-        _afterEditAutoReplace.AddRange(json.GetListString("aftereditautoreplace", null));
+        _afterEditAutoReplace.AddRange(LanguageTool.SortReplaceRules(json.GetListString("aftereditautoreplace", null)));
         _dropDownItems.Clear();
         _dropDownItems.AddRange(json.GetListString("dropdownitems", null));
         _linkedCellFilter.Clear();
@@ -2282,7 +2283,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.AutoReplaceAfterEdit:
                 _afterEditAutoReplace.Clear();
-                _afterEditAutoReplace.AddRange(value.SplitAndCutByCr());
+                _afterEditAutoReplace.AddRange(LanguageTool.SortReplaceRules(value.SplitAndCutByCr()));
                 break;
 
             case TableDataType.RegexCheck:

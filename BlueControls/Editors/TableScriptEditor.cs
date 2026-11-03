@@ -57,6 +57,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
     public override EditorMode SupportedModes => EditorMode.EditCopy;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Table? Table {
         get;
         set {

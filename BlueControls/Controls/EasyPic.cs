@@ -56,6 +56,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         }
     } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string OriginalText { get; init; } = string.Empty;
 
     [DefaultValue(0)]

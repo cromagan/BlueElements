@@ -38,6 +38,7 @@ public partial class PadEditor : FormWithStatusBar {
     /// Hinweis über allen Items im CreativePad eingeblendet.
     /// Jegliche Bearbeitung wird unterbunden. Zoom und Verschieben bleiben möglich.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string NotEditableReason {
         get;
         set {

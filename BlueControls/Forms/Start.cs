@@ -55,6 +55,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object { get; set; }
 
     #endregion

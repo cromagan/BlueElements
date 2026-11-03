@@ -89,10 +89,13 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     /// ScriptDescription.ExecuteScript übernommen.
     /// Parameter: Skripttext, Testmodus.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ExecuteScriptDelegate? ExecuteScript { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string LastFailedReason { get; set; } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<ScriptVariable>? LastVariables { get; set; }
 
     /// <summary>
@@ -101,6 +104,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     /// </summary>
     public override bool OpenMaximized => true;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Script {
         get => txtSkript.Text.TrimEnd(' ').Replace("\r\n", "\r");
         set {
@@ -116,6 +120,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int StoppedTimeCount { get; set; }
 
     [Category("Skript"), DefaultValue("")]

@@ -550,6 +550,7 @@ namespace BlueControls.BlueTableDialogs {
             txbAuswaehlbareWerte.Size = new Size(504, 480);
             txbAuswaehlbareWerte.SpellCheckingEnabled = true;
             txbAuswaehlbareWerte.TabIndex = 0;
+            txbAuswaehlbareWerte.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capImmerWerte
             // 

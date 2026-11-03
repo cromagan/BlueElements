@@ -40,11 +40,13 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public Type? EditorFor => null;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? InputItem {
         get => Table;
         set => Table = value as Table;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
     public EditorMode SupportedModes => EditorMode.EditItem;
 
@@ -63,6 +65,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool UndoDone { get; set; }
 
     #endregion

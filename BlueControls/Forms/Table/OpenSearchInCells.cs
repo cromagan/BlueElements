@@ -29,6 +29,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object {
         get => _tableView;
 

@@ -75,6 +75,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public abstract bool ControlMustPressedForZoomWithWheel { get; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CanvasMouseEventArgs? CurrentMouseData { get; protected set; }
 
     public bool Fitting { get; private set; }
@@ -82,6 +83,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     /// <summary>
     /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CanvasMouseEventArgs? MouseDownData { get; protected set; }
 
     [DefaultValue(0f)]

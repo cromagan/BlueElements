@@ -68,6 +68,13 @@ public static class LanguageTool {
     }
 
     /// <summary>
+    /// Sortiert Ersetzungsregeln im Format "Alt|Neu" nach der Länge des Suchtexts (längster zuerst),
+    /// damit kürzere Regeln längere nicht teilweise ersetzen.
+    /// </summary>
+    public static ReadOnlyCollection<string> SortReplaceRules(IEnumerable<string> rules) =>
+        new([.. rules.OrderByDescending(r => r.SplitBy("|")[0].Length)]);
+
+    /// <summary>
     /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
     /// </summary>
     /// <param name="txt">Der Basistext.</param>

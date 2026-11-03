@@ -4,7 +4,6 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.TableElements;
-using BlueTable.Classes;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
@@ -97,6 +96,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Ansichtbearbeitung {
         get => TableInternal.Ansichtbearbeitung;
         set => TableInternal.Ansichtbearbeitung = value;
@@ -192,6 +192,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool PowerEdit {
         get => TableInternal.PowerEdit;
         set => TableInternal.PowerEdit = value;
@@ -205,11 +206,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.SheetStyle = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ShowWaitScreen {
         get => TableInternal.ShowWaitScreen;
         internal set => TableInternal.ShowWaitScreen = value;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowSortDefinition? SortDefinitionTemporary {
         get => TableInternal.SortDefinitionTemporary;
         internal set => TableInternal.SortDefinitionTemporary = value;

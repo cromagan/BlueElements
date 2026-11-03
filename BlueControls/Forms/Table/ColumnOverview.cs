@@ -55,6 +55,7 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
     /// Die Tabelle, deren Spalten angezeigt werden. Wird von
     /// IUniqueWindowExtension.ShowOrCreate{T} gesetzt.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object {
         get => IsDisposed ? null : Table;
         set {

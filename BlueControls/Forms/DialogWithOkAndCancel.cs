@@ -38,6 +38,7 @@ public partial class DialogWithOkAndCancel : Form {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Canceled { get; protected set; }
 
     #endregion

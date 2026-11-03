@@ -29,9 +29,12 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ContextMenuDefault { get; set; } = true;
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string ErrorText { get; init; } = string.Empty;
 
     #endregion

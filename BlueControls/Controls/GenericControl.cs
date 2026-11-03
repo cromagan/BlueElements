@@ -63,6 +63,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtended,
     public bool ContainsMouse { get; private set; }
     public override bool Focused => base.Focused || ContainsFocus;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool IsSelectable {
         get;
         protected set {

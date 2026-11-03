@@ -44,6 +44,7 @@ public partial class ZoomPic : CreativePad {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IDrawsOverlay? ActiveTool {
         get;
         set {
@@ -53,6 +54,7 @@ public partial class ZoomPic : CreativePad {
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Bitmap? Bmp {
         get => _bmpItem?.BitmapValue;
         set {

@@ -32,6 +32,7 @@ public partial class Progressbar : FloatingForm {
     /// Wenn true, wird ein Abbrechen-Button angezeigt. Der Aufrufer muss
     /// IsCancelRequested zyklisch prüfen und die Progressbar schließen.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool CancelSupported {
         get;
         set {

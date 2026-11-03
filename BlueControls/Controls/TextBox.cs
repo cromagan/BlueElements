@@ -182,21 +182,24 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     }
 
     /// <summary>
-    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", längster Suchtext zuerst.
     /// Zu jedem Treffer wird ein nicht löschbarer OpticalReplaceChar eingefügt,
     /// der den Ersatz halb so groß und hellgrau anzeigt.
+    /// Der längste Suchtext greift zuerst (X1|A1 vor X|Y).
     /// </summary>
-    [DefaultValue("")]
-    public string OpticalReplace {
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> OpticalReplace {
         get;
         set {
-            if (IsDisposed || field == value) { return; }
-            field = value;
-            _opticalRules = LanguageTool.ParseOpticalReplace(value.SplitByCr());
+            if (IsDisposed) { return; }
+            var v = LanguageTool.SortReplaceRules(value);
+            if (!field.IsDifferentTo(v)) { return; }
+            field = v;
+            _opticalRules = LanguageTool.ParseOpticalReplace([.. v]);
             UpdateOpticalReplaceChars();
             Invalidate();
         }
-    } = string.Empty;
+    } = new([]);
 
     [DefaultValue(0)]
     public int RaiseChangeDelay {
@@ -308,6 +311,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal Func<object?, List<ListItem>?>? AdditionalContextMenuItems { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal int CursorPosition {
         get => Math.Max(0, Math.Max(_markStart, _markEnd));
         set {

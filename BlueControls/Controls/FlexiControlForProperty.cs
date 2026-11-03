@@ -102,6 +102,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 Size = new Size(s1.Width + 30, 22);
                 break;
 
+            case Accessor<ReadOnlyCollection<string>> when allPossibleItems is null:
+                // Freie Regellisten ohne Auswahl-Items als mehrzeiliges Textfeld bearbeiten.
+                SetupTypeDependent(_accessor, rowCount, allPossibleItems);
+                break;
+
             case Accessor<List<string>>:
             case Accessor<ReadOnlyCollection<string>>:
                 CaptionPosition = CaptionPosition.Über_dem_Feld;

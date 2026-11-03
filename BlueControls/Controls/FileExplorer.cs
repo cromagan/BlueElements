@@ -105,6 +105,7 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
     [DefaultValue(true)]
     public bool DoDefaultHandling { get; set; } = true;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Filter {
         get => IsDisposed ? string.Empty : _filter;
         set {
@@ -125,8 +126,10 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
         get;
     } = "Name";
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Var_Directory { get; init; } = string.Empty;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Var_DirectoryMin { get; init; } = string.Empty;
 
     #endregion

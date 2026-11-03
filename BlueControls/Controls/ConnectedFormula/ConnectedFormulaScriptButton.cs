@@ -16,8 +16,10 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ButtonArgs Drückbar_wenn { get; init; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string ImageCode {
         get => mainButton.ImageCode;
         init => mainButton.ImageCode = value;

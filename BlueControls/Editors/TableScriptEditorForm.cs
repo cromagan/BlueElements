@@ -42,6 +42,7 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
     /// Die Tabelle, deren Skripte bearbeitet werden. Wird von
     /// IUniqueWindowExtension.ShowOrCreate{T} gesetzt.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object {
         get => IsDisposed ? null : _table;
         set {

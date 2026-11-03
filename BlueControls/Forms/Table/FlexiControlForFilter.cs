@@ -72,14 +72,18 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// <summary>
     /// Bei True werden die zuletzt eingegebenen Werte auf Festplatte gespeichert und geladen.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool SavesSettings { get; internal init; }
 
     public List<string> Settings { get; } = [];
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool SettingsLoaded { get; set; }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string SettingsManualFilename { get; set; } = string.Empty;
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe { get; } = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public bool UsesSettings => true;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Value {
         get => f.Value;
         set => f.Value = value;

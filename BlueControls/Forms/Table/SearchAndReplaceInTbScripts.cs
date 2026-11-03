@@ -20,6 +20,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? Object { get; set; }
 
     #endregion

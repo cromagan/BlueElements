@@ -31,6 +31,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowItem? LastRow {
         get;
 

@@ -92,12 +92,13 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
             Invalidate();
         }
     }
-
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string ControlStrategy { get => f.ControlStrategy; set => f.ControlStrategy = value; }
 
     /// <summary>
     /// Parameter der strategie-spezifischen Werte der ControlStrategie als Json.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public JsonObject ControlStrategyParameter { get => f.ControlStrategyParameter; set => f.ControlStrategyParameter = value; }
 
     [DefaultValue(-1)]
@@ -128,7 +129,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IAutoNext {
                 };
                 f.OpticalReplace = r switch {
                     ImageAndTextRenderer iat => iat.Text_ersetzen,
-                    _ => string.Empty
+                    _ => new([])
                 };
 
                 // Back Column

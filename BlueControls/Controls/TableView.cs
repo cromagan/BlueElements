@@ -169,6 +169,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Ansichtbearbeitung {
         get;
         set {
@@ -299,6 +300,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem> PinnedRows { get; } = [];
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool PowerEdit {
         get => Table?.PowerEdit ?? false;
         set {

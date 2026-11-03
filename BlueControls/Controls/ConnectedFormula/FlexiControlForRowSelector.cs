@@ -33,10 +33,14 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     #region Properties
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal init => f.CaptionPosition = value; }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string ControlStrategy { get => f.ControlStrategy; internal init => f.ControlStrategy = value; }
     public List<string> Settings { get; } = [];
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool SettingsLoaded { get; set; }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string SettingsManualFilename { get; set; } = string.Empty;
     public bool UsesSettings => true;
 

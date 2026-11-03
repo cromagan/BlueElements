@@ -67,6 +67,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     public Type? EditorFor => typeof(ColumnItem);
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public object? InputItem {
         get;
         set {
@@ -97,6 +98,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public EditorMode Mode { get; set; } = EditorMode.EditItem;
     public EditorMode SupportedModes => EditorMode.EditItem; // EditCopy nicht möglich: Spalte wird inline in Tabelle bearbeitet
     public Table? Table => (InputItem as ColumnItem)?.Table;
@@ -901,7 +903,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             b.DefaultRenderer = ImageAndTextRenderer.ClassId;
 
             var s = new ImageAndTextRenderer {
-                Text_ersetzen = string.Join('\r', or)
+                Text_ersetzen = new(or)
             };
             b.RendererSettings = s.ReadableText();
 

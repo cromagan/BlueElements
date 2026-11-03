@@ -205,6 +205,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// Wenn <c>true</c>, reserviert CalculateCanvasMaxBounds zusätzlichen Platz
     /// am unteren Rand für den Add-Bereich des äußeren ListBox-Controls.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool AddAreaVisible {
         get;
         set {
@@ -218,6 +219,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// Das HotItem, das an ContextMenuEventArgs.HotItem übergeben wird,
     /// wenn ein ListItem per Linksklick ausgelöst wird.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal object? HotItemForClick { get; set; }
 
     /// <summary>

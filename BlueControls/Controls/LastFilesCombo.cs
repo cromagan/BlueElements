@@ -51,6 +51,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     public List<string> Settings { get; } = [];
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool SettingsLoaded { get; set; }
 
     /// <summary>

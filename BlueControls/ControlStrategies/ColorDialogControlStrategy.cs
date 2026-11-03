@@ -1,6 +1,5 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueControls.Controls;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using DialogResult = System.Windows.Forms.DialogResult;
 

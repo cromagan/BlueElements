@@ -134,7 +134,11 @@ public class TableColumnHeadCliCommand : CliCommand {
 
             switch (property) {
                 case TextReplaceProperty:
-                    SetTextReplace(column, text);
+                    if (ImageAndTextRendererOf(column) is { } r) { // durch die Vorprüfung ausgeschlossen
+                        r.Text_ersetzen = new(text.SplitAndCutByCr());
+                        column.RendererSettings = r.ParseableItems().FinishParseable();
+                    }
+
                     break;
 
                 case QuickInfoProperty:
@@ -211,7 +215,7 @@ public class TableColumnHeadCliCommand : CliCommand {
 
             default:
                 // Die Ersetzungen stecken versteckt im Renderer; andere Renderer liefern leer.
-                return ImageAndTextRendererOf(column)?.Text_ersetzen ?? string.Empty;
+                return ImageAndTextRendererOf(column) is { } r ? string.Join('\r', r.Text_ersetzen) : string.Empty;
         }
     }
 
@@ -237,16 +241,6 @@ public class TableColumnHeadCliCommand : CliCommand {
         return r.Text_anzeigen
             ? null
             : "Die Spalte '" + column.KeyName + "' zeigt keinen Text an (ShowText=-) — 'Text ersetzen' wäre wirkungslos.";
-    }
-
-    /// <summary>
-    /// Schreibt die Anzeige-Ersetzungen zurück in die RendererSettings der Spalte.
-    /// </summary>
-    private static void SetTextReplace(ColumnItem column, string value) {
-        if (ImageAndTextRendererOf(column) is not { } r) { return; } // durch die Vorprüfung ausgeschlossen
-
-        r.Text_ersetzen = value;
-        column.RendererSettings = r.ParseableItems().FinishParseable();
     }
 
     /// <summary>

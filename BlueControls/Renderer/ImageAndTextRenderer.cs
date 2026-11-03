@@ -1,6 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueControls.Controls;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Renderer;
 
@@ -18,7 +19,7 @@ public class ImageAndTextRenderer : Renderer {
     private List<string> _imagereplacement = [];
     private string _imgpräfix = string.Empty;
     private List<(string Search, string Replace)> _opticalReplace = [];
-    private string _textersatz = string.Empty;
+    private List<string> _textersatz = [];
     private bool _text_anzeigen = true;
 
     #endregion
@@ -154,26 +155,27 @@ public class ImageAndTextRenderer : Renderer {
     }
 
     /// <summary>
-    /// Eigene Ersetzungen nur für die Anzeige, eine Regel pro Zeile im Format alt|neu.<br />
+    /// Eigene Ersetzungen nur für die Anzeige, eine Regel pro Zeile im Format alt|neu; längster Suchtext zuerst.<br />
     /// Beispiel: „Privatkunde|PK" zeigt statt „Privatkunde" nur „PK" an.<br />
     /// Der gespeicherte Wert bleibt dabei unverändert.
     /// </summary>
-    public string Text_ersetzen {
-        get => _textersatz;
+    public ReadOnlyCollection<string> Text_ersetzen {
+        get => new(_textersatz);
         set {
-            var old = _textersatz;
-            if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
+            var v = LanguageTool.SortReplaceRules(value);
+            if (!_textersatz.IsDifferentTo(v)) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
 
-            // Rohstring verlustfrei halten (wie Bild_ersetzen), damit unvollständig
+            // Zeilen verlustfrei halten (wie Bild_ersetzen), damit unvollständig
             // getippte Regeln beim Editieren nicht aus dem Feld gelöscht werden.
             // Für das Rendering wird daraus separiert die gültige Regelmenge geparst.
-            _textersatz = value;
-            _opticalReplace = LanguageTool.ParseOpticalReplace(value.SplitByCr());
+            var menuUpdate = (_textersatz.Count == 0) != (v.Count == 0);
+            _textersatz = [.. v];
+            _opticalReplace = LanguageTool.ParseOpticalReplace([.. v]);
 
             OnPropertyChanged();
 
-            if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
+            if (menuUpdate) {
                 OnDoUpdateSideOptionMenu();
             }
         }
@@ -224,7 +226,7 @@ public class ImageAndTextRenderer : Renderer {
         if (Text_anzeigen) {
             //result.Add(new FlexiControlForProperty<string>(() => Präfix));
             //result.Add(new FlexiControlForProperty<string>(() => Suffix, cbxEinheit, true));
-            result.Add(new FlexiControlForProperty<string>(() => Text_ersetzen, 5));
+            result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Text_ersetzen, 5));
         }
 
         result.Add(new FlexiControlForProperty<bool>(() => Bild_anzeigen));
@@ -297,8 +299,8 @@ public class ImageAndTextRenderer : Renderer {
                 for (var z = 0; z < items.Length - 1; z += 2) {
                     lines.Add($"{items[z]}|{items[z + 1]}");
                 }
-                _opticalReplace = LanguageTool.ParseOpticalReplace([.. lines]);
-                _textersatz = string.Join('\r', lines);
+                _textersatz = [.. LanguageTool.SortReplaceRules(lines)];
+                _opticalReplace = LanguageTool.ParseOpticalReplace([.. _textersatz]);
                 return true;
 
             case "imagereplace":
