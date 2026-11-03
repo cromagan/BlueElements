@@ -2061,7 +2061,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // bleiben bei Einzelauswahl, sonst entstehen Mischwerte wie «+-».
             // Ohne Multiline kann die Zelle mehrere Werte (CR-getrennt) nicht
             // fassen — daher ebenfalls nur Einzelauswahl.
-            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown() && cc.MaxTextLength > 1 && cc.MultiLine) {
+            if (strategy.SupportsSuggestions && contentColumn is { } cc && cc.MayHaveDropDown() && cc.MaxTextLineLength > 1 && cc.MultiLine) {
                 strategy.CheckBehavior = CheckBehavior.MultiSelection;
                 strategy.AutoSort = true;
             } else if (strategy.SupportsSuggestions) {
@@ -2210,9 +2210,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             try {
                 var keysToRemove = new List<string>();
                 foreach (var kvp in _allViewItems) {
-                    if (kvp.Value is RowTableElement rli && rli.Row.IsDisposed) {
-                        keysToRemove.Add(kvp.Key);
-                    } else if (kvp.Value is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
+                    if ((kvp.Value is RowTableElement rli && rli.Row.IsDisposed) || (kvp.Value is IDisposableExtended extendedRli && extendedRli.IsDisposed)) {
                         keysToRemove.Add(kvp.Key);
                     }
                 }

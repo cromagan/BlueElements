@@ -142,7 +142,7 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
 
             case "MAXZEICHEN":
                 if (!int.TryParse(value, out var maxLen) || maxLen < 1) { RejectValue(value); return false; }
-                c.MaxCellLength = maxLen;
+                c.MaxTextLength = maxLen;
                 return true;
 
             case "FARBE":
@@ -351,7 +351,7 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
                 return FormatNameOf(c);
 
             case "MAXZEICHEN":
-                return c.MaxCellLength.ToString1();
+                return c.MaxTextLength.ToString1();
 
             case "FARBE":
                 return c.BackColor.ToHtmlCode();

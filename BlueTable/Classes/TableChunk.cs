@@ -1166,7 +1166,7 @@ public class TableChunk : TableFile {
         if (newestFile is null) {
             // Alle Dateien des Chunks wurden gelöscht — Tracking-Eintrag entfernen,
             // damit veraltete Daten nicht als "aktuell" gelten.
-            _processedFile.TryRemove(chunkId, out var prevFile);
+            _processedFile.TryRemove(chunkId, out _);
             _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
         }

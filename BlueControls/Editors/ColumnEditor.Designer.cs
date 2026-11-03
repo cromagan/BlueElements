@@ -74,7 +74,7 @@ namespace BlueControls.BlueTableDialogs {
             btnCalculateMaxCellLength = new Button();
             txbAutoReplace = new TextBox();
             capAutoReplace = new Caption();
-            txbMaxCellLength = new TextBox();
+            tbxMaxTextLength = new TextBox();
             txbAutoRemove = new TextBox();
             capAutoRemove = new Caption();
             capMaxCellLength = new Caption();
@@ -126,9 +126,9 @@ namespace BlueControls.BlueTableDialogs {
             chkIsKeyColumn = new Button();
             chkIsFirst = new Button();
             btnMaxTextLength = new Button();
-            txbMaxTextLength = new TextBox();
+            tbxMaxTextLineLength = new TextBox();
             capMaxTextLength = new Caption();
-            txbMinTextLength = new TextBox();
+            tbxMinTextLength = new TextBox();
             capMinTextLength = new Caption();
             txbSimilarityWeight = new TextBox();
             capSimilarityWeight = new Caption();
@@ -636,7 +636,7 @@ namespace BlueControls.BlueTableDialogs {
             tabAutoKorrektur.Controls.Add(btnCalculateMaxCellLength);
             tabAutoKorrektur.Controls.Add(txbAutoReplace);
             tabAutoKorrektur.Controls.Add(capAutoReplace);
-            tabAutoKorrektur.Controls.Add(txbMaxCellLength);
+            tabAutoKorrektur.Controls.Add(tbxMaxTextLength);
             tabAutoKorrektur.Controls.Add(txbAutoRemove);
             tabAutoKorrektur.Controls.Add(capAutoRemove);
             tabAutoKorrektur.Controls.Add(capMaxCellLength);
@@ -681,17 +681,17 @@ namespace BlueControls.BlueTableDialogs {
             capAutoReplace.Size = new Size(184, 24);
             capAutoReplace.Text = "Permanente Ersetzungen:";
             // 
-            // txbMaxCellLength
+            // tbxMaxTextLength
             // 
-            txbMaxCellLength.AdditionalFormatCheck = AdditionalCheck.Integer;
-            txbMaxCellLength.AllowedChars = "0123456789";
-            txbMaxCellLength.Cursor = Cursors.IBeam;
-            txbMaxCellLength.Location = new Point(216, 88);
-            txbMaxCellLength.MaxTextLength = 255;
-            txbMaxCellLength.Name = "txbMaxCellLength";
-            txbMaxCellLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
-            txbMaxCellLength.Size = new Size(96, 24);
-            txbMaxCellLength.TabIndex = 45;
+            tbxMaxTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
+            tbxMaxTextLength.AllowedChars = "0123456789";
+            tbxMaxTextLength.Cursor = Cursors.IBeam;
+            tbxMaxTextLength.Location = new Point(216, 88);
+            tbxMaxTextLength.MaxTextLineLength = 255;
+            tbxMaxTextLength.Name = "tbxMaxTextLength";
+            tbxMaxTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
+            tbxMaxTextLength.Size = new Size(96, 24);
+            tbxMaxTextLength.TabIndex = 45;
             // 
             // txbAutoRemove
             // 
@@ -716,6 +716,7 @@ namespace BlueControls.BlueTableDialogs {
             capMaxCellLength.CausesValidation = false;
             capMaxCellLength.Location = new Point(16, 88);
             capMaxCellLength.Name = "capMaxCellLength";
+            capMaxCellLength.QuickInfo = "Maximale Gesamtlänge des Zellinhalts (alle Zeilen zusammen).\r\n0 bedeutet: unbegrenzt.";
             capMaxCellLength.Size = new Size(160, 24);
             capMaxCellLength.Text = "Maximale Zellen-Kapazität:";
             // 
@@ -1143,9 +1144,9 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(chkSaveContent);
             tabDatenFormat.Controls.Add(chkIsFirst);
             tabDatenFormat.Controls.Add(btnMaxTextLength);
-            tabDatenFormat.Controls.Add(txbMaxTextLength);
+            tabDatenFormat.Controls.Add(tbxMaxTextLineLength);
             tabDatenFormat.Controls.Add(capMaxTextLength);
-            tabDatenFormat.Controls.Add(txbMinTextLength);
+            tabDatenFormat.Controls.Add(tbxMinTextLength);
             tabDatenFormat.Controls.Add(capMinTextLength);
             tabDatenFormat.Controls.Add(txbSimilarityWeight);
             tabDatenFormat.Controls.Add(capSimilarityWeight);
@@ -1239,17 +1240,17 @@ namespace BlueControls.BlueTableDialogs {
             btnMaxTextLength.TabIndex = 48;
             btnMaxTextLength.Click += btnMaxTextLength_Click;
             // 
-            // txbMaxTextLength
+            // tbxMaxTextLineLength
             // 
-            txbMaxTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
-            txbMaxTextLength.AllowedChars = "0123456789";
-            txbMaxTextLength.Cursor = Cursors.IBeam;
-            txbMaxTextLength.Location = new Point(560, 272);
-            txbMaxTextLength.MaxTextLength = 255;
-            txbMaxTextLength.Name = "txbMaxTextLength";
-            txbMaxTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
-            txbMaxTextLength.Size = new Size(96, 24);
-            txbMaxTextLength.TabIndex = 47;
+            tbxMaxTextLineLength.AdditionalFormatCheck = AdditionalCheck.Integer;
+            tbxMaxTextLineLength.AllowedChars = "0123456789";
+            tbxMaxTextLineLength.Cursor = Cursors.IBeam;
+            tbxMaxTextLineLength.Location = new Point(560, 272);
+            tbxMaxTextLineLength.MaxTextLineLength = 255;
+            tbxMaxTextLineLength.Name = "tbxMaxTextLineLength";
+            tbxMaxTextLineLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
+            tbxMaxTextLineLength.Size = new Size(96, 24);
+            tbxMaxTextLineLength.TabIndex = 47;
             // 
             // capMaxTextLength
             // 
@@ -1259,18 +1260,18 @@ namespace BlueControls.BlueTableDialogs {
             capMaxTextLength.QuickInfo = "Pro Zeile!\r\nEs wird wirklich die Anzahl der Zeichen gezählt.\r\nEs bezeht sich nur auf das Format, und es wird evtl. eine Meldung ausgegeben,\r\ndas die Eingabe nicht dem Format entspricht.";
             capMaxTextLength.Size = new Size(136, 24);
             capMaxTextLength.Text = "Maximale Text-Länge:";
-            // 
-            // txbMinTextLength
-            // 
-            txbMinTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
-            txbMinTextLength.AllowedChars = "0123456789";
-            txbMinTextLength.Cursor = Cursors.IBeam;
-            txbMinTextLength.Location = new Point(560, 328);
-            txbMinTextLength.MaxTextLength = 255;
-            txbMinTextLength.Name = "txbMinTextLength";
-            txbMinTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
-            txbMinTextLength.Size = new Size(96, 24);
-            txbMinTextLength.TabIndex = 45;
+            //
+            // tbxMinTextLength
+            //
+            tbxMinTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
+            tbxMinTextLength.AllowedChars = "0123456789";
+            tbxMinTextLength.Cursor = Cursors.IBeam;
+            tbxMinTextLength.Location = new Point(560, 328);
+            tbxMinTextLength.MaxTextLineLength = 255;
+            tbxMinTextLength.Name = "tbxMinTextLength";
+            tbxMinTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
+            tbxMinTextLength.Size = new Size(96, 24);
+            tbxMinTextLength.TabIndex = 45;
             // 
             // capMinTextLength
             // 
@@ -1467,7 +1468,7 @@ namespace BlueControls.BlueTableDialogs {
         private ComboBox cbxControlStrategy;
         private Caption capControlStrategy;
         private TextBox txbAuswaehlbareWerte;
-        private TextBox txbMinTextLength;
+        private TextBox tbxMinTextLength;
         private Caption capMinTextLength;
         private TextBox txbSimilarityWeight;
         private Caption capSimilarityWeight;
@@ -1540,13 +1541,13 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabDatenFormat;
         private TabPage tabSpaltenVerlinkung;
         private TableView tblFilterliste;
-        private TextBox txbMaxCellLength;
+        private TextBox tbxMaxTextLength;
         private Caption capMaxCellLength;
         private Button btnCalculateMaxCellLength;
         private Caption capTabellenname;
         private TextBox txbFixedColumnWidth;
         private Caption capFixedColumnWidth;
-        private TextBox txbMaxTextLength;
+        private TextBox tbxMaxTextLineLength;
         private Caption capMaxTextLength;
         private Button btnMaxTextLength;
         private Button btnSpaltenkopf;

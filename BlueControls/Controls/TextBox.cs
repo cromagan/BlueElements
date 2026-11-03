@@ -147,6 +147,16 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     } = 4000;
 
+    [DefaultValue(4000)]
+    public int MaxTextLineLength {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            GenerateEtxt(false);
+        }
+    } = 4000;
+
     [DefaultValue(0)]
     public int MinTextLength {
         get;
@@ -407,15 +417,6 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
 
     public void Mark(string markKey, int first, int last) => Mark(markKey, first, last, null);
 
-    public void Unmark(string markKey) => _zones.RemoveAll(z => z.Type == markKey);
-
-    internal void Mark(string markKey, int first, int last, Color? overrideColor) {
-        var renderer = AllRenderers[markKey];
-        if (renderer is null) { return; }
-        var end = Math.Min(last, _eTxt.Count - 1);
-        _zones.Add(new ZoneMarkRenderer(renderer, first, end, overrideColor));
-    }
-
     /// <summary>
     /// True, wenn der Text bei der gegebenen Control-Größe nicht passt und
     /// der vertikale Scrollbalken (SliderSize breit) erscheinen wird.
@@ -432,6 +433,15 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         _eTxt.TextDimensions = oldDimensions;
 
         return neededHeight > controlSize.Height;
+    }
+
+    public void Unmark(string markKey) => _zones.RemoveAll(z => z.Type == markKey);
+
+    internal void Mark(string markKey, int first, int last, Color? overrideColor) {
+        var renderer = AllRenderers[markKey];
+        if (renderer is null) { return; }
+        var end = Math.Min(last, _eTxt.Count - 1);
+        _zones.Add(new ZoneMarkRenderer(renderer, first, end, overrideColor));
     }
 
     internal void ProcessKey(AsciiKey keyAscii) {
@@ -503,7 +513,7 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
                     _markStart = Char_DelBereich(_markStart, _markEnd, false);
                     _markEnd = -1;
                     _markStart = Insert(_markStart, (char)keyAscii, true);
-                    if (_eTxt.Count >= MaxTextLength) {
+                    if (MaxTextLength > 0 && _eTxt.TextLength >= MaxTextLength) {
                         OnNavigateToNext(NavigationDirection.Next);
                     }
                 }
@@ -1202,8 +1212,13 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
     private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new AsciiChar(_eTxt, pos, c), raiseEvent);
 
     private int Insert(int pos, Chars.Char chr, bool raiseEvent) {
-        if (_eTxt.Count >= MaxTextLength) {
+        if (MaxTextLength > 0 && _eTxt.TextLength >= MaxTextLength) {
             ShowMaxLengthInfo();
+            return pos;
+        }
+
+        if (MaxTextLineLength > 0 && !chr.IsLineBreak() && _eTxt.TextLengthOfLine(pos) >= MaxTextLineLength) {
+            ShowMaxLineLengthInfo();
             return pos;
         }
 
@@ -1366,14 +1381,21 @@ public partial class TextBox : ZoomPad, IContextMenu, IInputFormat {
         }
     }
 
+    private void ShowLengthInfo(string message) {
+        if ((DateTime.UtcNow - _lastMaxLengthNotification).TotalSeconds < 2) { return; }
+        _lastMaxLengthNotification = DateTime.UtcNow;
+        QuickNote.Show(NoteSymbols.Warning, message);
+    }
+
     /// <summary>
     /// Zeigt eine Notify, wenn das Textfeld voll ist und kein Zeichen mehr aufgenommen werden kann.
     /// </summary>
-    private void ShowMaxLengthInfo() {
-        if ((DateTime.UtcNow - _lastMaxLengthNotification).TotalSeconds < 2) { return; }
-        _lastMaxLengthNotification = DateTime.UtcNow;
-        QuickNote.Show(NoteSymbols.Warning, "Maximal " + MaxTextLength + " Zeichen");
-    }
+    private void ShowMaxLengthInfo() => ShowLengthInfo("Maximal " + MaxTextLength + " Zeichen");
+
+    /// <summary>
+    /// Zeigt eine Notify, wenn die aktuelle Zeile voll ist und kein Zeichen mehr aufgenommen werden kann.
+    /// </summary>
+    private void ShowMaxLineLengthInfo() => ShowLengthInfo("Maximal " + MaxTextLineLength + " Zeichen pro Zeile");
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
         try {

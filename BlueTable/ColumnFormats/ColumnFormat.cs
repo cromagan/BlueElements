@@ -54,6 +54,7 @@ public abstract class ColumnFormat : IColumnInputFormat, IReadableTextWithKey {
     public string KeyName { get; protected set; }
 
     public int MaxTextLength { get => _format.MaxTextLength; set { } }
+    public int MaxTextLineLength { get => _format.MaxTextLineLength; set { } }
     public int MinTextLength { get => _format.MinTextLength; set { } }
     public bool MultiLine { get; set; }
 

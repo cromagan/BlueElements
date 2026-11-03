@@ -20,6 +20,7 @@ public class ColorFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 9;
+        MaxTextLineLength = 9;
         MinTextLength = 7;
         ForbiddenChars = "\r\n";
         QuickInfo = "Farbcode im Hex-Format. Beispiel: #aa0000";

@@ -97,10 +97,8 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         }
 
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_tableView?.CursorPosColumn?.Column is not { IsDisposed: false } column) {
+            if (_tableView?.CursorPosColumn?.Column is not { IsDisposed: false } column || !column.CanBeCheckedByRules()) {
                 canDo = false;
-            } else {
-                if (!column.CanBeCheckedByRules()) { canDo = false; }
             }
         }
         if (txbAlt.Text == txbNeu.Text) {

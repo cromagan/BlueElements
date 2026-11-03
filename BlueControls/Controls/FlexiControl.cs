@@ -384,6 +384,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = 4000;
 
+    [DefaultValue(4000)]
+    public int MaxTextLineLength {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { MaxTextLineLength = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.MaxTextLineLength = value;
+        }
+    } = 4000;
+
     [DefaultValue(0)]
     public int MinTextLength {
         get;
@@ -436,6 +452,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.MultiLine = value;
         }
     }
+
+    /// <summary>
+    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
+    /// Wird der Wert in einem Textfeld bearbeitet, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
+    /// </summary>
+    [DefaultValue("")]
+    public string OpticalReplace {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { OpticalReplace = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.OpticalReplace = value;
+        }
+    } = string.Empty;
 
     [DefaultValue(1)]
     [Browsable(false)]
@@ -534,26 +570,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             field = value;
             _strategy?.Suffix = value;
-        }
-    } = string.Empty;
-
-    /// <summary>
-    /// Optische Ersetzungsregeln im Format "Alt|Neu", CR-getrennt.
-    /// Wird der Wert in einem Textfeld bearbeitet, wird zu jedem Treffer eine graue Ersatz-Vorschau angezeigt.
-    /// </summary>
-    [DefaultValue("")]
-    public string OpticalReplace {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (InvokeRequired) {
-                Invoke(new Action(() => { OpticalReplace = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.OpticalReplace = value;
         }
     } = string.Empty;
 
@@ -767,6 +783,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.AutoSort = AutoSort;
             _strategy.CheckBehavior = CheckBehavior;
             _strategy.MaxTextLength = MaxTextLength;
+            _strategy.MaxTextLineLength = MaxTextLineLength;
             _strategy.MinTextLength = MinTextLength;
             _strategy.MultiLine = MultiLine;
             _strategy.MoveAllowed = MoveAllowed;

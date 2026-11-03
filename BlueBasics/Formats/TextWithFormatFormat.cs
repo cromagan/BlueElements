@@ -16,6 +16,7 @@ public class TextWithFormatFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = true;
         MaxTextLength = 4000;
+        MaxTextLineLength = 4000;
         MinTextLength = 0;
         QuickInfo = "TextFormat, der Kursiv, Fett, etc. unterstüzt";
     }

@@ -322,6 +322,18 @@ public abstract class ControlStrategy : IDisposableExtended, ISupportInitialize,
     /// <summary>
     /// Maximale Zeichenanzahl der Eingabe. 0 = unbegrenzt.
     /// </summary>
+    public int MaxTextLineLength {
+        get;
+        set {
+            if (IsDisposed || field == value) { return; }
+            field = value;
+            if (!IsEventsSuppressed) { ApplyStyle(); }
+        }
+    }
+
+    /// <summary>
+    /// Maximale Zeichenanzahl der gesamten Eingabe. 0 = unbegrenzt.
+    /// </summary>
     public int MaxTextLength {
         get;
         set {

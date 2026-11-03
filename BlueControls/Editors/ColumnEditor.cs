@@ -295,12 +295,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
         if (InputItem is not ColumnItem c) { return; }
 
-        txbMaxCellLength.Text = c.CalculatePreveredMaxCellLength(1.2f).ToString1();
+        tbxMaxTextLength.Text = c.CalculatePreveredMaxCellLength(1.2f).ToString1();
     }
 
     private void btnMaxTextLength_Click(object sender, System.EventArgs e) {
         if (InputItem is not ColumnItem c) { return; }
-        txbMaxTextLength.Text = c.CalculatePreveredMaxTextLength(1.2f).ToString1();
+        tbxMaxTextLineLength.Text = c.CalculatePreveredMaxTextLength(1.2f).ToString1();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {
@@ -477,7 +477,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxControlStrategy.Set(() => c.ControlStrategy);
         cbxControlStrategy_TextChanged(cbxControlStrategy, System.EventArgs.Empty);
         btnEditableStandard.SetChecked(() => c.EditableWithTextInput);
-        txbMinTextLength.Set(() => c.MinTextLength);
+        tbxMinTextLength.Set(() => c.MinTextLength);
         txbSimilarityWeight.Set(c.SimilarityWeight.ToString1_5(), () => c.SimilarityWeight);
         btnAutoEditAutoSort.SetChecked(() => c.AfterEditQuickSortRemoveDouble);
         txbRunden.Set(c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty, () => c.AfterEditRound);
@@ -496,8 +496,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbTags.Set(string.Join('\r', c.ColumnTags), () => c.ColumnTags);
         lbxCellEditor.Check(c.PermissionGroupsChangeCell, true);
         txbAllowedChars.Set(c.AllowedChars.EncodeControlChars(), () => c.AllowedChars);
-        txbMaxTextLength.Set(() => c.MaxTextLength);
-        txbMaxCellLength.Set(() => c.MaxCellLength);
+        tbxMaxTextLineLength.Set(() => c.MaxTextLineLength);
+        tbxMaxTextLength.Set(() => c.MaxTextLength);
         btnOtherValuesToo.SetChecked(() => c.ShowValuesOfOtherCellsInDropdown);
         btnIgnoreLock.SetChecked(() => c.EditAllowedDespiteLock);
         txbAdminInfo.Set(c.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase), () => c.AdminInfo);
@@ -576,13 +576,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.ControlStrategy = cbxControlStrategy.Text;
         c.ControlStrategyParameter = _strategyOptions?.ControlStrategyParameter ?? new JsonObject();
         c.EditableWithTextInput = btnEditableStandard.Checked;
-        c.MinTextLength = Math.Max(0, IntParse(txbMinTextLength.Text));
+        c.MinTextLength = Math.Max(0, IntParse(tbxMinTextLength.Text));
         c.SimilarityWeight = txbSimilarityWeight.Text.IsDouble() ? Math.Clamp(FloatParse(txbSimilarityWeight.Text), 0f, 2f) : 1f;
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         c.AllowedChars = txbAllowedChars.Text.DecodeControlChars();
-        c.MaxTextLength = IntParse(txbMaxTextLength.Text);
-        c.MaxCellLength = IntParse(txbMaxCellLength.Text);
+        c.MaxTextLineLength = IntParse(tbxMaxTextLineLength.Text);
+        c.MaxTextLength = IntParse(tbxMaxTextLength.Text);
         c.LinkedTableTableName = cbxLinkedTable.Text;
         c.ColumnKeyOfLinkedTable = cbxTargetColumn.Text;
         c.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
@@ -657,7 +657,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         //}
 
         if (fehler == CellSizeTooSmall) {
-            solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße anpassen", () => tbxMaxTextLength.Text = ((InputItem as ColumnItem)?.MaxTextLineLength ?? 64).ToString(CultureInfo.InvariantCulture), tbxMaxTextLength));
         }
 
         if (fehler == ChapterColumnMultilineWithRepeat) {
@@ -665,16 +665,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == CellSizeTooLarge) {
-            solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => txbMaxCellLength.Text = "4000", txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => tbxMaxTextLength.Text = "4000", tbxMaxTextLength));
         }
 
         if (fehler == MaxLengthTooLarge) {
-            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
+            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => tbxMaxTextLineLength.Text = "4000", tbxMaxTextLineLength));
         }
 
         if (fehler == MinLengthGreaterThanMax) {
-            solutions.Add(CreateSolution("Minimallänge auf 0 setzen", () => txbMinTextLength.Text = "0", txbMinTextLength));
-            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
+            solutions.Add(CreateSolution("Minimallänge auf 0 setzen", () => tbxMinTextLength.Text = "0", tbxMinTextLength));
+            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => tbxMaxTextLineLength.Text = "4000", tbxMaxTextLineLength));
         }
 
         //if (fehler == CaptionMissing) {
@@ -779,7 +779,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
-                txbMinTextLength.Text = "0";
+                tbxMinTextLength.Text = "0";
                 txbAuswaehlbareWerte.Text = string.Empty;
             }, txbAuswaehlbareWerte));
         }
@@ -815,7 +815,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler is ValueRequiredMissingFirst
                    or ValueRequiredMissingScript) {
-            solutions.Add(CreateSolution("Wert erforderlich aktivieren (mind. 1 Zeichen)", () => txbMinTextLength.Text = "1", txbMinTextLength));
+            solutions.Add(CreateSolution("Wert erforderlich aktivieren (mind. 1 Zeichen)", () => tbxMinTextLength.Text = "1", tbxMinTextLength));
         }
 
         if (fehler == ValueRequiredMissingScript) {
@@ -823,7 +823,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == EmptyNotAllowed) {
-            solutions.Add(CreateSolution("'Wert erforderlich' deaktivieren (0 Zeichen)", () => txbMinTextLength.Text = "0", txbMinTextLength));
+            solutions.Add(CreateSolution("'Wert erforderlich' deaktivieren (0 Zeichen)", () => tbxMinTextLength.Text = "0", tbxMinTextLength));
         }
 
         if (fehler == AllowedAndForbiddenOverlap) {

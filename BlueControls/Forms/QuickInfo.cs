@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
-public partial class QuickInfo : FloatingForm, IAnimatable {
+public sealed partial class QuickInfo : FloatingForm, IAnimatable {
 
     #region Fields
 

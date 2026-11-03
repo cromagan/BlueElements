@@ -17,6 +17,7 @@ public class UrlFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 2048;
+        MaxTextLineLength = 2048;
         MinTextLength = 4;
         ForbiddenChars = "\r\n";
     }

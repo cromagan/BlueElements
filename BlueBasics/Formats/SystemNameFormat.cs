@@ -20,6 +20,7 @@ public class SystemNameFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 128;
+        MaxTextLineLength = 128;
         MinTextLength = 2;
         ForbiddenChars = "\r\n";
         QuickInfo = "Werte, wie für eine System-Variabel. Beispiel: WERT_12";

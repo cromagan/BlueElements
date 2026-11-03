@@ -16,6 +16,7 @@ public class TextFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 4000;
+        MaxTextLineLength = 4000;
         MinTextLength = 0;
     }
 

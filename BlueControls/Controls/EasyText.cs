@@ -120,6 +120,7 @@ public sealed partial class EasyText : GenericControlReciver, IHasFieldVariable,
 
             txbText.AllowedChars = f.AllowedChars;
             txbText.ForbiddenChars = f.ForbiddenChars;
+            txbText.MaxTextLineLength = f.MaxTextLineLength;
             txbText.MaxTextLength = f.MaxTextLength;
             txbText.MinTextLength = f.MinTextLength;
             txbText.MultiLine = f.MultiLine;

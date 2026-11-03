@@ -21,6 +21,7 @@ public class FilepathAndNameFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 512;
+        MaxTextLineLength = 512;
         MinTextLength = 4;
         ForbiddenChars = "\r\n";
     }

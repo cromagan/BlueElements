@@ -16,6 +16,7 @@ public class LongOnlyPositiveFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.Integer;
         MultiLine = false;
         MaxTextLength = long.MaxValue.ToString1().Length;
+        MaxTextLineLength = long.MaxValue.ToString1().Length;
         MinTextLength = 1;
         ForbiddenChars = "\r\n";
     }

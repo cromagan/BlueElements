@@ -72,13 +72,6 @@ public class TableScriptVariable : ScriptVariable, IHasTable {
             }
             return _table;
         }
-        private set {
-            if (ReadOnly) { return; }
-            _pendingTableKey = null;
-            _table = value;
-
-            GetText();
-        }
     }
 
     #endregion

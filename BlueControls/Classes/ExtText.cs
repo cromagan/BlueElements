@@ -109,6 +109,37 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public BlueFont BaseFont { get; set; } = BlueFont.DefaultFont;
     public int Count => _internal.Count;
 
+    /// <summary>
+    /// Die Länge des eigentlichen Textes; unsichtbare Zeichen (z. B. OpticalReplaceChar) zählen nicht mit.
+    /// </summary>
+    public int TextLength {
+        get {
+            var l = 0;
+            foreach (var thisChar in _internal) {
+                l += thisChar.PlainText().Length;
+            }
+            return l;
+        }
+    }
+
+    /// <summary>
+    /// Die Anzahl der echten Textzeichen der Zeile, die die angegebene Position enthält.
+    /// Liegt die Position direkt auf einem Zeilenumbruch, zählt die Zeile davor.
+    /// </summary>
+    public int TextLengthOfLine(int pos) {
+        var start = Math.Clamp(pos, 0, _internal.Count);
+        while (start > 0 && !_internal[start - 1].IsLineBreak()) { start--; }
+
+        var end = Math.Clamp(pos, 0, _internal.Count);
+        while (end < _internal.Count && !_internal[end].IsLineBreak()) { end++; }
+
+        var l = 0;
+        for (var i = start; i < end; i++) {
+            l += _internal[i].PlainText().Length;
+        }
+        return l;
+    }
+
     public int HeightControl {
         get {
             EnsurePositions();

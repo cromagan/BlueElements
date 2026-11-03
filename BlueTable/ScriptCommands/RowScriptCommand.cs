@@ -24,6 +24,7 @@ public static class Row_Extension {
 /// Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).
 /// Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.
 /// Mit AgeInDays kann angeben werden, ab welchem Alter eine gefundene Zeile invalidiert werden soll.
+/// Ist das Skript nicht Extended, muss AgeInDays mindestens 7 sein.
 /// </summary>
 public class RowScriptCommand : TableGenericScriptCommand {
 
@@ -128,6 +129,11 @@ public class RowScriptCommand : TableGenericScriptCommand {
         if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix); }
 
         var d = attvar.ValueNumGet(0);
+
+        if (d < 7 && varCol.GetBoolean(KeyExtendend) == false) {
+            allFi.Dispose();
+            return new DoItFeedback("Row() mit einem Intervall unter 7 Tagen ist nur mit Extended-Skripten erlaubt.", true);
+        }
 
         var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'Row' der Tabelle {cap}, Skript {scp.ScriptName}", scp);
         allFi.Dispose();

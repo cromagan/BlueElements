@@ -55,7 +55,7 @@ public static class Generic {
 
             field = [];
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-                Type[] types = [];
+                Type[] types;
                 try {
                     types = thisas.GetTypes();
                 } catch (ReflectionTypeLoadException ex) {

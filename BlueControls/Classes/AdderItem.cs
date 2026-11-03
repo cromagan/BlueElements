@@ -43,7 +43,7 @@ internal class AdderItem : IReadableTextWithKey {
 
             if (!string.IsNullOrEmpty(keyName)) {
                 if (tb.Row.GenerateAndAdd(key, "Zeilengenerator im Formular") is { } r) {
-                    originIdColumn.MaxCellLength = Math.Max(originIdColumn.MaxCellLength, key.Length);
+                    originIdColumn.MaxTextLength = Math.Max(originIdColumn.MaxTextLength, key.Length);
                     originIdColumn.MultiLine = false;
                     originIdColumn.AfterEditAutoCorrect = false;
                     originIdColumn.AfterEditQuickSortRemoveDouble = false;
@@ -54,7 +54,7 @@ internal class AdderItem : IReadableTextWithKey {
                     if (additionalInfoColumn is not null) {
                         var info = thisKeyAndInfo.SplitBy("#")[1];
 
-                        additionalInfoColumn.MaxCellLength = Math.Max(additionalInfoColumn.MaxCellLength, info.Length);
+                        additionalInfoColumn.MaxTextLength = Math.Max(additionalInfoColumn.MaxTextLength, info.Length);
                         additionalInfoColumn.MultiLine = false;
                         additionalInfoColumn.AfterEditAutoCorrect = false;
                         additionalInfoColumn.AfterEditQuickSortRemoveDouble = false;

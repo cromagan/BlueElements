@@ -20,6 +20,7 @@ public class BitFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 1;
+        MaxTextLineLength = 1;
         MinTextLength = 1;
         ForbiddenChars = "\r\n";
         QuickInfo = "Ja/Nein Werte";

@@ -339,7 +339,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// <summary>
     /// Prüft, ob der Text die maximale Textlänge der Spalte erreicht hat.
     /// </summary>
-    private static bool MaxTextLengthReached(string value, ColumnItem column) => column.MaxTextLength > 0 && value.Length >= column.MaxTextLength;
+    private static bool MaxTextLengthReached(string value, ColumnItem column) => column.MaxTextLineLength > 0 && value.Length >= column.MaxTextLineLength;
 
     private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed || f is null) { return; }
@@ -466,9 +466,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
 
         if (filterSingle is not null) {
-            if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
-                nvalue = filterSingle.SearchValue[0];
-            } else if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich) {
+            if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 } || Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich) {
                 nvalue = filterSingle.SearchValue[0];
             }
         }

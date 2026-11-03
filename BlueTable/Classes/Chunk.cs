@@ -234,7 +234,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.AfterEditRound, c.AfterEditRound.ToString1(), name);
-        SaveToByteList(bytes, TableDataType.MaxCellLength, c.MaxCellLength.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
         SaveToByteList(bytes, TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString1(), name);
         SaveToByteList(bytes, TableDataType.ForbiddenChars, c.ForbiddenChars, name);
         SaveToByteList(bytes, TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
@@ -262,7 +262,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
         SaveToByteList(bytes, TableDataType.ColumnAdminInfo, c.AdminInfo, name);
         SaveToByteList(bytes, TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(bytes, TableDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(bytes, TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.MaxTextLineLength, c.MaxTextLineLength.ToString1(), name);
         SaveToByteList(bytes, TableDataType.PermissionGroupsChangeCell, string.Join('\r', c.PermissionGroupsChangeCell), name);
         SaveToByteList(bytes, TableDataType.ColumnTags, string.Join('\r', c.ColumnTags), name);
         SaveToByteList(bytes, TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
@@ -300,12 +300,6 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
             FileInfo = null;
         }
     }
-
-    /// <summary>
-    /// Setzt den LastUsed-Stempel auf jetzt. Aufrufer dokumentieren damit eine
-    /// echte Chunk-Nutzung (Laden, Speichern).
-    /// </summary>
-    public void Touch() => LastUsed = DateTime.UtcNow;
 
     public string IsNowEditable() {
         if (IsDisposed) { return "Verworfen."; }
@@ -381,6 +375,12 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
 
     public override string ToString() => KeyName;
+
+    /// <summary>
+    /// Setzt den LastUsed-Stempel auf jetzt. Aufrufer dokumentieren damit eine
+    /// echte Chunk-Nutzung (Laden, Speichern).
+    /// </summary>
+    public void Touch() => LastUsed = DateTime.UtcNow;
 
     protected virtual void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }

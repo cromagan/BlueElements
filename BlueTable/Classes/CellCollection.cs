@@ -215,7 +215,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
             items.Add((KeyOfCell(kvp.Key.column.KeyName, kvp.Key.row.KeyName), cellJson));
         }
 
-        foreach (var (sortKey, cell) in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
+        foreach (var (_, cell) in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
             cells.Add(cell);
         }
 

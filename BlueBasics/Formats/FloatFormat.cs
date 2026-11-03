@@ -21,6 +21,7 @@ public class FloatFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.Float;
         MultiLine = false;
         MaxTextLength = 255;
+        MaxTextLineLength = 255;
         MinTextLength = 1;
         ForbiddenChars = "\r\n";
     }

@@ -73,6 +73,7 @@ namespace BlueControls.Forms {
             // 
             txbText.Dock = DockStyle.Fill;
             txbText.Location = new Point(0, 48);
+            txbText.MaxTextLineLength = 1000000;
             txbText.MaxTextLength = 1000000;
             txbText.MultiLine = true;
             txbText.Name = "txbText";

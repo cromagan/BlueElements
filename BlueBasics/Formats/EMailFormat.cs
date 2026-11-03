@@ -22,6 +22,7 @@ public class EMailFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 320;
+        MaxTextLineLength = 320;
         MinTextLength = 5;
         ForbiddenChars = "\r\n";
     }

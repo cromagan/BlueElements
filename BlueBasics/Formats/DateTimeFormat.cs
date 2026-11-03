@@ -20,6 +20,7 @@ public class DateTimeFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.DateTime;
         MultiLine = false;
         MaxTextLength = 19;
+        MaxTextLineLength = 19;
         MinTextLength = 19;
         ForbiddenChars = "\r\n";
         QuickInfo = "Deutsches Datum und Uhrzeit. Beispiel: 31.12.2000 12:34:00";

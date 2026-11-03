@@ -275,21 +275,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    public string CreateDate {
-        get => _createDate;
-        private set {
-            if (_createDate == value) { return; }
-            ChangeData(TableDataType.CreateDateUTC, null, _createDate, value);
-        }
-    }
+    public string CreateDate => _createDate;
 
-    public string Creator {
-        get => _creator.Trim();
-        private set {
-            if (_creator == value) { return; }
-            ChangeData(TableDataType.Creator, null, _creator, value);
-        }
-    }
+    public string Creator => _creator.Trim();
 
     /// <summary>
     /// Zusätzliche Wörter für die Rechtschreibprüfung dieser Tabelle.

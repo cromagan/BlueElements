@@ -95,8 +95,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private Table? _linkedTable;
 
     private string _linkedTableTableName;
-    private int _maxCellLength;
     private int _maxTextLength;
+    private int _maxTextLineLength;
     private int _minTextLength;
     private bool _multiLine;
     private string _quickInfo;
@@ -164,9 +164,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _columnTags = string.Empty;
         _defaultRenderer = string.Empty;
         _rendererSettings = string.Empty;
-        _maxTextLength = 4000;
+        _maxTextLineLength = 4000;
         _minTextLength = 0;
-        _maxCellLength = 4000;
+        _maxTextLength = 4000;
         //ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
@@ -852,12 +852,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Maximale Gesamtlänge aller Einträge einer Zelle.
     /// </summary>
-    public int MaxCellLength {
-        get => _maxCellLength;
+    public int MaxTextLength {
+        get => _maxTextLength;
         set {
             if (IsDisposed) { return; }
-            if (_maxCellLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToString1(), value.ToString1());
+            if (_maxTextLength == value) { return; }
+            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -865,12 +865,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Maximale Länge eines einzelnen Eintrags in der Zelle.
     /// </summary>
-    public int MaxTextLength {
-        get => _maxTextLength;
+    public int MaxTextLineLength {
+        get => _maxTextLineLength;
         set {
             if (IsDisposed) { return; }
-            if (_maxTextLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString1(), value.ToString1());
+            if (_maxTextLineLength == value) { return; }
+            Table?.ChangeData(TableDataType.MaxTextLineLength, this, _maxTextLineLength.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -1276,7 +1276,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             value = string.Join('\r', l);
         }
 
-        return value.CutToUtf8Length(_maxCellLength);
+        return value.CutToUtf8Length(_maxTextLength);
     }
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled);
@@ -1293,7 +1293,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
-        return Math.Clamp((int)(m * prozentZuschlag) + 1, _maxTextLength, 3999);
+        return Math.Clamp((int)(m * prozentZuschlag) + 1, _maxTextLineLength, 3999);
     }
 
     public int CalculatePreveredMaxTextLength(double prozentZuschlag) {
@@ -1418,7 +1418,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         target.ColumnSystemInfo = ColumnSystemInfo;
         target.FilterOptions = FilterOptions;
         target.IgnoreAtRowFilter = IgnoreAtRowFilter;
-        target.MaxCellLength = MaxCellLength;
         target.FixedColumnWidth = FixedColumnWidth;
         target.AfterEditAutoCorrect = AfterEditAutoCorrect;
         target.AutoFilterJoker = AutoFilterJoker;
@@ -1636,8 +1635,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         json.Set("forbiddenchars", _forbiddenChars);
         json.Set("savecontent", _saveContent);
         json.Set("fixedcolumnwidth", _fixedColumnWidth);
+        json.Set("maxtextlinelength", _maxTextLineLength);
         json.Set("maxtextlength", _maxTextLength);
-        json.Set("maxcelllength", _maxCellLength);
         json.SetArrayIfNotEmpty("aftereditautoreplace", _afterEditAutoReplace);
         json.SetArrayIfNotEmpty("dropdownitems", _dropDownItems);
         json.SetArrayIfNotEmpty("linkedcellfilter", _linkedCellFilter);
@@ -1700,8 +1699,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _forbiddenChars = json.GetString("forbiddenchars", string.Empty).DistinctCharsSorted();
         _saveContent = json.GetBool("savecontent", _saveContent);
         _fixedColumnWidth = json.GetInt("fixedcolumnwidth", _fixedColumnWidth);
+        _maxTextLineLength = json.GetInt("maxtextlinelength", _maxTextLineLength);
         _maxTextLength = json.GetInt("maxtextlength", _maxTextLength);
-        _maxCellLength = json.GetInt("maxcelllength", _maxCellLength);
 
         _afterEditAutoReplace.Clear();
         _afterEditAutoReplace.AddRange(json.GetListString("aftereditautoreplace", null));
@@ -1745,7 +1744,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
 
-        if (MaxCellLength < MaxTextLength) { MaxCellLength = MaxTextLength; }
+        if (MaxTextLength < MaxTextLineLength) { MaxTextLength = MaxTextLineLength; }
 
         // Bei einzeiligen Spalten Zeilenumbrüche automatisch verbieten
         if (!_multiLine) {
@@ -1802,8 +1801,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.Creator:
                 _minTextLength = 1;
                 _isFirst = false;
+                _maxTextLineLength = 20;
                 _maxTextLength = 20;
-                _maxCellLength = 20;
                 if (allDefaultValues) {
                     this.GetStyleFrom(TextOneLineColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Ersteller";
@@ -1823,8 +1822,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _isFirst = false;
                 _ignoreAtRowFilter = true;
                 _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                _maxTextLineLength = 20;
                 _maxTextLength = 20;
-                _maxCellLength = 20;
                 if (allDefaultValues) {
                     this.GetStyleFrom(TextOneLineColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Änderer";
@@ -1841,7 +1840,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.DateCreated:
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(Formats.DateTimeFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
-                MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {
                     this.GetStyleFrom(DateTimeColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Erstell-Datum";
@@ -1858,8 +1856,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.List_Readonly) {
                     _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
                 }
+                _maxTextLineLength = 50;
                 _maxTextLength = 50;
-                _maxCellLength = 50;
                 if (allDefaultValues) {
                     this.GetStyleFrom(TextOneLineColumnFormat.Instance);
                     Caption = "Zeilen-Schlüssel";
@@ -1877,7 +1875,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _value_for_Chunk = ChunkType.None;
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(Formats.DateTimeFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
-                MaxCellLength = MaxTextLength;
                 if (allDefaultValues) {
                     this.GetStyleFrom(DateTimeColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Zeilen-Status";
@@ -1904,7 +1901,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(Formats.DateTimeWithMilliSecondsFormat.Instance); // Ja, Format, da wird der Script-Type nicht verändert
-                MaxCellLength = MaxTextLength;
                 _scriptType = ScriptType.Nicht_vorhanden; // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
 
@@ -1931,8 +1927,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
 
                 _linkedCellFilter.Clear();
+                _maxTextLineLength = 1;
                 _maxTextLength = 1;
-                _maxCellLength = 1;
 
                 if (allDefaultValues) {
                     AdminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
@@ -1958,8 +1954,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _autoFilterJoker = string.Empty;
                 _ignoreAtRowFilter = true;
                 _align = AlignmentHorizontal.Links;
+                _maxTextLineLength = 4000;
                 _maxTextLength = 4000;
-                _maxCellLength = 4000;
                 _multiLine = true;
 
                 if (allDefaultValues) {
@@ -1982,8 +1978,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _autoFilterJoker = string.Empty;
                 _ignoreAtRowFilter = true;
                 _align = AlignmentHorizontal.Zentriert;
+                _maxTextLineLength = 1;
                 _maxTextLength = 1;
-                _maxCellLength = 1;
                 _editableWithTextInput = false;
 
                 if (allDefaultValues) {
@@ -2007,8 +2003,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
+                _maxTextLineLength = 19;
                 _maxTextLength = 19;
-                _maxCellLength = 19;
                 _sortType = SortierTyp.ZahlenwertInt;
                 _ignoreAtRowFilter = true;
                 _scriptType = ScriptType.Nicht_vorhanden; // Keine Änderungen an der Zeile erkennen
@@ -2173,9 +2169,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (!IsSystemColumn()) {
             // Maximale Text-Länge beeinflusst stark die Ladezeit vom Server
             var l = CalculatePreveredMaxCellLength(1.2f);
-            if (l < MaxCellLength) { MaxCellLength = l; }
+            if (l < MaxTextLength) { MaxTextLength = l; }
 
-            if (MaxTextLength > MaxCellLength) { MaxTextLength = MaxCellLength; }
+            if (MaxTextLineLength > MaxTextLength) { MaxTextLineLength = MaxTextLength; }
 
             // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Änderung dieser Zelle
             if (!UsedInScript()) {
@@ -2309,8 +2305,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _allowedChars = value.DistinctCharsSorted();
                 break;
 
-            case TableDataType.MaxTextLength:
-                _maxTextLength = IntParse(value);
+            case TableDataType.MaxTextLineLength:
+                _maxTextLineLength = IntParse(value);
                 break;
 
             case TableDataType.FilterOptions:
@@ -2368,8 +2364,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _fixedColumnWidth = IntParse(value);
                 break;
 
-            case TableDataType.MaxCellLength:
-                _maxCellLength = IntParse(value);
+            case TableDataType.MaxTextLength:
+                _maxTextLength = IntParse(value);
                 break;
 
             case TableDataType.DoUcaseAfterEdit:
@@ -2602,11 +2598,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string? ErrorReason_KeyAndSizes(Table tb) {
         if (string.IsNullOrEmpty(_keyName)) { return ColumnKeyUndefined; }
         if (!IsValidColumnKey(_keyName)) { return ColumnKeyInvalid; }
-        if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
-        if (_maxCellLength < 1) { return CellSizeTooSmall; }
-        if (_maxCellLength > 4000) { return CellSizeTooLarge; }
-        if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
-        if (_minTextLength > _maxTextLength) { return MinLengthGreaterThanMax; }
+        if (_maxTextLength < _maxTextLineLength) { return CellSizeTooSmall; }
+        if (_maxTextLength < 1) { return CellSizeTooSmall; }
+        if (_maxTextLength > 4000) { return CellSizeTooLarge; }
+        if (_maxTextLineLength > 4000) { return MaxLengthTooLarge; }
+        if (_minTextLength > _maxTextLineLength) { return MinLengthGreaterThanMax; }
 
         if (tb.Column is { IsDisposed: false } col && col.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return ColumnKeyDuplicate;

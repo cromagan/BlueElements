@@ -16,6 +16,7 @@ public class LongFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.Integer;
         MultiLine = false;
         MaxTextLength = long.MinValue.ToString1().Length;
+        MaxTextLineLength = long.MinValue.ToString1().Length;
         MinTextLength = 1;
         ForbiddenChars = "\r\n";
     }

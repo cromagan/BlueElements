@@ -20,7 +20,15 @@ public interface IInputFormat : IHasQuickInfo {
     /// </summary>
     string ForbiddenChars { get; set; }
 
+    /// <summary>
+    /// Maximale Zeichenanzahl des gesamten Textes (Zellen-Kapazität). 0 bedeutet: unbegrenzt.
+    /// </summary>
     int MaxTextLength { get; set; }
+
+    /// <summary>
+    /// Maximale Zeichenanzahl je Zeile (Eintrag). 0 bedeutet: unbegrenzt.
+    /// </summary>
+    int MaxTextLineLength { get; set; }
 
     /// <summary>
     /// Mindestlänge des Textes. 0 bedeutet: auch leer erlaubt.
@@ -50,6 +58,7 @@ public static class InputFormatExtensions {
         t.ForbiddenChars = source.ForbiddenChars.DistinctCharsSorted();
         t.RegexCheck = source.RegexCheck;
         t.MultiLine = source.MultiLine;
+        t.MaxTextLineLength = source.MaxTextLineLength;
         t.MaxTextLength = source.MaxTextLength;
         t.MinTextLength = source.MinTextLength;
     }
@@ -64,27 +73,71 @@ public static class InputFormatExtensions {
 
     /// <summary>
     /// Prüft den Text, ob er mit dem geforderten Format übereinstimmt.
-    /// Gibt string.Empty zurück, wenn das Format stimmt, sonst eine
-    /// lesbare Begründung.
+    /// Die Min-/Max-Länge wird immer auf den Gesamten Text geprüft; die restlichen
+    /// Prüfungen erfolgen bei Multiline-Texten zeilenweise.
+    /// Gibt string.Empty zurück, wenn das Format stimmt, sonst eine lesbare Begründung.
     /// </summary>
     public static string IsFormat(this string txt, IInputFormat formatToCheck, bool splitallowed) {
-        if (txt is { Length: > 0 } && splitallowed && formatToCheck.MultiLine) {
-            if (txt.Contains("<br>", StringComparison.OrdinalIgnoreCase)) {
-                txt = txt.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-            }
-            if (txt.Contains('\r')) {
-                return txt.SplitByCr().ToList().IsFormat(formatToCheck);
-            }
+        var workText = txt;
+
+        if (workText is { Length: > 0 } && splitallowed && formatToCheck.MultiLine && workText.Contains("<br>", StringComparison.OrdinalIgnoreCase)) {
+            workText = workText.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         }
 
-        if ((txt?.Length ?? 0) < formatToCheck.MinTextLength) {
+        if ((workText?.Length ?? 0) < formatToCheck.MinTextLength) {
             return "Der Text muss mindestens " + formatToCheck.MinTextLength + " Zeichen lang sein.";
         }
 
-        if (txt is null) { return string.Empty; }
+        if (workText is null) { return string.Empty; }
 
-        if (txt.Length > formatToCheck.MaxTextLength) {
+        if (formatToCheck.MaxTextLength > 0 && workText.Length > formatToCheck.MaxTextLength) {
             return "Der Text darf maximal " + formatToCheck.MaxTextLength + " Zeichen lang sein.";
+        }
+
+        if (splitallowed && formatToCheck.MultiLine) {
+            foreach (var thisLine in workText.SplitByCr()) {
+                var reason = thisLine.ContentIsFormat(formatToCheck);
+                if (reason is { Length: > 0 }) { return reason; }
+            }
+            return string.Empty;
+        }
+
+        return workText.ContentIsFormat(formatToCheck);
+    }
+
+    public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
+            t.AllowedChars == source.AllowedChars &&
+            t.ForbiddenChars == source.ForbiddenChars &&
+            t.RegexCheck == source.RegexCheck &&
+            t.MultiLine == source.MultiLine &&
+            t.MinTextLength == source.MinTextLength &&
+            t.MaxTextLineLength == source.MaxTextLineLength &&
+            t.MaxTextLength == source.MaxTextLength;
+
+    /// <summary>
+    /// Ignoriert Multiline und wenn MaxTextLength 4000 ist
+    /// </summary>
+    public static bool IsFormatIdenticalSoft(this IInputFormat t, IInputFormat source) {
+        var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
+                   t.AllowedChars == source.AllowedChars &&
+                   t.ForbiddenChars == source.ForbiddenChars &&
+                   t.RegexCheck == source.RegexCheck;
+        if (!x) { return false; }
+
+        if (t.MaxTextLineLength < 4000) {
+            if (t.MaxTextLineLength != source.MaxTextLineLength) { return false; }
+        }
+
+        if (t.MaxTextLength < 4000) {
+            if (t.MaxTextLength != source.MaxTextLength) { return false; }
+        }
+
+        return t.MaxTextLineLength >= 1;
+    }
+
+    private static string ContentIsFormat(this string txt, IInputFormat formatToCheck) {
+        if (txt.Length > formatToCheck.MaxTextLineLength) {
+            return "Keine Zeile darf mehr als " + formatToCheck.MaxTextLineLength + " Zeichen lang sein.";
         }
 
         if (formatToCheck.ForbiddenChars is { Length: > 0 } forbidden) {
@@ -125,31 +178,6 @@ public static class InputFormatExtensions {
         }
 
         return string.Empty;
-    }
-
-    public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
-            t.AllowedChars == source.AllowedChars &&
-            t.ForbiddenChars == source.ForbiddenChars &&
-            t.RegexCheck == source.RegexCheck &&
-            t.MultiLine == source.MultiLine &&
-            t.MinTextLength == source.MinTextLength &&
-            t.MaxTextLength == source.MaxTextLength;
-
-    /// <summary>
-    /// Ignoriert Multiline und wenn MaxTextLength 4000 ist
-    /// </summary>
-    public static bool IsFormatIdenticalSoft(this IInputFormat t, IInputFormat source) {
-        var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
-                   t.AllowedChars == source.AllowedChars &&
-                   t.ForbiddenChars == source.ForbiddenChars &&
-                   t.RegexCheck == source.RegexCheck;
-        if (!x) { return false; }
-
-        if (t.MaxTextLength < 4000) {
-            if (t.MaxTextLength != source.MaxTextLength) { return false; }
-        }
-
-        return t.MaxTextLength >= 1;
     }
 
     #endregion

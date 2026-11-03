@@ -17,6 +17,7 @@ public class PhoneNumberFormat : Format {
         AdditionalFormatCheck = AdditionalCheck.None;
         MultiLine = false;
         MaxTextLength = 15;
+        MaxTextLineLength = 15;
         MinTextLength = 3;
         ForbiddenChars = "\r\n";
         QuickInfo = "Internationales Telefon-Format. Beispiel: +49 123 456";
