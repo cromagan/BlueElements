@@ -51,8 +51,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public ColumnItem? SysCellNote { get; private set; }
-
     public ColumnItem? SysCorrect { get; private set; }
 
     public ColumnItem? SysLocked { get; private set; }
@@ -164,7 +162,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem() {
         string[] w = [
-            SystemColumnKeys.CellNote,
             SystemColumnKeys.RowKey,
             SystemColumnKeys.RowState,
             SystemColumnKeys.DateChanged,
@@ -197,7 +194,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GetSystems() {
-        SysCellNote = null;
         SysLocked = null;
         SysRowCreateDate = null;
         SysRowCreator = null;
@@ -218,10 +214,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
                         case SystemColumnKeys.RowColor_Obsolete: // TODO: Entfernen, 12.01.2026
-                            break;
-
-                        case SystemColumnKeys.CellNote:
-                            SysCellNote = thisColumnItem;
                             break;
 
                         case SystemColumnKeys.Locked:

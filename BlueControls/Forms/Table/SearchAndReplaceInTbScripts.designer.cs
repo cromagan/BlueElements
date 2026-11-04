@@ -158,7 +158,7 @@ namespace BlueControls.BlueTableDialogs {
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "SearchAndReplaceInTbScripts";
             ShowInTaskbar = false;
-            Text = "Suchen und Ersetzen in allen Tabelle Skripten";
+            Text = "Suchen und Ersetzen in allen Skripten";
             TopMost = true;
             grpSuche.ResumeLayout(false);
             grpErsetzen.ResumeLayout(false);

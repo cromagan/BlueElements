@@ -1261,16 +1261,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #endregion
 
-            if (column is not null && row is not null) {
-                contextMenu.Add(ItemOf("Notiz", true));
-                var existingNote = CellNoteHelper.GetNoteData(column, row);
-                if (existingNote is null) {
-                    contextMenu.Add(ItemOf("Notiz bearbeiten", QuickImage.Get(ImageCode.Textdatei, IContextMenu.IconSize, ImageCode.Stift), ContextMenu_Note_Edit, true));
-                } else {
-                    contextMenu.Add(ItemOf("Notiz entfernen", QuickImage.Get(ImageCode.Textdatei, IContextMenu.IconSize, ImageCode.Radiergummi), ContextMenu_Note_Remove, true));
-                }
-            }
-
             #region Sortierung
 
             if (column is not null) {
@@ -2853,41 +2843,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
 
         return capsOfRow;
-    }
-
-    private static void ContextMenu_Note_Edit(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView, _) = GetContextData(e.HotItem);
-        if (column is null || row is null) { return; }
-        if (column.Table is not { IsDisposed: false } tb) { return; }
-        if (tb.Column.SysCellNote is null) {
-            QuickNote.Show(NoteSymbols.Warning, "Keine Notizspalte vorhanden");
-            return;
-        }
-
-        var existing = CellNoteHelper.GetNoteData(column, row);
-        var note = new NoteEntry();
-        if (existing.HasValue) {
-            note.Symbol = existing.Value.Symbol;
-            note.Note = existing.Value.Text;
-        }
-        InputBoxEditor.Edit(note, true);
-
-        if (string.IsNullOrEmpty(note.Note)) {
-            CellNoteHelper.RemoveNote(column, row);
-        } else {
-            CellNoteHelper.SetNote(column, row, note.Symbol, note.Note);
-        }
-
-        tableView?.Invalidate();
-    }
-
-    private static void ContextMenu_Note_Remove(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView, _) = GetContextData(e.HotItem);
-        if (column is null || row is null) { return; }
-        if (column.Table is not { IsDisposed: false }) { return; }
-
-        CellNoteHelper.RemoveNote(column, row);
-        tableView?.Invalidate();
     }
 
     /// <summary>

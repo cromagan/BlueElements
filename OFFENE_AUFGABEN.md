@@ -200,18 +200,7 @@ Dann muss der ColumnEditor bei Inkonsistenz einen Fehler ausgeben.
 ## Aufgabe
 Prüfe die Element von Connected formular:
 Wenn eine Tabelle nachgeladen wird, werden dann die Felder aktualisisert?
-
-## Aufgabe
-In Scripten Suchen / erstetze muss auch scripte in Connected Formular berücksichtigen
-
-##Aufgabe
-System.NullReferenceException
-  HResult=0x80004003
-  Nachricht = Object reference not set to an instance of an object.
-  Quelle = BlueTable
-  Stapelüberwachung:
-   bei BlueTable.Classes.UniqueValueDefinition.<>c.<Repair>b__28_1(ColumnItem c) in C:\01_DATA\Visual Studio GIT\BlueElements\BlueTable\Classes\UniqueValueDefinition.cs: Zeile152
-   
+  
 ## Aufgabe
 erstelle ein neues TabellenFormat:
 Ein dummy-Table und ein Arbeitsverzeichniss 
@@ -225,17 +214,8 @@ Das dann analagt TableFragments
 Mache in Paint ein Text-Tool. Verschiebar, Text, Farbe, Größe etc. bearbeittbar. Mit OK Knopf, dann wird der Text eingepreist
 
 ## Aufgabe
-Mach zwei ScriptCommands: ShowImage und ShowText. Dann gehen die entprechenden windows auf.
-die Befehlr sollen im Namespace BlueControls sein.
-
-## Aufgabe
-Entfernde die Notiz Funktion der Tabellen komplett. Auch den Renderer.
-Und wenn die Spalte Sys_note erkannt wird, entferne den Flag, dass es eine Systemspalte ist.
-
-## Aufgabe
 Erstelle ein CMD Script, dass alle .cs Dateien öffnet, und Properties in die Region "Properties" einodnet. genau so Fields, ect.
 und alle Funktionen, Properties etc. sollen alphabetisch sortiert werden.
-
 ## Aufgabe
 klickbare SCriptbuttons in TableView können nur vom benutzer aktiviert werden. Also muss die TableView in einer Form sein.
 die ScriptStrategyControl soll die Tags der Form als ReadOnly Variable im Script liefern
@@ -252,6 +232,3 @@ der Befehl versucht, die Optischen ersetzungen der Spalte zu setzen
 ColumnName = VariabelnName
 REplacements = liste
 DEr Befehl soll im Namespace BlueControls sein.
-
-## Aufgabe
-Listboxen können Filtern und hellen die nicht treffer auf. Diese sollen ausgeblentet werden.

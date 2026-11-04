@@ -138,6 +138,15 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
         return [new ScriptDescription(KeyName, s)];
     }
 
+    /// <summary>
+    /// IHasScript: Setzt das Klick-Skript.
+    /// </summary>
+    public bool SetScript(ScriptDescription script, string newScript) {
+        if (KeyName != script.KeyName) { return false; }
+        Script = newScript;
+        return true;
+    }
+
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 

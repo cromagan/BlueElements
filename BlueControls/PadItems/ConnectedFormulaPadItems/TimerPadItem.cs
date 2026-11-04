@@ -189,6 +189,15 @@ public class TimerPadItem : SizeableRectanglePadItem, IItemToControl, IAutosizab
         return [new ScriptDescription(KeyName, s)];
     }
 
+    /// <summary>
+    /// IHasScript: Setzt das Timer-Skript.
+    /// </summary>
+    public bool SetScript(ScriptDescription script, string newScript) {
+        if (KeyName != script.KeyName) { return false; }
+        Script = newScript;
+        return true;
+    }
+
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 

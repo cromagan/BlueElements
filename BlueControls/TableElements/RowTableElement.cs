@@ -201,7 +201,7 @@ public sealed class RowTableElement : TableElement {
         // Weder echte noch virtuelle Spalte — nichts zu zeichnen.
         if (!viewItem.IsOk()) { return; }
 
-        // Echte Spalten: spaltenspezifische Verarbeitung (Cursor, Notizen,
+        // Echte Spalten: spaltenspezifische Verarbeitung (Cursor,
         // RowCheck). Virtuelle Spalten überspringen diesen Block.
         if (viewItem.Column is { IsDisposed: false } column) {
             if (!column.SaveContent && Table.ExecutingScriptThreadsAnyTable.Count == 0) {
@@ -212,18 +212,6 @@ public sealed class RowTableElement : TableElement {
                 var _tmpCursorRect = new Rectangle((int)positionControl.X + 1, (int)positionControl.Y + 1, (int)positionControl.Width - 2, (int)positionControl.Height - 2);
                 Skin.Draw_Back(gr, Design.Table_Cursor, state, _tmpCursorRect, null, false);
                 Skin.Draw_Border(gr, Design.Table_Cursor, state, _tmpCursorRect);
-            }
-
-            if (column.Table is { IsDisposed: false }) {
-                var note = CellNoteHelper.GetNoteData(column, Row);
-                if (note.HasValue && note.Value.Text.Length > 0) {
-                    var noteDesign = NoteEntry.DesignFor(note.Value.Symbol);
-                    var noteRect = new Rectangle((int)positionControl.X + 1, (int)positionControl.Y + 1, (int)positionControl.Width - 2, (int)positionControl.Height - 2);
-                    Skin.Draw_Border(gr, noteDesign, States.Standard, noteRect);
-                    if (NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale)) is { } icon) {
-                        gr.DrawImageUnscaled(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
-                    }
-                }
             }
         }
 
@@ -315,25 +303,20 @@ public sealed class RowTableElement : TableElement {
         } else if (cvi.Column is { IsDisposed: false } column && column.Table is { IsDisposed: false } tb) {
             if (IsAdministrator() && RowCollection.FailedRows.ContainsKey(Row)) {
                 qt = Row.LastFailedReason();
-            } else {
-                var note = CellNoteHelper.GetNoteData(column, Row);
-                if (note.HasValue && note.Value.Text.Length > 0) {
-                    qt = $"<u><imagecode={NoteEntry.ImageCodeFor(note.Value.Symbol)}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
-                } else if (column.RelationType == RelationType.CellValues) {
-                    if (column.LinkedTable is null) {
-                        qt = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
-                    } else {
-                        var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false, false);
-                        if (lcolumn is { } lc) { qt = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
+            } else if (column.RelationType == RelationType.CellValues) {
+                if (column.LinkedTable is null) {
+                    qt = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
+                } else {
+                    var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false, false);
+                    if (lcolumn is { } lc) { qt = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
 
-                        if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
-                            if (string.IsNullOrEmpty(qt)) { qt += "\r\n"; }
-                            qt += "Verlinkungs-Status: " + info;
-                        }
+                    if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
+                        if (string.IsNullOrEmpty(qt)) { qt += "\r\n"; }
+                        qt += "Verlinkungs-Status: " + info;
                     }
-                } else if (tb.IsAdministrator()) {
-                    qt = UndoText(column, Row);
                 }
+            } else if (tb.IsAdministrator()) {
+                qt = UndoText(column, Row);
             }
         }
 

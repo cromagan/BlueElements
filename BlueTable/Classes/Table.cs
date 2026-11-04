@@ -1689,6 +1689,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public IEnumerable<ScriptDescription> GetAllScripts() => EventScript;
 
+    /// <summary>
+    /// IHasScript: Ersetzt den Inhalt des Tabellen-Skripts.
+    /// </summary>
+    public bool SetScript(ScriptDescription script, string newScript) {
+        if (script is not TableScriptDescription tableScript) { return false; }
+        return UpdateScript(tableScript, scriptContent: newScript, failedReason: string.Empty, stoppedtimecount: Math.Min(20, tableScript.StoppedTimeCount));
+    }
+
     public IJsonParseable? GetSubItemByKey(string containerName, string key) {
         if (IsDisposed) { return null; }
 

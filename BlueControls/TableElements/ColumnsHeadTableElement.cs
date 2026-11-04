@@ -78,8 +78,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
             (SystemColumnKeys.DateCreated, "DateCreated"),
             (SystemColumnKeys.Creator, "Creator"),
             (SystemColumnKeys.Correct, "Correct"),
-            (SystemColumnKeys.Locked, "Locked"),
-            (SystemColumnKeys.CellNote, "CellNote")
+            (SystemColumnKeys.Locked, "Locked")
         };
 
         systemKeys.Sort((a, b) => string.Compare(a.display, b.display, StringComparison.OrdinalIgnoreCase));

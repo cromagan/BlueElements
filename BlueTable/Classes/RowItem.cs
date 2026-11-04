@@ -305,7 +305,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     /// Sichert die aktuellen Zellwerte aller Skript-relevanten Spalten, um beim Zurückschreiben von
     /// Skript-Variablen konkurrierende Änderungen spaltengenau zu erkennen. Von den Systemspalten nur
-    /// die fremd änderbaren (RowKey, Correct, Locked, CellNote); Changer, DateChanged und RowState
+    /// die fremd änderbaren (RowKey, Correct, Locked); Changer, DateChanged und RowState
     /// pflegt die eigene Schreib-Pipeline und sind kein Konkurrenz-Hinweis.
     /// </summary>
     public Dictionary<ColumnItem, string> CellStartValues() {

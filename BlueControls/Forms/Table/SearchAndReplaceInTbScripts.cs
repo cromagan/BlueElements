@@ -1,5 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueScript.Interfaces;
+
 namespace BlueControls.BlueTableDialogs;
 
 internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow {
@@ -41,14 +43,25 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
 
         foreach (var thisTb in Table.AllInstances()) {
             if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
-                foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
-                    var newScriptContent = script.Script.Replace(suchText, ersetzText);
-                    if (newScriptContent != script.Script) {
-                        count++;
-                        Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: Math.Min(20, script.StoppedTimeCount));
-                    }
-                }
+                count += tb.ReplaceInScripts(suchText, ersetzText);
             }
+        }
+
+        foreach (var (tb, col, strategie) in ScriptVerwendung.SpaltenSkripte()) {
+            if (strategie is not IHasScript hasScript) { continue; }
+            if (tb is not { IsDisposed: false } || !TableViewForm.EditableErrorMessage(tb, null)) { continue; }
+
+            var changed = hasScript.ReplaceInScripts(suchText, ersetzText);
+            if (changed <= 0) { continue; }
+
+            // Geänderten Strategie-Zustand zur Spalte zurückschreiben (löst ChangeData aus)
+            col.ControlStrategyParameter = strategie.ControlStrategyParameter;
+            count += changed;
+        }
+
+        foreach (var (formular, _, element) in ScriptVerwendung.FormularSkripte()) {
+            if (formular.BlockerMessage() is { Length: > 0 }) { continue; }
+            count += element.ReplaceInScripts(suchText, ersetzText);
         }
 
         MessageBox.Show(count + " Skript(e) bearbeitet.", ImageCode.Information, "OK");
@@ -85,25 +98,20 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         var txt = new List<string>();
         var suchText = txbAlt.Text.DecodeControlChars();
 
-        foreach (var thisTb in Table.AllInstances()) {
-            if (thisTb is { IsDisposed: false } tb) {
-                foreach (var thiss in tb.EventScript) {
-                    // Prüfen, ob der Suchtext im Skript vorkommt
-                    if (thiss.Script.Contains(suchText)) {
-                        // Tabellename -> Skriptname zur Liste hinzufügen
-                        txt.Add(string.Empty);
-                        txt.Add(string.Empty);
-                        txt.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        txt.Add($"{tb.Caption} -> {thiss.KeyName}");
+        foreach (var (ort, skript) in ScriptVerwendung.CollectScripts()) {
+            if (!skript.Contains(suchText)) { continue; }
 
-                        // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
-                        var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var line in lines) {
-                            if (line.Contains(suchText)) {
-                                txt.Add(line.Trim());
-                            }
-                        }
-                    }
+            // Fundort zur Liste hinzufügen
+            txt.Add(string.Empty);
+            txt.Add(string.Empty);
+            txt.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            txt.Add(ort);
+
+            // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
+            var lines = skript.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines) {
+                if (line.Contains(suchText)) {
+                    txt.Add(line.Trim());
                 }
             }
         }

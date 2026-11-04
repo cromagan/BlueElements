@@ -40,7 +40,7 @@ public class ListItemChar : Char {
         if (!Item.Enabled) { itemState = States.Standard_Disabled; }
 
         Item.CanvasPosition = new Rectangle(chipRect.X + PaddingH, chipRect.Y + PaddingV, chipRect.Width - 2 * PaddingH, chipRect.Height - 2 * PaddingV);
-        Item.Draw(gr, chipRect, 0, 0, Design.Button, Design.Button, itemState, false, string.Empty, false, Design.Undefined, zoom);
+        Item.Draw(gr, chipRect, 0, 0, Design.Button, itemState, false, false, Design.Undefined, zoom);
     }
 
     public override string HtmlText() => "???";

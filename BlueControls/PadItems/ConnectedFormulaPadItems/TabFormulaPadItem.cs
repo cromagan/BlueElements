@@ -78,7 +78,6 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
             #endregion
 
             if (thisPage.HasVisibleItemsForMe(mode)) {
-                ConnectedFormulaView? cc;
 
                 if (existTab is null) {
 
@@ -90,7 +89,7 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
                     };
                     tabctrl.TabPages.Add(t);
 
-                    cc = new ConnectedFormulaView(mode, thisPage) {
+                  var  cc = new ConnectedFormulaView(mode, thisPage) {
                         GroupBoxStyle = GroupBoxStyle.Nothing
                     };
                     t.Controls.Add(cc);
@@ -103,19 +102,7 @@ public class TabFormulaPadItem : ReciverPadItem, IItemToControl, IAutosizable {
                     //cc.GenerateView();
 
                     #endregion
-                } else {
-
-                    #region ConnectedFormulaView (cc) im Tab Suchen
-
-                    foreach (var thisControl in existTab.Controls) {
-                        if (thisControl is ConnectedFormulaView cctmp) {
-                            cc = cctmp;
-                            break;
-                        }
-                    }
-
-                    #endregion
-                }
+                } 
             } else {
                 if (existTab is not null) {
 

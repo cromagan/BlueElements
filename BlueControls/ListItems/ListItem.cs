@@ -57,7 +57,7 @@ public static class ListItemExtension {
         }
     }
 
-    public static void DrawItems(this IEnumerable<ListItem>? list, Graphics gr, Rectangle visControlArea, ListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
+    public static void DrawItems(this IEnumerable<ListItem>? list, Graphics gr, Rectangle visControlArea, ListItem? _mouseOverItem, int offsetX, int offsetY, States controlState, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
         if (list is null) { return; }
 
         try {
@@ -70,7 +70,7 @@ public static class ListItemExtension {
 
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
-                    thisItem.Draw(gr, visControlArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, zoom);
+                    thisItem.Draw(gr, visControlArea, offsetX, offsetY, _itemDesign, itemState, true, false, checkboxDesign, zoom);
                 }
             }
         } catch { }
@@ -487,7 +487,7 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         GC.SuppressFinalize(this);
     }
 
-    public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float zoom) {
+    public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design itemdesign, States state, bool drawBorderAndBack, bool translate, Design checkboxDesign, float zoom) {
         if (itemdesign == Design.Undefined) { return; }
 
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
@@ -509,14 +509,6 @@ public abstract class ListItem : IComparable, IHasKeyName, IHasQuickInfo, INotif
         }
 
         DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
-        if (drawBorderAndBack) {
-            if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
-                var c1 = Skin.Color_Back(controldesign, States.Standard);// Standard als Notlösung, um nicht doppelt checken zu müssen
-                c1 = c1.SetAlpha(160);
-                var fb = BackgroundFill.GetBrush(c1);
-                lock (fb) { gr.FillRectangle(fb, controlIndented); }
-            }
-        }
     }
 
     public virtual bool FilterMatch(string filterText) => KeyName.Contains(filterText, StringComparison.OrdinalIgnoreCase);

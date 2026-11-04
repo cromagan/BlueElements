@@ -25,12 +25,12 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
 
     #region Constructors
 
-    private QuickNote(NoteSymbols symbol, string text, int x, int y) : base(NoteEntry.DesignFor(symbol)) {
+    private QuickNote(NoteSymbols symbol, string text, int x, int y) : base(DesignFor(symbol)) {
         DismissMode = DismissMode.ManualOnly;
 
         _text = text;
-        _design = NoteEntry.DesignFor(symbol);
-        _image = NoteEntry.GetQuickImage(symbol, 14);
+        _design = DesignFor(symbol);
+        _image = GetQuickImage(symbol, 14);
 
         var font = Skin.GetBlueFont(_design, States.Standard);
         _durationMs = BaseDurationMs + Math.Max(0, text.Length - BaseCharCount) * ExtraMsPerChar;
@@ -87,6 +87,22 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
     }
 
     public static void Show(NoteSymbols symbol, string text) => Show(symbol, text, Cursor.Position.X + 15, Cursor.Position.Y + 15);
+
+    private static Design DesignFor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Ok => Design.Note_OK,
+        NoteSymbols.Warning => Design.Note_Warning,
+        NoteSymbols.Critical => Design.Note_Error,
+        _ => Design.Note_Default
+    };
+
+    private static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => QuickImage.Get(ImageCodeFor(symbol), size);
+
+    private static ImageCode ImageCodeFor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Critical => ImageCode.Kritisch,
+        NoteSymbols.Warning => ImageCode.Warnung,
+        NoteSymbols.Ok => ImageCode.Häkchen,
+        _ => ImageCode.Stift
+    };
 
     /// <summary>
     /// Zeitbasierte Berechnung eines Animations-Frames. Position und Opacity

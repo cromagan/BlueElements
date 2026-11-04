@@ -168,6 +168,15 @@ public class RowAdderPadItem : ReciverSenderPadItem, IItemToControl, IAutosizabl
         return [new ScriptDescription(KeyName, s)];
     }
 
+    /// <summary>
+    /// IHasScript: Setzt das RowAdder-Skript.
+    /// </summary>
+    public bool SetScript(ScriptDescription script, string newScript) {
+        if (KeyName != script.KeyName) { return false; }
+        Script = newScript;
+        return true;
+    }
+
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new RowAdder {
             EntityID = EntityID,

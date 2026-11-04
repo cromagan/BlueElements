@@ -185,6 +185,17 @@ public class ImageAndTextRenderer : Renderer {
 
     #region Methods
 
+    /// <summary>
+    /// Erzeugt den Renderer einer Spalte mit ihren Einstellungen; null bei anderem Renderer oder unlesbaren Einstellungen.
+    /// </summary>
+    public static ImageAndTextRenderer? Of(ColumnItem column) {
+        if (!column.DefaultRenderer.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+        var r = new ImageAndTextRenderer();
+
+        return r.Parse(column.RendererSettings) ? r : null;
+    }
+
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 

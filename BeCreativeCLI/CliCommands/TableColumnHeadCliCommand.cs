@@ -134,7 +134,7 @@ public class TableColumnHeadCliCommand : CliCommand {
 
             switch (property) {
                 case TextReplaceProperty:
-                    if (ImageAndTextRendererOf(column) is { } r) { // durch die Vorprüfung ausgeschlossen
+                    if (ImageAndTextRenderer.Of(column) is { } r) { // durch die Vorprüfung ausgeschlossen
                         r.Text_ersetzen = new(text.SplitAndCutByCr());
                         column.RendererSettings = r.ParseableItems().FinishParseable();
                     }
@@ -215,26 +215,15 @@ public class TableColumnHeadCliCommand : CliCommand {
 
             default:
                 // Die Ersetzungen stecken versteckt im Renderer; andere Renderer liefern leer.
-                return ImageAndTextRendererOf(column) is { } r ? string.Join('\r', r.Text_ersetzen) : string.Empty;
+                return ImageAndTextRenderer.Of(column) is { } r ? string.Join('\r', r.Text_ersetzen) : string.Empty;
         }
-    }
-
-    /// <summary>
-    /// Erzeugt den ImageAndText-Renderer der Spalte mit ihren Einstellungen; null bei anderem Renderer oder unlesbaren Einstellungen.
-    /// </summary>
-    private static ImageAndTextRenderer? ImageAndTextRendererOf(ColumnItem column) {
-        if (!column.DefaultRenderer.Equals(ImageAndTextRenderer.ClassId, StringComparison.OrdinalIgnoreCase)) { return null; }
-
-        var r = new ImageAndTextRenderer();
-
-        return r.Parse(column.RendererSettings) ? r : null;
     }
 
     /// <summary>
     /// Liefert null, wenn 'Text ersetzen' an der Spalte wirksam setzbar ist, ansonsten die Fehlermeldung.
     /// </summary>
     private static string? TextReplaceProblem(ColumnItem column) {
-        if (ImageAndTextRendererOf(column) is not { } r) {
+        if (ImageAndTextRenderer.Of(column) is not { } r) {
             return "Die Spalte '" + column.KeyName + "' nutzt nicht den Renderer '" + ImageAndTextRenderer.ClassId + "' — 'Text ersetzen' gibt es nur dort.";
         }
 

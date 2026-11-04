@@ -127,12 +127,17 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     [DefaultValue(null)]
     public ReadOnlyCollection<ListItem>? CustomContextMenuItems { get; set; }
 
+    /// <summary>
+    /// Inhalt, nach dem die sichtbaren Items gefiltert werden.
+    /// Items ohne Treffer werden ausgeblendet.
+    /// </summary>
     [DefaultValue("")]
     public string FilterText {
         get;
         set {
             if (field == value) { return; }
             field = value;
+            InvalidateItemOrder();
             Invalidate();
         }
     } = string.Empty;
@@ -490,6 +495,11 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
             DoItemOrder();
 
             foreach (var item in _item.Where(i => i is not null)) {
+                if (IsHiddenByFilter(item)) {
+                    item.CanvasPosition = Rectangle.Empty;
+                    continue;
+                }
+
                 index++;
                 var isCaption = item is TextListItem { IsCaption: true };
                 var wi = (layoutOrientation == Orientation.Waagerecht && isCaption) ? drawAreaControl.Width : colWidth;
@@ -587,7 +597,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         DoItemOrder();
 
         var checkedKeys = CheckBehavior == CheckBehavior.AllSelected ? null : _checked.ToListOfString();
-        _item.DrawItems(gr, controPaintArea, MouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, ItemDesign, checkboxDesign, checkedKeys, Zoom);
+        _item.DrawItems(gr, controPaintArea, MouseOverItem, OffsetX, OffsetY, controlState, ItemDesign, checkboxDesign, checkedKeys, Zoom);
 
         if (_controlDesign == Design.ListBox) { Skin.Draw_Border(gr, _controlDesign, controlState, controPaintArea); }
     }
@@ -699,6 +709,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         if (index % BreakAfterItems == 0) { return (prev.CanvasPosition.Right + pad, 0); }
         return (prev.CanvasPosition.Left, prev.CanvasPosition.Bottom + pad);
     }
+
+    private bool IsHiddenByFilter(ListItem item) => FilterText is { Length: > 0 } ft && !item.FilterMatch(ft);
 
     private Size CanvasDrawArea() {
         var control = AvailableControlPaintArea;

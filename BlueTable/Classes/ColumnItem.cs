@@ -1557,8 +1557,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public bool IsSystemColumn() =>
-        _keyName is SystemColumnKeys.CellNote or
-            SystemColumnKeys.Correct or
+        _keyName is SystemColumnKeys.Correct or
             SystemColumnKeys.Changer or
             SystemColumnKeys.Creator or
             SystemColumnKeys.DateCreated or
@@ -1941,30 +1940,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     ForeColor = System.Drawing.Color.FromArgb(128, 0, 0);
                     BackColor = System.Drawing.Color.FromArgb(255, 185, 185);
                     LineStyleLeft = ColumnLineStyle.Dick;
-                }
-                DisableAllEditing();
-                break;
-
-            case SystemColumnKeys.CellNote:
-                _minTextLength = 0;
-                _isFirst = false;
-                _relationship_to_First = false;
-                _relationType = RelationType.None;
-                _value_for_Chunk = ChunkType.None;
-                _filterOptions = FilterOptions.None;
-                _autoFilterJoker = string.Empty;
-                _ignoreAtRowFilter = true;
-                _align = AlignmentHorizontal.Links;
-                _maxTextLineLength = 4000;
-                _maxTextLength = 4000;
-                _multiLine = true;
-
-                if (allDefaultValues) {
-                    this.GetStyleFrom(TextOneLineColumnFormat.Instance);
-                    DefaultRenderer = "CellNote";
-                    Caption = "Notizen";
-                    ForeColor = System.Drawing.Color.FromArgb(80, 80, 80);
-                    BackColor = System.Drawing.Color.FromArgb(255, 255, 230);
                 }
                 DisableAllEditing();
                 break;

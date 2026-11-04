@@ -149,7 +149,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
         // Muss hier gemacht werden!
         // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.
-        _internal.RemoveAll(c => c.RelationType != RelationType.None);
+        _internal.RemoveAll(c => c is not { IsDisposed: false } || c.RelationType != RelationType.None);
 
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
