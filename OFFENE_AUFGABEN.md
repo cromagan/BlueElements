@@ -8,7 +8,7 @@ Die Switch-Kaskaden in `SetValueFromProperty()` und `FillPropertyNow()` durch ge
 
 
 ## Aufgabe
-In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
+In allen Klassen, die von ParseableItem erben, müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 		
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
@@ -197,11 +197,61 @@ prüfe, ob BCR Dokumente bei eine externen Änderung nachgeladen werden und ob d
 ControlStrategies benötigen einen Check, ob sie Multiline Unterstützen.
 Dann muss der ColumnEditor bei Inkonsistenz einen Fehler ausgeben.
 
+## Aufgabe
+Prüfe die Element von Connected formular:
+Wenn eine Tabelle nachgeladen wird, werden dann die Felder aktualisisert?
 
+## Aufgabe
+In Scripten Suchen / erstetze muss auch scripte in Connected Formular berücksichtigen
 
+##Aufgabe
+System.NullReferenceException
+  HResult=0x80004003
+  Nachricht = Object reference not set to an instance of an object.
+  Quelle = BlueTable
+  Stapelüberwachung:
+   bei BlueTable.Classes.UniqueValueDefinition.<>c.<Repair>b__28_1(ColumnItem c) in C:\01_DATA\Visual Studio GIT\BlueElements\BlueTable\Classes\UniqueValueDefinition.cs: Zeile152
+   
+## Aufgabe
+erstelle ein neues TabellenFormat:
+Ein dummy-Table und ein Arbeitsverzeichniss 
+im Arbeitsverzeichniss ist dann die wirkliche Tabelle, mit Zeitstempel
+alles bisher Anlag Table chunk.
+nun der unteschied: Es weden im dem verzeichniss die Frahmgmente angelegt. und beim Komplettieren  dann eine neue Datei angelegt - ohne den teueren Tausch.
+und dann Fragemente aufräumne.
+Das dann analagt TableFragments
 
+## Aufgabe
+Mache in Paint ein Text-Tool. Verschiebar, Text, Farbe, Größe etc. bearbeittbar. Mit OK Knopf, dann wird der Text eingepreist
 
+## Aufgabe
+Mach zwei ScriptCommands: ShowImage und ShowText. Dann gehen die entprechenden windows auf.
+die Befehlr sollen im Namespace BlueControls sein.
 
+## Aufgabe
+Entfernde die Notiz Funktion der Tabellen komplett. Auch den Renderer.
+Und wenn die Spalte Sys_note erkannt wird, entferne den Flag, dass es eine Systemspalte ist.
 
+## Aufgabe
+Erstelle ein CMD Script, dass alle .cs Dateien öffnet, und Properties in die Region "Properties" einodnet. genau so Fields, ect.
+und alle Funktionen, Properties etc. sollen alphabetisch sortiert werden.
 
+## Aufgabe
+klickbare SCriptbuttons in TableView können nur vom benutzer aktiviert werden. Also muss die TableView in einer Form sein.
+die ScriptStrategyControl soll die Tags der Form als ReadOnly Variable im Script liefern
 
+## Aufgabe
+Tabellen brauchen einen neuen Script-Typ:
+ShownInTableView
+das Script wird aufgerufen, wenn die Tabelle zum ERSTEN Mal im TableView geöffnet wird.
+Mit den Tags der Form als Readonly, analog ScriptStrategyControl
+
+## Aufgabe
+Mach einen neuen ScriptCommand: SetOpticalReplacememts(ColumnName, replacements)
+der Befehl versucht, die Optischen ersetzungen der Spalte zu setzen
+ColumnName = VariabelnName
+REplacements = liste
+DEr Befehl soll im Namespace BlueControls sein.
+
+## Aufgabe
+Listboxen können Filtern und hellen die nicht treffer auf. Diese sollen ausgeblentet werden.

@@ -8,6 +8,7 @@ namespace BlueScript.ScriptCommands;
 /// Gibt einen kompletten Pfad mit Dateinamen zurück, der im angebenen Verzeichnis nicht existiert.
 /// Wird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.
 /// Wird dieser befüllt, wird eine laufende Nummer hinzugefügt.
+/// Wird kein Pfad angegeben, wird das Windows-Temp-Verzeichniss gewählt.
 /// Hashtag: #ID #einzigartig #filename
 /// </summary>
 internal class FreeFileNameScriptCommand : ScriptCommand {
@@ -30,6 +31,11 @@ internal class FreeFileNameScriptCommand : ScriptCommand {
         var nam = attvar.ValueStringGet(1);
         var suf = attvar.ValueStringGet(2);
 
+        if(string.IsNullOrEmpty(pf)) {  pf = System.IO.Path.GetTempPath(); }
+
+
+        pf = pf.TrimEnd("\\") + "\\";
+
         if (!DirectoryExists(pf)) {
             return new DoItFeedback("Verzeichnis existiert nicht", true);
         }
@@ -46,9 +52,9 @@ internal class FreeFileNameScriptCommand : ScriptCommand {
             for (var i = 0; i < 20; i++) {
                 buffer[i] = zeichen[GlobalRnd.Next(zeichen.Length)];
             }
-            var p = new string(buffer);
+            var p = pf +  new string(buffer) + "." + suf.TrimStart(".");
 
-            if (!FileExists(pf + p + suf)) {
+            if (!FileExists(p)) {
                 return new DoItFeedback(p);
             }
         } while (true);

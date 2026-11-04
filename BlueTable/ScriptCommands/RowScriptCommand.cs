@@ -50,7 +50,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new RowScriptVariable(row));
 
     public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
-        if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true); }
+        if (invalidateinDays < 0.04) { return new DoItFeedback("Intervall zu kurz, 0.04 ist erlaubt.", true); }
 
         if (fic.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Filter", true); }
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{tb.KeyName}' nicht gefunden", true); }
