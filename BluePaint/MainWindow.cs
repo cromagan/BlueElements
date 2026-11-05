@@ -200,10 +200,8 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void CurrentTool_ForceUndoSaving(object? sender, EventArgs e) {
         _isSaved = false;
-        if (_picUndo is not null) {
-            _picUndo.Dispose();
-            _picUndo = null;
-        }
+        _picUndo?.Dispose();
+        _picUndo = null;
 
         if (P.Bmp is not { } bmp) {
             btnRückgänig.Enabled = false;

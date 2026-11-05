@@ -232,3 +232,16 @@ der Befehl versucht, die Optischen ersetzungen der Spalte zu setzen
 ColumnName = VariabelnName
 REplacements = liste
 DEr Befehl soll im Namespace BlueControls sein.
+
+## Aufgabe
+ReorganizeChunks scheint tot zu ein. Das ist komisch und darf eigentlich nicht sein.
+Hinweis: es muss LoadTableRows benutzt werden.
+
+## Aufgabe
+Prüfe die ChunkId / ChunkValue ketten. Da ist irgendwo ein Fehler drinnen.
+
+## Aufgabe
+Irgendwie kommt StoppedTimeCount nicht über 15 hinaus. Da ist irgendwo ein bug.
+
+## Aufgabe
+Wenn power Bearebeitung an ist und eine gechunkte tabelle UND ein Filter einer anderen Spalte gesetzt wird, kommt der Fehler "Chunk-Wert Filter fehlt."

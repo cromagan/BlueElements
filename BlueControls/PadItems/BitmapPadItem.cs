@@ -342,10 +342,8 @@ public sealed class BitmapPadItem : SizeableRectanglePadItem, ICanHaveVariables,
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             _rawImageBase64 = string.Empty;
-            if (_bitmap is not null) {
-                _bitmap.Dispose();
-                _bitmap = null;
-            }
+            _bitmap?.Dispose();
+            _bitmap = null;
 
             //IsDisposed = true;
         }

@@ -63,13 +63,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28), ExportLayoutEditor_Click, true, string.Empty));
         }
 
-        if (btnAnsichtZoom is not null) {
-            btnAnsichtZoom.DropDownShowing += btnAnsichtZoom_DropDownShowing;
-        }
+        btnAnsichtZoom?.DropDownShowing += btnAnsichtZoom_DropDownShowing;
 
-        if (btnEinstellungen is not null) {
-            btnEinstellungen.DropDownShowing += btnEinstellungen_DropDownShowing;
-        }
+        btnEinstellungen?.DropDownShowing += btnEinstellungen_DropDownShowing;
         var keyName = table?.KeyName;
         if (!string.IsNullOrEmpty(keyName)) {
             SwitchTabToTable(keyName);

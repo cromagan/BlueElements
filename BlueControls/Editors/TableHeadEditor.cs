@@ -433,6 +433,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnUniqueAufräumen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
+        tb.LoadTableRows(false, -1);
+
         // Die Arbeitskopie zuerst ins Backend zurückschreiben, damit die
         // Duplikat-Suche die aktuellen (ggf. im Dialog geänderten) Definitionen nutzt.
         tb.UniqueValues = WorkingCopyUniques().AsReadOnly();

@@ -53,10 +53,8 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             if (field == value) { return; }
             field = value;
 
-            if (_clickFirerer is not null) {
-                _clickFirerer.Dispose();
-                _clickFirerer = null;
-            }
+            _clickFirerer?.Dispose();
+            _clickFirerer = null;
 
             if (value == ButtonStyle.SliderButton) {
                 _clickFirerer = new System.Threading.Timer(_ => {

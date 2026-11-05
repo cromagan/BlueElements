@@ -18,7 +18,6 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     #region Fields
 
-    private readonly VariableCollection _savedVariables = [];
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -132,7 +131,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     /// ausgetauscht, damit Pfad-Auflösungen (IJsonParseable.GetSubItemByKey)
     /// stets dasselbe Objekt liefern.
     /// </summary>
-    public VariableCollection SavedVariables => _savedVariables;
+    public VariableCollection SavedVariables { get; } = [];
 
     public string Script {
         get;

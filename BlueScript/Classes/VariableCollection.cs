@@ -263,7 +263,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         foreach (var kvp in _internal) {
             if (kvp.Value.Comment.Contains(comment)) {
                 _internal.TryRemove(kvp.Key, out var v);
-                if (v is not null) { v.PropertyChangedExt -= Variable_PropertyChangedExt; }
+                v?.PropertyChangedExt -= Variable_PropertyChangedExt;
                 changed = true;
             }
         }

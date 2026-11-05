@@ -187,14 +187,14 @@ public class TableChunk : TableFile {
         if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
 
         switch (chunkType) {
-            case ChunkType.ByHash_1Char:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
+            //case ChunkType.ByHash_1Char:
+            //    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
 
-            case ChunkType.ByHash_2Chars:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
+            //case ChunkType.ByHash_2Chars:
+            //    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
 
-            case ChunkType.ByHash_3Chars:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
+            //case ChunkType.ByHash_3Chars:
+            //    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
             case ChunkType.ByName:
                 var t = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(chunkvalue).TrimStart('_');
