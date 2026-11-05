@@ -88,16 +88,23 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
     /// <summary>
     /// Führt das Skript aus. Mit Zeile kommen alle Zeilen-Variablen zum Skript
     /// und werden bei Erfolg im Produktivmodus zurückgeschrieben.
+    /// Vom Fenster kommen die ID und dessen Tags als ReadOnly-Variablen ins Skript.
     /// </summary>
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktiv, bool readOnly, RowItem? row, string? fensterId) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, bool produktiv, bool readOnly, RowItem? row, System.Windows.Forms.Form? fenster) {
+        var fensterId = fenster is { IsDisposed: false } ? fenster.Handle.ToString(CultureInfo.InvariantCulture) : string.Empty;
+
         VariableCollection generatedVars =
         [
             new StringScriptVariable("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
             new StringScriptVariable("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
             new StringScriptVariable("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new RowScriptVariable("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"),
-            new StringScriptVariable("WindowID", fensterId ?? string.Empty, true, "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer.")
+            new StringScriptVariable("WindowID", fensterId, true, "Die ID des Fensters, aus dem das Skript gestartet wurde. Im Script Editor leer.")
         ];
+
+        if (fenster is Forms.Form { IsDisposed: false } bf && bf.Tags is { Count: > 0 } tags) {
+            generatedVars.Add(new ListOfStringsScriptVariable("FormTags", tags, true, "Die Tags des Fensters, aus dem das Skript gestartet wurde."));
+        }
 
         if (row?.Table is { IsDisposed: false } rowTb) {
             generatedVars.AddRange(rowTb.CreateVariableCollection(row, readOnly, false, false, true, null));
@@ -217,9 +224,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
             return;
         }
 
-        var fensterId = OwnerForm is { IsDisposed: false } owner ? owner.Handle.ToString(CultureInfo.InvariantCulture) : null;
-
-        var t = ExecuteScript(Script, true, ReadOnly, row, fensterId);
+        var t = ExecuteScript(Script, true, ReadOnly, row, OwnerForm);
 
         if (t.Failed) {
             Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{t.ProtocolText}", ImageCode.Kritisch, "Ok");

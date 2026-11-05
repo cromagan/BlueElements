@@ -36,6 +36,7 @@ namespace BlueControls.BlueTableDialogs {
             chkAuslöser_valuechangedThread = new Button();
             chkAuslöser_valuechanged = new Button();
             chkAuslöser_prepaireformula = new Button();
+            chkAuslöser_shownInTableView = new Button();
             capName = new Caption();
             txbName = new TextBox();
             grpRow = new GroupBox();
@@ -257,6 +258,7 @@ namespace BlueControls.BlueTableDialogs {
             grpAuslöser.Controls.Add(chkAuslöser_valuechangedThread);
             grpAuslöser.Controls.Add(chkAuslöser_valuechanged);
             grpAuslöser.Controls.Add(chkAuslöser_prepaireformula);
+            grpAuslöser.Controls.Add(chkAuslöser_shownInTableView);
             grpAuslöser.Location = new Point(224, 64);
             grpAuslöser.Name = "grpAuslöser";
             grpAuslöser.Size = new Size(240, 208);
@@ -327,6 +329,17 @@ namespace BlueControls.BlueTableDialogs {
             chkAuslöser_prepaireformula.TabIndex = 19;
             chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
             chkAuslöser_prepaireformula.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
+            //
+            // chkAuslöser_shownInTableView
+            //
+            chkAuslöser_shownInTableView.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_shownInTableView.Location = new Point(8, 136);
+            chkAuslöser_shownInTableView.Name = "chkAuslöser_shownInTableView";
+            chkAuslöser_shownInTableView.QuickInfo = "Das Skript wird ausgeführt, wenn die Tabelle zum ersten Mal\r\nin einem Tabellenansicht angezeigt wird.\r\nDie Tags des Fensters sind als Variable FormTags verfügbar.";
+            chkAuslöser_shownInTableView.Size = new Size(176, 16);
+            chkAuslöser_shownInTableView.TabIndex = 21;
+            chkAuslöser_shownInTableView.Text = "Tabelle im TableView geöffnet";
+            chkAuslöser_shownInTableView.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // capName
             // 
@@ -515,6 +528,7 @@ namespace BlueControls.BlueTableDialogs {
 
         private GroupBox grpRow;
         private Button chkAuslöser_prepaireformula;
+        private Button chkAuslöser_shownInTableView;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
         private Button chkZeile;

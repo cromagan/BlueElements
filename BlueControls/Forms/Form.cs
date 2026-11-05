@@ -68,6 +68,11 @@ public partial class Form : System.Windows.Forms.Form {
 
     public bool IsClosing { get; private set; }
 
+    /// <summary>
+    /// Tags des Fensters im Format "Name: Wert", z. B. als Kontext für Skripte.
+    /// </summary>
+    public List<string> Tags { get; } = [];
+
     protected override CreateParams CreateParams {
         get {
             var oParam = base.CreateParams;

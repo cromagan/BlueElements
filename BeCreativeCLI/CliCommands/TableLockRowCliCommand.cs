@@ -81,8 +81,8 @@ public class TableLockRowCliCommand : CliCommand {
             var changeable = rows.Where(r => r.CellGetBoolean(lockColumn) != lockIt).ToList();
 
             if (changeable.Count == 0) {
-                Console.Error.WriteLine("Alle getroffenen Zeilen haben den Zielzustand bereits.");
-                return 1;
+                Console.Out.WriteLine("Alle getroffenen Zeilen haben den Zielzustand bereits — nichts zu tun.");
+                return 0;
             }
 
             Console.Out.WriteLine("Trockenlauf — " + action + " würde: " + string.Join(", ", changeable.Select(r => r.KeyName)));
@@ -131,7 +131,7 @@ public class TableLockRowCliCommand : CliCommand {
             if (sr != 0) { return sr; }
         }
 
-        return failed > 0 || changed == 0 ? 1 : 0;
+        return failed > 0 ? 1 : 0;
     }
 
     #endregion

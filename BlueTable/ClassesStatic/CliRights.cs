@@ -4,8 +4,9 @@ namespace BlueTable.ClassesStatic;
 
 /// <summary>
 /// Die per Kommandozeile (CLI) erlaubten Aktionen. Die CLI vergleicht ausschließlich
-/// diese Texte mit der Tabelle (<see cref="BlueTable.Enums.TableDataType.CliRights"/>) —
-/// die Benutzergruppen-Rechte der Tabelle werden von der CLI ignoriert.
+/// diese Texte mit der Tabelle (<see cref="BlueTable.Enums.TableDataType.CliRights"/>).
+/// 'Change permitted cell values' wendet die Spalten-Rechte zusätzlich wie für einen
+/// Benutzer an (#CLI bzw. #User: <CLI-Name>), alle anderen Rechte ignoriieren die Benutzergruppen.
 /// </summary>
 public static class CliRights {
 
@@ -15,7 +16,9 @@ public static class CliRights {
 
     public const string AddRow = "Create row";
 
-    public const string ChangeCellValues = "Change cell values";
+    public const string ChangeAllCellValues = "Change all cell values";
+
+    public const string ChangePermittedCellValues = "Change permitted cell values";
 
     public const string ChangeColumnArrangement = "Change column arrangement";
 
@@ -45,7 +48,8 @@ public static class CliRights {
         AddRow,
         DeleteRow,
         MoveRows,
-        ChangeCellValues,
+        ChangeAllCellValues,
+        ChangePermittedCellValues,
         LockRow,
         RemoveRowLock,
         EditScript,
@@ -56,6 +60,13 @@ public static class CliRights {
         EditTableHead,
         EditColumnHead
     ];
+
+    /// <summary>
+    /// Repariert gegebene Rechte-Texte: Groß-/Kleinschreibung wird kanonisiert, unbekannte Texte fallen weg.
+    /// </summary>
+    public static List<string> Repair(IEnumerable<string> rights) => [.. rights
+        .Select(v => AllRights.FirstOrDefault(r => r.Equals(v, StringComparison.OrdinalIgnoreCase)))
+        .OfType<string>()];
 
     #endregion
 }

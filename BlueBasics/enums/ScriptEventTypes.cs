@@ -16,7 +16,12 @@ public enum ScriptEventTypes {
 
     value_changed_extra_thread = 8,
 
-    //loaded = 16,
+    /// <summary>
+    /// Wird ausgeführt, wenn die Tabelle zum ersten Mal in einem TableView angezeigt wird.
+    /// Die Tags des Fensters kommen als ReadOnly-Variable FormTags ins Skript.
+    /// </summary>
+    ShownInTableView = 16,
+
     export = 32,
 
     //clipboard_changed = 64,

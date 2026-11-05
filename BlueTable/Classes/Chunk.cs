@@ -32,7 +32,7 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
 
     /// <summary>
     /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung
-    /// über Get. Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// über Get. MainFileName ist der vollständige Dateipfad.
     /// Das Added-Event wird nicht mehr aus dem Konstruktor gefeuert — das übernimmt
     /// LiveInstanceCache{T}.GetOrCreate.
     /// </summary>
@@ -70,8 +70,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
-    /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
-    /// Wird im Konstruktor einmalig berechnet, da Filename unveränderlich ist.
+    /// Gibt die Chunk-ID LOWERCASE zurück. Chunk-Instanzen bilden jeweils eine ganze
+    /// Tabellendatei ab (Legacy-.tbl), daher ist der Wert konstant "_maindata".
+    /// Row-Chunks werden ohne Chunk-Instanzen direkt von TableChunk verwaltet.
     /// </summary>
     public string KeyName { get; }
 

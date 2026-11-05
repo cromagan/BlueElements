@@ -192,6 +192,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
 
         //if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
 
+        if (EventTypes == ScriptEventTypes.ShownInTableView) { return ScriptCommandType.GUI; }
+
         return ScriptCommandType.Sub;
     }
 
@@ -270,6 +272,11 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IJson
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
             if (!ValuesReadOnly) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
             if (!NeedRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
+        }
+
+        if (EventTypes.HasFlag(ScriptEventTypes.ShownInTableView)) {
+            if (NeedRow) { return "Routinen beim Anzeigen der Tabelle dürfen sich nicht auf Zeilen beziehen."; }
+            if (EventTypes != ScriptEventTypes.ShownInTableView) { return "Routinen für die Tabellenanzeige müssen für sich alleine stehen."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed)) {

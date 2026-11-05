@@ -68,9 +68,10 @@ public class TableCellSetCliCommand : CliCommand {
             return UsageError("Es fehlt mindestens ein --set <spalte>=<wert>. Werte mit Leerzeichen gehören in Anführungszeichen; der Wert darf leer sein.");
         }
 
-        // Spalten- und Rechteprüfung vorab für alle Zielspalten.
+        // Spalten- und Rechteprüfung vorab für alle Zielspalten. Das Zellwerte-Recht
+        // ('Change all cell values' oder 'Change permitted cell values' mit Spalten-Freigabe) prüft CellValueRightProblem.
         foreach (var (column, value) in targets) {
-            var columnProblem = ColumnWriteProblem(tbl, column, value);
+            var columnProblem = ColumnWriteProblem(tbl, column, value) ?? CellValueRightProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -78,10 +79,9 @@ public class TableCellSetCliCommand : CliCommand {
             }
         }
 
-        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
         // SYS_ROWSORTINDEX hält die Sortiernummern lückenlos (Nummern werden verschoben) — dafür ist das eigene Recht 'Move rows' nötig.
-        foreach (var neededRight in targets.Select(t => tbl.Column.SysRowSortIndex == t.Column ? CliRights.MoveRows : CliRights.ChangeCellValues).Distinct()) {
-            var rightProblem = RightProblem(tbl, neededRight);
+        if (targets.Exists(t => tbl.Column.SysRowSortIndex == t.Column)) {
+            var rightProblem = RightProblem(tbl, CliRights.MoveRows);
 
             if (rightProblem is not null) {
                 Console.Error.WriteLine(rightProblem);

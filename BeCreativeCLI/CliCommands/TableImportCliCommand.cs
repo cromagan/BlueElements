@@ -20,8 +20,8 @@ public class TableImportCliCommand : CliCommand {
             "Die Kopfzeile enthält die übrigen Spaltennamen (wie table-export); leere Zellen leeren die Spalte. " +
             "--noheader ordnet positionsgleich zu: erste Spalte Key, dann Speicherreihenfolge ohne Systemspalten. " +
             "--unescape ist das Gegenstück zu table-export --escape: Literal \\n wird zum Zeilenumbruch, \\\\ zum Backslash. " +
-            "Nicht gefundene Zeilen-Keys, abgeschlossene Zellen (SYS_LOCKED) und nicht beschreibbare Spalten " +
-            "brechen vorab ab. Benötigt wird das CLI-Recht 'Change cell values' (für SYS_ROWSORTINDEX: 'Move rows'). " +
+            "Nicht gefundene Zeilen-Keys, abgeschlossene Zellen (SYS_LOCKED), nicht beschreibbare Spalten und Systemspalten außer SYS_ROWKEY " +
+            "brechen vorab ab. Benötigt wird das CLI-Recht 'Change all cell values' oder 'Change permitted cell values' (nur per Spalten-Recht #CLI freigegebene Spalten). " +
             "Beispiel: bcr table-export Karten.tblh --withrowkey --no-system-columns > x.csv — danach bcr table-import Karten.tblh x.csv";
 
     public override List<string> Options => ["sep", "password"];
@@ -80,24 +80,12 @@ public class TableImportCliCommand : CliCommand {
             return 1;
         }
 
-        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
-        // SYS_ROWSORTINDEX hält die Sortiernummern lückenlos (Nummern werden verschoben) — dafür ist das eigene Recht 'Move rows' nötig.
-        var neededRights = new List<string> { CliRights.ChangeCellValues };
-
-        if (mapping.Exists(m => tbl.Column.SysRowSortIndex == m)) { neededRights.Add(CliRights.MoveRows); }
-
-        foreach (var right in neededRights) {
-            var rightProblem = RightProblem(tbl, right);
-
-            if (rightProblem is not null) {
-                Console.Error.WriteLine(rightProblem);
-                return 1;
-            }
-        }
-
+        // Spalten- und Rechteprüfung vorab für alle zugeordneten Spalten. Das
+        // Zellwerte-Recht ('Change all cell values' oder 'Change permitted cell
+        // values' mit Spalten-Freigabe) prüft CellValueRightProblem.
         foreach (var column in mapping) {
             // Systemspalten sind in der Zuordnung ausgeschlossen — der Wert ist hier ohne Bedeutung.
-            var columnProblem = ColumnWriteProblem(tbl, column, string.Empty);
+            var columnProblem = ColumnWriteProblem(tbl, column, string.Empty) ?? CellValueRightProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);

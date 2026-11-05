@@ -14,7 +14,7 @@ public class TableReplaceCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Die Suche läuft auf dekodiertem Zelltext: 'gewürfelten' trifft auch als gew&#252;rfelten gespeicherte Werte; --find und --replace dürfen selbst Entities enthalten. " +
-            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den passenden CLI-Rechten: 'Change cell values'; Sperrspalte je Zielwert '" + CliRights.LockRow + "'/'" + CliRights.RemoveRowLock + "'), ohne Zeilenadressierung alle Zeilen. " +
+            "Ohne --column werden alle Spalten durchsucht (Systemspalten nur mit den passenden CLI-Rechten: 'Change all cell values'; Sperrspalte je Zielwert '" + CliRights.LockRow + "'/'" + CliRights.RemoveRowLock + "'; mit 'Change permitted cell values' nur die per Spalten-Recht #CLI freigegebenen Spalten), ohne Zeilenadressierung alle Zeilen. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen; ausgenommen sind die Sperrspalte selbst und Spalten mit 'Bearbeitbar trotz Zeilensperre'. " +
             "Der neue Zellwert wird wie in der App gespeichert (Sonderzeichen als HTML-Entities). " +
             "Mit --dry-run werden nur die betroffenen Zellen angezeigt, nichts geändert und nichts gespeichert.";
@@ -61,12 +61,15 @@ public class TableReplaceCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
-        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
-        var rightProblem = RightProblem(tbl, CliRights.ChangeCellValues);
+        // Ohne irgendein Zellwerte-Recht gar nicht starten; welche Spalten je
+        // Recht beschreibbar sind, klären ColumnWriteProblem und CellValueRightProblem.
+        if (!HasRight(tbl, CliRights.ChangeAllCellValues) && !HasRight(tbl, CliRights.ChangePermittedCellValues)) {
+            var rightProblem = RightProblem(tbl, CliRights.ChangeAllCellValues);
 
-        if (rightProblem is not null) {
-            Console.Error.WriteLine(rightProblem);
-            return 1;
+            if (rightProblem is not null) {
+                Console.Error.WriteLine(rightProblem);
+                return 1;
+            }
         }
 
         List<ColumnItem> columns;
@@ -79,7 +82,7 @@ public class TableReplaceCliCommand : CliCommand {
                 return 1;
             }
 
-            var columnProblem = ColumnWriteProblem(tbl, column, replace);
+            var columnProblem = ColumnWriteProblem(tbl, column, replace) ?? CellValueRightProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);
@@ -89,10 +92,10 @@ public class TableReplaceCliCommand : CliCommand {
             columns = [column];
         } else {
             // Systemspalten nur mit passendem CLI-Recht einschließen; alle
-            // übrigen nicht änderbaren Spalten dem Benutzer melden.
-            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c, string.Empty) is null)];
+            // übrigen nicht änderbaren oder nicht freigegebenen Spalten dem Benutzer melden.
+            columns = [.. tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c, string.Empty) is null && CellValueRightProblem(tbl, c) is null)];
 
-            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && ColumnWriteProblem(tbl, c, string.Empty) is not null).ToList();
+            var skipped = tbl.Column.Where(c => c is { IsDisposed: false } && (ColumnWriteProblem(tbl, c, string.Empty) is not null || CellValueRightProblem(tbl, c) is not null)).ToList();
 
             if (skipped.Count > 0) {
                 Console.Error.WriteLine("Übersprungen (nicht per CLI änderbar): " + string.Join(", ", skipped.Select(c => c.KeyName)));

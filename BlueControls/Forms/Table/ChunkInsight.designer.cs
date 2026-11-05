@@ -81,7 +81,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // OpenTab
             // 
-            OpenTab.Filter = "Chunk-Dateien|*.bdb;*.mbdb;*.tblc;*.tblh|Alle Dateien|*.*";
+            OpenTab.Filter = "Chunk-Dateien|*.bdb;*.mbdb;*.tblc;*.tblh;*.tblt|Alle Dateien|*.*";
             OpenTab.Title = "Chunk-Datei öffnen";
             // 
             // capZeilen2

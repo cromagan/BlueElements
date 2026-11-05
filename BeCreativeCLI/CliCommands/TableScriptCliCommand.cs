@@ -383,7 +383,7 @@ public class TableScriptCliCommand : CliCommand {
         ScriptEndedFeedback feedback;
 
         try {
-            feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false);
+            feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false, null);
         } finally {
             if (debugOutput) { DebugPrintScriptCommand.LineAdded -= DebugPrint_LineAdded; }
         }
@@ -412,7 +412,7 @@ public class TableScriptCliCommand : CliCommand {
 
         try {
             foreach (var row in rows) {
-                var feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false);
+                var feedback = tbl.ExecuteScript(script, !script.ValuesReadOnly, row, null, true, true, false, null);
 
                 if (feedback.Failed) {
                     Console.Error.WriteLine($"Zeile {row.KeyName} — Skript abgebrochen:\r\n" + feedback.ProtocolText);

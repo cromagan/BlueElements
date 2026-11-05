@@ -7,8 +7,9 @@ namespace BlueTable.Classes;
 
 /// <summary>
 /// JSON-basierte Variante von TableFile. Lädt und speichert das
-/// Hauptfile komplett als JSON über Table.ParseableJson() bzw.
-/// Table.ParseJson(JsonObject). Im Gegensatz zu TableFile
+/// Hauptfile komplett als gezipptes JSON über Table.ParseableJson() bzw.
+/// Table.ParseJson(JsonObject); unkomprimierte Bestandsdateien
+/// werden weiterhin gelesen. Im Gegensatz zu TableFile
 /// wird KEIN binäres Chunk-Format verwendet, dementsprechend ist auch kein
 /// Multi-User-Zugriff möglich (TableFile.MultiUserPossible = false).
 /// Für Multi-User-Betrieb TableJsonFragments verwenden.
@@ -50,10 +51,10 @@ public class TableJsonFile : TableFile {
     #region Methods
 
     /// <summary>
-    /// Lädt die Hauptdatei als JSON und übernimmt den Zustand über
-    /// Table.ParseJson(JsonObject). Vor dem ersten Speichern
-    /// (TableFile.InitialSavePending) oder bei fehlender Datei
-    /// wird kein Ladeversuch unternommen.
+    /// Lädt die Hauptdatei als gezipptes oder unkomprimiertes JSON und
+    /// übernimmt den Zustand über Table.ParseJson(JsonObject). Vor dem
+    /// ersten Speichern (TableFile.InitialSavePending) oder bei fehlender
+    /// Datei wird kein Ladeversuch unternommen.
     /// </summary>
     /// <remarks>
     /// Die Collection-Implementierungen von <c>ParseJson</c>
@@ -72,7 +73,22 @@ public class TableJsonFile : TableFile {
         if (!IO.FileExists(Filename)) { return true; }
 
         try {
-            var json = IO.ReadAllText(Filename, Encoding.UTF8);
+            // Rückwärtskompatibel: Gezippte Dateien entpacken, unkomprimierte
+            // Bestandsdateien direkt als UTF-8 lesen.
+            if (IO.ReadAllBytes(Filename, 5).Value is not byte[] raw) {
+                Freeze("JSON-Datei konnte nicht gelesen werden");
+                return false;
+            }
+
+            if (raw.IsZipped()) {
+                if (raw.UnzipIt() is not { } unzipped) {
+                    Freeze("JSON-Datei konnte nicht entpackt werden");
+                    return false;
+                }
+                raw = unzipped;
+            }
+
+            var json = Encoding.UTF8.GetString(raw);
             if (string.IsNullOrWhiteSpace(json)) {
                 Freeze("JSON-Datei ist leer");
                 return false;
@@ -132,9 +148,9 @@ public class TableJsonFile : TableFile {
     }
 
     /// <summary>
-    /// Speichert die komplette Tabelle als formatiertes JSON. Verwendet
-    /// IO.SaveExtended für Backup-Rotation (analog zu
-    /// TableFile.SaveFullFile, aber ohne Zip/EOF-Marker).
+    /// Speichert die komplette Tabelle als formatiertes, gezipptes JSON.
+    /// Verwendet IO.SaveExtended für Backup-Rotation (analog zu
+    /// TableFile.SaveFullFile, aber ohne EOF-Marker).
     /// </summary>
     protected override string SaveInternal() {
         var f = IsGenericEditable(false);
@@ -142,13 +158,15 @@ public class TableJsonFile : TableFile {
 
         try {
             var json = ParseableJson().ToJsonString(new JsonSerializerOptions { WriteIndented = true });
-            var bytes = json.UTF8_ToByte();
+            if (json.UTF8_ToByte().ZipIt() is not { Length: > 0 } contentToWrite) {
+                return "Komprimierung fehlgeschlagen.";
+            }
 
             if (IO.CreateDirectory(Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
             }
 
-            var result = IO.SaveExtended(Filename, bytes);
+            var result = IO.SaveExtended(Filename, contentToWrite);
             if (result.IsFailed) { return result.FailedReason; }
 
             InitialSavePending = false;

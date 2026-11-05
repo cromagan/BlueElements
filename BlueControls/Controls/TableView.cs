@@ -114,6 +114,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private List<RowItem> _rowsVisibleUnique = new([]);
 
+    /// <summary>
+    /// KeyNames der Tabellen, für die das ShownInTableView-Skript in dieser Ansicht bereits ausgeführt wurde.
+    /// Die Merkung erfolgt über den KeyName, damit auch ein Ersetzen durch eine neue
+    /// Instanz derselben Tabelle nicht erneut auslöst.
+    /// </summary>
+    private readonly HashSet<string> _shownInTableViewExecutedFor = new(StringComparer.OrdinalIgnoreCase);
+
     private RowSortDefinition? _sortDefinitionTemporary;
 
     private List<TableElement> _sortedViewItems = [];
@@ -419,6 +426,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             OnEnabledChanged(System.EventArgs.Empty);
 
             OnTableChanged();
+
+            ExecuteShownInTableViewScripts();
         }
     }
 
@@ -545,7 +554,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
 
-        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
+        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false, null);
 
         if (!s.Failed) {
             SuccessMessage(s);
@@ -838,6 +847,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         e.Add(Everybody);
         e.Add("#User: " + UserName);
+
+        // Die Gruppe der Kommandozeilen-Prozesse.
+        e.Add(Cli);
 
         if (mitRowCreator) {
             e.Add("#RowCreator");
@@ -2732,7 +2744,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // schließen und ihre Werte committen.
         if (!Visible) {
             CloseAllComponents();
+            return;
         }
+
+        ExecuteShownInTableViewScripts();
     }
 
     protected override void OnZoomChanged() {
@@ -2958,6 +2973,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // nächsten Batches zeigt den eingefrorenen Stand statt eines Wartescreens.
         if (Table is { IsDisposed: false } tbr && !tbr.IsDataReloading) {
             _ = AllViewItems;
+        }
+
+        ExecuteShownInTableViewScripts();
+    }
+
+    /// <summary>
+    /// Führt beim ersten Anzeigen einer Tabelle in dieser Ansicht deren ShownInTableView-Skripte aus.
+    /// Pro Tabelle (KeyName) wird nur einmal ausgelöst, ein Tabellenwechsel löst für eine
+    /// neue Tabelle erneut aus.
+    /// Die Tags des Fensters kommen als ReadOnly-Variable FormTags ins Skript.
+    /// </summary>
+    private void ExecuteShownInTableViewScripts() {
+        if (!Visible || !IsHandleCreated) { return; }
+        if (Table is not { IsDisposed: false, IsDataReloading: false } tb) { return; }
+        if (!_shownInTableViewExecutedFor.Add(tb.KeyName)) { return; }
+
+        var formTags = new VariableCollection();
+        if (FindForm() is Forms.Form { IsDisposed: false } f && f.Tags is { Count: > 0 } tags) {
+            formTags.Add(new ListOfStringsScriptVariable("FormTags", tags, true, "Die Tags des Fensters, in dem die Tabelle angezeigt wird."));
+        }
+
+        foreach (var script in tb.EventScript.Get(ScriptEventTypes.ShownInTableView)) {
+            var feedback = tb.ExecuteScript(script, !script.ValuesReadOnly, null, null, true, true, false, formTags);
+
+            if (feedback.Failed) {
+                Forms.MessageBox.Show("Skript abgebrochen:\r\n" + feedback.ProtocolText, ImageCode.Kreuz, "OK");
+            }
         }
     }
 

@@ -16,6 +16,7 @@ public class TableAddRowCliCommand : CliCommand {
     public override string? HelpDetails =>
             "--set füllt Spalten direkt beim Anlegen und darf mehrfach angegeben werden: --set KATEGORIE=Regeln --set ANLEITUNG=\"Text mit Leerzeichen\". " +
             "Die --set-Werte dienen beim Anlegen zugleich als Filter: Alle Pflicht-Spalten (Erstspalte, Chunk- und Unique-Spalten) müssen daher per --set mitgegeben werden. " +
+            "Für die --set-Spalten gelten dieselben Zellwerte-Rechte wie bei table-cellset ('Change all cell values' oder 'Change permitted cell values' mit Spalten-Freigabe; Systemspalten je eigenem Recht). " +
             "Format: <spalte>=<wert>; der Wert darf leer sein. Leerzeichen und Sonderzeichen in Anführungszeichen setzen. " +
             "Beispiel: bcr table-addrow Test.tblh --set <erstspalte>=NeuerEintrag --set KATEGORIE=Glossar.";
 
@@ -49,7 +50,7 @@ public class TableAddRowCliCommand : CliCommand {
             }
 
             var value = set[(eq + 1)..];
-            var columnProblem = ColumnWriteProblem(tbl, column, value);
+            var columnProblem = ColumnWriteProblem(tbl, column, value) ?? CellValueRightProblem(tbl, column);
 
             if (columnProblem is not null) {
                 Console.Error.WriteLine(columnProblem);

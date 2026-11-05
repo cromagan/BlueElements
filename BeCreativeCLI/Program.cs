@@ -18,10 +18,13 @@ internal static class Program {
         // stdin wird nicht umgestellt: Die Befehle lesen keine Standardeingabe.
 
         StartService();
-        // Die CLI ist kein Tabellen-Benutzer: Erlaubte Aktionen stehen als CLI-Rechte
-        // (Texte) in der Tabelle und werden direkt als String verglichen — nicht über
-        // Benutzergruppen. Der Namenspräfix dient der Zuordnung von Fragment-Dateien.
+        // Die CLI ist kein regulärer Tabellen-Benutzer: Erlaubte Aktionen stehen als
+        // CLI-Rechte (Texte) in der Tabelle und werden direkt als String verglichen.
+        // Nur 'Change permitted cell values' wendet die Spalten-Rechte wie für einen
+        // Benutzer an (#CLI bzw. #User: <CLI-Name>). Der Namenspräfix dient der
+        // Zuordnung von Fragment-Dateien; als Benutzergruppe trägt die CLI '#CLI'.
         UserName = "CLI_" + UserName;
+        UserGroup = Cli;
         MessageDG += Program_MessageDG;
         // Headless: Die CLI bearbeitet in jedem Fall alle Zeilen — kein Abbruch durch Benutzeraktivität oder Zeitlimit.
         RowCollection.AllowProcessingAborts = false;

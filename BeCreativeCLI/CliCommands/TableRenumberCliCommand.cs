@@ -19,7 +19,7 @@ public class TableRenumberCliCommand : CliCommand {
             "Werte werden numerisch verglichen, wenn beide Seiten Zahlen sind, sonst alphabetisch; bei Gleichstand behält die aktuelle Reihenfolge. " +
             "Abgeschlossene Zeilen (SYS_LOCKED) werden übersprungen. " +
             "Je Zeile wird die alte und die neue Nummer gemeldet. " +
-            "Die Nummern-Spalte braucht das CLI-Recht 'Change cell values' — bei SYS_ROWSORTINDEX 'Move rows'. " +
+            "Die Nummern-Spalte braucht das CLI-Recht 'Change all cell values' oder 'Change permitted cell values' — bei SYS_ROWSORTINDEX 'Move rows'. " +
             "Mit --dry-run werden nur die geplanten Nummern angezeigt, nichts geändert und nichts gespeichert.";
 
     public override List<string> Options => [.. AddressingOptions, "column", "sortcolumn", "start", "step", "password"];
@@ -78,11 +78,11 @@ public class TableRenumberCliCommand : CliCommand {
             return 1;
         }
 
-        // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
-        // Wie table-cellset: SYS_ROWSORTINDEX verschiebt Zeilen ('Move rows'), sonst Zellwerte ändern.
-        var neededRight = tbl.Column.SysRowSortIndex == numberColumn ? CliRights.MoveRows : CliRights.ChangeCellValues;
-
-        var rightProblem = RightProblem(tbl, neededRight);
+        // Wie table-cellset: SYS_ROWSORTINDEX verschiebt Zeilen ('Move rows'),
+        // sonst das Zellwerte-Recht der Nummern-Spalte (alle oder freigegebene).
+        var rightProblem = tbl.Column.SysRowSortIndex == numberColumn
+            ? RightProblem(tbl, CliRights.MoveRows)
+            : CellValueRightProblem(tbl, numberColumn);
 
         if (rightProblem is not null) {
             Console.Error.WriteLine(rightProblem);

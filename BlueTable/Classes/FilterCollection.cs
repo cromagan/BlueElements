@@ -385,7 +385,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
         }
 
-        if (!hasChunkFilter && !hasAlwaysFalse) { return "Chunk-Wert Filter fehlt."; }
+        // Mit PowerEdit ist ein fehlender Chunk-Wert Filter zulässig.
+        if (!hasChunkFilter && !hasAlwaysFalse && _table is not { IsDisposed: false, PowerEdit: true }) { return "Chunk-Wert Filter fehlt."; }
 
         return string.Empty;
     }

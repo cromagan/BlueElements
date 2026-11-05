@@ -193,6 +193,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         chkAuslöser_valuechangedThread.Checked = false;
         chkAuslöser_export.Checked = false;
         chkAuslöser_deletingRow.Checked = false;
+        chkAuslöser_shownInTableView.Checked = false;
         capFehler.Text = string.Empty;
     }
 
@@ -271,6 +272,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         chkAuslöser_prepaireformula.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula));
         chkAuslöser_export.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.export));
         chkAuslöser_deletingRow.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.row_deleting));
+        chkAuslöser_shownInTableView.SetChecked(() => value.EventTypes.HasFlag(ScriptEventTypes.ShownInTableView));
         Script = value.Script;
         LastFailedReason = value.FailedReason;
         LastVariables = value.SavedVariables.ToList();
@@ -453,6 +455,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
         if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
         if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
+        if (chkAuslöser_shownInTableView.Checked) { tmp |= ScriptEventTypes.ShownInTableView; }
         return tmp;
     }
 
@@ -521,7 +524,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
         var ext = chkExtendend is { Checked: true, Enabled: true };
 
         _allowTemporay = true;
-        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true);
+        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true, null);
         _allowTemporay = false;
 
         return f;

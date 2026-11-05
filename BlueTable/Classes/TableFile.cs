@@ -261,7 +261,7 @@ public class TableFile : Table {
             }
         }
 
-        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "tblh", "mbdb", "bdb" };
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "tblh", "mbdb", "bdb", "tblt" };
         return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
@@ -499,6 +499,26 @@ public class TableFile : Table {
         EndLog($"UnMasterMe '{KeyName}': ENDE");
     }
 
+    /// <summary>
+    /// Erzeugt den kompletten Datei-Inhalt einer Tabelle (Head-Daten, Spalten,
+    /// Zeilen, Historie, EOF). Reihenfolge ist für den Parser irrelevant —
+    /// er verarbeitet jeden Datentyp unabhängig.
+    /// </summary>
+    protected static List<byte> GenerateFullContent(TableFile tbf) {
+        List<byte> content =
+        [
+            .. TableChunk.GenerateMainChunk(tbf),
+            .. TableChunk.GenerateUsesChunk(tbf),
+            .. TableChunk.GenerateHeadVariableChunks(tbf),
+            .. TableChunk.GenerateMasterUserChunk(tbf),
+            .. TableChunk.GenerateRowChunk(tbf, true, string.Empty),
+            .. TableChunk.GenerateUndoChunk(tbf, true, string.Empty),
+            .. TableChunk.GenerateEOF(),
+        ];
+
+        return content;
+    }
+
     protected static string SaveFullFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -506,20 +526,7 @@ public class TableFile : Table {
         var x = tbf.LastChange;
 
         // Alle Daten in einer einzigen Byte-Liste sammeln (.bdb ist nicht chunked).
-        // Reihenfolge ist für den Parser irrelevant — er verarbeitet jeden Datentyp unabhängig.
-        List<byte> content = new();
-
-        content.AddRange(TableChunk.GenerateMainChunk(tbf));
-        content.AddRange(TableChunk.GenerateUsesChunk(tbf));
-
-        if (TableChunk.GenerateHeadVariableChunks(tbf) is { } varChunk) {
-            content.AddRange(varChunk);
-        }
-
-        content.AddRange(TableChunk.GenerateMasterUserChunk(tbf));
-        content.AddRange(TableChunk.GenerateRowChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunk.GenerateUndoChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunk.GenerateEOF());
+        var content = GenerateFullContent(tbf);
 
         if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 
@@ -677,7 +684,7 @@ public class TableFile : Table {
         var suffixTypes = BuildSuffixTypeMap();
 
         if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblj, .mtblj");
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblj, .mtblj, .tblt");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -712,7 +719,8 @@ public class TableFile : Table {
         [".mbdb"] = typeof(TableFragments),
         [".tblh"] = typeof(TableChunk),
         [".tblj"] = typeof(TableJsonFile),
-        [".mtblj"] = typeof(TableJsonFragments)
+        [".mtblj"] = typeof(TableJsonFragments),
+        [".tblt"] = typeof(TableTimestamp)
     };
 
     private static void GenerateTableUpdateTimer() {

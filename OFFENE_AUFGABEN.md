@@ -202,46 +202,11 @@ Prüfe die Element von Connected formular:
 Wenn eine Tabelle nachgeladen wird, werden dann die Felder aktualisisert?
   
 ## Aufgabe
-erstelle ein neues TabellenFormat:
-Ein dummy-Table und ein Arbeitsverzeichniss 
-im Arbeitsverzeichniss ist dann die wirkliche Tabelle, mit Zeitstempel
-alles bisher Anlag Table chunk.
-nun der unteschied: Es weden im dem verzeichniss die Frahmgmente angelegt. und beim Komplettieren  dann eine neue Datei angelegt - ohne den teueren Tausch.
-und dann Fragemente aufräumne.
-Das dann analagt TableFragments
-
-## Aufgabe
 Mache in Paint ein Text-Tool. Verschiebar, Text, Farbe, Größe etc. bearbeittbar. Mit OK Knopf, dann wird der Text eingepreist
 
 ## Aufgabe
 Erstelle ein CMD Script, dass alle .cs Dateien öffnet, und Properties in die Region "Properties" einodnet. genau so Fields, ect.
 und alle Funktionen, Properties etc. sollen alphabetisch sortiert werden.
-## Aufgabe
-klickbare SCriptbuttons in TableView können nur vom benutzer aktiviert werden. Also muss die TableView in einer Form sein.
-die ScriptStrategyControl soll die Tags der Form als ReadOnly Variable im Script liefern
 
-## Aufgabe
-Tabellen brauchen einen neuen Script-Typ:
-ShownInTableView
-das Script wird aufgerufen, wenn die Tabelle zum ERSTEN Mal im TableView geöffnet wird.
-Mit den Tags der Form als Readonly, analog ScriptStrategyControl
 
-## Aufgabe
-Mach einen neuen ScriptCommand: SetOpticalReplacememts(ColumnName, replacements)
-der Befehl versucht, die Optischen ersetzungen der Spalte zu setzen
-ColumnName = VariabelnName
-REplacements = liste
-DEr Befehl soll im Namespace BlueControls sein.
 
-## Aufgabe
-ReorganizeChunks scheint tot zu ein. Das ist komisch und darf eigentlich nicht sein.
-Hinweis: es muss LoadTableRows benutzt werden.
-
-## Aufgabe
-Prüfe die ChunkId / ChunkValue ketten. Da ist irgendwo ein Fehler drinnen.
-
-## Aufgabe
-Irgendwie kommt StoppedTimeCount nicht über 15 hinaus. Da ist irgendwo ein bug.
-
-## Aufgabe
-Wenn power Bearebeitung an ist und eine gechunkte tabelle UND ein Filter einer anderen Spalte gesetzt wird, kommt der Fehler "Chunk-Wert Filter fehlt."

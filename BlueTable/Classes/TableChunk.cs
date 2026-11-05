@@ -361,9 +361,8 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Ermittelt die Chunk-ID (maindata, _master, 1e3, etc.) LOWERCASE für den angegebenen Typ und Wert.
-    /// Standard-Implementierung mit System-Chunks. Wird von ChunkValueToId
-    /// und RowsOfChunk(TableFile, string) genutzt.
+    /// Ermittelt die Chunk-ID (_maindata, _master, namen-basiert, etc.) LOWERCASE für den angegebenen Typ und Wert.
+    /// Zellenwerte (inkl. Undo/AddRow/RemoveRow) werden über ChunkValueToId aufgelöst.
     /// </summary>
     public static string GetChunkId(Table tb, TableDataType type, string chunkvalue) {
         if (tb.IsDisposed) { return string.Empty; }
@@ -397,6 +396,7 @@ public class TableChunk : TableFile {
     /// dem Chunk.KeyName von <paramref name="chunk"/> entspricht.
     /// Siehe RowsOfChunk(TableFile, string) für Details.
     /// </summary>
+    // TODO: Unused
     public static List<RowItem> RowsOfChunk(TableFile tb, Chunk chunk) {
         if (chunk is null || chunk.IsDisposed) { return []; }
         return RowsOfChunk(tb, chunk.KeyName);
@@ -562,7 +562,7 @@ public class TableChunk : TableFile {
         if (!_systemChunksVerified) {
             // Flag VOR dem Laden setzen — Reentrancy-Sperre.
             // VerifySystemChunksEditable löst Chunk-Parsen aus, das über
-            // VariableRowItem.TryParseValue → BeSureRowIsLoaded wieder hier
+            // RowScriptVariable.TryParseValue → BeSureRowIsLoaded wieder hier
             // landet. Ohne Vorab-Setzung entstünde ein Stack Overflow.
             _systemChunksVerified = true;
             _systemChunksError = VerifySystemChunksEditable();
@@ -627,6 +627,30 @@ public class TableChunk : TableFile {
         if (loaded) { OnLoaded(false, true); }
 
         return ok;
+    }
+
+    /// <summary>
+    /// Lädt nach einer Änderung des Chunk-Typs alle Row-Chunks von der
+    /// Festplatte nach, speichert alle Zeilen in die nun korrekten
+    /// Chunk-Ordner und löscht die verwaisten Chunk-Ordner.
+    /// </summary>
+    public override void ReorganizeChunks() {
+        if (IsDisposed) { return; }
+        if (string.IsNullOrEmpty(Filename)) { return; }
+
+        if (!LoadTableRows(true, -1)) { return; }
+
+        SaveRequired = true;
+
+        // Die verwaisten Ordner dürfen erst weg, wenn alle Zeilen dauerhaft in
+        // den neuen Ordnern liegen. SaveInternal liefert auch bei durch eine
+        // Edit-Sperre übersprungenen Row-Chunks string.Empty — dann bleibt
+        // SaveRequired true und die alten Ordner als einzige Kopie bestehen.
+        SaveInternal();
+
+        if (SaveRequired) { return; }
+
+        DeleteOrphanedChunkFolders();
     }
 
     /// <summary>
@@ -949,8 +973,9 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc).
     /// Millisekunden sind verpflichtend. Gibt null zurück, wenn das Datum nicht geparst werden kann.
+    /// Wird auch für Snapshot-Dateien (TableTimestamp) mit gleichem Namensformat genutzt.
     /// </summary>
-    private static DateTime? ExtractDateFromFileName(string filePath) {
+    internal static DateTime? ExtractDateFromFileName(string filePath) {
         var fileName = filePath.FileNameWithoutSuffix();
         if (fileName.Length < 23) { return null; }
         var datePart = fileName[..23];
@@ -1064,6 +1089,41 @@ public class TableChunk : TableFile {
         var creatorDisplay = string.IsNullOrEmpty(creatorHash) ? creator : $"{creator} - {creatorHash}";
         var lockUntil = fileDate.Value.AddSeconds(EditLockSeconds).ToLocalTime();
         return $"Der Chunk '{chunkId}' wird bis {lockUntil:HH:mm} Uhr von '{creatorDisplay}' bearbeitet";
+    }
+
+    /// <summary>
+    /// Löscht Row-Chunk-Ordner, deren Chunk-ID unter dem aktuellen Chunk-Typ
+    /// für keine geladene Zeile mehr zutrifft. Ein Ordner wird nur entfernt,
+    /// wenn seine neueste Datei älter als DeleteOldFilesAfterHours ist —
+    /// fremde Instanzen mit noch veraltetem Chunk-Typ könnten sonst beim
+    /// Speichern Zeilen hineinschreiben.
+    /// </summary>
+    private void DeleteOrphanedChunkFolders() {
+        var chunkFolder = BaseChunkFolder();
+        if (!IO.DirectoryExists(chunkFolder)) { return; }
+
+        var validIds = RowChunkIdsInMemory(this);
+        var unknownId = Chunk_UnknownData.ToLowerInvariant();
+        if (!validIds.Contains(unknownId)) { validIds.Add(unknownId); }
+
+        var threshold = DateTime.UtcNow.AddHours(-DeleteOldFilesAfterHours);
+
+        foreach (var subDir in IO.GetDirectories(chunkFolder)) {
+            var chunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+            if (!IsRowChunk(chunkId) || validIds.Contains(chunkId)) { continue; }
+
+            // Nur überspringen, wenn die neueste Datei ein gültiges, zu frisches
+            // Datum trägt. Leere Ordner und Ordner ohne gültige Datumsangaben
+            // (kann kein frischer Fremd-Schreibvorgang sein) werden gelöscht.
+            if (GetChunkFilesOrderedByTime(subDir).FirstOrDefault() is { } newestFile
+                && ExtractDateFromFileName(newestFile) is { } newestDate
+                && newestDate > threshold) { continue; }
+
+            IO.DeleteDir(subDir, false);
+            _processedFile.TryRemove(chunkId, out _);
+            _lastUsed.TryRemove(chunkId, out _);
+            _lastContentHash.TryRemove(chunkId, out _);
+        }
     }
 
     /// <summary>
@@ -1252,10 +1312,10 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Aktualisiert alle geladenen Row-Chunks: Prüft für jeden, ob eine neuere
-    /// Datei im Ordner existiert und lädt diese ggf. neu.
-    /// Entdeckt außerdem neue Row-Chunk-Ordner, die andere Benutzer seit dem
-    /// letzten Refresh angelegt haben (z.B. Zeilen in einem neuen Chunk-Wert).
+    /// Aktualisiert alle bekannten Row-Chunks (Einträge in _processedFile):
+    /// Prüft für jeden, ob eine neuere Datei im Ordner existiert und lädt
+    /// diese ggf. neu. Neue Chunk-Ordner anderer Benutzer werden hier nicht
+    /// entdeckt — das übernimmt GetAvailableChunkIds via LoadTableRows.
     /// Chunks, deren LastUsed-Stempel älter als SkipIfUnusedMinutes ist,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).

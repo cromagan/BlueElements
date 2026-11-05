@@ -252,7 +252,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public ReadOnlyCollection<string> CliRights {
         get => new(_cliRights);
         set {
-            var repaired = value.Where(ClassesStatic.CliRights.AllRights.Contains).ToList();
+            var repaired = ClassesStatic.CliRights.Repair(value);
             if (!_cliRights.IsDifferentTo(repaired)) { return; }
             ChangeData(TableDataType.CliRights, null, string.Join('\r', _cliRights), string.Join('\r', repaired));
         }
@@ -498,7 +498,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public ReadOnlyCollection<string> TableAdmin {
         get => new(_tableAdmin);
         set {
-            var repaired = RepairUserGroups(value).AsReadOnly();
+            var repaired = WithoutCliAdmin(RepairUserGroups(value)).AsReadOnly();
             if (!_tableAdmin.IsDifferentTo(repaired)) { return; }
             ChangeData(TableDataType.TableAdminGroups, null, string.Join('\r', _tableAdmin), string.Join('\r', repaired));
         }
@@ -929,6 +929,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         return l.SortedDistinctList();
     }
+
+    /// <summary>
+    /// Entfernt Tabellen-Admin-Einträge, die die Kommandozeile zum Admin machen würden:
+    /// alles mit '#CLI' bzw. 'CLI-'-Bezug — die CLI ist nie Tabellen-Administrator.
+    /// </summary>
+    /// <param name="groups"></param>
+    /// <returns></returns>
+    private static List<string> WithoutCliAdmin(IEnumerable<string> groups) =>
+        [.. groups.Where(v => !v.Contains("#cli", StringComparison.OrdinalIgnoreCase) && !v.Contains("cli-", StringComparison.OrdinalIgnoreCase))];
 
     public static void SaveAll() {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
@@ -1451,8 +1460,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <param name="tableHeadVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="ignoreError"></param>
+    /// <param name="additionalVariables">Zusätzliche Variablen (z. B. FormTags), die dem Skript mitgegeben werden</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError) {
+    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError, VariableCollection? additionalVariables) {
         // Vorab-Prüfungen
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
@@ -1492,6 +1502,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             AddAttributes(vars, args ?? []);
+
+            if (additionalVariables is { Count: > 0 } av) {
+                foreach (var v in av) { vars.Add(v); }
+            }
 
             // Nur bei Skripten, die von außerhalb angestoßen werden können (Benutzergruppen vorhanden):
             // Erfolgsmeldung, die nach dem Skript statt der Standardmeldung angezeigt wird.
@@ -1625,7 +1639,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (!script.IsOk()) { return new ScriptEndedFeedback($"Skript '{script.KeyName}' defekt", false, false, script.KeyName); }
 
         if (retrySeconds <= 0) {
-            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, null);
         }
 
         var startTime = DateTime.UtcNow;
@@ -1634,7 +1648,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         do {
             attempt++;
-            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, null);
 
             if (!erg.Failed) { return erg; }
 
@@ -1754,6 +1768,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                                     CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
+        if (string.Equals(UserGroup, Cli, StringComparison.OrdinalIgnoreCase)) { return false; } // Die CLI ist nie Tabellen-Administrator
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (_tableAdmin.Count == 0) { return false; }
         if (_tableAdmin.Contains(Everybody, StringComparer.OrdinalIgnoreCase)) { return true; }
@@ -2193,12 +2208,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         if (json["tableadmin"] is JsonArray taArr) {
             _tableAdmin.Clear();
-            _tableAdmin.AddRange(RepairUserGroups(taArr.ToStringList()));
+            _tableAdmin.AddRange(WithoutCliAdmin(RepairUserGroups(taArr.ToStringList())));
         }
 
         if (json["clirights"] is JsonArray crArr) {
             _cliRights.Clear();
-            _cliRights.AddRange(crArr.ToStringList().Where(ClassesStatic.CliRights.AllRights.Contains));
+            _cliRights.AddRange(ClassesStatic.CliRights.Repair(crArr.ToStringList()));
         }
 
         #endregion
@@ -2532,11 +2547,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         var failedChanged = failed != script.FailedReason;
-        // Persistiert wird nur, wenn sich der gerundete Durchschnitt geändert hat —
-        // ein reiner Zählerstand löst keinen Fragment-Schreib mehr aus.
-        var timeChanged = avgRunTime != script.AverageRunTime;
+        // Auch ein reiner Zählerstand muss persistiert werden, sonst friert der Zähler
+        // ein, sobald der gerundete Durchschnitt (500-ms-Blöcke) stabil bleibt.
+        var statsChanged = avgRunTime != script.AverageRunTime || runTimeCount != script.StoppedTimeCount;
 
-        if (failedChanged || timeChanged) {
+        if (failedChanged || statsChanged) {
             // Variablen dürfen nur in Kombination mit einem geänderten FailedReason gespeichert werden
             UpdateScript(script,
                 failedReason: failed,
@@ -2879,12 +2894,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 break;
 
             case TableDataType.TableAdminGroups:
-                _tableAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                _tableAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(string.Join('\r', WithoutCliAdmin(value.SplitAndCutByCr())));
                 break;
 
             case TableDataType.CliRights:
                 _cliRights.Clear();
-                _cliRights.AddRange(value.SplitAndCutByCr().Where(ClassesStatic.CliRights.AllRights.Contains));
+                _cliRights.AddRange(ClassesStatic.CliRights.Repair(value.SplitAndCutByCr()));
                 break;
 
             case TableDataType.SortDefinition:

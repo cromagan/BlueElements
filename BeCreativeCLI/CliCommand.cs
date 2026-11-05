@@ -22,7 +22,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Dateiendungen, die als Tabelle geladen werden dürfen — oder der Name ganz ohne Endung.
     /// </summary>
-    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "mbdb", "tblh", "tblj", "mtblj" };
+    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "mbdb", "tblh", "tblj", "mtblj", "tblt" };
 
     #endregion
 
@@ -132,6 +132,26 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
+    /// Rechteprüfung für Zellwerte normaler Spalten: 'Change all cell values'
+    /// erlaubt jede Spalte, 'Change permitted cell values' nur Spalten, deren
+    /// Rechteprüfung wie für einen Benutzer besteht (#CLI bzw. #User: <CLI-Name>).
+    /// Systemspalten prüft ausschließlich SystemColumnWriteProblem.
+    /// </summary>
+    protected static string? CellValueRightProblem(Table tbl, ColumnItem column) {
+        if (column.IsSystemColumn()) { return null; }
+
+        if (HasRight(tbl, CliRights.ChangeAllCellValues)) { return null; }
+
+        if (HasRight(tbl, CliRights.ChangePermittedCellValues)) {
+            return tbl.PermissionCheck(column.PermissionGroupsChangeCell, null, true)
+                ? null
+                : "Keine Rechte: Die Spalte '" + column.KeyName + "' ist für die Kommandozeile nicht freigegeben (Spalten-Recht '#CLI' bzw. '#User: <CLI-Name>' fehlt).";
+        }
+
+        return RightProblem(tbl, CliRights.ChangeAllCellValues);
+    }
+
+    /// <summary>
     /// Ersetzt Zeilenumbrüche durch Literal \n (Backslashes vorher verdoppelt),
     /// damit jede Ausgabezeile genau einem Datensatz entspricht.
     /// </summary>
@@ -159,17 +179,17 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Tabelle per Kommandozeile bearbeitet werden kann.
-    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb) und
-    /// TableJsonFragments (.mtblj) führen automatisch die jüngste, sauber mit
-    /// EOF abgeschlossene Fragment-Datei des eigenen Benutzers fort
-    /// (jünger als 5 Minuten; neue Änderungen werden per Append angehängt).
-    /// Gibt es keine, legt das System beim ersten Schreiben eine neue Fragment-Datei an.
-    /// Das Öffnen hängt sofort einen CONTINUED-Marker an, damit kein zweiter
-    /// Prozess dieselbe Datei zum Schreiben öffnen kann.
+    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb),
+    /// TableJsonFragments (.mtblj) und TableTimestamp (.tblt) führen automatisch
+    /// die jüngste, sauber mit EOF abgeschlossene Fragment-Datei des eigenen
+    /// Benutzers fort (jünger als 5 Minuten; neue Änderungen werden per Append
+    /// angehängt). Gibt es keine, legt das System beim ersten Schreiben eine
+    /// neue Fragment-Datei an. Das Öffnen hängt sofort einen CONTINUED-Marker an,
+    /// damit kein zweiter Prozess dieselbe Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
-        if (tbl is not (TableFragments or TableJsonFragments)) { return null; }
+        if (tbl is not (TableFragments or TableJsonFragments or TableTimestamp)) { return null; }
 
         // Geeignete Fragment-Datei automatisch erkennen (EOF am Ende, eigener Benutzer,
         // jünger als 5 Minuten); ohne Fund startet der Writer eine neue Datei.
@@ -180,6 +200,7 @@ public abstract class CliCommand : IHasKeyName {
         var f = tbl switch {
             TableFragments tf => tf.ContinueFragment(fragmentFile),
             TableJsonFragments tjf => tjf.ContinueFragment(fragmentFile),
+            TableTimestamp tt => tt.ContinueFragment(fragmentFile),
             _ => "Nicht unterstützter Fragment-Tabellentyp."
         };
 
@@ -276,7 +297,8 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// True, wenn die Tabelle das CLI-Recht gesetzt hat. Die CLI vergleicht
     /// ausschließlich diese Texte — die Benutzergruppen-Rechte der Tabelle
-    /// (Spalten-Rechte, Neue Zeilen, Administratoren) werden ignoriert.
+    /// werden ignoriert, ausgenommen die Spalten-Rechte bei 'Change permitted
+    /// cell values' (siehe CellValueRightProblem).
     /// </summary>
     protected static bool HasRight(Table tbl, string right) => tbl.CliRights.Contains(right, StringComparer.OrdinalIgnoreCase);
 
@@ -314,7 +336,7 @@ public abstract class CliCommand : IHasKeyName {
         var suffix = name.FileSuffix();
 
         if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblj, .mtblj (oder ganz ohne Endung).");
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblj, .mtblj, .tblt (oder ganz ohne Endung).");
             return null;
         }
 
@@ -381,6 +403,11 @@ public abstract class CliCommand : IHasKeyName {
             case TableJsonFragments tjf:
                 directory = tjf.FragmengtsPath();
                 suffix = TableJsonFragments.SuffixOfJsonFragments;
+                break;
+
+            case TableTimestamp tt:
+                directory = tt.WorkFolder();
+                suffix = TableTimestamp.SuffixOfFragments;
                 break;
 
             default:
@@ -558,7 +585,7 @@ public abstract class CliCommand : IHasKeyName {
     /// beschreibbar je Zielwert nur mit 'Lock row' (gesperrt) bzw.
     /// 'Remove row lock' (ungesperrt), die Sortierindex-Spalte
     /// (SYS_ROWSORTINDEX) nur mit 'Move rows' — sie hält die Nummern
-    /// lückenlos —, alle übrigen Systemspalten nur mit 'Change cell values'.
+    /// lückenlos —, alle übrigen Systemspalten nur mit 'Change all cell values'.
     /// </summary>
     protected static string? SystemColumnWriteProblem(Table tbl, ColumnItem column, string newValue) {
         if (tbl.Column.SysRowKey == column) {
@@ -575,7 +602,7 @@ public abstract class CliCommand : IHasKeyName {
         } else if (tbl.Column.SysRowSortIndex == column) {
             right = CliRights.MoveRows;
         } else {
-            right = CliRights.ChangeCellValues;
+            right = CliRights.ChangeAllCellValues;
         }
 
         return HasRight(tbl, right)
