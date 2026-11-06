@@ -391,16 +391,6 @@ public class TableChunk : TableFile {
         return tbf.Row.Select(r => ChunkValueToId(chunktype, r.ChunkValue)).Distinct().ToList();
     }
 
-    /// <summary>
-    /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID
-    /// dem Chunk.KeyName von <paramref name="chunk"/> entspricht.
-    /// Siehe RowsOfChunk(TableFile, string) für Details.
-    /// </summary>
-    // TODO: Unused
-    public static List<RowItem> RowsOfChunk(TableFile tb, Chunk chunk) {
-        if (chunk is null || chunk.IsDisposed) { return []; }
-        return RowsOfChunk(tb, chunk.KeyName);
-    }
 
     /// <summary>
     /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID

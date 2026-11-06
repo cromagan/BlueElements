@@ -687,7 +687,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public static Table Create(string key) => CreateInstance(key);
 
-    // TODO: Unused
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
         lock (AllFilesLocker) {

@@ -44,19 +44,6 @@ public class InvalidatedRowsManager {
     public static DGDoUpdateRow DoUpdateRow { get; set; } = UpdateRowNow;
 
     /// <summary>
-    /// Überprüft, ob gerade eine Verarbeitung stattfindet.
-    /// Thread-sicher implementiert.
-    /// </summary>
-    // TODO: Unused
-    public bool IsProcessing {
-        get {
-            lock (_processingLock) {
-                return _isProcessing;
-            }
-        }
-    }
-
-    /// <summary>
     /// Gibt die aktuelle Anzahl der zu verarbeitenden Zeilen zurück.
     /// </summary>
     public int PendingRowsCount => _invalidatedRows.Count;

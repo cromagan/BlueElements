@@ -198,7 +198,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     public object? CreateNewItem() => null;
 
-    // TODO: Unused
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
 
         #region Tabellen Initialisieren

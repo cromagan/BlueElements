@@ -195,12 +195,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Methods
 
-    // TODO: Unused
-    public static bool ScaleWarnung() {
-        if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
-        Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
-        return true;
-    }
+
 
     public void DoZoom(bool zoomIn) {
         var nz = Zoom;
