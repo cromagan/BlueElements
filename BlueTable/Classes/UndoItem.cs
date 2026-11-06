@@ -2,7 +2,7 @@
 
 namespace BlueTable.Classes;
 
-public class UndoItem : IParseable, IJsonParseable {
+public class UndoItem : IParseable {
 
     #region Constructors
 
@@ -24,12 +24,6 @@ public class UndoItem : IParseable, IJsonParseable {
     public UndoItem(string s) => this.Parse(s);
 
     public UndoItem() { }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -177,42 +171,6 @@ public class UndoItem : IParseable, IJsonParseable {
         return table.Column[ColName] is { IsDisposed: false, SaveContent: true } c &&
              c != table.Column.SysRowChanger &&
              c != table.Column.SysRowChangeDate;
-    }
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("table", TableName);
-        json.Set("command", (int)Command);
-        json.Set("datetimeutc", DateTimeUtc);
-        json.Set("user", User);
-        json.Set("colname", ColName);
-        json.Set("rowkey", RowKey);
-        json.Set("previousvalue", PreviousValue);
-        json.Set("changedto", ChangedTo);
-        json.Set("comment", Comment);
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        TableName = json.GetString("table", TableName);
-        if (json["command"] is JsonValue v && v.TryGetValue(out int i)) { Command = (TableDataType)i; }
-        var dt = json.GetString("datetimeutc", string.Empty);
-        if (dt is { Length: > 0 } && DateTimeUtcTryParse(dt, out var parsedUtc)) { DateTimeUtc = parsedUtc; }
-        User = json.GetString("user", User);
-        ColName = json.GetString("colname", ColName);
-        RowKey = json.GetString("rowkey", RowKey);
-        PreviousValue = json.GetString("previousvalue", PreviousValue);
-        ChangedTo = json.GetString("changedto", ChangedTo);
-        Comment = json.GetString("comment", Comment);
     }
 
     #endregion

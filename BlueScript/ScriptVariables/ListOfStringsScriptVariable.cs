@@ -76,7 +76,6 @@ public class ListOfStringsScriptVariable : ScriptVariable {
 
             _list = value;
             //if (value is not null) { _list.AddRange(value); }
-            OnPropertyChangedExt("value", _list);
         }
     }
 
@@ -123,7 +122,6 @@ public class ListOfStringsScriptVariable : ScriptVariable {
         if (value is not StringScriptVariable s) { return VerschiedeneTypen(value); }
 
         _list[i] = s.ValueString;
-        OnPropertyChangedExt("value", _list);
         return string.Empty;
     }
 

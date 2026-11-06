@@ -4,17 +4,11 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition>, IJsonParseable {
+public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition> {
 
     #region Fields
 
     private readonly List<ColumnViewItem> _internal = [];
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -160,32 +154,6 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     /// True, wenn die Spalte an der Sortierung beteiligt ist.
     /// </summary>
     public bool UsedForRowSort(ColumnViewItem? column) => _internal.Count != 0 && column is not null && _internal.Exists(thisColumn => SameSortColumn(thisColumn, column));
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("reverse", Reverse);
-        json.SetArrayIfNotEmpty("columns", _internal.Select(thisColumn => thisColumn.ColumnName ?? string.Empty));
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        Reverse = json.GetBool("reverse", Reverse);
-        if (json["columns"] is JsonArray arr) {
-            _internal.Clear();
-            foreach (var item in arr) {
-                if (item is JsonValue v && v.TryGetValue(out string? s) && SortedColumnByName(s) is { } c) { _internal.Add(c); }
-            }
-        }
-    }
 
     private static bool IsSortColumnInvalid(ColumnViewItem c) =>
         c is not { IsDisposed: false }

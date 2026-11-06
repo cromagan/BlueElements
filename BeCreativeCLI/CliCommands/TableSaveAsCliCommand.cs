@@ -3,7 +3,7 @@
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Tabellen: Speichert eine Tabelle im durch die Ziel-Endung bestimmten Format als neue Datei (z. B. .mbdb -> .mtblj).
+/// Tabellen: Speichert eine Tabelle im durch die Ziel-Endung bestimmten Format als neue Datei (z. B. .mbdb -> .bdb).
 /// </summary>
 public class TableSaveAsCliCommand : CliCommand {
 
@@ -13,8 +13,8 @@ public class TableSaveAsCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Legt eine neue, vollständige Tabellendatei an und übernimmt die kompletten Daten der Quelltabelle — " +
-            "ohne deren Fragment-Historie. Das Zielformat folgt der Endung: .bdb, .mbdb, .tblh, .tblj oder .mtblj. " +
-            "Beispiel: bcr table-saveas Test.mbdb Test2.mtblj";
+            "ohne deren Fragment-Historie. Das Zielformat folgt der Endung: .bdb, .mbdb, .tblh oder .tblt. " +
+            "Beispiel: bcr table-saveas Test.mbdb Test2.bdb";
 
     public override List<string> Options => ["password"];
     public override string Syntax => "bcr table-saveas <tabelle> <zieldatei> [--password <kennwort>]";

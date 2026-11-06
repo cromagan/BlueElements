@@ -7,7 +7,7 @@ Bei „BCR“, „ShellCommand bcr“ etc. ist IMMER diese Exe gemeint — direk
 
 Kommandozeilen-Werkzeug für BeCreative-Dateien. Tabellen (Datenbank-Formate
 wie `.bdb`, `.tblh`, `.mbdb`) tragen das Präfix `table-`; zusätzlich gibt es
-den Roundtrip-Test `roundtrip` für Layout- und Tabellendateien. Für Skripte,
+den Roundtrip-Test `roundtrip` für Layout-Dateien. Für Skripte,
 Automatisierung und schnelle Änderungen ohne GUI.
 
 ## Wichtig
@@ -17,14 +17,14 @@ Automatisierung und schnelle Änderungen ohne GUI.
 - Daten auf stdout (CSV, UTF-8), Fehler auf stderr.
 - Rechte-Modell der CLI: Die CLI ist kein regulärer Tabellen-Benutzer; erlaubte Aktionen stehen als CLI-Rechte (englische Texte) in den Tabellen-Eigenschaften (Tab 'CLI-Rechte') und werden direkt als String verglichen: `Create row` (table-addrow), `Delete row` (table-delrow), `Move rows` (table-cellset auf die Sortierindex-Spalte SYS_ROWSORTINDEX — verschiebt die Zeile), `Change all cell values` (table-cellset, table-replace, table-import — jede Spalte änderbar), `Change permitted cell values` (gleiche Befehle, aber nur Spalten, deren Spalten-Rechte die Kommandozeile wie einen Benutzer zulassen: Spalten-Recht `#CLI` für alle CLI-Prozesse — die CLI führt die Benutzergruppe `#CLI` — bzw. `#User: <CLI-Name>` wie `#User: CLI_cp33` für einen bestimmten CLI-Prozess), `Lock row` (table-lockrow --lock; auch table-cellset/table-addrow, wenn die Sperrspalte SYS_LOCKED auf gesperrt gesetzt wird), `Remove row lock` (table-lockrow --unlock; auch Zurücksetzen der Sperrspalte SYS_LOCKED auf ungesperrt), `Edit script` (table-script import), `Execute script` (table-script execute), `Add column` (table-addcolumn), `Delete column` (table-delcolumn), `Change column arrangement` (table-columnarrangement), `Edit table head` (table-head), `Edit column head` (table-columnhead). Ohne das jeweilige Recht meldet der Befehl sofort einen Fehler. Ausnahme: `table-script export/compare/check/names` sind ohne CLI-Recht erlaubt (Skripte ansehen und fehlertesten); export meldet zusätzlich auf stdout, wenn das Recht `Edit script` für den Rückimport fehlt. Die CLI kann nie Tabellen-Administrator sein: TableAdmin-Einträge mit `#CLI`- bzw. `CLI-`-Bezug werden beim Setzen und Laden entfernt und für CLI-Prozesse zur Laufzeit ignoriert — Spalten-Freigaben gelten daher immer.
 - Tabellen mit Kennwort: per `--password <kennwort>` mitgeben (gilt für alle table-Befehle, die die Tabelle laden). Ohne korrektes Kennwort sofortiger Fehler.
-- Dateiendungen: Nur `.bdb`, `.mbdb`, `.tblh`, `.tblj`, `.mtblj` werden akzeptiert (oder der Name ganz ohne Endung). Ein anderer Name wird abgelehnt, statt stillschweigend eine gleichnamige Tabelle zu öffnen.
+- Dateiendungen: Nur `.bdb`, `.mbdb`, `.tblh`, `.tblt` werden akzeptiert (oder der Name ganz ohne Endung). Ein anderer Name wird abgelehnt, statt stillschweigend eine gleichnamige Tabelle zu öffnen.
 - Nicht beschreibbare Spalten: Spalten, die auf Werte einer anderen Tabelle verknüpft sind, und berechnete Spalten (`WirdGespeichert: nein`) lehnen Schreibversuche (`table-cellset`, `table-replace --column`, `table-addrow --set`) mit Fehler ab — in der GUI oder in der Quell-Tabelle ändern. `table-replace` ohne `--column` überspringt diese Spalten und nennt sie auf stderr.
 - Spalten anlegen/löschen: `table-addcolumn` und `table-delcolumn` (nur mit den CLI-Rechten `Add column` bzw. `Delete column`); gültige Formate listet `table-columnformats`. Systemspalten sind geschützt.
 - Skripte: `table-script <tabelle> <aktion> [<skript>]` mit aktion = import|export|compare|execute|check|names. Die Skript-Dateien liegen im Ordner der Tabelle und heißen `<tabelle>.<skript>.txt` (import liest sie, export schreibt sie — mit `--stdout` auf der Standardausgabe statt in die Datei, compare/names vergleichen). `script-syntax [filter]` listet die Syntax aller Skript-Befehle auf.
 - Kapitel sind kein eigenes CLI-Konzept: Die Kapitelspalte enthält je Zeile den Text des Kapitels, zu dem die Zeile gehört, und ist mit `table-cellset` bearbeitbar wie jeder Zellwert (CLI-Recht `Change all cell values` oder Spalten-Freigabe via `Change permitted cell values` vorausgesetzt). Bei Aufgaben wie „Zeile(n) unter Kapitel X anlegen/einfügen“ gehört dazu BEIDES: Position unter der Kapitelzeile UND Kapitelspalte der neuen Zeilen mit dem Kapiteltext setzen (`table-addrow`, danach `table-cellset`). Eines allein ist unvollständig.
 - Kapitel sind mehrstufig: Stufe 1\Stufe 2\Stufe 3
 - Eine Zeile kann mehreren Kapiteln zugeordnet werden. Getrennt mit \r
-- Fragment-Tabellen: `.mbdb` (TableFragments) und `.mtblj` (TableJsonFragments) sind bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten). Lesen (`table-info` etc.) geht überall.
+- Fragment-Tabellen: `.mbdb` (TableFragments) und `.tblt` (TableTimestamp) sind bearbeitbar — das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt wird (siehe eigenen Abschnitt unten). Lesen (`table-info` etc.) geht überall.
 - Datenüberprüfung: Geänderte Zeilen werden invalidiert und beim Freigeben der Tabelle geprüft — vor dem Entladen, ohne Neuladen. Row-Skripte laufen dabei; Meldungen erscheinen über das normale Meldungswesen auf stderr.
 - Mehrdeutige Aufträge (z. B. „unter Kapitel X“ = nur Position oder auch Kapitelwert setzen?) niemals raten — vor der Ausführung kurz nachfragen. Betroffene Spalten/Werte explizit nennen lassen, wenn der Auftrag sie nicht nennt.
 
@@ -75,14 +75,14 @@ Wichtige Stolperfalle:
 - `bcr table-script <tabelle> names` — alle Skripte mit Compare-Ergebnis auflisten (ohne CLI-Recht erlaubt)
 - `bcr script-syntax [filter]` — Syntax aller Skript-Befehle auflisten, optional gefiltert
 - `bcr table-rowerrors <tabelle>` + Zeilenadressierung — Datenüberprüfung adressierter Zeilen per prepare_formula-Skript; Exit-Code 1 bei Fehlern oder Skriptversagen; Standard: nur Zeilen mit Meldungen ausgeben (fehlerhafte Spalten samt Fehlermeldung); mit `--allrows` zusätzlich fehlerfreie Zeilen (`Fehlerfrei`), mit `--nodetails` ohne die Spalten-Meldungen (nur die betroffenen Zeilen-Keys); Exit-Code bleibt gleich; jeder Fehlerfund wird vor der Meldung per kompletter Datenüberprüfung bestätigt
-- `bcr table-saveas <tabelle> <zieldatei>` — Tabelle als neue, vollständige Datei im Format der Ziel-Endung speichern (.bdb, .mbdb, .tblh, .tblj, .mtblj); ohne Fragment-Historie der Quelle. Beispiel: `bcr table-saveas Test.mbdb Test2.mtblj`
+- `bcr table-saveas <tabelle> <zieldatei>` — Tabelle als neue, vollständige Datei im Format der Ziel-Endung speichern (.bdb, .mbdb, .tblh, .tblt); ohne Fragment-Historie der Quelle. Beispiel: `bcr table-saveas Test.mbdb Test2.bdb`
 - `bcr table-columnformats` — alle Spaltenformate auflisten, die `table-addcolumn --format` akzeptiert (je Zeile der Format-Key, mit Quickinfo nach einem Doppelpunkt)
 
 Zeilenadressierung: `--rowkey <key>` ODER `--filtercolumn <c> --filtervalue <w>` (optional `--filtertype equals|exact|contains|startswith`). Der Zeilen-Key ist numerisch (Zeitstempel-artiger Long) und gehört in `--rowkey` — nicht als Positionsargument oder als `KEY=Wert` — Beispiele: `bcr help table-info`.
 
-## Fragment-Tabellen bearbeiten (.mbdb/.mtblj)
+## Fragment-Tabellen bearbeiten (.mbdb/.tblt)
 
-Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-import`, `table-replace`, `table-delrow`, `table-lockrow`, `table-addcolumn`, `table-delcolumn`, `table-columnarrangement`, `table-head`, `table-columnhead`) arbeiten auch auf `.mbdb` (TableFragments) und `.mtblj` (TableJsonFragments) — ohne Zusatzschalter:
+Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-import`, `table-replace`, `table-delrow`, `table-lockrow`, `table-addcolumn`, `table-delcolumn`, `table-columnarrangement`, `table-head`, `table-columnhead`) arbeiten auch auf `.mbdb` (TableFragments) und `.tblt` (TableTimestamp) — ohne Zusatzschalter:
 
 - Das System erkennt selbst, ob eine geeignete Fragment-Datei fortgeführt werden kann: Die letzte sauber geschlossene Fragment-Datei des eigenen Benutzers (jünger als 5 Minuten, endend mit `- EOF`) wird wiederaufgenommen: Der Writer wird direkt im Append-Modus auf diese Datei geöffnet und die neuen Änderungen werden angehängt. Damit bleiben alle Änderungen einer Aufgabenkette in EINER Fragment-Datei gebündelt.
 - Gibt es keine geeignete Fragment-Datei (zu alt, kein EOF, fremder Benutzer), legt der Befehl beim ersten Schreiben selbst eine neue Fragment-Datei an.
@@ -91,12 +91,11 @@ Alle Bearbeitungs-Befehle (`table-addrow`, `table-cellset`, `table-import`, `tab
 
 ## Roundtrip-Test (roundtrip)
 
-`bcr roundtrip <datei> [--full]` — lädt eine Datei, speichert sie ins Gegenstück-Format (altes Format <-> JSON), lädt sie zurück, speichert sie wieder im Originalformat und vergleicht bit-genau mit dem Original. Unterstützt Layouts (`.cfo`, `.bcr`) und Tabellen (`.bdb`<->`.tblj`, `.mbdb`<->`.mtblj`).
+`bcr roundtrip <datei> [--full]` — lädt eine Layout-Datei, speichert sie als JSON, lädt sie zurück, speichert sie wieder im alten Format und vergleicht bit-genau mit dem Original. Unterstützt Layouts (`.cfo`, `.bcr`).
 
 - Protokoll auf stdout; Exit-Code 0 = bit-genau identisch, 1 = Abweichung/Fehler, 2 = Benutzungsfehler.
 - Bei Abweichung: Diff-Analyse mit erster abweichender Byte-Position, Kontext davor/danach als Text (Steuerzeichen escaped: `\r`, `\n`, `\t`, `\0`) UND als Hex-Dump — damit die Ausgabe verlustfrei kopierbar ist.
 - `--full`: zusätzlich den kompletten Inhalt beider Dateien, zeilenweise (an CR getrennt) mit Byte-Offset und escapeden Steuerzeichen.
-- `.bdb`/`.mbdb` sind ZIP-Container: Deren Eintrags-Zeitstempel verhindern Bit-Identität — der Befehl vergleicht deshalb zusätzlich den entpackten Inhalt (Main.bin) separat und meldet, ob nur Container-Metadaten oder echter Inhalt abweichen.
 - Das Original wird nur gelesen; alle Zwischenschritte laufen auf temporären Kopien.
 
 ## Standard-Rezept für Aufgaben

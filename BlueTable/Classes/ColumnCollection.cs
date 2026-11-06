@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable, IJsonParseable {
+public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable {
 
     #region Fields
 
@@ -36,8 +36,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public event EventHandler<ColumnEventArgs>? ColumnRemoving;
 
     public event EventHandler? Disposed;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -186,13 +184,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public IEnumerator<ColumnItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
-            return this[key];
-        }
-        return null;
-    }
-
     public void GetSystems() {
         SysLocked = null;
         SysRowCreateDate = null;
@@ -262,39 +253,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                     }
                 }
             }
-        }
-    }
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        // SaveOrder statt Collection-Enumeration: Die Enumeration einer
-        // ConcurrentDictionary ist Hash-basiert (Kollisions-Ketten drehen sich
-        // je nach Einfüge-Reihenfolge) und damit über Lade-/Kopiervorgänge
-        // hinweg nicht stabil.
-        json.SetArrayIfNotEmpty("columns", (Table is { IsDisposed: false } tb
-            ? tb.ColumnsInSaveOrder()
-            : [.. _internal.Values]).Cast<IJsonStringable>());
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        // Spalten werden über den normalen Ladevorgang (Table.ChangeData) angelegt.
-        // Hier nur die Eigenschaften aktualisieren, falls Spalten bereits existieren.
-        if (Table is not { IsDisposed: false }) { return; }
-        if (json["columns"] is not JsonArray cols) { return; }
-
-        foreach (var item in cols) {
-            if (item is not JsonObject jo) { continue; }
-            var key = jo.GetString("key", string.Empty);
-            if (key is not { Length: > 0 }) { continue; }
-            if (this[key] is { } c) { c.ParseJson(jo); }
         }
     }
 
@@ -509,7 +467,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             ColumnPropertyChanged = null;
             ColumnRemoved = null;
             ColumnRemoving = null;
-            PropertyChangedExt = null;
 
             Table = null;
 
@@ -556,7 +513,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void OnColumnAdded(ColumnEventArgs e) {
         e.Column.PropertyChanged += OnColumnPropertyChanged;
-        e.Column.PropertyChangedExt += OnColumnPropertyChangedExt;
         e.Column.Disposed += Column_Disposed;
         ColumnAdded?.Invoke(this, e);
     }
@@ -567,16 +523,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (sender is ColumnItem ci) { ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs(ci)); }
     }
 
-    private void OnColumnPropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
-        if (sender is not ColumnItem c) { return; }
-        OnPropertyChangedExt($"Columns[{c.KeyName}].{e.RelativePath}", e.Partial);
-    }
-
     private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 
     private void OnColumnRemoving(ColumnEventArgs e) {
         e.Column.PropertyChanged -= OnColumnPropertyChanged;
-        e.Column.PropertyChangedExt -= OnColumnPropertyChangedExt;
         e.Column.Disposed -= Column_Disposed;
         ColumnRemoving?.Invoke(this, e);
     }

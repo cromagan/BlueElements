@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParseable {
+public sealed class CellCollection : IDisposableExtended, IHasTable {
 
     #region Fields
 
@@ -41,8 +41,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
     #region Events
 
     public event EventHandler? Disposed;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -192,60 +190,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         GC.SuppressFinalize(this);
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        JsonArray cells = [];
-        // ConcurrentDictionary iteriert nicht-deterministisch: Über den Cell-Key
-        // sortieren, damit identischer Inhalt immer identische Dateien erzeugt.
-        List<(string sortKey, JsonObject cell)> items = [];
-        foreach (var kvp in _internal) {
-            if (string.IsNullOrEmpty(kvp.Value.Value)) { continue; }
-            if (kvp.Key.column.IsDisposed || kvp.Key.row.IsDisposed) { continue; }
-            var cellJson = new JsonObject();
-            cellJson.Set("column", kvp.Key.column.KeyName);
-            cellJson.Set("row", kvp.Key.row.KeyName);
-            cellJson.Set("value", kvp.Value.Value);
-            items.Add((KeyOfCell(kvp.Key.column.KeyName, kvp.Key.row.KeyName), cellJson));
-        }
-
-        foreach (var (_, cell) in items.OrderBy(i => i.sortKey, StringComparer.OrdinalIgnoreCase)) {
-            cells.Add(cell);
-        }
-
-        if (cells.Count > 0) { json.Set("cells", cells); }
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        if (Table is not { IsDisposed: false } tb) { return; }
-        if (json["cells"] is not JsonArray cells) { return; }
-
-        foreach (var item in cells) {
-            if (item is not JsonObject jo) { continue; }
-            var colName = jo.GetString("column", string.Empty);
-            var rowKey = jo.GetString("row", string.Empty);
-            var value = jo.GetString("value", string.Empty);
-            if (string.IsNullOrEmpty(colName)) { continue; }
-
-            var c = tb.Column[colName];
-            if (c is null) { continue; }
-
-            var r = tb.Row.GetByKey(rowKey);
-            if (r is null) { continue; }
-
-            r.CellSetInMemory(c, value);
-        }
-    }
-
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal void Clear() => _internal.Clear();
@@ -348,7 +292,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable, IJsonParsea
         if (disposing) {
             OnDisposed();
             Disposed = null;
-            PropertyChangedExt = null;
         }
         Table = null;
         _internal.Clear();

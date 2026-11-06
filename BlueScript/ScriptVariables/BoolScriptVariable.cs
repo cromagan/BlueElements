@@ -40,7 +40,6 @@ public class BoolScriptVariable : ScriptVariable {
         set {
             if (ReadOnly) { return; }
             _valuebool = value; // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
-            OnPropertyChangedExt("value", _valuebool);
         }
     }
 

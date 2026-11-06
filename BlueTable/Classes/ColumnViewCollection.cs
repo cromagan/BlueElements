@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IJsonParseable {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable {
 
     #region Fields
 
@@ -33,8 +33,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Events
 
     public event EventHandler? Disposed;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -207,7 +205,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Add(ColumnViewItem columnViewItem, ColumnItem? insertAfterColumn) {
         columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-        columnViewItem.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
 
         var insertIndex = _internal.Count;
         if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
@@ -230,13 +227,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
-
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
-            return _internal.FirstOrDefault(i => string.Equals(i.ColumnName, key, StringComparison.OrdinalIgnoreCase));
-        }
-        return null;
-    }
 
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
@@ -295,11 +285,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         } while (true);
     }
 
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
@@ -330,120 +315,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return result;
     }
 
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("name", KeyName);
-        json.Set("showhead", ShowHead);
-        json.Set("startcollapsed", StartCollapsed);
-        json.Set("chaptersunique", ChaptersUnique);
-        json.Set("scaletofit", (int)ScaleToFit);
-        json.Set("showpin", Pin_anzeigen);
-        json.Set("showviews", Ansicht_anzeigen);
-        json.Set("showsimilarity", Ähnliche_anzeigen);
-        json.Set("showcollapsebutton", CollapseButton_anzeigen);
-        json.Set("filterrows", FilterRows);
-        json.Set("chaptercolumn", ColumnForChapter?.KeyName ?? string.Empty);
-        json.Set("quickinfo", QuickInfo);
-        json.Set("columnheadermode", (int)ColumnHeaderMode);
-        json.SetArrayIfNotEmpty("columns", _internal.Cast<IJsonStringable>());
-        json.SetArrayIfNotEmpty("contextmenuscripts", Kontextmenu_Skripte);
-        json.SetArrayIfNotEmpty("executables", Ausführbare_Skripte);
-        json.SetArrayIfNotEmpty("showalwaysfilters", Filter_immer_Anzeigen);
-        var perm = PermissionGroups_Show.SortedDistinctList();
-        perm.RemoveString(Administrator, false);
-        json.SetArrayIfNotEmpty("permissiongroups", perm);
-        return json;
-    }
-
     public void ParseFinished(string parsed) {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
         Invalidated = true;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) {
-        if (FilterRows < 0) { FilterRows = 0; }
-        if (FilterRows > 10) { FilterRows = 10; }
-        Invalidated = true;
-    }
-
-    public void ParseJson(JsonObject json) {
-        KeyName = json.GetString("name", KeyName);
-        ShowHead = json.GetBool("showhead", ShowHead);
-        StartCollapsed = json.GetBool("startcollapsed", StartCollapsed);
-        ChaptersUnique = json.GetBool("chaptersunique", ChaptersUnique);
-        Pin_anzeigen = json.GetBool("showpin", Pin_anzeigen);
-        Ansicht_anzeigen = json.GetBool("showviews", Ansicht_anzeigen);
-        Ähnliche_anzeigen = json.GetBool("showsimilarity", Ähnliche_anzeigen);
-        CollapseButton_anzeigen = json.GetBool("showcollapsebutton", CollapseButton_anzeigen);
-        ScaleToFit = json.GetEnum("scaletofit", ScaleToFit);
-        FilterRows = json.GetInt("filterrows", FilterRows);
-        // Nur bei vorhandener Key explizit übernehmen: Bei Partial-Updates
-        // (JSON-Fragmente) bedeutet das Fehlen des Keys "unverändert", ein
-        // vorhandener leerer Wert dagegen "Kapitelspalte entfernen".
-        if (json["chaptercolumn"] is not null) {
-            var chapter = json.GetString("chaptercolumn", string.Empty);
-            ColumnForChapter = chapter is { Length: > 0 } ? Table?.Column[chapter] : null;
-        }
-        QuickInfo = json.GetString("quickinfo", QuickInfo);
-        ColumnHeaderMode = json.GetEnum("columnheadermode", ColumnHeaderMode);
-        // Listen nur bei vorhandenem Key übernehmen — Partial-Updates
-        // (JSON-Fragmente) dürfen fehlende Keys nicht als "leer" werten.
-        if (json["contextmenuscripts"] is JsonArray cmsArr) { Kontextmenu_Skripte = cmsArr.ToStringList().AsReadOnly(); }
-        if (json["executables"] is JsonArray exArr) { Ausführbare_Skripte = exArr.ToStringList().AsReadOnly(); }
-        if (json["showalwaysfilters"] is JsonArray safArr) { Filter_immer_Anzeigen = safArr.ToStringList().AsReadOnly(); }
-        if (json["permissiongroups"] is JsonArray parr) {
-            _permissionGroups_show.Clear();
-            _permissionGroups_show.AddRange(parr.ToStringList());
-        }
-
-        if (Table is not null) {
-            // "columnkeys" (Legacy) und "columns" beschreiben die komplette
-            // Spaltenliste der Ansicht — bei Vorhandensein wird die interne
-            // Liste KOMPLETT ersetzt (inkl. Reihenfolge), nicht gemerged.
-            // So entfernen Partial-Updates (JSON-Fragmente) auch ausgeblendete
-            // Spalten zuverlässig.
-            var columnsReplaced = false;
-
-            if (json["columnkeys"] is JsonArray ckArr) {
-                _internal.Clear();
-                columnsReplaced = true;
-
-                foreach (var item in ckArr) {
-                    if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) {
-                        Add(new ColumnViewItem(c));
-                    }
-                }
-            }
-
-            if (json["columns"] is JsonArray colsArr) {
-                if (!columnsReplaced) { _internal.Clear(); }
-
-                foreach (var item in colsArr) {
-                    if (item is not JsonObject jo) { continue; }
-                    var colName = jo.GetString("columnname", string.Empty);
-                    if (colName is not { Length: > 0 }) { continue; }
-
-                    // Virtuelle persistente Spalte (VIR_…) über ihren Typnamen
-                    // rekonstruieren — analog zu ColumnViewItem.Create. ParseJson
-                    // übernimmt Permanent/FontHorizontal; die Column-Zuordnung
-                    // bleibt null, weil VIR_-Spalten nicht als ColumnItem existieren.
-                    if (colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) {
-                        if (ParseableItem.NewByTypeName<ColumnViewItem>(colName) is { } v) {
-                            v.ParseJson(jo);
-                            Add(v);
-                        }
-                        continue;
-                    }
-
-                    if (Table.Column[colName] is { } c) {
-                        var cvi = new ColumnViewItem(c);
-                        cvi.ParseJson(jo);
-                        Add(cvi);
-                    }
-                }
-            }
-        }
     }
 
     public bool ParseThis(string key, string value) {
@@ -595,7 +470,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             if (!want) {
                 v.PropertyChanged -= ColumnViewItem_PropertyChanged;
-                v.PropertyChangedExt -= ColumnViewItem_PropertyChangedExt;
                 _onDemand.RemoveAt(z);
                 changed = true;
             }
@@ -614,7 +488,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 Permanent = true
             };
             p.PropertyChanged += ColumnViewItem_PropertyChanged;
-            p.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
             _onDemand.Add(p);
             changed = true;
         }
@@ -622,7 +495,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (needAdd && !_internal.OfType<AddColumnItem>().Any() && !_onDemand.OfType<AddColumnItem>().Any()) {
             var a = new AddColumnItem();
             a.PropertyChanged += ColumnViewItem_PropertyChanged;
-            a.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
             _onDemand.Add(a);
             changed = true;
         }
@@ -630,7 +502,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (needSimilarity && !_internal.OfType<SimilarityColumnItem>().Any() && !_onDemand.OfType<SimilarityColumnItem>().Any()) {
             var s = new SimilarityColumnItem();
             s.PropertyChanged += ColumnViewItem_PropertyChanged;
-            s.PropertyChangedExt += ColumnViewItem_PropertyChangedExt;
             _onDemand.Add(s);
             changed = true;
         }
@@ -657,7 +528,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Remove(ColumnViewItem? columnViewItem) {
         if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
         columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
-        columnViewItem.PropertyChangedExt -= ColumnViewItem_PropertyChangedExt;
         _internal.Remove(columnViewItem);
         Invalidated = true;
     }
@@ -770,19 +640,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
-    private void ColumnViewItem_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
-        if (sender is not ColumnViewItem item) { return; }
-        var key = item.ColumnName ?? item.StorageKey ?? string.Empty;
-        OnPropertyChangedExt($"Columns[{key}].{e.RelativePath}", e.Partial);
-    }
-
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
             OnDisposed();
             Disposed = null;
-            PropertyChangedExt = null;
             Table = null;
             foreach (var item in _internal) {
                 item.Dispose();

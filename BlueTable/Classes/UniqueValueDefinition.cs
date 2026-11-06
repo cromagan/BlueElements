@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable, IJsonParseable {
+public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
 
     #region Fields
 
@@ -80,36 +80,10 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return result;
     }
 
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("type", "UniqueValueDefinition");
-        json.SetArrayIfNotEmpty("columns", _internal.Select(c => c.KeyName));
-        return json;
-    }
-
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) {
-        SortColumnsBySaveOrder();
-        KeyName = RebuildKeyName();
-    }
-
-    public void ParseJson(JsonObject json) {
-        BeginInit();
-        try {
-            if (json["columns"] is JsonArray arr) {
-                _internal.Clear();
-                foreach (var item in arr) {
-                    if (item is JsonValue v && v.TryGetValue(out string? s) && Table.Column[s] is { } c) { _internal.Add(c); }
-                }
-            }
-        } finally {
-            EndInit();
-        }
     }
 
     public override bool ParseThis(string key, string value) {

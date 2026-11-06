@@ -20,7 +20,7 @@ using static BlueScript.Classes.Script;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IHasScript, IEditable, IJsonParseable {
+public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IHasScript, IEditable {
 
     #region Fields
 
@@ -164,8 +164,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public event EventHandler<FirstEventArgs>? Loaded;
 
     public event EventHandler? Loading;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     public event EventHandler? ScriptChanged;
 
@@ -1723,43 +1721,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return UpdateScript(tableScript, scriptContent: newScript, failedReason: string.Empty, stoppedtimecount: Math.Min(20, tableScript.StoppedTimeCount));
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (IsDisposed) { return null; }
-
-        if (string.Equals(containerName, "Columns", StringComparison.OrdinalIgnoreCase)) {
-            return Column[key];
-        }
-
-        if (string.Equals(containerName, "Rows", StringComparison.OrdinalIgnoreCase)) {
-            return Row.GetByKey(key);
-        }
-
-        if (string.Equals(containerName, "Variables", StringComparison.OrdinalIgnoreCase)) {
-            return Variables.GetByKey(key);
-        }
-
-        if (string.Equals(containerName, "EventScript", StringComparison.OrdinalIgnoreCase)) {
-            return _eventScript.GetByKey(key, StringComparison.OrdinalIgnoreCase);
-        }
-
-        if (string.Equals(containerName, "UniqueValues", StringComparison.OrdinalIgnoreCase)) {
-            return _uniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, key, StringComparison.OrdinalIgnoreCase));
-        }
-
-        if (string.Equals(containerName, "SortDefinition", StringComparison.OrdinalIgnoreCase)) {
-            return _sortDefinition;
-        }
-
-        if (string.Equals(containerName, "ColumnArrangements", StringComparison.OrdinalIgnoreCase)) {
-            // Index-basiert (ältere Fragmente) oder über den Ansichtsnamen auflösen —
-            // der Name ist gegen unterschiedliche Ansicht-Reihenfolgen bei Multi-User robust.
-            if (int.TryParse(key, out var i)) { return i >= 0 && i < _columnArrangements.Count ? _columnArrangements[i] : null; }
-            return _columnArrangements.FirstOrDefault(c => string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase));
-        }
-
-        return null;
-    }
-
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
                                             CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
@@ -1938,11 +1899,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
     public void OnScriptChanged() {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
@@ -2063,243 +2019,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) { Freeze("Tabelleversions-Konflikt"); }
 
         return true;
-    }
-
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("key", KeyName);
-        json.Set("caption", _caption);
-        json.Set("creator", _creator);
-        json.Set("createdate", _createDate);
-        json.Set("version", TableVersion);
-        json.Set("assetfolder", _assetFolder);
-        json.Set("symbolfolder", _symbolFolder);
-        json.Set("globalshowpass", _globalShowPass);
-        json.Set("rowquickinfo", _rowQuickInfo);
-        json.Set("standardformulafile", _standardFormulaFile);
-        json.Set("temporarytablemasterapp", _temporaryTableMasterApp);
-        json.Set("temporarytablemasterid", _temporaryTableMasterId);
-        json.Set("temporarytablemastermachine", _temporaryTableMasterMachine);
-        json.Set("temporarytablemastertimeutc", _temporaryTableMasterTimeUtc);
-        json.Set("temporarytablemasteruser", _temporaryTableMasterUser);
-
-        json.SetArrayIfNotEmpty("tags", _tags);
-
-        // Diese Listen schreibt auch das Binärformat (TableChunk.GenerateMainChunk)
-        // sortiert und dedupliziert — hier identisch halten, damit die Formate
-        // verlustfrei ineinander überführbar sind.
-        json.SetArrayIfNotEmpty("dictionarywords", _dictionaryWords.SortedDistinctList());
-        json.SetArrayIfNotEmpty("permissiongroupsnewrow", _permissionGroupsNewRow.SortedDistinctList());
-        json.SetArrayIfNotEmpty("tableadmin", _tableAdmin.SortedDistinctList());
-        json.SetArrayIfNotEmpty("clirights", _cliRights.SortedDistinctList());
-
-        if (SortDefinition is { } sd) { json.Set("sortdefinition", sd.ParseableJson()); }
-        json.SetArrayIfNotEmpty("uniquevalues", _uniqueValues);
-        json.SetArrayIfNotEmpty("eventscript", _eventScript);
-        json.SetArrayIfNotEmpty("columnarrangements", _columnArrangements.Where(c => !c.IsDisposed));
-
-        json.Set("eventscriptversion", _eventScriptVersion);
-        json.Set("poweredittime", _powerEditTime);
-
-        if (_variables is { Count: > 0 }) {
-            json.Set("variables", new VariableCollection(_variables.ToList(), false).ParseableJson());
-        }
-
-        // Undo-History in der Listen-Reihenfolge serialisieren - die Speicher-
-        // Reihenfolge (.bdb) sortiert selbst neu, hier darf nichts umsortiert werden.
-        lock (_undoLock) {
-            if (Undo.Count > 0) {
-                JsonArray undoJson = [];
-                foreach (var thisUndo in Undo) {
-                    if (thisUndo is null) { continue; }
-                    undoJson.Add(thisUndo.ParseableJson());
-                }
-                if (undoJson.Count > 0) { json.Set("undo", undoJson); }
-            }
-        }
-
-        // Sub-Bäume (Columns, Rows, Cells) werden über die Collections serialisiert.
-        // Rows werden in Speicher-Reihenfolge ausgegeben (SortDefinition bzw. KeyName),
-        // damit eine deterministische Datei entsteht - siehe TableScriptCommand.RowsInSaveOrder().
-        if (Column is { IsDisposed: false, Count: > 0 }) { json.Set("columns", Column.ParseableJson()["columns"]?.DeepClone()); }
-        if (Row is { IsDisposed: false, Count: > 0 }) {
-            JsonArray rowsJson = [];
-            foreach (var row in RowsInSaveOrder()) { rowsJson.Add(row.ParseableJson()); }
-            if (rowsJson.Count > 0) { json.Set("rows", rowsJson); }
-        }
-        if (Cell is { IsDisposed: false } && Cell.ParseableJson() is { Count: > 0 } cells) {
-            foreach (var kvp in cells) { json.Set(kvp.Key, kvp.Value?.DeepClone()); }
-        }
-
-        return json;
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        // TableScriptCommand ist über ChangeData zentral gesteuert. Diese Implementierung
-        // spiegelt den Zustand wider, ohne die bestehenden Lade-Routinen zu
-        // ersetzen. Sie ist rein additiv und für Partial-Updates geeignet.
-        // Felder werden direkt gesetzt (analog zu ColumnItem/RowItem.ParseJson),
-        // damit beim Laden/Parsen keine Platten-Schreibvorgänge oder Undo-Einträge
-        // entstehen. Für echte Benutzeränderungen sind die öffentlichen Setter
-        // bzw. ChangeData zu verwenden.
-
-        if (IsDisposed) { return; }
-
-        #region Skalare Properties
-
-        _caption = json.GetString("caption", _caption);
-        _creator = json.GetString("creator", _creator);
-        _createDate = json.GetString("createdate", _createDate);
-        LoadedVersion = json.GetString("version", LoadedVersion);
-        _globalShowPass = json.GetString("globalshowpass", _globalShowPass);
-        // Wie beim binären Laden: Eine gesetzte Passwort-Tabelle gilt als gesperrt,
-        // die Abfrage erfolgt erst bei der Anzeige (bzw. wird von Skript/CLI abgelehnt).
-        if (!string.IsNullOrEmpty(_globalShowPass)) { Unlocked = false; }
-        _rowQuickInfo = json.GetString("rowquickinfo", _rowQuickInfo);
-        _standardFormulaFile = json.GetString("standardformulafile", _standardFormulaFile);
-        _temporaryTableMasterApp = json.GetString("temporarytablemasterapp", _temporaryTableMasterApp);
-        _temporaryTableMasterId = json.GetString("temporarytablemasterid", _temporaryTableMasterId);
-        _temporaryTableMasterMachine = json.GetString("temporarytablemastermachine", _temporaryTableMasterMachine);
-        _temporaryTableMasterTimeUtc = json.GetString("temporarytablemastertimeutc", _temporaryTableMasterTimeUtc);
-        _temporaryTableMasterUser = json.GetString("temporarytablemasteruser", _temporaryTableMasterUser);
-
-        if (json["assetfolder"] is not null) {
-            _assetFolder = json.GetString("assetfolder", _assetFolder);
-            _assetFolderTemp = null; // Cache verwerfen, da sich der Ordner geändert haben könnte
-        }
-
-        if (json["symbolfolder"] is not null) {
-            _symbolFolder = json.GetString("symbolfolder", _symbolFolder);
-            _symbolFolderTemp = null; // Cache verwerfen, da sich der Ordner geändert haben könnte
-            RegisterSymbolFolder();
-        }
-
-        if (json["poweredittime"] is JsonValue pe && pe.TryGetValue(out string? pes)) {
-            var pdt = DateTimeParse(pes);
-            if (pdt > DateTime.MinValue) { _powerEditTime = pdt; }
-        }
-
-        if (json["eventscriptversion"] is JsonValue esv && esv.TryGetValue(out string? esvs)) {
-            var esvdt = DateTimeParse(esvs);
-            if (esvdt > DateTime.MinValue) { _eventScriptVersion = esvdt; }
-        }
-
-        #endregion
-
-        #region String-Listen
-
-        if (json["tags"] is JsonArray tagsArr) {
-            _tags.Clear();
-            _tags.AddRange(tagsArr.ToStringList());
-        }
-
-        if (json["dictionarywords"] is JsonArray dwArr) {
-            _dictionaryWords.Clear();
-            _dictionaryWords.AddRange(dwArr.ToStringList());
-        }
-
-        if (json["permissiongroupsnewrow"] is JsonArray pgnrArr) {
-            _permissionGroupsNewRow.Clear();
-            _permissionGroupsNewRow.AddRange(RepairUserGroups(pgnrArr.ToStringList()));
-        }
-
-        if (json["tableadmin"] is JsonArray taArr) {
-            _tableAdmin.Clear();
-            _tableAdmin.AddRange(WithoutCliAdmin(RepairUserGroups(taArr.ToStringList())));
-        }
-
-        if (json["clirights"] is JsonArray crArr) {
-            _cliRights.Clear();
-            _cliRights.AddRange(ClassesStatic.CliRights.Repair(crArr.ToStringList()));
-        }
-
-        #endregion
-
-        #region Variablen
-
-        if (json["variables"] is JsonObject varsJson) {
-            var vars = new VariableCollection();
-            vars.ParseJson(varsJson);
-            _variables.Clear();
-            _variables.AddRange(vars.SortByKeyName());
-            _variableTmp = _variables.ToString(true);
-        }
-
-        #endregion
-
-        #region Undo-History
-
-        if (json["undo"] is JsonArray undoArr) {
-            lock (_undoLock) {
-                Undo.Clear();
-                foreach (var item in undoArr) {
-                    if (item is not JsonObject ujo) { continue; }
-                    var undoItem = new UndoItem();
-                    undoItem.ParseJson(ujo);
-                    Undo.Add(undoItem);
-                }
-            }
-            SeedLogTimeFromUndo();
-        }
-
-        #endregion
-
-        #region Struktur-Sub-Bäume (Columns, Rows, Cells)
-
-        if (json["columns"] is JsonArray) { Column?.ParseJson(json); }
-
-        if (json["rows"] is JsonArray) { Row?.ParseJson(json); }
-
-        Cell?.ParseJson(json);
-
-        #endregion
-
-        #region Definitions-Sub-Bäume (benötigen Columns)
-
-        if (json["sortdefinition"] is JsonObject sdJson) {
-            var sd = new RowSortDefinition(this, (ColumnItem?)null, false);
-            sd.ParseJson(sdJson);
-            _sortDefinition = sd;
-        }
-
-        if (json["uniquevalues"] is JsonArray uvArr) {
-            var uvs = new List<UniqueValueDefinition>();
-            foreach (var item in uvArr) {
-                if (item is not JsonObject ujo) { continue; }
-                var uv = new UniqueValueDefinition(this, string.Empty);
-                uv.ParseJson(ujo);
-                uvs.Add(uv);
-            }
-            _uniqueValues = uvs.AsReadOnly();
-        }
-
-        if (json["eventscript"] is JsonArray esArr) {
-            var scripts = new List<TableScriptDescription>();
-            foreach (var item in esArr) {
-                if (item is not JsonObject ejo) { continue; }
-                var script = new TableScriptDescription(this);
-                script.ParseJson(ejo);
-                scripts.Add(script);
-            }
-            scripts.Sort();
-            _eventScript = scripts.AsReadOnly();
-            InvalidateHeadCaches();
-        }
-
-        if (json["columnarrangements"] is JsonArray caArr) {
-            var cas = new List<ColumnViewCollection>();
-            foreach (var item in caArr) {
-                if (item is not JsonObject cjo) { continue; }
-                var cvc = new ColumnViewCollection(this, string.Empty);
-                cvc.ParseJson(cjo);
-                cas.Add(cvc);
-            }
-            _columnArrangements = cas.AsReadOnly();
-        }
-
-        #endregion
     }
 
     /// <summary>
@@ -3236,19 +2955,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Setzt die logische Uhr auf den neuesten geladenen Undo-Zeitstempel, damit neue Einträge
-    /// auch bei Uhrversatz (Multi-User) danach liegen.
-    /// </summary>
-    private void SeedLogTimeFromUndo() {
-        lock (_undoLock) {
-            foreach (var item in Undo) {
-                if (item is null) { continue; }
-                if (item.DateTimeUtc > _lastChangeUtc) { _lastChangeUtc = item.DateTimeUtc; }
-            }
-        }
-    }
-
     private void UnregisterEvents() {
         try {
             // Column Events
@@ -3267,7 +2973,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             SortParameterChanged = null;
             ViewChanged = null;
             CellValueChanged = null;
-            PropertyChangedExt = null;
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Abmelden der Events", ex);
         }

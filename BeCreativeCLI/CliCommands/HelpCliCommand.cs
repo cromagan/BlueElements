@@ -15,7 +15,7 @@ public class HelpCliCommand : CliCommand {
     public override List<string> Flags => ["dev"];
     public override string Syntax => "bcr help [befehl]";
 
-    public override string? HelpDetails => "Ohne <befehl> werden alle Befehle mit ihrer Beschreibung gelistet. Mit --dev werden zusätzlich die internen Befehle (z. B. roundtrip, fragmenttest) gelistet.";
+    public override string? HelpDetails => "Ohne <befehl> werden alle Befehle mit ihrer Beschreibung gelistet. Mit --dev werden zusätzlich die internen Befehle (z. B. roundtrip) gelistet.";
 
     #endregion
 

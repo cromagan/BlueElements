@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.IO;
-using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using BlueTable.EventArgs;
 
@@ -22,7 +21,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Dateiendungen, die als Tabelle geladen werden dürfen — oder der Name ganz ohne Endung.
     /// </summary>
-    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "mbdb", "tblh", "tblj", "mtblj", "tblt" };
+    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "mbdb", "tblh", "tblt" };
 
     #endregion
 
@@ -179,17 +178,17 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Tabelle per Kommandozeile bearbeitet werden kann.
-    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb),
-    /// TableJsonFragments (.mtblj) und TableTimestamp (.tblt) führen automatisch
-    /// die jüngste, sauber mit EOF abgeschlossene Fragment-Datei des eigenen
-    /// Benutzers fort (jünger als 5 Minuten; neue Änderungen werden per Append
-    /// angehängt). Gibt es keine, legt das System beim ersten Schreiben eine
-    /// neue Fragment-Datei an. Das Öffnen hängt sofort einen CONTINUED-Marker an,
-    /// damit kein zweiter Prozess dieselbe Datei zum Schreiben öffnen kann.
+    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb) und
+    /// TableTimestamp (.tblt) führen automatisch die jüngste, sauber mit EOF
+    /// abgeschlossene Fragment-Datei des eigenen Benutzers fort (jünger als
+    /// 5 Minuten; neue Änderungen werden per Append angehängt). Gibt es keine,
+    /// legt das System beim ersten Schreiben eine neue Fragment-Datei an.
+    /// Das Öffnen hängt sofort einen CONTINUED-Marker an, damit kein zweiter
+    /// Prozess dieselbe Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
-        if (tbl is not (TableFragments or TableJsonFragments or TableTimestamp)) { return null; }
+        if (tbl is not (TableFragments or TableTimestamp)) { return null; }
 
         // Geeignete Fragment-Datei automatisch erkennen (EOF am Ende, eigener Benutzer,
         // jünger als 5 Minuten); ohne Fund startet der Writer eine neue Datei.
@@ -199,7 +198,6 @@ public abstract class CliCommand : IHasKeyName {
 
         var f = tbl switch {
             TableFragments tf => tf.ContinueFragment(fragmentFile),
-            TableJsonFragments tjf => tjf.ContinueFragment(fragmentFile),
             TableTimestamp tt => tt.ContinueFragment(fragmentFile),
             _ => "Nicht unterstützter Fragment-Tabellentyp."
         };
@@ -208,8 +206,7 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Prüft, ob die Fragment-Datei mit dem EOF-Marker endet: binär die Zeile "- EOF",
-    /// JSON ein Objekt mit "_meta": "eof".
+    /// Prüft, ob die Fragment-Datei mit dem binären EOF-Marker ("- EOF") endet.
     /// </summary>
     protected static bool FragmentEndsAtEof(string filename, string suffix) {
         try {
@@ -230,10 +227,6 @@ public abstract class CliCommand : IHasKeyName {
 
             if (line is null) { return false; }
 
-            if (suffix == "frj") {
-                return JsonNode.Parse(line) is JsonObject eof && eof["_meta"]?.GetValue<string>() == "eof";
-            }
-
             return line.TrimEnd() == "- EOF";
         } catch {
             // Unlesbare Datei (z. B. exklusiv gesperrt) überspringen.
@@ -252,12 +245,7 @@ public abstract class CliCommand : IHasKeyName {
             for (var i = 0; i < 10; i++) {
                 if (reader.ReadLine() is not { Length: > 0 } line) { break; }
 
-                if (suffix == "frj") {
-                    // NDJSON-Steuerzeile: {"_meta":"header","version":...,"filename":...,"user":...}
-                    if (JsonNode.Parse(line) is JsonObject header && header["user"] is { } jsonUser) {
-                        return jsonUser.GetValue<string>().Equals(user, StringComparison.OrdinalIgnoreCase);
-                    }
-                } else if (line.StartsWith("- User ", StringComparison.OrdinalIgnoreCase)) {
+                if (line.StartsWith("- User ", StringComparison.OrdinalIgnoreCase)) {
                     return line["- User ".Length..].Trim().Equals(user, StringComparison.OrdinalIgnoreCase);
                 }
             }
@@ -336,7 +324,7 @@ public abstract class CliCommand : IHasKeyName {
         var suffix = name.FileSuffix();
 
         if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblj, .mtblj, .tblt (oder ganz ohne Endung).");
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblt (oder ganz ohne Endung).");
             return null;
         }
 
@@ -388,7 +376,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Liefert die jüngste, sauber mit EOF abgeschlossene Fragment-Datei der Tabelle,
     /// die dieser Benutzer zuletzt genutzt hat — oder null. Nur Dateien jünger als
-    /// 5 Minuten gelten. Unterstützt binäre (.frg) und JSON-Fragmente (.frj).
+    /// 5 Minuten gelten.
     /// </summary>
     protected static string? NewestFragmentOf(Table tbl) {
         string directory;
@@ -398,11 +386,6 @@ public abstract class CliCommand : IHasKeyName {
             case TableFragments tf:
                 directory = tf.FragmengtsPath();
                 suffix = TableFragments.SuffixOfFragments;
-                break;
-
-            case TableJsonFragments tjf:
-                directory = tjf.FragmengtsPath();
-                suffix = TableJsonFragments.SuffixOfJsonFragments;
                 break;
 
             case TableTimestamp tt:

@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable, IJsonParseable {
+public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable {
 
     #region Fields
 
@@ -37,8 +37,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     public event EventHandler? Disposed;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -195,8 +193,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         return string.Empty;
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) => null;
-
     /// <summary>
     /// QuickImage-Code des Kopf-Buttons der Spalte oder null, wenn kein
     /// Button angezeigt wird. Die Basis liefert den Fehler-Button für
@@ -225,11 +221,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
 
-    public void OnPropertyChangedExt(string relativePath, object? value) {
-        if (IsDisposed || string.IsNullOrEmpty(relativePath)) { return; }
-        PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
-    }
-
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
@@ -240,34 +231,8 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         return result;
     }
 
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("columnname", ColumnName);
-        json.Set("permanent", Permanent);
-        json.Set("fonthorizontal", Horizontal);
-        if (IsExpanded is false) { json.Set("isexpanded", IsExpanded); }
-        return json;
-    }
-
     public void ParseFinished(string parsed) {
         // Keine Nachbearbeitung mehr nötig — Permanent hat einen gültigen Default.
-    }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        Permanent = json.GetBool("permanent", Permanent);
-        Horizontal = json.GetBool("fonthorizontal", Horizontal);
-        IsExpanded = json.GetBool("isexpanded", IsExpanded);
-
-        var colName = json.GetString("columnname", string.Empty);
-        if (colName is { Length: > 0 } && Table is { IsDisposed: false } tb) {
-            Column = tb.Column[colName];
-            if (Column is null) {
-                // Schlüssel merken, damit Repair den Verweis später erneut auflösen kann.
-                ColumnName = colName;
-            }
-        }
     }
 
     public bool ParseThis(string key, string value) {
@@ -350,7 +315,6 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
             OnDisposed();
             Disposed = null;
             PropertyChanged = null;
-            PropertyChangedExt = null;
             Column = null;
         }
     }

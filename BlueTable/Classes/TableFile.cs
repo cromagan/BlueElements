@@ -684,7 +684,7 @@ public class TableFile : Table {
         var suffixTypes = BuildSuffixTypeMap();
 
         if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblj, .mtblj, .tblt");
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblt");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -718,8 +718,6 @@ public class TableFile : Table {
         [".bdb"] = typeof(TableFile),
         [".mbdb"] = typeof(TableFragments),
         [".tblh"] = typeof(TableChunk),
-        [".tblj"] = typeof(TableJsonFile),
-        [".mtblj"] = typeof(TableJsonFragments),
         [".tblt"] = typeof(TableTimestamp)
     };
 

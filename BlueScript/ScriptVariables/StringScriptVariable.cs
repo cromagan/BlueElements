@@ -62,7 +62,6 @@ public class StringScriptVariable : ScriptVariable {
                 return;
             }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
-            OnPropertyChangedExt("value", _valueString);
         }
     }
 

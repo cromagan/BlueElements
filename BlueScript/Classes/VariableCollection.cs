@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 
 namespace BlueScript.ScriptVariables;
 
-public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParseable, IJsonParseable {
+public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParseable {
 
     #region Fields
 
@@ -30,12 +30,6 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         }
         ReadOnly = readOnly;
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler<JsonPathChangedEventArgs>? PropertyChangedExt;
 
     #endregion
 
@@ -100,7 +94,6 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         if (variable is null) { return false; }
 
         if (!_internal.TryAdd(variable.KeyName, variable)) { return false; }
-        variable.PropertyChangedExt += Variable_PropertyChangedExt;
         InvalidateCache();
         return true;
     }
@@ -191,16 +184,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         return vf.ValueString;
     }
 
-    public IJsonParseable? GetSubItemByKey(string containerName, string key) {
-        if (string.Equals(containerName, "Variables", StringComparison.OrdinalIgnoreCase)) {
-            return GetByKey(key);
-        }
-        return null;
-    }
-
     public string IsNowEditable() => string.Empty;
-
-    public void OnPropertyChangedExt(string relativePath, object? value) => PropertyChangedExt?.Invoke(this, this.BuildSubItemEventArgs(relativePath, value));
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -211,26 +195,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         return result;
     }
 
-    public JsonObject ParseableJson() {
-        var json = new JsonObject();
-        json.Set("readonly", ReadOnly);
-        json.SetArrayIfNotEmpty("variables", _internal.Values);
-        return json;
-    }
-
     public void ParseFinished(string parsed) { }
-
-    public void ParseFinishedJson(JsonObject parsed) { }
-
-    public void ParseJson(JsonObject json) {
-        ReadOnly = json.GetBool("readonly", ReadOnly);
-
-        // Ein geliefertes "variables"-Array ist der komplette neue Zustand
-        // (inkl. wegfallender Variablen); ohne Array nur den ReadOnly-Flag mergen.
-        if (json["variables"] is JsonArray) {
-            ReplaceWith(json.GetList<ScriptVariable>("variables", false));
-        }
-    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -250,8 +215,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     public bool Remove(string keyName) {
         if (ReadOnly) { return false; }
 
-        if (!_internal.TryRemove(keyName, out var v)) { return false; }
-        v.PropertyChangedExt -= Variable_PropertyChangedExt;
+        if (!_internal.TryRemove(keyName, out _)) { return false; }
         InvalidateCache();
         return true;
     }
@@ -262,8 +226,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         var changed = false;
         foreach (var kvp in _internal) {
             if (kvp.Value.Comment.Contains(comment)) {
-                _internal.TryRemove(kvp.Key, out var v);
-                v?.PropertyChangedExt -= Variable_PropertyChangedExt;
+                _internal.TryRemove(kvp.Key, out _);
                 changed = true;
             }
         }
@@ -279,8 +242,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
 
     /// <summary>
     /// Ersetzt den kompletten Inhalt durch die übergebenen Variablen.
-    /// Die Collection-Instanz bleibt erhalten, damit Pfad-Auflösungen
-    /// (IJsonParseable.GetSubItemByKey) stets dasselbe Objekt liefern.
+    /// Die Collection-Instanz bleibt erhalten.
     /// Gleichnamige Variablen behalten, wenn möglich, ihre Instanz
     /// (Wert und Kommentar werden übernommen), damit bestehende Referenzen gültig bleiben.
     /// </summary>
@@ -455,9 +417,6 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     internal void Clear() {
         if (ReadOnly) { return; }
 
-        foreach (var v in _internal.Values) {
-            v.PropertyChangedExt -= Variable_PropertyChangedExt;
-        }
         _internal.Clear();
         InvalidateCache();
     }
@@ -465,11 +424,6 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
     private void InvalidateCache() => _cachedStringableNames = null;
-
-    private void Variable_PropertyChangedExt(object? sender, JsonPathChangedEventArgs e) {
-        if (sender is not ScriptVariable v) { return; }
-        OnPropertyChangedExt($"Variables[{v.KeyName}].{e.RelativePath}", e.Partial);
-    }
 
     #endregion
 }

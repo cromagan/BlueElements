@@ -159,9 +159,8 @@ public class TableFragments : TableFile {
     }
 
     /// <summary>
-    /// Bereitet die Fortführung einer mit "- EOF" abgeschlossenen Fragment-Datei vor.
-    /// Öffnet den Writer im Append-Modus auf diese Datei und markiert sie sofort mit
-    /// "- CONTINUED", damit kein zweiter Prozess Schreibzugriff auf dieselbe Datei erhält.
+    /// Bereitet die Fortführung einer mit "- EOF" abgeschlossenen Fragment-Datei vor:
+    /// Ordner- und Existenzprüfung, Writer-Übernahme und Kennzeichnung als eigene Datei.
     /// Liefert bei Problemen die Fehlermeldung, sonst leer.
     /// </summary>
     public string ContinueFragment(string fragmentFilename) {
@@ -177,25 +176,37 @@ public class TableFragments : TableFile {
         _myFragmentsFilename = fragmentFilename;
         CanDeleteWriter = false;
 
+        var error = ContinueFragment(fragmentFilename, "- CONTINUED", out var writer);
+        _writer = writer;
+        return error;
+    }
+
+    /// <summary>
+    /// Öffnet die Fragment-Datei im Append-Modus und markiert sie sofort als "in Bearbeitung",
+    /// damit kein zweiter Prozess Schreibzugriff auf dieselbe Datei erhält.
+    /// Liefert bei Problemen die Fehlermeldung, sonst leer.
+    /// </summary>
+    public static string ContinueFragment(string fragmentFilename, string markerLine, out System.IO.StreamWriter? writer) {
+        writer = null;
         if (Develop.AllReadOnly) { return string.Empty; }
 
         System.IO.FileStream? fileStream = null;
         try {
-            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
-            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
+            fileStream = new System.IO.FileStream(fragmentFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+            writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
             fileStream = null;
 
-            _writer.AutoFlush = true;
+            writer.AutoFlush = true;
 
-            // Sofort als "in Bearbeitung" markieren: Die Datei endet damit nicht
-            // mehr auf "- EOF", also wählt kein weiterer Prozess sie zur Fortführung.
-            _writer.WriteLine("- CONTINUED");
+            // Der Marker sorgt dafür, dass die Datei nicht mehr auf dem EOF-Marker
+            // endet und somit von keinem weiteren Prozess zur Fortführung gewählt wird.
+            writer.WriteLine(markerLine);
 
             return string.Empty;
         } catch (Exception ex) {
             fileStream?.Dispose();
-            _writer?.Dispose();
-            _writer = null;
+            writer?.Dispose();
+            writer = null;
 
             return ex.Message;
         }

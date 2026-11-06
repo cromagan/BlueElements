@@ -58,7 +58,6 @@ public class DoubleScriptVariable : ScriptVariable {
         set {
             if (ReadOnly) { return; }
             _double = Math.Round(value, 5, MidpointRounding.AwayFromZero);
-            OnPropertyChangedExt("value", _double);
         }
     }
 

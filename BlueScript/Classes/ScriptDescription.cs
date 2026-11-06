@@ -128,8 +128,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     /// <summary>
     /// Die beim letzten Skriptlauf gespeicherten Variablen. Die Instanz ist
     /// fest mit dem Skript verbunden; der Inhalt wird per ReplaceWith
-    /// ausgetauscht, damit Pfad-Auflösungen (IJsonParseable.GetSubItemByKey)
-    /// stets dasselbe Objekt liefern.
+    /// ausgetauscht, damit bestehende Referenzen stets dasselbe Objekt sehen.
     /// </summary>
     public VariableCollection SavedVariables { get; } = [];
 

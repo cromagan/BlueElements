@@ -42,7 +42,6 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
         set {
             if (_comment == value) { return; }
             _comment = value;
-            OnPropertyChangedExt("comment", _comment);
         }
     }
 
@@ -63,7 +62,6 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
             value = value.ToUpperInvariant();
             if (field == value) { return; }
             field = value;
-            OnPropertyChangedExt("key", field);
         }
     }
 

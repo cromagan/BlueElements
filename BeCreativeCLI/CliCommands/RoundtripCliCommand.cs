@@ -10,7 +10,7 @@ using BlueControls.PadItems;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Intern: Lädt eine Datei, serialisiert sie ins Gegenstück-Format (alt &lt;-&gt; JSON), lädt das Ergebnis erneut und vergleicht bit-genau mit dem Original.
+/// Intern: Lädt eine Layout-Datei, serialisiert sie ins Gegenstück-Format (alt &lt;-&gt; JSON), lädt das Ergebnis erneut und vergleicht bit-genau mit dem Original.
 /// </summary>
 public class RoundtripCliCommand : CliCommand {
 
@@ -23,7 +23,7 @@ public class RoundtripCliCommand : CliCommand {
 
     public override string? HelpDetails =>
         "--full gibt bei Abweichung zusätzlich den kompletten Inhalt beider Dateien aus (Steuerzeichen escaped). " +
-        "ZIP-Container (.bdb/.mbdb) werden zusätzlich entpackt verglichen (Main.bin), da deren Eintrags-Zeitstempel keine Tabellendaten sind.";
+        "Unterstützt werden Layout-Dateien (.cfo/.bcr).";
 
     #endregion
 
@@ -71,14 +71,8 @@ public class RoundtripCliCommand : CliCommand {
             case "BCR":
                 return ProcessLayoutFile(filename, suffix, origBytes, full);
 
-            case "BDB":
-            case "TBLJ":
-            case "MBDB":
-            case "MTBLJ":
-                return ProcessTableFile(filename, suffix, origBytes, full);
-
             default:
-                Console.Error.WriteLine("Unbekannter Dateityp: '" + suffix + "'. Unterstützt: .cfo, .bcr, .bdb, .tblj, .mbdb, .mtblj");
+                Console.Error.WriteLine("Unbekannter Dateityp: '" + suffix + "'. Unterstützt: .cfo, .bcr");
                 return 2;
         }
     }
@@ -108,36 +102,12 @@ public class RoundtripCliCommand : CliCommand {
 
     /// <summary>
     /// Vergleicht Original und Roundtrip. Liefert 0 bei Identität, ansonsten 1.
-    /// ZIP-Container (bdb/mbdb) werden entpackt verglichen, da ihre Eintrags-
-    /// Zeitstempel und sonstigen ZIP-Metadaten keine Tabellendaten sind.
     /// </summary>
     private static int Compare(byte[] original, byte[] roundtrip, bool full) {
         if (original.SequenceEqual(roundtrip)) {
             Out(string.Empty);
             Out("*** ERFOLG: Beide Dateien sind bit-genau identisch. ***");
             return 0;
-        }
-
-        if (original.IsZipped() && roundtrip.IsZipped()
-            && original.UnzipIt() is { } origMain
-            && roundtrip.UnzipIt() is { } rtMain) {
-
-            if (origMain.SequenceEqual(rtMain)) {
-                Out(string.Empty);
-                Out("*** ERFOLG: Der entpackte Inhalt (Main.bin) ist identisch. ***");
-                Out("Die Dateien unterscheiden sich nur in den ZIP-Metadaten (z. B. Eintrags-Zeitstempel).");
-                return 0;
-            }
-
-            Out(string.Empty);
-            Out("*** WARNUNG: Der entpackte Inhalt (Main.bin) UNTERSCHIEDET SICH: ***");
-            GenerateDiffReport(origMain, rtMain);
-
-            if (full) {
-                DumpFull("Original", original);
-                DumpFull("Roundtrip", roundtrip);
-            }
-            return 1;
         }
 
         Out(string.Empty);
@@ -156,43 +126,14 @@ public class RoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Erzeugt eine TableFile-Instanz passend zum Suffix, gefüllt mit den Daten
-    /// der Quelltabelle. Liefert null für unbekannte Suffixe.
-    /// </summary>
-    private static TableFile? CreateTableFile(string filename, string suffix, Table source) {
-        switch (suffix.ToUpperInvariant()) {
-            case "BDB":
-                return new TableFile(filename, source);
-
-            case "MBDB":
-                return new TableFragments(filename, source);
-
-            case "MTBLJ":
-                return new TableJsonFragments(filename, source);
-
-            case "TBLJ":
-                return new TableJsonFile(filename, source);
-
-            default:
-                return null;
-        }
-    }
-
-    /// <summary>
     /// Gibt den kompletten Inhalt aus, zerlegt an CR. Alle Steuerzeichen sind
-    /// escaped (\r, \n, \t, \0). ZIP-Container werden zusätzlich entpackt ausgegeben.
+    /// escaped (\r, \n, \t, \0).
     /// </summary>
     private static void DumpFull(string caption, byte[] bytes) {
         Out(string.Empty);
         Out("--- Kompletter Inhalt: " + caption + " (" + bytes.Length + " Bytes) ---");
 
         DumpLines(bytes);
-
-        if (bytes.IsZipped() && bytes.UnzipIt() is { } main) {
-            Out(string.Empty);
-            Out("--- Kompletter Inhalt: " + caption + ", entpackt (Main.bin, " + main.Length + " Bytes) ---");
-            DumpLines(main);
-        }
     }
 
     private static void DumpLines(byte[] bytes) {
@@ -259,26 +200,6 @@ public class RoundtripCliCommand : CliCommand {
 
         Out("Anzahl unterschiedlicher Bytes im gemeinsamen Bereich (0.." + (minLen - 1) + "): " + diffCount);
         Out("Größenunterschied: " + Math.Abs(original.Length - roundtrip.Length) + " Bytes");
-    }
-
-    /// <summary>
-    /// Gegenstück-Format des Roundtrips: Binär &lt;-&gt; JSON,
-    /// Fragment-Binär &lt;-&gt; Fragment-JSON.
-    /// </summary>
-    private static string JsonCounterpartOf(string suffix) {
-        switch (suffix.ToUpperInvariant()) {
-            case "MBDB":
-                return "mtblj";
-
-            case "MTBLJ":
-                return "mbdb";
-
-            case "TBLJ":
-                return "bdb";
-
-            default:
-                return "tblj"; // BDB -> TBLJ
-        }
     }
 
     private static void Out(string text) => Console.Out.WriteLine(text);
@@ -432,169 +353,5 @@ public class RoundtripCliCommand : CliCommand {
         }
     }
 
-    /// <summary>
-    /// Tabellen: Original laden, im Gegenstück-Format (JSON &lt;-&gt; Binär)
-    /// speichern, neu laden, im Originalformat speichern, bit-genau vergleichen.
-    /// </summary>
-    private static int ProcessTableFile(string filename, string suffix, byte[] origBytes, bool full) {
-        var jsonSuffix = JsonCounterpartOf(suffix);
-        var baseName = filename.FileNameWithoutSuffix();
-        // Windows-Temp, pro Lauf ein eigenes Unterverzeichnis: Der Tabellenname
-        // folgt dem Dateinamen — würde TempFile bei Kollision einen Counter an den
-        // Namen hängen, verfälscht das Key und Undo-Einträge (Schein-Diffs).
-        var tempDir = Path.Combine(Path.GetTempPath(), "Roundtrip",
-            DateTime.UtcNow.ToString("yyyyMMdd_HHmmssFF", CultureInfo.InvariantCulture));
-
-        var tempJson = TempFile(tempDir, baseName + "_json", jsonSuffix);
-        // Ausgabedatei mit dem ORIGINALNamen: Der Tabellenname folgt dem Dateinamen,
-        // ein anderer Name würde die Undo-Einträge verfälschen und Schein-Diffs erzeugen.
-        var tempOut = TempFile(tempDir, baseName, suffix.ToLowerInvariant());
-        // Kopien wie beim Layout-Roundtrip: LiveInstanceCache dazu zwingen,
-        // neu von Platte zu laden; Live-Instanzen unangetastet lassen.
-        var origCopy = TempFile(tempDir, baseName + "_orig", suffix.ToLowerInvariant());
-        var tempJsonCopy = TempFile(tempDir, baseName + "_jsoncp", jsonSuffix);
-
-        try {
-            #region Schritt 0: Originaldatei kopieren
-
-            Out("--- Schritt 0: Originaldatei in Temp-Bereich kopieren ---");
-
-            if (!FileCopy(filename, origCopy, false)) {
-                Out("FEHLER: Originaldatei konnte nicht kopiert werden.");
-                return 1;
-            }
-
-            #endregion
-
-            #region Schritt 1 und 2: Original laden, im Gegenstück-Format speichern
-
-            var origTable = Table.Get(origCopy);
-
-            if (origTable is null) {
-                Out("FEHLER: Tabelle konnte nicht geladen werden.");
-                return 1;
-            }
-
-            // Bit-Vergleich: Veraltete Zeilen dürfen während des Roundtrips weder
-            // neu berechnet noch mit Changer/Datum neu gestempelt werden.
-            origTable.PauseTimer();
-
-            using (origTable) {
-                Out("--- Schritt 1: Original laden ---");
-                Out("Zeilen : " + origTable.Row.Count);
-                Out("Spalten: " + origTable.Column.Count);
-                Out("Spalten-Ordnung: " + string.Join(", ", origTable.Column.Select(c => c.KeyName)));
-                Out("Save-Ordnung   : " + string.Join(", ", origTable.ColumnsInSaveOrder().Select(c => c.KeyName)));
-
-                Out(string.Empty);
-                Out("--- Schritt 2: Als ." + jsonSuffix + " speichern ---");
-
-                var jsonTable = CreateTableFile(tempJson, jsonSuffix, origTable);
-
-                if (jsonTable is null) {
-                    Out("FEHLER: Kein Tabellentyp für Suffix '" + jsonSuffix + "'.");
-                    return 1;
-                }
-
-                // Der Prüftimer scannt alle geladenen Tabellen — auch diese pausieren.
-                jsonTable.PauseTimer();
-
-                using (jsonTable) {
-                    Out("Ziel-Ordnung   : " + string.Join(", ", jsonTable.Column.Select(c => c.KeyName)));
-                    var saveResult = jsonTable.Save();
-
-                    if (saveResult.IsFailed) {
-                        Out("FEHLER beim Speichern der " + jsonSuffix + "-Datei: " + (saveResult.FailedReason ?? "Unbekannter Fehler"));
-                        return 1;
-                    }
-                }
-
-                Out("Temp-Datei 1 (" + jsonSuffix + "): " + tempJson);
-                Out(jsonSuffix.ToUpperInvariant() + "-Größe: " + (GetFileInfo(tempJson)?.Length ?? 0) + " Bytes");
-            }
-
-            #endregion
-
-            #region Schritt 3 und 4: Neu laden, im Originalformat speichern
-
-            if (!FileCopy(tempJson, tempJsonCopy, false)) {
-                Out("FEHLER: Zwischendatei konnte nicht kopiert werden.");
-                return 1;
-            }
-
-            var loadedTable = Table.Get(tempJsonCopy);
-
-            if (loadedTable is null) {
-                Out("FEHLER: " + jsonSuffix + "-Datei konnte nicht geladen werden.");
-                return 1;
-            }
-
-            loadedTable.PauseTimer();
-
-            using (loadedTable) {
-                Out(string.Empty);
-                Out("--- Schritt 3: ." + jsonSuffix + " laden ---");
-                Out("Geladene Zeilen : " + loadedTable.Row.Count);
-                Out("Geladene Spalten: " + loadedTable.Column.Count);
-                Out("Spalten-Ordnung: " + string.Join(", ", loadedTable.Column.Select(c => c.KeyName)));
-
-                Out(string.Empty);
-                Out("--- Schritt 4: Als ." + suffix.ToLowerInvariant() + " speichern ---");
-
-                var outTable = CreateTableFile(tempOut, suffix, loadedTable);
-
-                if (outTable is null) {
-                    Out("FEHLER: Kein Tabellentyp für Suffix '" + suffix + "'.");
-                    return 1;
-                }
-
-                outTable.PauseTimer();
-
-                using (outTable) {
-                    var outResult = outTable.Save();
-
-                    if (outResult.IsFailed) {
-                        Out("FEHLER beim Speichern der Ausgabedatei: " + (outResult.FailedReason ?? "Unbekannter Fehler"));
-                        return 1;
-                    }
-                }
-
-                Out("Temp-Datei 2: " + tempOut);
-            }
-
-            #endregion
-
-            #region Schritt 5: Bit-genauer Vergleich
-
-            Out(string.Empty);
-            Out("--- Schritt 5: Bit-Vergleich Original vs. Roundtrip ---");
-
-            var tempResult = ReadAllBytes(tempOut, 10);
-
-            if (tempResult.IsFailed || tempResult.Value is not byte[] outBytes) {
-                Out("FEHLER: Ausgabedatei konnte nicht gelesen werden: " + (tempResult.FailedReason ?? "Unbekannter Fehler"));
-                return 1;
-            }
-
-            Out("Original : " + origBytes.Length + " Bytes");
-            Out("Roundtrip: " + outBytes.Length + " Bytes");
-
-            var compareResult = Compare(origBytes, outBytes, full);
-
-            Out(string.Empty);
-            Out("Temp-Dateien (bleiben zur Analyse liegen):");
-            Out("  JSON : " + tempJson);
-            Out("  Roundtrip: " + tempOut);
-
-            return compareResult;
-
-            #endregion
-        } finally {
-            DeleteFile(origCopy, false);
-            DeleteFile(tempJsonCopy, false);
-        }
-    }
-
     #endregion
 }
-
