@@ -6,16 +6,33 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
-public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable {
+public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable, IFragmentStoreable {
     /// <summary>
     /// Fehlergrund einer fehlgeschlagenen Zeile samt Zeitpunkt des Fehlschlags.
     /// </summary>
     public readonly record struct FailedRowEntry(string Reason, DateTime FailedUtc);
+
+    #region Enums
+
+    /// <summary>
+    /// Pfad-Typen der Zeilensammlung im binären Fragment-Format.
+    /// Nur der Sammlung selbst bekannt.
+    /// </summary>
+    private enum RowCollectionFragmentType : byte {
+
+        /// <summary>
+        /// Navigation in eine Zeile (Key = RowKey).
+        /// </summary>
+        SubRow = 210
+    }
+
+    #endregion
 
     #region Fields
 
@@ -892,6 +909,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var targetRow = new RowItem(tb, sourceRow.KeyName);
             if (!target._internal.TryAdd(targetRow.KeyName, targetRow)) { continue; }
 
+            // Zeile als Fragment-Kind verdrahten (Crumb = SubRow, Key = RowKey)
+            target.RegisterEvents(RowCollectionFragmentType.SubRow, targetRow);
+
             sourceRow.CopyTo(targetRow, tb.Column);
         }
     }
@@ -907,6 +927,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             row = new RowItem(tb, rowkey);
 
             if (!_internal.TryAdd(row.KeyName, row)) { return OperationResult.Failed("Hinzufügen fehlgeschlagen."); }
+
+            // Zeile als Fragment-Kind verdrahten (Crumb = SubRow, Key = RowKey)
+            this.RegisterEvents(RowCollectionFragmentType.SubRow, row);
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) {
                 OnRowAdded(new RowEventArgs(row));
@@ -944,6 +967,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (!_internal.TryRemove(row.KeyName, out _)) { return OperationResult.Failed("Löschen nicht erfolgreich"); }
+
+            // Bubbling der entfernten Zeile abmelden, bevor sie verworfen wird
+            this.UnregisterEvents(RowCollectionFragmentType.SubRow, row);
 
             row.Dispose();
 
@@ -1033,6 +1059,75 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         e.Row.RowChecked -= OnRowChecked;
         if (Table is { IsEventsSuppressed: true }) { return; }
         RowRemoving?.Invoke(this, e);
+    }
+
+    #endregion
+
+    #region FragmentChanged
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Schreibt alle Zeilen nach RowKey sortiert: je Zeile ein SubRow-Satz
+    /// (Key = RowKey), darunter der Zeilen-Block eine Ebene tiefer.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+
+        var allok = true;
+
+        foreach (var row in this.OrderBy(r => r.KeyName)) {
+            if (row is null || row.IsDisposed) { continue; }
+
+            allok &= FragmentRecord.Append(stream, depth, RowCollectionFragmentType.SubRow, row);
+        }
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Zeilen-Block: Der SubRow-Satz benennt die Zeile — der
+    /// Empfänger wird gesucht, notfalls erzeugt, und liest seinen Block eine Ebene
+    /// tiefer selbst.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        if (IsDisposed) { return false; }
+
+        switch ((RowCollectionFragmentType)record.LeafType) {
+            case RowCollectionFragmentType.SubRow:
+                if (RowCreateOrGet(record.StringContent) is not { } row) { return false; }
+
+                return row.Deserialize(stream, record.Depth + 1);
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                return true;
+        }
+    }
+
+    /// <summary>
+    /// Liefert die Zeile des benannten RowKeys; fehlende Zeilen werden angelegt.
+    /// </summary>
+    public RowItem? RowCreateOrGet(string keyName) {
+        if (Table is not { IsDisposed: false } tb) { return null; }
+
+        if (GetByKey(keyName) is { IsDisposed: false } row) { return row; }
+
+        return tb.Row.ExecuteCommand(TableDataType.Command_AddRow, keyName, ChangeFlags.IgnoreFreeze, null, null).IsFailed
+            ? null
+            : GetByKey(keyName);
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
     }
 
     #endregion

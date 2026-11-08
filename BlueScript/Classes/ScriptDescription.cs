@@ -209,7 +209,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
         }
     }
 
-    public virtual void ParseFinished(string parsed) { }
+    public virtual bool ParseFinished() => true;
 
     public virtual bool ParseThis(string key, string value) {
         switch (key) {

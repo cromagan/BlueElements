@@ -2,12 +2,40 @@
 
 using BlueTable.EventArgs;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace BlueTable.Classes;
 
-public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable, IErrorCheckable {
+public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasKeyName, IHasTable, IErrorCheckable, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Empfänger-Typen des Ansichts-Eintrags im binären Fragment-Format.
+    /// Nur dem Eintrag selbst bekannt.
+    /// </summary>
+    private enum ViewItemFragmentType : byte {
+
+        /// <summary>
+        /// Eintrag dauerhaft anzeigen.
+        /// </summary>
+        Permanent = 1,
+
+        /// <summary>
+        /// Spaltenbeschriftung horizontal drehen.
+        /// </summary>
+        FontHorizontal = 2,
+
+        /// <summary>
+        /// Schlüssel des Eintrags; erster Satz des Blocks, die Empfänger-Fabrik
+        /// baut das Objekt daraus.
+        /// </summary>
+        KeyName = 3
+    }
+
+    #endregion
 
     #region Fields
 
@@ -20,7 +48,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
     public ColumnViewItem(ColumnItem column) : this(column.Table) => Column = column;//Renderer = string.Empty;
 
-    public ColumnViewItem(Table? table, List<KeyValuePair<string, string>> allTags, string originalParse) : this(table) => this.Parse(allTags, originalParse);
+    public ColumnViewItem(Table? table, List<KeyValuePair<string, string>> allTags) : this(table) => this.Parse(allTags);
 
     protected ColumnViewItem(Table? parent) : base() {
         Table = parent;
@@ -82,6 +110,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         set {
             if (field == value) { return; }
             field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewItemFragmentType.FontHorizontal, value));
             OnPropertyChanged();
         }
     }
@@ -97,6 +126,12 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         }
     } = true;
 
+    /// <summary>
+    /// Schlüssel des Eintrags (ColumnName bzw. StorageKey); erster Satz des
+    /// eigenen Blocks im Fragment-Format.
+    /// </summary>
+    public string KeyName => ColumnName ?? string.Empty;
+
     public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.Dünn;
 
     public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
@@ -106,6 +141,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         set {
             if (field == value) { return; }
             field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewItemFragmentType.Permanent, value));
             OnPropertyChanged();
         }
     }
@@ -166,7 +202,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
         if (colName is { Length: > 0 } && colName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) { return ParseableItem.NewByTypeName<ColumnViewItem>(colName); }
 
-        return new ColumnViewItem(table, x, toParse);
+        return new ColumnViewItem(table, x);
     }
 
     /// <summary>
@@ -231,8 +267,9 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         return result;
     }
 
-    public void ParseFinished(string parsed) {
+    public bool ParseFinished() {
         // Keine Nachbearbeitung mehr nötig — Permanent hat einen gültigen Default.
+        return true;
     }
 
     public bool ParseThis(string key, string value) {
@@ -346,6 +383,65 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
                 tb.CellValueChanged -= Cell_CellValueChanged;
             }
         }
+    }
+
+    #endregion
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Ein Ansichts-Eintrag hat keine Sub-Items.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+
+        var allok = true;
+
+        // Der Schlüssel ist der erste Satz: Die Empfänger-Fabrik baut das Objekt daraus
+        allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.KeyName, KeyName);
+        allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.Permanent, Permanent);
+        allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.FontHorizontal, Horizontal);
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Block des Ansichts-Eintrags: Permanent immer, FontHorizontal nur wenn gesetzt.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((ViewItemFragmentType)record.LeafType) {
+            case ViewItemFragmentType.KeyName:
+                // Schlüssel steckt im Objekt; die Empfänger-Fabrik hat ihn übernommen
+                break;
+
+            case ViewItemFragmentType.Permanent:
+                Permanent = record.BoolContent;
+                break;
+
+            case ViewItemFragmentType.FontHorizontal:
+                Horizontal = record.BoolContent;
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
     }
 
     #endregion

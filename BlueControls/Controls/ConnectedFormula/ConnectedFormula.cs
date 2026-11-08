@@ -298,7 +298,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
     /// in <c>_pages</c> eingetragen. Hier erfolgen nur noch Standard-Sicherungen
     /// (Default-Head, RowEntryItem, GridShow/GridSnap) und die Receiver-Reparatur.
     /// </summary>
-    public void ParseFinished(string parsed) {
+    public bool ParseFinished() {
         _finishingParse = true;
         IsParsed = true;
 
@@ -347,9 +347,11 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         // wurde bereits vom Dateisystem geladen und ist in _content aktuell —
         // lediglich die Hashes werden als "gespeichert" markiert.
         MarkCurrentContentAsLoaded();
+
+        return true;
     }
 
-    public void ParseFinishedJson(JsonObject parsed) => ParseFinished(parsed.ToJsonString());
+    public void ParseFinishedJson(JsonObject parsed) => ParseFinished();
 
     public void ParseJson(JsonObject json) {
         CreateDate = json.GetString("createdate", CreateDate);
@@ -516,7 +518,7 @@ public sealed class ConnectedFormula : BlockableFile, ICreateByKey<ConnectedForm
         if (IsParsed || IsDisposed) { return; }
         var c = Win1252.GetString(Content);
         if (!this.Parse(c)) {
-            ParseFinished(c);
+            ParseFinished();
         }
     }
 

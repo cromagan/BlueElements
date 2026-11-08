@@ -483,7 +483,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public bool ParseFinished() => true;
 
     public bool ParseThis(string key, string value) {
         switch (key) {

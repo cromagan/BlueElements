@@ -60,6 +60,7 @@ public class BoolScriptVariable : ScriptVariable {
         if (variable is not BoolScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
         ValueBool = v.ValueBool;
+        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 

@@ -71,6 +71,7 @@ public class DoubleScriptVariable : ScriptVariable {
         if (variable is not DoubleScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
         ValueNum = v.ValueNum;
+        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 

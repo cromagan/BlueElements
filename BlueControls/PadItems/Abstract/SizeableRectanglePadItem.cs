@@ -129,9 +129,10 @@ public abstract class SizeableRectanglePadItem : PadItem {
         return json;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+       var t = base.ParseFinished();
         CalculateSlavePoints();
+        return t;
     }
 
     public override void ParseJson(JsonObject json) {

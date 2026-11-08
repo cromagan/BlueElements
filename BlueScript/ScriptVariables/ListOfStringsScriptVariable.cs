@@ -96,6 +96,7 @@ public class ListOfStringsScriptVariable : ScriptVariable {
         if (variable is not ListOfStringsScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
         ValueList = v.ValueList;
+        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 
@@ -122,6 +123,7 @@ public class ListOfStringsScriptVariable : ScriptVariable {
         if (value is not StringScriptVariable s) { return VerschiedeneTypen(value); }
 
         _list[i] = s.ValueString;
+        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 

@@ -87,9 +87,10 @@ public abstract class Renderer : ParseableItem, IReadableText, IHasQuickInfo, IS
         return result;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+      var t =  base.ParseFinished();
         _lastCode = ParseableItems().FinishParseable();
+        return t;
     }
 
     public override bool ParseThis(string key, string value) {

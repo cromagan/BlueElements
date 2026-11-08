@@ -12,10 +12,10 @@ public static class ParseableExtension {
 
     public static bool Parse(this IParseable parsable, string toParse, char bracketOpen, char bracketClose, char separator) {
         if (toParse.GetAllTags(bracketOpen, bracketClose, separator) is not { } x) { return false; }
-        return parsable.Parse(x, toParse);
+        return parsable.Parse(x);
     }
 
-    public static bool Parse(this IParseable parsable, List<KeyValuePair<string, string>> allTags, string originalParse) {
+    public static bool Parse(this IParseable parsable, List<KeyValuePair<string, string>> allTags) {
         // ParseableItem: Suppress-Modus whrend des gesamten Parsens, damit
         // Property-Setter der Subklassen keine Change-Events feuern (siehe
         // ParseableItem.ISupportInitialize). Andere IParseable-Implementierungen
@@ -29,11 +29,11 @@ public static class ParseableExtension {
                     Develop.DebugPrint("Kann nicht geparsed werden: " + pair.Key + " = " + pair.Value + Develop.ContextInfo(parsable));
                 }
             }
-            parsable.ParseFinished(originalParse);
+           return parsable.ParseFinished();
         } finally {
             if (parsable is ISupportInitialize pi2) { pi2.EndInit(); }
         }
-        return true;
+
     }
 
     #endregion
@@ -43,7 +43,10 @@ public interface IParseable : IStringable {
 
     #region Methods
 
-    void ParseFinished(string parsed);
+    /// <summary>
+    /// Wird nach dem erfolgreichen ParseThis-Durchlauf aufgerufen, um Nacharbeiten auszuführen.
+    /// </summary>
+    bool ParseFinished();
 
     /// <summary>
     ///

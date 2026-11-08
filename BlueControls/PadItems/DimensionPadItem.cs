@@ -278,9 +278,10 @@ public sealed class DimensionPadItem : PadItem, IStyleableOne, ISupportsTextScal
         return json;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+        var t = base.ParseFinished();
         CalculateOtherPoints();
+        return t;
     }
 
     public override void ParseFinishedJson(JsonObject parsed) {

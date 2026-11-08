@@ -208,5 +208,33 @@ Mache in Paint ein Text-Tool. Verschiebar, Text, Farbe, Größe etc. bearbeittba
 Erstelle ein CMD Script, dass alle .cs Dateien öffnet, und Properties in die Region "Properties" einodnet. genau so Fields, ect.
 und alle Funktionen, Properties etc. sollen alphabetisch sortiert werden.
 
+## Aufgabe
+Mache zwei Systemspalten:
+Eine erhält den kommentar, warum die Zeile erstellt wurde
+Die andere, den Komentar der letzten Zelländerung
 
+## Aufgabe
+Mache CellCollection als Statisch. Verlager das Dictionory in das RowItem. Key: ColumnEditor
 
+## Aufgabe
+Mach eine Übersicht in CreativePadItem, welche Tabelle, Formular von was abhänig ist. Mit Pfeilen.
+Beachte Linked Cell, Welche Script wohin verweisen, welche Formulare welche Tabelle benutzen
+
+## Aufgabe
+public static ReadOnlyCollection<T>? DeserializeList<T>
+ändern. So, dass es es ohne <T> funktioniert. Dafür muss ein basicklasse erstellt werden, die IhasKeyName und IFragmentStoreable impelementiert.
+Dann noch eine neue statische Routine: Create(Stream stream). Das gibt dann die Klasse zurück.
+
+## Aufgabe (WICHTIG)
+FragmentEventExtension muss entfernt werden:
+FragmentEventExtension verstehe ich nicht. Es sollen ganz einfach die ausgelösten Events des Childs von Parent aboneriert werdem-
+
+Zusätzlich soll das Parent  das Dispose vom Child abbniren und die Verbindung dann kappen.
+Aber alles ohneneuer klassen FragmentEventExtension, FragmentRegistration und ohne     private static readonly Dictionary<IFragmentStoreable, ParentRegistration> Registered = [];
+
+## Aufgabe (WICHTIG)
+UndoItem ohne    public byte[]? FragmentBlock { get; private set; } lösen
+
+## Aufgabe (WICHTIG)
+VariableCollection und alle anderen Collections, die mit Listen von Klassen arbeiten sollen den SerializeList Befehl benutzen => static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<IFragmentStoreable> content)
+ und auch mit dem gegen Pendat sie wieder erstellen.

@@ -2,6 +2,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
@@ -109,6 +110,12 @@ public class TableFile : Table {
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
+    /// True, wenn die Datei-Endung das binäre Fragment-Format „Typ + Key“ nutzt
+    /// (.nbdb, .fbdb); sonst werden Classic-Chunks geschrieben und gelesen.
+    /// </summary>
+    protected bool IsBinaryFormat => Filename.FileSuffix().ToLowerInvariant() is "nbdb" or "fbdb";
+
+    /// <summary>
     /// Gibt an, ob die Tabelle vor kurzem aktiv verwendet wurde und daher
     /// in die periodische Aktualisierung (TableUpdater) einbezogen
     /// werden soll. Die Basisklasse prüft dies über die zugehörige Chunk-LiveInstance.
@@ -150,7 +157,10 @@ public class TableFile : Table {
 
     /// <summary>
     /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
-    /// Der Marker besteht aus: [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"]
+    /// Binäres Fragment-Format (BinaryFormat.md): beginnt mit einem Tab-Satz und endet
+    /// auf den 255-EOF-Satz (valueId FF, leerer Content, 0x0D).
+    /// Classic-Format: Der Marker besteht aus
+    /// [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"].
     /// </summary>
     public static bool HasValidEofMarker(byte[] rawBytes) {
         try {
@@ -165,6 +175,10 @@ public class TableFile : Table {
             }
 
             if (data.Length < 8) { return false; }
+
+            if (data[0] == 0x09) {
+                return data[^4] == 0xFF && data[^3] == 0x00 && data[^2] == 0x00 && data[^1] == 0x0D;
+            }
 
             var offset = data.Length - 8;
             return data[offset] == 0x03
@@ -261,7 +275,7 @@ public class TableFile : Table {
             }
         }
 
-        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "tblh", "mbdb", "bdb", "tblt" };
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "fbdb", "mbdb", "tblh", "tblt" };
         return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
@@ -519,6 +533,38 @@ public class TableFile : Table {
         return content;
     }
 
+    /// <summary>
+    /// Erzeugt den zu speichernden Datei-Inhalt; binäre Fragment-Formate (.nbdb, .fbdb)
+    /// schreiben Fragment-Sätze (Versions-Satz, Tabellen-Baum inkl. Undo-Sektion, EOF),
+    /// sonst die Classic-Chunks.
+    /// </summary>
+    protected virtual List<byte> GenerateContentToSave() {
+        if (!IsBinaryFormat) { return GenerateFullContent(this); }
+
+        using var ms = new MemoryStream();
+
+        // System-Bytes, kompletter Tabellenstand inkl. Undo-Sektion und EOF über Serialize
+        var allok = true;
+        allok &= this.Serialize(ms, 1);
+
+        if (!allok) {
+            Freeze("Hauptdatei: Satz zu groß oder ungültig — Speicherung abgebrochen");
+            return [];
+        }
+
+        return [.. ms.ToArray()];
+    }
+
+    /// <summary>
+    /// Mindestgröße des Datei-Inhalts; schützt vor korrupten Re-Saves (z. B. wenn
+    /// durch einen Fehler kaum Daten generiert werden). Beim initialen Save einer
+    /// neuen, leeren Tabelle ist der Inhalt legitim klein und darf nicht zum Freeze
+    /// führen — sonst wäre die neue Tabelle sofort blockiert. Fragment-Sätze sind
+    /// deutlich kompakter als die Classic-Chunks, daher gilt für das Binärformat
+    /// ein kleinerer Schwellwert.
+    /// </summary>
+    protected virtual int MinimumContentSize => IsBinaryFormat ? 200 : 1200;
+
     protected static string SaveFullFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -526,7 +572,7 @@ public class TableFile : Table {
         var x = tbf.LastChange;
 
         // Alle Daten in einer einzigen Byte-Liste sammeln (.bdb ist nicht chunked).
-        var content = GenerateFullContent(tbf);
+        var content = tbf.GenerateContentToSave();
 
         if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 
@@ -534,7 +580,7 @@ public class TableFile : Table {
         // durch einen Fehler kaum Daten generiert werden). Beim initialen Save
         // einer neuen, leeren Tabelle ist der Inhalt legitim klein und darf
         // nicht zum Freeze führen — sonst wäre die neue Tabelle sofort blockiert.
-        if (!tbf.InitialSavePending && content.Count < 1200) {
+        if (!tbf.InitialSavePending && content.Count < tbf.MinimumContentSize) {
             tbf.Freeze("Datei zu klein für Speicherung");
             return "Datei zu klein für Speicherung.";
         }
@@ -623,15 +669,38 @@ public class TableFile : Table {
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// Lädt die Hauptdaten; binäre Inhalte (beginnen mit einem Fragment-Satz) werden
+    /// blockweise über IFragmentStoreable.Deserialize gelesen, Classic-Inhalte über
+    /// den Classic-Parser.
+    /// </summary>
     protected virtual bool LoadMainData() {
         var chunk = Chunk.Get(Filename);
 
         if (chunk is null || chunk.LoadFailed) {
-            Freeze($"Laden fehlgeschlagen");
+            Freeze("Laden fehlgeschlagen");
             return false;
         }
 
-        var ok = Parse(chunk.LoadContent(), true, null);
+        var data = chunk.LoadContent();
+
+        if (data is { Length: > 0 } && data[0] == 0x09) {
+            using var ms = new MemoryStream(data);
+
+            FragmentLoadedColumns.Clear();
+
+            // Objekt-Baum inklusive Undo-Historie bis zum Datei-Ende
+            if (!this.Deserialize(ms, 1)) {
+                Freeze("Parsen fehlgeschlagen!");
+                return false;
+            }
+
+            FinishMainParse(true, FragmentLoadedColumns);
+
+            return true;
+        }
+
+        var ok = Parse(data, true, null);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -684,7 +753,7 @@ public class TableFile : Table {
         var suffixTypes = BuildSuffixTypeMap();
 
         if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .tblh, .tblt");
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .nbdb, .fbdb, .mbdb, .tblh, .tblt");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -716,6 +785,8 @@ public class TableFile : Table {
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
         [".bdb"] = typeof(TableFile),
+        [".nbdb"] = typeof(TableFile),
+        [".fbdb"] = typeof(TableFragmentsNew),
         [".mbdb"] = typeof(TableFragments),
         [".tblh"] = typeof(TableChunk),
         [".tblt"] = typeof(TableTimestamp)

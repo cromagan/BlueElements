@@ -4,6 +4,7 @@ using BlueScript.Classes;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -12,7 +13,7 @@ using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText, IFragmentStoreable {
 
     #region Fields
 
@@ -23,7 +24,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private volatile int _isDisposedFlag;
     private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
-
     #endregion
 
     #region Constructors
@@ -1026,6 +1026,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
                     }
+
+                    // Zelle ist aus dem Speicher entfernt: Bubbling abmelden
+                    c.FragmentChanged -= _cell_FragmentChanged;
                 }
             } else {
                 if (!string.IsNullOrEmpty(value)) {
@@ -1033,6 +1036,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
+                    }
+
+                    if (tb.Cell.TryGetCell(column, this, out var newCell) && newCell is not null) {
+                        newCell.FragmentChanged -= _cell_FragmentChanged;
+                        newCell.FragmentChanged += _cell_FragmentChanged;
                     }
                 }
             }
@@ -1422,6 +1430,114 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
         return $"Unique-Wert-Verletzung in Tabelle '{tb.Caption}': Die Kombination aus [{string.Join(", ", valuePairs)}] muss einzigartig sein.";
     }
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Pfad-Typen der Zeile im binären Fragment-Format. Nur der Zeile selbst bekannt.
+    /// </summary>
+    private enum RowNavigationType : byte {
+
+        /// <summary>
+        /// Navigation in eine Zelle der Zeile (Key = Spalten-Key).
+        /// </summary>
+        Cell = 90
+    }
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Schreibt die Zellen der Zeile: SaveContent-Spalten mit nicht-leerem Inhalt als
+    /// Cell-Satz (Key = ColumnKey) mit Zell-Block eine Ebene tiefer (Reihenfolge
+    /// wie der Classic-RowChunk).
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+        if (Table is not { IsDisposed: false } tb) { return true; }
+
+        var allok = true;
+
+        foreach (var column in tb.Column) {
+            if (column is not { IsDisposed: false } || !column.SaveContent) { continue; }
+
+            var content = CellGetStringCore(column);
+            if (string.IsNullOrEmpty(content)) { continue; }
+
+            if (!tb.Cell.TryGetCell(column, this, out var cell) || cell is null) { continue; }
+
+            allok &= FragmentRecord.Append(stream, depth, RowNavigationType.Cell, column.KeyName, cell);
+        }
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Zeilen-Block: Zellen über den Cell-Satz (Key = ColumnKey)
+    /// suchen bzw. anlegen und deren Block eine Ebene tiefer lesen.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        if ((RowNavigationType)record.LeafType != RowNavigationType.Cell) {
+            // Unbekannter Blatt-Typ — Satz überspringen
+            return true;
+        }
+
+        if (CellCreateOrGet(record.StringContent) is not { } cell) { return false; }
+
+        return cell.Deserialize(stream, record.Depth + 1);
+    }
+
+    /// <summary>
+    /// Liefert die Zelle der benannten Spalte; fehlende Zellen werden angelegt.
+    /// </summary>
+    private CellItem? CellCreateOrGet(string columnKey) {
+        if (Table is not { IsDisposed: false } tb) { return null; }
+        if (tb.Column[columnKey] is not { IsDisposed: false } column) { return null; }
+
+        if (tb.Cell.TryGetCell(column, this, out var cell) && cell is not null) {
+            cell.FragmentChanged -= _cell_FragmentChanged;
+            cell.FragmentChanged += _cell_FragmentChanged;
+            return cell;
+        }
+
+        if (!tb.Cell.TryAddCell(column, this, new CellItem(string.Empty))) { return null; }
+
+        _ = tb.Cell.TryGetCell(column, this, out cell);
+        if (cell is not null) {
+            cell.FragmentChanged -= _cell_FragmentChanged;
+            cell.FragmentChanged += _cell_FragmentChanged;
+        }
+        return cell;
+    }
+
+    /// <summary>
+    /// Reicht eine Zell-Änderung mit dem Zell-Pfad (Cell + ColumnKey) eine Ebene höher;
+    /// die Spalte der geänderten Zelle wird über die eigenen Zellen aufgelöst.
+    /// </summary>
+    private void _cell_FragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        if (sender is not CellItem cell) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+
+        foreach (var column in tb.Column) {
+            if (tb.Cell.TryGetCell(column, this, out var c) && ReferenceEquals(c, cell)) {
+                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(RowNavigationType.Cell, column.KeyName, e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
+
+    #endregion
 
     #endregion
 }

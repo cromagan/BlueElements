@@ -256,10 +256,21 @@ public class TableFragments : TableFile {
         if (IsDisposed) { return; }
 
         if (disposing) {
+            // Master-Schaft abmelden, bevor der Writer geschlossen wird: Die
+            // Freigabe landet in der bestehenden Fragmentdatei, statt beim
+            // Abmelden (base.Dispose ruft UnMasterMe) eine neue, nie mit EOF
+            // abgeschlossene Fragmentdatei zu öffnen.
+            UnMasterMe();
             CloseWriter();
         }
 
         base.Dispose(disposing);
+
+        // Sicherheitsnetz: Falls das Abmelde-Schreiben im base.Dispose doch
+        // einen neuen Writer geöffnet hat, diesen sauber abschließen.
+        if (disposing && _writer is not null) {
+            CloseWriter();
+        }
     }
 
     /// <summary>

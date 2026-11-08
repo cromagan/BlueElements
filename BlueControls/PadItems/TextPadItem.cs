@@ -176,9 +176,10 @@ public class TextPadItem : SizeableRectanglePadItem, ICanHaveVariables, IStyleab
         return json;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+        var t = base.ParseFinished();
         InvalidateText();
+        return t;
     }
 
     public override void ParseFinishedJson(JsonObject parsed) {

@@ -236,7 +236,9 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         }
     }
 
-    internal bool TryAddCell(ColumnItem column, RowItem row, CellItem cell) => _internal.TryAdd((column, row), cell);
+    internal bool TryAddCell(ColumnItem column, RowItem row, CellItem cell) {
+        return _internal.TryAdd((column, row), cell);
+    }
 
     internal bool TryGetCell(ColumnItem column, RowItem row, out CellItem? cell) => _internal.TryGetValue((column, row), out cell);
 

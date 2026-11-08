@@ -40,9 +40,10 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Methods
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+       var t = base.ParseFinished();
         SizeChanged();
+        return t;
     }
 
     public override void ParseFinishedJson(JsonObject parsed) {

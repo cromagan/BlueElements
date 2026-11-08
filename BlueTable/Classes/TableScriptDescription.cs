@@ -2,6 +2,7 @@
 
 using BlueScript.Classes;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace BlueTable.Classes;
 
@@ -21,7 +22,71 @@ public static class TableScriptDescriptionExtension {
     #endregion
 }
 
-public sealed class TableScriptDescription : ScriptDescription, IHasTable {
+public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Empfänger-Typen des Skripts im binären Fragment-Format. Nur dem Skript selbst bekannt.
+    /// </summary>
+    private enum ScriptFragmentType : byte {
+
+        /// <summary>
+        /// Der Skript-Text selbst.
+        /// </summary>
+        Script = 1,
+
+        QuickInfo = 2,
+
+        AdminInfo = 3,
+
+        Image = 4,
+
+        /// <summary>
+        /// Benutzergruppen; Content = Gruppennamen, durch „|“ getrennt.
+        /// </summary>
+        UserGroups = 5,
+
+        FailedReason = 6,
+
+        /// <summary>
+        /// Gespeicherte Skript-Variablen (nur für alte Dateien; neue Dateien
+        /// adressieren SavedVariables über die Sub*-Navigation).
+        /// </summary>
+        SavedVariables = 7,
+
+        NeedRow = 8,
+
+        ValuesReadOnly = 9,
+
+        /// <summary>
+        /// Auslösende Ereignisse; Content = int-Wert von ScriptEventTypes.
+        /// </summary>
+        Events = 10,
+
+        StoppedTimeCount = 11,
+
+        AverageRunTime = 12,
+
+        /// <summary>
+        /// Name des Skripts; erster Satz des Blocks, die Empfänger-Fabrik baut das
+        /// Objekt daraus.
+        /// </summary>
+        ScriptName = 13
+    }
+
+    /// <summary>
+    /// Pfad-Typen, unter denen das Skript Unter-Objekte adressiert.
+    /// </summary>
+    private enum ScriptNavigationType : byte {
+
+        /// <summary>
+        /// Navigation in die gespeicherten Skript-Variablen.
+        /// </summary>
+        SubVariableCollection = 94
+    }
+
+    #endregion
 
     #region Fields
 
@@ -41,11 +106,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         StoppedTimeCount = stoppedtimecount;
         AverageRunTime = averageruntime;
         _mayAffectUser = null;
+        ObserveFragmentChain();
     }
 
     public TableScriptDescription(Table? table, string name, string script) : base(name, script) {
         Table = table;
         NeedRow = false;
+        ObserveFragmentChain();
     }
 
     public TableScriptDescription(Table? table, string toParse) : this(table) => this.Parse(toParse);
@@ -328,10 +395,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
     }
 
-    public override void ParseFinished(string parsed) {
+    public override bool ParseFinished() {
         if (MustBeReadonly(EventTypes)) {
             ValuesReadOnly = true;
         }
+
+        return true;
     }
 
     public override bool ParseThis(string key, string value) {
@@ -403,6 +472,18 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     internal static long RoundRunTime(long milliseconds) => ((milliseconds + 250) / 500) * 500;
 
     /// <summary>
+    /// Verdrahtet die FragmentChanged-Bubbling-Kette: Das Skript meldet sich bei der
+    /// Tabelle (Crumb = SubScript + eigener KeyName, je Event neu gelesen) und die
+    /// gespeicherten Skript-Variablen beim Skript (Crumb = SubVariableCollection,
+    /// leerer Key).
+    /// </summary>
+    private void ObserveFragmentChain() {
+        if (Table is { IsDisposed: false } tb) { tb.ObserveScriptFragments(this); }
+
+        this.RegisterEvents(ScriptNavigationType.SubVariableCollection, SavedVariables);
+    }
+
+    /// <summary>
     /// Übernimmt alle Werte von <paramref name="other"/> (Basis + Skript-spezifisch).
     /// Wird beim Recycling in Table.SetValueInternal (case EventScript)
     /// verwendet: Existierende Instanzen behalten ihre Identität, nur die Felder
@@ -420,6 +501,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     protected override void Dispose(bool disposing) {
         if (!IsDisposed) {
+            if (Table is { IsDisposed: false } tb) { tb.UnobserveScriptFragments(this); }
+
+            this.UnregisterEvents(ScriptNavigationType.SubVariableCollection, SavedVariables);
+
             Table = null;
         }
 
@@ -427,6 +512,121 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     }
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Schreibt den Skript-Block: Name (erster Satz), Skript-Eigenschaften und die
+    /// gespeicherten Skript-Variablen.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+
+        var allok = true;
+
+        // Der Name ist der erste Satz: Die Empfänger-Fabrik baut das Objekt daraus
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.ScriptName, KeyName);
+
+        // Immer alles hinzufügen, keine Ausschlüsse
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.Script, Script.Replace("\r\n", "\r").TrimEnd(' '));
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.QuickInfo, QuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.AdminInfo, AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.Image, Image);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.UserGroups, UserGroups);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.FailedReason, FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
+
+        allok &= FragmentRecord.Append(stream, depth, ScriptNavigationType.SubVariableCollection, SavedVariables);
+
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.NeedRow, NeedRow);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.ValuesReadOnly, ValuesReadOnly);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.Events, (int)EventTypes);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.StoppedTimeCount, StoppedTimeCount);
+        allok &= FragmentRecord.Append(stream, depth, ScriptFragmentType.AverageRunTime, AverageRunTime);
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Skript-Block: Skript-Eigenschaften im Switch, die gespeicherten
+    /// Variablen über den SubVariableCollection-Satz (leerer Key) eine Ebene tiefer.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        // Die gespeicherten Variablen sind ein eigenes Unter-Objekt (leerer Key)
+        if ((ScriptNavigationType)record.LeafType == ScriptNavigationType.SubVariableCollection) { return SavedVariables.Deserialize(stream, record.Depth + 1); }
+
+        switch ((ScriptFragmentType)record.LeafType) {
+            case ScriptFragmentType.ScriptName:
+                // Name steckt im Objekt; die Empfänger-Fabrik hat ihn übernommen
+                break;
+
+            case ScriptFragmentType.Script:
+                Script = record.StringContent;
+                break;
+
+            case ScriptFragmentType.QuickInfo:
+                QuickInfo = record.StringContent;
+                break;
+
+            case ScriptFragmentType.AdminInfo:
+                AdminInfo = record.StringContent;
+                break;
+
+            case ScriptFragmentType.Image:
+                Image = record.StringContent;
+                break;
+
+            case ScriptFragmentType.UserGroups:
+                UserGroups = [.. record.ListContent];
+                break;
+
+            case ScriptFragmentType.FailedReason:
+                FailedReason = record.StringContent;
+                break;
+
+            case ScriptFragmentType.NeedRow:
+                NeedRow = record.BoolContent;
+                break;
+
+            case ScriptFragmentType.ValuesReadOnly:
+                ValuesReadOnly = record.BoolContent;
+                break;
+
+            case ScriptFragmentType.Events:
+                EventTypes = (ScriptEventTypes)record.IntContent;
+                break;
+
+            case ScriptFragmentType.StoppedTimeCount:
+                StoppedTimeCount = record.IntContent;
+                _mayAffectUser = null;
+                break;
+
+            case ScriptFragmentType.AverageRunTime:
+                AverageRunTime = record.LongContent;
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
+
+    #endregion
 
     #endregion
 }

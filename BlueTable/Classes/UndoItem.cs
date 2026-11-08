@@ -1,8 +1,10 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.IO;
+
 namespace BlueTable.Classes;
 
-public class UndoItem : IParseable {
+public class UndoItem : IParseable, IFragmentStoreable {
 
     #region Constructors
 
@@ -22,6 +24,15 @@ public class UndoItem : IParseable {
     public UndoItem(string tablename, TableDataType command, string column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
 
     public UndoItem(string s) => this.Parse(s);
+
+    /// <summary>
+    /// Leer-Eintrag zum Einlesen der Undo-Sektion; TableName ist die empfangende
+    /// Tabelle, Container deren Hauptdatei.
+    /// </summary>
+    public UndoItem(string tablename, string container) {
+        TableName = tablename;
+        Container = container;
+    }
 
     public UndoItem() { }
 
@@ -56,17 +67,119 @@ public class UndoItem : IParseable {
 
     #endregion
 
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Blatt-Eintrag ohne Sub-Baum: Das Event wird nie ausgelöst.
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Blatt-Typen des eigenen Blocks in der Undo-Sektion der Hauptdatei.
+    /// </summary>
+    private enum UndoItemType : byte {
+
+        /// <summary>
+        /// Klassischer Ganzwert-Typ der Änderung (Int).
+        /// </summary>
+        Command = 1,
+
+        /// <summary>
+        /// Spalten-Key der Änderung (leer bei Kopf-Werten).
+        /// </summary>
+        ColName = 2,
+
+        /// <summary>
+        /// Zeilen-Key der Änderung (leer bei Kopf- und Spalten-Werten).
+        /// </summary>
+        RowKey = 3,
+
+        /// <summary>
+        /// Neuer Wert samt Meta (User, DateTimeUtc, Comment).
+        /// </summary>
+        ChangedTo = 4
+    }
+
+    /// <summary>
+    /// Schreibt den Eintrag als eigenen Block: Command, Navigation (nur wenn
+    /// gesetzt) und den neuen Wert samt Meta (User, DateTimeUtc, Comment).
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        var allok = true;
+
+        allok &= FragmentRecord.Append(stream, depth, UndoItemType.Command, (int)Command);
+
+        if (ColName is { Length: > 0 }) {
+            allok &= FragmentRecord.Append(stream, depth, UndoItemType.ColName, ColName);
+        }
+
+        if (RowKey is { Length: > 0 }) {
+            allok &= FragmentRecord.Append(stream, depth, UndoItemType.RowKey, RowKey);
+        }
+
+        allok &= FragmentRecord.Append(stream, depth, UndoItemType.ChangedTo, ChangedTo, User, DateTimeUtc, Comment);
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Liest die Blatt-Sätze des eigenen Blocks; unbekannte Typen werden übersprungen.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((UndoItemType)record.LeafType) {
+            case UndoItemType.Command:
+                Command = (TableDataType)record.IntContent;
+                break;
+
+            case UndoItemType.ColName:
+                ColName = record.StringContent;
+                break;
+
+            case UndoItemType.RowKey:
+                RowKey = record.StringContent;
+                break;
+
+            case UndoItemType.ChangedTo:
+                ChangedTo = record.StringContent;
+                User = record.User;
+                DateTimeUtc = record.DateTimeUtc;
+                Comment = record.Comment;
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Blatt-Eintrag ohne Sub-Baum: löst nichts aus.
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        FragmentChanged?.Invoke(this, e);
+    }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
     /// Berechnet einen deterministischen Hash zur Dedup-Erkennung in TableFragments.
-    /// Enthält nur die identitätsstiftenden Werte (ohne PreviousValue,
-    /// Comment und Container), weil diese zwischen Fragment-
-    /// und Undo-Schreibweg inkonsistent sein können. Damit ist der Hash unabhängig vom
-    /// Serialisationsformat und vom Schreibweg (Fragment vs. lokales Undo vs. Hauptfile).
+    /// Enthält nur die identitätsstiftenden Werte (ohne PreviousValue, Comment und
+    /// Container), weil diese zwischen den Schreibwegen inkonsistent sein können.
+    /// Damit ist der Hash unabhängig vom Serialisationsformat und vom Schreibweg.
     /// </summary>
-    public string Hash() => (TableName + "|" + (int)Command + "|" + ColName + "|" + RowKey + "|" +
-                DateTimeUtc.ToString9() + "|" + User + "|" + ChangedTo).GetMD5Hash();
+    public string Hash() => BuildHash(TableName, Command, ColName, RowKey, DateTimeUtc, User, ChangedTo);
+
+    /// <summary>
+    /// Geteilte Dedup-Formel für klassische Einträge; muss für die Hauptfile-Historie
+    /// und für aus Fragmenten gelesene Änderungen identisch sein.
+    /// </summary>
+    internal static string BuildHash(string tableName, TableDataType command, string colName, string rowKey, DateTime dateTimeUtc, string user, string changedTo) =>
+        (tableName + "|" + (int)command + "|" + colName + "|" + rowKey + "|" +
+         dateTimeUtc.ToString9() + "|" + user + "|" + changedTo).GetMD5Hash();
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -83,7 +196,7 @@ public class UndoItem : IParseable {
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public bool ParseFinished() => true;
 
     public bool ParseThis(string key, string value) {
         switch (key) {

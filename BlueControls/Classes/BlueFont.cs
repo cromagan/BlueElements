@@ -350,10 +350,10 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
 
-    public void ParseFinished(string parsed) {
+    public bool ParseFinished() {
         // StringBuilder ist bei vielen Replace-Operationen schneller,
         // bei einer einzelnen Operation aber langsamer
-        KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
+        KeyName = ParseableItems().FinishParseable().Replace(" ", string.Empty).ToUpperInvariant();
 
         // Flags direkt in einer Operation setzen
         var ftst = FontStyle.Regular |
@@ -429,6 +429,8 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         //https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
         //http://www.typo-info.de/schriftgrad.htm
         _zeilenabstand = _fontOl.Height + 1;
+
+        return true;
     }
 
     public bool ParseThis(string key, string value) {

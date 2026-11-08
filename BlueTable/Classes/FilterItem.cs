@@ -10,6 +10,7 @@ public sealed class FilterItem : IReadableText, IHasQuickInfo, IParseable, ICanB
 
     private string? _pendingColumnName;
     private string? _pendingTableName;
+    private bool _pendingEmptyValue;
 
     #endregion
 
@@ -210,8 +211,15 @@ public sealed class FilterItem : IReadableText, IHasQuickInfo, IParseable, ICanB
         }
     }
 
-    public void ParseFinished(string parsed) {
-        if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { SearchValue.AddIfNotExists(string.Empty); }
+    public bool ParseFinished() {
+        if (_pendingEmptyValue && !SearchValue.Contains(string.Empty)) {
+            var l = SearchValue.ToList();
+            l.Add(string.Empty);
+            SearchValue = l.AsReadOnly();
+        }
+
+        _pendingEmptyValue = false;
+        return true;
     }
 
     public bool ParseThis(string key, string value) {
@@ -235,6 +243,11 @@ public sealed class FilterItem : IReadableText, IHasQuickInfo, IParseable, ICanB
             case "columnname":
             case "column":
                 _pendingColumnName = value.FromNonCritical();
+                return true;
+
+            case "value":
+                // Legacy-Tag: ein leerer Wert kennzeichnet den Filter ohne Suchtext
+                if (value.Length == 0) { _pendingEmptyValue = true; }
                 return true;
 
             case "values":

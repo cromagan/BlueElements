@@ -3,11 +3,28 @@
 using BlueTable.EventArgs;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable {
+public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Pfad-Typen der Spaltensammlung im binären Fragment-Format.
+    /// Nur der Sammlung selbst bekannt.
+    /// </summary>
+    private enum ColumnCollectionFragmentType : byte {
+
+        /// <summary>
+        /// Navigation in eine Spalte (Key = ColumnKey).
+        /// </summary>
+        SubColumn = 90
+    }
+
+    #endregion
 
     #region Fields
 
@@ -36,6 +53,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public event EventHandler<ColumnEventArgs>? ColumnRemoving;
 
     public event EventHandler? Disposed;
+
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     #endregion
 
@@ -118,6 +137,35 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public HashSet<ColumnItem> ColumnsUsedInUniqueDefinition() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return []; }
         return [.. tb.UniqueValues.SelectMany(uvd => uvd.KeyColumns).Where(kc => kc is { IsDisposed: false })];
+    }
+
+    /// <summary>
+    /// Verarbeitet den Spalten-Block: Der SubColumn-Satz benennt die Spalte — der
+    /// Empfänger wird gesucht, notfalls erzeugt, und liest seinen Block eine Ebene
+    /// tiefer selbst.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        if (IsDisposed) { return false; }
+
+        switch ((ColumnCollectionFragmentType)record.LeafType) {
+            case ColumnCollectionFragmentType.SubColumn: {
+                // Key der Nachbereitung (verwaiste Spalten entfernen) mitgeben
+                Table?.FragmentLoadedColumns.Add(record.StringContent);
+
+                if (this[record.StringContent] is not { IsDisposed: false } column) {
+                    ExecuteCommand(TableDataType.Command_AddColumnByName, record.StringContent, ChangeFlags.IgnoreFreeze);
+                    column = this[record.StringContent];
+                }
+
+                if (column is null) { return false; }
+
+                return column.Deserialize(stream, record.Depth + 1);
+            }
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                return true;
+        }
     }
 
     public void DisableAllEditing() {
@@ -256,6 +304,15 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
+
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
                                                                                 && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand));
 
@@ -325,6 +382,29 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         foreach (var thisColumn in this) {
             thisColumn.Repair();
         }
+    }
+
+    /// <summary>
+    /// Schreibt alle Spalten in der Speicherreihenfolge: je Spalte ein SubColumn-Satz
+    /// (Key = ColumnKey), darunter der Spalten-Block eine Ebene tiefer.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+
+        var allok = true;
+
+        // SaveOrder statt Collection-Enumeration: Die Enumerationsordnung des
+        // ConcurrentDictionary ist hash-basiert und instabil; gespeichert wird
+        // in der Classic-Reihenfolge (Ansicht 1, danach alphabetisch).
+        var saveColumns = Table is { IsDisposed: false } st ? st.ColumnsInSaveOrder() : [.. this];
+
+        foreach (var column in saveColumns) {
+            if (column is not { IsDisposed: false }) { continue; }
+
+            allok &= FragmentRecord.Append(stream, depth, ColumnCollectionFragmentType.SubColumn, column);
+        }
+
+        return allok;
     }
 
     /// <summary>
@@ -421,6 +501,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (this[column.KeyName] is not null) { return "Hinzufügen fehlgeschlagen."; }
             if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
 
+            // Spalte als Fragment-Kind verdrahten (Crumb = SubColumn, Key = ColumnKey)
+            this.RegisterEvents(ColumnCollectionFragmentType.SubColumn, column);
+
             GetSystems();
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnAdded(new ColumnEventArgs(column)); }
@@ -434,6 +517,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
+
+            this.UnregisterEvents(ColumnCollectionFragmentType.SubColumn, c);
+
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoved(); }
 
             c.Dispose();
@@ -450,6 +536,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Column_Disposed(object? sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.Disposed -= Column_Disposed;
+            this.UnregisterEvents(ColumnCollectionFragmentType.SubColumn, c);
             _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
             OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");

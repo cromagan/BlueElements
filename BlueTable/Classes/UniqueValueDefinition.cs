@@ -1,10 +1,11 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
+public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable, IFragmentStoreable {
 
     #region Fields
 
@@ -80,10 +81,11 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         return result;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
+    public override bool ParseFinished() {
+        var t = base.ParseFinished();
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
+        return t;
     }
 
     public override bool ParseThis(string key, string value) {
@@ -161,6 +163,72 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
         _internal.Sort((a, b) => saveOrder.IndexOf(a).CompareTo(saveOrder.IndexOf(b)));
     }
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Empfänger-Typen der Unique-Wert-Definition im binären Fragment-Format.
+    /// Nur der Definition selbst bekannt.
+    /// </summary>
+    private enum UniqueFragmentType : byte {
+
+        /// <summary>
+        /// Spalten der Definition; Content = ColumnKeys, durch „|“ getrennt.
+        /// </summary>
+        Columns = 1
+    }
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Eine Unique-Wert-Definition hat keine Sub-Items.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (KeyColumns.Count == 0) { return true; }
+
+        List<string> cols = [];
+        foreach (var c in KeyColumns) { cols.Add(c.KeyName); }
+
+        return FragmentRecord.Append(stream, depth, UniqueFragmentType.Columns, cols);
+    }
+
+    /// <summary>
+    /// Verarbeitet den Definitions-Block; der Content der Spalten enthält die
+    /// ColumnKeys als ListSet-Einträge. Danach werden Sortierung und KeyName neu gebaut,
+    /// damit eine beim Lesen neu erzeugte Definition per KeyName auffindbar bleibt.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((UniqueFragmentType)record.LeafType) {
+            case UniqueFragmentType.Columns:
+                // Erst leeren: Ein wiederverwendetes Objekt bleibt damit beim
+                // Wieder-Einspielen des Blocks idempotent.
+                _internal.Clear();
+
+                foreach (var thisc in record.ListContent) {
+                    if (Table.Column[thisc] is { } c) { _internal.Add(c); }
+                }
+
+                SortColumnsBySaveOrder();
+                KeyName = RebuildKeyName();
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
+
+    #endregion
 
     #endregion
 }

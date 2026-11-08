@@ -1,10 +1,34 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace BlueScript.ScriptVariables;
 
-public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, IHasKeyName, IJsonParseable {
+public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, IHasKeyName, IJsonParseable, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Empfänger-Typen der Variablen im binären Fragment-Format (Blatt-Werte unterhalb
+    /// des SubVariable-Pfades).
+    /// </summary>
+    public enum VariableFragmentType : byte {
+
+        /// <summary>
+        /// ClassId des Variablen-Typs (z. B. "String"); der Writer schreibt diesen
+        /// Satz immer zuerst, damit der Empfänger den konkreten Typ kennt.
+        /// </summary>
+        Type = 1,
+
+        Value = 2,
+
+        Comment = 3,
+
+        ReadOnly = 4
+    }
+
+    #endregion
 
     #region Fields
 
@@ -42,6 +66,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
         set {
             if (_comment == value) { return; }
             _comment = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Comment, value));
         }
     }
 
@@ -67,7 +92,17 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
 
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
-    public bool ReadOnly { get; set; }
+    /// <summary>
+    /// Schreibschutz der Variablen; jeder Wechsel wird als Fragment-Blatt gemeldet.
+    /// </summary>
+    public bool ReadOnly {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.ReadOnly, value));
+        }
+    }
 
     /// <summary>
     /// Wichtig für Boolsche Vergleiche
@@ -102,6 +137,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
                 Develop.DebugError($"Variablenfehler({MyClassId}): {value}");
             }
             SetValue(result);
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, value));
         }
     }
 
@@ -276,6 +312,69 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     protected abstract void SetValue(object? x);
 
     protected abstract bool TryParseValue(string txt, out object? result);
+
+    #endregion
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Eine Variable hat keine Sub-Items.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        var allok = true;
+
+        if (ToStringPossible) {
+            allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Type, MyClassId);
+            allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Value, ValueForReplace);
+            allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Comment, Comment);
+            allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.ReadOnly, ReadOnly);
+        }
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Variablen-Block: Type (nur bei direkt gelesenen Variablen — die
+    /// Collection bestimmt den konkreten Typ bereits vor dem Erzeugen der Instanz),
+    /// Wert, Kommentar und Schreibschutz.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((VariableFragmentType)record.LeafType) {
+            case VariableFragmentType.Type:
+                // Der Typ ist beim Erzeugen der Instanz bereits festgelegt
+                if (record.StringContent != MyClassId) { return false; }
+                break;
+
+            case VariableFragmentType.Value:
+                if (!ToStringPossible) { return false; }
+                ValueForReplace = record.StringContent;
+                break;
+
+            case VariableFragmentType.Comment:
+                Comment = record.StringContent;
+                break;
+
+            case VariableFragmentType.ReadOnly:
+                ReadOnly = record.BoolContent;
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
 
     #endregion
 }

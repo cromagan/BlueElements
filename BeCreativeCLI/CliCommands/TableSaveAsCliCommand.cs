@@ -13,7 +13,7 @@ public class TableSaveAsCliCommand : CliCommand {
 
     public override string? HelpDetails =>
             "Legt eine neue, vollständige Tabellendatei an und übernimmt die kompletten Daten der Quelltabelle — " +
-            "ohne deren Fragment-Historie. Das Zielformat folgt der Endung: .bdb, .mbdb, .tblh oder .tblt. " +
+            "ohne deren Fragment-Historie. Das Zielformat folgt der Endung: .bdb, .fbdb, .mbdb, .tblh oder .tblt. " +
             "Beispiel: bcr table-saveas Test.mbdb Test2.bdb";
 
     public override List<string> Options => ["password"];

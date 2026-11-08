@@ -234,7 +234,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         return json;
     }
 
-    public void ParseFinished(string parsed) { }
+    public bool ParseFinished() => true;
 
     public void ParseFinishedJson(JsonObject parsed) { }
 

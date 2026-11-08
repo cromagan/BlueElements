@@ -75,6 +75,7 @@ public class StringScriptVariable : ScriptVariable {
         if (variable is not StringScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
         ValueString = v.ValueString;
+        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 

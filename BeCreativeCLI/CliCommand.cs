@@ -21,7 +21,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Dateiendungen, die als Tabelle geladen werden dürfen — oder der Name ganz ohne Endung.
     /// </summary>
-    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "mbdb", "tblh", "tblt" };
+    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "fbdb", "mbdb", "tblh", "tblt" };
 
     #endregion
 
@@ -178,17 +178,17 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Tabelle per Kommandozeile bearbeitet werden kann.
-    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb) und
-    /// TableTimestamp (.tblt) führen automatisch die jüngste, sauber mit EOF
-    /// abgeschlossene Fragment-Datei des eigenen Benutzers fort (jünger als
-    /// 5 Minuten; neue Änderungen werden per Append angehängt). Gibt es keine,
-    /// legt das System beim ersten Schreiben eine neue Fragment-Datei an.
-    /// Das Öffnen hängt sofort einen CONTINUED-Marker an, damit kein zweiter
-    /// Prozess dieselbe Datei zum Schreiben öffnen kann.
+    /// Fragment-Tabellen sind Multi-User-Formate: TableFragments (.mbdb, Altformat),
+    /// TableFragmentsNew (.fbdb, binäres Fragment-Format) und TableTimestamp (.tblt)
+    /// führen automatisch die jüngste, sauber mit EOF abgeschlossene Fragment-Datei
+    /// des eigenen Benutzers fort (jünger als 5 Minuten; neue Änderungen werden per
+    /// Append angehängt). Gibt es keine, legt das System beim ersten Schreiben eine
+    /// neue Fragment-Datei an. Das Öffnen hängt sofort einen ContinueEOF-Marker an,
+    /// damit kein zweiter Prozess dieselbe Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
-        if (tbl is not (TableFragments or TableTimestamp)) { return null; }
+        if (tbl is not (TableFragments or TableFragmentsNew or TableTimestamp)) { return null; }
 
         // Geeignete Fragment-Datei automatisch erkennen (EOF am Ende, eigener Benutzer,
         // jünger als 5 Minuten); ohne Fund startet der Writer eine neue Datei.
@@ -198,6 +198,7 @@ public abstract class CliCommand : IHasKeyName {
 
         var f = tbl switch {
             TableFragments tf => tf.ContinueFragment(fragmentFile),
+            TableFragmentsNew tf => tf.ContinueFragment(fragmentFile),
             TableTimestamp tt => tt.ContinueFragment(fragmentFile),
             _ => "Nicht unterstützter Fragment-Tabellentyp."
         };
@@ -206,28 +207,13 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Prüft, ob die Fragment-Datei mit dem binären EOF-Marker ("- EOF") endet.
+    /// Prüft, ob die Fragment-Datei sauber abgeschlossen ist: beim Binärformat auf den
+    /// Satz 255 (EOF), beim Altformat auf die Textzeile „- EOF“ (BinaryFormat.md §2).
     /// </summary>
     protected static bool FragmentEndsAtEof(string filename, string suffix) {
         try {
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-            if (stream.Length == 0) { return false; }
-
-            // Nur das Dateiende lesen; die erste (evtl. mittendrin beginnende) Zeile liefert der Loop automatisch mit.
-            var tailLength = (int)Math.Min(stream.Length, 4096);
-            stream.Seek(-tailLength, SeekOrigin.End);
-
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-            string? line = null;
-
-            while (reader.ReadLine() is { } l) {
-                if (l.Length > 0) { line = l; }
-            }
-
-            if (line is null) { return false; }
-
-            return line.TrimEnd() == "- EOF";
+            return FragmentRecord.EndsOnEof(stream);
         } catch {
             // Unlesbare Datei (z. B. exklusiv gesperrt) überspringen.
             return false;
@@ -235,25 +221,17 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Liest den Benutzernamen aus dem Kopf der Fragment-Datei (erste Zeilen) und vergleicht ihn.
+    /// Liest den Benutzer aus dem Kopf der Fragment-Datei (Satz 251 bzw.
+    /// Altformat-Zeile „- User “) und vergleicht ihn.
     /// </summary>
     protected static bool FragmentIsMine(string filename, string suffix, string user) {
         try {
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-
-            for (var i = 0; i < 10; i++) {
-                if (reader.ReadLine() is not { Length: > 0 } line) { break; }
-
-                if (line.StartsWith("- User ", StringComparison.OrdinalIgnoreCase)) {
-                    return line["- User ".Length..].Trim().Equals(user, StringComparison.OrdinalIgnoreCase);
-                }
-            }
+            return FragmentRecord.HeadUser(stream) is { } headUser && headUser.Equals(user, StringComparison.OrdinalIgnoreCase);
         } catch {
             // Unlesbare Datei (z. B. exklusiv gesperrt) überspringen.
+            return false;
         }
-
-        return false;
     }
 
     /// <summary>
@@ -324,7 +302,7 @@ public abstract class CliCommand : IHasKeyName {
         var suffix = name.FileSuffix();
 
         if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .mbdb, .tblh, .tblt (oder ganz ohne Endung).");
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .fbdb, .mbdb, .tblh, .tblt (oder ganz ohne Endung).");
             return null;
         }
 
@@ -386,6 +364,11 @@ public abstract class CliCommand : IHasKeyName {
             case TableFragments tf:
                 directory = tf.FragmengtsPath();
                 suffix = TableFragments.SuffixOfFragments;
+                break;
+
+            case TableFragmentsNew tf:
+                directory = tf.FragmengtsPath();
+                suffix = TableFragmentsNew.SuffixOfFragments;
                 break;
 
             case TableTimestamp tt:

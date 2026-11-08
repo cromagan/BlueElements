@@ -3,11 +3,66 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Pfad- und Empfänger-Typen der Ansicht im binären Fragment-Format.
+    /// Nur der Ansicht selbst bekannt.
+    /// </summary>
+    private enum ViewFragmentType : byte {
+
+        /// <summary>
+        /// Navigation in einen Ansichts-Eintrag (Key = ColumnName bzw. StorageKey).
+        /// </summary>
+        SubViewItem = 90,
+
+        ShowHead = 1,
+
+        StartCollapsed = 2,
+
+        ChaptersUnique = 3,
+
+        FilterRows = 4,
+
+        ChapterColumn = 5,
+
+        QuickInfo = 6,
+
+        ColumnHeaderMode = 7,
+
+        ScaleToFit = 8,
+
+        PinAnzeigen = 9,
+
+        AnsichtAnzeigen = 10,
+
+        AehnlicheAnzeigen = 11,
+
+        CollapseButtonAnzeigen = 12,
+
+        ContextmenuScripts = 13,
+
+        ExecuteableScripts = 14,
+
+        ColumnsShowAlwaysFilter = 15,
+
+        PermissionGroups = 16,
+
+        /// <summary>
+        /// Name der Ansicht; erster Satz des Blocks, die Empfänger-Fabrik baut das
+        /// Objekt daraus.
+        /// </summary>
+        ViewName = 17
+    }
+
+    #endregion
 
     #region Fields
 
@@ -43,36 +98,101 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <summary>
     /// Ansichten-Button (gespeicherte Ansichten) in der Filterleiste anzeigen.
     /// </summary>
-    public bool Ansicht_anzeigen { get; set; } = true;
+    public bool Ansicht_anzeigen {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.AnsichtAnzeigen, value));
+        }
+    } = true;
 
     /// <summary>
     /// Ähnlichkeits-Spalte und Ähnlich-Button der Ähnlichen-Zeilen-Suche anzeigen.
     /// </summary>
-    public bool Ähnliche_anzeigen { get; set; } = true;
+    public bool Ähnliche_anzeigen {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.AehnlicheAnzeigen, value));
+        }
+    } = true;
 
-    public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
+    public ReadOnlyCollection<string> Ausführbare_Skripte {
+        get;
+        set {
+            if (!value.IsDifferentTo(field)) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ExecuteableScripts, value));
+        }
+    } = new List<string>().AsReadOnly();
+
     public string CaptionForEditor => "Spaltenanordnung";
 
-    public ColumnItem? ColumnForChapter { get; set; }
+    public ColumnItem? ColumnForChapter {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ChapterColumn, value?.KeyName ?? string.Empty));
+        }
+    }
 
     /// <summary>
     /// Kapitel einzigartig anzeigen: Kapitel werden zusammengefasst und nur einmal angezeigt.
     /// Ist false, erscheinen die Zeilen in der Reihenfolge der aktuellen Sortierung
     /// und Kapitelüberschriften können sich wiederholen.
     /// </summary>
-    public bool ChaptersUnique { get; set; } = true;
+    public bool ChaptersUnique {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ChaptersUnique, value));
+        }
+    } = true;
 
     /// <summary>
     /// Kapitel-Button (alle Kapitel auf-/zuklappen) in der Filterleiste anzeigen.
     /// </summary>
-    public bool CollapseButton_anzeigen { get; set; } = true;
+    public bool CollapseButton_anzeigen {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.CollapseButtonAnzeigen, value));
+        }
+    } = true;
 
-    public ColumnHeaderMode ColumnHeaderMode { get; set; }
+    public ColumnHeaderMode ColumnHeaderMode {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ColumnHeaderMode, (int)value));
+        }
+    }
+
     public int Count => _internal.Count;
 
-    public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
+    public ReadOnlyCollection<string> Filter_immer_Anzeigen {
+        get;
+        set {
+            if (!value.IsDifferentTo(field)) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ColumnsShowAlwaysFilter, value));
+        }
+    } = new List<string>().AsReadOnly();
 
-    public int FilterRows { get; set; } = 1;
+    public int FilterRows {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.FilterRows, value));
+        }
+    } = 1;
 
     public bool Invalidated { get; set; } = true;
 
@@ -80,7 +200,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string KeyName { get; set; }
 
-    public ReadOnlyCollection<string> Kontextmenu_Skripte { get; set; } = new List<string>().AsReadOnly();
+    public ReadOnlyCollection<string> Kontextmenu_Skripte {
+        get;
+        set {
+            if (!value.IsDifferentTo(field)) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ContextmenuScripts, value));
+        }
+    } = new List<string>().AsReadOnly();
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => new(_permissionGroups_show);
@@ -90,6 +217,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (l.IsDifferentTo(_permissionGroups_show)) {
                 _permissionGroups_show.Clear();
                 _permissionGroups_show.AddRange(l);
+                OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.PermissionGroups, l));
             }
         }
     }
@@ -97,9 +225,23 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <summary>
     /// Pin-Spalte und Pin-Buttons in der Filterleiste anzeigen.
     /// </summary>
-    public bool Pin_anzeigen { get; set; } = true;
+    public bool Pin_anzeigen {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.PinAnzeigen, value));
+        }
+    } = true;
 
-    public string QuickInfo { get; set; } = string.Empty;
+    public string QuickInfo {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.QuickInfo, value));
+        }
+    } = string.Empty;
 
     /// <summary>
     /// Alle für die Darstellung relevante Spalten: die persistenten
@@ -124,18 +266,39 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public ScaleToFitMode ScaleToFit { get; set; } = ScaleToFitMode.Normal;
+    public ScaleToFitMode ScaleToFit {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ScaleToFit, (int)value));
+        }
+    } = ScaleToFitMode.Normal;
 
     [DefaultValue(Win11)]
     public string SheetStyle { get; set; } = Win11;
 
-    public bool ShowHead { get; set; } = true;
+    public bool ShowHead {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ShowHead, value));
+        }
+    } = true;
 
     /// <summary>
     /// Wenn true, klappt die TableView beim Umschalten auf diese Ansicht
     /// alle Kapitelüberschriften ein.
     /// </summary>
-    public bool StartCollapsed { get; set; }
+    public bool StartCollapsed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.StartCollapsed, value));
+        }
+    }
 
     public Table? Table {
         get;
@@ -315,10 +478,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return result;
     }
 
-    public void ParseFinished(string parsed) {
+    public bool ParseFinished() {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
         Invalidated = true;
+        return true;
     }
 
     public bool ParseThis(string key, string value) {
@@ -640,6 +804,30 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
+    /// <summary>
+    /// Liefert den Ansichts-Eintrag zum Schlüssel des ersten Blocksatzes
+    /// (ColumnName bzw. StorageKey), inklusive der on-demand Spalten; fehlt er,
+    /// wird er erzeugt und angehängt.
+    /// </summary>
+    private ColumnViewItem? GetViewItemCreateOrGet(FragmentRecord first) {
+        var keyName = first.StringContent;
+
+        if (this[keyName] is { } existing) { return existing; }
+
+        ColumnViewItem? newItem = null;
+
+        if (keyName.StartsWith("VIR_", StringComparison.OrdinalIgnoreCase)) {
+            newItem = ParseableItem.NewByTypeName<ColumnViewItem>(keyName);
+        } else if (Table?.Column[keyName] is { IsDisposed: false } column) {
+            newItem = new ColumnViewItem(column);
+        }
+
+        if (newItem is null) { return null; }
+
+        Add(newItem);
+        return newItem;
+    }
+
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
@@ -660,6 +848,156 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    #endregion
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+
+    /// <summary>
+    /// Schreibt die Ansicht: eigene Werte nur wenn nicht im Standard, danach die
+    /// persistenten Ansichts-Einträge als Sub*-Sätze (Key = ColumnName) mit
+    /// eigenem Block eine Ebene tiefer.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        if (IsDisposed) { return true; }
+
+        var allok = true;
+
+        // Der Name ist der erste Satz: Die Empfänger-Fabrik baut das Objekt daraus
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ViewName, KeyName);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ShowHead, ShowHead);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.StartCollapsed, StartCollapsed);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ChaptersUnique, ChaptersUnique);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.FilterRows, FilterRows);
+
+        if (ColumnForChapter is { IsDisposed: false } chapter) {
+            allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ChapterColumn, chapter.KeyName);
+        }
+
+
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.QuickInfo, QuickInfo); 
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ColumnHeaderMode, (int)ColumnHeaderMode);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ScaleToFit, (int)ScaleToFit);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.PinAnzeigen, Pin_anzeigen);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.AnsichtAnzeigen, Ansicht_anzeigen);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.AehnlicheAnzeigen, Ähnliche_anzeigen);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.CollapseButtonAnzeigen, CollapseButton_anzeigen);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ContextmenuScripts, Kontextmenu_Skripte);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ExecuteableScripts, Ausführbare_Skripte);
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ColumnsShowAlwaysFilter, Filter_immer_Anzeigen);
+
+        var tmp = PermissionGroups_Show.SortedDistinctList();
+        tmp.RemoveString(Administrator, false);
+
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.PermissionGroups, tmp);
+
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.SubViewItem, _internal);
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Ansicht-Block: eigene Werte im Switch, Ansichts-Einträge über
+    /// den SubViewItem-Satz suchen bzw. erzeugen und deren Block eine Ebene tiefer lesen.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((ViewFragmentType)record.LeafType) {
+            case ViewFragmentType.ShowHead:
+                ShowHead = record.BoolContent;
+                break;
+
+            case ViewFragmentType.StartCollapsed:
+                StartCollapsed = record.BoolContent;
+                break;
+
+            case ViewFragmentType.ChaptersUnique:
+                ChaptersUnique = record.BoolContent;
+                break;
+
+            case ViewFragmentType.FilterRows:
+                FilterRows = record.IntContent;
+                break;
+
+            case ViewFragmentType.ChapterColumn:
+                ColumnForChapter = Table?.Column[record.StringContent];
+                break;
+
+            case ViewFragmentType.ViewName:
+                // Name steckt im Objekt; die Empfänger-Fabrik hat ihn übernommen
+                break;
+
+            case ViewFragmentType.QuickInfo:
+                QuickInfo = record.StringContent;
+                break;
+
+            case ViewFragmentType.ColumnHeaderMode:
+                ColumnHeaderMode = (ColumnHeaderMode)record.IntContent;
+                break;
+
+            case ViewFragmentType.ScaleToFit:
+                ScaleToFit = (ScaleToFitMode)record.IntContent;
+                break;
+
+            case ViewFragmentType.PinAnzeigen:
+                Pin_anzeigen = record.BoolContent;
+                break;
+
+            case ViewFragmentType.AnsichtAnzeigen:
+                Ansicht_anzeigen = record.BoolContent;
+                break;
+
+            case ViewFragmentType.AehnlicheAnzeigen:
+                Ähnliche_anzeigen = record.BoolContent;
+                break;
+
+            case ViewFragmentType.CollapseButtonAnzeigen:
+                CollapseButton_anzeigen = record.BoolContent;
+                break;
+
+            case ViewFragmentType.ContextmenuScripts:
+                Kontextmenu_Skripte = [.. record.ListContent];
+                break;
+
+            case ViewFragmentType.ExecuteableScripts:
+                Ausführbare_Skripte = [.. record.ListContent];
+                break;
+
+            case ViewFragmentType.ColumnsShowAlwaysFilter:
+                Filter_immer_Anzeigen = [.. record.ListContent];
+                break;
+
+            case ViewFragmentType.PermissionGroups:
+                PermissionGroups_Show = [.. record.ListContent];
+                break;
+
+            case ViewFragmentType.SubViewItem:
+                // Ansichts-Einträge als Liste: Items liegen eine Ebene unter dem
+                // ListKeyObject-Satz, je Trenner leitet ein neues Item ein
+                FragmentStoreableExtension.DeserializeList(stream, record.Depth, GetViewItemCreateOrGet);
+
+                break;
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
 
     #endregion
 }

@@ -1,10 +1,38 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace BlueTable.Classes;
 
-public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition> {
+public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition>, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Fragment-Typen der Sortier-Definition im binären Fragment-Format.
+    /// Nur der Definition selbst bekannt.
+    /// </summary>
+    private enum SortDefinitionFragmentType : byte {
+
+        /// <summary>
+        /// Key-Name einer Sortier-Spalte (Blatt-Wert; die Spalte wird nur
+        /// aufgelöst, nicht neu angelegt).
+        /// </summary>
+        ColumnKeyName = 1,
+
+        /// <summary>
+        /// Absteigend sortieren.
+        /// </summary>
+        Reverse = 2,
+
+        /// <summary>
+        /// Komplette Spaltenliste (ListSet; Content = CR-getrennte ColumnNames).
+        /// </summary>
+        ColumnsList = 3
+    }
+
+    #endregion
 
     #region Fields
 
@@ -46,7 +74,14 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     /// <summary>
     /// Es wird absteigend sortiert, der größte Wert kommt zuerst.
     /// </summary>
-    public bool Reverse { get; private set; }
+    public bool Reverse {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, SortDefinitionFragmentType.Reverse, value));
+        }
+    }
 
     public Table Table { get; }
 
@@ -90,7 +125,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public bool ParseFinished() => true;
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -179,6 +214,68 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         if (Table.Column[name] is not { IsDisposed: false } c) { return null; }
         return new ColumnViewItem(c);
     }
+
+    #endregion
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Schreibt die Sortier-Definition: Reverse nur wenn gesetzt, danach die
+    /// Sortier-Spalten als Blatt-Sätze (Content = ColumnName).
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) {
+        var allok = true;
+
+        allok &= FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.Reverse, Reverse);
+
+        foreach (var thisColumn in _internal) {
+            allok &= FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.ColumnKeyName, thisColumn.ColumnName ?? string.Empty);
+        }
+
+        return allok;
+    }
+
+    /// <summary>
+    /// Verarbeitet den Sortier-Definitions-Block: Reverse im Switch, Sortier-Spalten
+    /// über den ColumnKeyName-Satz nur auflösen — fehlende Spalten werden
+    /// übersprungen, nicht neu angelegt. ColumnsList setzt die komplette Liste neu
+    /// (ListSet; Replay mehrerer Blöcke bleibt damit deterministisch).
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((SortDefinitionFragmentType)record.LeafType) {
+            case SortDefinitionFragmentType.Reverse:
+                Reverse = record.BoolContent;
+                break;
+
+            case SortDefinitionFragmentType.ColumnKeyName:
+                if (SortedColumnByName(record.StringContent) is { } target) { _internal.Add(target); }
+                break;
+
+            case SortDefinitionFragmentType.ColumnsList:
+                _internal.Clear();
+                foreach (var thisColumn in record.ListContent) {
+                    if (SortedColumnByName(thisColumn) is { } newTarget) { _internal.Add(newTarget); }
+                }
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
+
 
     #endregion
 }

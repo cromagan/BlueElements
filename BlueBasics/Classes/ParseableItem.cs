@@ -245,7 +245,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         return result;
     }
 
-    public virtual void ParseFinished(string parsed) { }
+    public virtual bool ParseFinished() => true;
 
     public abstract bool ParseThis(string key, string value);
 
