@@ -225,6 +225,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == tb.Column.SysRowChanger ||
             column == tb.Column.SysRowCreator ||
             column == tb.Column.SysRowCreateDate ||
+            column == tb.Column.SysRowCreateComment ||
+            column == tb.Column.SysRowChangeComment ||
             column == tb.Column.SysLocked ||
             column == tb.Column.SysRowState) { return null; }
 

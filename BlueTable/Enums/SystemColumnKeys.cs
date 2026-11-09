@@ -16,6 +16,16 @@ public static class SystemColumnKeys {
     public const string RowKey = "SYS_ROWKEY";
 
     /// <summary>
+    /// Kommentar, warum die Zeile erstellt wurde; wird beim Zeilen-Anlegen gesetzt.
+    /// </summary>
+    public const string CreateComment = "SYS_CREATECOMMENT";
+
+    /// <summary>
+    /// Kommentar der letzten Zelländerung; wird bei jeder Zelländerung überschrieben.
+    /// </summary>
+    public const string ChangeComment = "SYS_CHANGECOMMENT";
+
+    /// <summary>
     /// Benutzerdefinierte Sortierung. Ist diese Spalte vorhanden, wird die
     /// Tabellen-Sortierung fixiert und immer aufsteigend nach diesem Index sortiert.
     /// </summary>

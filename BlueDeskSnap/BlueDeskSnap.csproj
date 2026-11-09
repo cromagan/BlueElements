@@ -1,0 +1,93 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+	<TargetFramework>net10.0-windows</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
+
+    <!-- Assembly-Metadaten -->
+    <RootNamespace>BlueDeskSnap</RootNamespace>
+    <AssemblyName>BlueDeskSnap</AssemblyName>
+    <Product>BlueDeskSnap</Product>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2026 Christian Peter</Copyright>
+
+    <!-- Versionierung -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+
+    <!-- Plattformen -->
+	<Platforms>AnyCPU;x86;x64</Platforms>
+	<UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+  <!-- Code-Analyzer -->
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.403">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+ </ItemGroup>
+
+  <ItemGroup>
+    <!-- NuGet-Pakete -->
+    <!-- UI Automation liegt im WPF-Profil des WindowsDesktop-Frameworks -->
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- NuGet-Pakete -->
+    <!-- Projekt-Referenzen -->
+    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
+    <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
+    <ProjectReference Include="..\BluePaint\BluePaint.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Drawing" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Runtime.InteropServices" />
+    <Using Include="BlueBasics" />
+    <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics.Enums" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueBasics.Interfaces" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
+    <Using Include="BlueControls.Controls" />
+    <Using Include="BlueControls.Classes" />
+    <Using Include="BlueControls.ClassesStatic" />
+    <Using Include="BlueControls.Enums" />
+    <Using Include="BlueControls.EventArgs" />
+    <Using Include="BlueControls.Forms" />
+    <Using Include="BlueControls.Interfaces" />
+    <Using Include="BlueControls.ListItems" />
+    <Using Include="BlueDeskSnap.Interop" />
+    <Using Include="BlueDeskSnap.Plugins" />
+    <Using Include="BlueDeskSnap.QualityPlugins" />
+    <Using Include="BlueDeskSnap.Snap" />
+  </ItemGroup>
+</Project>

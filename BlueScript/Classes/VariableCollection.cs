@@ -17,7 +17,8 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     private enum VariableCollectionNavigationType : byte {
 
         /// <summary>
-        /// Navigation in eine Variable (Key = KeyName der Variablen).
+        /// Navigation in eine Variable (Key = KeyName der Variablen);
+        /// Journal-Einzelsätze.
         /// </summary>
         SubVariable = 1,
 
@@ -25,7 +26,13 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         /// Blatt-Satz: übernimmt eine ganze neue Variable im Classic-Format
         /// (Content = Parseable-String der Variablen).
         /// </summary>
-        VariableAdd = 2
+        VariableAdd = 2,
+
+        /// <summary>
+        /// ListKeyObject-Satz: die Variablen folgen als Liste eine Ebene tiefer,
+        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
+        /// </summary>
+        VariableList = 3
     }
 
     #endregion
@@ -120,7 +127,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
 
         // Das Kind-Event für das FragmentChanged-Bubbling verdrahten und die neue
         // Variable als ganze (Classic-Format) ans Root melden.
-        this.RegisterEvents(VariableCollectionNavigationType.SubVariable, variable);
+        this.Register(variable);
 
         OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableCollectionNavigationType.VariableAdd, variable));
 
@@ -246,7 +253,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         if (ReadOnly) { return false; }
 
         if (!_internal.TryRemove(keyName, out var variable)) { return false; }
-        this.UnregisterEvents(VariableCollectionNavigationType.SubVariable, variable);
+        this.Unregister(variable);
         InvalidateCache();
         return true;
     }
@@ -257,7 +264,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         var changed = false;
         foreach (var kvp in _internal) {
             if (kvp.Value.Comment.Contains(comment)) {
-                this.UnregisterEvents(VariableCollectionNavigationType.SubVariable, kvp.Value);
+                this.Unregister(kvp.Value);
                 _internal.TryRemove(kvp.Key, out _);
                 changed = true;
             }
@@ -448,7 +455,7 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     public void Clear() {
         if (ReadOnly) { return; }
 
-        foreach (var variable in _internal.Values) { this.UnregisterEvents(VariableCollectionNavigationType.SubVariable, variable); }
+        this.Unregister(_internal.Values);
         _internal.Clear();
         InvalidateCache();
     }
@@ -467,37 +474,54 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     /// <summary>
-    /// Schreibt alle Variablen mit Textdarstellung: je Variable ein SubVariable-Satz
-    /// (Key = KeyName), darunter der Variablen-Block eine Ebene tiefer.
+    /// Schreibt alle Variablen mit Textdarstellung als Liste: ein VariableList-Satz,
+    /// darunter je Variable der Variablen-Block eine Ebene tiefer (Type-Satz zuerst).
     /// </summary>
-    public bool SerializeCore(Stream stream, int depth) {
-        var allok = true;
-
-        foreach (var thisv in ToStringableListVariable()) {
-            allok &= FragmentRecord.Append(stream, depth, VariableCollectionNavigationType.SubVariable, thisv);
-        }
-
-        return allok;
-    }
+    public bool SerializeCore(Stream stream, int depth) => FragmentRecord.Append(stream, depth, VariableCollectionNavigationType.VariableList, ToStringableListVariable());
 
     /// <summary>
-    /// Verarbeitet den Variablen-Block: Der SubVariable-Satz benennt die Variable —
-    /// der erste Satz ihres Blocks (Type) erzeugt eine neue Instanz, trägt er einen
-    /// Blatt-Wert, wird der Block direkt auf die bestehende Variable angewendet.
-    /// Der VariableAdd-Satz übernimmt eine ganze neue Variable im Classic-Format.
+    /// Verarbeitet den Variablen-Block: Der VariableList-Satz liest die Variablen
+    /// als Liste, der SubVariable-Satz wendet einen Journal-Einzelsatz an, der
+    /// VariableAdd-Satz übernimmt eine ganze neue Variable im Classic-Format.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((VariableCollectionNavigationType)record.LeafType) {
+            case VariableCollectionNavigationType.VariableList:
+                // Je Segment eine Variable (Type-Satz zuerst); bestehende Instanzen behalten ihre Identität
+                if (FragmentStoreableExtension.DeserializeList(stream, record.Depth, VariableCreate) is not { } vars) { return false; }
+
+                foreach (var thisvar in vars) {
+                    if (!ApplyVariable(thisvar.KeyName, thisvar)) { return false; }
+                }
+
+                return true;
+
             case VariableCollectionNavigationType.SubVariable:
                 return DeserializeVariable(stream, record);
 
             case VariableCollectionNavigationType.VariableAdd:
-                if (ParseableItem.NewByParsing<ScriptVariable>(record.StringContent) is not { } variable) { return false; }
-                return Add(variable);
+                // Ganze Variable im Classic-Format: fehlt sie, wird sie zugefügt,
+                // sonst behält die bestehende Instanz ihre Identität (das Journal
+                // kann VariableAdd-Sätze wiederholen).
+                if (ParseableItem.NewByParsing<ScriptVariable>(record.StringContent) is not { } newVariable) { return false; }
+
+                return ApplyVariable(newVariable.KeyName, newVariable);
 
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Erzeugt die Variable zum Type-Satz des Segment-Anfangs; der konkrete Typ
+    /// liegt im Content. Konstruktoren erzeugen schreibgeschützt — zum Einlesen
+    /// wird freigegeben (wie im Classic-Pfad).
+    /// </summary>
+    private ScriptVariable? VariableCreate(FragmentRecord first) {
+        if (ParseableItem.NewByTypeName<ScriptVariable>(first.StringContent) is not { } newVar) { return null; }
+
+        newVar.ReadOnly = false;
+        return newVar;
     }
 
     /// <summary>
@@ -514,8 +538,9 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         if (first is null) { return false; }
 
         if (first.LeafType != (byte)ScriptVariable.VariableFragmentType.Type) {
-            // Bestehende Variable: Wert-/Kommentar-Sätze direkt auf die Instanz anwenden
-            if (GetByKey(record.StringContent) is not { } existing) { return false; }
+            // Bestehende Variable: Wert-/Kommentar-Sätze direkt auf die Instanz anwenden.
+            // Fehlt die Variable (Satz trifft vor dem Anlegen ein), Satz überspringen.
+            if (GetByKey(record.StringContent) is not { } existing) { return true; }
 
             return existing.DeserializeThis(stream, first) && existing.Deserialize(stream, record.Depth + 1);
         }
@@ -551,6 +576,13 @@ public class VariableCollection : IEnumerable<ScriptVariable>, IEditable, IParse
         existing.Comment = newVar.Comment;
 
         return error is not { Length: > 0 };
+    }
+
+    /// <summary>
+    /// Reicht eine Variablen-Änderung mit dem eigenen Pfad-Segment (SubVariable, Key der Variable) eine Ebene höher.
+    /// </summary>
+    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(VariableCollectionNavigationType.SubVariable, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
     }
 
     /// <summary>

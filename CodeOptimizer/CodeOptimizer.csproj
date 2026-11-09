@@ -1,0 +1,82 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <StartupObject>CodeOptimizer.Program</StartupObject>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnableHotReload>true</EnableHotReload>
+    <Deterministic>false</Deterministic>
+
+    <!-- Assembly-Metadaten -->
+    <RootNamespace>CodeOptimizer</RootNamespace>
+    <AssemblyName>CodeOptimizer</AssemblyName>
+    <Product>CodeOptimizer</Product>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2026 Christian Peter</Copyright>
+
+    <!-- Versionierung -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+
+    <!-- Plattformen -->
+    <Platforms>AnyCPU</Platforms>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Code-Analyzer -->
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.403">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Projekt-Referenzen -->
+    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
+    <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.RegularExpressions" />
+    <Using Include="BlueBasics" />
+    <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics.Enums" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueBasics.Interfaces" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
+    <Using Include="BlueControls.Classes" />
+    <Using Include="BlueControls.Controls" />
+    <Using Include="BlueControls.Enums" />
+    <Using Include="BlueControls.EventArgs" />
+    <Using Include="BlueControls.Forms" />
+    <Using Include="BlueControls.ListItems" />
+    <Using Include="CodeOptimizer.Classes" />
+    <Using Include="CodeOptimizer.Forms" />
+    <Using Include="CodeOptimizer.Plugins" />
+  </ItemGroup>
+
+</Project>

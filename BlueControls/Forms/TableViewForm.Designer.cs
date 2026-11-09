@@ -74,6 +74,7 @@ namespace BlueControls.Forms {
             btnStresstest = new Button();
             grpAdminBearbeiten = new GroupBox();
             btnSuchInScript = new Button();
+            btnAbhängigkeiten = new Button();
             btnSkripteBearbeiten = new Button();
             btnFormular = new Button();
             btnTabelleKopf = new Button();
@@ -584,6 +585,7 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.BackColor = Color.FromArgb(244, 245, 246);
             grpAdminBearbeiten.CausesValidation = false;
             grpAdminBearbeiten.Controls.Add(btnSuchInScript);
+            grpAdminBearbeiten.Controls.Add(btnAbhängigkeiten);
             grpAdminBearbeiten.Controls.Add(btnSkripteBearbeiten);
             grpAdminBearbeiten.Controls.Add(btnFormular);
             grpAdminBearbeiten.Controls.Add(btnTabelleKopf);
@@ -592,7 +594,7 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminBearbeiten.Location = new Point(0, 0);
             grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            grpAdminBearbeiten.Size = new Size(312, 81);
+            grpAdminBearbeiten.Size = new Size(384, 81);
             grpAdminBearbeiten.TabIndex = 9;
             grpAdminBearbeiten.TabStop = false;
             grpAdminBearbeiten.Text = "Bearbeiten";
@@ -608,6 +610,18 @@ namespace BlueControls.Forms {
             btnSuchInScript.TabIndex = 46;
             btnSuchInScript.Text = "in Skripten suchen";
             btnSuchInScript.Click += btnSuchInScript_Click;
+            //
+            // btnAbhängigkeiten
+            //
+            btnAbhängigkeiten.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnAbhängigkeiten.ImageCode = "Hierarchie";
+            btnAbhängigkeiten.Location = new Point(304, 2);
+            btnAbhängigkeiten.Name = "btnAbhängigkeiten";
+            btnAbhängigkeiten.QuickInfo = "Zeigt als Grafik, welche Tabellen, Formulare und Skripte voneinander abhängen (LinkedCells, Skript-Verweise, Formular-Nutzung).";
+            btnAbhängigkeiten.Size = new Size(72, 66);
+            btnAbhängigkeiten.TabIndex = 48;
+            btnAbhängigkeiten.Text = "Abhängig-keiten";
+            btnAbhängigkeiten.Click += btnAbhängigkeiten_Click;
             // 
             // btnSkripteBearbeiten
             // 
@@ -960,6 +974,7 @@ namespace BlueControls.Forms {
 
         private Button btnUserInfo;
         private Button btnSuchInScript;
+        private Button btnAbhängigkeiten;
         private Button btnMonitoring;
         private Button btnStresstest;
     }

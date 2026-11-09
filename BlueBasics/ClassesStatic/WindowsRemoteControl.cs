@@ -1,7 +1,9 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueBasics.Structs;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using FormWindowState = System.Windows.Forms.FormWindowState;
 
 namespace BlueBasics.ClassesStatic;
 
@@ -9,11 +11,19 @@ public static class WindowsRemoteControl {
 
     #region Fields
 
+    private const int DwmwaCloaked = 14;
+
+    private const int GwlExstyle = -20;
+
     private const int KeyeventfExtendedkey = 0x1;
 
     private const int KeyeventfKeydown = 0x0;
 
     private const int KeyeventfKeyup = 0x2;
+
+    private const int SwpNoactivate = 0x0010;
+
+    private const int WsexToolwindow = 0x00000080;
 
     #endregion
 
@@ -66,16 +76,14 @@ public static class WindowsRemoteControl {
     /// <param name="wDescr"></param>
     /// <remarks></remarks>
     public static void GetWindowInfo(ref StrProcess wDescr) {
-        // If WorkStationISLocked() Then
-        //    wDescr = Nothing
-        //    Exit Sub
-        // End If
-        // Dim PridA As Integer
         var prid = 0;
         var hParent = GetAncestor(wDescr.MainWindowHandle);
         _ = GetWindowThreadProcessId(hParent, ref prid);
+        Develop.Diagnose("WRC", "Handle " + wDescr.MainWindowHandle + ": Titel wird gelesen");
         wDescr.MainWindowTitle = WinTitle(wDescr.MainWindowHandle);
+        Develop.Diagnose("WRC", "Handle " + wDescr.MainWindowHandle + ": Klasse wird gelesen");
         wDescr.Klasse = WinClass(wDescr.MainWindowHandle);
+        Develop.Diagnose("WRC", "Handle " + wDescr.MainWindowHandle + ": Exe wird gelesen");
         wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
         wDescr.Prid = prid;
     }
@@ -171,16 +179,30 @@ public static class WindowsRemoteControl {
     }
 
     /// <summary>
+    /// Liefert die Bildschirmkoordinaten (Position und Größe) des Fensters.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    public static Rectangle WinBounds(IntPtr handle) {
+        if (GetWindowRect(handle, out var rect) == 0) { return Rectangle.Empty; }
+
+        return new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
+    }
+
+    /// <summary>
     /// Liest den KlassenNames aus.
     /// </summary>
     /// <param name="handle"></param>
     /// <returns></returns>
     /// <remarks></remarks>
     public static string WinClass(IntPtr handle) {
-        var buffer = string.Empty.PadRight(250); // = Space(250)
-        var l = GetClassName(handle, buffer, 250);
-        // If String.IsNullOrEmpty(buffer) Then Return String.Empty
-        return buffer[..l];
+        var buffer = Marshal.AllocHGlobal(512);
+        try {
+            var l = GetClassName(handle, buffer, 511);
+            return l <= 0 ? string.Empty : Marshal.PtrToStringAnsi(buffer, l) ?? string.Empty;
+        } finally {
+            Marshal.FreeHGlobal(buffer);
+        }
     }
 
     /// <summary>
@@ -190,13 +212,78 @@ public static class WindowsRemoteControl {
     /// <returns></returns>
     /// <remarks></remarks>
     public static string WinExeName(IntPtr handle) {
-        var buffer = string.Empty.PadRight(250);
-        var l = GetWindowModuleFileName(handle, buffer, 250);
-        if (l > 0) {
-            buffer = buffer[..l];
-            return buffer[^1] == '\0' ? buffer[..^1] : buffer;
+        var buffer = Marshal.AllocHGlobal(1024);
+        try {
+            var l = GetWindowModuleFileName(handle, buffer, 1023);
+            return l <= 0 ? string.Empty : (Marshal.PtrToStringAnsi(buffer, l) ?? string.Empty).TrimEnd('\0');
+        } finally {
+            Marshal.FreeHGlobal(buffer);
         }
-        return string.Empty;
+    }
+
+    /// <summary>
+    /// True, wenn das Fenster als Werkzeugfenster (WS_EX_TOOLWINDOW) markiert ist und typischerweise nicht gesichert werden soll.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    public static bool WinIsToolWindow(IntPtr handle) => (GetWindowLong(handle, GwlExstyle) & WsexToolwindow) != 0;
+
+    /// <summary>
+    /// True, wenn das Fenster sichtbar und nicht von einer anderen Anwendung "verhüllt" (Cloaked) ist.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    public static bool WinIsVisible(IntPtr handle) => IsWindowVisible(handle) && !WinIsCloaked(handle);
+
+    /// <summary>
+    /// Bringt das Fenster auf die gewünschte Position/Größe, stellt den Fensterzustand wieder her und holt es in den Vordergrund.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <param name="bounds"></param>
+    /// <param name="maximized"></param>
+    public static void WinPlace(IntPtr handle, Rectangle bounds, bool maximized) {
+        Develop.Diagnose("WRC", "WinPlace " + handle + (maximized ? " maximiert" : " normal"));
+
+        if (maximized) {
+            _ = ShowWindow(handle, (int)Sw.ShowMaximized);
+            Develop.Diagnose("WRC", "WinPlace ShowWindow fertig: " + handle);
+            return;
+        }
+
+        FensterRestore(handle);
+        Develop.Diagnose("WRC", "WinPlace Restore fertig: " + handle);
+        _ = SetWindowPos(handle, 0, bounds.X, bounds.Y, bounds.Width, bounds.Height, SwpNoactivate); // 0 = HwndTop
+        Develop.Diagnose("WRC", "WinPlace SetWindowPos fertig: " + handle);
+    }
+
+    /// <summary>
+    /// Minimiert das Fenster.
+    /// </summary>
+    public static void WinMinimize(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.Minimize);
+
+    /// <summary>
+    /// Liefert den Fensterzustand des Fensters.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    public static FormWindowState WinState(IntPtr handle) {
+        if (IsIconic(handle)) { return FormWindowState.Minimized; }
+
+        return IsZoomed(handle) ? FormWindowState.Maximized : FormWindowState.Normal;
+    }
+
+    /// <summary>
+    /// Liefert Position und Größe des Fensters im Normalzustand - auch für minimierte Fenster.
+    /// </summary>
+    public static Rectangle WinNormalBounds(IntPtr handle) {
+        var placement = new WindowPlacement {
+            Length = Marshal.SizeOf<WindowPlacement>()
+        };
+
+        if (!GetWindowPlacement(handle, ref placement)) { return Rectangle.Empty; }
+
+        var r = placement.NormalPosition;
+        return new Rectangle(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top);
     }
 
     /// <summary>
@@ -207,16 +294,25 @@ public static class WindowsRemoteControl {
     /// <remarks></remarks>
     public static string WinTitle(IntPtr handle) {
         var l = GetWindowTextLength(handle) + 1;
-        var buffer = string.Empty.PadRight(l);
-        _ = GetWindowText(handle, buffer, l);
-        return buffer[..];
+        if (l <= 1) { return string.Empty; }
+
+        var buffer = Marshal.AllocHGlobal(l * 2);
+        try {
+            _ = GetWindowText(handle, buffer, l);
+            return (Marshal.PtrToStringUni(buffer) ?? string.Empty).TrimEnd('\0');
+        } finally {
+            Marshal.FreeHGlobal(buffer);
+        }
     }
 
     [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern short GetAsyncKeyState(int vKey);
 
     [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    private static extern int GetClassName(IntPtr hWnd, string lpClassName, int nMaxCount);
+    private static extern int GetClassName(IntPtr hWnd, IntPtr lpClassName, int nMaxCount);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attr, out int attrValue, int attrSize);
 
     [DllImport("user32.dll", EntryPoint = "GetMessageExtraInfo", SetLastError = true)]
     private static extern IntPtr GetMessageExtraInfo();
@@ -230,20 +326,35 @@ public static class WindowsRemoteControl {
     [DllImport("user32", EntryPoint = "GetWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern IntPtr GetWindow(IntPtr hwnd, int wCmd);
 
+    [DllImport("user32", EntryPoint = "GetWindowLong", SetLastError = true)]
+    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
     [DllImport("user32", EntryPoint = "GetWindowModuleFileNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    private static extern int GetWindowModuleFileName(IntPtr hWnd, string pszFileName, int cchFileNameMax);
+    private static extern int GetWindowModuleFileName(IntPtr hWnd, IntPtr pszFileName, int cchFileNameMax);
 
-    [DllImport("user32", EntryPoint = "GetWindowRect", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    private static extern int GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+    [DllImport("user32", EntryPoint = "GetWindowPlacement", SetLastError = true)]
+    private static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement lpplwnd);
 
-    [DllImport("user32", EntryPoint = "GetWindowTextA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    private static extern int GetWindowText(IntPtr hWnd, string lpstring, int cch);
+    [DllImport("user32", EntryPoint = "GetWindowRect", SetLastError = true)]
+    private static extern int GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [DllImport("user32", EntryPoint = "GetWindowTextW", ExactSpelling = true, SetLastError = true)]
+    private static extern int GetWindowText(IntPtr hWnd, IntPtr lpstring, int cch);
 
     [DllImport("user32", EntryPoint = "GetWindowTextLengthA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern int GetWindowTextLength(IntPtr hwnd);
 
     [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
+
+    [DllImport("user32", EntryPoint = "IsIconic", ExactSpelling = true, SetLastError = true)]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+    [DllImport("user32", EntryPoint = "IsWindowVisible", ExactSpelling = true, SetLastError = true)]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32", EntryPoint = "IsZoomed", ExactSpelling = true, SetLastError = true)]
+    private static extern bool IsZoomed(IntPtr hWnd);
 
     // VK_CANCEL = &H3 'Used for control-break processing.
     // '****************
@@ -283,6 +394,16 @@ public static class WindowsRemoteControl {
     [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
+    /// <summary>
+    /// True, wenn das Fenster von einer anderen Anwendung "verhüllt" (Cloaked, z.B. UWP im Hintergrund) ist.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    private static bool WinIsCloaked(IntPtr handle) {
+        var result = DwmGetWindowAttribute(handle, DwmwaCloaked, out var cloak, sizeof(int));
+        return result == 0 && cloak != 0;
+    }
+
     #endregion
 
     #region Structs
@@ -298,6 +419,16 @@ public static class WindowsRemoteControl {
         public int Prid { get; set; }
 
         #endregion
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WindowPlacement {
+        public int Length;
+        public int Flags;
+        public int ShowCmd;
+        public Point MinPosition;
+        public Point MaxPosition;
+        public RECT NormalPosition;
     }
 
     [StructLayout(LayoutKind.Sequential)]

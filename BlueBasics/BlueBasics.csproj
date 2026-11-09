@@ -250,4 +250,8 @@
     <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
     <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Structs\" />
+  </ItemGroup>
 </Project>

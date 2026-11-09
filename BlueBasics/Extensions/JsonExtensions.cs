@@ -143,6 +143,16 @@ public static partial class Extensions {
     /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
     /// <paramref name="defaultValue" /> geliefert.
     /// </summary>
+    public static Rectangle GetRectangle(this JsonObject json, string key, Rectangle defaultValue) {
+        if (json[key] is not JsonObject jo) { return defaultValue; }
+        return new Rectangle(jo.GetInt("left"), jo.GetInt("top"), jo.GetInt("width"), jo.GetInt("height"));
+    }
+
+    /// <summary>
+    /// Liest ein vom Set geschriebenes verschachteltes Objekt
+    /// unter <paramref name="key" />. Fehlt der Key oder ist kein Objekt, wird
+    /// <paramref name="defaultValue" /> geliefert.
+    /// </summary>
     public static SizeF GetSizeF(this JsonObject json, string key, SizeF defaultValue) {
         if (json[key] is not JsonObject jo) { return defaultValue; }
         return new SizeF(jo.GetFloat("width"), jo.GetFloat("height"));
@@ -215,6 +225,19 @@ public static partial class Extensions {
         jo.Set("top", padding.Top);
         jo.Set("right", padding.Right);
         jo.Set("bottom", padding.Bottom);
+        json.Set(key, jo);
+    }
+
+    /// <summary>
+    /// Serialisiert ein Rectangle unter <paramref name="key" /> als
+    /// verschachteltes Objekt mit den Feldern <c>left</c>, <c>top</c>, <c>width</c>, <c>height</c>.
+    /// </summary>
+    public static void Set(this JsonObject json, string key, Rectangle rectangle) {
+        JsonObject jo = new();
+        jo.Set("left", rectangle.Left);
+        jo.Set("top", rectangle.Top);
+        jo.Set("width", rectangle.Width);
+        jo.Set("height", rectangle.Height);
         json.Set(key, jo);
     }
 

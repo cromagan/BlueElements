@@ -49,6 +49,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
+    <ProjectReference Include="..\BlueDeskSnap\BlueDeskSnap.csproj" />
     <ProjectReference Include="..\BlueInternet\BlueInternet.csproj" />
     <ProjectReference Include="..\BluePaint\BluePaint.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />

@@ -204,7 +204,7 @@ public class TableRoundtripTestCliCommand : CliCommand {
         #region T3: Bytegenaue Vergleiche erster Stand vs. folgende Stände
 
         Out(string.Empty);
-        Out("=== T3: Bytegenauer Vergleich erster Stand vs. letzte Stände ===");
+        Out("=== T3: Bytegenauer Vergleich erster Stand vs. letzte Stände (Zip-Uhrzeit neutralisiert) ===");
 
         List<string> bdbFiles = [];
         List<string> nbdbFiles = [];
@@ -224,8 +224,9 @@ public class TableRoundtripTestCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Vergleicht jede Datei der Kette mit dem ersten Stand: Datei-Bytes bytegenau,
-    /// dazu der entpackte Inhalt (trennt ZIP-Header- von Daten-Problemen).
+    /// Vergleicht jede Datei der Kette mit dem ersten Stand: Datei-Bytes bytegenau
+    /// ohne die Zip-Uhrzeit, dazu der entpackte Inhalt (trennt ZIP-Header- von
+    /// Daten-Problemen).
     /// </summary>
     private static void CheckByteIdentical(List<string> failures, string caption, List<string> files) {
         if (files.Count < 2) {
@@ -252,8 +253,8 @@ public class TableRoundtripTestCliCommand : CliCommand {
                 continue;
             }
 
-            if (!Check(failures, cmpBytes.SequenceEqual(refBytes), caption + " — Datei bytegenau identisch: " + f.FileNameWithSuffix() + $" ({cmpBytes.Length} Bytes)")) {
-                Out("  Datei-Bytes unterscheiden sich: " + f.FileNameWithSuffix());
+            if (!Check(failures, ZipTimeNeutralized(cmpBytes).SequenceEqual(ZipTimeNeutralized(refBytes)), caption + " — Datei bytegenau identisch ohne Zip-Uhrzeit: " + f.FileNameWithSuffix() + $" ({cmpBytes.Length} Bytes)")) {
+                Out("  Datei-Bytes unterscheiden sich (ohne Zip-Uhrzeit): " + f.FileNameWithSuffix());
             }
 
             var d = DiffOf(refRaw, cmpRaw);
@@ -270,6 +271,38 @@ public class TableRoundtripTestCliCommand : CliCommand {
     private static byte[]? RawContentOf(string file) {
         if (ReadAllBytes(file, 10).Value is not byte[] bytes) { return null; }
         return bytes.IsZipped() ? bytes.UnzipIt() : bytes;
+    }
+
+    /// <summary>
+    /// Setzt die ZIP-Zeitstempel (Mod-Zeit und Mod-Datum in Local-File- und
+    /// Central-Directory-Headern) auf 0, damit der Bytevergleich die Zip-Uhrzeit
+    /// ignoriert. Alle übrigen Bytes bleiben unverändert.
+    /// </summary>
+    private static byte[] ZipTimeNeutralized(byte[] bytes) {
+        if (!bytes.IsZipped()) { return bytes; }
+
+        var result = (byte[])bytes.Clone();
+        var pos = 0;
+
+        // Local-File-Header (PK\3\4): Zeitstempel an +10, danach Name, Extra und Nutzdaten überspringen.
+        while (pos + 30 <= result.Length && BitConverter.ToInt32(result, pos) == 0x04034B50) {
+            Array.Clear(result, pos + 10, 4);
+
+            var compSize = BitConverter.ToInt32(result, pos + 18);
+            var nameLen = BitConverter.ToInt16(result, pos + 26);
+            var extraLen = BitConverter.ToInt16(result, pos + 28);
+
+            pos += 30 + compSize + nameLen + extraLen;
+        }
+
+        // Central-Directory-Einträge (PK\1\2): Zeitstempel an +12, danach Name, Extra und Kommentar überspringen.
+        while (pos + 46 <= result.Length && BitConverter.ToInt32(result, pos) == 0x02014B50) {
+            Array.Clear(result, pos + 12, 4);
+
+            pos += 46 + BitConverter.ToInt16(result, pos + 28) + BitConverter.ToInt16(result, pos + 30) + BitConverter.ToInt16(result, pos + 32);
+        }
+
+        return result;
     }
 
     /// <summary>

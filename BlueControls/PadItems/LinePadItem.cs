@@ -32,15 +32,15 @@ public class LinePadItem : PadItem, IStyleableOne {
 
     public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
-    public LinePadItem(string keyName, PadStyles format, Point point1, Point point2) : base(keyName) {
+    public LinePadItem(string keyName, PadStyles format, Point point1, Point point2) : this(keyName, format, (PointF)point1, (PointF)point2) { }
+
+    public LinePadItem(string keyName, PadStyles format, PointF point1, PointF point2) : base(keyName) {
         // Suppress-Modus whrend der Konstruktion: Property-Setter (z. B. Style)
         // lsen keine Change-Events aus. Siehe ParseableItem.ISupportInitialize.
         BeginInit();
         try {
-            _point1 = new PointM(this, "Punkt 1", 0, 0);
-            _point2 = new PointM(this, "Punkt 2", 0, 0);
-            _point1.SetTo(point1, false);
-            _point2.SetTo(point2, false);
+            _point1 = new PointM(this, "Punkt 1", point1.X, point1.Y);
+            _point2 = new PointM(this, "Punkt 2", point2.X, point2.Y);
             MovablePoint.Add(_point1);
             MovablePoint.Add(_point2);
             PointsForSuccessfullyMove.AddRange(MovablePoint);

@@ -1028,19 +1028,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     }
 
                     // Zelle ist aus dem Speicher entfernt: Bubbling abmelden
-                    c.FragmentChanged -= _cell_FragmentChanged;
+                    this.Unregister(c);
                 }
             } else {
                 if (!string.IsNullOrEmpty(value)) {
-                    if (!tb.Cell.TryAddCell(column, this, new CellItem(value))) {
+                    if (!tb.Cell.TryAddCell(column, this, new CellItem())) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
                     }
 
                     if (tb.Cell.TryGetCell(column, this, out var newCell) && newCell is not null) {
-                        newCell.FragmentChanged -= _cell_FragmentChanged;
-                        newCell.FragmentChanged += _cell_FragmentChanged;
+                        this.Reregister(newCell);
+                        // Erst nach der Anmeldung setzen — der Konstruktor-Wert würde
+                        // vor dem Bubbling verloren gehen (Satz fehlt im Fragment-Journal).
+                        newCell.Value = value;
                     }
                 }
             }
@@ -1052,10 +1054,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
     /// <summary>
-    /// Pflegt nach einer Zelländerung die Systemspalten: Änderer/Änderungsdatum werden immer
-    /// gesetzt, der Zeilenstatus bei Neuberechnungs-spalten über InvalidateRowState(ColumnItem?, string, DateTime, ChangeFlags) invalidiert.
+    /// Pflegt nach einer Zelländerung die Systemspalten: Änderer/Änderungsdatum/Änder-Kommentar
+    /// werden gesetzt, der Zeilenstatus bei Neuberechnungs-Spalten über
+    /// InvalidateRowState(ColumnItem?, string, DateTime, string, ChangeFlags) invalidiert.
     /// </summary>
-    internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, ChangeFlags reason) {
+    internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, string comment, ChangeFlags reason) {
         if (!reason.HasFlag(ChangeFlags.PostProcess)) { return; }
         if (reason.HasFlag(ChangeFlags.IgnoreSystemColumns)) { return; }
 
@@ -1065,10 +1068,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
         if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
+        if (tb.Column.SysRowChangeComment is { IsDisposed: false } scc && scc != column) { CellSetInMemory(scc, comment); }
 
         // user durchreichen: Bei nachgeladenen Fragmenten ist das der Original-Autor,
         // nicht der lokale Benutzer. Sonst würde der Stempel den Autor überschreiben.
-        InvalidateRowState(column, "Automatische Invalidierung nach Zelländerung", datetimeutc, user, ChangeFlags.None);
+        InvalidateRowState(column, comment, datetimeutc, user, ChangeFlags.None);
     }
 
     internal bool IsMyRow(double maxminutes, bool mastertoo) {
@@ -1439,6 +1443,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     private enum RowNavigationType : byte {
 
         /// <summary>
+        /// Blatt-Satz: benennt die Zeile (Content = RowKey); er öffnet den
+        /// Zeilen-Block in Listen.
+        /// </summary>
+        RowKey = 89,
+
+        /// <summary>
         /// Navigation in eine Zelle der Zeile (Key = Spalten-Key).
         /// </summary>
         Cell = 90
@@ -1450,15 +1460,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     /// <summary>
-    /// Schreibt die Zellen der Zeile: SaveContent-Spalten mit nicht-leerem Inhalt als
-    /// Cell-Satz (Key = ColumnKey) mit Zell-Block eine Ebene tiefer, in der
-    /// Speicherreihenfolge der Spalten — deterministisch über Instanzen hinweg.
+    /// Schreibt den RowKey und danach die Zellen der Zeile: SaveContent-Spalten
+    /// mit nicht-leerem Inhalt als Cell-Satz (Key = ColumnKey) mit Zell-Block eine
+    /// Ebene tiefer, in der Speicherreihenfolge der Spalten. Der RowKey kommt
+    /// zuerst, da er die Zeile beim Laden anlegt.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
         if (Table is not { IsDisposed: false } tb) { return true; }
 
-        var allok = true;
+        var allok = FragmentRecord.Append(stream, depth, RowNavigationType.RowKey, KeyName);
 
         foreach (var column in tb.ColumnsInSaveOrder()) {
             if (column is not { IsDisposed: false } || !column.SaveContent) { continue; }
@@ -1475,18 +1486,25 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Verarbeitet den Zeilen-Block: Zellen über den Cell-Satz (Key = ColumnKey)
-    /// suchen bzw. anlegen und deren Block eine Ebene tiefer lesen.
+    /// Verarbeitet den Zeilen-Block: Der RowKey-Satz ist mit dem Anlegen der Zeile
+    /// abgehakt, Zellen über den Cell-Satz (Key = ColumnKey) suchen bzw. anlegen
+    /// und deren Block eine Ebene tiefer lesen.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if ((RowNavigationType)record.LeafType != RowNavigationType.Cell) {
-            // Unbekannter Blatt-Typ — Satz überspringen
-            return true;
+        switch ((RowNavigationType)record.LeafType) {
+            case RowNavigationType.RowKey:
+                // Der RowKey hat den Empfänger bereits benannt (RowCreateOrGet der Collection)
+                return true;
+
+            case RowNavigationType.Cell:
+                if (CellCreateOrGet(record.StringContent) is not { } cell) { return false; }
+
+                return cell.Deserialize(stream, record.Depth + 1);
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                return true;
         }
-
-        if (CellCreateOrGet(record.StringContent) is not { } cell) { return false; }
-
-        return cell.Deserialize(stream, record.Depth + 1);
     }
 
     /// <summary>
@@ -1497,8 +1515,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tb.Column[columnKey] is not { IsDisposed: false } column) { return null; }
 
         if (tb.Cell.TryGetCell(column, this, out var cell) && cell is not null) {
-            cell.FragmentChanged -= _cell_FragmentChanged;
-            cell.FragmentChanged += _cell_FragmentChanged;
+            this.Reregister(cell);
             return cell;
         }
 
@@ -1506,8 +1523,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         _ = tb.Cell.TryGetCell(column, this, out cell);
         if (cell is not null) {
-            cell.FragmentChanged -= _cell_FragmentChanged;
-            cell.FragmentChanged += _cell_FragmentChanged;
+            this.Reregister(cell);
         }
         return cell;
     }
@@ -1516,7 +1532,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Reicht eine Zell-Änderung mit dem Zell-Pfad (Cell + ColumnKey) eine Ebene höher;
     /// die Spalte der geänderten Zelle wird über die eigenen Zellen aufgelöst.
     /// </summary>
-    private void _cell_FragmentChanged(object? sender, FragmentChangedEventArgs e) {
+    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
         if (sender is not CellItem cell) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
 

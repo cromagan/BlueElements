@@ -1742,7 +1742,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnKeys.Locked or
             SystemColumnKeys.RowState or
             SystemColumnKeys.RowKey or
-            SystemColumnKeys.RowSortIndex;
+            SystemColumnKeys.RowSortIndex or
+            SystemColumnKeys.CreateComment or
+            SystemColumnKeys.ChangeComment;
 
     public bool MayHaveDropDown() {
         return _relationType == RelationType.DropDownValues
@@ -1857,6 +1859,27 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
+            case SystemColumnKeys.CreateComment:
+                _relationship_to_First = false;
+                _relationType = RelationType.None;
+                _value_for_Chunk = ChunkType.None;
+                _isKeyColumn = false;
+                _isFirst = false;
+                _ignoreAtRowFilter = true;
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.List_Readonly) {
+                    _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                }
+                _maxTextLineLength = 500;
+                _maxTextLength = 500;
+                if (allDefaultValues) {
+                    this.GetStyleFrom(TextOneLineColumnFormat.Instance);
+                    Caption = "Erstell-Kommentar";
+                    ForeColor = System.Drawing.Color.FromArgb(0, 0, 128);
+                    BackColor = System.Drawing.Color.FromArgb(185, 185, 255);
+                }
+                DisableAllEditing();
+                break;
+
             case SystemColumnKeys.Changer:
                 _minTextLength = 1;
                 _relationship_to_First = false;
@@ -1871,6 +1894,27 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 if (allDefaultValues) {
                     this.GetStyleFrom(TextOneLineColumnFormat.Instance); // HIer ColumnFormat
                     Caption = "Änderer";
+                    ForeColor = System.Drawing.Color.FromArgb(0, 128, 0);
+                    BackColor = System.Drawing.Color.FromArgb(185, 255, 185);
+                }
+                DisableAllEditing();
+                break;
+
+            case SystemColumnKeys.ChangeComment:
+                _relationship_to_First = false;
+                _relationType = RelationType.None;
+                _value_for_Chunk = ChunkType.None;
+                _isKeyColumn = false;
+                _isFirst = false;
+                _ignoreAtRowFilter = true;
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.List_Readonly) {
+                    _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                }
+                _maxTextLineLength = 500;
+                _maxTextLength = 500;
+                if (allDefaultValues) {
+                    this.GetStyleFrom(TextOneLineColumnFormat.Instance);
+                    Caption = "Änder-Kommentar";
                     ForeColor = System.Drawing.Color.FromArgb(0, 128, 0);
                     BackColor = System.Drawing.Color.FromArgb(185, 255, 185);
                 }

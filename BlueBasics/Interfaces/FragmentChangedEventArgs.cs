@@ -136,6 +136,12 @@ public class FragmentChangedEventArgs(object sender, string relativePath, byte t
     public static string Crumbs(Enum crumbType, string crumbKey, string childPath) => Crumbs(FragmentRecord.EnumByte(crumbType), crumbKey, childPath);
 
     /// <summary>
+    /// Liest den Key des auslösenden Kindes frisch beim Ereignis (umbenennungssicher);
+    /// Kinder ohne Schlüssel liefern einen leeren Key.
+    /// </summary>
+    public static string CrumbKey(object? sender) => sender is IHasKeyName named ? named.KeyName : string.Empty;
+
+    /// <summary>
     /// Liefert die Paare (Typ, Key) der Crumb-Kette in Reihenfolge.
     /// </summary>
     public List<(byte CrumbType, string CrumbKey)> CrumbPath() {

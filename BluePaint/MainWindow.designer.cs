@@ -60,6 +60,9 @@ namespace BluePaint
             this.grpZeichnen = new BlueControls.Controls.GroupBox();
             this.btnZeichnen = new BlueControls.Controls.Button();
             this.btnRadiergummi = new BlueControls.Controls.Button();
+            this.btnTextmarker = new BlueControls.Controls.Button();
+            this.btnStempel = new BlueControls.Controls.Button();
+            this.btnText = new BlueControls.Controls.Button();
             this.grpSteuerung = new BlueControls.Controls.GroupBox();
             this.btn100 = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
@@ -361,11 +364,14 @@ namespace BluePaint
             this.grpZeichnen.CausesValidation = false;
             this.grpZeichnen.Controls.Add(this.btnZeichnen);
             this.grpZeichnen.Controls.Add(this.btnRadiergummi);
+            this.grpZeichnen.Controls.Add(this.btnTextmarker);
+            this.grpZeichnen.Controls.Add(this.btnStempel);
+            this.grpZeichnen.Controls.Add(this.btnText);
             this.grpZeichnen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpZeichnen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpZeichnen.Location = new System.Drawing.Point(192, 0);
             this.grpZeichnen.Name = "grpZeichnen";
-            this.grpZeichnen.Size = new System.Drawing.Size(136, 81);
+            this.grpZeichnen.Size = new System.Drawing.Size(296, 81);
             this.grpZeichnen.TabIndex = 4;
             this.grpZeichnen.TabStop = false;
             this.grpZeichnen.Text = "Zeichnen";
@@ -391,6 +397,38 @@ namespace BluePaint
             this.btnRadiergummi.TabIndex = 4;
             this.btnRadiergummi.Text = "Radier-gummi";
             this.btnRadiergummi.Click += new System.EventHandler(this.Radiergummi_Click);
+            // 
+            // btnTextmarker
+            // 
+            this.btnTextmarker.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTextmarker.ImageCode = "Pinsel";
+            this.btnTextmarker.Location = new System.Drawing.Point(120, 2);
+            this.btnTextmarker.Name = "btnTextmarker";
+            this.btnTextmarker.Size = new System.Drawing.Size(56, 66);
+            this.btnTextmarker.TabIndex = 10;
+            this.btnTextmarker.Text = "Text-marker";
+            this.btnTextmarker.Click += new System.EventHandler(this.Textmarker_Click);
+            // 
+            // btnStempel
+            // 
+            this.btnStempel.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnStempel.Location = new System.Drawing.Point(176, 2);
+            this.btnStempel.Name = "btnStempel";
+            this.btnStempel.Size = new System.Drawing.Size(56, 66);
+            this.btnStempel.TabIndex = 11;
+            this.btnStempel.Text = "Stempel";
+            this.btnStempel.Click += new System.EventHandler(this.Stempel_Click);
+            // 
+            // btnText
+            // 
+            this.btnText.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnText.ImageCode = "Textfeld";
+            this.btnText.Location = new System.Drawing.Point(232, 2);
+            this.btnText.Name = "btnText";
+            this.btnText.Size = new System.Drawing.Size(56, 66);
+            this.btnText.TabIndex = 12;
+            this.btnText.Text = "Text";
+            this.btnText.Click += new System.EventHandler(this.Text_Click);
             // 
             // grpSteuerung
             // 
@@ -550,6 +588,9 @@ namespace BluePaint
         internal Button btnZeichnen;
         internal Button btnKontrast;
         internal Button btnRadiergummi;
+        internal Button btnTextmarker;
+        internal Button btnStempel;
+        internal Button btnText;
         internal Button btnRückgänig;
         internal GroupBox grpNeu;
         internal GroupBox grpZeichnen;

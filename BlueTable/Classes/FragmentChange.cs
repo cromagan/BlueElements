@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.IO;
-using System.Security.Cryptography;
 
 namespace BlueTable.Classes;
 
@@ -83,11 +82,9 @@ public sealed class FragmentChange(string tableName, string container) {
     /// Roh-Bytes.
     /// </summary>
     public string Hash() {
-        if (Block is { Length: > 0 } block) {
-            return (TableName + "|block|" + Convert.ToHexString(MD5.HashData(block))).GetMD5Hash();
-        }
+        Develop.DebugPrint_NichtImplementiert(true);
 
-        return UndoItem.BuildHash(TableName, Command, ColName, RowKey, DateTimeUtc, User, ChangedTo);
+        return string.Empty;
     }
 
     /// <summary>
@@ -217,19 +214,19 @@ public sealed class FragmentChange(string tableName, string container) {
 
             if (inner.Depth <= navigation.Depth) { break; } // Block-Ende: äußerer Satz folgt
 
-            if (!inner.IsTag) {
-                if (!inner.HasMeta) {
-                    invalidCount++;
-                } else if (!hasMeta) {
-                    // Meta des ersten Blatt-Satzes kennzeichnet den Block (Sortierung, Dedup)
-                    user = inner.User;
-                    dateTimeUtc = inner.DateTimeUtc;
-                    hasMeta = true;
-                }
+            if (!inner.IsTag && inner.HasMeta && !hasMeta) {
+                // Meta des ersten Blatt-Satzes kennzeichnet den Block (Sortierung, Dedup);
+                // die schlüssellosen Crumb-Sätze des Blocks tragen bewusst keine Meta.
+                user = inner.User;
+                dateTimeUtc = inner.DateTimeUtc;
+                hasMeta = true;
             }
 
             pos = innerNext;
         }
+
+        // Ein Block ohne einen einzigen Blatt-Satz mit Meta trägt keine verwertbaren Daten.
+        if (!hasMeta) { invalidCount++; }
 
         result.Add(new FragmentChange(tableName, navigation.LeafType, data[blockStart..pos], user, dateTimeUtc, filename));
 

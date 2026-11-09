@@ -829,9 +829,9 @@ public class TableFragmentsNew : TableFile {
                         var error = string.Empty;
 
                         if (initialload) {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, thisWork.Comment, ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
                         } else {
-                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, ChangeFlags.RaiseEvents | ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, thisWork.Comment, ChangeFlags.RaiseEvents | ChangeFlags.IgnoreFreeze | ChangeFlags.PostProcess);
                         }
 
                         if (!string.IsNullOrEmpty(error)) {

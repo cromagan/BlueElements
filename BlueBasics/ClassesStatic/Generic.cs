@@ -30,6 +30,8 @@ public static class Generic {
     private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
     private static readonly DocXmlReader Reader = new();
 
+    private static readonly object _allTypesLock = new();
+
     private static int _allTypesAssemblyCount;
 
     private static bool _allTypesLoading;
@@ -44,34 +46,44 @@ public static class Generic {
 
     public static List<Type> AllTypes {
         get {
-            if (_allTypesLoading) { return []; }
+            // Lock schließt parallele Aufrufer vom Aufbau aus; das reentrante Monitor-Lock
+            // lässt rekursive Aufrufe desselben Threads durch, die über _allTypesLoading
+            // leer bedient werden (gleiche Semantik wie beim rekursiven Einzelfall zuvor).
+            lock (_allTypesLock) {
+                if (_allTypesLoading) { return []; }
 
-            var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (field is not null && _allTypesAssemblyCount == currentCount) { return field; }
+                var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+                if (field is not null && _allTypesAssemblyCount == currentCount) { return field; }
 
-            _allTypesLoading = true;
-            LoadAllAssemblies();
-            currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-
-            field = [];
-            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-                Type[] types;
+                _allTypesLoading = true;
                 try {
-                    types = thisas.GetTypes();
-                } catch (ReflectionTypeLoadException ex) {
-                    types = ex.Types.OfType<Type>().ToArray();
-                } catch { continue; }
+                    LoadAllAssemblies();
+                    currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
 
-                foreach (var thist in types) {
-                    if (thist.IsClass && (!thist.IsAbstract || thist.IsSealed)) {
-                        field.Add(thist);
+                    var neue = new List<Type>();
+                    foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+                        Type[] types;
+                        try {
+                            types = thisas.GetTypes();
+                        } catch (ReflectionTypeLoadException ex) {
+                            types = ex.Types.OfType<Type>().ToArray();
+                        } catch { continue; }
+
+                        foreach (var thist in types) {
+                            if (thist.IsClass && (!thist.IsAbstract || thist.IsSealed)) {
+                                neue.Add(thist);
+                            }
+                        }
                     }
-                }
-            }
 
-            _allTypesAssemblyCount = currentCount;
-            _allTypesLoading = false;
-            return field;
+                    field = neue;
+                    _allTypesAssemblyCount = currentCount;
+                } finally {
+                    _allTypesLoading = false;
+                }
+
+                return field;
+            }
         }
     }
 

@@ -43,6 +43,23 @@ public static class ScriptVerwendung {
     }
 
     /// <summary>
+    /// Liefert alle bekannten Formulare: geladene Instanzen plus *.cfo-Dateien
+    /// der Formular-Ordner aller geladenen Tabellen samt verschachtelter Unterformulare.
+    /// </summary>
+    public static List<ConnectedFormula> AlleFormulare() {
+        var verarbeitet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var offen = CollectFormulas(verarbeitet);
+
+        List<ConnectedFormula> result = [];
+        while (offen.Count > 0) {
+            var thisCf = offen.Dequeue();
+            if (thisCf is { IsDisposed: false }) { result.Add(thisCf); }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Listet jeden Befehl mit allen gefundenen Verwendungen auf;
     /// ohne Verwendung erhält der Befehl den Eintrag „Keine Verwendung".
     /// </summary>

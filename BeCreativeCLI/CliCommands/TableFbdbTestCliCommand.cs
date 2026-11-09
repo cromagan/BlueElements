@@ -2,6 +2,7 @@
 
 using System.Globalization;
 using System.IO;
+using BlueScript.ScriptVariables;
 
 namespace BeCreativeCLI.CliCommands;
 
@@ -622,7 +623,20 @@ public class TableFbdbTestCliCommand : CliCommand {
         // Kopf-Wert ändern.
         tbl.Tags = ["FBDBTEST", "Zweiter Tag"];
 
-        return (true, "3 Zellen, +2/-1 Zeilen, +2/-1 Spalten, 1 Zelle in neuer Spalte, Tags", rowA.KeyName);
+        // Kopf-Variable anlegen (klassisch über TableVariables) und anschließend im
+        // Bestand ändern: Die Wert-Änderung bubbelt als SubVariable-Satz in den
+        // VariableCollection-Block des Fragment-Journals.
+        var variablen = tbl.Variables.ToList();
+        variablen.Add(new StringScriptVariable("FBDBTESTVAR", "fbdbtest öäü Erststand", false, "fbdbtest Variable"));
+        tbl.Variables = new VariableCollection(variablen, false);
+
+        if (tbl.Variables.GetByKey("FBDBTESTVAR") is not StringScriptVariable { } fbdbVar) { return (false, "Kopf-Variable nicht gesetzt", string.Empty); }
+
+        fbdbVar.ReadOnly = false;
+        fbdbVar.ValueString = "fbdbtest öäü Geändert";
+        fbdbVar.ReadOnly = true;
+
+        return (true, "3 Zellen, +2/-1 Zeilen, +2/-1 Spalten, 1 Zelle in neuer Spalte, Tags, 1 Kopf-Variable", rowA.KeyName);
     }
 
     /// <summary>

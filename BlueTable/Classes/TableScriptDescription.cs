@@ -478,9 +478,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     /// leerer Key).
     /// </summary>
     private void ObserveFragmentChain() {
-        if (Table is { IsDisposed: false } tb) { tb.ObserveScriptFragments(this); }
+        if (Table is { IsDisposed: false } tb) { tb.Reregister(this); }
 
-        this.RegisterEvents(ScriptNavigationType.SubVariableCollection, SavedVariables);
+        this.Register(SavedVariables);
     }
 
     /// <summary>
@@ -501,9 +501,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
 
     protected override void Dispose(bool disposing) {
         if (!IsDisposed) {
-            if (Table is { IsDisposed: false } tb) { tb.UnobserveScriptFragments(this); }
+            if (Table is { IsDisposed: false } tb) { tb.Unregister(this); }
 
-            this.UnregisterEvents(ScriptNavigationType.SubVariableCollection, SavedVariables);
+            this.Unregister(SavedVariables);
 
             Table = null;
         }
@@ -615,6 +615,14 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Reicht eine Änderung der gespeicherten Variablen mit dem eigenen Pfad-Segment
+    /// (SubVariableCollection, leerer Key) eine Ebene höher.
+    /// </summary>
+    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(ScriptNavigationType.SubVariableCollection, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
     }
 
     /// <summary>

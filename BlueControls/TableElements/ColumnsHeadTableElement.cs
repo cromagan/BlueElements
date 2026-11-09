@@ -75,8 +75,10 @@ public sealed class ColumnsHeadTableElement : TableElement {
             (SystemColumnKeys.RowState, "RowState"),
             (SystemColumnKeys.DateChanged, "DateChanged"),
             (SystemColumnKeys.Changer, "Changer"),
+            (SystemColumnKeys.ChangeComment, "ChangeComment"),
             (SystemColumnKeys.DateCreated, "DateCreated"),
             (SystemColumnKeys.Creator, "Creator"),
+            (SystemColumnKeys.CreateComment, "CreateComment"),
             (SystemColumnKeys.Correct, "Correct"),
             (SystemColumnKeys.Locked, "Locked")
         };

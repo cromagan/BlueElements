@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueBasics.Structs;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -75,7 +76,7 @@ public static class Animator {
     /// direkt via Win32 — thread-safe, ohne den UI-Thread zu berühren.
     /// </summary>
     public static int GetWindowY(nint hwnd) {
-        var rect = default(Rect);
+        var rect = default(RECT);
         return GetWindowRect(hwnd, ref rect) ? rect.Top : 0;
     }
 
@@ -200,7 +201,7 @@ public static class Animator {
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetWindowRect(nint hWnd, ref Rect lpRect);
+    private static extern bool GetWindowRect(nint hWnd, ref RECT lpRect);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -316,14 +317,6 @@ public static class Animator {
     private struct Point32 {
         public int X;
         public int Y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct Rect {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
     }
 
     #endregion

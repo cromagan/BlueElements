@@ -132,6 +132,8 @@ public partial class MainWindow : FormWithStatusBar {
         btnScreenshot.SetAddButtonInfo<ScreenshotTool>();
         btnGrößeÄndern.SetAddButtonInfo<ResizeTool>();
         btnDummy.SetAddButtonInfo<DummyGeneratorTool>();
+        btnStempel.SetAddButtonInfo<StampTool>();
+        btnText.SetAddButtonInfo<TextTool>();
     }
 
     private void btn100_Click(object sender, EventArgs e) => P.Zoom = 1f;
@@ -267,7 +269,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void Kontrast_Click(object sender, EventArgs e) => SetTool(new ContrastTool());
 
-    private void LoadFromDisk(string filename) {
+    public void LoadFromDisk(string filename) {
         if (!IsSaved()) { return; }
         if (FileExists(filename)) {
             SetPic(Image_FromFile(filename) as Bitmap, true);
@@ -361,6 +363,12 @@ public partial class MainWindow : FormWithStatusBar {
     }
 
     private void Spiegeln_Click(object sender, EventArgs e) => SetTool(new MirrorTool());
+
+    private void Stempel_Click(object sender, EventArgs e) => SetTool(new StampTool());
+
+    private void Textmarker_Click(object sender, EventArgs e) => SetTool(new TextmarkerTool());
+
+    private void Text_Click(object sender, EventArgs e) => SetTool(new TextTool());
 
     private void Zeichnen_Click(object sender, EventArgs e) => SetTool(new PenTool());
 

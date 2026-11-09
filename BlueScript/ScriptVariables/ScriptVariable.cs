@@ -25,7 +25,13 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
 
         Comment = 3,
 
-        ReadOnly = 4
+        ReadOnly = 4,
+
+        /// <summary>
+        /// KeyName der Variablen; die Listen-Empfänger (z. B. VariableCollection)
+        /// erzeugen die Instanz über den Type-Satz und lesen den Schlüssel hier.
+        /// </summary>
+        KeyName = 5
     }
 
     #endregion
@@ -323,13 +329,15 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     /// <summary>
-    /// Eine Variable hat keine Sub-Items.
+    /// Schreibt den Variablen-Block: Type (immer zuerst, damit der Empfänger den
+    /// konkreten Typ kennt), KeyName, Wert, Kommentar und Schreibschutz.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
         var allok = true;
 
         if (ToStringPossible) {
             allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Type, MyClassId);
+            allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.KeyName, KeyName);
             allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Value, ValueForReplace);
             allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.Comment, Comment);
             allok &= FragmentRecord.Append(stream, depth, VariableFragmentType.ReadOnly, ReadOnly);
@@ -339,15 +347,18 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     }
 
     /// <summary>
-    /// Verarbeitet den Variablen-Block: Type (nur bei direkt gelesenen Variablen — die
-    /// Collection bestimmt den konkreten Typ bereits vor dem Erzeugen der Instanz),
-    /// Wert, Kommentar und Schreibschutz.
+    /// Verarbeitet den Variablen-Block: Type, KeyName, Wert, Kommentar und
+    /// Schreibschutz.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((VariableFragmentType)record.LeafType) {
             case VariableFragmentType.Type:
                 // Der Typ ist beim Erzeugen der Instanz bereits festgelegt
                 if (record.StringContent != MyClassId) { return false; }
+                break;
+
+            case VariableFragmentType.KeyName:
+                KeyName = record.StringContent;
                 break;
 
             case VariableFragmentType.Value:

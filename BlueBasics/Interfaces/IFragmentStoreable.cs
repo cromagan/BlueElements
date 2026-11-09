@@ -93,6 +93,14 @@ public interface IFragmentStoreable {
     /// </summary>
     void OnFragmentChanged(FragmentChangedEventArgs e);
 
+    /// <summary>
+    /// Wird beim Bubbling aufgerufen, wenn ein verdrahtetes Fragment-Kind eine Änderung meldet.
+    /// Der Default reicht die Änderung unverändert durch (der Pfad des Kindes ist bereits komplett);
+    /// Container mit eigenem Pfad-Segment überschreiben die Routine und stellen ihrem Paar
+    /// (Typ, Key) den Pfad des Kindes voran.
+    /// </summary>
+    void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) => OnFragmentChanged(e);
+
     #endregion
 }
 
@@ -102,6 +110,62 @@ public interface IFragmentStoreable {
 public static class FragmentStoreableExtension {
 
     #region Methods
+
+    /// <summary>
+    /// Verdrahtet ein neues Fragment-Kind für das FragmentChanged-Bubbling:
+    /// Bei einer Kind-Änderung wird ChildFragmentChanged des Parents aufgerufen.
+    /// </summary>
+    public static void Register(this IFragmentStoreable parent, IFragmentStoreable? child) {
+        if (child is null) { return; }
+
+        child.FragmentChanged += parent.ChildFragmentChanged;
+    }
+
+    /// <summary>
+    /// Löst die Verdrahtung eines Fragment-Kindes.
+    /// </summary>
+    public static void Unregister(this IFragmentStoreable parent, IFragmentStoreable? child) {
+        if (child is null) { return; }
+
+        child.FragmentChanged -= parent.ChildFragmentChanged;
+    }
+
+    /// <summary>
+    /// Löst die Verdrahtung eines Fragment-Kindes und verdrahtet es neu — sicher bei Kindern, die bereits verdrahtet sein können.
+    /// </summary>
+    public static void Reregister(this IFragmentStoreable parent, IFragmentStoreable? child) {
+        Unregister(parent, child);
+        Register(parent, child);
+    }
+
+    /// <summary>
+    /// Verdrahtet alle Elemente der Liste als Fragment-Kinder für das FragmentChanged-Bubbling.
+    /// Bewusst ICollection statt IEnumerable: Typen, die IFragmentStoreable und IEnumerable sind
+    /// (z. B. VariableCollection), bleiben damit eindeutig der Einzel-Überladung zugeordnet.
+    /// </summary>
+    public static void Register<T>(this IFragmentStoreable parent, ICollection<T>? children) where T : IFragmentStoreable {
+        if (children is null) { return; }
+
+        foreach (var child in children) { Register(parent, child); }
+    }
+
+    /// <summary>
+    /// Löst die Verdrahtung aller Elemente der Liste.
+    /// </summary>
+    public static void Unregister<T>(this IFragmentStoreable parent, ICollection<T>? children) where T : IFragmentStoreable {
+        if (children is null) { return; }
+
+        foreach (var child in children) { Unregister(parent, child); }
+    }
+
+    /// <summary>
+    /// Löst die Verdrahtung aller Elemente der Liste und verdrahtet sie neu — sicher bei Kindern, die bereits verdrahtet sein können.
+    /// </summary>
+    public static void Reregister<T>(this IFragmentStoreable parent, ICollection<T>? children) where T : IFragmentStoreable {
+        if (children is null) { return; }
+
+        foreach (var child in children) { Reregister(parent, child); }
+    }
 
     /// <summary>
     /// Schreibt System-Bytes (User, DateTimeUtc, Machine), den eigenen Block per

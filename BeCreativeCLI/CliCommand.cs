@@ -546,7 +546,8 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Separate Rechteprüfung der CLI ausschließlich für Systemspalten: Die
-    /// Zeilen-Identität (SYS_ROWKEY) sowie Changer/ChangeDate pflegt das
+    /// Zeilen-Identität (SYS_ROWKEY) sowie Changer/ChangeDate und die
+    /// Kommentar-Spalten (SYS_CREATECOMMENT/SYS_CHANGECOMMENT) pflegt das
     /// System selbst und ist nie beschreibbar, die Sperrspalte (SYS_LOCKED)
     /// beschreibbar je Zielwert nur mit 'Lock row' (gesperrt) bzw.
     /// 'Remove row lock' (ungesperrt), die Sortierindex-Spalte
@@ -558,8 +559,9 @@ public abstract class CliCommand : IHasKeyName {
             return "Die Spalte '" + column.KeyName + "' hält die Zeilen-Identität und wird vom System verwaltet.";
         }
 
-        if (tbl.Column.SysRowChanger == column || tbl.Column.SysRowChangeDate == column) {
-            return "Die Spalte '" + column.KeyName + "' pflegt das System bei jeder Änderung selbst (Benutzer/Zeitstempel) und ist nicht beschreibbar.";
+        if (tbl.Column.SysRowChanger == column || tbl.Column.SysRowChangeDate == column ||
+            tbl.Column.SysRowCreateComment == column || tbl.Column.SysRowChangeComment == column) {
+            return "Die Spalte '" + column.KeyName + "' pflegt das System bei jeder Änderung selbst (Benutzer/Zeitstempel/Kommentar) und ist nicht beschreibbar.";
         }
 
         string right;

@@ -320,7 +320,13 @@ public abstract class ScriptCommand : IReadableTextWithKey {
 
         if (ParseOperators(txt, varCol, scp) is { } b) { return new DoItFeedback(b); }
 
-        foreach (var thisVt in ScriptVariable.VarTypes.Instances) {
+        // Nach CheckOrder sortiert prüfen: Der Catch-all UnknownScriptVariable (CheckOrder 100)
+        // darf nicht vor den echten Typen greifen. VarTypes.Instances hat keine feste Reihenfolge,
+        // sie folgt der zufälligen Assembly-Ladereihenfolge.
+        List<ScriptVariable> varTypes = [.. ScriptVariable.VarTypes.Instances];
+        varTypes.Sort();
+
+        foreach (var thisVt in varTypes) {
             if (thisVt.GetFromStringPossible) {
                 if (thisVt.TryParse(txt, out var v) && v is not null) {
                     return new DoItFeedback(v);
