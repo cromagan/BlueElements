@@ -301,7 +301,7 @@ public sealed class FragmentRecord {
     /// <summary>
     /// Schreibt einen Bool-Wert als Daten-Satz (FragmentDataType.Bool, Content "+/-").
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, bool content) => Append(stream, depth, leafType, content.ToPlusMinus());
+    public static bool Append(Stream stream, int depth, byte leafType, bool content) => AppendData(stream, depth, leafType, FragmentDataType.Bool, Encoding.UTF8.GetBytes(content.ToPlusMinus()), null);
 
     /// <summary>
     /// Schreibt einen Int-Wert als Daten-Satz (FragmentDataType.Int, Content ToString1).

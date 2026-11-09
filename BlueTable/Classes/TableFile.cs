@@ -177,7 +177,13 @@ public class TableFile : Table {
             if (data.Length < 8) { return false; }
 
             if (data[0] == 0x09) {
-                return data[^4] == 0xFF && data[^3] == 0x00 && data[^2] == 0x00 && data[^1] == 0x0D;
+                // 255-EOF-Satz: ... 0x20, valueId 0xFF, 4 Längen-Bytes (leerer Content), 0x0D
+                return data[^6] == 0xFF
+                    && data[^5] == 0x00
+                    && data[^4] == 0x00
+                    && data[^3] == 0x00
+                    && data[^2] == 0x00
+                    && data[^1] == 0x0D;
             }
 
             var offset = data.Length - 8;

@@ -2943,20 +2943,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((ColumnFragmentType)record.LeafType) {
             case ColumnFragmentType.ColumnKey: {
-                // Erst die Sammlung umschlüsseln; _keyName erst bei Erfolg ändern -
-                // sonst hätte das Item bei Fehlschlag einen Key, unter dem es in
-                // der Sammlung nicht mehr erreichbar ist.
-                var newKey = record.StringContent.ToUpperInvariant();
-                var f = Table?.Column.ChangeKey(_keyName, newKey) ?? "Tabelle verworfen";
+                    // Erst die Sammlung umschlüsseln; _keyName erst bei Erfolg ändern -
+                    // sonst hätte das Item bei Fehlschlag einen Key, unter dem es in
+                    // der Sammlung nicht mehr erreichbar ist.
+                    var newKey = record.StringContent.ToUpperInvariant();
+                    var f = Table?.Column.ChangeKey(_keyName, newKey) ?? "Tabelle verworfen";
 
-                if (!string.IsNullOrEmpty(f)) {
-                    Table?.Freeze($"Schwerer Spaltenkey Umbenennungsfehler, {f}");
-                    return false;
+                    if (!string.IsNullOrEmpty(f)) {
+                        Table?.Freeze($"Schwerer Spaltenkey Umbenennungsfehler, {f}");
+                        return false;
+                    }
+
+                    _keyName = newKey;
+                    break;
                 }
-
-                _keyName = newKey;
-                break;
-            }
 
             case ColumnFragmentType.ColumnCaption:
                 _caption = record.StringContent;
@@ -3043,7 +3043,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case ColumnFragmentType.PermissionGroupsChangeCell:
-                _permissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(record.StringContent);
+                _permissionGroupsChangeCell.Clear();
+                _permissionGroupsChangeCell.AddRange(record.ListContent);
                 break;
 
             case ColumnFragmentType.AllowedChars:

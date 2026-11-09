@@ -782,7 +782,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// <summary>
     /// Lädt eine Tabelle frisch von der Datei (Instanzen müssen vorher freigegeben sein).
     /// </summary>
-    private static Table? Load(string filename) {
+    internal static Table? Load(string filename) {
         var tbl = Table.Get(filename);
 
         if (tbl is not { IsDisposed: false }) {
@@ -815,7 +815,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// Vergleicht drei Snapshot-Teile und verbucht Abweichungen mit Diff-Details.
     /// Zeilen werden semantisch verglichen, ohne das zeitgesteuerte SYS_ROWSTATE.
     /// </summary>
-    private static void CompareSnapshots(List<string> failures, string caption, (byte[] Main, byte[] HeadVars, byte[] Rows) expected, (byte[] Main, byte[] HeadVars, byte[] Rows) actual) {
+    internal static void CompareSnapshots(List<string> failures, string caption, (byte[] Main, byte[] HeadVars, byte[] Rows) expected, (byte[] Main, byte[] HeadVars, byte[] Rows) actual) {
         var d1 = DiffOf(expected.Main, actual.Main);
 
         if (!Check(failures, d1 is null, caption + " — Head+Spalten (MainChunk)")) { Out("  MainChunk-Diff: " + d1); }
@@ -833,7 +833,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// Vergleicht zwei RowChunks über die geparsten Datensätze, ohne SYS_ROWSTATE
     /// (wird von der Zeilenprüfung je Prüfzeitpunkt neu gesetzt).
     /// </summary>
-    private static (bool Ok, string Detail) RowsDiff(byte[] expectedRows, byte[] actualRows) {
+    internal static (bool Ok, string Detail) RowsDiff(byte[] expectedRows, byte[] actualRows) {
         var e = RowChunkRecords(expectedRows);
         var a = RowChunkRecords(actualRows);
 
@@ -854,7 +854,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// <summary>
     /// Zerlegt einen RowChunk in Datensatz-Zeilen (Typ|Spalte|Zeile|Wert), ohne SYS_ROWSTATE.
     /// </summary>
-    private static List<string> RowChunkRecords(byte[] rows) {
+    internal static List<string> RowChunkRecords(byte[] rows) {
         List<string> result = [];
         var pointer = 0;
 
@@ -876,7 +876,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// <summary>
     /// Vergleicht zwei Byte-Arrays und meldet bis zu drei Abweichungsregionen mit Kontext.
     /// </summary>
-    private static string? DiffOf(byte[] expected, byte[] actual) {
+    internal static string? DiffOf(byte[] expected, byte[] actual) {
         if (expected.SequenceEqual(actual)) { return null; }
 
         var minLen = Math.Min(expected.Length, actual.Length);
@@ -906,7 +906,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// <summary>
     /// Wandelt Bytes in escapted Text (Steuerzeichen als \xNN), für Diff-Ausgaben.
     /// </summary>
-    private static string Printable(byte[] bytes, int start, int count) {
+    internal static string Printable(byte[] bytes, int start, int count) {
         var sb = new StringBuilder();
         var end = Math.Min(bytes.Length, start + count);
 
@@ -923,12 +923,12 @@ public class TableFbdbTestCliCommand : CliCommand {
         return sb.ToString();
     }
 
-    private static void Out(string text) => Console.Out.WriteLine(text);
+    internal static void Out(string text) => Console.Out.WriteLine(text);
 
     /// <summary>
     /// Prüft eine Bedingung, gibt das Ergebnis aus und verbucht Fehler. Liefert die Bedingung zurück.
     /// </summary>
-    private static bool Check(List<string> failures, bool ok, string text) {
+    internal static bool Check(List<string> failures, bool ok, string text) {
         Out((ok ? "[OK]  " : "[FEHLER] ") + text);
 
         if (!ok) { failures.Add(text); }
@@ -936,7 +936,7 @@ public class TableFbdbTestCliCommand : CliCommand {
         return ok;
     }
 
-    private static void ReleaseAll() {
+    internal static void ReleaseAll() {
         RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
         foreach (var tbl in Table.AllInstances().ToList()) {
@@ -948,7 +948,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     /// Erzeugt den Vergleichsstand einer Tabelle: MainChunk (Kopf + Spalten),
     /// HeadVariableChunks (Variablen) und RowChunk (alle Zeilen).
     /// </summary>
-    private static (byte[] Main, byte[] HeadVars, byte[] Rows) SnapshotOf(Table tbl) {
+    internal static (byte[] Main, byte[] HeadVars, byte[] Rows) SnapshotOf(Table tbl) {
         var tbf = (TableFile)tbl;
         return ([.. TableChunk.GenerateMainChunk(tbf)], [.. TableChunk.GenerateHeadVariableChunks(tbf)], [.. TableChunk.GenerateRowChunk(tbf, true, string.Empty)]);
     }

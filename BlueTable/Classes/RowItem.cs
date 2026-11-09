@@ -1451,8 +1451,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Schreibt die Zellen der Zeile: SaveContent-Spalten mit nicht-leerem Inhalt als
-    /// Cell-Satz (Key = ColumnKey) mit Zell-Block eine Ebene tiefer (Reihenfolge
-    /// wie der Classic-RowChunk).
+    /// Cell-Satz (Key = ColumnKey) mit Zell-Block eine Ebene tiefer, in der
+    /// Speicherreihenfolge der Spalten — deterministisch über Instanzen hinweg.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
@@ -1460,7 +1460,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var allok = true;
 
-        foreach (var column in tb.Column) {
+        foreach (var column in tb.ColumnsInSaveOrder()) {
             if (column is not { IsDisposed: false } || !column.SaveContent) { continue; }
 
             var content = CellGetStringCore(column);

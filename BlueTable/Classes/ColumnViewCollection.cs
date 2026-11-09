@@ -807,12 +807,17 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <summary>
     /// Liefert den Ansichts-Eintrag zum Schlüssel des ersten Blocksatzes
     /// (ColumnName bzw. StorageKey), inklusive der on-demand Spalten; fehlt er,
-    /// wird er erzeugt und angehängt.
+    /// wird er erzeugt und angehängt. Ein bereits vorhandener Eintrag wandert an
+    /// seine Position gemäß Block — die Datei-Reihenfolge ist maßgeblich.
     /// </summary>
     private ColumnViewItem? GetViewItemCreateOrGet(FragmentRecord first) {
         var keyName = first.StringContent;
 
-        if (this[keyName] is { } existing) { return existing; }
+        if (this[keyName] is { } existing) {
+            _ = _internal.Remove(existing);
+            Add(existing);
+            return existing;
+        }
 
         ColumnViewItem? newItem = null;
 

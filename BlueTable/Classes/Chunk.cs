@@ -280,7 +280,9 @@ public class Chunk : LiveInstanceCache<Chunk>, ICreateByKey<Chunk>, IDisposableE
     public static void SaveToByteList(List<byte> bytes, RowItem thisRow) {
         if (thisRow.Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var thisColumn in tb.Column) {
+        // Speicherreihenfolge statt Hash-Enumeration: identische Stände müssen
+        // byteidentisch gespeichert werden, auch über Instanzgrenzen hinweg.
+        foreach (var thisColumn in tb.ColumnsInSaveOrder()) {
             if (thisColumn.SaveContent) {
                 SaveToByteList(bytes, thisColumn, thisRow);
             }

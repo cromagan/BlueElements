@@ -60,6 +60,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         VariableCollection = 94,
 
         /// <summary>
+        /// Navigation in die Zeilen (leerer Key); der Block enthält je Zeile
+        /// einen SubRow-Satz.
+        /// </summary>
+        Rows = 97,
+
+        /// <summary>
         /// Navigation in eine Spaltenanordnung (Key = KeyName der Ansicht).
         /// </summary>
         ColumnArrangements = 95,
@@ -1400,7 +1406,20 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 UniqueValues.Select(u => new UniqueValueDefinition(target, u.ParseableItems().FinishParseable())).ToList())
             : new([]);
 
-        target.ColumnArrangements = ColumnArrangements;
+        // Tief kopiert und per Feldzuweisung setzen (wie die Metadaten oben): Der
+        // öffentliche Setter prüft das Editier-Recht der Spaltenanordnung und würde
+        // die Übernahme im Lade-Kontext verweigern. Die Ansichten des Ziels müssen
+        // auf die Zieltabelle und deren Spalten zeigen.
+        List<ColumnViewCollection> viewsCopy = [];
+
+        foreach (var view in ColumnArrangements) {
+            if (view is { IsDisposed: false }) {
+                viewsCopy.Add(new ColumnViewCollection(target, view.ParseableItems().FinishParseable()));
+            }
+        }
+
+        target._columnArrangements = viewsCopy.AsReadOnly();
+        target.ReregisterEvents(TableFragmentType.ColumnArrangements, target._columnArrangements);
 
         target.EventScript = EventScript is { Count: > 0 }
             ? new ReadOnlyCollection<TableScriptDescription>(
@@ -3161,9 +3180,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <summary>
     /// Schreibt den kompletten Tabellenstand als tiefenbasierte Fragment-Blöcke:
     /// Kopf-Werte, Spalten über SubColumn, Sortier-Definition, Ansichten, Uniques,
-    /// Skripte und Kopf-Variablen — danach den Undo-Marker samt Undo-Sektion.
-    /// Reihenfolge wie der Classic-Content, damit Referenzen (Spalten) vor ihren
-    /// Nutzern da sind. Zeilen stehen im Datenteil der Hauptdatei.
+    /// Skripte und Kopf-Variablen, danach die Zeilen über SubRow und den Undo-Marker
+    /// samt Undo-Sektion. Reihenfolge wie der Classic-Content, damit Referenzen
+    /// (Spalten) vor ihren Nutzern da sind.
     /// </summary>
     public virtual bool SerializeCore(Stream stream, int depth) {
         var allok = true;
@@ -3210,6 +3229,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Kopf-Variablen (Classic: Variables-Chunk)
         allok &= FragmentRecord.Append(stream, depth, TableFragmentType.VariableCollection, _variables);
 
+        // Zeilen (Classic: RowChunk) — je Zeile ein SubRow-Satz samt Block eine Ebene tiefer
+        allok &= FragmentRecord.Append(stream, depth, TableFragmentType.Rows, Row);
+
         // Undo-Sektion: je Eintrag ein Nav-Satz (UndoHistory) samt Block eine Ebene tiefer.
 
         lock (_undoLock) {
@@ -3248,6 +3270,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableFragmentType.VariableCollection:
                 return _variables.Deserialize(stream, record.Depth + 1);
+
+            case TableFragmentType.Rows:
+                return Row.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.SortDefinition:
                 // Navigations-Satz (leerer Key); der Block folgt eine Ebene tiefer

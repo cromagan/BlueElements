@@ -21,7 +21,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Dateiendungen, die als Tabelle geladen werden dürfen — oder der Name ganz ohne Endung.
     /// </summary>
-    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "fbdb", "mbdb", "tblh", "tblt" };
+    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "fbdb", "mbdb", "tblh", "tblt" };
 
     #endregion
 
@@ -302,7 +302,7 @@ public abstract class CliCommand : IHasKeyName {
         var suffix = name.FileSuffix();
 
         if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .fbdb, .mbdb, .tblh, .tblt (oder ganz ohne Endung).");
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .nbdb, .fbdb, .mbdb, .tblh, .tblt (oder ganz ohne Endung).");
             return null;
         }
 

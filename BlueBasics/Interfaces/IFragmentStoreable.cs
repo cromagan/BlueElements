@@ -28,37 +28,38 @@ public interface IFragmentStoreable {
     #region Methods
 
     /// <summary>
-    /// Schreibt System-Bytes (User, DateTimeUtc, Machine), den eigenen Block per
+    /// Schreibt System-Bytes (User, Machine), den eigenen Block per
     /// SerializeCore und abschließend den EOF-Satz. Nur die Wurzel (Tiefe 1) setzt
-    /// System-Bytes und EOF; Sub-Objekte werden mit Serialize(stream, depth + 1)
-    /// aufgerufen und schreiben nur ihren Block.
+    /// System-Bytes, Kommentar-Trenner und EOF; Sub-Objekte werden mit
+    /// Serialize(stream, depth + 1) aufgerufen und schreiben nur ihren Block.
+    /// Bewusst kein Zeitstempel-Satz: Die Speicherzeit steht im Dateisystem
+    /// (LastWriteTimeUtc), ein UtcNow-Satz würde identische Stände nicht mehr
+    /// byteidentisch speichern. Bewusst kein Kommentar-Trenner bei Sub-Objekten:
+    /// Er hätte Item-Tiefe und würde vom Deserialize hinter die Blockgrenze
+    /// genommen — die Grenzen zwischen Listen-Items setzt der Listen-Writer
+    /// zwei Ebenen unter der Liste.
     /// </summary>
     bool Serialize(Stream stream, int depth, string type) {
         var allok = true;
         var isRoot = depth == 1;
-        
+
         if (isRoot) {
             // Anfangs bytes nur im Root schreiben, weil sie durchgehend gleich sind
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SerializerVersion, "1.00");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.CopyrightInfo, "(c) by Christian Peter - see License for details.");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Type,  type);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.User, Generic.UserName);
-            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.DateTimeUtc, DateTime.UtcNow);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Machine, Environment.MachineName);
-        }
 
-        // Kommentar-Trenner auf eigener Tiefe: markiert den eigenen Block, ohne
-        // fremde Blöcke zu zerschneiden; Deserialize überspringt Steuer-Sätze.
-        allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Comment, FragmentRecord.SeparatorComment);
-        allok &= SerializeCore(stream, depth);
+            // Kommentar-Trenner markiert das Ende der Root-Kopfzeilen
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Comment, FragmentRecord.SeparatorComment);
+            allok &= SerializeCore(stream, depth);
 
-
-        // EOF-Satz nur am Root schreiben: Er markiert das saubere Datei-Ende.
-
-        if (isRoot) {
+            // EOF-Satz nur am Root schreiben: Er markiert das saubere Datei-Ende.
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Eof, string.Empty);
+        } else {
+            allok &= SerializeCore(stream, depth);
         }
-
 
         return allok;
     }
@@ -132,43 +133,71 @@ public static class FragmentStoreableExtension {
 
     /// <summary>
     /// Liest eine Liste von Schlüssel-Objekten: Der ListKeyObject-Satz wurde bereits
-    /// vom Switch des Aufrufers gelesen. Die Items liegen eine Ebene tiefer; ihr
-    /// erster Satz geht an create (baut den Empfänger — bei Schlüssel-Objekten ist
-    /// er der Schlüssel) und an DeserializeThis, den Rest liest das Item selbst.
-    /// Kommentar-Trenner auf der Item-Tiefe werden übersprungen; zwischen den Items
-    /// steht je ein Trenner zwei Ebenen unter der Liste. Fehlt ein Satz der
-    /// Item-Tiefe, endet die Liste (der Stream bleibt an dessen Satzanfang stehen).
-    /// Liefert null bei echten Lesefehlern.
+    /// vom Switch des Aufrufers gelesen. Der komplette Block (alle Sätze tiefer als
+    /// die List-Ebene) wird gepuffert, an den Item-Trennern (Tag-Sätze zwei Ebenen
+    /// unter der Liste) segmentiert und je Segment exakt ein Item geladen — das
+    /// Item-Deserialize kann so seine Blockgrenze nicht verfehlen, auch wenn alle
+    /// Items dieselbe Tiefe haben. Der erste Satz jedes Segments geht an create
+    /// (baut den Empfänger — bei Schlüssel-Objekten ist er der Schlüssel) und an
+    /// DeserializeThis, den Rest liest das Item selbst. Liefert null bei echten
+    /// Lesefehlern.
     /// </summary>
     public static ReadOnlyCollection<T>? DeserializeList<T>(Stream stream, int depth, Func<FragmentRecord, T> create) where T : class, IFragmentStoreable {
-        List<T> result = [];
+        // Listen-Block in den Puffer kopieren: alle Sätze tiefer als depth.
+        // Der stream steht danach exakt am nächsten Satz der List-Ebene.
+        using var blockStream = new MemoryStream();
 
         while (true) {
-            if (FragmentRecord.TryReadNext(stream, depth + 1) is not { } first) {
-                // Kein Item-Satz mehr; einen hängenden Trenner (leeres Item) dennoch konsumieren
-                var position = stream.Position;
+            var pos0 = stream.Position;
 
-                if (FragmentRecord.TryReadNext(stream, depth + 2) is not { } trailing || !trailing.IsTag) {
-                    stream.Position = position;
-                    break;
-                }
+            if (FragmentRecord.TryReadNext(stream) is not { } record) { stream.Position = pos0; break; }
 
-                continue;
-            }
+            var pos1 = stream.Position;
 
-            if (first.IsTag) { continue; }
-
-            if (create(first) is not { } item || !item.DeserializeThis(stream, first) || !item.Deserialize(stream, depth + 1)) { return null; }
-
-            result.Add(item);
-
-            // Trenner konsumieren; fehlt er, folgt kein weiteres Item
-            var separatorPosition = stream.Position;
-
-            if (FragmentRecord.TryReadNext(stream, depth + 2) is not { } separator || !separator.IsTag) {
-                stream.Position = separatorPosition;
+            if (record.Depth <= depth) {
+                stream.Position = pos0;
                 break;
             }
+
+            var size = (int)(pos1 - pos0);
+            var tmp = new byte[size];
+            _ = stream.Position = pos0;
+            _ = stream.Read(tmp, 0, size);
+            blockStream.Write(tmp, 0, size);
+        }
+
+        // Segmentgrenzen: Trenner-Sätze (Tiefe depth+2, Tag) beenden ein Segment.
+        var buffer = blockStream.ToArray();
+        List<long> cuts = [0];
+        blockStream.Position = 0;
+
+        while (FragmentRecord.TryReadNext(blockStream) is { } rec) {
+            if (rec.Depth == depth + 2 && rec.IsTag) { cuts.Add(blockStream.Position); }
+        }
+
+        cuts.Add(blockStream.Length);
+
+        List<T> result = [];
+
+        for (var i = 0; i < cuts.Count - 1; i++) {
+            var start = (int)cuts[i];
+            var len = (int)(cuts[i + 1] - start);
+
+            if (len <= 0) { continue; }
+
+            using var segment = new MemoryStream(buffer, start, len);
+
+            if (FragmentRecord.TryReadNext(segment) is not { } first) { continue; }
+
+            // Kommentar-Trenner am Segment-Anfang überspringen (Alt-Format)
+            if (first.IsTag) {
+                if (FragmentRecord.TryReadNext(segment) is not { } next) { continue; }
+                first = next;
+            }
+
+            if (create(first) is not { } item || !item.DeserializeThis(segment, first) || !item.Deserialize(segment, depth + 1)) { return null; }
+
+            result.Add(item);
         }
 
         return new ReadOnlyCollection<T>(result);
