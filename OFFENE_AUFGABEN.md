@@ -237,4 +237,31 @@ UndoItem ohne    public byte[]? FragmentBlock { get; private set; } lösen
 
 ## Aufgabe (WICHTIG)
 VariableCollection und alle anderen Collections, die mit Listen von Klassen arbeiten sollen den SerializeList Befehl benutzen => static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<IFragmentStoreable> content)
- und auch mit dem gegen Pendat sie wieder erstellen.
+ und auch mit dem gegen Pendant sie wieder erstellen.
+ 
+## Aufgabe
+Mach eine Listbox in einer Form, die Permament im Vordergund ist.
+Wenn man einen "neuen" eintrag hinzufügt, wird ein Screenshot gemacht.
+Dann wird sich gemerkt, welche Fenster gerade sichtbar und wo sie sind. Größe Position Windowstate.
+Achtung. nur Sichtbatre Fenster, nicht minimierte
+klickt man dann den Eintrag an, werden die Fenster wiederhergestellt.
+
+Dabei werden Explorer, Internet Explorer, Chrome Fenster analysiert, welche Dateien / Urls offen sind und ebenfalls wiederhergestellt.
+Das soll mit einem Plugin-System funktionieren. So wie ich es z.B. schon bei Renderer, oder ScriptComande gemacht habe.
+
+## Aufgabe
+Überwache Screenshot ordner. Wird ein Screenshot erstellt, wird er mit Paint geöffnet
+
+## Aufgabe 
+mach einen Mouse Jiggler
+
+## Aufgabe
+mache für paint eine Textmarker
+
+## Aufgabe
+kompette Datenüberprüfung soll in der Messagebox ausgeben, was alles geprüft wurde - oder warum etwas nicht gemacht wurde.
+Auch, ob ein Value Changed Script vorhanden ist.
+
+## Aufgabe
+Bei 'xxx' konnte das Attribut '1' nicht aufgelöst werden:
+Diese meldung kommt spordisch immer wieder.
