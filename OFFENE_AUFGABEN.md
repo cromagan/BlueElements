@@ -296,6 +296,10 @@ und Connected Formular sollen acuh angezeugt werdn
 mache für Scripte ein Grafec generator, aber mit CreativePad.
 Gib den Relenaten Befehlen ein nterfeace oder ein überscheibbares Property mit
 
+## Aufgabe
+Desktop Snap: wenn das original Fenster geschlossen wird, soll improvisiert werden und ein fenster des gleichen Typs an dessen stelle gestellt werden
+Wichtig dabei, dass das Fnester in keinem anderen Snap benutzt wird.
+
 
 
 
