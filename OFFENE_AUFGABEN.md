@@ -265,3 +265,37 @@ Auch, ob ein Value Changed Script vorhanden ist.
 ## Aufgabe
 Bei 'xxx' konnte das Attribut '1' nicht aufgelöst werden:
 Diese meldung kommt spordisch immer wieder.
+
+## Aufgabe
+Desktop Snap soll nur eine Datei für alles Snaps anlegen
+
+## Aufgabe
+Desktop Snap: Die Reihenfolge der snaps darf sich beim umbenennen nicht ändern
+
+## Aufgabe
+Desktop Snap: Es muss immer ein Snap angewählt bleiben, ODER dei Qualitiy Plugins deaktiviert werden. optisch und auch funtkionell
+
+## Aufgabe
+Desktop Snap: Es wird ein button in der leiste zwischen Snap und Stern benötigt, der alle Fenster minimiert
+
+## Aufgabe
+Das abhänigkeistdiagramm soll so aussehen:
+
++----------+----------+----------+----------+
++ Tablle 1 + Tablle 2 + Tablle 4 + Tablle 6 +
++----------+----------+----------+----------+
++ Spalte 1 -------------Spalte 2
++ Spalte 4 ------------------------Spalte 4
++ Script 1 --Spalte 4
+
+Dann kann man irgend eine Tabelle oder Spalte anklicken und Beziehungen hinzufügen
+Oder eben eine Spalte oder ein Script
+und Connected Formular sollen acuh angezeugt werdn
+
+## Aufgabe
+mache für Scripte ein Grafec generator, aber mit CreativePad.
+Gib den Relenaten Befehlen ein nterfeace oder ein überscheibbares Property mit
+
+
+
+

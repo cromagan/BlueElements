@@ -23,9 +23,7 @@ public static class SnapshotStore {
 
     #region Methods
 
-    public static void DeleteFolder(string folder) {
-        if (Directory.Exists(folder)) { Directory.Delete(folder, true); }
-    }
+    public static void DeleteFolder(string folder) => IO.DeleteFile(folder, false);
 
     /// <summary>
     /// Legt eine vollständige Kopie des Snapshots unter neuem Namen ab.
