@@ -143,6 +143,7 @@ namespace BlueControls.BlueTableDialogs {
             butAktuellZurueck = new Button();
             capTabellenname = new Caption();
             btnSpaltenkopf = new Button();
+            btnAbhängigkeiten = new Button();
             tabAnzeige.SuspendLayout();
             tabBearbeitung.SuspendLayout();
             grpAuswahlmenuOptionen.SuspendLayout();
@@ -774,6 +775,8 @@ namespace BlueControls.BlueTableDialogs {
             tabFilter.Controls.Add(txbJoker);
             tabFilter.Controls.Add(btnZeilenFilterIgnorieren);
             tabFilter.Controls.Add(btnAutoFilterMoeglich);
+            tabFilter.Controls.Add(txbSimilarityWeight);
+            tabFilter.Controls.Add(capSimilarityWeight);
             tabFilter.Controls.Add(btnAutoFilterTXTErlaubt);
             tabFilter.Controls.Add(btnAutoFilterErweitertErlaubt);
             tabFilter.Location = new Point(4, 25);
@@ -1034,6 +1037,7 @@ namespace BlueControls.BlueTableDialogs {
             grpAllgemein.BackColor = Color.FromArgb(240, 240, 240);
             grpAllgemein.CausesValidation = false;
             grpAllgemein.Controls.Add(capInfo);
+            grpAllgemein.Controls.Add(btnAbhängigkeiten);
             grpAllgemein.Controls.Add(capInternalName);
             grpAllgemein.Controls.Add(txbName);
             grpAllgemein.Controls.Add(capCaption);
@@ -1129,8 +1133,6 @@ namespace BlueControls.BlueTableDialogs {
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
             tabControl.Size = new Size(1106, 623);
-            tabControl.TabDefault = tabDatenFormat;
-            tabControl.TabDefaultOrder = null;
             tabControl.TabIndex = 15;
             tabControl.SelectedIndexChanged += tabControl_SelectedIndexChanged;
             // 
@@ -1149,8 +1151,6 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(capMaxTextLength);
             tabDatenFormat.Controls.Add(tbxMinTextLength);
             tabDatenFormat.Controls.Add(capMinTextLength);
-            tabDatenFormat.Controls.Add(txbSimilarityWeight);
-            tabDatenFormat.Controls.Add(capSimilarityWeight);
             tabDatenFormat.Controls.Add(txbAllowedChars);
             tabDatenFormat.Controls.Add(cbxSort);
             tabDatenFormat.Controls.Add(capSortiermaske);
@@ -1261,9 +1261,9 @@ namespace BlueControls.BlueTableDialogs {
             capMaxTextLength.QuickInfo = "Pro Zeile!\r\nEs wird wirklich die Anzahl der Zeichen gezählt.\r\nEs bezeht sich nur auf das Format, und es wird evtl. eine Meldung ausgegeben,\r\ndas die Eingabe nicht dem Format entspricht.";
             capMaxTextLength.Size = new Size(136, 24);
             capMaxTextLength.Text = "Maximale Text-Länge:";
-            //
+            // 
             // tbxMinTextLength
-            //
+            // 
             tbxMinTextLength.AdditionalFormatCheck = AdditionalCheck.Integer;
             tbxMinTextLength.AllowedChars = "0123456789";
             tbxMinTextLength.Cursor = Cursors.IBeam;
@@ -1286,7 +1286,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbSimilarityWeight
             // 
             txbSimilarityWeight.Cursor = Cursors.IBeam;
-            txbSimilarityWeight.Location = new Point(840, 40);
+            txbSimilarityWeight.Location = new Point(576, 16);
             txbSimilarityWeight.Name = "txbSimilarityWeight";
             txbSimilarityWeight.RegexCheck = null;
             txbSimilarityWeight.Size = new Size(96, 24);
@@ -1295,9 +1295,9 @@ namespace BlueControls.BlueTableDialogs {
             // capSimilarityWeight
             // 
             capSimilarityWeight.CausesValidation = false;
-            capSimilarityWeight.Location = new Point(656, 40);
+            capSimilarityWeight.Location = new Point(404, 15);
             capSimilarityWeight.Name = "capSimilarityWeight";
-            capSimilarityWeight.QuickInfo = "Wie stark fließt diese Spalte in die Ähnlichkeits-Suche (Ähnliche Zeilen) ein?\r\n0 = Spalte ignorieren, 1 = volles Gewicht. Leer = volles Gewicht.";
+            capSimilarityWeight.QuickInfo = "Wie stark fließt diese Spalte in die Ähnlichkeits-Suche (Ähnliche Zeilen) ein?\r\n0 = Spalte ignorieren, 1 = volles Gewicht, 2 = doppeltes Gewicht. Komma Werte erlaubt.";
             capSimilarityWeight.Size = new Size(176, 24);
             capSimilarityWeight.Text = "Gewicht bei Ähnlichkeit:";
             // 
@@ -1338,11 +1338,9 @@ namespace BlueControls.BlueTableDialogs {
             // tblFilterliste
             // 
             tblFilterliste.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tblFilterliste.Ansichtbearbeitung = false;
             tblFilterliste.ColumnMoveAllowed = false;
             tblFilterliste.Location = new Point(8, 112);
             tblFilterliste.Name = "tblFilterliste";
-            tblFilterliste.PowerEdit = false;
             tblFilterliste.Size = new Size(1073, 472);
             tblFilterliste.TabIndex = 39;
             // 
@@ -1415,6 +1413,16 @@ namespace BlueControls.BlueTableDialogs {
             btnSpaltenkopf.Size = new Size(32, 24);
             btnSpaltenkopf.TabIndex = 49;
             btnSpaltenkopf.Click += btnSpaltenkopf_Click;
+            // 
+            // btnAbhängigkeiten
+            // 
+            btnAbhängigkeiten.ImageCode = "Hierarchie|16";
+            btnAbhängigkeiten.Location = new Point(8, 80);
+            btnAbhängigkeiten.Name = "btnAbhängigkeiten";
+            btnAbhängigkeiten.QuickInfo = "Zeigt die Abhängigkeiten der Spalte als Diagramm: eingehende Verweise links, ausgehende rechts.";
+            btnAbhängigkeiten.Size = new Size(32, 24);
+            btnAbhängigkeiten.TabIndex = 50;
+            btnAbhängigkeiten.Click += btnAbhängigkeiten_Click;
             // 
             // ColumnEditor
             // 
@@ -1552,6 +1560,8 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capMaxTextLength;
         private Button btnMaxTextLength;
         private Button btnSpaltenkopf;
+
+        private Button btnAbhängigkeiten;
         private ComboBox cbxRenderer;
         private Caption capRenderer;
         private ScrollPanel RendererEditor;

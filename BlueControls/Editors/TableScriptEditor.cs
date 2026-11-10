@@ -353,14 +353,13 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
             txbChunk.Text = string.Empty;
         }
 
-        // chkExtendend: nur behandeln, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
-        if (chkExtendend.Enabled) {
-            if (data is not null
-                && data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode)
-                && exNode is JsonValue exv
-                && exv.TryGetValue(out string? ex)) {
-                chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
-            }
+        // chkExtendend: Wert auch bei deaktivierter Checkbox übernehmen,
+        // damit der Fehler-Snapshot den zur Laufzeit verwendeten Wert zeigt.
+        if (data is not null
+            && data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode)
+            && exNode is JsonValue exv
+            && exv.TryGetValue(out string? ex)) {
+            chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
         }
     }
 

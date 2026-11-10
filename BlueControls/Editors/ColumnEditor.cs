@@ -319,6 +319,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         tb.Edit();
     }
 
+    private void btnAbhängigkeiten_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || InputItem is not ColumnItem { IsDisposed: false } col) { return; }
+
+        IUniqueWindowExtension.ShowOrCreate<DependencyOverviewForm>(col);
+    }
+
     private void btnStandard_Click(object sender, System.EventArgs e) {
         if (IsDisposed || InputItem is not ColumnItem { IsDisposed: false } c) { return; }
         if (!AllOk()) { return; }

@@ -5,7 +5,7 @@ using BlueControls.PadItems.Abstract;
 namespace BlueControls.PadItems;
 
 /// <summary>
-/// Eine Box des Abhängigkeits-Graphen: Formular, Formular-Element, Tabelle, Skript oder Spalte.
+/// Eine Box des Abhängigkeits-Graphen: Formular, Tabelle, Skript oder Spalte.
 /// </summary>
 public sealed class DependencyBoxPadItem : PadItem {
 
@@ -88,23 +88,37 @@ public sealed class DependencyBoxPadItem : PadItem {
         var fKlein = BoxFont.Scale(zoom * 0.8f);
         var tx = positionControl.Left + 30;
         gr.FillRectangle(Brushes.White, new RectangleF(tx, positionControl.Top + 4, positionControl.Width - 34, positionControl.Height - 8));
-        f.DrawString(gr, Node.Caption, 1f, tx, positionControl.Top + 6);
-        fKlein.DrawString(gr, Node.Info, 1f, tx, positionControl.Top + 6 + f.Size * 1.2f);
+
+        if (Node.Art == DependencyOverviewForm.NodeArt.Spalte) {
+            // Ohne Info-Zeile: Beschriftung vertikal zentriert.
+            f.DrawString(gr, Node.Caption, 1f, tx, positionControl.Top + (positionControl.Height - f.Size) / 2f);
+        } else {
+            f.DrawString(gr, Node.Caption, 1f, tx, positionControl.Top + 6);
+            fKlein.DrawString(gr, Node.Info, 1f, tx, positionControl.Top + 6 + f.Size * 1.2f);
+        }
     }
 
     /// <summary>
     /// Die Randfarbe einer Box je Knoten-Art.
     /// </summary>
-    private static Color KnotenFarbe(DependencyOverviewForm.NodeArt art) => art switch {
-        DependencyOverviewForm.NodeArt.Formular => Color.FromArgb(70, 124, 60),
-        DependencyOverviewForm.NodeArt.Element => Color.FromArgb(126, 84, 168),
-        DependencyOverviewForm.NodeArt.Tabelle => Color.FromArgb(52, 96, 176),
-        DependencyOverviewForm.NodeArt.Skript => Color.FromArgb(110, 110, 110),
-        _ => Color.FromArgb(64, 110, 190)
-    };
+    private static Color KnotenFarbe(DependencyOverviewForm.NodeArt art) {
+        switch (art) {
+            case DependencyOverviewForm.NodeArt.Formular:
+                return Color.FromArgb(70, 124, 60);
+
+            case DependencyOverviewForm.NodeArt.Tabelle:
+                return Color.FromArgb(52, 96, 176);
+
+            case DependencyOverviewForm.NodeArt.Skript:
+                return Color.FromArgb(110, 110, 110);
+
+            default:
+                return Color.FromArgb(64, 110, 190);
+        }
+    }
 
     /// <summary>
-    /// Das Symbol einer Box je Knoten-Art; Elemente bekommen das Symbol ihres Typs.
+    /// Das Symbol einer Box je Knoten-Art.
     /// </summary>
     private static ImageCode SymbolFür(DependencyOverviewForm.Node knoten) {
         switch (knoten.Art) {
@@ -117,51 +131,8 @@ public sealed class DependencyBoxPadItem : PadItem {
             case DependencyOverviewForm.NodeArt.Skript:
                 return ImageCode.Skript;
 
-            case DependencyOverviewForm.NodeArt.Spalte:
-                return ImageCode.Spalte;
-        }
-
-        switch (knoten.Info) {
-            case "EditField":
-                return ImageCode.Spalte;
-
-            case "TableView":
-                return ImageCode.Tabelle;
-
-            case "ScriptButton":
-                return ImageCode.Skript;
-
-            case "Timer":
-                return ImageCode.Uhr;
-
-            case "RowAdder":
-                return ImageCode.Zeile;
-
-            case "FilterConverter":
-            case "OutputFilter":
-                return ImageCode.Trichter;
-
-            case "TabFormula":
-            case "DropDownSelectRow":
-                return ImageCode.Register;
-
-            case "Monitor":
-                return ImageCode.Monitor;
-
-            case "EasyText":
-                return ImageCode.Textfeld;
-
-            case "EasyPic":
-                return ImageCode.Bild;
-
-            case "FileExplorer":
-                return ImageCode.Ordner;
-
-            case "RegionFormula":
-                return ImageCode.Groupbox;
-
             default:
-                return ImageCode.Anwendung;
+                return ImageCode.Spalte;
         }
     }
 

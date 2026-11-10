@@ -8,9 +8,9 @@ namespace BlueTable.Classes;
 
 /// <summary>
 /// Verwaltet Tabellenfragmente für Multi-User-Umgebungen im binären Fragment-Format
-/// „Typ + Key“ (BinaryFormat.md, Hauptdatei .fbdb). Vom klassischen TableFragments
-/// (.mbdb, Altformat mit Textzeilen) unabhängig: eigene Dateien, eigener Reader/Writer.
-/// Die Komplettierung der Hauptdatei läuft über TableFile und schreibt binär.
+/// „Typ + Key“ (Hauptdatei .fbdb). Vom klassischen TableFragments (.mbdb, Altformat
+/// mit Textzeilen) unabhängig: eigene Dateien, eigener Reader/Writer. Die
+/// Komplettierung der Hauptdatei läuft über TableFile und schreibt binär.
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -333,11 +333,16 @@ public class TableFragmentsNew : TableFile {
             // werden und die Historie nur um erfolgreich angewendete Items wächst.
             _processedHashes.Clear();
             List<UndoItem> undoSnapshot;
+            List<FragmentChange> blockSnapshot;
             lock (_undoLock) {
                 undoSnapshot = [.. Undo];
+                blockSnapshot = [.. FragmentUndos];
             }
             foreach (var u in undoSnapshot) {
                 _processedHashes.TryAdd(u.Hash(), default);
+            }
+            foreach (var f in blockSnapshot) {
+                _processedHashes.TryAdd(f.Hash(), default);
             }
         }
 
@@ -531,51 +536,73 @@ public class TableFragmentsNew : TableFile {
         var user = UserName;
         var datetimeUtc = DateTime.UtcNow;
 
+        var blockType = BlockCrumbType(crumbs);
+
         try {
+            byte[]? blockBytes = null;
+
             lock (_writer) {
+                // Block-Änderungen (Sub*-Typen 92-96) zuerst in den Puffer schreiben:
+                // Die Bytes gehen identisch in die Fragmentdatei und als Block-Undo in
+                // das Hauptfile, damit der Dedup-Hash beim Einlesen übereinstimmt.
+                using var buffer = blockType != 0 ? new System.IO.MemoryStream() : null;
+                var target = buffer ?? _writer;
                 var depth = 1;
 
                 foreach (var (crumbType, crumbKey) in crumbs) {
-                    if (!FragmentRecord.Append(_writer, depth++, crumbType, crumbKey)) {
+                    if (!FragmentRecord.Append(target, depth++, crumbType, crumbKey)) {
                         Freeze("Fragment-Navigationssatz ungültig: " + e.RelativePath);
                         return;
                     }
                 }
 
                 if (e.ListContent is { } list) {
-                    if (!FragmentRecord.Append(_writer, depth, e.TypeSelector, FragmentDataType.ListSet, list, user, datetimeUtc, string.Empty)) {
+                    if (!FragmentRecord.Append(target, depth, e.TypeSelector, FragmentDataType.ListSet, list, user, datetimeUtc, string.Empty)) {
                         Freeze("Fragment-Listen-Satz ungültig oder zu groß: " + e.TypeSelector);
                         return;
                     }
-                } else if (!FragmentRecord.Append(_writer, depth, e.TypeSelector, e.ContentType, e.Content, user, datetimeUtc, string.Empty)) {
+                } else if (!FragmentRecord.Append(target, depth, e.TypeSelector, e.ContentType, e.Content, user, datetimeUtc, string.Empty)) {
                     Freeze("Fragment-Satz ungültig oder zu groß: " + e.TypeSelector);
                     return;
+                }
+
+                if (buffer is not null) {
+                    blockBytes = buffer.ToArray();
+                    _writer.Write(blockBytes, 0, blockBytes.Length);
                 }
 
                 _writer.Flush();
                 CanDeleteWriter = false;
             }
 
-            // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen.
-            _processedHashes.TryAdd(OwnFragmentHash(e, crumbs, user, datetimeUtc), default);
+            if (blockBytes is not null) {
+                // Block-Änderung als Undo-Eintrag merken: Sie läuft nicht durch die
+                // klassische Änderungs-Pipeline und hat daher keinen UndoItem-Eintrag.
+                var entry = new FragmentChange(KeyName, blockType, blockBytes, user, datetimeUtc, "[Änderung in dieser Session]");
+
+                lock (_undoLock) {
+                    FragmentUndos.Add(entry);
+                }
+
+                _processedHashes.TryAdd(entry.Hash(), default);
+            } else {
+                // Klassische Änderung: Dedup über die mit UndoItem geteilte Formel.
+                _processedHashes.TryAdd(OwnFragmentHash(e, crumbs, user, datetimeUtc), default);
+            }
         } catch {
             Freeze("Netzwerkfehler!");
         }
     }
 
     /// <summary>
-    /// Bildet den Dedup-Hash einer selbst geschriebenen Änderung — für klassische
-    /// Sätze identisch zu UndoItem.Hash(), für Sub*-Blöcke deterministisch über
-    /// Pfad und Inhalt.
+    /// Bildet den Dedup-Hash einer selbst geschriebenen klassischen Änderung —
+    /// identisch zu UndoItem.Hash(). Block-Änderungen dedupen über FragmentChange.Hash().
     /// </summary>
     private string OwnFragmentHash(FragmentChangedEventArgs e, List<(byte CrumbType, string CrumbKey)> crumbs, string user, DateTime datetimeUtc) {
         string rowKey = string.Empty;
         string colName = string.Empty;
-        var isBlock = false;
 
         foreach (var (crumbType, crumbKey) in crumbs) {
-            if (IsSubBlockCrumb(crumbType)) { isBlock = true; continue; }
-
             if (crumbType == (byte)FragmentType.RowKey) {
                 rowKey = crumbKey;
                 colName = string.Empty;
@@ -584,16 +611,23 @@ public class TableFragmentsNew : TableFile {
             }
         }
 
-        if (isBlock) {
-            return (KeyName + "|block|" + e.RelativePath + "|" + e.TypeSelector + "|" + e.Content).GetMD5Hash();
-        }
-
         // Listen-Inhalte in die CR-verbundene Domänen-Form bringen, damit der Hash
         // mit den aus UndoItem.Hash() gelesenen Einträgen übereinstimmt.
         var content = e.ListContent is { } list ? string.Join('\r', list) : e.Content;
 
         return (KeyName + "|" + (int)(TableDataType)e.TypeSelector + "|" + colName + "|" + rowKey + "|" +
                 datetimeUtc.ToString9() + "|" + user + "|" + content).GetMD5Hash();
+    }
+
+    /// <summary>
+    /// Liefert das Crumb-Byte, das einen Sub*-Block eröffnet (92-96); 0 bei klassischen Pfaden.
+    /// </summary>
+    private static byte BlockCrumbType(List<(byte CrumbType, string CrumbKey)> crumbs) {
+        foreach (var (crumbType, _) in crumbs) {
+            if (IsSubBlockCrumb(crumbType)) { return crumbType; }
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -796,10 +830,15 @@ public class TableFragmentsNew : TableFile {
             try {
                 foreach (var thisWork in dataSorted) {
                     if (KeyName == thisWork.TableName) {
-                        // Sub*-Blöcke als Fragment-Baum anwenden: kein Undo-Eintrag,
-                        // aber Schutz vor dem Aufräumen, solange der Block nicht
-                        // in der Hauptdatei komplettiert ist.
+                        // Sub*-Blöcke als Fragment-Baum anwenden; zusätzlich als Block-Undo
+                        // übernehmen, damit der Undo-Seed des Hauptfiles sie nach der
+                        // Komplettierung wiedererkennt. Schutz vor dem Aufräumen, solange
+                        // der Block nicht in der Hauptdatei komplettiert ist.
                         if (thisWork.Block is { Length: > 0 } block) {
+                            lock (_undoLock) {
+                                FragmentUndos.Add(thisWork);
+                            }
+
                             _filesNotIncluded.Add(thisWork.Container);
                             affectingHead = true;
 
@@ -901,7 +940,7 @@ public class TableFragmentsNew : TableFile {
             _ = FragmentRecord.Append(_writer, 1, FragmentTagType.Machine, Environment.MachineName);
 
             var l = new FragmentChange(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
-            _ = FragmentChange.AppendFragment(_writer, l);
+            _ = FragmentChange.AppendFragment(_writer, 1, l);
 
             CanDeleteWriter = true;
             _writer.Flush();

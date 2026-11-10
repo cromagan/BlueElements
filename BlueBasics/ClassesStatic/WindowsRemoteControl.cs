@@ -23,6 +23,10 @@ public static class WindowsRemoteControl {
 
     private const int SwpNoactivate = 0x0010;
 
+    private const int SwpNomove = 0x0002;
+
+    private const int SwpNosize = 0x0001;
+
     private const int WsexToolwindow = 0x00000080;
 
     #endregion
@@ -238,6 +242,7 @@ public static class WindowsRemoteControl {
     /// <summary>
     /// Bringt das Fenster auf die gewünschte Position/Größe, stellt den Fensterzustand wieder her und holt es in den Vordergrund.
     /// Liegt das Ziel auf einem nicht mehr vorhandenen Bildschirm, wird es auf den nächstgelegenen verfügbaren verschoben.
+    /// Soll maximiert werden und liegt das Fenster bereits am Zielbildschirm, entfällt das Anpositionieren.
     /// </summary>
     /// <param name="handle"></param>
     /// <param name="bounds"></param>
@@ -245,6 +250,18 @@ public static class WindowsRemoteControl {
     public static void WinPlace(IntPtr handle, Rectangle bounds, bool maximized) {
         var target = WinBoundsOnScreen(bounds);
         Develop.Diagnose("WRC", "WinPlace " + handle + " -> " + target + (maximized ? " maximiert" : " normal"));
+
+        // Schon am Zielbildschirm? Dann direkt maximieren bzw. nichts tun - das spart das sichtbare Anpositionieren.
+        if (maximized && WinState(handle) != FormWindowState.Minimized && SameScreen(handle, target)) {
+            if (WinState(handle) == FormWindowState.Maximized) {
+                _ = SetWindowPos(handle, 0, 0, 0, 0, 0, SwpNoactivate | SwpNomove | SwpNosize); // 0 = HwndTop, nur Z-Ordnung
+                Develop.Diagnose("WRC", "WinPlace bereits maximiert am Zielbildschirm: " + handle);
+            } else {
+                _ = ShowWindow(handle, (int)Sw.ShowMaximized);
+                Develop.Diagnose("WRC", "WinPlace direkt maximiert: " + handle);
+            }
+            return;
+        }
 
         // Minimierte und maximierte Fenster melden falsche Maße - daher zuerst in den Normalzustand
         if (WinState(handle) != FormWindowState.Normal) {
@@ -260,6 +277,17 @@ public static class WindowsRemoteControl {
             _ = ShowWindow(handle, (int)Sw.ShowMaximized);
             Develop.Diagnose("WRC", "WinPlace maximiert: " + handle);
         }
+    }
+
+    /// <summary>
+    /// True, wenn das Fenster aktuell auf demselben Bildschirm liegt wie das Zielrechteck.
+    /// </summary>
+    private static bool SameScreen(IntPtr handle, Rectangle target) {
+        var current = WinBounds(handle);
+
+        if (current.IsEmpty || target.IsEmpty) { return false; }
+
+        return System.Windows.Forms.Screen.FromRectangle(current).DeviceName == System.Windows.Forms.Screen.FromRectangle(target).DeviceName;
     }
 
     /// <summary>

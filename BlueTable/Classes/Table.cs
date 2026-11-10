@@ -39,8 +39,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         Columns = 90,
 
         /// <summary>
-        /// Trenner zwischen Objekt-Baum und Undo-Historie (Content leer); die
-        /// Undo-Einträge folgen bis zum Datei-Ende.
+        /// Nav-Satz je Undo-Eintrag (Content leer); der Block des Eintrags —
+        /// klassischer Satz oder Sub*-Block — folgt eine Ebene tiefer.
         /// </summary>
         UndoHistory = 91,
 
@@ -692,6 +692,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
     public List<UndoItem> Undo { get; }
+
+    /// <summary>
+    /// Undo-Einträge des binären Fragment-Formats als ganze Sub*-Blöcke (Änderungen an
+    /// Uniques, Skripten, Ansichten, Variablen und Sortierung); parallel zu Undo geführt,
+    /// weil diese Änderungen kein klassisches TableDataType-Pendant haben.
+    /// </summary>
+    internal List<FragmentChange> FragmentUndos { get; } = [];
 
     public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
         get => _uniqueValues;
@@ -2605,6 +2612,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 // Listen leeren
                 lock (_undoLock) {
                     Undo.Clear();
+                    FragmentUndos.Clear();
                 }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
@@ -3238,12 +3246,27 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Zeilen (Classic: RowChunk) — die RowCollection schreibt die Zeilen als Liste
         allok &= FragmentRecord.Append(stream, depth, TableFragmentType.Rows, Row);
 
-        // Undo-Sektion: je Eintrag ein Nav-Satz (UndoHistory) samt Block eine Ebene tiefer.
 
+        List<UndoItem> undoSave;
+        List<FragmentChange> blockSave;
         lock (_undoLock) {
-           // allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UndoHistory, Undo);
+            undoSave = [.. Undo];
+            blockSave = [.. FragmentUndos];
         }
 
+        foreach (var u in undoSave) {
+            // Steuer-Typen (z. B. der Undo-Satz selbst) haben keinen Daten-Satz.
+            if ((byte)u.Command > FragmentRecord.MaxUserTypeValue) { continue; }
+
+            var item = new FragmentChange(KeyName, u.Command, u.ColName, u.RowKey, u.ChangedTo, u.User, u.DateTimeUtc, u.Comment, "[Hauptdatei]");
+            allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UndoHistory, string.Empty)
+                  && FragmentChange.AppendFragment(stream, depth + 1, item);
+        }
+
+        foreach (var f in blockSave) {
+            allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UndoHistory, string.Empty)
+                  && FragmentChange.AppendBlock(stream, depth + 1, f);
+        }
 
         return allok;
     }
@@ -3264,13 +3287,20 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 return Column.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.UndoHistory:
-                // Je Eintrag ein eigener Block eine Ebene unter dem ListKeyObject-Satz
-                //if (FragmentStoreableExtension.DeserializeList(stream, record.Depth, UndoItemCreate) is not { } undoItems) { return false; }
+                // Je Eintrag ein eigener Block eine Ebene unter dem Nav-Satz; die
+                // Eintrags-Bytes liegen einen Tab tiefer als im Fragment-Datei-Layout
+                // und werden vor dem Parsen auf Basis-Tiefe 1 zurückgeschoben.
+                var undoEntries = FragmentChange.ReadFragments(FragmentChange.ReadEntryBlock(stream, record.Depth), KeyName, "[Hauptdatei]");
 
-                //lock (_undoLock) {
-                //    Undo.Clear();
-                //    Undo.AddRange(undoItems);
-                //}
+                lock (_undoLock) {
+                    foreach (var undoEntry in undoEntries) {
+                        if (undoEntry.Block is { Length: > 0 }) {
+                            FragmentUndos.Add(undoEntry);
+                        } else {
+                            Undo.Add(new UndoItem(undoEntry.TableName, undoEntry.Command, undoEntry.ColName, undoEntry.RowKey, string.Empty, undoEntry.ChangedTo, undoEntry.User, undoEntry.DateTimeUtc, undoEntry.Comment, undoEntry.Container));
+                        }
+                    }
+                }
 
                 break;
 

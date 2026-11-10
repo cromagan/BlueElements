@@ -608,12 +608,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         IUniqueWindowExtension.ShowOrCreate<ColumnOverview>(tb);
     }
 
-    private void btnAbhängigkeiten_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
-
-        IUniqueWindowExtension.ShowOrCreate<DependencyOverviewForm>(null);
-    }
-
     private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
         if (!IsAdministrator()) { return; }
 

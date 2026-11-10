@@ -5,7 +5,7 @@ using System.IO;
 namespace BlueBasics.Classes;
 
 /// <summary>
-/// Ein einzelner Satz im binären Fragment-Format „Typ + Key“ (BinaryFormat.md).
+/// Ein einzelner Satz im binären Fragment-Format „Typ + Key“.
 /// Aufbau: Tabs (Einrücktiefe), SpeicherTyp, len1, [Empfänger-Typ], 0x20, valueId,
 /// len2, Content, optional Meta (User/DateTimeUtc/Comment, durch US getrennt), 0x0D.
 /// ListSet-Sätze haben kein len2: Count als lesbare Dezimalzahl, dann je Eintrag

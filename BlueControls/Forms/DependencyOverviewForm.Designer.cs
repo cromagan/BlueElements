@@ -44,6 +44,7 @@ namespace BlueControls.Forms {
             Pad.Dock = DockStyle.Fill;
             Pad.Location = new Point(0, 0);
             Pad.Name = "Pad";
+            Pad.ShowInPrintMode = true;
             Pad.Size = new Size(1200, 576);
             Pad.TabIndex = 1;
             //

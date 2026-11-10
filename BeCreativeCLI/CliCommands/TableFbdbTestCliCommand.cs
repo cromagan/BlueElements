@@ -13,7 +13,7 @@ namespace BeCreativeCLI.CliCommands;
 /// Komplettierungen aus. Zusätzlich legt eine neue Tabelle "TabNew" als Kopie
 /// der Quelle an (.nbdb/TableFile binär und .fbdb) und prüft deren Roundtrip,
 /// Konvertierungskette und Komplettierung. Prüft Parser-Robustheit sowie
-/// Writer-/Reader-Regeln von FragmentRecord (BinaryFormat.md §8).
+/// Writer-/Reader-Regeln von FragmentRecord.
 /// </summary>
 public class TableFbdbTestCliCommand : CliCommand {
 
@@ -665,7 +665,7 @@ public class TableFbdbTestCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// T6: Writer-/Reader-Regeln von FragmentRecord im Direktvergleich (BinaryFormat.md §4/§8).
+    /// T6: Writer-/Reader-Regeln von FragmentRecord im Direktvergleich.
     /// </summary>
     private static void RunRecordTests(List<string> failures) {
         // Steuer-Satz schreiben und lesen.
@@ -768,7 +768,7 @@ public class TableFbdbTestCliCommand : CliCommand {
         using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
 
         // Gültiger Block: Zell-Änderung mit Meta (RowKey- + SubColumn-Satz + Blatt).
-        var ok = FragmentChange.AppendFragment(fs, new FragmentChange(tbl.KeyName, TableDataType.UTF8Value_withoutSizeData, "KATEGORIE", markerRowKey, "RobustheitsMarkerXYZ", UserName, DateTime.UtcNow, "fbdbtest Robustheit", "fbdbtest"));
+        var ok = FragmentChange.AppendFragment(fs, 1, new FragmentChange(tbl.KeyName, TableDataType.UTF8Value_withoutSizeData, "KATEGORIE", markerRowKey, "RobustheitsMarkerXYZ", UserName, DateTime.UtcNow, "fbdbtest Robustheit", "fbdbtest"));
 
         if (!Check(failures, ok, "T5: gültiger Marker-Block geschrieben: " + path.FileNameWithSuffix())) { return; }
 

@@ -3,13 +3,19 @@
 namespace BlueDeskSnap.Forms;
 
 /// <summary>
-/// Immer im Vordergrund liegende Liste der Desktop-Snaps: Plus-Knopf = erfassen, Klick = wiederherstellen, Rechtsklick = Umbenennen/Aktualisieren/Kopieren, Stern = Auswahlmenü öffnen.
+/// Immer im Vordergrund liegende Liste der Desktop-Snaps: Plus-Knopf = erfassen, Minus-Knopf = alle Fenster minimieren, Stern = Auswahlmenü.
+/// Klick auf einen Snap stellt ihn wieder her; solange kein Snap gewählt ist, sind die Quality-Plugins deaktiviert.
 /// </summary>
 public partial class DeskSnapForm : Form {
 
     #region Fields
 
     private int _nextSnapshotNumber = 1;
+
+    /// <summary>
+    /// Der Schlüssel des aktuell gewählten Snaps; leer, wenn kein Snap gewählt ist.
+    /// </summary>
+    private string _selectedSnapId = string.Empty;
 
     #endregion
 
@@ -36,6 +42,19 @@ public partial class DeskSnapForm : Form {
     [StandaloneInfo("Desktop-Snaps", ImageCode.Kamera, "Allgemein", "Fensteranordnungen sichern und wiederherstellen", 899)]
     public static System.Windows.Forms.Form Start() => new DeskSnapForm();
 
+    /// <summary>
+    /// Wählt keinen Snap mehr und deaktiviert alle Quality-Plugins - funktional und sichtbar in der Liste.
+    /// </summary>
+    private void DisableQualityPlugins() {
+        _selectedSnapId = string.Empty;
+
+        foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
+            plugin.IsRunning = false;
+        }
+
+        FillQualityList();
+    }
+
     private void FillList() {
         lstSnaps.ItemClear();
 
@@ -43,23 +62,30 @@ public partial class DeskSnapForm : Form {
 
         foreach (var snap in snaps) {
             var quickInfo = $"{snap.Created.ToString5()} | {snap.Windows.Count} Fenster";
-            lstSnaps.ItemAdd(new TextListItem(snap.Name, snap.Folder, null, false, true, quickInfo, $"{long.MaxValue - snap.Created.Ticks:d19}"));
+            lstSnaps.ItemAdd(new TextListItem(snap.Name, snap.Id, null, false, true, quickInfo, $"{long.MaxValue - snap.Created.Ticks:d19}"));
         }
 
         _nextSnapshotNumber = NextSnapshotNumber(snaps);
-    }
 
-    private void LstSnaps_ItemClicked(object? sender, ListItemEventArgs e) {
-        if (SnapshotStore.Load(e.Item.KeyName) is { } snap) {
-            DesktopSnapshot.Restore(snap);
-            FillQualityList(); // Der Restore schaltet die Quality-Plugins gemäß dem Snapshot um
-        }
+        // Die getroffene Auswahl über den Neuaufbau der Liste hinweg halten
+        if (_selectedSnapId.Length > 0 && lstSnaps[_selectedSnapId] is not null) { lstSnaps.Check(_selectedSnapId); }
     }
-
-    private void LstSnaps_RemoveClicked(object? sender, ListItemEventArgs e) => SnapshotStore.DeleteFolder(e.Item.KeyName);
 
     /// <summary>
-    /// Benennt den per Rechtsklick gewählten Snap um.
+    /// Füllt die Plugin-Liste; die eingebaute Kästchen-Funktion zeigt den Aktiv-Status, der Klick schaltet um.
+    /// </summary>
+    private void FillQualityList() {
+        lstQuality.ItemClear();
+
+        foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
+            lstQuality.ItemAdd(new TextListItem(plugin.Name, plugin.KeyName, null, false, true, plugin.QuickInfo, plugin.Name));
+        }
+
+        lstQuality.Check(QualityPlugin.AllPlugins.Instances.Where(p => p.IsRunning).Select(p => p.KeyName), true);
+    }
+
+    /// <summary>
+    /// Benennt den per Rechtsklick gewählten Snap um; Reihenfolge und Auswahl bleiben unverändert.
     /// </summary>
     private void ContextMenu_RenameSnap(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not TextListItem item) { return; }
@@ -70,7 +96,8 @@ public partial class DeskSnapForm : Form {
         if (string.IsNullOrWhiteSpace(newName) || string.Equals(newName, snap.Name, StringComparison.Ordinal)) { return; }
 
         snap.Name = newName.Trim();
-        SnapshotStore.Save(snap);
+        _selectedSnapId = snap.Id;
+        SnapshotStore.Save(snap); // Der Snap behält seinen Platz in der Ablage
         FillList();
     }
 
@@ -81,9 +108,7 @@ public partial class DeskSnapForm : Form {
         if (e.HotItem is not TextListItem item) { return; }
         if (SnapshotStore.Load(item.KeyName) is not { } snap) { return; }
 
-        TakeSnapshot(snap.Name);
-        SnapshotStore.DeleteFolder(snap.Folder);
-        FillList();
+        TakeSnapshot(snap);
     }
 
     /// <summary>
@@ -93,29 +118,8 @@ public partial class DeskSnapForm : Form {
         if (e.HotItem is not TextListItem item) { return; }
         if (SnapshotStore.Load(item.KeyName) is not { } snap) { return; }
 
-        SnapshotStore.Copy(snap, snap.Name + " (Kopie)");
+        _selectedSnapId = SnapshotStore.Copy(snap, snap.Name + " (Kopie)").Id;
         FillList();
-    }
-
-    /// <summary>
-    /// Füllt die Plugin-Liste; die eingebaute Kästchen-Funktion zeigt den Aktiv-Status, der Klick schaltet um.
-    /// </summary>
-    private void FillQualityList() {
-        lstQuality.ItemClear();
-
-        lstQuality.ItemAdd(new TextListItem("Quality-Plugins", "QualityPlugins", null, true, true, "Klick auf ein Plugin schaltet es ein oder aus", "0"));
-
-        foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
-            lstQuality.ItemAdd(new TextListItem(plugin.Name, plugin.KeyName, null, false, true, plugin.QuickInfo, plugin.Name));
-        }
-
-        lstQuality.Check(QualityPlugin.AllPlugins.Instances.Where(p => p.IsRunning).Select(p => p.KeyName), true);
-    }
-
-    private void LstQuality_CheckedChanged(object? sender, System.EventArgs e) {
-        foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
-            plugin.IsRunning = lstQuality.Checked.Contains(plugin.KeyName);
-        }
     }
 
     /// <summary>
@@ -126,6 +130,64 @@ public partial class DeskSnapForm : Form {
         if (QualityPlugin.AllPlugins.Instances.FirstOrDefault(p => string.Equals(p.KeyName, it.KeyName, StringComparison.OrdinalIgnoreCase)) is not ISimpleEditor plugin) { return; }
 
         InputBoxEditor.Edit(plugin, true);
+    }
+
+    private void LstSnaps_ItemClicked(object? sender, ListItemEventArgs e) {
+        if (lstSnaps.Checked.Contains(e.Item.KeyName) && SnapshotStore.Load(e.Item.KeyName) is { } snap) {
+            if (_selectedSnapId == snap.Id) { return; } // Bereits gewählt: kein erneutes Restore
+            _selectedSnapId = snap.Id;
+            DesktopSnapshot.Restore(snap);
+            FillQualityList(); // Der Restore schaltet die Quality-Plugins gemäß dem Snapshot um
+            return;
+        }
+
+        // Kein Snap mehr gewählt: die Quality-Plugins werden deaktiviert
+        DisableQualityPlugins();
+    }
+
+    private void LstSnaps_RemoveClicked(object? sender, ListItemEventArgs e) {
+        SnapshotStore.Delete(e.Item.KeyName);
+
+        if (lstSnaps.Checked.Count == 0) {
+            DisableQualityPlugins();
+        }
+    }
+
+    /// <summary>
+    /// Übernimmt die vom User verschobene Reihenfolge dauerhaft in die Ablage.
+    /// </summary>
+    private void LstSnaps_UpDownClicked(object? sender, SwapEventArgs e) {
+        var snaps = SnapshotStore.LoadAll();
+        List<WindowSnapshot> ordered = [];
+
+        foreach (var item in lstSnaps.Items) {
+            var snap = snaps.FirstOrDefault(s => string.Equals(s.Id, item.KeyName, StringComparison.OrdinalIgnoreCase));
+            if (snap is not null) { ordered.Add(snap); }
+        }
+
+        SnapshotStore.SaveOrder(ordered);
+    }
+
+    private void LstQuality_CheckedChanged(object? sender, System.EventArgs e) {
+        if (_selectedSnapId.Length == 0) {
+            // Ohne gewählten Snap bleiben die Quality-Plugins deaktiviert
+            lstQuality.UncheckAll();
+            foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
+                plugin.IsRunning = false;
+            }
+            return;
+        }
+
+        foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
+            plugin.IsRunning = lstQuality.Checked.Contains(plugin.KeyName);
+        }
+
+        // Die geänderten Häkchen dauerhaft im gewählten Snap ablegen
+        if (SnapshotStore.Load(_selectedSnapId) is { } snap) {
+            snap.ActivePlugins.Clear();
+            snap.ActivePlugins.AddRange(QualityPlugin.AllPlugins.Instances.Where(p => p.IsRunning).Select(p => p.KeyName));
+            SnapshotStore.Save(snap);
+        }
     }
 
     private void TmrQuality_Tick(object? sender, System.EventArgs e) {
@@ -139,7 +201,12 @@ public partial class DeskSnapForm : Form {
         }
     }
 
-    private void BtnNeu_Click(object? sender, System.EventArgs e) => TakeSnapshot($"Snap {_nextSnapshotNumber}");
+    private void BtnNeu_Click(object? sender, System.EventArgs e) => TakeSnapshot(new WindowSnapshot { Name = $"Snap {_nextSnapshotNumber}" });
+
+    /// <summary>
+    /// Minimiert alle Fenster außer diesem Werkzeug.
+    /// </summary>
+    private void BtnMinimizeAll_Click(object? sender, System.EventArgs e) => DesktopSnapshot.MinimizeAll();
 
     /// <summary>
     /// Öffnet das Auswahlmenü, ohne dieses Werkzeugfenster zu schließen.
@@ -163,22 +230,20 @@ public partial class DeskSnapForm : Form {
         return max + 1;
     }
 
-    private void TakeSnapshot(string name) {
-        Opacity = 0; // Dieses Fenster blendet sich für die Erfassung aus
-        Generic.Pause(0.3, true);
-        try {
-            _ = DesktopSnapshot.Capture(name);
-        } finally {
-            Opacity = 1;
-        }
+    /// <summary>
+    /// Erfasst den aktuellen Desktop in den gegebenen Snap; dieser wird gewählt und die Liste neu aufgebaut.
+    /// </summary>
+    private void TakeSnapshot(WindowSnapshot snap) {
+        _ = DesktopSnapshot.CaptureInto(snap); // Die eigenen Fenster sind per Handle ausgeschlossen
 
+        _selectedSnapId = snap.Id;
         FillList();
     }
 
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         FillList();
-        FillQualityList();
+        DisableQualityPlugins(); // Ohne gewählten Snap sind die Quality-Plugins aus
     }
 
     #endregion

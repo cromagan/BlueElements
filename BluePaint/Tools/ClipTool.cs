@@ -10,6 +10,7 @@ public partial class ClipTool {
     #region Fields
 
     private static readonly Brush BrushBlau = new SolidBrush(Color.FromArgb(120, Color.Blue));
+
     private static readonly Pen PenBlau = new Pen(Color.FromArgb(150, Color.Blue));
 
     #endregion
@@ -21,44 +22,6 @@ public partial class ClipTool {
     #endregion
 
     #region Methods
-
-    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
-        var pic = OnNeedCurrentPic();
-        if (pic is null || mouseCurrent is null) { return; }
-        DrawZusatz(gr, zoom, offsetX, offsetY, pic);
-        gr.DrawLine(PenBlau, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
-        gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
-
-        if (mouseCurrent.Button == MouseButtons.Left && mouseDown is not null) {
-            gr.DrawLine(PenBlau, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
-            gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
-        }
-    }
-
-    public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
-
-    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
-
-    public override void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
-        if (originalPic is null) { return; }
-        Links.Value = Math.Min(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX) + 1;
-        Recht.Value = -(originalPic.Width - Math.Max(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX));
-        Oben.Value = Math.Min(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY) + 1;
-        Unten.Value = -(originalPic.Height - Math.Max(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY));
-        ValueChangedByClicking(this, EventArgs.Empty);
-    }
-
-    public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
-
-    public override void ToolFirstShown() {
-        CheckMinMax();
-        btnAutoZ_Click(this, EventArgs.Empty);
-        ZuschnittOK_Click(this, EventArgs.Empty);
-    }
-
-    public override string ReadableText() => "Zuschneiden";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zuschneiden, 16);
 
     private void btnAutoZ_Click(object sender, EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
@@ -83,6 +46,19 @@ public partial class ClipTool {
         Unten.Minimum = -pic.Height + 1;
     }
 
+    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
+        var pic = OnNeedCurrentPic();
+        if (pic is null || mouseCurrent is null) { return; }
+        DrawZusatz(gr, zoom, offsetX, offsetY, pic);
+        gr.DrawLine(PenBlau, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+        gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
+
+        if (mouseCurrent.Button == MouseButtons.Left && mouseDown is not null) {
+            gr.DrawLine(PenBlau, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+            gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
+        }
+    }
+
     private void DrawZusatz(Graphics gr, float zoom, int offsetX, int offsetY, Image? originalPic) {
         if (originalPic is null) { return; }
 
@@ -102,6 +78,31 @@ public partial class ClipTool {
             var r = new RectangleF(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value).CanvasToControl(zoom, offsetX, offsetY, true);
             gr.FillRectangle(BrushBlau, r);
         }
+    }
+
+    public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
+
+    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
+
+    public override void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
+        if (originalPic is null) { return; }
+        Links.Value = Math.Min(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX) + 1;
+        Recht.Value = -(originalPic.Width - Math.Max(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX));
+        Oben.Value = Math.Min(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY) + 1;
+        Unten.Value = -(originalPic.Height - Math.Max(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY));
+        ValueChangedByClicking(this, EventArgs.Empty);
+    }
+
+    public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
+
+    public override string ReadableText() => "Zuschneiden";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zuschneiden, 16);
+
+    public override void ToolFirstShown() {
+        CheckMinMax();
+        btnAutoZ_Click(this, EventArgs.Empty);
+        ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
     private void ValueChangedByClicking(object sender, EventArgs e) => OnDoInvalidate();
@@ -126,4 +127,3 @@ public partial class ClipTool {
     }
 
     #endregion
-}

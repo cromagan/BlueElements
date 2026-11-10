@@ -5,8 +5,9 @@ using System.IO;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// Transport-Eintrag für Änderungen, die aus einer Fragment-Datei gelesen wurden:
-/// klassische Wert-Änderung oder roher Sub*-Block samt Roh-Bytes.
+/// Transport-Eintrag für Änderungen im binären Fragment-Format: klassische
+/// Wert-Änderung oder roher Sub*-Block samt Roh-Bytes. Dient dem Fragment-Austausch
+/// und als Undo-Eintrag für Block-Änderungen im neuen Format.
 /// </summary>
 public sealed class FragmentChange(string tableName, string container) {
 
@@ -79,12 +80,13 @@ public sealed class FragmentChange(string tableName, string container) {
     /// <summary>
     /// Berechnet einen deterministischen Hash zur Dedup-Erkennung in TableFragments.
     /// Klassische Einträge über die mit UndoItem geteilte Formel, Blöcke über ihre
-    /// Roh-Bytes.
+    /// kanonischen Roh-Bytes (Basis-Tiefe 1, wie im Fragment-Datei-Layout).
     /// </summary>
     public string Hash() {
-        Develop.DebugPrint_NichtImplementiert(true);
+        if (Block is { Length: > 0 } block) { return Convert.ToBase64String(block).GetMD5Hash(); }
 
-        return string.Empty;
+        return (TableName + "|" + (int)Command + "|" + ColName + "|" + RowKey + "|" +
+                DateTimeUtc.ToString9() + "|" + User + "|" + ChangedTo).GetMD5Hash();
     }
 
     /// <summary>
@@ -111,19 +113,96 @@ public sealed class FragmentChange(string tableName, string container) {
     /// Kopf-Werte und Kommandos als einzelnen Blatt-Satz — je Navigation eine Ebene.
     /// Liefert false, wenn ein Satz ungültig oder zu groß ist.
     /// </summary>
-    public static bool AppendFragment(Stream stream, FragmentChange item) {
+    public static bool AppendFragment(Stream stream, int depth, FragmentChange item) {
         if (item.Command.IsCellValue()) {
-            if (!FragmentRecord.Append(stream, 1, UndoNavigationType.RowKey, item.RowKey)) { return false; }
-            if (!FragmentRecord.Append(stream, 2, UndoNavigationType.SubColumn, item.ColName)) { return false; }
-            return FragmentRecord.Append(stream, 3, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
+            if (!FragmentRecord.Append(stream, depth, UndoNavigationType.RowKey, item.RowKey)) { return false; }
+            if (!FragmentRecord.Append(stream, depth + 1, UndoNavigationType.SubColumn, item.ColName)) { return false; }
+            return FragmentRecord.Append(stream, depth + 2, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
         }
 
         if (item.Command.IsColumnTag()) {
-            if (!FragmentRecord.Append(stream, 1, UndoNavigationType.SubColumn, item.ColName)) { return false; }
-            return FragmentRecord.Append(stream, 2, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
+            if (!FragmentRecord.Append(stream, depth, UndoNavigationType.SubColumn, item.ColName)) { return false; }
+            return FragmentRecord.Append(stream, depth + 1, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
         }
 
-        return FragmentRecord.Append(stream, 1, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
+        return FragmentRecord.Append(stream, depth, (byte)item.Command, item.ChangedTo, item.User, item.DateTimeUtc, item.Comment);
+    }
+
+    /// <summary>
+    /// Schreibt den rohen Block eines Sub*-Eintrags auf der Ziel-Tiefe: Je Satz wird
+    /// die Basis-Tiefe per Tab-Anzahl angepasst (Pendant zu ReadEntryBlock). Der Inhalt
+    /// bleibt byteidentisch, damit der Dedup-Hash beim Einlesen übereinstimmt.
+    /// Liefert false bei leerem Block.
+    /// </summary>
+    public static bool AppendBlock(Stream stream, int depth, FragmentChange item) {
+        if (item.Block is not { Length: > 0 } block) { return false; }
+
+        var shifted = ShiftDepth(block, depth - 1);
+        stream.Write(shifted, 0, shifted.Length);
+        return true;
+    }
+
+    /// <summary>
+    /// Liest alle tieferen Sätze ab der aktuellen Stream-Position als Eintrags-Block
+    /// und schiebt sie auf Basis-Tiefe 1 zurück (Pendant zu AppendBlock). Der Stream
+    /// steht danach am nächsten Satz der Nav-Ebene; geliefert werden die kanonischen
+    /// Roh-Bytes des Eintrags.
+    /// </summary>
+    public static byte[] ReadEntryBlock(Stream stream, int navDepth) {
+        using var ms = new MemoryStream();
+
+        while (true) {
+            var pos0 = stream.Position;
+
+            if (FragmentRecord.TryReadNext(stream) is not { } inner) {
+                stream.Position = pos0;
+                break;
+            }
+
+            var pos1 = stream.Position;
+
+            if (inner.Depth <= navDepth) {
+                stream.Position = pos0;
+                break;
+            }
+
+            var size = (int)(pos1 - pos0);
+            var tmp = new byte[size];
+            _ = stream.Position = pos0;
+            _ = stream.Read(tmp, 0, size);
+            ms.Write(tmp, 0, size);
+        }
+
+        return ShiftDepth(ms.ToArray(), -navDepth);
+    }
+
+    /// <summary>
+    /// Verschiebt alle Sätze des Blocks auf eine neue Basis-Tiefe, indem je Satz
+    /// Tabs ergänzt (delta &gt; 0) oder entfernt (delta &lt; 0) werden.
+    /// </summary>
+    private static byte[] ShiftDepth(byte[] block, int delta) {
+        if (delta == 0) { return block; }
+
+        using var ms = new MemoryStream();
+
+        var pos = 0;
+
+        while (pos < block.Length) {
+            if (block[pos] != 0x09 || !FragmentRecord.TryParse(block, pos, out var record, out var next) || record is null) { break; }
+
+            if (delta > 0) {
+                for (var i = 0; i < delta; i++) { ms.WriteByte(0x09); }
+
+                ms.Write(block, pos, next - pos);
+            } else {
+                var skip = Math.Min(-delta, record.Depth);
+                ms.Write(block, pos + skip, next - pos - skip);
+            }
+
+            pos = next;
+        }
+
+        return ms.ToArray();
     }
 
     /// <summary>

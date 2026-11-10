@@ -157,7 +157,7 @@ public class TableFile : Table {
 
     /// <summary>
     /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
-    /// Binäres Fragment-Format (BinaryFormat.md): beginnt mit einem Tab-Satz und endet
+    /// Binäres Fragment-Format: beginnt mit einem Tab-Satz und endet
     /// auf den 255-EOF-Satz (valueId FF, leerer Content, 0x0D).
     /// Classic-Format: Der Marker besteht aus
     /// [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"].

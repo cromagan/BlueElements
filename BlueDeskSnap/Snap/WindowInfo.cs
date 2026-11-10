@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.Globalization;
 using System.Text.Json.Nodes;
 using FormWindowState = System.Windows.Forms.FormWindowState;
 
@@ -27,6 +28,11 @@ public sealed class WindowInfo : ParseableItem, IJsonParseable {
 
     public string ProcessName { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Handle des improvisierten Ersatzfensters; es gehört ausschließlich diesem Snap (0 = Originalfenster).
+    /// </summary>
+    public long ReplacementHandle { get; set; }
+
     public FormWindowState State { get; set; } = FormWindowState.Normal;
 
     public string Title { get; set; } = string.Empty;
@@ -48,6 +54,7 @@ public sealed class WindowInfo : ParseableItem, IJsonParseable {
         json.Set("state", (int)State);
         json.Set("bounds", Bounds);
         json.Set("documents", Documents);
+        json.Set("replacement", ReplacementHandle.ToString(CultureInfo.InvariantCulture));
         return json;
     }
 
@@ -74,6 +81,7 @@ public sealed class WindowInfo : ParseableItem, IJsonParseable {
         Bounds = json.GetRectangle("bounds", Bounds);
         Documents.Clear();
         Documents.AddRange(json.GetStringList("documents"));
+        ReplacementHandle = LongParse(json.GetString("replacement", "0"));
     }
 
     public override bool ParseThis(string key, string value) {
@@ -103,6 +111,9 @@ public sealed class WindowInfo : ParseableItem, IJsonParseable {
                 foreach (var doc in value.Split('|', StringSplitOptions.RemoveEmptyEntries)) {
                     Documents.Add(doc.FromNonCritical());
                 }
+                return true;
+            case "replacement":
+                ReplacementHandle = LongParse(value);
                 return true;
         }
 

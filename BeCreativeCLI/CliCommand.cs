@@ -208,7 +208,7 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Fragment-Datei sauber abgeschlossen ist: beim Binärformat auf den
-    /// Satz 255 (EOF), beim Altformat auf die Textzeile „- EOF“ (BinaryFormat.md §2).
+    /// Satz 255 (EOF), beim Altformat auf die Textzeile „- EOF“.
     /// </summary>
     protected static bool FragmentEndsAtEof(string filename, string suffix) {
         try {

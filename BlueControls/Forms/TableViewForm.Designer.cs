@@ -74,7 +74,6 @@ namespace BlueControls.Forms {
             btnStresstest = new Button();
             grpAdminBearbeiten = new GroupBox();
             btnSuchInScript = new Button();
-            btnAbhängigkeiten = new Button();
             btnSkripteBearbeiten = new Button();
             btnFormular = new Button();
             btnTabelleKopf = new Button();
@@ -146,8 +145,6 @@ namespace BlueControls.Forms {
             ribMain.Name = "ribMain";
             ribMain.SelectedIndex = 1;
             ribMain.Size = new Size(1329, 110);
-            ribMain.TabDefault = tabFile;
-            ribMain.TabDefaultOrder = null;
             ribMain.TabIndex = 93;
             // 
             // tabFile
@@ -228,7 +225,6 @@ namespace BlueControls.Forms {
             btnLetzteDateien.Name = "btnLetzteDateien";
             btnLetzteDateien.QuickInfo = "Zuletzt geöffnete Tabellen zum schnellen Wechseln.";
             btnLetzteDateien.RemoveAllowed = true;
-            btnLetzteDateien.SettingsLoaded = false;
             btnLetzteDateien.Size = new Size(104, 66);
             btnLetzteDateien.TabIndex = 1;
             btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
@@ -585,7 +581,6 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.BackColor = Color.FromArgb(244, 245, 246);
             grpAdminBearbeiten.CausesValidation = false;
             grpAdminBearbeiten.Controls.Add(btnSuchInScript);
-            grpAdminBearbeiten.Controls.Add(btnAbhängigkeiten);
             grpAdminBearbeiten.Controls.Add(btnSkripteBearbeiten);
             grpAdminBearbeiten.Controls.Add(btnFormular);
             grpAdminBearbeiten.Controls.Add(btnTabelleKopf);
@@ -594,7 +589,7 @@ namespace BlueControls.Forms {
             grpAdminBearbeiten.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminBearbeiten.Location = new Point(0, 0);
             grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            grpAdminBearbeiten.Size = new Size(384, 81);
+            grpAdminBearbeiten.Size = new Size(312, 81);
             grpAdminBearbeiten.TabIndex = 9;
             grpAdminBearbeiten.TabStop = false;
             grpAdminBearbeiten.Text = "Bearbeiten";
@@ -610,18 +605,6 @@ namespace BlueControls.Forms {
             btnSuchInScript.TabIndex = 46;
             btnSuchInScript.Text = "in Skripten suchen";
             btnSuchInScript.Click += btnSuchInScript_Click;
-            //
-            // btnAbhängigkeiten
-            //
-            btnAbhängigkeiten.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnAbhängigkeiten.ImageCode = "Hierarchie";
-            btnAbhängigkeiten.Location = new Point(304, 2);
-            btnAbhängigkeiten.Name = "btnAbhängigkeiten";
-            btnAbhängigkeiten.QuickInfo = "Zeigt als Grafik, welche Tabellen, Formulare und Skripte voneinander abhängen (LinkedCells, Skript-Verweise, Formular-Nutzung).";
-            btnAbhängigkeiten.Size = new Size(72, 66);
-            btnAbhängigkeiten.TabIndex = 48;
-            btnAbhängigkeiten.Text = "Abhängig-keiten";
-            btnAbhängigkeiten.Click += btnAbhängigkeiten_Click;
             // 
             // btnSkripteBearbeiten
             // 
@@ -778,19 +761,15 @@ namespace BlueControls.Forms {
             tbcTableSelector.Name = "tbcTableSelector";
             tbcTableSelector.SelectedIndex = 0;
             tbcTableSelector.Size = new Size(972, 24);
-            tbcTableSelector.TabDefault = null;
-            tbcTableSelector.TabDefaultOrder = null;
             tbcTableSelector.TabIndex = 20;
             tbcTableSelector.Selected += tbcTableSelector_Selected;
             tbcTableSelector.Deselecting += tbcTableSelector_Deselecting;
             // 
             // TableView
             // 
-            TableView.Ansichtbearbeitung = false;
             TableView.Dock = DockStyle.Fill;
             TableView.Location = new Point(0, 24);
             TableView.Name = "TableView";
-            TableView.PowerEdit = false;
             TableView.Size = new Size(972, 571);
             TableView.TabIndex = 0;
             TableView.CellClicked += Table_CellClicked;
@@ -830,8 +809,6 @@ namespace BlueControls.Forms {
             tbcSidebar.Name = "tbcSidebar";
             tbcSidebar.SelectedIndex = 0;
             tbcSidebar.Size = new Size(346, 595);
-            tbcSidebar.TabDefault = null;
-            tbcSidebar.TabDefaultOrder = null;
             tbcSidebar.TabIndex = 21;
             // 
             // tabFormula
@@ -851,7 +828,6 @@ namespace BlueControls.Forms {
             CFO.GroupBoxStyle = GroupBoxStyle.Nothing;
             CFO.Location = new Point(0, 0);
             CFO.Name = "CFO";
-            CFO.Page = null;
             CFO.Size = new Size(338, 566);
             CFO.TabIndex = 0;
             CFO.TabStop = false;
@@ -974,7 +950,6 @@ namespace BlueControls.Forms {
 
         private Button btnUserInfo;
         private Button btnSuchInScript;
-        private Button btnAbhängigkeiten;
         private Button btnMonitoring;
         private Button btnStresstest;
     }

@@ -14,19 +14,26 @@ public static class DesktopSnapshot {
     #region Methods
 
     /// <summary>
-    /// Erfasst alle sichtbaren, nicht minimierten Fenster (das Snap-Fenster selbst ausgenommen) und speichert alles ab.
+    /// Erfasst alle sichtbaren, nicht minimierten Fenster (das Snap-Fenster selbst ausgenommen) in einen neuen Snap und speichert die Ablage.
     /// </summary>
-    public static WindowSnapshot Capture(string name) {
-        Develop.Diagnose("Snap", "Capture gestartet: " + name);
+    public static WindowSnapshot Capture(string name) => CaptureInto(new WindowSnapshot { Name = name });
 
-        var folder = SnapshotStore.NewSnapshotFolder(name);
-        var snap = new WindowSnapshot { Name = name, Created = DateTime.Now, Folder = folder };
-        Develop.Diagnose("Snap", "Ordner erstellt: " + folder);
+    /// <summary>
+    /// Erfasst den aktuellen Desktop in den gegebenen Snap (neu anlegen oder aktualisieren) und speichert die Ablage.
+    /// </summary>
+    public static WindowSnapshot CaptureInto(WindowSnapshot snap) {
+        if (snap.Id.Length == 0) { snap.Id = Generic.GetUniqueKey(); }
+        snap.Created = DateTime.Now;
+        Develop.Diagnose("Snap", "Capture gestartet: " + snap.Name);
 
         var windows = DesktopWindows();
         Develop.Diagnose("Snap", "Desktop-Fenster: " + windows.Count);
 
         var snapHandles = SnapFormHandles();
+
+        snap.Windows.Clear();
+        snap.ActivePlugins.Clear();
+        snap.PluginSettings.Clear();
 
         foreach (var window in windows) {
             if (snapHandles.Contains(window.MainWindowHandle)) { continue; }
@@ -72,8 +79,27 @@ public static class DesktopSnapshot {
     }
 
     /// <summary>
+    /// Minimiert alle sichtbaren Fenster - die eigenen Snap-Fenster, Shell- und titellose Fenster ausgenommen.
+    /// </summary>
+    public static void MinimizeAll() {
+        var snapHandles = SnapFormHandles();
+
+        foreach (var window in DesktopWindows()) {
+            if (snapHandles.Contains(window.MainWindowHandle)) { continue; }
+            if (window.MainWindowTitle.Length == 0) { continue; }
+            if (ShellClasses.Contains(window.Klasse)) { continue; }
+            if (WindowsRemoteControl.WinState(window.MainWindowHandle) == FormWindowState.Minimized) { continue; }
+
+            Develop.Diagnose("Snap", "Alle minimiert: " + window.Klasse + " | " + window.MainWindowTitle);
+            WindowsRemoteControl.WinMinimize(window.MainWindowHandle);
+        }
+    }
+
+    /// <summary>
     /// Stellt den Snapshot wieder her: alle dem Snap unbekannten Fenster werden minimiert,
     /// die gesicherten Fenster bekommen Zustand, Position und Z-Ordnung zurück.
+    /// Fehlende Fenster werden über ihre Dokumente neu gestartet oder - ohne Dokumente -
+    /// durch ein improvisiertes Fenster desselben Typs ersetzt, das nur diesem Snap gehört.
     /// </summary>
     public static void Restore(WindowSnapshot snapshot) {
         foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
@@ -85,10 +111,12 @@ public static class DesktopSnapshot {
         }
 
         var snapHandles = SnapFormHandles();
+        var claimedByOthers = ClaimedHandles(snapshot);
 
-        // Das Snap-Fenster selbst nie zuordnen - Position und Zustand bleiben unangetastet
+        // Das Snap-Fenster selbst nie zuordnen - Position und Zustand bleiben unangetastet.
+        // Ersatzfenster anderer Snaps werden ebenfalls nicht angetastet.
         var pool = DesktopWindows();
-        pool.RemoveAll(w => snapHandles.Contains(w.MainWindowHandle));
+        pool.RemoveAll(w => snapHandles.Contains(w.MainWindowHandle) || claimedByOthers.Contains(w.MainWindowHandle));
         var processNames = new Dictionary<int, string>();
         var assignments = new List<(WindowInfo Info, IntPtr Handle)>();
 
@@ -129,25 +157,77 @@ public static class DesktopSnapshot {
         }
 
         var assignedHandles = assignments.Select(a => a.Handle).ToHashSet();
+        var busyHandles = new HashSet<IntPtr>(assignedHandles);
+        busyHandles.UnionWith(claimedByOthers);
+        var changed = false;
 
-        // Fehlende Fenster über die Dokumente neu starten
+        // Fehlende Fenster über die Dokumente neu starten - oder ohne Dokumente ein Ersatzfenster desselben Typs improvisieren
         foreach (var info in snapshot.Windows) {
-            if (assignments.Exists(a => a.Info == info)) { continue; }
-
-            if (info.Documents is not { Count: > 0 }) {
-                Develop.Diagnose("Snap", "Restore: Fenster nicht gefunden: " + info.ProcessName + " | " + info.Title);
+            if (assignments.Exists(a => a.Info == info)) {
+                if (info.ReplacementHandle != 0) { info.ReplacementHandle = 0; changed = true; } // Das Original ist wieder da
                 continue;
             }
 
-            WindowPlugin.FindFor(info.ClassName, info.ProcessName).RestoreDocuments(info.Documents);
-            var handle = WaitForWindow(info, processNames, assignedHandles);
+            IntPtr handle;
+
+            if (info.Documents is { Count: > 0 }) {
+                WindowPlugin.FindFor(info.ClassName, info.ProcessName).RestoreDocuments(info.Documents);
+                handle = WaitForWindow(info, processNames, busyHandles);
+            } else {
+                Develop.Diagnose("Snap", "Restore: improvisiere Fenster: " + info.ProcessName + " | " + info.Title);
+                handle = StartSimilarWindow(info, processNames, busyHandles);
+            }
 
             if (handle != IntPtr.Zero) {
                 WindowsRemoteControl.WinPlace(handle, info.Bounds, info.State == FormWindowState.Maximized);
+                _ = busyHandles.Add(handle);
+
+                // Der neue Fensterplatz gehört nur diesem Snap
+                if (info.ReplacementHandle != handle.ToInt64()) {
+                    info.ReplacementHandle = handle.ToInt64();
+                    changed = true;
+                }
             } else {
                 Develop.Diagnose("Snap", "Restore: Fenster nicht gestartet: " + info.ProcessName + " | " + info.Title);
             }
         }
+
+        if (changed) { SnapshotStore.Save(snapshot); }
+    }
+
+    /// <summary>
+    /// Handles aller Fenster, die als Ersatz für einen anderen Snap improvisiert wurden.
+    /// Verfallene Ansprüche auf geschlossene Fenster werden dabei aus der Ablage entfernt.
+    /// </summary>
+    private static HashSet<IntPtr> ClaimedHandles(WindowSnapshot snapshot) {
+        HashSet<IntPtr> result = [];
+        var live = WindowsRemoteControl.Prozesse();
+        var processNames = new Dictionary<int, string>();
+
+        foreach (var other in SnapshotStore.LoadAll()) {
+            if (string.Equals(other.Id, snapshot.Id, StringComparison.Ordinal)) { continue; }
+
+            var changed = false;
+
+            foreach (var info in other.Windows) {
+                if (info.ReplacementHandle == 0) { continue; }
+
+                var handle = new IntPtr(info.ReplacementHandle);
+                var window = live.FirstOrDefault(w => w.MainWindowHandle == handle);
+
+                if (window.MainWindowHandle == handle && SameWindow(window, info, processNames)) {
+                    _ = result.Add(handle);
+                } else {
+                    // Der Anspruch verfällt, sobald das Ersatzfenster geschlossen wurde
+                    info.ReplacementHandle = 0;
+                    changed = true;
+                }
+            }
+
+            if (changed) { SnapshotStore.Save(other); }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -195,13 +275,44 @@ public static class DesktopSnapshot {
         }
     }
 
-    private static IntPtr WaitForWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> assignedHandles) {
+    /// <summary>
+    /// True, wenn das gefundene Fenster zur gesicherten Beschreibung passt (Fensterklasse und Prozess).
+    /// </summary>
+    private static bool SameWindow(WindowsRemoteControl.StrProcess window, WindowInfo info, Dictionary<int, string> processNames) {
+        if (!string.Equals(window.Klasse, info.ClassName, StringComparison.Ordinal)) { return false; }
+
+        if (!processNames.TryGetValue(window.Prid, out var name)) {
+            name = ProcessNameOf(window.Prid);
+            processNames.Add(window.Prid, name);
+        }
+
+        return string.Equals(name, info.ProcessName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Startet improvisiert einen Prozess desselben Typs und liefert das Handle des neuen Fensters.
+    /// </summary>
+    private static IntPtr StartSimilarWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> busyHandles) {
+        if (info.ProcessName.Length == 0) { return IntPtr.Zero; }
+
+        try {
+            _ = Process.Start(new ProcessStartInfo(info.ProcessName) { UseShellExecute = true });
+        } catch (Exception ex) {
+            // Manche Prozesse sind nicht direkt startbar - der Snap bleibt dann an dieser Stelle lückenhaft
+            Develop.DebugPrint("Snap: Ersatzfenster nicht startbar: " + info.ProcessName, ex);
+            return IntPtr.Zero;
+        }
+
+        return WaitForWindow(info, processNames, busyHandles);
+    }
+
+    private static IntPtr WaitForWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> busyHandles) {
         for (var i = 0; i < 16; i++) {
             Generic.Pause(0.25, false);
 
             // Frisch enumerieren, weil das Fenster gerade neu gestartet wurde
             var windows = DesktopWindows();
-            windows.RemoveAll(w => assignedHandles.Contains(w.MainWindowHandle));
+            windows.RemoveAll(w => busyHandles.Contains(w.MainWindowHandle));
 
             var window = FindWindow(windows, processNames, info, true) ?? FindWindow(windows, processNames, info, false);
             if (window is { } match) { return match.MainWindowHandle; }
