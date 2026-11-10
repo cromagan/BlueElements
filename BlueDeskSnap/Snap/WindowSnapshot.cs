@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 namespace BlueDeskSnap.Snap;
 
 /// <summary>
-/// Ein Desktop-Snapshot: Screenshot-Datei plus alle sichtbaren Fenster mit deren Geometrie und Dokumenten.
+/// Ein Desktop-Snapshot: alle sichtbaren Fenster mit deren Geometrie und Dokumenten.
 /// </summary>
 public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
 
@@ -21,13 +21,16 @@ public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
     public DateTime Created { get; set; }
 
     /// <summary>
-    /// Der Ordner, in dem Snapshot.json und der Screenshot liegen.
+    /// Einstellungen aller Quality-Plugins zum Erfassungszeitpunkt - gleiche Struktur wie die TableView-Views.
+    /// </summary>
+    public List<QualityPluginState> PluginSettings { get; } = [];
+
+    /// <summary>
+    /// Der Ordner, in dem die Snapshot.json liegt.
     /// </summary>
     public string Folder { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;
-
-    public string ScreenshotFile { get; set; } = string.Empty;
 
     /// <summary>
     /// Die Fenster in Z-Ordnung (vorne zuerst).
@@ -47,8 +50,8 @@ public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
         json.Set("name", Name);
         json.Set("created", Created);
         json.Set("folder", Folder);
-        json.Set("screenshot", ScreenshotFile);
         json.Set("activeplugins", ActivePlugins);
+        json.SetArrayIfNotEmpty("pluginsettings", PluginSettings);
         json.SetArrayIfNotEmpty("windows", Windows);
         return json;
     }
@@ -58,7 +61,6 @@ public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
         result.ParseableAdd("Name", Name);
         result.ParseableAdd("Created", Created);
         result.ParseableAdd("Folder", Folder);
-        result.ParseableAdd("Screenshot", ScreenshotFile);
         result.ParseableAdd("Window", Windows.Cast<IStringable>());
         return result;
     }
@@ -69,9 +71,10 @@ public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
         Name = json.GetString("name", Name);
         if (DateTimeTryParse(json.GetString("created"), out var created)) { Created = created; }
         Folder = json.GetString("folder", Folder);
-        ScreenshotFile = json.GetString("screenshot", ScreenshotFile);
         ActivePlugins.Clear();
         ActivePlugins.AddRange(json.GetStringList("activeplugins"));
+        PluginSettings.Clear();
+        PluginSettings.AddRange(json.GetList<QualityPluginState>("pluginsettings", false));
         Windows.Clear();
         Windows.AddRange(json.GetList<WindowInfo>("windows", false));
     }
@@ -90,8 +93,7 @@ public sealed class WindowSnapshot : ParseableItem, IJsonParseable {
             case "folder":
                 Folder = value.FromNonCritical();
                 return true;
-            case "screenshot":
-                ScreenshotFile = value.FromNonCritical();
+            case "screenshot": // Früher wurde ein Screenshot gespeichert, der Schlüssel wird nur noch konsumiert
                 return true;
             case "window":
                 if (NewByParsing<WindowInfo>(value.FromNonCritical()) is { } wi) { Windows.Add(wi); }

@@ -237,23 +237,55 @@ public static class WindowsRemoteControl {
 
     /// <summary>
     /// Bringt das Fenster auf die gewünschte Position/Größe, stellt den Fensterzustand wieder her und holt es in den Vordergrund.
+    /// Liegt das Ziel auf einem nicht mehr vorhandenen Bildschirm, wird es auf den nächstgelegenen verfügbaren verschoben.
     /// </summary>
     /// <param name="handle"></param>
     /// <param name="bounds"></param>
     /// <param name="maximized"></param>
     public static void WinPlace(IntPtr handle, Rectangle bounds, bool maximized) {
-        Develop.Diagnose("WRC", "WinPlace " + handle + (maximized ? " maximiert" : " normal"));
+        var target = WinBoundsOnScreen(bounds);
+        Develop.Diagnose("WRC", "WinPlace " + handle + " -> " + target + (maximized ? " maximiert" : " normal"));
 
-        if (maximized) {
-            _ = ShowWindow(handle, (int)Sw.ShowMaximized);
-            Develop.Diagnose("WRC", "WinPlace ShowWindow fertig: " + handle);
-            return;
+        // Minimierte und maximierte Fenster melden falsche Maße - daher zuerst in den Normalzustand
+        if (WinState(handle) != FormWindowState.Normal) {
+            FensterRestore(handle);
+            Develop.Diagnose("WRC", "WinPlace Restore fertig: " + handle);
         }
 
-        FensterRestore(handle);
-        Develop.Diagnose("WRC", "WinPlace Restore fertig: " + handle);
-        _ = SetWindowPos(handle, 0, bounds.X, bounds.Y, bounds.Width, bounds.Height, SwpNoactivate); // 0 = HwndTop
+        _ = SetWindowPos(handle, 0, target.X, target.Y, target.Width, target.Height, SwpNoactivate); // 0 = HwndTop
         Develop.Diagnose("WRC", "WinPlace SetWindowPos fertig: " + handle);
+
+        if (maximized) {
+            // Erst an den Zielbildschirm heranschieben und dann maximieren, damit der richtige Monitor maximiert wird
+            _ = ShowWindow(handle, (int)Sw.ShowMaximized);
+            Develop.Diagnose("WRC", "WinPlace maximiert: " + handle);
+        }
+    }
+
+    /// <summary>
+    /// Projiziert gesicherte Fensterkoordinaten auf die vorhandenen Bildschirme:
+    /// liegt das Rechteck ganz oder teilweise auf einem Bildschirm, bleibt es unverändert;
+    /// ist der Bildschirm verschwunden, landet es passend skaliert auf dem nächstgelegenen verfügbaren Bildschirm.
+    /// </summary>
+    public static Rectangle WinBoundsOnScreen(Rectangle bounds) {
+        if (bounds.IsEmpty) { return bounds; }
+
+        foreach (var screen in System.Windows.Forms.Screen.AllScreens) {
+            var r = screen.Bounds;
+            if (bounds.Left < r.Right && r.Left < bounds.Right && bounds.Top < r.Bottom && r.Top < bounds.Bottom) {
+                return bounds;
+            }
+        }
+
+        var nearest = System.Windows.Forms.Screen.FromRectangle(bounds).Bounds;
+        var width = Math.Min(bounds.Width, nearest.Width);
+        var height = Math.Min(bounds.Height, nearest.Height);
+
+        return new Rectangle(
+            Math.Clamp(bounds.Left, nearest.Left, nearest.Right - width),
+            Math.Clamp(bounds.Top, nearest.Top, nearest.Bottom - height),
+            width,
+            height);
     }
 
     /// <summary>

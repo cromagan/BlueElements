@@ -1,20 +1,20 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueControls;
-using System.Drawing.Imaging;
+using BlueDeskSnap.Forms;
+using System.Text.Json.Nodes;
 using FormWindowState = System.Windows.Forms.FormWindowState;
 
 namespace BlueDeskSnap.Snap;
 
 /// <summary>
-/// Erstellt Desktop-Snapshots: sichtbare Fenster erfassen, Screenshot ablegen, Zustand wiederherstellen.
+/// Erstellt Desktop-Snaps: sichtbare Fenster erfassen, Zustand sichern und wiederherstellen.
 /// </summary>
 public static class DesktopSnapshot {
 
     #region Methods
 
     /// <summary>
-    /// Erfasst alle sichtbaren, nicht minimierten Fenster (ohne eigene), sichert einen Screenshot und speichert alles ab.
+    /// Erfasst alle sichtbaren, nicht minimierten Fenster (das Snap-Fenster selbst ausgenommen) und speichert alles ab.
     /// </summary>
     public static WindowSnapshot Capture(string name) {
         Develop.Diagnose("Snap", "Capture gestartet: " + name);
@@ -26,8 +26,10 @@ public static class DesktopSnapshot {
         var windows = DesktopWindows();
         Develop.Diagnose("Snap", "Desktop-Fenster: " + windows.Count);
 
+        var snapHandles = SnapFormHandles();
+
         foreach (var window in windows) {
-            if (window.Prid == Environment.ProcessId) { continue; }
+            if (snapHandles.Contains(window.MainWindowHandle)) { continue; }
 
             if (window.MainWindowTitle.Length == 0) { continue; }
 
@@ -60,13 +62,8 @@ public static class DesktopSnapshot {
 
         foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
             if (plugin.IsRunning) { snap.ActivePlugins.Add(plugin.KeyName); }
+            snap.PluginSettings.Add(new QualityPluginState(plugin.KeyName, plugin.SettingsOf()));
         }
-
-        snap.ScreenshotFile = Path.Combine(folder, "Screenshot.png");
-        Develop.Diagnose("Snap", "Screenshot wird erstellt...");
-        using var bmp = ScreenShot.GrabAllScreens();
-        bmp.Save(snap.ScreenshotFile, ImageFormat.Png);
-        Develop.Diagnose("Snap", "Screenshot gespeichert: " + snap.ScreenshotFile);
 
         SnapshotStore.Save(snap);
         Develop.Diagnose("Snap", "Snapshot gespeichert: " + snap.Windows.Count + " Fenster");
@@ -81,9 +78,17 @@ public static class DesktopSnapshot {
     public static void Restore(WindowSnapshot snapshot) {
         foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
             plugin.IsRunning = snapshot.ActivePlugins.Contains(plugin.KeyName);
+
+            if (snapshot.PluginSettings.FirstOrDefault(s => string.Equals(s.KeyName, plugin.KeyName, StringComparison.OrdinalIgnoreCase)) is { } state) {
+                plugin.ApplySettings(state.Settings ?? new JsonObject());
+            }
         }
 
+        var snapHandles = SnapFormHandles();
+
+        // Das Snap-Fenster selbst nie zuordnen - Position und Zustand bleiben unangetastet
         var pool = DesktopWindows();
+        pool.RemoveAll(w => snapHandles.Contains(w.MainWindowHandle));
         var processNames = new Dictionary<int, string>();
         var assignments = new List<(WindowInfo Info, IntPtr Handle)>();
 
@@ -98,10 +103,10 @@ public static class DesktopSnapshot {
             assignments.Add((info, match.MainWindowHandle));
         }
 
-        // Alles, was dem Snap unbekannt ist, minimieren - eigener Prozess, Shell- und titellose Fenster bleiben unberührt
+        // Alles, was dem Snap unbekannt ist, minimieren - das Snap-Fenster selbst, Shell- und titellose Fenster bleiben unberührt
         foreach (var window in DesktopWindows()) {
             if (assignments.Exists(a => a.Handle == window.MainWindowHandle)) { continue; }
-            if (window.Prid == Environment.ProcessId) { continue; }
+            if (snapHandles.Contains(window.MainWindowHandle)) { continue; }
             if (window.MainWindowTitle.Length == 0) { continue; }
             if (ShellClasses.Contains(window.Klasse)) { continue; }
             if (WindowsRemoteControl.WinState(window.MainWindowHandle) == FormWindowState.Minimized) { continue; }
@@ -218,6 +223,19 @@ public static class DesktopSnapshot {
             if (WindowsRemoteControl.WinIsToolWindow(handle)) { continue; }
 
             result.Add(window);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Handles aller offenen DeskSnapForm-Fenster - eigene Fenster werden mitgesteuert, nur das Snap-Fenster selbst nicht.
+    /// </summary>
+    private static HashSet<IntPtr> SnapFormHandles() {
+        HashSet<IntPtr> result = [];
+
+        foreach (var form in System.Windows.Forms.Application.OpenForms) {
+            if (form is DeskSnapForm { IsHandleCreated: true } snapForm) { _ = result.Add(snapForm.Handle); }
         }
 
         return result;

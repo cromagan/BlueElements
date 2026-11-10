@@ -24,7 +24,7 @@ public sealed class AppOpenerPlugin : QualityPlugin, ISimpleEditor {
 
     #region Constructors
 
-    public AppOpenerPlugin() => _dateien = DateienOfSettings();
+    public AppOpenerPlugin() => LoadSettings();
 
     #endregion
 
@@ -85,13 +85,19 @@ public sealed class AppOpenerPlugin : QualityPlugin, ISimpleEditor {
 
     private static List<string> CleanOf(IEnumerable<string> dateien) => [.. dateien.Select(d => d.Trim()).Where(d => d.Length > 0)];
 
-    private List<string> DateienOfSettings() => CleanOf(QualityPluginSettings.Load(KeyName).GetStringList("dateien"));
-
-    private void SaveSettings() {
+    /// <summary>
+    /// Die Dateiliste als Einstellungs-Block.
+    /// </summary>
+    public override JsonObject SettingsOf() {
         JsonObject json = new();
         json.Set("dateien", _dateien);
-        QualityPluginSettings.Save(KeyName, json);
+        return json;
     }
+
+    /// <summary>
+    /// Übernimmt die Dateiliste aus dem Einstellungs-Block.
+    /// </summary>
+    public override void ApplySettings(JsonObject settings) => _dateien = CleanOf(settings.GetStringList("dateien"));
 
     /// <summary>
     /// True, wenn die Anwendung als Prozess läuft bzw. die Datei laut Fenstertitel geöffnet ist.

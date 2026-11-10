@@ -32,6 +32,7 @@ namespace BlueDeskSnap.Forms
             components = new Container();
             grpNeu = new GroupBox();
             btnNeu = new Button();
+            btnMenu = new Button();
             lstSnaps = new ListBox();
             lstQuality = new ListBox();
             tmrQuality = new System.Windows.Forms.Timer(components);
@@ -41,6 +42,7 @@ namespace BlueDeskSnap.Forms
             // grpNeu
             //
             grpNeu.Controls.Add(btnNeu);
+            grpNeu.Controls.Add(btnMenu);
             grpNeu.Dock = System.Windows.Forms.DockStyle.Top;
             grpNeu.Location = new Point(0, 0);
             grpNeu.Name = "grpNeu";
@@ -53,10 +55,19 @@ namespace BlueDeskSnap.Forms
             btnNeu.ImageCode = "PlusZeichen|16";
             btnNeu.Location = new Point(4, 16);
             btnNeu.Name = "btnNeu";
-            btnNeu.Size = new Size(145, 24);
+            btnNeu.Size = new Size(117, 24);
             btnNeu.TabIndex = 0;
             btnNeu.Text = "Snap erfassen";
             btnNeu.Click += BtnNeu_Click;
+            //
+            // btnMenu
+            //
+            btnMenu.ImageCode = "Stern|16";
+            btnMenu.Location = new Point(123, 16);
+            btnMenu.Name = "btnMenu";
+            btnMenu.Size = new Size(26, 24);
+            btnMenu.TabIndex = 3;
+            btnMenu.Click += BtnMenu_Click;
             //
             // lstSnaps
             //
@@ -64,6 +75,7 @@ namespace BlueDeskSnap.Forms
             lstSnaps.AutoSort = false;
             lstSnaps.Dock = System.Windows.Forms.DockStyle.Fill;
             lstSnaps.Location = new Point(0, 42);
+            lstSnaps.MoveAllowed = true;
             lstSnaps.Name = "lstSnaps";
             lstSnaps.RemoveAllowed = true;
             lstSnaps.Size = new Size(153, 258);
@@ -110,6 +122,7 @@ namespace BlueDeskSnap.Forms
         private BlueControls.Controls.ListBox lstSnaps;
         private BlueControls.Controls.GroupBox grpNeu;
         private BlueControls.Controls.Button btnNeu;
+        private BlueControls.Controls.Button btnMenu;
         private BlueControls.Controls.ListBox lstQuality;
         private System.Windows.Forms.Timer tmrQuality;
     }

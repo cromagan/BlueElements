@@ -1,12 +1,13 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Globalization;
+using System.Text.Json.Nodes;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueDeskSnap.Snap;
 
 /// <summary>
-/// Ablage der Snapshots unter %appdocumentpath%\DeskSnaps - ein Ordner pro Snapshot mit Snapshot.json und Screenshot.png.
+/// Ablage der Snapshots unter %appdocumentpath%\DeskSnaps - ein Ordner pro Snapshot mit Snapshot.json.
 /// </summary>
 public static class SnapshotStore {
 
@@ -24,6 +25,24 @@ public static class SnapshotStore {
 
     public static void DeleteFolder(string folder) {
         if (Directory.Exists(folder)) { Directory.Delete(folder, true); }
+    }
+
+    /// <summary>
+    /// Legt eine vollständige Kopie des Snapshots unter neuem Namen ab.
+    /// </summary>
+    public static WindowSnapshot Copy(WindowSnapshot snapshot, string newName) {
+        var copy = new WindowSnapshot {
+            Name = newName,
+            Created = DateTime.Now,
+            Folder = NewSnapshotFolder(newName)
+        };
+
+        copy.Windows.AddRange(snapshot.Windows.Select(w => (WindowInfo)w.Clone()));
+        copy.ActivePlugins.AddRange(snapshot.ActivePlugins);
+        copy.PluginSettings.AddRange(snapshot.PluginSettings.Select(p => new QualityPluginState(p.KeyName, p.Settings?.DeepClone() as JsonObject) { Modified = p.Modified }));
+
+        Save(copy);
+        return copy;
     }
 
     public static WindowSnapshot? Load(string folder) {
@@ -53,6 +72,22 @@ public static class SnapshotStore {
     }
 
     public static void Save(WindowSnapshot snapshot) => WriteAllText(Path.Combine(snapshot.Folder, SnapshotFileName), snapshot.ParseableJson().ToJsonString(), Encoding.UTF8, false);
+
+    /// <summary>
+    /// Ersetzt die gespeicherten Einstellungen eines Plugins in allen Snaps.
+    /// </summary>
+    public static void UpdatePluginSettings(string pluginKeyName, JsonObject settings) {
+        foreach (var snap in LoadAll()) {
+            if (snap.PluginSettings.FirstOrDefault(s => string.Equals(s.KeyName, pluginKeyName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
+                existing.Settings = (JsonObject)settings.DeepClone();
+                existing.Modified = DateTime.Now;
+            } else {
+                snap.PluginSettings.Add(new QualityPluginState(pluginKeyName, settings));
+            }
+
+            Save(snap);
+        }
+    }
 
     private static string CleanFolderName(string name) {
         var invalid = Path.GetInvalidFileNameChars();

@@ -3,7 +3,7 @@
 namespace BlueDeskSnap.Forms;
 
 /// <summary>
-/// Immer im Vordergrund liegende Liste der Desktop-Snaps: Plus-Knopf = erfassen, Klick = wiederherstellen, Minus = entfernen.
+/// Immer im Vordergrund liegende Liste der Desktop-Snaps: Plus-Knopf = erfassen, Klick = wiederherstellen, Rechtsklick = Umbenennen/Aktualisieren/Kopieren, Stern = Auswahlmenü öffnen.
 /// </summary>
 public partial class DeskSnapForm : Form {
 
@@ -17,6 +17,12 @@ public partial class DeskSnapForm : Form {
 
     public DeskSnapForm() {
         InitializeComponent();
+
+        lstSnaps.CustomContextMenuItems = new([
+            ListItemExtension.ItemOf("Umbenennen", ImageCode.Stift, ContextMenu_RenameSnap, true),
+            ListItemExtension.ItemOf("Snap aktualisieren", ImageCode.Refresh, ContextMenu_UpdateSnap, true),
+            ListItemExtension.ItemOf("Snap kopieren", ImageCode.Kopieren, ContextMenu_CopySnap, true)
+        ]);
 
         lstQuality.CustomContextMenuItems = new([
             ListItemExtension.ItemOf("Eigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditQualityProperties, true)
@@ -51,6 +57,45 @@ public partial class DeskSnapForm : Form {
     }
 
     private void LstSnaps_RemoveClicked(object? sender, ListItemEventArgs e) => SnapshotStore.DeleteFolder(e.Item.KeyName);
+
+    /// <summary>
+    /// Benennt den per Rechtsklick gewählten Snap um.
+    /// </summary>
+    private void ContextMenu_RenameSnap(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not TextListItem item) { return; }
+        if (SnapshotStore.Load(item.KeyName) is not { } snap) { return; }
+
+        var newName = InputBox.Show("Neuer Name für den Snap", snap.Name, BlueBasics.Classes.Formats.TextFormat.Instance);
+
+        if (string.IsNullOrWhiteSpace(newName) || string.Equals(newName, snap.Name, StringComparison.Ordinal)) { return; }
+
+        snap.Name = newName.Trim();
+        SnapshotStore.Save(snap);
+        FillList();
+    }
+
+    /// <summary>
+    /// Erfasst den aktuellen Desktop erneut und ersetzt den Inhalt des gewählten Snaps.
+    /// </summary>
+    private void ContextMenu_UpdateSnap(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not TextListItem item) { return; }
+        if (SnapshotStore.Load(item.KeyName) is not { } snap) { return; }
+
+        TakeSnapshot(snap.Name);
+        SnapshotStore.DeleteFolder(snap.Folder);
+        FillList();
+    }
+
+    /// <summary>
+    /// Legt eine vollständige Kopie des gewählten Snaps an.
+    /// </summary>
+    private void ContextMenu_CopySnap(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not TextListItem item) { return; }
+        if (SnapshotStore.Load(item.KeyName) is not { } snap) { return; }
+
+        SnapshotStore.Copy(snap, snap.Name + " (Kopie)");
+        FillList();
+    }
 
     /// <summary>
     /// Füllt die Plugin-Liste; die eingebaute Kästchen-Funktion zeigt den Aktiv-Status, der Klick schaltet um.
@@ -97,6 +142,13 @@ public partial class DeskSnapForm : Form {
     private void BtnNeu_Click(object? sender, System.EventArgs e) => TakeSnapshot($"Snap {_nextSnapshotNumber}");
 
     /// <summary>
+    /// Öffnet das Auswahlmenü, ohne dieses Werkzeugfenster zu schließen.
+    /// </summary>
+    private void BtnMenu_Click(object? sender, System.EventArgs e) {
+        FormManager.OpenLastMenu();
+    }
+
+    /// <summary>
     /// Ermittelt die nächste freie Nummer hinter den vorhandenen "Snap &lt;Nr&gt;"-Namen.
     /// </summary>
     private static int NextSnapshotNumber(List<WindowSnapshot> snaps) {
@@ -112,7 +164,7 @@ public partial class DeskSnapForm : Form {
     }
 
     private void TakeSnapshot(string name) {
-        Opacity = 0; // Dieses Fenster soll nicht auf dem Screenshot landen
+        Opacity = 0; // Dieses Fenster blendet sich für die Erfassung aus
         Generic.Pause(0.3, true);
         try {
             _ = DesktopSnapshot.Capture(name);

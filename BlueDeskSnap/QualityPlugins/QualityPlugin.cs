@@ -1,5 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.Text.Json.Nodes;
+
 namespace BlueDeskSnap.QualityPlugins;
 
 /// <summary>
@@ -63,6 +65,32 @@ public abstract class QualityPlugin : IHasKeyName {
     /// Ein Durchlauf des Plugins - alle 3 Sekunden, solange aktiviert.
     /// </summary>
     protected abstract void ExecuteTick();
+
+    /// <summary>
+    /// Die aktuellen Einstellungen des Plugins; Basis für die Speicherung in den Snaps.
+    /// </summary>
+    public virtual JsonObject SettingsOf() => new();
+
+    /// <summary>
+    /// Übernimmt die übergebenen Einstellungen in das Plugin.
+    /// </summary>
+    public virtual void ApplySettings(JsonObject settings) { }
+
+    /// <summary>
+    /// Übernimmt die zuletzt gespeicherten Einstellungen des Plugins aus dem neuesten Snap.
+    /// </summary>
+    protected void LoadSettings() {
+        if (SnapshotStore.LoadAll().OrderByDescending(s => s.Created).FirstOrDefault() is not { } snap) { return; }
+
+        if (snap.PluginSettings.FirstOrDefault(s => string.Equals(s.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) is { } state) {
+            ApplySettings(state.Settings ?? new JsonObject());
+        }
+    }
+
+    /// <summary>
+    /// Schreibt die aktuellen Einstellungen des Plugins in alle gespeicherten Snaps.
+    /// </summary>
+    protected void SaveSettings() => SnapshotStore.UpdatePluginSettings(KeyName, SettingsOf());
 
     #endregion
 }
