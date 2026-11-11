@@ -278,28 +278,19 @@ Desktop Snap: Es muss immer ein Snap angewählt bleiben, ODER dei Qualitiy Plugi
 ## Aufgabe
 Desktop Snap: Es wird ein button in der leiste zwischen Snap und Stern benötigt, der alle Fenster minimiert
 
-## Aufgabe
-Das abhänigkeistdiagramm soll so aussehen:
 
-+----------+----------+----------+----------+
-+ Tablle 1 + Tablle 2 + Tablle 4 + Tablle 6 +
-+----------+----------+----------+----------+
-+ Spalte 1 -------------Spalte 2
-+ Spalte 4 ------------------------Spalte 4
-+ Script 1 --Spalte 4
-
-Dann kann man irgend eine Tabelle oder Spalte anklicken und Beziehungen hinzufügen
-Oder eben eine Spalte oder ein Script
-und Connected Formular sollen acuh angezeugt werdn
-
-## Aufgabe
-mache für Scripte ein Grafec generator, aber mit CreativePad.
-Gib den Relenaten Befehlen ein nterfeace oder ein überscheibbares Property mit
 
 ## Aufgabe
 Desktop Snap: wenn das original Fenster geschlossen wird, soll improvisiert werden und ein fenster des gleichen Typs an dessen stelle gestellt werden
 Wichtig dabei, dass das Fnester in keinem anderen Snap benutzt wird.
 
+## Aufgabe
+RowCollection.RepairUniques soll einen delgaten als neue attribut erhalten.
+Daruch soll bei btnUniqueAufräumen_Click ein Progressbar mit Abbrechen ermöglicht und eingebaut werden. Das abbrechen nur bei gechunkten Tabellen erlauben.
+Das gut es schon so ähnlich bei der kompletten Datenüberprüfung
+
+## Aufgabe
+Desksnap soll bei start Similar keine neuen Prozesse starten
 
 
 

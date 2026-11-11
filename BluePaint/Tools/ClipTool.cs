@@ -127,3 +127,5 @@ public partial class ClipTool {
     }
 
     #endregion
+
+}

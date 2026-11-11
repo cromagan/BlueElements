@@ -30,7 +30,6 @@ public sealed class FragmentRecord {
     public const byte StandardStorageType = 1;
 
     private const byte TabByte = 0x09;
-    private const byte LineFeedByte = 0x0A;
     private const byte CarriageReturnByte = 0x0D;
     private const byte UnitSeparatorByte = 0x1F;
     private const byte SpaceByte = 0x20;
@@ -45,9 +44,6 @@ public sealed class FragmentRecord {
     /// Längenbegrenzung eines List-Eintrags (2 Längenbytes).
     /// </summary>
     public const int MaxListEntryLength = 256 * 256 - 1;
-
-    private const string LegacyEofLine = "- EOF";
-    private const string LegacyUserLine = "- User ";
 
     /// <summary>
     /// Text der Kommentar-Trenner zwischen Objekt-Blöcken.
@@ -728,64 +724,6 @@ public sealed class FragmentRecord {
         return true;
     }
 
-    /// <summary>
-    /// Prüft byteweise, ob die Datei sauber abgeschlossen ist: Der letzte Satz entscheidet —
-    /// 255 (EOF) bzw. beim Altformat die Textzeile „- EOF“ bedeuten abgeschlossen,
-    /// alles andere (insbesondere 254 ContinueEOF) bedeutet in Bearbeitung.
-    /// Eine unlesbare oder abgeschnittene Datei gilt als nicht abgeschlossen.
-    /// </summary>
-    public static bool EndsOnEof(Stream stream) {
-        if (stream.Length == 0) { return false; }
-
-        var data = ReadAllBytes(stream);
-        var pos = 0;
-        var ended = false;
-
-        while (pos < data.Length) {
-            if (data[pos] == TabByte) {
-                if (!TryParse(data, pos, out var record, out pos) || record is null) { return false; }
-
-                ended = record.TagType == FragmentTagType.Eof;
-            } else {
-                var nl = Array.IndexOf(data, LineFeedByte, pos);
-                var end = nl < 0 ? data.Length : nl;
-                var line = Encoding.UTF8.GetString(data, pos, end - pos).TrimEnd('\r');
-                pos = nl < 0 ? data.Length : nl + 1;
-
-                if (line.Length > 0) { ended = line == LegacyEofLine; }
-            }
-        }
-
-        return ended;
-    }
-
-    /// <summary>
-    /// Liefert den Benutzer, der die Datei erstellt hat: den ersten 233-Satz (User)
-    /// bzw. beim Altformat den Inhalt der ersten „- User “-Zeile — oder null.
-    /// </summary>
-    public static string? HeadUser(Stream stream) {
-        if (stream.Length == 0) { return null; }
-
-        var data = ReadAllBytes(stream);
-        var pos = 0;
-
-        while (pos < data.Length) {
-            if (data[pos] == TabByte) {
-                if (!TryParse(data, pos, out var record, out pos) || record is null) { return null; }
-
-                if (record.TagType == FragmentTagType.User) { return record.StringContent; }
-            } else {
-                var nl = Array.IndexOf(data, LineFeedByte, pos);
-                var end = nl < 0 ? data.Length : nl;
-                var line = Encoding.UTF8.GetString(data, pos, end - pos).TrimEnd('\r');
-                pos = nl < 0 ? data.Length : nl + 1;
-
-                if (line.StartsWith(LegacyUserLine, StringComparison.Ordinal)) { return line[LegacyUserLine.Length..].Trim(); }
-            }
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// Baut die Meta-Bytes (User, DateTimeUtc als ToString9 UTC und Comment, durch US getrennt).
@@ -944,12 +882,6 @@ public sealed class FragmentRecord {
         record[pos] = CarriageReturnByte;
 
         stream.Write(record);
-    }
-
-    private static byte[] ReadAllBytes(Stream stream) {
-        using var target = new MemoryStream();
-        stream.CopyTo(target);
-        return target.ToArray();
     }
 
     #endregion

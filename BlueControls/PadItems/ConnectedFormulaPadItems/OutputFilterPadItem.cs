@@ -218,12 +218,8 @@ public class OutputFilterPadItem : ReciverSenderPadItem, IItemToControl, IAutosi
             Filterart_bei_Texteingabe = json.GetEnum("defaulttextfilter", Filterart_bei_Texteingabe);
             AutoNext = json.GetBool("autonext", AutoNext);
 
-            if (json["snapfilter"] is JsonValue v && v.TryGetValue(out bool b)) {
-                // Legacy: Boolean-Wert
-                Einschnappen = b ? SnapFilterMode.Wenn_Vorhanden : SnapFilterMode.Niemals;
-            } else {
-                Einschnappen = json.GetEnum("snapfilter", Einschnappen);
-            }
+            Einschnappen = json.GetEnum("snapfilter", Einschnappen);
+
 
             base.ParseJson(json);
         } finally {

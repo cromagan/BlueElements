@@ -80,7 +80,7 @@ public abstract class QualityPlugin : IHasKeyName {
     /// Übernimmt die zuletzt gespeicherten Einstellungen des Plugins aus dem neuesten Snap.
     /// </summary>
     protected void LoadSettings() {
-        if (SnapshotStore.LoadAll().OrderByDescending(s => s.Created).FirstOrDefault() is not { } snap) { return; }
+        if (SnapshotStore.LoadFile().OrderByDescending(s => s.Created).FirstOrDefault() is not { } snap) { return; }
 
         if (snap.PluginSettings.FirstOrDefault(s => string.Equals(s.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) is { } state) {
             ApplySettings(state.Settings ?? new JsonObject());

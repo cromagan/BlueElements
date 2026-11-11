@@ -58,7 +58,7 @@ public partial class DeskSnapForm : Form {
     private void FillList() {
         lstSnaps.ItemClear();
 
-        var snaps = SnapshotStore.LoadAll();
+        var snaps = SnapshotStore.LoadFile();
 
         foreach (var snap in snaps) {
             var quickInfo = $"{snap.Created.ToString5()} | {snap.Windows.Count} Fenster";
@@ -157,7 +157,7 @@ public partial class DeskSnapForm : Form {
     /// Übernimmt die vom User verschobene Reihenfolge dauerhaft in die Ablage.
     /// </summary>
     private void LstSnaps_UpDownClicked(object? sender, SwapEventArgs e) {
-        var snaps = SnapshotStore.LoadAll();
+        var snaps = SnapshotStore.LoadFile();
         List<WindowSnapshot> ordered = [];
 
         foreach (var item in lstSnaps.Items) {

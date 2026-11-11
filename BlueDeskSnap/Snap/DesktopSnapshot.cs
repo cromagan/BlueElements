@@ -204,7 +204,7 @@ public static class DesktopSnapshot {
         var live = WindowsRemoteControl.Prozesse();
         var processNames = new Dictionary<int, string>();
 
-        foreach (var other in SnapshotStore.LoadAll()) {
+        foreach (var other in SnapshotStore.LoadFile()) {
             if (string.Equals(other.Id, snapshot.Id, StringComparison.Ordinal)) { continue; }
 
             var changed = false;
@@ -296,10 +296,9 @@ public static class DesktopSnapshot {
         if (info.ProcessName.Length == 0) { return IntPtr.Zero; }
 
         try {
-            _ = Process.Start(new ProcessStartInfo(info.ProcessName) { UseShellExecute = true });
-        } catch (Exception ex) {
+            _ = Process.Start(new ProcessStartInfo(info.ProcessName) { UseShellExecute = false });
+        } catch {
             // Manche Prozesse sind nicht direkt startbar - der Snap bleibt dann an dieser Stelle lückenhaft
-            Develop.DebugPrint("Snap: Ersatzfenster nicht startbar: " + info.ProcessName, ex);
             return IntPtr.Zero;
         }
 

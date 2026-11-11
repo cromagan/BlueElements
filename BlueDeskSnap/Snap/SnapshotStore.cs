@@ -12,10 +12,6 @@ public static class SnapshotStore {
 
     #region Fields
 
-    private const string LegacySnapshotFileName = "Snapshot.txt";
-
-    private const string SnapshotFileName = "Snapshot.json";
-
     private static readonly string _file = @"%appdocumentpath%\DeskSnaps\DeskSnaps.json".NormalizeFile();
 
     private static readonly string _rootFolder = @"%appdocumentpath%\DeskSnaps".NormalizePath();
@@ -46,29 +42,17 @@ public static class SnapshotStore {
     /// Entfernt den Snap endgültig aus der Ablage.
     /// </summary>
     public static void Delete(string id) {
-        var all = LoadAll();
+        var all = LoadFile();
         if (all.RemoveAll(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase)) == 0) { return; }
         SaveAll(all);
     }
 
-    public static WindowSnapshot? Load(string id) => LoadAll().FirstOrDefault(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase));
+    public static WindowSnapshot? Load(string id) => SnapshotStore.LoadFile().FirstOrDefault(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase));
 
-    public static List<WindowSnapshot> LoadAll() {
-        if (FileExists(_file)) { return LoadFile(); }
 
-        // Erster Start nach dem alten Ordner-Format: alle Snaps wandeln in die eine Datei
-        var migrated = LoadLegacyFolders();
-
-        if (migrated.Count > 0) {
-            SaveAll(migrated);
-            DeleteLegacyFolders();
-        }
-
-        return migrated;
-    }
 
     public static void Save(WindowSnapshot snapshot) {
-        var all = LoadAll();
+        var all = LoadFile();
         var existing = all.FindIndex(s => string.Equals(s.Id, snapshot.Id, StringComparison.OrdinalIgnoreCase));
 
         if (existing >= 0) {
@@ -89,7 +73,7 @@ public static class SnapshotStore {
     /// Ersetzt die gespeicherten Einstellungen eines Plugins in allen Snaps.
     /// </summary>
     public static void UpdatePluginSettings(string pluginKeyName, JsonObject settings) {
-        var all = LoadAll();
+        var all = LoadFile();
 
         foreach (var snap in all) {
             if (snap.PluginSettings.FirstOrDefault(s => string.Equals(s.KeyName, pluginKeyName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
@@ -103,39 +87,13 @@ public static class SnapshotStore {
         SaveAll(all);
     }
 
-    private static void DeleteLegacyFolders() {
-        foreach (var folder in Directory.GetDirectories(_rootFolder)) {
-            _ = DeleteDir(folder, false);
-        }
-    }
-
-    private static List<WindowSnapshot> LoadFile() {
+    public static List<WindowSnapshot> LoadFile() {
         List<WindowSnapshot> result = [];
 
         if (JsonNode.Parse(ReadAllText(_file)) is not JsonArray array) { return result; }
 
         foreach (var element in array) {
             if (element is JsonObject obj && ParseableItem.NewByParsingJson<WindowSnapshot>(obj) is { } snap) { result.Add(snap); }
-        }
-
-        return result;
-    }
-
-    private static List<WindowSnapshot> LoadLegacyFolders() {
-        List<WindowSnapshot> result = [];
-
-        if (!Directory.Exists(_rootFolder)) { return result; }
-
-        foreach (var folder in Directory.GetDirectories(_rootFolder).OrderBy(f => f, StringComparer.Ordinal)) {
-            var file = Path.Combine(folder, SnapshotFileName);
-            WindowSnapshot? snap = FileExists(file) ? ParseableItem.NewByParsingJson<WindowSnapshot>(ReadAllText(file).ParseAsJsonObject()) : null;
-
-            var legacyFile = Path.Combine(folder, LegacySnapshotFileName);
-            snap ??= FileExists(legacyFile) ? ParseableItem.NewByParsing<WindowSnapshot>(ReadAllText(legacyFile)) : null;
-
-            if (snap is null) { continue; }
-            if (snap.Id.Length == 0) { snap.Id = Generic.GetUniqueKey(); }
-            result.Add(snap);
         }
 
         return result;
