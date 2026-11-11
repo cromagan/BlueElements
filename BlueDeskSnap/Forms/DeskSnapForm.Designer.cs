@@ -87,7 +87,7 @@ namespace BlueDeskSnap.Forms
             //
             lstSnaps.AddAllowed = AddType.None;
             lstSnaps.AutoSort = false;
-            lstSnaps.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
+            lstSnaps.CheckBehavior = CheckBehavior.UserLockedSingleSelection;
             lstSnaps.Dock = System.Windows.Forms.DockStyle.Fill;
             lstSnaps.Location = new Point(0, 42);
             lstSnaps.MoveAllowed = true;

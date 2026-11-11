@@ -5,7 +5,7 @@ using MemberEntry = (string Category, string SortKey, System.Collections.Generic
 namespace CodeOptimizer.Plugins;
 
 /// <summary>
-/// Baut die Standard-Regionen auf oberster Klassenebene neu auf und sortiert die Elemente alphabetisch.
+/// Baut die Standard-Regionen auf oberster Klassenebene neu auf, ergänzt fehlende Regionen und sortiert die Elemente alphabetisch.
 /// Felder behalten ihre Reihenfolge, da die Initialisierungsreihenfolge wichtig ist.
 /// </summary>
 public partial class RegionPlugin : CodeOptimizerPlugin {
@@ -23,7 +23,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     public override string Name => "Regionen";
     public override ImageCode Symbol => ImageCode.Groupbox;
-    public override string QuickInfo => "Baut die Standard-Regionen auf Klassenebene neu auf und sortiert die Elemente alphabetisch. Felder behalten ihre Reihenfolge.";
+    public override string QuickInfo => "Baut die Standard-Regionen auf Klassenebene neu auf, ergänzt fehlende Regionen und sortiert die Elemente alphabetisch. Felder behalten ihre Reihenfolge.";
     public override int Order => 40;
 
     #endregion
@@ -86,21 +86,24 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
         while (i2 < lines.Count) {
             var depthBefore = i2 == 0 ? 0 : depths[i2 - 1];
+            var openBrace = nsDepth < 0 || depthBefore == nsDepth ? TypeOpenBrace(i2, clean) : -1;
 
-            if ((nsDepth < 0 || depthBefore == nsDepth) && depths[i2] == depthBefore + 1 && IsTypeDeclaration(clean[i2])) {
+            if (openBrace >= i2 && depths[openBrace] == depthBefore + 1 && (openBrace == i2 || depths[i2] == depthBefore)) {
                 var bodyDepth = depthBefore + 1;
-                var close = FindTypeClose(depths, lines, i2, bodyDepth);
+                var close = FindTypeClose(depths, clean, openBrace, bodyDepth);
 
-                if (close > i2) {
+                if (close > openBrace) {
                     if (nsDepth < 0) { nsDepth = depthBefore; }
-                    var body = ReorganizeBody(lines, clean, depths, i2 + 1, close - 1, bodyDepth, TypeName(clean[i2]), out var removed, out var added);
-                    output.Add(lines[i2]);
+                    var body = ReorganizeBody(lines, clean, depths, openBrace + 1, close - 1, bodyDepth, TypeName(clean[i2]), out var removed, out var added);
+
+                    for (var j = i2; j <= openBrace; j++) { output.Add(lines[j]); }
 
                     if (body is null) {
-                        for (var j = i2 + 1; j <= close; j++) { output.Add(lines[j]); }
+                        for (var j = openBrace + 1; j <= close; j++) { output.Add(lines[j]); }
                     } else {
                         if (body.Count > 0) { output.Add(string.Empty); }
                         output.AddRange(body);
+                        output.Add(lines[close]);
                         rebuilt++;
                         totalRemoved += removed;
                         totalAdded += added;
@@ -128,7 +131,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         var items = ParseBody(lines, clean, depths, first, last, bodyDepth, typeName, out regionsRemoved, out var otherDirectives);
         regionsAdded = 0;
 
-        // Konservativ: Bei anderen Präprozessor-Direktiven (#if/#pragma ...) nichts tun
+        // Konservativ: Bei strukturbildenden Präprozessor-Direktiven (#if/#endif, #line) nichts tun
         if (otherDirectives > 0) { return null; }
 
         var categorized = 0;
@@ -193,7 +196,15 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
             }
 
             if (t.StartsWith('#')) {
-                otherDirectives++;
+                // Strukturbildende Direktiven (#if/#endif, #line) machen die Codeauswahl konfigurationsabhängig - konservativ abbrechen
+                if (t.StartsWith("#if", StringComparison.Ordinal) || t.StartsWith("#elif", StringComparison.Ordinal) || t.StartsWith("#else", StringComparison.Ordinal) || t.StartsWith("#endif", StringComparison.Ordinal) || t.StartsWith("#line", StringComparison.Ordinal)) {
+                    otherDirectives++;
+                    i++;
+                    continue;
+                }
+
+                // #pragma / #nullable bleiben beim folgenden Member
+                trivia.Add(lines[i]);
                 i++;
                 continue;
             }
@@ -218,7 +229,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            var end = MemberEndIndex(depths, lines, i, last, bodyDepth);
+            var end = MemberEndIndex(depths, clean, i, last, bodyDepth);
             var count = end - i + 1;
             var code = lines.GetRange(i, count);
             var cleanHeader = string.Join(" ", clean.GetRange(i, count));
@@ -244,10 +255,10 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
     }
 
     /// <summary>Liefert die Zeile, in der der ab start beginnende Member endet.</summary>
-    private static int MemberEndIndex(int[] depths, List<string> lines, int start, int last, int bodyDepth) {
+    private static int MemberEndIndex(int[] depths, List<string> clean, int start, int last, int bodyDepth) {
         for (var j = start; j <= last; j++) {
             if (depths[j] == bodyDepth) {
-                var t = lines[j].Trim();
+                var t = clean[j].TrimEnd();
                 if (t.EndsWith(';') || t.EndsWith('}')) { return j; }
             }
         }
@@ -311,16 +322,28 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     private static string SortKeySelector(MemberEntry item) => item.SortKey;
 
-    private static bool IsTypeDeclaration(string cleanLine) => cleanLine.TrimEnd().EndsWith('{') && TypeKeywordRegex().IsMatch(cleanLine);
+    /// <summary>Liefert den Index der öffnenden Klammer des ab start beginnenden Typs, oder -1. Erkennt ägyptische und Allman-Klammern.</summary>
+    private static int TypeOpenBrace(int start, List<string> clean) {
+        if (!TypeKeywordRegex().IsMatch(clean[start])) { return -1; }
+
+        var limit = Math.Min(clean.Count, start + 5);
+        for (var j = start; j < limit; j++) {
+            var t = clean[j].TrimEnd();
+            if (t.Length == 0) { continue; }
+            if (t.EndsWith('{')) { return j; }
+            if (t.EndsWith(';') || t.EndsWith('}')) { return -1; }
+        }
+        return -1;
+    }
 
     private static string TypeName(string cleanLine) {
         var m = TypeNameRegex().Match(cleanLine);
         return m.Success ? m.Groups[1].Value : string.Empty;
     }
 
-    private static int FindTypeClose(int[] depths, List<string> lines, int open, int bodyDepth) {
-        for (var j = open + 1; j < lines.Count; j++) {
-            if (depths[j] == bodyDepth - 1 && lines[j].Trim() == "}") { return j; }
+    private static int FindTypeClose(int[] depths, List<string> clean, int open, int bodyDepth) {
+        for (var j = open + 1; j < clean.Count; j++) {
+            if (depths[j] == bodyDepth - 1 && clean[j].Trim() == "}") { return j; }
         }
         return -1;
     }

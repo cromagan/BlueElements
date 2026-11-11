@@ -469,7 +469,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     }
 
     internal Design CheckboxDesign() => (Appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected)
-        ? (_checkBehavior is CheckBehavior.SingleSelection or CheckBehavior.AlwaysSingleSelection ? Design.OptionButton_TextStyle : Design.CheckBox_TextStyle)
+        ? (_checkBehavior is CheckBehavior.SingleSelection or CheckBehavior.UserLockedSingleSelection ? Design.OptionButton_TextStyle : Design.CheckBox_TextStyle)
         : Design.Undefined;
 
     internal Size ComputeAllItemPositions(Size drawAreaControl, int biggestItemX, int heightAdded, Orientation orientation, Renderer.Renderer renderer) {
@@ -719,8 +719,8 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private void ChangeCheck(ListItem ne) {
         if (IsChecked(ne)) {
-            // Bei AlwaysSingleSelection bleibt ein gewählter Eintrag gewählt
-            if (_checkBehavior != CheckBehavior.AlwaysSingleSelection) { UnCheck(ne); }
+            // Bei UserLockedSingleSelection kann der Benutzer den Eintrag nicht abwählen
+            if (_checkBehavior != CheckBehavior.UserLockedSingleSelection) { UnCheck(ne); }
         } else {
             Check(ne);
         }
@@ -805,18 +805,12 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
                 newChecked.Add(keep);
                 break;
 
-            case CheckBehavior.AlwaysSingleSelection when newChecked.Count > 1:
+            case CheckBehavior.UserLockedSingleSelection when newChecked.Count > 1:
                 var keepExisting = string.IsNullOrEmpty(lastAdded)
                     ? _checked.FirstOrDefault(c => newChecked.Contains(c.KeyName))?.KeyName ?? newChecked[0]
                     : lastAdded;
                 newChecked.Clear();
                 newChecked.Add(keepExisting);
-                break;
-
-            case CheckBehavior.AlwaysSingleSelection when newChecked.Count == 0:
-                // Ein gewählter Eintrag bleibt gewählt, solange er existiert
-                var remain = _checked.FirstOrDefault(c => _item.GetByKey(c.KeyName) is not null);
-                if (remain is not null) { newChecked.Add(remain.KeyName); }
                 break;
         }
 

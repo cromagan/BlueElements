@@ -99,7 +99,7 @@ public static class DesktopSnapshot {
     /// Stellt den Snapshot wieder her: alle dem Snap unbekannten Fenster werden minimiert,
     /// die gesicherten Fenster bekommen Zustand, Position und Z-Ordnung zurück.
     /// Fehlende Fenster werden über ihre Dokumente neu gestartet oder - ohne Dokumente -
-    /// durch ein improvisiertes Fenster desselben Typs ersetzt, das nur diesem Snap gehört.
+    /// durch ein vorhandenes, freies Fenster desselben Typs ersetzt, das nur diesem Snap gehört (kein Prozessstart).
     /// </summary>
     public static void Restore(WindowSnapshot snapshot) {
         foreach (var plugin in QualityPlugin.AllPlugins.Instances) {
@@ -159,9 +159,10 @@ public static class DesktopSnapshot {
         var assignedHandles = assignments.Select(a => a.Handle).ToHashSet();
         var busyHandles = new HashSet<IntPtr>(assignedHandles);
         busyHandles.UnionWith(claimedByOthers);
+        busyHandles.UnionWith(snapHandles);
         var changed = false;
 
-        // Fehlende Fenster über die Dokumente neu starten - oder ohne Dokumente ein Ersatzfenster desselben Typs improvisieren
+        // Fehlende Fenster über die Dokumente neu starten - oder ohne Dokumente ein vorhandenes Fenster desselben Typs umwidmen
         foreach (var info in snapshot.Windows) {
             if (assignments.Exists(a => a.Info == info)) {
                 if (info.ReplacementHandle != 0) { info.ReplacementHandle = 0; changed = true; } // Das Original ist wieder da
@@ -175,7 +176,7 @@ public static class DesktopSnapshot {
                 handle = WaitForWindow(info, processNames, busyHandles);
             } else {
                 Develop.Diagnose("Snap", "Restore: improvisiere Fenster: " + info.ProcessName + " | " + info.Title);
-                handle = StartSimilarWindow(info, processNames, busyHandles);
+                handle = SimilarWindow(info, processNames, pool);
             }
 
             if (handle != IntPtr.Zero) {
@@ -290,19 +291,17 @@ public static class DesktopSnapshot {
     }
 
     /// <summary>
-    /// Startet improvisiert einen Prozess desselben Typs und liefert das Handle des neuen Fensters.
+    /// Liefert ein bereits vorhandenes, freies Fenster desselben Typs als Ersatz - ohne einen Prozess zu starten.
     /// </summary>
-    private static IntPtr StartSimilarWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> busyHandles) {
+    private static IntPtr SimilarWindow(WindowInfo info, Dictionary<int, string> processNames, List<WindowsRemoteControl.StrProcess> pool) {
         if (info.ProcessName.Length == 0) { return IntPtr.Zero; }
 
-        try {
-            _ = Process.Start(new ProcessStartInfo(info.ProcessName) { UseShellExecute = false });
-        } catch {
-            // Manche Prozesse sind nicht direkt startbar - der Snap bleibt dann an dieser Stelle lückenhaft
-            return IntPtr.Zero;
-        }
+        var window = FindWindow(pool, processNames, info, true) ?? FindWindow(pool, processNames, info, false);
 
-        return WaitForWindow(info, processNames, busyHandles);
+        if (window is not { } match) { return IntPtr.Zero; }
+
+        _ = pool.Remove(match);
+        return match.MainWindowHandle;
     }
 
     private static IntPtr WaitForWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> busyHandles) {

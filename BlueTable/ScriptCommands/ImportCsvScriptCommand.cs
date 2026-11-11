@@ -35,7 +35,7 @@ internal class ImportCsvScriptCommand : TableGenericScriptCommand {
 
         // Vor dem Import die Duplikate der Unique-Definitionen reparieren;
         // ohne Rückfrage wird bei mehr als 5 gleichen Zeilen abgebrochen.
-        if (!RowCollection.RepairUniques(tb, true, 5, false)) {
+        if (!RowCollection.RepairUniques(tb, true, 5, false, null, null)) {
             return new DoItFeedback("Import abgebrochen: Die Zeilen verletzen eine Unique-Definition und konnten nicht automatisch repariert werden.", false);
         }
 

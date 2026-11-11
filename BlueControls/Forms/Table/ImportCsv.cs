@@ -80,12 +80,12 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
             // Vor dem Import die Duplikate der Unique-Definitionen reparieren
             // (Warnung ab mehr als 5 gleichen Zeilen); bei Abbruch kein Import.
             // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
-            var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true)
+            var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true, null, null)
                 || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
 
             if (!fortsetzen) { return; }
 
-            RowCollection.RepairUniques(tb, false, 5, false);
+            RowCollection.RepairUniques(tb, false, 5, false, null, null);
 
             // Import erzeugt viele GenerateAndAdd- und CellSet-Aufrufe; ohne
             // Suppression feuert jeder sofort Events und baut die UI mehrfach auf.

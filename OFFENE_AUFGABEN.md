@@ -164,7 +164,6 @@ Was meinst du?
 ## Aufgabe
 Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nicht.
 
-
 ## Aufgabe
 Umbennennen in Explorer Soll eine Textbox IM angezeigten Explorer Fenster gehen.
 Zudem fehlt der Befehl Neuer Ordner
@@ -191,39 +190,11 @@ Wie schaffe ich es, dass je nach TableView ein anderes Script ausgeführt wird?
 Ich will im Script irgendwie Feldvariablen benutzen. Aber die werden von einem anderen Ort gesetzt.
 
 ## Aufgabe
-prüfe, ob BCR Dokumente bei eine externen Änderung nachgeladen werden und ob dann das Formular richtig aufgebaut wird.
-
-## Aufgabe
 ControlStrategies benötigen einen Check, ob sie Multiline Unterstützen.
 Dann muss der ColumnEditor bei Inkonsistenz einen Fehler ausgeben.
 
 ## Aufgabe
-Prüfe die Element von Connected formular:
-Wenn eine Tabelle nachgeladen wird, werden dann die Felder aktualisisert?
-  
-## Aufgabe
-Mache in Paint ein Text-Tool. Verschiebar, Text, Farbe, Größe etc. bearbeittbar. Mit OK Knopf, dann wird der Text eingepreist
-
-## Aufgabe
-Erstelle ein CMD Script, dass alle .cs Dateien öffnet, und Properties in die Region "Properties" einodnet. genau so Fields, ect.
-und alle Funktionen, Properties etc. sollen alphabetisch sortiert werden.
-
-## Aufgabe
-Mache zwei Systemspalten:
-Eine erhält den kommentar, warum die Zeile erstellt wurde
-Die andere, den Komentar der letzten Zelländerung
-
-## Aufgabe
 Mache CellCollection als Statisch. Verlager das Dictionory in das RowItem. Key: ColumnEditor
-
-## Aufgabe
-Mach eine Übersicht in CreativePadItem, welche Tabelle, Formular von was abhänig ist. Mit Pfeilen.
-Beachte Linked Cell, Welche Script wohin verweisen, welche Formulare welche Tabelle benutzen
-
-## Aufgabe
-public static ReadOnlyCollection<T>? DeserializeList<T>
-ändern. So, dass es es ohne <T> funktioniert. Dafür muss ein basicklasse erstellt werden, die IhasKeyName und IFragmentStoreable impelementiert.
-Dann noch eine neue statische Routine: Create(Stream stream). Das gibt dann die Klasse zurück.
 
 ## Aufgabe (WICHTIG)
 FragmentEventExtension muss entfernt werden:
@@ -232,65 +203,9 @@ FragmentEventExtension verstehe ich nicht. Es sollen ganz einfach die ausgelöst
 Zusätzlich soll das Parent  das Dispose vom Child abbniren und die Verbindung dann kappen.
 Aber alles ohneneuer klassen FragmentEventExtension, FragmentRegistration und ohne     private static readonly Dictionary<IFragmentStoreable, ParentRegistration> Registered = [];
 
-## Aufgabe (WICHTIG)
-UndoItem ohne    public byte[]? FragmentBlock { get; private set; } lösen
-
-## Aufgabe (WICHTIG)
-VariableCollection und alle anderen Collections, die mit Listen von Klassen arbeiten sollen den SerializeList Befehl benutzen => static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<IFragmentStoreable> content)
- und auch mit dem gegen Pendant sie wieder erstellen.
- 
-## Aufgabe
-Mach eine Listbox in einer Form, die Permament im Vordergund ist.
-Wenn man einen "neuen" eintrag hinzufügt, wird ein Screenshot gemacht.
-Dann wird sich gemerkt, welche Fenster gerade sichtbar und wo sie sind. Größe Position Windowstate.
-Achtung. nur Sichtbatre Fenster, nicht minimierte
-klickt man dann den Eintrag an, werden die Fenster wiederhergestellt.
-
-Dabei werden Explorer, Internet Explorer, Chrome Fenster analysiert, welche Dateien / Urls offen sind und ebenfalls wiederhergestellt.
-Das soll mit einem Plugin-System funktionieren. So wie ich es z.B. schon bei Renderer, oder ScriptComande gemacht habe.
-
-## Aufgabe
-Überwache Screenshot ordner. Wird ein Screenshot erstellt, wird er mit Paint geöffnet
-
-## Aufgabe 
-mach einen Mouse Jiggler
-
-## Aufgabe
-mache für paint eine Textmarker
-
-## Aufgabe
-kompette Datenüberprüfung soll in der Messagebox ausgeben, was alles geprüft wurde - oder warum etwas nicht gemacht wurde.
-Auch, ob ein Value Changed Script vorhanden ist.
-
-## Aufgabe
-Bei 'xxx' konnte das Attribut '1' nicht aufgelöst werden:
-Diese meldung kommt spordisch immer wieder.
-
-## Aufgabe
-Desktop Snap soll nur eine Datei für alles Snaps anlegen
-
-## Aufgabe
-Desktop Snap: Die Reihenfolge der snaps darf sich beim umbenennen nicht ändern
-
-## Aufgabe
-Desktop Snap: Es muss immer ein Snap angewählt bleiben, ODER dei Qualitiy Plugins deaktiviert werden. optisch und auch funtkionell
-
-## Aufgabe
-Desktop Snap: Es wird ein button in der leiste zwischen Snap und Stern benötigt, der alle Fenster minimiert
 
 
 
-## Aufgabe
-Desktop Snap: wenn das original Fenster geschlossen wird, soll improvisiert werden und ein fenster des gleichen Typs an dessen stelle gestellt werden
-Wichtig dabei, dass das Fnester in keinem anderen Snap benutzt wird.
-
-## Aufgabe
-RowCollection.RepairUniques soll einen delgaten als neue attribut erhalten.
-Daruch soll bei btnUniqueAufräumen_Click ein Progressbar mit Abbrechen ermöglicht und eingebaut werden. Das abbrechen nur bei gechunkten Tabellen erlauben.
-Das gut es schon so ähnlich bei der kompletten Datenüberprüfung
-
-## Aufgabe
-Desksnap soll bei start Similar keine neuen Prozesse starten
 
 
 

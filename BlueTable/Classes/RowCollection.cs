@@ -406,9 +406,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Mit dryRun wird nichts geändert; false bedeutet, dass eine Gruppe
     /// maxRows überschreitet und der Aufrufer rückfragen muss. Ohne dryRun
     /// werden übergroße Gruppen bei warn mitrepariert, sonst abgebrochen.
+    /// progress meldet den Bearbeitungsstand (Zeilen, Gesamtzeilen) und
+    /// liefert true für Abbruch.
     /// true bei erfolgreicher bzw. für möglich befundener Reparatur.
     /// </summary>
-    public static bool RepairUniques(Table? table, bool abortIfToMany, int maxRows, bool dryRun) {
+    public static bool RepairUniques(Table? table, bool abortIfToMany, int maxRows, bool dryRun, ProgressDelegate? progress) {
         if (table is not { IsDisposed: false } tb) { return false; }
 
         // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events.
@@ -417,12 +419,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // sicher wieder freigegeben. Im Trockenlauf bleibt die Tabelle unangetastet.
         if (!dryRun) { tb.SuppressEvents(); }
         try {
+            var gesamt = tb.Row.Count;
+            var bearbeitet = 0;
+            if (progress?.Invoke(bearbeitet, gesamt) == true) { return false; }
+
             foreach (var thisDef in tb.UniqueValues) {
                 // Spalten der Definition; die Chunk-Spalte ergänzt DuplicateGroups selbst.
                 var keyColumns = thisDef.KeyColumns.Where(c => c is { IsDisposed: false }).ToList();
                 if (keyColumns.Count == 0) { continue; }
 
                 foreach (var rows in DuplicateGroups(tb, keyColumns, null, true)) {
+                    bearbeitet += rows.Count;
+                    if (progress?.Invoke(bearbeitet, gesamt) == true) { return false; }
+
                     if (rows.Count > maxRows) {
                         // Trockenlauf: abbrechen, damit der Aufrufer die Rückfrage stellen kann.
                         if (dryRun || abortIfToMany) { return false; }

@@ -20,9 +20,9 @@ public enum CheckBehavior {
     MultiSelection = 2,
 
     /// <summary>
-    /// Es muss genau ein Eintrag gewählt sein - ein gewählter Eintrag kann nicht abgewählt werden.
+    /// Es muss genau ein Eintrag gewählt sein. Der Benutzer kann diesen nicht abwählen, systemintern ist das erlaubt.
     /// </summary>
-    AlwaysSingleSelection = 3,
+    UserLockedSingleSelection = 3,
 
     /// <summary>
     /// Es können keine Einträge gewählt werden. Es können nur Werte angeklickt werden.

@@ -127,6 +127,6 @@
     <value>116, 17</value>
   </metadata>
   <data name="SaveTab.Filter" xml:space="preserve">
-    <value>*.BDB Single-User Tabellen|*.BDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH|*.TBLJ JSON Tabellen|*.TBLJ|*.MTBLJ JSON Fragment basierte Tabellen|*.MTBLJ|*.* Alle Dateien|*</value>
+    <value>*.BDB Single-User Tabellen|*.BDB|*.NBDB Binäre Single-User Tabellen|*.NBDB|*.MBDB Fragment basierte Tabellen|*.MBDB|*.FBDB Binäre Fragment basierte Tabellen|*.FBDB|*.TBLH Neue Chunk basierte Tabellen|*.TBLH|*.TBLJ JSON Tabellen|*.TBLJ|*.MTBLJ JSON Fragment basierte Tabellen|*.MTBLJ|*.* Alle Dateien|*</value>
   </data>
 </root>

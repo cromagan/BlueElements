@@ -440,11 +440,45 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // Duplikat-Suche die aktuellen (ggf. im Dialog geänderten) Definitionen nutzt.
         tb.UniqueValues = WorkingCopyUniques().AsReadOnly();
 
-        // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
-        var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true)
-            || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
+        // Fortschritt und Abbrechen nur bei gechunkten Tabellen: Nur dort
+        // kann die Reparatur durch Chunk-Zugriffe spürbar dauern.
+        var _uniqueProgressbar = tb is TableChunk ? Progressbar.Show("Unique-Definitionen aufräumen", tb.Row.Count) : null;
+        _uniqueProgressbar?.CancelSupported = true;
 
-        if (fortsetzen) { RowCollection.RepairUniques(tb, false, 5, false); }
+        try {
+            // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
+            var fortsetzen = RowCollection.RepairUniques(tb, true, 5, true, UniqueRepairProgress, _uniqueProgressbar);
+
+            if (_uniqueProgressbar is { IsCancelRequested: true }) {
+                QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                return;
+            }
+
+            if (!fortsetzen) {
+                fortsetzen = Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
+            }
+
+            if (fortsetzen) {
+                RowCollection.RepairUniques(tb, false, 5, false, UniqueRepairProgress, _uniqueProgressbar);
+
+                if (_uniqueProgressbar is { IsCancelRequested: true }) {
+                    QuickNote.Show(NoteSymbols.Critical, "Abbruch durch Benutzer");
+                }
+            }
+        } finally {
+            _uniqueProgressbar?.Close();
+        }
+    }
+
+    /// <summary>
+    /// Meldet den Reparatur-Fortschritt an die als Objekt mitgegebene Progressbar;
+    /// true = Abbrechen gewählt.
+    /// </summary>
+    private static bool UniqueRepairProgress(object? state, int processed, int total) {
+        if (state is not Progressbar { IsDisposed: false } pg) { return false; }
+        pg.Update(processed);
+        Develop.DoEvents();
+        return pg.IsCancelRequested;
     }
 
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
@@ -558,10 +592,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // Zeilen-Duplikate aller Definitionen repariert (Warnung ab mehr als 5 gleichen Zeilen).
         if (uniquesChanged) {
             // Trockenlauf zuerst: übergroße Duplikat-Gruppen nur nach Rückfrage reparieren.
-            var fortsetzen = RowCollection.RepairUniques(Table, true, 5, true)
+            var fortsetzen = RowCollection.RepairUniques(Table, true, 5, true, null, null)
                 || Forms.MessageBox.Show("Es wurden mehr als 5 gleiche Zeilen innerhalb einer Unique-Definition gefunden.<br>Reparatur fortsetzen?", ImageCode.Warnung, "OK", "Abbrechen") == 0;
 
-            if (fortsetzen) { RowCollection.RepairUniques(Table, false, 5, false); }
+            if (fortsetzen) { RowCollection.RepairUniques(Table, false, 5, false, null, null); }
         }
 
         #endregion

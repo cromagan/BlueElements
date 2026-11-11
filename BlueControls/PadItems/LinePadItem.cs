@@ -280,19 +280,24 @@ public class LinePadItem : PadItem, IStyleableOne {
     private bool Begradige(int p1) {
         if (_tempPoints is null || p1 >= _tempPoints.Count - 1) { return false; }
         if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X || (int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y) { return false; }
-        PointF np1;
-        PointF np2;
+
+        PointF ecke1;
+        PointF ecke2;
         if (Math.Abs(_tempPoints[p1].X - _tempPoints[p1 + 1].X) > Math.Abs(_tempPoints[p1].Y - _tempPoints[p1 + 1].Y)) {
-            np1 = new PointF(_tempPoints[p1].X, (_tempPoints[p1].Y + _tempPoints[p1 + 1].Y) / 2);
-            np2 = new PointF(_tempPoints[p1 + 1].X, (_tempPoints[p1].Y + _tempPoints[p1 + 1].Y) / 2);
-            _tempPoints.Insert(p1 + 1, np1);
-            _tempPoints.Insert(p1 + 2, np2);
+            var mitteY = (_tempPoints[p1].Y + _tempPoints[p1 + 1].Y) / 2;
+            ecke1 = new PointF(_tempPoints[p1].X, mitteY);
+            ecke2 = new PointF(_tempPoints[p1 + 1].X, mitteY);
         } else {
-            np1 = new PointF((_tempPoints[p1].X + _tempPoints[p1 + 1].X) / 2, _tempPoints[p1].Y);
-            np2 = new PointF((_tempPoints[p1].X + _tempPoints[p1 + 1].X) / 2, _tempPoints[p1 + 1].Y);
-            _tempPoints.Insert(p1 + 1, np1);
-            _tempPoints.Insert(p1 + 2, np2);
+            var mitteX = (_tempPoints[p1].X + _tempPoints[p1 + 1].X) / 2;
+            ecke1 = new PointF(mitteX, _tempPoints[p1].Y);
+            ecke2 = new PointF(mitteX, _tempPoints[p1 + 1].Y);
         }
+
+        // Eine verdeckte Ecke würde LöscheVerdeckte sofort wieder entfernen: Diagonale belassen.
+        if (IsVerdeckt(ecke1.X, ecke1.Y) || IsVerdeckt(ecke2.X, ecke2.Y)) { return false; }
+
+        _tempPoints.Insert(p1 + 1, ecke1);
+        _tempPoints.Insert(p1 + 2, ecke2);
         return true;
     }
 
@@ -475,7 +480,7 @@ public class LinePadItem : PadItem, IStyleableOne {
                             ersteWahl = linksErst ? new[] { lu, lo } : new[] { ru, ro };
                             zweiteWahl = linksErst ? new[] { ru, ro } : new[] { lu, lo };
                         }
-                        return EckenEinsetzen(p1, ersteWahl) || EckenEinsetzen(p1, zweiteWahl);
+                        return EckenEinsetzen(p1, a, ersteWahl) || EckenEinsetzen(p1, a, zweiteWahl);
                     }
 
                     if (!tLinks.IsEmpty && !tRechts.IsEmpty) {
@@ -490,14 +495,20 @@ public class LinePadItem : PadItem, IStyleableOne {
                             ersteWahl = obenErst ? new[] { ro, lo } : new[] { ru, lu };
                             zweiteWahl = obenErst ? new[] { ru, lu } : new[] { ro, lo };
                         }
-                        return EckenEinsetzen(p1, ersteWahl) || EckenEinsetzen(p1, zweiteWahl);
+                        return EckenEinsetzen(p1, a, ersteWahl) || EckenEinsetzen(p1, a, zweiteWahl);
                     }
 
                     // Nur eine Ecke getroffen: diese eine Ecke ausweichen.
-                    if (!tUnten.IsEmpty && !tRechts.IsEmpty) { return EckenEinsetzen(p1, ru); }
-                    if (!tOben.IsEmpty && !tRechts.IsEmpty) { return EckenEinsetzen(p1, ro); }
-                    if (!tUnten.IsEmpty && !tLinks.IsEmpty) { return EckenEinsetzen(p1, lu); }
-                    return EckenEinsetzen(p1, lo);
+                    if (!tUnten.IsEmpty && !tRechts.IsEmpty) { return EckenEinsetzen(p1, a, ru); }
+                    if (!tOben.IsEmpty && !tRechts.IsEmpty) { return EckenEinsetzen(p1, a, ro); }
+                    if (!tUnten.IsEmpty && !tLinks.IsEmpty) { return EckenEinsetzen(p1, a, lu); }
+                    if (!tOben.IsEmpty && !tLinks.IsEmpty) { return EckenEinsetzen(p1, a, lo); }
+
+                    // Nur eine Kante getroffen: zur Schnittstelle nächste Ecke ausweichen.
+                    if (!tOben.IsEmpty) { return EckenEinsetzen(p1, a, tOben.X < (a.Left + a.Right) / 2 ? lo : ro); }
+                    if (!tUnten.IsEmpty) { return EckenEinsetzen(p1, a, tUnten.X < (a.Left + a.Right) / 2 ? lu : ru); }
+                    if (!tLinks.IsEmpty) { return EckenEinsetzen(p1, a, tLinks.Y < (a.Top + a.Bottom) / 2 ? lo : lu); }
+                    return EckenEinsetzen(p1, a, tRechts.Y < (a.Top + a.Bottom) / 2 ? ro : ru);
                 }
             }
         }
@@ -505,17 +516,35 @@ public class LinePadItem : PadItem, IStyleableOne {
     }
 
     /// <summary>
-    /// Fügt die Eckpunkte in die Punktliste ein, wenn keiner davon verdeckt ist.
+    /// Fügt die Eckpunkte in die Punktliste ein, wenn keiner verdeckt ist und der Umweg das Objekt frei umrundet.
     /// </summary>
-    private bool EckenEinsetzen(int p1, params PointF[] ecken) {
+    private bool EckenEinsetzen(int p1, RectangleF umwegUm, params PointF[] ecken) {
         if (_tempPoints is null) { return false; }
+
+        var vorher = _tempPoints[p1];
+        var nachher = _tempPoints[p1 + 1];
+
         foreach (var ecke in ecken) {
             if (IsVerdeckt(ecke.X, ecke.Y)) { return false; }
         }
+
+        if (StreckeSchneidetRechteck(vorher, ecken[0], umwegUm)) { return false; }
+        for (var z = 0; z < ecken.Length - 1; z++) {
+            if (StreckeSchneidetRechteck(ecken[z], ecken[z + 1], umwegUm)) { return false; }
+        }
+        if (StreckeSchneidetRechteck(ecken[^1], nachher, umwegUm)) { return false; }
+
         for (var z = 0; z < ecken.Length; z++) {
             _tempPoints.Insert(p1 + 1 + z, ecken[z]);
         }
         return true;
+    }
+
+    private static bool StreckeSchneidetRechteck(PointF p1, PointF p2, RectangleF rechteck) {
+        return !LinesIntersect(p1, p2, rechteck.PointOf(Alignment.Top_Left), rechteck.PointOf(Alignment.Top_Right), true).IsEmpty ||
+            !LinesIntersect(p1, p2, rechteck.PointOf(Alignment.Bottom_Left), rechteck.PointOf(Alignment.Bottom_Right), true).IsEmpty ||
+            !LinesIntersect(p1, p2, rechteck.PointOf(Alignment.Top_Left), rechteck.PointOf(Alignment.Bottom_Left), true).IsEmpty ||
+            !LinesIntersect(p1, p2, rechteck.PointOf(Alignment.Top_Right), rechteck.PointOf(Alignment.Bottom_Right), true).IsEmpty;
     }
 
     #endregion

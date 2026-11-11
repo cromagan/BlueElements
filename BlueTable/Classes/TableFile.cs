@@ -110,10 +110,11 @@ public class TableFile : Table {
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
-    /// True, wenn die Datei-Endung das binäre Fragment-Format „Typ + Key“ nutzt
-    /// (.nbdb, .fbdb); sonst werden Classic-Chunks geschrieben und gelesen.
+    /// True, wenn die Tabelle binäre Fragment-Sätze schreibt und liest (.nbdb, .fbdb);
+    /// sonst werden Classic-Chunks geschrieben und gelesen. TableTimestamp überschreibt
+    /// dies: Ihre Snapshots (.tbls) sind immer binär, die .tblt selbst ist eine Dummy-Datei.
     /// </summary>
-    protected bool IsBinaryFormat => Filename.FileSuffix().ToLowerInvariant() is "nbdb" or "fbdb";
+    protected virtual bool IsBinaryFormat => Filename.FileSuffix().ToLowerInvariant() is "nbdb" or "fbdb";
 
     /// <summary>
     /// Gibt an, ob die Tabelle vor kurzem aktiv verwendet wurde und daher
