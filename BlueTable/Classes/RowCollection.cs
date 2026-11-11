@@ -407,10 +407,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// maxRows überschreitet und der Aufrufer rückfragen muss. Ohne dryRun
     /// werden übergroße Gruppen bei warn mitrepariert, sonst abgebrochen.
     /// progress meldet den Bearbeitungsstand (Zeilen, Gesamtzeilen) und
-    /// liefert true für Abbruch.
+    /// liefert true für Abbruch; state wird dabei als Objekt durchgereicht.
     /// true bei erfolgreicher bzw. für möglich befundener Reparatur.
     /// </summary>
-    public static bool RepairUniques(Table? table, bool abortIfToMany, int maxRows, bool dryRun, ProgressDelegate? progress) {
+    public static bool RepairUniques(Table? table, bool abortIfToMany, int maxRows, bool dryRun, ProgressDelegate? progress, object? state) {
         if (table is not { IsDisposed: false } tb) { return false; }
 
         // Combine/RemoveYoungest feuern pro Duplikat-Gruppe mehrere Events.
@@ -421,7 +421,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             var gesamt = tb.Row.Count;
             var bearbeitet = 0;
-            if (progress?.Invoke(bearbeitet, gesamt) == true) { return false; }
+            if (progress?.Invoke(state, bearbeitet, gesamt) == true) { return false; }
 
             foreach (var thisDef in tb.UniqueValues) {
                 // Spalten der Definition; die Chunk-Spalte ergänzt DuplicateGroups selbst.
@@ -430,7 +430,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 foreach (var rows in DuplicateGroups(tb, keyColumns, null, true)) {
                     bearbeitet += rows.Count;
-                    if (progress?.Invoke(bearbeitet, gesamt) == true) { return false; }
+                    if (progress?.Invoke(state, bearbeitet, gesamt) == true) { return false; }
 
                     if (rows.Count > maxRows) {
                         // Trockenlauf: abbrechen, damit der Aufrufer die Rückfrage stellen kann.
