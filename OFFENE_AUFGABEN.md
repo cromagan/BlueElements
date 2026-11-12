@@ -232,6 +232,21 @@ So, dass SaveableFileChunk INTERN entscheiden kann, welche Datei gepürft/gelade
 übrogens: Tablechunk hat nur noch die Möglichkeit über "Namen" zu Chunken. Das soll so bleiben und nicht erweitert werden.Du kannst also den einfachen Weg nehmen und nur das betrachten.
 
 
+## Aufgabe
+Der Befehl geht nicht, es kommt die meldung Der Befehl 'String(numeral)' ist in diesem Skript nicht erlaubt.
+var tlg = [string(K200_B_08_RAND01);string(K200_B_08_RAND02),string(K200_B_08_RAND03),string(K200_B_08_RAND04)]
+
+Das geht aber: var x = string(K200_B_08_RAND01);
+
+## Aufgabe
+füge eine Prüfung hinzu, die bei List Element Variablen wie SP01 verbietet.
+
+## Aufgabe
+Mach VarTemp als ScriptCommand.
+Legt die Variable an, wenn nicht vorhanden. Wenn vorhanden, wird der Befehl ignoriert.
 
 
+## Aufgabe
+ist ein If faul (Exists(xx) && b=8) 
+wird Exists angemeckert, anstelle B=8
 
