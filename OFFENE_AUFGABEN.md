@@ -203,7 +203,33 @@ FragmentEventExtension verstehe ich nicht. Es sollen ganz einfach die ausgelöst
 Zusätzlich soll das Parent  das Dispose vom Child abbniren und die Verbindung dann kappen.
 Aber alles ohneneuer klassen FragmentEventExtension, FragmentRegistration und ohne     private static readonly Dictionary<IFragmentStoreable, ParentRegistration> Registered = [];
 
+## Aufgabe
+Table einmal kopieren zu TableNew.
+Aus Table IFragmentStoreable ENTFERNEN!
+Aus TableNew da Legacy-Format entfernen.
 
+Nun haben wir eine saubere Trennung der beiden Formate.
+
+nun mache eine neue Klasse SaveableFile
+
+TableNew hat eine Instanz der neuen Klasse. und einen neuen konstruktor, der Saveablefile mit abfrägt.
+
+SavableFile verwaltet das NEUE undo System. Immer.
+Dann gibt es ableitungen:
+
+SaveableFileChunk
+SaveableFileFragment
+SaveableFileOnefile
+SaveableFileBlockableFile
+
+TableNew kommuniziert alle undo, alle Dateirelevaten EditableAbfragen, alles Speicher, alle Öffnen, Nachladen aktionen, filename abfragn, an die neue klasse.
+
+Lösche TableFragmentsNew
+Lösche TableTimeStamp
+
+Wenn eine Datei nachgeladen,m gespeichert, etc werden soll, muss immer eine info mitgegeben werden.
+So, dass SaveableFileChunk INTERN entscheiden kann, welche Datei gepürft/geladen/gespeichert werden muss.
+übrogens: Tablechunk hat nur noch die Möglichkeit über "Namen" zu Chunken. Das soll so bleiben und nicht erweitert werden.Du kannst also den einfachen Weg nehmen und nur das betrachten.
 
 
 

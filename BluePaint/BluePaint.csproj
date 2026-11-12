@@ -29,7 +29,18 @@
 	<UseWindowsForms>true</UseWindowsForms>
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
+
+		<!-- Self-contained (Debug und Release) -->
+		<SelfContained>true</SelfContained>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Platform)' != 'x86'">
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Platform)' == 'x86'">
+		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
+	</PropertyGroup>
   
   <ItemGroup>
   <!-- Code-Analyzer -->
