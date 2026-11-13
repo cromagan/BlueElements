@@ -611,7 +611,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
-        if (column.Table is not { IsDisposed: false } tbl) { return; }
+        if (column.Table is not TableFile { IsDisposed: false } tbl) { return; }
         var sortedUndoItems = tbl.Undo.Where(item => item.CellKey == cellKey).OrderByDescending(item => item.DateTimeUtc).ToList();
 
         if (sortedUndoItems.Count == 0) {

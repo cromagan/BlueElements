@@ -30,7 +30,9 @@ public sealed class CsSanitizer {
 
     #region Methods
 
-    /// <summary>Bereinigt alle Zeilen und liefert zeilengleich die bereinigten Zeilen zurück.</summary>
+    /// <summary>
+    /// Bereinigt alle Zeilen und liefert zeilengleich die bereinigten Zeilen zurück.
+    /// </summary>
     public List<string> SanitizeLines(List<string> lines) {
         var result = new List<string>(lines.Count);
         foreach (var line in lines) {
@@ -42,7 +44,9 @@ public sealed class CsSanitizer {
         return result;
     }
 
-    /// <summary>Bereinigt einen zusammenhängenden Textabschnitt (z. B. einen Member-Kopf).</summary>
+    /// <summary>
+    /// Bereinigt einen zusammenhängenden Textabschnitt (z. B. einen Member-Kopf).
+    /// </summary>
     public string Sanitize(string text) {
         var sb = new StringBuilder(text.Length);
         foreach (var part in text.Split(["\r\n", "\n"], StringSplitOptions.None)) {

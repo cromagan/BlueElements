@@ -57,6 +57,7 @@ public static class ColumnErrorConstants {
     public const string LinkedTableMissing = "Verknüpfte Tabelle fehlt oder existiert nicht.";
     public const string ListElementNameAlreadyUsed = "Der Listen-Name dieser ListElement-Spalte wird bereits von einer anderen Skript-Spalte verwendet.";
     public const string ListElementNameInvalid = "Für ListElement muss der Spaltenname mit einer Zahl enden (Format NameZahl, z. B. Test0 oder Test5); der Teil vor der Zahl muss ein erlaubter Skript-Variablenname sein. Die Zahl ist die nullbasierte Position in der Liste.";
+    public const string ListElementNameLeadingZero = "Bei ListElement darf die Zahl am Ende des Namens keine führende Null haben (z. B. SP01 ist unzulässig, bitte SP1 verwenden).";
     public const string MaxLengthTooLarge = "Maximallänge zu groß!";
     public const string MinLengthGreaterThanMax = "Die Minimallänge ist größer als die Maximallänge!";
     public const string MultilineButCrForbidden = "Mehrzeilige Spalten dürfen \\r (Wagenrücklauf) nicht verbieten!";

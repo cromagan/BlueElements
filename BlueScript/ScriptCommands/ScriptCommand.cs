@@ -199,7 +199,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                 // Wir haben so einen Fall: (true) || (true)
                 var scx = GetVariableByParsing(txt[1..pose], varCol, scp);
                 if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true);
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in (): " + scx.FailedReason, true);
                     return scx;
                 }
                 if (scx.ReturnValue is null) {
@@ -263,6 +263,13 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             return GetVariableByParsing(txt[(oo + 2)..], varCol, scp);
         }
 
+        // Ein einzelnes '=' ist eine Zuweisung und in einem Ausdruck nicht erlaubt.
+        // Hier prüfen, damit der Ausdruck (z.B. 'b=8' in 'Exists(x) && b=8') und nicht ein Teilausdruck bemängelt wird.
+        var (poseq, _) = NextText(txt, 0, EqualsSign, false, false, Brackets);
+        if (poseq > -1 && !IstVergleichsGleichzeichen(txt, poseq)) {
+            return new DoItFeedback("Ungültige Zuweisung '" + txt + "'. Zum Vergleichen '==' verwenden.", true);
+        }
+
         // Index-Zugriffe auf Listen-Variablen ersetzen (z.B. MeineListe[1]).
         // Muss vor ReplaceVariable geschehen, da der Variablenname sonst durch den kompletten Listenwert ersetzt würde.
         var ti = ReplaceIndexedAccess(txt, varCol, scp);
@@ -302,7 +309,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             if (!string.IsNullOrEmpty(tmptxt)) {
                 var scx = GetVariableByParsing(tmptxt, varCol, scp);
                 if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true);
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in (): " + scx.FailedReason, true);
                     return scx;
                 }
                 if (scx.ReturnValue is null) {
@@ -504,7 +511,10 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                         // Subname/Line werden hier nicht benötigt, das Feedback dient nur der Prüfung auf mögliche Befehle.
                         // true, damit auch Befehle mit MustUseReturnValue erkannt werden.
                         var f = thisC.CanDo(attributes[n], 0, true, string.Empty, 0);
-                        if (string.IsNullOrEmpty(f.FailedReason)) {
+
+                        // Nur wenn der Befehl den gesamten Ausdruck abdeckt, kann er der Verursacher sein.
+                        // Andernfalls stammt das Problem aus einem Teilausdruck (z.B. 'Exists(x) && b=8').
+                        if (string.IsNullOrEmpty(f.FailedReason) && f.ContinueOrErrorPosition >= attributes[n].Length) {
                             if (command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
                                 return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
                             }
@@ -796,13 +806,22 @@ public abstract class ScriptCommand : IReadableTextWithKey {
 
         foreach (var thisC in AllMethods.Instances) {
             // Subname/Line werden hier nicht benötigt, das Feedback dient nur der Prüfung auf mögliche Befehle.
-            if (string.IsNullOrEmpty(thisC.CanDo(ausdruck, 0, true, string.Empty, 0).FailedReason)) {
+            var f = thisC.CanDo(ausdruck, 0, true, string.Empty, 0);
+
+            // Nur melden, wenn der Befehl den kompletten Ausdruck abdeckt; sonst ist ein Teilausdruck das Problem.
+            if (string.IsNullOrEmpty(f.FailedReason) && f.ContinueOrErrorPosition >= ausdruck.Length) {
                 return "Der Befehl '" + thisC.Syntax + "' ist in diesem Skript nicht erlaubt.";
             }
         }
 
         return "Der Ausdruck '" + ausdruck + "' konnte nicht aufgelöst werden (unbekannte Variable oder unbekannter Befehl).";
     }
+
+    /// <summary>
+    /// Liefert true, wenn das '=' an der Position Teil eines Vergleichsoperators ist (==, !=, >=, <=).
+    /// </summary>
+    private static bool IstVergleichsGleichzeichen(string txt, int poseq) =>
+        (poseq > 0 && txt[poseq - 1] is '=' or '!' or '>' or '<') || (poseq + 1 < txt.Length && txt[poseq + 1] == '=');
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp) {
         if (ScriptVariable.TryParseValue<BoolScriptVariable>(txt, out var result) && result is bool b) { return b; }

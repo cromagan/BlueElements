@@ -725,7 +725,7 @@ public class TableFbdbTestCliCommand : CliCommand {
 
         Check(failures, deepOk && deepRec is { TagType: FragmentTagType.Eof, Depth: 3 } && deepNext == deepTabs.Length, "Steuer-Satz mit 3 Tabs -> gültig (Tiefe 3)");
 
-        // Zustandserkennung: 255 am Ende = abgeschlossen, 254 = in Bearbeitung, Altformat-Zeilen.
+        // Zustandserkennung: 255 am Ende = abgeschlossen, 254 = in Bearbeitung, Text-Zeilen = nicht abgeschlossen.
         var eofStream = new MemoryStream();
         _ = FragmentRecord.Append(eofStream, 1, FragmentTagType.Eof, string.Empty);
 
@@ -736,11 +736,11 @@ public class TableFbdbTestCliCommand : CliCommand {
 
         using (var s = new MemoryStream(contStream.ToArray())) { Check(failures, !FragmentRecord.EndsOnEof(s), "EndsOnEof: 254-Satz = in Bearbeitung"); }
 
-        using (var s = new MemoryStream(Encoding.UTF8.GetBytes("- User cp33\r\n- EOF\r\n"))) { Check(failures, FragmentRecord.EndsOnEof(s), "EndsOnEof: Altformat '- EOF' = abgeschlossen"); }
+        using (var s = new MemoryStream(Encoding.UTF8.GetBytes("- User cp33\r\n- EOF\r\n"))) { Check(failures, !FragmentRecord.EndsOnEof(s), "EndsOnEof: Text-Zeilen = nicht abgeschlossen"); }
 
         using (var s = new MemoryStream()) { Check(failures, !FragmentRecord.EndsOnEof(s), "EndsOnEof: leere Datei = nicht abgeschlossen"); }
 
-        using (var s = new MemoryStream(Encoding.UTF8.GetBytes("- User abc\r\n- EOF\r\n"))) { Check(failures, FragmentRecord.HeadUser(s) == "abc", "HeadUser: Altformat '- User abc'"); }
+        using (var s = new MemoryStream(Encoding.UTF8.GetBytes("- User abc\r\n- EOF\r\n"))) { Check(failures, FragmentRecord.HeadUser(s) is null, "HeadUser: Text-Zeilen = null"); }
 
         var userStream = new MemoryStream();
         _ = FragmentRecord.Append(userStream, 1, FragmentTagType.User, "cp33");

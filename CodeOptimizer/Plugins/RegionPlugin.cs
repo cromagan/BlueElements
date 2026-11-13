@@ -12,7 +12,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     #region Fields
 
-    /// <summary>Reihenfolge und Namen der Standard-Regionen.</summary>
+    /// <summary>
+    /// Reihenfolge und Namen der Standard-Regionen.
+    /// </summary>
     private static readonly string[] RegionOrder = ["Fields", "Delegates", "Constructors", "Events", "Properties", "Indexers", "Methods", "Structs"];
 
     private static readonly char[] TokenChars = ['(', '{', ';', '='];
@@ -61,7 +63,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         return report.ToString();
     }
 
-    /// <summary>Baut die Elementbereiche aller obersten Typen neu auf. Liefert null, wenn nichts zu ändern ist.</summary>
+    /// <summary>
+    /// Baut die Elementbereiche aller obersten Typen neu auf. Liefert null, wenn nichts zu ändern ist.
+    /// </summary>
     private static string? ReorganizeFile(string content, out int typesReorganized, out int regionsRemoved, out int regionsAdded) {
         typesReorganized = 0;
         regionsRemoved = 0;
@@ -126,7 +130,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         return string.Join("\r\n", output);
     }
 
-    /// <summary>Gruppiert und sortiert die Member des Typkörpers und baut die Regionen neu auf.</summary>
+    /// <summary>
+    /// Gruppiert und sortiert die Member des Typkörpers und baut die Regionen neu auf.
+    /// </summary>
     private static List<string>? ReorganizeBody(List<string> lines, List<string> clean, int[] depths, int first, int last, int bodyDepth, string typeName, out int regionsRemoved, out int regionsAdded) {
         var items = ParseBody(lines, clean, depths, first, last, bodyDepth, typeName, out regionsRemoved, out var otherDirectives);
         regionsAdded = 0;
@@ -176,7 +182,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         return result;
     }
 
-    /// <summary>Zerlegt den Typkörper in Member-Blöcke mit vorausgehenden Kommentaren und Attributen.</summary>
+    /// <summary>
+    /// Zerlegt den Typkörper in Member-Blöcke mit vorausgehenden Kommentaren und Attributen.
+    /// </summary>
     private static List<MemberEntry> ParseBody(List<string> lines, List<string> clean, int[] depths, int first, int last, int bodyDepth, string typeName, out int regionsRemoved, out int otherDirectives) {
         regionsRemoved = 0;
         otherDirectives = 0;
@@ -254,7 +262,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         }
     }
 
-    /// <summary>Liefert die Zeile, in der der ab start beginnende Member endet.</summary>
+    /// <summary>
+    /// Liefert die Zeile, in der der ab start beginnende Member endet.
+    /// </summary>
     private static int MemberEndIndex(int[] depths, List<string> clean, int start, int last, int bodyDepth) {
         for (var j = start; j <= last; j++) {
             if (depths[j] == bodyDepth) {
@@ -265,7 +275,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         return last;
     }
 
-    /// <summary>Ordnet einen Member anhand seines Kopfes einer Region zu. Leerzeichen = nicht zuordnungsbar.</summary>
+    /// <summary>
+    /// Ordnet einen Member anhand seines Kopfes einer Region zu. Leerzeichen = nicht zuordnungsbar.
+    /// </summary>
     private static string Classify(string header, string typeName) {
         var p = header.IndexOfAny(TokenChars);
         if (p < 0) { return string.Empty; }
@@ -293,7 +305,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         }
     }
 
-    /// <summary>Liefert den Sortierschlüssel des Members. Felder und Konstruktoren behalten die Originalreihenfolge.</summary>
+    /// <summary>
+    /// Liefert den Sortierschlüssel des Members. Felder und Konstruktoren behalten die Originalreihenfolge.
+    /// </summary>
     private static string SortKeyOf(string category, string header) {
         if (category == "Indexers") { return "this"; }
         if (category == "Structs") { return WordAfter(header, "struct"); }
@@ -322,7 +336,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     private static string SortKeySelector(MemberEntry item) => item.SortKey;
 
-    /// <summary>Liefert den Index der öffnenden Klammer des ab start beginnenden Typs, oder -1. Erkennt ägyptische und Allman-Klammern.</summary>
+    /// <summary>
+    /// Liefert den Index der öffnenden Klammer des ab start beginnenden Typs, oder -1. Erkennt ägyptische und Allman-Klammern.
+    /// </summary>
     private static int TypeOpenBrace(int start, List<string> clean) {
         if (!TypeKeywordRegex().IsMatch(clean[start])) { return -1; }
 
@@ -359,7 +375,9 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         return balance;
     }
 
-    /// <summary>Liefert das letzte Wortzeichen-Wort vor dem ermittelten Token.</summary>
+    /// <summary>
+    /// Liefert das letzte Wortzeichen-Wort vor dem ermittelten Token.
+    /// </summary>
     private static string NameBefore(string pre) {
         var s = pre.TrimEnd();
         var end = s.Length;

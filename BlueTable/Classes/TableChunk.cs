@@ -963,7 +963,7 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc).
     /// Millisekunden sind verpflichtend. Gibt null zurück, wenn das Datum nicht geparst werden kann.
-    /// Wird auch für Snapshot-Dateien (TableTimestamp) mit gleichem Namensformat genutzt.
+    /// Wird auch für Snapshot-Dateien (SaveableFileBlockableFile) mit gleichem Namensformat genutzt.
     /// </summary>
     internal static DateTime? ExtractDateFromFileName(string filePath) {
         var fileName = filePath.FileNameWithoutSuffix();

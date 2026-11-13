@@ -143,7 +143,7 @@ public sealed class RowTableElement : TableElement {
     }
 
     public static string UndoText(ColumnItem? column, RowItem? row) {
-        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
+        if (column?.Table is not TableFile { IsDisposed: false } tb) { return string.Empty; }
 
         if (tb.Undo.Count == 0) { return string.Empty; }
 
