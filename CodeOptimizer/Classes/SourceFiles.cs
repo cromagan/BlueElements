@@ -15,7 +15,7 @@ public static class SourceFiles {
         var result = new List<string>();
 
         foreach (var file in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.AllDirectories)) {
-            if (file.Contains("\\obj\\", StringComparison.OrdinalIgnoreCase)) { continue; }
+            if (file.Contains("\\obj\\", StringComparison.OrdinalIgnoreCase) || file.Contains("\\bin\\", StringComparison.OrdinalIgnoreCase)) { continue; }
             result.Add(file);
         }
 
@@ -29,8 +29,11 @@ public static class SourceFiles {
 
     /// <summary>
     /// Liefert true, wenn die Bytes gültiges UTF-8 sind; der UTF-8-BOM ist dabei erlaubt.
+    /// NUL-Bytes (z. B. UTF-16 ohne BOM oder Binärdaten) führen zu false, damit solche Dateien nicht als Text umgeschrieben werden.
     /// </summary>
     public static bool IsValidUtf8(byte[] bytes) {
+        if (bytes.AsSpan().IndexOf((byte)0) >= 0) { return false; }
+
         var i = 0;
 
         while (i < bytes.Length) {

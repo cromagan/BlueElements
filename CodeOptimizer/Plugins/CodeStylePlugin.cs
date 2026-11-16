@@ -152,8 +152,8 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"Leere Klammern eingekürzt:  {braces}");
         report.AppendLine(CultureInfo.InvariantCulture, $"If-Rückgaben einzeilig:     {ifOneLine}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Klammer-Leerzeichen:        {parenSpace}");
-        report.AppendLine(CultureInfo.InvariantCulture, $" is not null -> is not null:     {neNull}");
-        report.AppendLine(CultureInfo.InvariantCulture, $" is null -> is null:         {eqNull}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"!= null -> is not null:      {neNull}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"== null -> is null:          {eqNull}");
         report.AppendLine(CultureInfo.InvariantCulture, $"is not {{ }} -> is null:     {isNotBrace}");
         report.AppendLine(CultureInfo.InvariantCulture, $"is {{ }} -> is not null:     {isBrace}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Disposable is not {{ }}:     {dispNot}");

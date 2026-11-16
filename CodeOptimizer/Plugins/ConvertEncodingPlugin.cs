@@ -63,11 +63,16 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
                 // Gültiges UTF-8 ohne BOM - BOM ergänzen
                 WriteUtf8Bom(file, Encoding.UTF8.GetString(bytes));
                 counterAddedBom++;
+            } else if (Utf16Encoding(bytes) is { } utf16) {
+                // UTF-16 ohne BOM - korrekt konvertieren, bevor ein anderes Modul die Datei als Text anfassen könnte
+                WriteUtf8Bom(file, utf16.GetString(bytes));
+                counterConverted++;
             } else {
                 // Kein UTF-8 (z. B. CP1252) - konvertieren
                 WriteUtf8Bom(file, Win1252.GetString(bytes));
                 counterConverted++;
-            }        }
+            }
+        }
 
         var report = new StringBuilder();
         report.AppendLine("=== Encoding ===");
@@ -81,6 +86,28 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
         }
 
         return report.ToString();
+    }
+
+    /// <summary>
+    /// Liefert das Encoding einer UTF-16-Datei ohne BOM, erkennbar am NUL-Muster der High- bzw. Low-Bytes; sonst null.
+    /// </summary>
+    private static Encoding? Utf16Encoding(byte[] bytes) {
+        if (bytes.Length == 0 || bytes.Length % 2 != 0) { return null; }
+
+        var nulEven = 0;
+        var nulOdd = 0;
+
+        for (var i = 0; i < bytes.Length; i += 2) {
+            if (bytes[i] == 0) { nulEven++; }
+            if (bytes[i + 1] == 0) { nulOdd++; }
+        }
+
+        var pairs = bytes.Length / 2;
+
+        if (nulOdd >= pairs / 4 && nulEven == 0) { return Encoding.Unicode; }
+        if (nulEven >= pairs / 4 && nulOdd == 0) { return Encoding.BigEndianUnicode; }
+
+        return null;
     }
 
     private static void WriteUtf8Bom(string file, string content) {

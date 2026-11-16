@@ -792,13 +792,14 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
             // Zähler-Anhang (_000xx) heißt: Der Wunschname war in dieser Sekunde bereits
             // vergeben. Die Pause verschiebt den Sekunden-Zeitstempel im Namen.
-            for (var nameversuch = 1; nameversuch <= 3 && MyJournalFile.Contains("_000"); nameversuch++) {
+            // Geprüft wird nur der Dateiname — der Ordner darf `_000` gefahrlos enthalten.
+            for (var nameversuch = 1; nameversuch <= 3 && MyJournalFile.FileNameWithSuffix().Contains("_000"); nameversuch++) {
                 Generic.Pause(1, false);
                 MyJournalFile = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
             }
 
-            if (MyJournalFile.Contains("_000")) {
-                Freeze("Journaldatei konnte nicht eindeutig benannt werden: " + MyJournalFile);
+            if (MyJournalFile.FileNameWithSuffix().Contains("_000")) {
+                Freeze("Journaldatei konnte nicht eindeutig benannt werden: " + MyJournalFile.FileNameWithSuffix());
                 return;
             }
 

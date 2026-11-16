@@ -1152,10 +1152,11 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// selbst, die Ansichts-Einträge werden abgeglichen — fehlende entfernt, neue
     /// aufgenommen (beides meldet die Journal-Ereignisse), gemeinsame per Eintrag-Update
     /// beschrieben. Die Spalten werden in der eigenen Tabelle aufgelöst.
+    /// Auch schreibgeschützte Ansichten (Legacy-Live-Ansichten) werden beschrieben:
+    /// Alle Aufrufer sind Systempfade (Einlesen, Journal, Reparatur, Tabellenkopie).
     /// </summary>
     public override string Update(IFragmentStoreable source) {
         if (IsDisposed) { return "Ansicht ist verworfen"; }
-        if (ReadOnly) { return "Ansicht ist schreibgeschützt"; }
         if (source is not ColumnViewCollection sourceView) { return "Quelltyp ungültig"; }
 
         ShowHead = sourceView.ShowHead;
@@ -1176,7 +1177,16 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         PermissionGroups_Show = sourceView.PermissionGroups_Show;
 
         foreach (var thisItem in _internal.ToList()) {
-            if (sourceView[thisItem.KeyName] is null) { Remove(thisItem); }
+            if (sourceView[thisItem.KeyName] is not null) { continue; }
+
+            // Schreibgeschützte Ansichten (Legacy) werden still bereinigt —
+            // das Ansichts-Set wird ohnehin als Ganzes gejournalt; in der
+            // schreibbaren Variante meldet Remove den Eintrag selbst.
+            if (ReadOnly) {
+                RemoveCore(thisItem, false);
+            } else {
+                Remove(thisItem);
+            }
         }
 
         foreach (var sourceItem in sourceView._internal) {

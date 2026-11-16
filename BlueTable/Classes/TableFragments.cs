@@ -625,13 +625,14 @@ public class TableFragments : TableFile {
 
             // Zähler-Anhang (_000xx) heißt: Der Wunschname war in dieser Sekunde bereits
             // vergeben. Die Pause verschiebt den Sekunden-Zeitstempel im Namen.
-            for (var nameversuch = 1; nameversuch <= 3 && _myFragmentsFilename.Contains("_000"); nameversuch++) {
+            // Geprüft wird nur der Dateiname — der Ordner darf `_000` gefahrlos enthalten.
+            for (var nameversuch = 1; nameversuch <= 3 && _myFragmentsFilename.FileNameWithSuffix().Contains("_000"); nameversuch++) {
                 Pause(1, false);
                 _myFragmentsFilename = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
             }
 
-            if (_myFragmentsFilename.Contains("_000")) {
-                Freeze("Fragmentdatei konnte nicht eindeutig benannt werden: " + _myFragmentsFilename);
+            if (_myFragmentsFilename.FileNameWithSuffix().Contains("_000")) {
+                Freeze("Fragmentdatei konnte nicht eindeutig benannt werden: " + _myFragmentsFilename.FileNameWithSuffix());
                 return;
             }
 
