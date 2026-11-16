@@ -15,7 +15,7 @@ public enum ChangeFlags : byte {
 
     /// <summary>
     /// Fügt der Änderung einen Undo-Eintrag hinzu; ob das Logbuch geführt wird, entscheidet
-    /// zusätzlich die Property Table.LogUndo. In InvalidateRowState steuert dieser Wert zusätzlich,
+    /// zusätzlich die Property TableFile.LogUndo. In InvalidateRowState steuert dieser Wert zusätzlich,
     /// ob über die Änderungs-Pipeline (Festplatte/Server) oder nur im Speicher geschrieben wird.
     /// </summary>
     LogUndo = 1,

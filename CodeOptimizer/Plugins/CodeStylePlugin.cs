@@ -48,74 +48,84 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         var summaryClose = 0;
         var docIndent = 0;
         var totalFiles = 0;
+        var skipped = new List<string>();
 
         foreach (var file in SourceFiles.Enumerate(rootPath)) {
+            // Dateien ohne gültiges UTF-8 dürfen nicht umgeschrieben werden - das übernimmt das Encoding-Modul
+            if (!SourceFiles.IsUtf8(file)) {
+                skipped.Add(file);
+                continue;
+            }
+
             var content = File.ReadAllText(file);
             var original = content;
 
             // 1. Leere Klammern über zwei Zeilen -> eine Zeile
             var prev = content;
-            content = EmptyBracesRegex().Replace(content, CollapseEmptyBraces);
+            content = ReplaceInCode(content, EmptyBracesRegex(), CollapseEmptyBraces);
             var c1 = content != prev;
 
             // 3. Einfaches return;/return true;/return false;/continue;/break; in If ohne Klammern -> If() { ...; }
             prev = content;
-            content = IfSimpleStatementRegex().Replace(content, AddBracesToSimpleStatement);
+            content = ReplaceInCode(content, IfSimpleStatementRegex(), AddBracesToSimpleStatement);
             var c3 = content != prev;
 
             // 3b. If-Block mit nur einer einfachen Anweisung -> eine Zeile
             prev = content;
-            content = IfSimpleStatementBlockRegex().Replace(content, AddBracesToSimpleStatement);
+            content = ReplaceInCode(content, IfSimpleStatementBlockRegex(), AddBracesToSimpleStatement);
             c3 = c3 || content != prev;
 
             // 4. Leerzeichen nach ( bei Methodenaufrufen entfernen
             prev = content;
-            content = ParenSpaceRegex().Replace(content, RemoveParenSpace);
+            content = ReplaceInCode(content, ParenSpaceRegex(), RemoveParenSpace);
             var c4 = content != prev;
 
             // 5. is not null -> is not null
             prev = content;
-            content = NotNullRegex().Replace(content, " is not null");
+            content = ReplaceInCode(content, NotNullRegex(), static _ => " is not null");
             var c5 = content != prev;
 
             // 6. is null -> is null
             prev = content;
-            content = NullEqualsRegex().Replace(content, " is null");
+            content = ReplaceInCode(content, NullEqualsRegex(), static _ => " is null");
             var c6 = content != prev;
 
             // 7a. (Disposable) is not { } -> is not { IsDisposed: false }
             prev = content;
-            content = DisposableNotBraceRegex().Replace(content, "$1 is not { IsDisposed: false }");
+            content = ReplaceInCode(content, DisposableNotBraceRegex(), static m => m.Result("$1 is not { IsDisposed: false }"));
             var c7a = content != prev;
 
             // 7b. (Disposable) is { } -> is { IsDisposed: false }
             prev = content;
-            content = DisposableBraceRegex().Replace(content, "$1 is { IsDisposed: false }");
+            content = ReplaceInCode(content, DisposableBraceRegex(), static m => m.Result("$1 is { IsDisposed: false }"));
             var c7b = content != prev;
 
             // 7. is not { } -> is null (nur vor ) & |)
             prev = content;
-            content = IsNotBraceRegex().Replace(content, "is null");
+            content = ReplaceInCode(content, IsNotBraceRegex(), static _ => "is null");
             var c7 = content != prev;
 
             // 8. is { } -> is not null (nur vor ) & |)
             prev = content;
-            content = IsBraceRegex().Replace(content, "is not null");
+            content = ReplaceInCode(content, IsBraceRegex(), static _ => "is not null");
             var c8 = content != prev;
 
             // 9a. /// <summary> mit Text -> Tag in eigene Zeile
             prev = content;
-            content = SummaryOpenRegex().Replace(content, SplitSummaryOpen);
+            var kinds = new CsSanitizer().SanitizeKinds(content);
+            content = SummaryOpenRegex().Replace(content, m => CsSanitizer.ContainsString(kinds, m.Index, m.Length) ? m.Value : SplitSummaryOpen(m));
             var c9a = content != prev;
 
             // 9b. Text + </summary> am Zeilenende -> Tag in eigene Zeile
             prev = content;
-            content = SummaryCloseRegex().Replace(content, SplitSummaryClose);
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = SummaryCloseRegex().Replace(content, m => CsSanitizer.ContainsString(kinds, m.Index, m.Length) ? m.Value : SplitSummaryClose(m));
             var c9b = content != prev;
 
             // 10. Einheitliche Einrückung von ///-Blöcken (an der Folgezeile ausgerichtet)
             prev = content;
-            content = DocIndentRegex().Replace(content, FixDocIndent);
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = DocIndentRegex().Replace(content, m => CsSanitizer.ContainsString(kinds, m.Index, m.Length) ? m.Value : FixDocIndent(m));
             var c10 = content != prev;
 
             if (c1) { braces++; }
@@ -151,10 +161,19 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"Summary-Tags aufgetrennt:   {summaryOpen + summaryClose}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Doc-Einzug korrigiert:      {docIndent}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Dateien geändert:           {totalFiles}");
+        AppendSkipped(report, skipped);
         return report.ToString();
     }
 
-    private static string CollapseEmptyBraces(Match m) => m.Groups[1].Success ? " { }" : "{}";
+    /// <summary>
+    /// Ersetzt Regex-Treffer, aber nur wenn der Treffer komplett in Code liegt (nicht in Strings, Interpolationen oder Kommentaren).
+    /// </summary>
+    private static string ReplaceInCode(string content, Regex regex, Func<Match, string> toReplacement) {
+        var kinds = new CsSanitizer().SanitizeKinds(content);
+        return regex.Replace(content, m => CsSanitizer.IsPureCode(kinds, m.Index, m.Length) ? toReplacement(m) : m.Value);
+    }
+
+    private static string CollapseEmptyBraces(Match m) => m.Groups[1].Success ? " { }" : "{ }";
 
     private static string AddBracesToSimpleStatement(Match m) => $"{m.Groups[1].Value} {{ {m.Groups[2].Value} }}";
 
@@ -210,10 +229,10 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     [GeneratedRegex($@"\b({DisposableTypes})\s+is\s*\{{\s*\}}")]
     private static partial Regex DisposableBraceRegex();
 
-    [GeneratedRegex(@"is\s+not\s*\{\s*\}(?=\s*[)&|])")]
+    [GeneratedRegex(@"is\s+not\s*\{\s*\}(?=\s*[)&|;,?])")]
     private static partial Regex IsNotBraceRegex();
 
-    [GeneratedRegex(@"is\s*\{\s*\}(?=\s*[)&|])")]
+    [GeneratedRegex(@"is\s*\{\s*\}(?=\s*[)&|;,?])")]
     private static partial Regex IsBraceRegex();
 
     [GeneratedRegex(@"(?m)^([ \t]*)///[ \t]*<summary>[ \t]*(.*?)[ \t]*(</summary>)?[ \t]*(?=\r?\n)")]

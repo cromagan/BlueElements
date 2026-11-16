@@ -6,7 +6,7 @@ namespace BlueBasics.Enums;
 /// Standardisierte Tags (valueId 231–255) des binären Fragment-Formats — Steuer-Sätze
 /// auf Datei-Ebene ohne Empfänger-Typ: genau 1 Tab, nie Meta, werden vom Reader
 /// abgefangen, bevor der Satz an eine Klasse gereicht wird. Klasseneigene Enums
-/// dürfen eigene Steuer-Werte ≥ 231 definieren und teilen sich die Bytes mit
+/// dürfen keine Steuer-Werte ≥ 231 definieren und teilen sich die Bytes mit
 /// diesem Enum.
 /// </summary>
 public enum FragmentTagType : byte {
@@ -23,14 +23,14 @@ public enum FragmentTagType : byte {
     SerializerVersion = 232,
 
     /// <summary>
-    /// Benutzer, der die Binärdatei zuletzt gespeichert hat.
+    /// Benutzer, der die Datei zuletzt gespeichert hat.
     /// </summary>
-    User = 233,
+    SaveUser = 233,
 
     /// <summary>
-    /// Datum/Uhrzeit der letzten Speicherung (ToString9, UTC).
+    /// UTC-Zeitpunkt der letzten Speicherung (ToString9).
     /// </summary>
-    DateTimeUtc = 234,
+    SaveTimeUtc = 234,
 
     /// <summary>
     /// Rechner, der die Binärdatei zuletzt gespeichert hat.
@@ -44,7 +44,44 @@ public enum FragmentTagType : byte {
 
     Type = 237,
 
-    // 238 - 253 frei für künftige Typen
+    /// <summary>
+    /// UTC-Zeitpunkt, bis zu dem der eingetragene temporäre Master erwartet wird.
+    /// </summary>
+    MasterTimeUtc = 238,
+
+    /// <summary>
+    /// Benutzer des aktuell eingetragenen temporären Masters.
+    /// </summary>
+    MasterUser = 239,
+
+    /// <summary>
+    /// Rechner des aktuell eingetragenen temporären Masters.
+    /// </summary>
+    MasterMachine = 240,
+
+    /// <summary>
+    /// Anwendung des aktuell eingetragenen temporären Masters.
+    /// </summary>
+    MasterApp = 241,
+
+    /// <summary>
+    /// Instanz-Kennung des aktuell eingetragenen temporären Masters.
+    /// </summary>
+    MasterId = 242,
+
+    /// <summary>
+    /// Benutzer, der die Daten erzeugt hat; bleibt über weitere Speicherungen erhalten.
+    /// </summary>
+    CreateUser = 243,
+
+    /// <summary>
+    /// UTC-Zeitpunkt der Erzeugung der Daten (ToString9); bleibt über weitere Speicherungen erhalten.
+    /// </summary>
+    CreateTimeUtc = 244,
+
+
+
+    // 245 - 253 frei für künftige Typen
 
     /// <summary>
     /// Marker „Datei wird von einem anderen Prozess fortgeführt“; ersetzt den

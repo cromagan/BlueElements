@@ -110,7 +110,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewItemFragmentType.FontHorizontal, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewItemFragmentType.FontHorizontal, value));
             OnPropertyChanged();
         }
     }
@@ -141,7 +141,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewItemFragmentType.Permanent, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewItemFragmentType.Permanent, value));
             OnPropertyChanged();
         }
     }
@@ -390,6 +390,28 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     #region IFragmentStoreable
 
     /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events; zählbasiert, also verschachtelbar — jedes SuppressEvents braucht ein ResumeEvents.
+    /// </summary>
+    public void SuppressEvents() => _eventsSuppressCount++;
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+    }
+
+    /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
@@ -436,10 +458,23 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     }
 
     /// <summary>
+    /// Übernimmt die Ansichts-Eigenschaften; die Setter melden die Änderungen selbst.
+    /// Der Schlüssel bleibt unverändert, da er den Eintrag identifiziert.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (IsDisposed) { return "Eintrag ist verworfen"; }
+        if (source is not ColumnViewItem sourceViewItem) { return "Quelltyp ungültig"; }
+
+        Permanent = sourceViewItem.Permanent;
+        Horizontal = sourceViewItem.Horizontal;
+        return string.Empty;
+    }
+
+    /// <summary>
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
 
         FragmentChanged?.Invoke(this, e);
     }

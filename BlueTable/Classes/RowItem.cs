@@ -433,6 +433,25 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    /// <summary>
+    /// Übernimmt die Zellwerte der Quellzeile Spalte für Spalte; das Setzen läuft
+    /// über die normale Zell-Pipeline und meldet jede Änderung selbst.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Zeile/Tabelle ungültig"; }
+        if (source is not RowItem sourceRow) { return "Quelltyp ungültig"; }
+        if (sourceRow.IsDisposed || sourceRow.Table is not { IsDisposed: false } sourceTable) { return "Quellzeile ungültig"; }
+
+        foreach (var sourceColumn in sourceTable.Column) {
+            if (sourceColumn is not { IsDisposed: false } || tb.Column[sourceColumn.KeyName] is not { IsDisposed: false } targetColumn) { continue; }
+
+            var error = CellSet(targetColumn, sourceRow.CellGetString(sourceColumn), "Update aus Quellzeile");
+            if (error is { Length: > 0 }) { return error; }
+        }
+
+        return string.Empty;
+    }
+
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
@@ -839,7 +858,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new ScriptEndedFeedback([], reas);
             }
 
-            CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
+            // Wie InvalidateRowState: Der Status-Refresh ist kein Inhaltswechsel und darf
+            // Änderer/Änder-Datum nicht überschreiben; geloggt wird er trotzdem.
+            CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung", ChangeFlags.UserCommand | ChangeFlags.IgnoreSystemColumns);
 
             InvalidateCheckData();
 
@@ -992,7 +1013,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         // SYS_ROWSORTINDEX: die Nummern bleiben lückenlos. Erst NACH dem Schreiben auslösen,
         // damit die Kettenreaktion der Rückungen jeweils ins freigewordene Feld läuft.
-        if (column == tb.Column.SysRowSortIndex) {
+        // Unterdrückte Events (Bulk-Lade-/Reparatur-Kontexte und die Rückungen der
+        // Normalisierung selbst) lösen keine Kettenreaktion aus — die Aufrufer
+        // schreiben vollständige Nummern oder regeln die Lücken explizit.
+        if (column == tb.Column.SysRowSortIndex && !tb.IsEventsSuppressed) {
             tb.NormalizeSortIndexRows(this, oldValue, value, comment);
         }
 
@@ -1438,6 +1462,29 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #region IFragmentStoreable
 
     /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// Zell-Events stoppen damit an der Zeile, ohne dass die Zellen einzeln verdrahtet werden müssen.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events der Zeile; zählbasiert, also verschachtelbar — jedes SuppressEvents braucht ein ResumeEvents.
+    /// </summary>
+    public void SuppressEvents() => _eventsSuppressCount++;
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+    }
+
+    /// <summary>
     /// Pfad-Typen der Zeile im binären Fragment-Format. Nur der Zeile selbst bekannt.
     /// </summary>
     private enum RowNavigationType : byte {
@@ -1512,7 +1559,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     private CellItem? CellCreateOrGet(string columnKey) {
         if (Table is not { IsDisposed: false } tb) { return null; }
-        if (tb.Column[columnKey] is not { IsDisposed: false } column) { return null; }
+
+        if (tb.Column[columnKey] is not { IsDisposed: false } column) {
+            Develop.Message(ErrorType.Warning, this, columnKey, ImageCode.Tabelle, $"Zelle konnte nicht zugeordnet werden: Spalte '{columnKey}' fehlt (Spalten im Ziel: {tb.Column.Count})", 0);
+            return null;
+        }
 
         if (tb.Cell.TryGetCell(column, this, out var cell) && cell is not null) {
             this.Reregister(cell);
@@ -1529,16 +1580,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Reicht eine Zell-Änderung mit dem Zell-Pfad (Cell + ColumnKey) eine Ebene höher;
+    /// Reicht eine Zell-Änderung mit dem Zell-Navigationssatz (Cell + ColumnKey) eine Ebene höher;
     /// die Spalte der geänderten Zelle wird über die eigenen Zellen aufgelöst.
     /// </summary>
     public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
         if (sender is not CellItem cell) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
 
         foreach (var column in tb.Column) {
             if (tb.Cell.TryGetCell(column, this, out var c) && ReferenceEquals(c, cell)) {
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(RowNavigationType.Cell, column.KeyName, e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
+                // Nur das Blatt (Zelle) liefert ihren Blatt-Satz; diese Stufe feuert
+                // mit dem Cell-Navigationssatz (Spalten-Key) weiter.
+                OnFragmentChanged(e.WithNavigation(RowNavigationType.Cell, column.KeyName));
                 return;
             }
         }
@@ -1548,7 +1602,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
 
         FragmentChanged?.Invoke(this, e);
     }

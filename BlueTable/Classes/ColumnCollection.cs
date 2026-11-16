@@ -1,14 +1,12 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueTable.EventArgs;
-using System.Collections;
-using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable, IFragmentStoreable {
+public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTable {
 
     #region Enums
 
@@ -27,22 +25,26 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         /// ListKeyObject-Satz: die Spalten folgen als Liste eine Ebene tiefer,
         /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
         /// </summary>
-        Columns = 91
+        Columns = 91,
+
+        /// <summary>
+        /// Blatt-Satz: übernimmt eine ganze neue Spalte im Classic-Format
+        /// (Content = Parseable-String der Spalte). Oberhalb des
+        /// Spalten-Eigenschaften-Kreises (bis 98), damit es keine Verwechslung gibt.
+        /// </summary>
+        ColumnAdd = 99,
+
+        /// <summary>
+        /// Blatt-Satz: entfernt die Spalte des Journal-Blocks (Nav-Schlüssel).
+        /// </summary>
+        ColumnRemove = 100
     }
-
-    #endregion
-
-    #region Fields
-
-    private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
-
-    private volatile int _isDisposedFlag;
 
     #endregion
 
     #region Constructors
 
-    public ColumnCollection(Table table) : base() => Table = table;
+    public ColumnCollection(Table table) => Table = table;
 
     #endregion
 
@@ -58,21 +60,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public event EventHandler<ColumnEventArgs>? ColumnRemoving;
 
-    public event EventHandler? Disposed;
-
-    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
-
     #endregion
 
     #region Properties
 
     public ColumnItem? ChunkValueColumn { get; private set; }
 
-    public int Count => _internal.Count;
-
     public ColumnItem? First { get; private set; }
-
-    public bool IsDisposed => _isDisposedFlag == 1;
 
     public ColumnItem? SysCorrect { get; private set; }
 
@@ -116,29 +110,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #endregion
 
-    #region Indexers
-
-    public ColumnItem? this[string keyName] {
-        get {
-            if (IsDisposed || Table is not { IsDisposed: false } || string.IsNullOrEmpty(keyName)) { return null; }
-
-            try {
-                keyName = keyName.ToUpperInvariant();
-                var col = _internal.TryGetValue(keyName, out var value) ? value : null;
-                if (col is { IsDisposed: true }) {
-                    Develop.DebugError("Interner Spaltenfehler, Spalte verworfen: " + keyName);
-                    return null;
-                }
-                return col;
-            } catch {
-                Develop.AbortAppIfStackOverflow();
-                return this[keyName];
-            }
-        }
-    }
-
-    #endregion
-
     #region Methods
 
     /// <summary>
@@ -150,34 +121,67 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     /// <summary>
-    /// Verarbeitet den Spalten-Block: Der ColumnList-Satz liest die Spalten als
-    /// Liste; je Segment benennt der ColumnKey-Satz die Spalte.
+    /// Pfad-Typen: die Liste unter dem Columns-Satz; Navigation über SubColumn.
     /// </summary>
-    public bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (IsDisposed) { return false; }
+    protected override Enum ListType => ColumnCollectionFragmentType.Columns;
 
-        switch ((ColumnCollectionFragmentType)record.LeafType) {
-            case ColumnCollectionFragmentType.Columns:
-                // Spalten als Liste: je Segment eine Spalte (ColumnKey-Satz zuerst)
-                return FragmentStoreableExtension.DeserializeList(stream, record.Depth, ColumnCreateOrGet) is not null;
+    /// <summary>
+    /// Aufnahmen einer ganzen Classic-Spalte.
+    /// </summary>
+    protected override Enum AddItemType => ColumnCollectionFragmentType.ColumnAdd;
 
-            default:
-                // Unbekannter Blatt-Typ — Satz überspringen
-                return true;
-        }
+    /// <summary>
+    /// Entfernungen per Journal-Block.
+    /// </summary>
+    protected override Enum RemoveItemType => ColumnCollectionFragmentType.ColumnRemove;
+
+    /// <summary>
+    /// Pfad-Segment des Bubbling.
+    /// </summary>
+    protected override Enum ItemSubType => ColumnCollectionFragmentType.SubColumn;
+
+    /// <summary>
+    /// Liefert die Spalte zum Schlüssel eines Journal-Blocks oder null; Property-Blätter
+    /// erzeugen bewusst keine Spalten — nur ApplyItemAdd (Add-Blatt) und CreateItem
+    /// (Snapshot-Liste) erzeugen, damit Entfernungen durch spätere Blätter nicht
+    /// rückgängig gemacht werden können.
+    /// </summary>
+    protected override ColumnItem? GetOrCreateItem(string keyName) => this[keyName];
+
+    /// <summary>
+    /// Übernimmt ein Journal-Add-Blatt: ColumnItem ist kein IStringable, der Blatt-Inhalt
+    /// ist leer — die Spalte wird anhand des Pfad-Schlüssels idempotent erzeugt; ihre
+    /// Eigenschaften tragen die Property-Blätter.
+    /// </summary>
+    protected override bool ApplyItemAdd(string toParse, string keyName) {
+        if (!ColumnItem.IsValidColumnKey(keyName)) { return true; }
+
+        if (this[keyName] is { IsDisposed: false }) { return true; }
+
+        Develop.Diagnose("ColumnAddByName", "Key=" + keyName + ", ApplyItemAdd, Stack: " + Develop.DiagStack());
+
+        ExecuteCommand(TableDataType.Command_AddColumnByName, keyName, ChangeFlags.IgnoreFreeze);
+        return true;
     }
 
     /// <summary>
     /// Liefert die Spalte zum ColumnKey des ersten Segment-Satzes; fehlende Spalten
-    /// werden erzeugt. Der Key geht an die Nachbereitung (verwaiste Spalten entfernen).
+    /// werden erzeugt.
     /// </summary>
-    private ColumnItem? ColumnCreateOrGet(FragmentRecord first) {
-        Table?.FragmentLoadedColumns.Add(first.StringContent);
-
+    protected override ColumnItem? CreateItem(FragmentRecord first) {
         if (this[first.StringContent] is { IsDisposed: false } column) { return column; }
 
         ExecuteCommand(TableDataType.Command_AddColumnByName, first.StringContent, ChangeFlags.IgnoreFreeze);
         return this[first.StringContent];
+    }
+
+    /// <summary>
+    /// Entfernt nach dem Übernehmen einer geladenen Spalten-Liste alle Spalten,
+    /// die nicht darin stehen (Überbleibsel beim Nachladen in eine gefüllte Instanz).
+    /// </summary>
+    protected override bool ApplyLoadedItems(ReadOnlyCollection<ColumnItem> items) {
+        RemoveObsoleteColumns(this, [.. items.Select(i => i.KeyName)], ChangeFlags.IgnoreFreeze);
+        return true;
     }
 
     public void DisableAllEditing() {
@@ -186,8 +190,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             thisColumn.DisableAllEditing();
         }
     }
-
-    public void Dispose() => Dispose(true);
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, format, string.Empty);
 
@@ -241,10 +243,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             }
         }
     }
-
-    IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
-
-    public IEnumerator<ColumnItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     public void GetSystems() {
         SysLocked = null;
@@ -328,22 +326,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    /// <summary>
-    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
-    /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
-
-        FragmentChanged?.Invoke(this, e);
-    }
-
-    /// <summary>
-    /// Reicht eine Spalten-Änderung mit dem eigenen Pfad-Segment (SubColumn, ColumnKey der Spalte) eine Ebene höher.
-    /// </summary>
-    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
-        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(ColumnCollectionFragmentType.SubColumn, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-    }
-
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
                                                                                 && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, UserName, DateTime.UtcNow, comment, ChangeFlags.UserCommand));
 
@@ -419,7 +401,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     /// Schreibt alle Spalten als Liste in der Speicherreihenfolge: ein ColumnList-
     /// Satz, darunter je Spalte der Spalten-Block eine Ebene tiefer (ColumnKey zuerst).
     /// </summary>
-    public bool SerializeCore(Stream stream, int depth) {
+    public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
         // SaveOrder statt Collection-Enumeration: Die Enumerationsordnung des
@@ -453,7 +435,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return sb.ToString();
     }
 
-    internal string ChangeKey(string oldKey, string newKey) {
+    public override string ChangeKey(string oldKey, string newKey) {
+        oldKey = oldKey.ToUpperInvariant();
+        newKey = newKey.ToUpperInvariant();
+
         if (oldKey == newKey) { return string.Empty; }
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
@@ -464,19 +449,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Wiedereinspiel-Artefakt (Zelldaten liegen in den Zeilen, nicht in der
         // Spalte) und wird entfernt. Damit ist die Umbenennung idempotent.
         if (this[newKey] is { IsDisposed: false }) {
-            if (_internal.TryRemove(oldKey.ToUpperInvariant(), out var artifact) && artifact is { IsDisposed: false }) {
+            if (this[oldKey] is { IsDisposed: false } artifact) {
+                _ = Remove(oldKey);
                 artifact.Dispose();
             }
             return string.Empty;
         }
 
-        var ok = _internal.TryRemove(oldKey.ToUpperInvariant(), out var value);
-        if (!ok || value is null) { return string.Empty; }
-
-        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
-        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
-
-        return string.Empty;
+        return base.ChangeKey(oldKey, newKey);
     }
 
     internal void CopyTo(ColumnCollection target) {
@@ -498,7 +478,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 target.GenerateAndAdd(sourceColumn.KeyName, sourceColumn.Caption, null, sourceColumn.QuickInfo);
 
             if (l is not null) {
-                sourceColumn.CopyTo(l, true);
+                _ = l.Update(sourceColumn);
 
                 if (l.KeyName != sourceColumn.KeyName) {
                     Develop.DebugError("Name nicht korrekt!");
@@ -523,10 +503,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             column = new ColumnItem(Table, name);
 
             if (this[column.KeyName] is not null) { return "Hinzufügen fehlgeschlagen."; }
-            if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
-
-            // Spalte als Fragment-Kind verdrahten (Crumb = SubColumn, Key = ColumnKey)
-            this.Register(column);
+            if (!Add(column)) { return "Hinzufügen fehlgeschlagen."; }
 
             GetSystems();
 
@@ -540,9 +517,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c is null) { return "Spalte nicht gefunden!"; }
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
-            if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
-
-            this.Unregister(c);
+            if (!Remove(name)) { return "Löschen nicht erfolgreich"; }
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) { OnColumnRemoved(); }
 
@@ -560,19 +535,16 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Column_Disposed(object? sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.Disposed -= Column_Disposed;
-            this.Unregister(c);
-            _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
+            _ = Remove(c.KeyName);
             OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }
     }
 
-    private void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
 
         if (disposing) {
-            OnDisposed();
-            Disposed = null;
             ColumnAdded = null;
             ColumnDisposed = null;
             ColumnPropertyChanged = null;
@@ -580,13 +552,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             ColumnRemoving = null;
 
             Table = null;
-
-            foreach (var kvp in _internal) {
-                kvp.Value?.Dispose();
-            }
         }
 
-        _internal.Clear();
+        base.Dispose(disposing);
     }
 
     private string Freename(string preferedName) {
@@ -620,8 +588,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         c?.ResetSystemToDefault(true);
     }
 
-    private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
-
     private void OnColumnAdded(ColumnEventArgs e) {
         e.Column.PropertyChanged += OnColumnPropertyChanged;
         e.Column.Disposed += Column_Disposed;
@@ -641,8 +607,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         e.Column.Disposed -= Column_Disposed;
         ColumnRemoving?.Invoke(this, e);
     }
-
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

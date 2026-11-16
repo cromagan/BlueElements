@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueTable.EventArgs;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
-public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable, IFragmentStoreable {
+public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     /// <summary>
     /// Fehlergrund einer fehlgeschlagenen Zeile samt Zeitpunkt des Fehlschlags.
     /// </summary>
@@ -35,7 +34,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         /// ListKeyObject-Satz: die Zeilen folgen als Liste eine Ebene tiefer,
         /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
         /// </summary>
-        RowList = 211
+        RowList = 211,
+
+        /// <summary>
+        /// Blatt-Satz: übernimmt eine ganze neue Zeile im Classic-Format
+        /// (Content = Parseable-String der Zeile).
+        /// </summary>
+        RowAdd = 212,
+
+        /// <summary>
+        /// Blatt-Satz: entfernt die Zeile des Journal-Blocks (Nav-Schlüssel).
+        /// </summary>
+        RowRemove = 213
     }
 
     #endregion
@@ -49,10 +59,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static readonly List<BackgroundWorker> Pendingworker = [];
 
     private static int _executingchangedrows;
-
-    private readonly ConcurrentDictionary<string, RowItem> _internal = [];
-
-    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -71,8 +77,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #endregion
 
     #region Events
-
-    public event EventHandler? Disposed;
 
     public event EventHandler<RowEventArgs>? RowAdded;
 
@@ -105,10 +109,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public static int WaitDelay { get; set; }
 
-    public int Count => _internal.Count;
-
-    public bool IsDisposed => _isDisposedFlag == 1;
-
     public Table? Table {
         get;
         private set {
@@ -130,7 +130,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen Primärschlüssel.
     /// </summary>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-    public RowItem? this[string primärSchlüssel] {
+    public new RowItem? this[string primärSchlüssel] {
         get {
             if (primärSchlüssel is not { Length: > 0 }) { return null; }
             if (Table is not { IsDisposed: false }) { return null; }
@@ -140,7 +140,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (Table.BeSureRowIsLoaded(primärSchlüssel, false).IsFailed) { return null; }
             }
 
-            foreach (var thisRow in _internal.Values) {
+            foreach (var thisRow in this) {
                 if (thisRow is null) { continue; }
                 var cellValue = thisRow.CellGetStringCore(c);
                 if (string.Equals(cellValue, primärSchlüssel, StringComparison.OrdinalIgnoreCase)) {
@@ -577,13 +577,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.SuccessTrue;
     }
 
-    public void Dispose() {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
+    public RowItem? First() => this.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
     /// <summary>
     /// Erstellt eine neue Zeile inkl. Initialwerten aus den Filterkriterien. Nur IstGleich-Filter werden unterstützt.
@@ -729,25 +723,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).Value as RowItem;
     }
 
-    public RowItem? GetByKey(string? key) {
-        if (Table is not { IsDisposed: false } || string.IsNullOrWhiteSpace(key)) { return null; }
-        try {
-            var r = _internal.TryGetValue(key, out var value) ? value : null;
-            if (r is { IsDisposed: true }) {
-                Develop.DebugError("Interner Zeilenfehler: " + key);
-                return null;
-            }
+    public override RowItem? GetByKey(string? keyName) {
+        if (Table is not { IsDisposed: false }) { return null; }
 
-            return r;
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return GetByKey(key);
-        }
+        return base.GetByKey(keyName);
     }
-
-    public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
     public void InvalidateAllCheckData() {
         try {
@@ -909,25 +889,31 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void CopyTo(RowCollection target) {
-        if (target.Count > 0) {
-            Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
-        }
-
         if (target.Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var sourceRow in this) {
-            if (sourceRow is not { IsDisposed: false }) { continue; }
+        // Bulk-Vorgang: Keine SortIndex-Rückungen und keine Events pro Einzelzeile —
+        // ohne das wäre jede Löschung eine O(n)-Rückung und jede Rückung eine
+        // O(n)-Kettenreaktion (bei großen Tabellen Stunden). Die Quelle liefert
+        // vollständige Nummern und wird zellenweise im Speicher übernommen.
+        tb.SuppressEvents();
+        try {
+            if (target.Count > 0) {
+                Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
+            }
 
-            // Original-Key übernehmen: Die Ziel-Collection ist zuvor geleert worden,
-            // neue Timestamp-Keys würden die Row-Reihenfolge und die RowKey-Bezüge
-            // der Undo-History verfälschen.
-            var targetRow = new RowItem(tb, sourceRow.KeyName);
-            if (!target._internal.TryAdd(targetRow.KeyName, targetRow)) { continue; }
+            foreach (var sourceRow in this) {
+                if (sourceRow is not { IsDisposed: false }) { continue; }
 
-            // Zeile als Fragment-Kind verdrahten (Crumb = SubRow, Key = RowKey)
-            target.Register(targetRow);
+                // Original-Key übernehmen: Die Ziel-Collection ist zuvor geleert worden,
+                // neue Timestamp-Keys würden die Row-Reihenfolge und die RowKey-Bezüge
+                // der Undo-History verfälschen.
+                var targetRow = new RowItem(tb, sourceRow.KeyName);
+                if (!target.Add(targetRow)) { continue; }
 
-            sourceRow.CopyTo(targetRow, tb.Column);
+                sourceRow.CopyTo(targetRow, tb.Column);
+            }
+        } finally {
+            tb.ResumeEvents();
         }
     }
 
@@ -941,10 +927,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             row = new RowItem(tb, rowkey);
 
-            if (!_internal.TryAdd(row.KeyName, row)) { return OperationResult.Failed("Hinzufügen fehlgeschlagen."); }
-
-            // Zeile als Fragment-Kind verdrahten (Crumb = SubRow, Key = RowKey)
-            this.Register(row);
+            if (!Add(row)) { return OperationResult.Failed("Hinzufügen fehlgeschlagen."); }
 
             if (reason.HasFlag(ChangeFlags.RaiseEvents)) {
                 OnRowAdded(new RowEventArgs(row));
@@ -982,15 +965,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             }
 
-            if (!_internal.TryRemove(row.KeyName, out _)) { return OperationResult.Failed("Löschen nicht erfolgreich"); }
-
-            // Bubbling der entfernten Zeile abmelden, bevor sie verworfen wird
-            this.Unregister(row);
+            if (!Remove(row.KeyName)) { return OperationResult.Failed("Löschen nicht erfolgreich"); }
 
             row.Dispose();
 
             // Benutzerdefinierte Sortierung: die Lücke der gelöschten Zeile schließen.
-            if (!string.IsNullOrEmpty(sortOld)) {
+            // Bei unterdrückten Events (Bulk-Vorgänge wie CopyTo) entfällt die Rückung —
+            // der Aufrufer übernimmt die vollständigen Nummern der Quelle.
+            if (!string.IsNullOrEmpty(sortOld) && !tb.IsEventsSuppressed) {
                 tb.NormalizeSortIndexRows(null, sortOld, string.Empty, "Zeile gelöscht");
             }
 
@@ -1001,11 +983,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.Failed("Befehl unbekannt");
     }
 
-    internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
-
     internal void Repair() {
-        foreach (var thisR in _internal) {
-            thisR.Value.Repair();
+        foreach (var thisRow in this) {
+            thisRow.Repair();
         }
     }
 
@@ -1037,26 +1017,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
-    private void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
 
         if (disposing) {
-            OnDisposed();
-            Disposed = null;
             Table = null;
-            Parallel.ForEach(_internal.Values, row => row.Dispose());
             RowAdded = null;
             RowChecked = null;
             RowRemoved = null;
             RowRemoving = null;
         }
 
-        try {
-            _internal.Clear();
-        } catch { }
+        base.Dispose(disposing);
     }
-
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
@@ -1082,39 +1055,64 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region FragmentChanged
 
     /// <summary>
-    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
-    /// </summary>
-    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
-
-    /// <summary>
     /// Schreibt alle Zeilen als Liste nach RowKey sortiert: ein RowList-Satz,
     /// darunter je Zeile der Zeilen-Block eine Ebene tiefer (RowKey zuerst).
     /// </summary>
-    public bool SerializeCore(Stream stream, int depth) {
+    public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
-        List<RowItem> saveRows = [.. this.OrderBy(r => r.KeyName)];
+        List<RowItem> saveRows = ToList();
         saveRows.RemoveAll(row => row is not { IsDisposed: false });
 
         return FragmentRecord.Append(stream, depth, RowCollectionFragmentType.RowList, saveRows);
     }
 
     /// <summary>
-    /// Verarbeitet den Zeilen-Block: Der RowList-Satz liest die Zeilen als Liste;
-    /// je Segment benennt der RowKey-Satz die Zeile.
+    /// Die Liste unter dem RowList-Satz.
     /// </summary>
-    public bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (IsDisposed) { return false; }
+    protected override Enum ListType => RowCollectionFragmentType.RowList;
 
-        switch ((RowCollectionFragmentType)record.LeafType) {
-            case RowCollectionFragmentType.RowList:
-                // Zeilen als Liste: je Segment eine Zeile (RowKey-Satz zuerst)
-                return FragmentStoreableExtension.DeserializeList(stream, record.Depth, RowCreateOrGet) is not null;
+    /// <summary>
+    /// Aufnahmen einer ganzen Classic-Zeile.
+    /// </summary>
+    protected override Enum AddItemType => RowCollectionFragmentType.RowAdd;
 
-            default:
-                // Unbekannter Blatt-Typ — Satz überspringen
-                return true;
+    /// <summary>
+    /// Entfernungen per Journal-Block.
+    /// </summary>
+    protected override Enum RemoveItemType => RowCollectionFragmentType.RowRemove;
+
+    /// <summary>
+    /// Pfad-Segment des Bubbling.
+    /// </summary>
+    protected override Enum ItemSubType => RowCollectionFragmentType.SubRow;
+
+    /// <summary>
+    /// Liefert die Zeile zum Schlüssel; fehlt sie, wird sie still angelegt
+    /// (Journal kann vor der Aufnahme eintreffen).
+    /// </summary>
+    protected override RowItem? GetOrCreateItem(string keyName) => RowCreateOrGet(keyName);
+
+    /// <summary>
+    /// Reicht eine Zeilen-Änderung eine Ebene höher und stempelt zuvor den Chunk
+    /// der betroffenen Zeile als zuletzt verwendet.
+    /// </summary>
+    public override void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        if (Table is { IsDisposed: false } tb && GetByKey(FragmentChangedEventArgs.SenderKey(sender)) is { IsDisposed: false } row) {
+            tb.TouchChunk(row.ChunkValue);
         }
+
+        base.ChildFragmentChanged(sender, e);
+    }
+
+    /// <summary>
+    /// Stempelt den Chunk der neuen Zeile als zuletzt verwendet und reicht die
+    /// Aufnahme eine Ebene höher.
+    /// </summary>
+    protected override void OnItemAdded(RowItem item) {
+        if (Table is { IsDisposed: false } tb && item is { IsDisposed: false }) { tb.TouchChunk(item.ChunkValue); }
+
+        base.OnItemAdded(item);
     }
 
     /// <summary>
@@ -1134,23 +1132,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Liefert die Zeile zum RowKey des ersten Segment-Satzes einer Zeilen-Liste;
     /// fehlende Zeilen werden angelegt.
     /// </summary>
-    public RowItem? RowCreateOrGet(FragmentRecord first) => RowCreateOrGet(first.StringContent);
-
-    /// <summary>
-    /// Reicht eine Zeilen-Änderung mit dem eigenen Pfad-Segment (SubRow, RowKey der Zeile) eine Ebene höher.
-    /// </summary>
-    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
-        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(RowCollectionFragmentType.SubRow, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-    }
-
-    /// <summary>
-    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
-    /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
-
-        FragmentChanged?.Invoke(this, e);
-    }
+    protected override RowItem? CreateItem(FragmentRecord first) => RowCreateOrGet(first.StringContent);
 
     #endregion
 }

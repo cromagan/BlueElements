@@ -2,7 +2,6 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
@@ -76,6 +75,16 @@ public class TableFile : Table {
 
     private int _checkerTickCount = -5;
 
+    /// <summary>
+    /// Sperre für alle Zugriffe auf die Undo-Historie dieser Datei.
+    /// </summary>
+    internal readonly object _undoLock = new();
+
+    /// <summary>
+    /// Zuletzt vergebener Zeitstempel für Undo-Log-Einträge; garantiert eindeutigen Millisekunden-Abstand.
+    /// </summary>
+    private DateTime _lastChangeUtc = DateTime.MinValue;
+
     #endregion
 
     #region Constructors
@@ -95,7 +104,7 @@ public class TableFile : Table {
         GenerateTableUpdateTimer();
         InitialSavePending = true;
         SaveRequired = true;
-        source?.CopyTo(this);
+        if (source is not null) { _ = Update(source); }
     }
 
     #endregion
@@ -110,11 +119,15 @@ public class TableFile : Table {
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
-    /// True, wenn die Tabelle binäre Fragment-Sätze schreibt und liest (.nbdb, .fbdb);
-    /// sonst werden Classic-Chunks geschrieben und gelesen. TableTimestamp überschreibt
-    /// dies: Ihre Snapshots (.tbls) sind immer binär, die .tblt selbst ist eine Dummy-Datei.
+    /// Klassische Undo-Historie der Datei (legacy): wird beim Speichern in die
+    /// Undo-Chunks geschrieben und beim Laden wieder eingelesen.
     /// </summary>
-    protected virtual bool IsBinaryFormat => Filename.FileSuffix().ToLowerInvariant() is "nbdb" or "fbdb";
+    public List<UndoItem> Undo { get; } = [];
+
+    /// <summary>
+    /// Steuert, ob Änderungen in die klassische Undo-Historie aufgenommen werden.
+    /// </summary>
+    public bool LogUndo { get; set; } = true;
 
     /// <summary>
     /// Gibt an, ob die Tabelle vor kurzem aktiv verwendet wurde und daher
@@ -140,9 +153,9 @@ public class TableFile : Table {
         }
     }
 
-    public virtual bool MasterNeeded => false;
+    public override bool MasterNeeded => false;
 
-    public virtual bool MultiUserPossible => false;
+    public override bool MultiUserPossible => false;
 
     /// <summary>
     /// Markiert die initiale Speicherung als abgeschlossen. Muss von SaveInternal-Ableitungen
@@ -175,11 +188,12 @@ public class TableFile : Table {
                 data = rawBytes;
             }
 
-            if (data.Length < 8) { return false; }
+            if (data.Length < 9) { return false; }
 
             if (data[0] == 0x09) {
-                // 255-EOF-Satz: ... 0x20, valueId 0xFF, 4 Längen-Bytes (leerer Content), 0x0D
-                return data[^6] == 0xFF
+                // 255-EOF-Satz: ... 0x20, valueId 0xFF, Content-Typ, 4 Längen-Bytes (leerer Content), 0x0D
+                return data[^7] == 0xFF
+                    && data[^6] <= FragmentRecord.MaxUserTypeValue
                     && data[^5] == 0x00
                     && data[^4] == 0x00
                     && data[^3] == 0x00
@@ -282,37 +296,13 @@ public class TableFile : Table {
             }
         }
 
-        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "fbdb", "mbdb", "tblh", "tblt" };
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "mbdb", "tblh" };
         return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
     /// <summary>
-    /// Prüft, ob diese Instanz der registrierte Master der Tabelle ist.
-    /// Der Master-Eintrag muss mindestens <paramref name="ranges"/> Minuten alt sein (Propagations-Schutz),
-    /// und älter als <paramref name="rangee"/> Minuten zählt er als abgelaufen.
+    /// Prüft, warum die Tabelle aktuell nicht editierbar ist.
     /// </summary>
-    /// <param name="ranges">Mindestalter des Master-Eintrags in Minuten, ab dem er vertraut wird.</param>
-    /// <param name="rangee">Maximalalter des Master-Eintrags in Minuten, bis dem er gilt.</param>
-    /// <param name="updateAllowed">True lädt den Master-Status zuvor von der Festplatte.</param>
-    /// <returns></returns>
-    public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
-        if (!MultiUserPossible) { return true; }
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
-
-        if (TemporaryTableMasterUser != UserName) { return false; }
-        if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
-
-        var d = DateTimeParse(TemporaryTableMasterTimeUtc);
-        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
-
-        ranges = Math.Max(ranges, 0);
-
-        // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
-        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return mins > ranges && mins < rangee;
-    }
-
     public override string IsGenericEditable(bool isloading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
@@ -501,26 +491,6 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
-    /// </summary>
-    public void TryToSetMeTemporaryMaster() {
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
-        if (!NewMasterPossible()) { return; }
-        MasterMe();
-    }
-
-    public void UnMasterMe() {
-        EndLog($"UnMasterMe '{KeyName}': START");
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
-            if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
-                TemporaryTableMasterUser = "Unset: " + UserName;
-                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
-            }
-        }
-        EndLog($"UnMasterMe '{KeyName}': ENDE");
-    }
-
-    /// <summary>
     /// Erzeugt den kompletten Datei-Inhalt einer Tabelle (Head-Daten, Spalten,
     /// Zeilen, Historie, EOF). Reihenfolge ist für den Parser irrelevant —
     /// er verarbeitet jeden Datentyp unabhängig.
@@ -541,36 +511,19 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    /// Erzeugt den zu speichernden Datei-Inhalt; binäre Fragment-Formate (.nbdb, .fbdb)
-    /// schreiben Fragment-Sätze (Versions-Satz, Tabellen-Baum inkl. Undo-Sektion, EOF),
-    /// sonst die Classic-Chunks.
+    /// Erzeugt den kompletten Datei-Inhalt einer Tabelle (Head-Daten, Spalten,
+    /// Zeilen, Historie, EOF). Reihenfolge ist für den Parser irrelevant —
+    /// er verarbeitet jeden Datentyp unabhängig.
     /// </summary>
-    protected virtual List<byte> GenerateContentToSave() {
-        if (!IsBinaryFormat) { return GenerateFullContent(this); }
-
-        using var ms = new MemoryStream();
-
-        // System-Bytes, kompletter Tabellenstand inkl. Undo-Sektion und EOF über Serialize
-        var allok = true;
-        allok &= this.Serialize(ms, 1);
-
-        if (!allok) {
-            Freeze("Hauptdatei: Satz zu groß oder ungültig — Speicherung abgebrochen");
-            return [];
-        }
-
-        return [.. ms.ToArray()];
-    }
+    protected virtual List<byte> GenerateContentToSave() => GenerateFullContent(this);
 
     /// <summary>
     /// Mindestgröße des Datei-Inhalts; schützt vor korrupten Re-Saves (z. B. wenn
     /// durch einen Fehler kaum Daten generiert werden). Beim initialen Save einer
     /// neuen, leeren Tabelle ist der Inhalt legitim klein und darf nicht zum Freeze
-    /// führen — sonst wäre die neue Tabelle sofort blockiert. Fragment-Sätze sind
-    /// deutlich kompakter als die Classic-Chunks, daher gilt für das Binärformat
-    /// ein kleinerer Schwellwert.
+    /// führen — sonst wäre die neue Tabelle sofort blockiert.
     /// </summary>
-    protected virtual int MinimumContentSize => IsBinaryFormat ? 200 : 1200;
+    protected virtual int MinimumContentSize => 1200;
 
     protected static string SaveFullFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
@@ -605,14 +558,121 @@ public class TableFile : Table {
         return string.Empty;
     }
 
+    #region Undo (klassisch)
+
+    /// <summary>
+    /// Setzt einen Wert und führt bei LogUndo die klassische Undo-Aufzeichnung aus:
+    /// Der Zeitstempel wird vor der Pipeline auf eindeutigen Abstand gebracht, nach
+    /// Erfolg landet die Änderung in der Undo-Historie.
+    /// </summary>
+    public override string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, ChangeFlags reason) {
+        // Spaltennamen VOR der Änderung sichern: Bei Umbenennungen ändert der
+        // Basis-Durchlauf den Schlüssel, der Undo-Eintrag zeigt auf den alten.
+        var colName = column?.KeyName ?? string.Empty;
+
+        // Logische Uhr: Einmalig vor der gesamten Pipeline (Speicher, Undo) auf eindeutigen
+        // Abstand bringen, damit alle Undo-Einträge denselben Zeitstempel erhalten.
+        if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
+            datetimeutc = UndoStampUtc(datetimeutc);
+        }
+
+        var error = base.ChangeData(type, column, row, previousValue, changedTo, user, datetimeutc, comment, reason);
+
+        if (!string.IsNullOrEmpty(error) || !LogUndo || !reason.HasFlag(ChangeFlags.LogUndo)) { return error; }
+
+        AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]");
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Nachbereitung des Tabellenstands-Übernehmens: Die klassische Undo-Historie
+    /// wird übertragen, wenn die Quelle ebenfalls dateibasiert ist.
+    /// </summary>
+    protected internal override void OnUpdateCompleted(Table sourceTable) {
+        if (sourceTable is not TableFile sourceFile) { return; }
+
+        // Muss NACH dem Kopieren laufen: Die Setter-Aufrufe des Kopierens erzeugen
+        // Undo-Einträge, die hier komplett durch die Undo-History der Quelle
+        // ersetzt werden.
+        List<UndoItem> undoSnapshot;
+        lock (sourceFile._undoLock) {
+            undoSnapshot = [.. sourceFile.Undo];
+        }
+
+        lock (_undoLock) {
+            Undo.Clear();
+            foreach (var thisUndo in undoSnapshot) {
+                if (thisUndo is null) { continue; }
+
+                // Nur Einträge des Ziel-Tabellennamens übernehmen: Bei Formatwandlung
+                // unter gleichem Namen bleibt die Historie erhalten, bei einer Kopie
+                // unter neuem Namen startet die Datei mit eigener, leerer Historie.
+                // InjectData würde fremd benannte Einträge ohnehin überspringen.
+                if (!string.Equals(thisUndo.TableName, KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
+
+                Undo.Add(new UndoItem(thisUndo.ParseableItems().FinishParseable()));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Setzt einen Wert; Undo-Chunk-Sätze des Classic-Formats landen direkt in der Historie.
+    /// </summary>
+    internal protected override string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, string comment, ChangeFlags changeFlags) {
+        if (type == TableDataType.Undo) {
+            if (IsDisposed) { return "Tabelle verworfen!"; }
+            AddLoadedUndo(new UndoItem(value));
+            return string.Empty;
+        }
+
+        return base.SetValueInternal(type, column, row, value, user, datetimeutc, comment, changeFlags);
+    }
+
+    /// <summary>
+    /// Nimmt eine Änderung in die klassische Undo-Historie auf; sie wird beim
+    /// Speichern in die Undo-Chunks geschrieben.
+    /// </summary>
+    private void AddUndo(TableDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container) {
+        if (IsDisposed) { return; }
+        if (type.IsObsolete()) { return; }
+        if (type == TableDataType.SystemValue) { return; }
+
+        lock (_undoLock) {
+            Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
+        }
+    }
+
+    /// <summary>
+    /// Nimmt ein beim Laden gelesenes Undo-Item in die Historie auf.
+    /// </summary>
+    private void AddLoadedUndo(UndoItem item) {
+        lock (_undoLock) {
+            Undo.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// Logische Uhr: garantiert eindeutigen Millisekunden-Abstand für Undo-Einträge.
+    /// </summary>
+    private DateTime UndoStampUtc(DateTime datetimeutc) {
+        lock (_undoLock) {
+            var t = datetimeutc;
+            if (t <= _lastChangeUtc) { t = _lastChangeUtc.AddMilliseconds(1); }
+            _lastChangeUtc = t;
+            return t;
+        }
+    }
+
+    #endregion
+
     protected override void Checker_Tick(object? state) {
         base.Checker_Tick(state);
 
         if (!SaveRequired || !LogUndo || !string.IsNullOrEmpty(IsGenericEditable(false))) {
             _checkerTickCount = 0;
             return;
-        }
-
+        }        
         _checkerTickCount++;
         _checkerTickCount = Math.Min(_checkerTickCount, 5000);
 
@@ -650,6 +710,11 @@ public class TableFile : Table {
             UnMasterMe();
 
             try {
+                // Listen leeren
+                lock (_undoLock) {
+                    Undo.Clear();
+                }
+
                 // Auf laufende Speichervorgänge warten, BEVOR die Semaphore disposed wird.
                 if (_saveSemaphore.Wait(30000)) {
                     _saveSemaphore.Release();
@@ -677,9 +742,7 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    /// Lädt die Hauptdaten; binäre Inhalte (beginnen mit einem Fragment-Satz) werden
-    /// blockweise über IFragmentStoreable.Deserialize gelesen, Classic-Inhalte über
-    /// den Classic-Parser.
+    /// Lädt die Hauptdaten über den Classic-Parser.
     /// </summary>
     protected virtual bool LoadMainData() {
         var chunk = Chunk.Get(Filename);
@@ -691,25 +754,7 @@ public class TableFile : Table {
 
         var data = chunk.LoadContent();
 
-        if (data is { Length: > 0 } && data[0] == 0x09) {
-            using var ms = new MemoryStream(data);
-
-            FragmentLoadedColumns.Clear();
-
-            // Objekt-Baum inklusive Undo-Historie bis zum Datei-Ende
-            if (!this.Deserialize(ms, 1)) {
-                Freeze("Parsen fehlgeschlagen!");
-                return false;
-            }
-
-            FinishMainParse(true, FragmentLoadedColumns);
-
-            return true;
-        }
-
-        var ok = Parse(data, true, null);
-
-        if (!ok) {
+        if (!Parse(data, true, null)) {
             Freeze("Parsen fehlgeschlagen!");
             return false;
         }
@@ -760,7 +805,7 @@ public class TableFile : Table {
         var suffixTypes = BuildSuffixTypeMap();
 
         if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .nbdb, .fbdb, .mbdb, .tblh, .tblt");
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .nbdb, .mbdb, .tblh");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -793,10 +838,8 @@ public class TableFile : Table {
     private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
         [".bdb"] = typeof(TableFile),
         [".nbdb"] = typeof(TableFile),
-        [".fbdb"] = typeof(TableFragmentsNew),
         [".mbdb"] = typeof(TableFragments),
-        [".tblh"] = typeof(TableChunk),
-        [".tblt"] = typeof(TableTimestamp)
+        [".tblh"] = typeof(TableChunk)
     };
 
     private static void GenerateTableUpdateTimer() {
@@ -833,44 +876,6 @@ public class TableFile : Table {
         }
 
         BeSureToBeUpToDate(filtered);
-    }
-
-    private bool NewMasterPossible() {
-        if (!IsAdministrator()) { return false; }
-
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
-
-        // Master wurde bewusst freigegeben (UnMasterMe) — ein neuer Master darf sofort übernehmen.
-        if (TemporaryTableMasterUser.Contains("Unset")) { return true; }
-
-        if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
-            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }
-            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
-        }
-
-        if (RowCollection.WaitDelay > 90) { return true; }
-
-        if (MasterNeeded) { return true; }
-
-        try {
-            var masters = 0;
-            List<Table> snapshot;
-            lock (AllFilesLocker) {
-                snapshot = [.. LiveInstances.Values];
-            }
-
-            foreach (var thisTb in snapshot) {
-                if (thisTb is TableFile { IsDisposed: false, MultiUserPossible: true } tbf &&
-                    tbf.AmITemporaryMaster(MasterBlockedMin, MasterCount, false)) {
-                    masters++;
-                    if (masters >= MaxMasterCount) { return false; }
-                }
-            }
-        } catch {
-            return false;
-        }
-
-        return true;
     }
 
     #endregion

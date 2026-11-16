@@ -19,112 +19,21 @@ using static BlueScript.Classes.Script;
 
 namespace BlueTable.Classes;
 
+/// <summary>
+/// Legacy-Basisklasse einer Tabelle: reiner In-Memory-Stand mit dem klassischen
+/// Binärformat (Parse/Routinen). Undo und Dateizugriff liegen bei TableFile;
+/// das binäre Fragment-Format (SerializeCore/DeserializeThis/FragmentChanged)
+/// implementiert die Klasse selbst, die Ableitung TableFileNew hängt die
+/// Datei-Verwaltung (SaveableFile) daran an.
+/// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IHasKeyName, IHasScript, IEditable, IFragmentStoreable {
-
-    #region Enums
-
-    /// <summary>
-    /// Empfänger- und Pfad-Typen der Table im binären Fragment-Format „Typ + Key“;
-    /// spiegelt die Nummernkreise von TableDataType (Werte ≤ 230). Nur der Table
-    /// selbst bekannt. Die Sub*-Werte (90-96) sind reine Navigations-Paare: Sie
-    /// steigen in Spalten, Unique-Definitionen, Skripte, Kopf-Variablen, Ansichten
-    /// und die Sortier-Definition hinab.
-    /// </summary>
-    protected enum TableFragmentType : byte {
-
-        /// <summary>
-        /// Navigation in eine Spalte (Key = ColumnKey).
-        /// </summary>
-        Columns = 90,
-
-        /// <summary>
-        /// Nav-Satz je Undo-Eintrag (Content leer); der Block des Eintrags —
-        /// klassischer Satz oder Sub*-Block — folgt eine Ebene tiefer.
-        /// </summary>
-        UndoHistory = 91,
-
-        /// <summary>
-        /// Navigation in eine Unique-Wert-Definition (Key = KeyName der Definition).
-        /// </summary>
-        UniqueDefinitions = 92,
-
-        /// <summary>
-        /// Navigation in ein Tabellen-Skript (Key = Skriptname).
-        /// </summary>
-        Scripts = 93,
-
-        /// <summary>
-        /// Navigation in die Kopf-Variablen (leerer Key).
-        /// </summary>
-        VariableCollection = 94,
-
-        /// <summary>
-        /// Navigation in die Zeilen (leerer Key); der Block enthält je Zeile
-        /// einen SubRow-Satz.
-        /// </summary>
-        Rows = 97,
-
-        /// <summary>
-        /// Navigation in eine Spaltenanordnung (Key = KeyName der Ansicht).
-        /// </summary>
-        ColumnArrangements = 95,
-
-        /// <summary>
-        /// Navigation in die Sortier-Definition (leerer Key).
-        /// </summary>
-        SortDefinition = 96,
-
-        TableVersion = 1,
-
-        TemporaryTableMasterTimeUTC = 4,
-
-        TemporaryTableMasterUser = 5,
-
-        TemporaryTableMasterMachine = 6,
-
-        TemporaryTableMasterApp = 7,
-
-        TemporaryTableMasterId = 8,
-
-        Creator = 10,
-
-        CreateDateUTC = 11,
-
-        Caption = 13,
-
-        Tags = 18,
-
-        GlobalShowPass = 21,
-
-        PermissionGroupsNewRow = 31,
-
-        TableAdminGroups = 38,
-
-        RowQuickInfo = 66,
-
-        AssetFolder = 68,
-
-        StandardFormulaFile = 69,
-
-        EventScriptVersion = 72,
-
-        DictionaryWords = 83,
-
-        SymbolFolder = 84,
-
-        CliRights = 85
-    }
-
-    #endregion
+public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IFragmentStoreable, IHasKeyName, IHasScript, IEditable {
 
     #region Fields
 
     public const string KeyShortSuccessMessage = "ShortSuccessMessage";
 
     public const string TableVersion = "4.11";
-
-    internal readonly object _undoLock = new();
 
     private static List<string> _allavailableTables = [];
 
@@ -139,19 +48,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
-
-    /// <summary>
-    /// Kopf-Variablen der Tabelle; wird über die SubVariableCollection-Navigation
-    /// als eigenes Fragment-Unter-Objekt gespeichert.
-    /// </summary>
-    private readonly VariableCollection _variables = [];
-
     private string _assetFolder;
 
     private string _caption = string.Empty;
     private bool? _changesRowColor;
     private Timer? _checker;
-    private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
     private string _createDate;
     private string _creator;
 
@@ -160,32 +61,21 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     private int _dataReloadPaused;
 
-    private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
+    private readonly TableScriptCollection _eventScript;
     private DateTime _eventScriptVersion = DateTime.MinValue;
     private string _globalShowPass = string.Empty;
     private bool? _hasPrepareFormulaScript;
     private bool? _hasValueChangedScript;
     private volatile int _isDisposedFlag;
 
-    /// <summary>
-    /// Zuletzt vergebener Zeitstempel für Undo-Log-Einträge; garantiert eindeutigen Millisekunden-Abstand.
-    /// </summary>
-    private DateTime _lastChangeUtc = DateTime.MinValue;
-
     private bool? _mayAffectUser;
     private DateTime _powerEditTime = DateTime.MinValue;
     private string _rowQuickInfo = string.Empty;
-    private RowSortDefinition? _sortDefinition;
 
     /// <summary>
     /// Die Formulardatei, die standardmäßig zu dieser Tabelle gehört.
     /// </summary>
     private string _standardFormulaFile = string.Empty;
-
-    /// <summary>
-    /// Zähler für SuppressEvents/ResumeEvents. Bei &gt; 0 werden keine Events ausgelöst.
-    /// </summary>
-    private int _suppressEvents;
 
     private string _symbolFolder = string.Empty;
     private string _temporaryTableMasterApp = string.Empty;
@@ -200,7 +90,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private int _timerPaused;
 
-    private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
+    private readonly UniqueValueCollection _uniqueValues;
 
     private string _variableTmp;
 
@@ -222,12 +112,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             Cell = new CellCollection(this);
             Row = new RowCollection(this);
             Column = new ColumnCollection(this);
+            _eventScript = new TableScriptCollection(this);
+            _uniqueValues = new UniqueValueCollection(this);
+            _columnArrangements = new ColumnArrangementCollection(this);
 
             Column.ColumnDisposed += Column_ColumnChanged;
             Column.ColumnRemoving += Column_ColumnChanged;
-
-
-            Undo = [];
 
             _creator = UserName;
             _createDate = DateTime.UtcNow.ToString9();
@@ -235,17 +125,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _assetFolder = "Assets";
             _symbolFolder = "Symbole";
             _variableTmp = string.Empty;
-
-            // Kopf-Variablen als Fragment-Kind verdrahten (Crumb = SubVariableCollection, leerer Key)
-            this.Register(_variables);
-
-            // Spalten-Sammlung durchreichen: Die Sammlung verdrahtet ihre Spalten
-            // selbst mit dem SubColumn-Crumb, die Tabelle ergänzt kein eigenes Segment.
-            this.Register(Column);
-
-            // Zeilen-Sammlung durchreichen: Die Sammlung verdrahtet ihre Zeilen
-            // selbst mit dem SubRow-Crumb, die Tabelle ergänzt kein eigenes Segment.
-            this.Register(Row);
 
             // Muss vor dem Laden der Daten in LiveInstances eingetragen werden,
             // weil interne Logik (Passwort-Logik, Filter für den Export etc.)
@@ -258,7 +137,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     protected Table(string tablename, Table? source) : this(tablename) {
         MainChunkLoadDone = true;
-        source?.CopyTo(this);
+        if (source is not null) { _ = Update(source); }
     }
 
     #endregion
@@ -270,6 +149,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public event EventHandler<CellEventArgs>? CellValueChanged;
 
     public event EventHandler? Disposed;
+
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen im Sub-Baum (Pendant zu PropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     public event EventHandler? InvalidateView;
 
@@ -304,7 +188,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (_assetFolder == value) { return; }
             _assetFolderTemp = null;
             if (ChangeData(TableDataType.AssetFolder, null, _assetFolder, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.AssetFolder, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.AssetFolder, value));
             Cell.InvalidateAllSizes();
         }
     }
@@ -317,7 +201,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_caption == value) { return; }
             if (ChangeData(TableDataType.Caption, null, _caption, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.Caption, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.Caption, value));
         }
     }
 
@@ -367,26 +251,34 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var repaired = ClassesStatic.CliRights.Repair(value);
             if (!_cliRights.IsDifferentTo(repaired)) { return; }
             if (ChangeData(TableDataType.CliRights, null, string.Join('\r', _cliRights), string.Join('\r', repaired)) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.CliRights, repaired));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.CliRights, repaired));
         }
     }
 
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
-        get => _columnArrangements;
+        get => new(_columnArrangements.ToList());
         set {
-            var l = new List<ColumnViewCollection>();
-            l.AddRange(value);
+            if (_columnArrangements.ReadOnly) {
+                // Legacy-Format: Der ganze Ansichten-Satz wird neu geschrieben
+                var l = new List<ColumnViewCollection>();
+                l.AddRange(value);
 
-            var caOld = _columnArrangements.ToString(false);
-            var caNew = l.ToString(false);
+                var caOld = _columnArrangements.ToString(false);
+                var caNew = l.ToString(false);
 
-            if (caOld == caNew) { return; }
-            if (ChangeData(TableDataType.ColumnArrangement, null, caOld, caNew) is { Length: > 0 }) { return; }
+                if (caOld == caNew) { return; }
+                if (ChangeData(TableDataType.ColumnArrangement, null, caOld, caNew) is { Length: > 0 }) { return; }
+                OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.ColumnArrangement, caNew));
 
-            OnViewChanged();
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.ColumnArrangement, caNew));
+                OnViewChanged();
+            } else {
+                // Binärformat: granular je Ansicht (Navigationspfad in die Fragmente)
+                _ = _columnArrangements.Update(value, false);
+
+                OnViewChanged();
+            }
         }
     }
 
@@ -395,7 +287,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_createDate == value) { return; }
             if (ChangeData(TableDataType.CreateDateUTC, null, _createDate, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.CreateDateUTC, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.CreateDateUTC, value));
         }
     }
 
@@ -403,9 +295,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         get => _creator;
         set {
             value = value.Trim();
-            if (_createDate == value) { return; }
+            if (_creator == value) { return; }
             if (ChangeData(TableDataType.Creator, null, _creator, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.Creator, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.Creator, value));
         }
     }
 
@@ -417,35 +309,41 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (!_dictionaryWords.IsDifferentTo(value)) { return; }
             if (ChangeData(TableDataType.DictionaryWords, null, string.Join('\r', _dictionaryWords), string.Join('\r', value)) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.DictionaryWords, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.DictionaryWords, value));
         }
     }
 
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public ReadOnlyCollection<TableScriptDescription> EventScript {
+    public TableScriptCollection EventScript {
         get {
             lock (_eventScriptLock) { return _eventScript; }
         }
         set {
-            var l = new List<TableScriptDescription>();
-            l.AddRange(value);
-            l.Sort();
+            if (_eventScript.ReadOnly) {
+                // Legacy-Format: Der ganze Skript-Satz wird neu geschrieben
+                var l = new List<TableScriptDescription>();
+                l.AddRange(value);
+                l.Sort();
 
-            string eventScriptOld;
-            var eventScriptNew = l.ToString(false);
-            lock (_eventScriptLock) {
-                eventScriptOld = _eventScript.ToString(false);
+                string eventScriptOld;
+                var eventScriptNew = l.ToString(false);
+                lock (_eventScriptLock) {
+                    eventScriptOld = _eventScript.ToString(false);
+                }
+
+                if (eventScriptOld == eventScriptNew) { return; }
+
+                // ChangeData außerhalb des Locks: feuert OnScriptChanged, dessen Subscriber
+                // (UI) synchron invoken. Unter dem Lock deadlockt das mit UI-Lesern des Getters.
+                if (ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew) is { Length: > 0 }) { return; }
+
+                OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.EventScript, eventScriptNew));
+            } else {
+                // Binärformat: granular je Skript (Navigationspfad in die Fragmente)
+                _eventScript.UpdateChild(value);
             }
-
-            if (eventScriptOld == eventScriptNew) { return; }
-
-            // ChangeData außerhalb des Locks: feuert OnScriptChanged, dessen Subscriber
-            // (UI) synchron invoken. Unter dem Lock deadlockt das mit UI-Lesern des Getters.
-            if (ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew) is { Length: > 0 }) { return; }
-
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.EventScript, eventScriptNew));
         }
     }
 
@@ -454,7 +352,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_eventScriptVersion == value) { return; }
             if (ChangeData(TableDataType.EventScriptVersion, null, _eventScriptVersion.ToString5(), value.ToString5()) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.EventScriptVersion, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.EventScriptVersion, value.ToString5()));
         }
     }
 
@@ -473,7 +371,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_globalShowPass == value) { return; }
             if (ChangeData(TableDataType.GlobalShowPass, null, _globalShowPass, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.GlobalShowPass, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.GlobalShowPass, value));
         }
     }
 
@@ -512,17 +410,32 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Dabei sind Spaltenschlüssel kurzzeitig nicht auflösbar; Ansichten dürfen
     /// in diesem Fenster keine Einträge endgültig entfernen und nicht neu berechnet werden.
     /// </summary>
-    public bool IsDataReloading => _dataReloadPaused > 0;
+    public virtual bool IsDataReloading => _dataReloadPaused > 0;
+
+    /// <summary>
+    /// Zugriff für TableFileNew auf die Kopf-Variablen (Fragment-Laden und Bubbling).
+    /// </summary>
+    protected VariableCollection _variables { get; } = [];
+
+    /// <summary>
+    /// Zugriff für TableFileNew auf die Spaltenanordnungen (Fragment-Laden und Bubbling).
+    /// </summary>
+    protected ColumnArrangementCollection _columnArrangements { get; }
+
+    /// <summary>
+    /// Zugriff für TableFileNew auf die Sortier-Definition (Fragment-Laden).
+    /// </summary>
+    protected RowSortDefinition? _sortDefinition { get; set; }
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public bool IsEventsSuppressed => _suppressEvents > 0;
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
 
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     public string KeyName { get; }
 
-    public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    public DateTime LastChange { get; protected internal set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
     /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
@@ -536,10 +449,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public DateTime LastUsedDate { get; set; } = DateTime.UtcNow;
 
-    public bool LogUndo { get; set; } = true;
+    public bool MainChunkLoadDone { get; protected internal set; }
 
-    public bool MainChunkLoadDone { get; protected set; }
+    public virtual bool MasterNeeded => false;
 
+    public virtual bool MultiUserPossible => false;
     /// <summary>
     /// Pro Instanz einmalig generierter Hash aus MachineName und einer Guid.
     /// Unterscheidet verschiedene Tabellen-Instanzen — auch im selben Prozess
@@ -554,7 +468,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var repaired = RepairUserGroups(value).AsReadOnly();
             if (!_permissionGroupsNewRow.IsDifferentTo(repaired)) { return; }
             if (ChangeData(TableDataType.PermissionGroupsNewRow, null, string.Join('\r', _permissionGroupsNewRow), string.Join('\r', repaired)) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.PermissionGroupsNewRow, repaired));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.PermissionGroupsNewRow, repaired));
         }
     }
 
@@ -577,7 +491,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_rowQuickInfo == value) { return; }
             if (ChangeData(TableDataType.RowQuickInfo, null, _rowQuickInfo, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.RowQuickInfo, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.RowQuickInfo, value));
         }
     }
 
@@ -589,9 +503,26 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (_sortDefinition is not null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
             if (value is not null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
+
+            if (!IsLegacyFormat) {
+                // Binäres Fragment-Format: granular über die registrierte Instanz —
+                // nur ihre Blatt-Sätze (Reverse, ColumnsList) sind im Journal-Replay
+                // interpretierbar. Fehlt die Instanz, wird eine leere registriert,
+                // damit das Bubbling entspungen kann.
+                if (_sortDefinition is null) { ReplaceSortDefinition(SortDefinitionCreate()); }
+
+                var existing = _sortDefinition;
+
+                if (existing is null) { return; }
+
+                _ = existing.Update(value ?? SortDefinitionCreate());
+                OnSortParameterChanged();
+                return;
+            }
+
             if (ChangeData(TableDataType.SortDefinition, null, alt, neu) is { Length: > 0 }) { return; }
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.SortDefinition, neu));
             OnSortParameterChanged();
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.SortDefinition, neu));
         }
     }
 
@@ -603,7 +534,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_standardFormulaFile == value) { return; }
             if (ChangeData(TableDataType.StandardFormulaFile, null, _standardFormulaFile, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.StandardFormulaFile, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.StandardFormulaFile, value));
         }
     }
 
@@ -616,7 +547,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             if (_symbolFolder == value) { return; }
             _symbolFolderTemp = null;
             if (ChangeData(TableDataType.SymbolFolder, null, _symbolFolder, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.SymbolFolder, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.SymbolFolder, value));
             Cell.InvalidateAllSizes();
         }
     }
@@ -627,7 +558,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var repaired = WithoutCliAdmin(RepairUserGroups(value)).AsReadOnly();
             if (!_tableAdmin.IsDifferentTo(repaired)) { return; }
             if (ChangeData(TableDataType.TableAdminGroups, null, string.Join('\r', _tableAdmin), string.Join('\r', repaired)) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TableAdminGroups, repaired));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TableAdminGroups, repaired));
         }
     }
 
@@ -639,7 +570,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
             if (ChangeData(TableDataType.Tags, null, string.Join('\r', _tags), string.Join('\r', value)) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.Tags, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.Tags, value));
         }
     }
 
@@ -648,7 +579,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_temporaryTableMasterApp == value) { return; }
             if (ChangeData(TableDataType.TemporaryTableMasterApp, null, _temporaryTableMasterApp, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TemporaryTableMasterApp, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TemporaryTableMasterApp, value));
         }
     }
 
@@ -657,7 +588,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_temporaryTableMasterId == value) { return; }
             if (ChangeData(TableDataType.TemporaryTableMasterId, null, _temporaryTableMasterId, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TemporaryTableMasterId, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TemporaryTableMasterId, value));
         }
     }
 
@@ -666,7 +597,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_temporaryTableMasterMachine == value) { return; }
             if (ChangeData(TableDataType.TemporaryTableMasterMachine, null, _temporaryTableMasterMachine, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TemporaryTableMasterMachine, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TemporaryTableMasterMachine, value));
         }
     }
 
@@ -675,7 +606,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_temporaryTableMasterTimeUtc == value) { return; }
             if (ChangeData(TableDataType.TemporaryTableMasterTimeUTC, null, _temporaryTableMasterTimeUtc, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TemporaryTableMasterTimeUTC, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TemporaryTableMasterTimeUTC, value));
         }
     }
 
@@ -684,32 +615,33 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         set {
             if (_temporaryTableMasterUser == value) { return; }
             if (ChangeData(TableDataType.TemporaryTableMasterUser, null, _temporaryTableMasterUser, value) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TemporaryTableMasterUser, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.TemporaryTableMasterUser, value));
         }
     }
 
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
-    public List<UndoItem> Undo { get; }
-
-    /// <summary>
-    /// Undo-Einträge des binären Fragment-Formats als ganze Sub*-Blöcke (Änderungen an
-    /// Uniques, Skripten, Ansichten, Variablen und Sortierung); parallel zu Undo geführt,
-    /// weil diese Änderungen kein klassisches TableDataType-Pendant haben.
-    /// </summary>
-    internal List<FragmentChange> FragmentUndos { get; } = [];
-
-    public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
+    public UniqueValueCollection UniqueValues {
         get => _uniqueValues;
         set {
-            var oldStr = string.Join('\r', _uniqueValues.Select(x => x.ParseableItems().FinishParseable()));
-            var newStr = string.Join('\r', value.Select(x => x.ParseableItems().FinishParseable()).SortedDistinctList());
+            if (_uniqueValues.ReadOnly) {
+                // Legacy-Format: Der ganze Definitions-Satz wird neu geschrieben
+                var l = new List<UniqueValueDefinition>();
+                l.AddRange(value);
+                l.Sort();
 
-            if (oldStr == newStr) { return; }
-            if (ChangeData(TableDataType.UniqueValues, null, oldStr, newStr) is { Length: > 0 }) { return; }
+                var oldStr = string.Join('\r', _uniqueValues.Select(x => x.ParseableItems().FinishParseable()));
+                var newStr = string.Join('\r', l.Select(x => x.ParseableItems().FinishParseable()).SortedDistinctList());
 
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.UniqueValues, newStr));
+                if (oldStr == newStr) { return; }
+                if (ChangeData(TableDataType.UniqueValues, null, oldStr, newStr) is { Length: > 0 }) { return; }
+
+                OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.UniqueValues, newStr));
+            } else {
+                // Binärformat: granular je Definition (Navigationspfad in die Fragmente)
+                _ = _uniqueValues.Update(value);
+            }
         }
     }
 
@@ -720,6 +652,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Passwort eingegeben wurde. Die Abfrage erfolgt erst bei der Anzeige.
     /// </summary>
     public bool Unlocked { get; set; } = true;
+
+    /// <summary>
+    /// True, wenn die Sortier-Definition als Ganzsatz über ChangeData geändert
+    /// wird (altes Format). Beim neuen Format läuft die Änderung granular über
+    /// die Blatt-Sätze der Instanz, da nur diese im Journal-Replay
+    /// interpretierbar sind.
+    /// </summary>
+    protected internal virtual bool IsLegacyFormat => true;
 
     public VariableCollection Variables {
         get => [.. _variables];
@@ -746,7 +686,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             #endregion
 
             if (ChangeData(TableDataType.TableVariables, null, _variableTmp, serialized) is { Length: > 0 }) { return; }
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, TableDataType.TableVariables, serialized));
+
+            OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.TableVariables, serialized));
         }
     }
 
@@ -757,7 +698,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     internal bool IsTimerPaused => _timerPaused > 0;
 
-    protected string LoadedVersion { get; private set; }
+    protected internal string LoadedVersion { get; protected set; }
 
     /// <summary>
     /// Thread-static: zusätzliche Suchpfade, die von Get(string) befüllt
@@ -829,6 +770,31 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// und gibt null zurück.
     /// </summary>
     public static Table Create(string key) => CreateInstance(key);
+
+    /// <summary>
+    /// Legt eine neue Tabellendatei an: .fbdb über TableFileNew mit
+    /// Fragment-Journal, alle übrigen Endungen über TableFile.Create.
+    /// </summary>
+    public static OperationResult Create(string targetPath, Table? source) => Create(targetPath, source, SaveableFileFragment.ClassId);
+
+    /// <summary>
+    /// Legt eine neue Tabellendatei an: .fbdb über TableFileNew mit dem über die
+    /// Layout-ClassId gewählten Datei-Layout (der Layout-Kopf der Kopf-Datei wird
+    /// sofort geschrieben), alle übrigen Endungen über TableFile.Create.
+    /// </summary>
+    public static OperationResult Create(string targetPath, Table? source, string layoutClassId) {
+        if (targetPath.FileSuffix().Equals(TableFileNew.SuffixMainFile, StringComparison.OrdinalIgnoreCase)) {
+            if (ParseableItem.NewByTypeName<SaveableFile>(layoutClassId, targetPath) is not { } saveable) {
+                return OperationResult.Failed("Unbekanntes Datei-Layout: " + layoutClassId);
+            }
+
+            var tbl = new TableFileNew(targetPath, source, saveable);
+            SaveableFile.WriteHeadFile(targetPath, layoutClassId);
+            return tbl.Save();
+        }
+
+        return TableFile.Create(targetPath, source);
+    }
 
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
@@ -1126,74 +1092,118 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        if (failedReason is null || string.IsNullOrEmpty(failedReason)) {
+        if (string.IsNullOrEmpty(failedReason)) {
             savedVariables = null;
         }
 
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
+        if (tb.IsValueEditable(TableDataType.EventScript, string.Empty) is { Length: > 0 }) { return false; }
 
-        List<TableScriptDescription> updatedScripts = [];
+        var found = false;
+        var unchanged = false;
+        TableScriptDescription? updatedScript = null;
+
         lock (tb._eventScriptLock) {
-            var found = false;
+            foreach (var existingScript in tb._eventScript) {
+                if (!ReferenceEquals(existingScript, script) && (existingScript.KeyName != script.KeyName || existingScript.Script != script.Script)) { continue; }
+
+                found = true;
+
+                if (isDisposed) { break; }
+
+                // Prüfe ob sich wirklich etwas geändert hat
+                var hasChanges = keyname is not null && keyname != existingScript.KeyName ||
+                                scriptContent is not null && scriptContent != existingScript.Script ||
+                                image is not null && image != existingScript.Image ||
+                                quickInfo is not null && quickInfo != existingScript.QuickInfo ||
+                                adminInfo is not null && adminInfo != existingScript.AdminInfo ||
+                                eventTypes is not null && eventTypes != existingScript.EventTypes ||
+                                needRow is not null && needRow != existingScript.NeedRow ||
+                                readOnly is not null && readOnly != existingScript.ValuesReadOnly ||
+                                userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
+                                failedReason is not null && failedReason != existingScript.FailedReason ||
+                                savedVariables is not null && existingScript.SavedVariables.SortByKeyName().IsDifferentTo(savedVariables.SortByKeyName()) ||
+                                stoppedtimecount is not null && stoppedtimecount != existingScript.StoppedTimeCount ||
+                                averageruntime is not null && averageruntime != existingScript.AverageRunTime;
+
+                if (!hasChanges) {
+                    // Nichts geändert: nicht schreiben, damit kein Journal-Eintrag entsteht
+                    unchanged = true;
+                    break;
+                }
+
+                // Neues Skript mit aktualisierten Werten
+                updatedScript = new TableScriptDescription(
+                    existingScript.Table,
+                    keyname ?? existingScript.KeyName,
+                    scriptContent ?? existingScript.Script,
+                    image ?? existingScript.Image,
+                    quickInfo ?? existingScript.QuickInfo,
+                    adminInfo ?? existingScript.AdminInfo,
+                    userGroups ?? existingScript.UserGroups,
+                    eventTypes ?? existingScript.EventTypes,
+                    needRow ?? existingScript.NeedRow,
+                    readOnly ?? existingScript.ValuesReadOnly,
+                    failedReason ?? existingScript.FailedReason,
+                    savedVariables ?? existingScript.SavedVariables.ToList(),
+                    stoppedtimecount ?? existingScript.StoppedTimeCount,
+                    averageruntime ?? existingScript.AverageRunTime
+                );
+                break;
+            }
+
+            if (!found && !isDisposed) { updatedScript = script; }
+        }
+
+        if (!found && isDisposed) { return true; }
+
+        // Unverändert: nichts zu schreiben
+        if (unchanged) { return true; }
+
+        // Schreiben außerhalb des Locks: Es feuert Events, deren Subscriber auf den
+        // UI-Thread invoken. Unter dem Lock deadlockt das mit UI-Lesern des Getters.
+        if (updatedScript is null) {
+            // found && isDisposed: das Skript wird entfernt
+            if (tb.EventScript.ReadOnly) {
+                // Legacy-Format: Collections werden komplett überschrieben
+                var rest = new List<TableScriptDescription>();
+
+                foreach (var existingScript in tb._eventScript) {
+                    if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) { continue; }
+
+                    rest.Add(existingScript);
+                }
+
+                tb.EventScript = new TableScriptCollection(tb, rest);
+                return true;
+            }
+
+            // Binärformat: gezielte Entfernung je Skript
+            return tb.EventScript.Remove(script.KeyName);
+        }
+
+        if (tb.EventScript.ReadOnly) {
+            // Legacy-Format: Collections werden komplett überschrieben
+            var scripts = new List<TableScriptDescription>();
+            var replaced = false;
 
             foreach (var existingScript in tb._eventScript) {
                 if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) {
-                    found = true;
-
-                    if (!isDisposed) {
-                        // Prüfe ob sich wirklich etwas geändert hat
-                        var hasChanges = keyname is not null && keyname != existingScript.KeyName ||
-                                        scriptContent is not null && scriptContent != existingScript.Script ||
-                                        image is not null && image != existingScript.Image ||
-                                        quickInfo is not null && quickInfo != existingScript.QuickInfo ||
-                                        adminInfo is not null && adminInfo != existingScript.AdminInfo ||
-                                        eventTypes is not null && !eventTypes.Equals(existingScript.EventTypes) ||
-                                        needRow is not null && needRow != existingScript.NeedRow ||
-                                        readOnly is not null && readOnly != existingScript.ValuesReadOnly ||
-                                        userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
-                                        failedReason is not null && failedReason != existingScript.FailedReason ||
-                                        savedVariables is not null && existingScript.SavedVariables.SortByKeyName().IsDifferentTo(savedVariables.SortByKeyName()) ||
-                                        stoppedtimecount is not null && stoppedtimecount != existingScript.StoppedTimeCount ||
-                                        averageruntime is not null && averageruntime != existingScript.AverageRunTime;
-
-                        if (hasChanges) {
-                            // Erstelle neues Script mit aktualisierten Werten
-                            var newScript = new TableScriptDescription(
-                                existingScript.Table,
-                                keyname ?? existingScript.KeyName,
-                                scriptContent ?? existingScript.Script,
-                                image ?? existingScript.Image,
-                                quickInfo ?? existingScript.QuickInfo,
-                                adminInfo ?? existingScript.AdminInfo,
-                                userGroups ?? existingScript.UserGroups,
-                                eventTypes ?? existingScript.EventTypes,
-                                needRow ?? existingScript.NeedRow,
-                                readOnly ?? existingScript.ValuesReadOnly,
-                                failedReason ?? existingScript.FailedReason,
-                                savedVariables ?? existingScript.SavedVariables.ToList(),
-                                stoppedtimecount ?? existingScript.StoppedTimeCount,
-                                averageruntime ?? existingScript.AverageRunTime
-                            );
-                            updatedScripts.Add(newScript);
-                        } else {
-                            updatedScripts.Add(existingScript);
-                        }
-                    }
-                } else {
-                    updatedScripts.Add(existingScript);
+                    scripts.Add(updatedScript);
+                    replaced = true;
+                    continue;
                 }
+
+                scripts.Add(existingScript);
             }
 
-            if (!found) {
-                updatedScripts.Add(script);
-            }
+            if (!replaced) { scripts.Add(updatedScript); }
+
+            tb.EventScript = new TableScriptCollection(tb, scripts);
+            return true;
         }
 
-        // Außerhalb des Locks: der Setter ruft ChangeData -> OnScriptChanged,
-        // dessen Subscriber auf den UI-Thread invoken. Unter dem Lock deadlockt das.
-        tb.EventScript = updatedScripts.AsReadOnly();
-
-        return true;
+        // Binärformat: gezielte granulare Änderung je Skript (Navigationspfad in die Fragmente)
+        return tb.EventScript.Update(updatedScript);
     }
 
     public static void WaitScriptsDone() {
@@ -1278,7 +1288,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, ChangeFlags.UserCommand);
 
     /// <summary>
-    /// Setzt einen Wert dauerhaft (Speicher + Festplatte/Server) und führt Undo, Events und Systemspalten-Pflege aus.
+    /// Setzt einen Wert dauerhaft (Speicher + Festplatte/Server) und führt Events und Systemspalten-Pflege aus.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>
@@ -1289,16 +1299,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
     /// <param name="reason">Flags für Undo/Logging, Events und Systemspalten-Pflege.</param>
-    public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, ChangeFlags reason) {
+    public virtual string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, ChangeFlags reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
-
-        // Logische Uhr: Einmalig vor der gesamten Pipeline (Speicher, Fragment, Undo) auf eindeutigen
-        // Abstand bringen, damit Fragment- und Undo-Eintrag denselben Zeitstempel erhalten.
-        if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
-            datetimeutc = EnsureLogTimeUtc(datetimeutc);
-        }
 
         if (row is not null) {
             var cv = row.ChunkValue;
@@ -1347,10 +1351,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             UpdateColumnArrangementsAfterRename(column, arrangementsBeforeRename);
         }
 
-        if (LogUndo && reason.HasFlag(ChangeFlags.LogUndo)) {
-            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]");
-        }
-
         return string.Empty;
     }
 
@@ -1382,94 +1382,103 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return result;
     }
 
-    public void CopyTo(Table target) {
-        if (IsDisposed) { return; }
+    /// <summary>
+    /// Übernimmt den kompletten Tabellenstand aus der Quelltabelle: Spalten, Zeilen
+    /// und alle Kopf-Werte. Die Quelle lädt bei Bedarf ihre Zeilen nach.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (IsDisposed) { return "Tabelle verworfen"; }
+        if (source is not Table sourceTable) { return "Quelltyp ungültig"; }
+        if (sourceTable.IsDisposed) { return "Quelltabelle verworfen"; }
 
-        LoadTableRows(false, -1); // Statt BeSureToBeUpToDate: lädt bei TableChunk ALLE Row-Chunks
+        sourceTable.LoadTableRows(false, -1); // Statt BeSureToBeUpToDate: lädt bei TableChunk ALLE Row-Chunks
 
-        Column.CopyTo(target.Column);
-        Row.CopyTo(target.Row);
+        sourceTable.Column.CopyTo(Column);
+        sourceTable.Row.CopyTo(Row);
 
-        target.Caption = Caption;
-        target.GlobalShowPass = GlobalShowPass;
-        target.RowQuickInfo = RowQuickInfo;
-        target.StandardFormulaFile = StandardFormulaFile;
-        target.AssetFolder = AssetFolder;
-        target.SymbolFolder = SymbolFolder;
-        target.Tags = Tags;
-        target.DictionaryWords = DictionaryWords;
-        target.PermissionGroupsNewRow = PermissionGroupsNewRow;
-        target.TableAdmin = TableAdmin;
-        target.CliRights = CliRights;
+        Caption = sourceTable.Caption;
+        GlobalShowPass = sourceTable.GlobalShowPass;
+        RowQuickInfo = sourceTable.RowQuickInfo;
+        StandardFormulaFile = sourceTable.StandardFormulaFile;
+        AssetFolder = sourceTable.AssetFolder;
+        SymbolFolder = sourceTable.SymbolFolder;
+        Tags = sourceTable.Tags;
+        DictionaryWords = sourceTable.DictionaryWords;
+        PermissionGroupsNewRow = sourceTable.PermissionGroupsNewRow;
+        TableAdmin = sourceTable.TableAdmin;
+        CliRights = sourceTable.CliRights;
 
-        target.SortDefinition = SortDefinition is not null
-            ? new RowSortDefinition(target, SortDefinition.ParseableItems().FinishParseable())
+        SortDefinition = sourceTable.SortDefinition is not null
+            ? new RowSortDefinition(this, sourceTable.SortDefinition.ParseableItems().FinishParseable())
             : null;
 
-        target.UniqueValues = UniqueValues is { Count: > 0 }
-            ? new ReadOnlyCollection<UniqueValueDefinition>(
-                UniqueValues.Select(u => new UniqueValueDefinition(target, u.ParseableItems().FinishParseable())).ToList())
-            : new([]);
+        List<UniqueValueDefinition> uniqueCopies = [];
 
-        // Tief kopiert und per Feldzuweisung setzen (wie die Metadaten oben): Der
-        // öffentliche Setter prüft das Editier-Recht der Spaltenanordnung und würde
-        // die Übernahme im Lade-Kontext verweigern. Die Ansichten des Ziels müssen
-        // auf die Zieltabelle und deren Spalten zeigen.
+        if (sourceTable.UniqueValues is { Count: > 0 }) {
+            foreach (var unique in sourceTable.UniqueValues) {
+                uniqueCopies.Add(new UniqueValueDefinition(this, unique.ParseableItems().FinishParseable()));
+            }
+        }
+
+        // Klassischer Ganzsatz-Schreibweg: Die frische Zieltabelle ist im
+        // Legacy-Zustand (ReadOnly), das binäre Format gibt die Sammlung
+        // erst nach dem Kopieren zum granularen Ändern frei.
+        UniqueValues = new(this, uniqueCopies);
+
+        // Tief kopiert und per Update übernehmen: Bestehende Ansichten
+        // behalten ihre Instanz, damit Referenzen gültig bleiben. Der
+        // öffentliche Setter prüft das Editier-Recht der Spaltenanordnung und
+        // würde die Übernahme im Lade-Kontext verweigern. Die Ansichten müssen
+        // auf die eigene Tabelle und deren Spalten zeigen.
         List<ColumnViewCollection> viewsCopy = [];
 
-        foreach (var view in ColumnArrangements) {
+        foreach (var view in sourceTable.ColumnArrangements) {
             if (view is { IsDisposed: false }) {
-                viewsCopy.Add(new ColumnViewCollection(target, view.ParseableItems().FinishParseable()));
+                viewsCopy.Add(new ColumnViewCollection(this, view.ParseableItems().FinishParseable()));
             }
         }
 
-        target.Unregister(target._columnArrangements);
-        target._columnArrangements = viewsCopy.AsReadOnly();
-        target.Register(viewsCopy);
+        _ = _columnArrangements.Update(viewsCopy, true);
 
-        target.EventScript = EventScript is { Count: > 0 }
-            ? new ReadOnlyCollection<TableScriptDescription>(
-                EventScript.Select(s => new TableScriptDescription(target, s.ParseableItems().FinishParseable())).ToList())
-            : new([]);
+        List<TableScriptDescription> scriptCopies = [];
 
-        target.Variables = Variables;
+        if (sourceTable.EventScript is { Count: > 0 }) {
+            foreach (var script in sourceTable.EventScript) {
+                scriptCopies.Add(new TableScriptDescription(this, script.ParseableItems().FinishParseable()));
+            }
+        }
 
-        target.MainChunkLoadDone = true;
+        // Klassischer Ganzsatz-Schreibweg: Die frische Zieltabelle ist im
+        // Legacy-Zustand (ReadOnly), das binäre Format gibt die Sammlung
+        // erst nach dem Kopieren zum granularen Ändern frei.
+        EventScript = new(this, scriptCopies);
+
+        Variables = sourceTable.Variables;
+
+        MainChunkLoadDone = true;
 
         // Metadaten direkt per Feldzuweisung übernehmen - die öffentlichen Setter
-        // würden ChangeData auslösen. Muss NACH den Zuweisungen oben stehen, weil
-        // deren Setter-Aufrufe Undo-Einträge in target erzeugen, die hier komplett
-        // durch die Undo-History der Quelle ersetzt werden.
-        target._creator = _creator;
-        target._createDate = _createDate;
-        target._eventScriptVersion = _eventScriptVersion;
-        target._powerEditTime = _powerEditTime;
-        target._temporaryTableMasterUser = _temporaryTableMasterUser;
-        target._temporaryTableMasterTimeUtc = _temporaryTableMasterTimeUtc;
-        target._temporaryTableMasterApp = _temporaryTableMasterApp;
-        target._temporaryTableMasterMachine = _temporaryTableMasterMachine;
-        target._temporaryTableMasterId = _temporaryTableMasterId;
+        // würden ChangeData auslösen.
+        _creator = sourceTable._creator;
+        _createDate = sourceTable._createDate;
+        _eventScriptVersion = sourceTable._eventScriptVersion;
+        _powerEditTime = sourceTable._powerEditTime;
+        _temporaryTableMasterUser = sourceTable._temporaryTableMasterUser;
+        _temporaryTableMasterTimeUtc = sourceTable._temporaryTableMasterTimeUtc;
+        _temporaryTableMasterApp = sourceTable._temporaryTableMasterApp;
+        _temporaryTableMasterMachine = sourceTable._temporaryTableMasterMachine;
+        _temporaryTableMasterId = sourceTable._temporaryTableMasterId;
 
-        List<UndoItem> undoSnapshot;
-        lock (_undoLock) {
-            undoSnapshot = [.. Undo];
-        }
+        OnUpdateCompleted(sourceTable);
 
-        lock (target._undoLock) {
-            target.Undo.Clear();
-            foreach (var thisUndo in undoSnapshot) {
-                if (thisUndo is null) { continue; }
-
-                // Nur Einträge des Ziel-Tabellennamens übernehmen: Bei Formatwandlung
-                // unter gleichem Namen bleibt die Historie erhalten, bei einer Kopie
-                // unter neuem Namen startet die Datei mit eigener, leerer Historie.
-                // InjectData würde fremd benannte Einträge ohnehin überspringen.
-                if (!string.Equals(thisUndo.TableName, target.KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
-
-                target.Undo.Add(new UndoItem(thisUndo.ParseableItems().FinishParseable()));
-            }
-        }
+        return string.Empty;
     }
+
+    /// <summary>
+    /// Nachbereitung des Tabellenstands-Übernehmens; Unterklassen ergänzen hier
+    /// Pflegeaufgaben, die erst nach allen Kopier-Zuweisungen laufen dürfen.
+    /// </summary>
+    protected internal virtual void OnUpdateCompleted(Table sourceTable) { }
 
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool tableHeadVariables, bool virtualcolumns, bool extendedVariable, IEnumerable<FilterItem>? filter) {
 
@@ -1957,6 +1966,53 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     /// <summary>
+    /// Prüft, ob diese Instanz der registrierte Master der Tabelle ist.
+    /// Der Master-Eintrag muss mindestens <paramref name="ranges"/> Minuten alt sein (Propagations-Schutz),
+    /// und älter als <paramref name="rangee"/> Minuten zählt er als abgelaufen.
+    /// </summary>
+    /// <param name="ranges">Mindestalter des Master-Eintrags in Minuten, ab dem er vertraut wird.</param>
+    /// <param name="rangee">Maximalalter des Master-Eintrags in Minuten, bis dem er gilt.</param>
+    /// <param name="updateAllowed">True lädt den Master-Status zuvor von der Festplatte.</param>
+    /// <returns></returns>
+    public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
+        if (!MultiUserPossible) { return true; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
+
+        if (TemporaryTableMasterUser != UserName) { return false; }
+        if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
+
+        var d = DateTimeParse(TemporaryTableMasterTimeUtc);
+        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
+
+        ranges = Math.Max(ranges, 0);
+
+        // Info:
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
+        return mins > ranges && mins < rangee;
+    }
+
+    /// <summary>
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
+    /// </summary>
+    public void TryToSetMeTemporaryMaster() {
+        if (AmITemporaryMaster(TableFile.MasterBlockedMin, TableFile.MasterBlockedMax, true)) { return; }
+        if (!NewMasterPossible()) { return; }
+        MasterMe();
+    }
+
+    public void UnMasterMe() {
+        Develop.EndLog($"UnMasterMe '{KeyName}': START");
+        if (AmITemporaryMaster(TableFile.MasterBlockedMin, TableFile.MasterBlockedMax, false)) {
+            if (AmITemporaryMaster(TableFile.MasterBlockedMin, TableFile.MasterBlockedMax, true)) {
+                TemporaryTableMasterUser = "Unset: " + UserName;
+                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            }
+        }
+        Develop.EndLog($"UnMasterMe '{KeyName}': ENDE");
+    }
+
+    /// <summary>
     /// Lädt Zeilen der Tabelle nach. Je nach Tabellentyp werden andere Funktionen unterstützt
     /// </summary>
     /// <param name="oldest">True wird versucht, die ältesten Zeilen zu laden. Im normalfall langsamer, das Stände verglichen werden müssen</param>
@@ -2048,25 +2104,25 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public void OnCanDoScript(CanDoScriptEventArgs e) {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         CanDoScript?.Invoke(this, e);
     }
 
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnScriptChanged() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         ScriptChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnViewChanged() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -2263,7 +2319,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         // UniqueValueDefinitions ohne Spalten entfernen
         if (_uniqueValues.Any(uv => uv.KeyColumns.Count == 0)) {
-            _uniqueValues = _uniqueValues.Where(uv => uv.KeyColumns.Count > 0).ToList().AsReadOnly();
+            _ = _uniqueValues.Update(_uniqueValues.Where(uv => uv.KeyColumns.Count > 0).ToList(), true);
         }
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
@@ -2276,7 +2332,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 .Select(g => g.OrderByDescending(s => s.Script.Length).First())
                 .ToList();
             deduplicated.Sort();
-            _eventScript = deduplicated.AsReadOnly();
+            _ = _eventScript.Update(deduplicated, true);
             InvalidateHeadCaches();
         }
 
@@ -2308,10 +2364,21 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public void ResumeEvents() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { _suppressEvents--; }
-        if (_suppressEvents > 0) { return; }
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
 
-        // _suppressEvents ist jetzt 0 — On-Methoden feuern wieder.
+        // Kinder manuell mit aufheben: Spalten, Zeilen, Skripte, Uniques,
+        // Kopf-Variablen, Sortier-Definition und Ansichten.
+        Column.ResumeEvents();
+        Row.ResumeEvents();
+        EventScript.ResumeEvents();
+        UniqueValues.ResumeEvents();
+        _variables.ResumeEvents();
+        _sortDefinition?.ResumeEvents();
+        _columnArrangements.ResumeEvents();
+
+        if (_eventsSuppressCount > 0) { return; }
+
+        // _eventsSuppressCount ist jetzt 0 — On-Methoden feuern wieder.
         // Reihenfolge: Loaded first (signalisiert Daten-Reload, FilterCollection
         // und TableView bauen ihre Row-Sets neu auf), dann ViewChanged für
         // Arrangement/ViewItems, dann InvalidateView für reinen Repaint.
@@ -2340,12 +2407,22 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Unterbricht die Auslösung aller Events (außer Disposed).
+    /// Unterbricht die Auslösung aller Events (außer Disposed), auch bei den
+    /// Fragment-Kindern: Spalten, Zeilen, Skripte, Uniques, Kopf-Variablen,
+    /// Sortier-Definition und Ansichten.
     /// Mehrfache Aufrufe sind möglich und müssen durch entsprechend viele ResumeEvents-Aufrufe aufgehoben werden.
     /// </summary>
     public void SuppressEvents() {
         if (IsDisposed) { return; }
-        _suppressEvents++;
+        _eventsSuppressCount++;
+
+        Column.SuppressEvents();
+        Row.SuppressEvents();
+        EventScript.SuppressEvents();
+        UniqueValues.SuppressEvents();
+        _variables.SuppressEvents();
+        _sortDefinition?.SuppressEvents();
+        _columnArrangements.SuppressEvents();
     }
 
     /// <summary>
@@ -2447,13 +2524,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<ScriptVariable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
-        var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
-        if (existingScript is null) { return false; }
-
-        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, savedVariables, isDisposed, readOnly, stoppedtimecount, averageruntime);
-    }
-
     /// <summary>
     /// Schreibt Skript-Variablen in Zeile und Kopf zurück.
     /// Liefert eine Fehlermeldung, wenn eine Zelle gegenüber startValues fremderseits geändert wurde (WriteBack abgebrochen).
@@ -2528,34 +2598,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
 
         column.UcaseNamesSortedByLength = null;
-        if (_suppressEvents <= 0) {
+        if (!IsEventsSuppressed) {
             // Reparatur passiert verzögert beim Anzeigen der Zeile in einer TableView (RepairLinkedCellIfDue).
             rowItem.LastLinkedCellCheck = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 5));
             CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
-        }
-    }
-
-    /// <summary>
-    /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="previousValue"></param>
-    /// <param name="changedTo"></param>
-    /// <param name="userName"></param>
-    /// <param name="datetimeutc"></param>
-    /// <param name="comment"></param>
-    /// <param name="container"></param>
-    protected void AddUndo(TableDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container) {
-        if (IsDisposed) { return; }
-        if (type.IsObsolete()) { return; }
-        // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
-
-        if (type == TableDataType.SystemValue) { return; }
-
-        lock (_undoLock) {
-            Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
         }
     }
 
@@ -2572,7 +2618,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
     }
 
-    protected void CreateWatcher() {
+    protected internal void CreateWatcher() {
         _checker?.Dispose();
         _checker = null;
 
@@ -2600,21 +2646,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 Column.Dispose();
                 Row.Dispose();
 
-                // Fragment-Bubbling der Kinder abmelden
-                this.Unregister(_variables);
-                this.Unregister(Column);
-                this.Unregister(Row);
-                this.Unregister(_sortDefinition);
-                this.Unregister(_uniqueValues);
-                this.Unregister(_eventScript);
-                this.Unregister(_columnArrangements);
-
                 // Listen leeren
-                lock (_undoLock) {
-                    Undo.Clear();
-                    FragmentUndos.Clear();
-                }
-                _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
+                _ = _eventScript.Update([], true);
+                _ = _uniqueValues.Update([], true);
                 _tableAdmin.Clear();
                 _cliRights.Clear();
                 _permissionGroupsNewRow.Clear();
@@ -2626,24 +2660,24 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
-    protected void OnLoaded(bool isFirst, bool affectingHead) {
+    protected internal void OnLoaded(bool isFirst, bool affectingHead) {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         Loaded?.Invoke(this, new FirstEventArgs(isFirst, affectingHead));
         // Schreibzugriff kann sich durch den Ladevorgang geändert haben
         // (z.B. MainChunkLoadDone, LoadedVersion oder Chunk-Locks), deshalb erneut prüfen.
         OnWriteAccessChanged();
     }
 
-    protected void OnLoading() {
+    protected internal void OnLoading() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
     protected void OnWriteAccessChanged() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         var reason = IsValueEditable(TableDataType.Command_AddColumnByName, string.Empty);
         WriteAccessChanged?.Invoke(this, new WriteAccessChangedEventArgs(string.IsNullOrEmpty(reason), reason));
     }
@@ -2652,7 +2686,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Markiert den Bereich, in dem Daten neu eingespielt werden. In diesem Fenster
     /// löst RepairAfterParse keine endgültigen Entfernungen in den Ansichten aus.
     /// </summary>
-    protected void PauseDataReload() => Interlocked.Increment(ref _dataReloadPaused);
+    protected internal void PauseDataReload() => Interlocked.Increment(ref _dataReloadPaused);
 
     /// <summary>
     /// Tiefenprüfung der Editierbarkeit auf Dateiebene (z.B. Chunk vom Laufwerk
@@ -2671,7 +2705,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         ColumnArrangements = RepairedArrangements().AsReadOnly();
     }
 
-    protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
+    protected internal void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.
@@ -2686,7 +2720,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <param name="user"></param>
     /// <param name="comment">Änderungs-Grund für die Systemspalten-Pflege (Änder-Kommentar, Erstell-Kommentar).</param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, string comment, ChangeFlags changeFlags) {
+    // internal protected: TableFileNew/SaveableFile spielen geladene
+    // Fragment-Änderungen direkt ins eigene Objekt (gleiche Assembly).
+    internal protected virtual string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, string comment, ChangeFlags changeFlags) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
 
         if (!changeFlags.HasFlag(ChangeFlags.IgnoreFreeze)) {
@@ -2745,7 +2781,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
                 default:
                     if (LoadedVersion == TableVersion) {
-                        Freeze("Ladefehler der Tabelle");
+                        Freeze("Ladefehler der Tabelle (Datentyp " + (int)type + ")");
                         if (!IsFreezed) {
                             Develop.DebugError("Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                         }
@@ -2804,26 +2840,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 break;
 
             case TableDataType.UniqueValues: {
-                    var existingByKey = new Dictionary<string, UniqueValueDefinition>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var uv in _uniqueValues) { existingByKey.TryAdd(uv.KeyName, uv); }
-
-                    _uniqueValues = value.ToUpperInvariant()
+                    var parsed = value.ToUpperInvariant()
                         .SplitAndCutByCr()
                         .SortedDistinctList()
-                        .Select(t => {
-                            var newItem = new UniqueValueDefinition(this, t);
-                            if (existingByKey.Remove(newItem.KeyName, out var existing)) {
-                                existing.UpdateFrom(newItem);
-                                return existing;
-                            }
-                            return newItem;
-                        })
-                        .ToList()
-                        .AsReadOnly();
+                        .Select(t => new UniqueValueDefinition(this, t))
+                        .ToList();
 
-                    // Verdrahtung nachziehen: entfernte Definitionen abmelden, alle aktuellen verdrahten
-                    this.Unregister(existingByKey.Values);
-                    this.Reregister(_uniqueValues);
+                    // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
+                    _ = _uniqueValues.Update(parsed, true);
                     break;
                 }
 
@@ -2864,18 +2888,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
                     // IsOnlyStatisticsUpdate muss gegen den ALTEN Stand von _eventScript
                     // gebildet werden, deshalb vor der Aktualisierung auswerten.
-                    var isOnlyStatisticsUpdate = IsOnlyStatisticsUpdate(_eventScript, parsed);
+                    var isOnlyStatisticsUpdate = IsOnlyStatisticsUpdate(_eventScript.ToList(), parsed);
 
-                    var existingByKey = new Dictionary<string, TableScriptDescription>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var s in _eventScript) { existingByKey.TryAdd(s.KeyName, s); }
-
-                    _eventScript = parsed.Select(newItem => {
-                        if (existingByKey.Remove(newItem.KeyName, out var existing)) {
-                            existing.UpdateFrom(newItem);
-                            return existing;
-                        }
-                        return newItem;
-                    }).ToList().AsReadOnly();
+                    // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
+                    _ = _eventScript.Update(parsed, true);
 
                     InvalidateHeadCaches();
 
@@ -2887,10 +2903,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         Row.InvalidateAllCheckData();
                         OnScriptChanged();
                     }
-
-                    // Verdrahtung nachziehen: entfernte Skripte abmelden, alle aktuellen verdrahten
-                    this.Unregister(existingByKey.Values);
-                    this.Reregister(_eventScript);
                     break;
                 }
 
@@ -2907,9 +2919,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.ColumnArrangement:
                 var cas = value.SplitAndCutByCr();
-                this.Unregister(_columnArrangements);
-                _columnArrangements = cas.Select(t => new ColumnViewCollection(this, t)).ToList().AsReadOnly();
-                this.Reregister(_columnArrangements);
+
+                // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
+                _ = _columnArrangements.Update(cas.Select(t => new ColumnViewCollection(this, t)).ToList(), true);
                 break;
 
             case TableDataType.PermissionGroupsNewRow:
@@ -2925,25 +2937,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 InvalidateHeadCaches();
                 break;
 
-            //case TableDataType.UndoInOne:
-            //    lock (_undoLock) {
-            //        Undo.Clear();
-            //        var uio = value.SplitAndCutByCr();
-            //        for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-            //            var tmpWork = new UndoItem(uio[z]);
-            //            Undo.Add(tmpWork);
-            //        }
-            //    }
-            //    SeedLogTimeFromUndo();
-            //    break;
-
             case TableDataType.CheckPoint:
-                break;
-
-            case TableDataType.Undo:
-                lock (_undoLock) {
-                    Undo.Add(new(value));
-                }
                 break;
 
             case TableDataType.EOF:
@@ -2952,7 +2946,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             default:
                 // Variable type
                 if (LoadedVersion == TableVersion) {
-                    Freeze("Ladefehler der Tabelle");
+                    Freeze("Ladefehler der Tabelle (Datentyp " + (int)type + ")");
                     if (!IsFreezed) {
                         Develop.DebugError("Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                     }
@@ -2961,6 +2955,15 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 return "Datentyp unbekannt.";
         }
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Ersetzt die Sortier-Definition und verdrahtet das Bubbling neu; null löst die Verdrahtung.
+    /// </summary>
+    private void ReplaceSortDefinition(RowSortDefinition? newDefinition) {
+        this.Unregister(_sortDefinition);
+        _sortDefinition = newDefinition;
+        this.Register(newDefinition);
     }
 
     /// <summary>
@@ -3016,6 +3019,33 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         foreach (var thisfolder in folder) {
             var f = thisfolder + key;
 
+            // Neues Fragment-Format vor den klassischen Formaten prüfen:
+            // TableFileNew ist keine TableFile-Ableitung; das Datei-Layout
+            // steht im Layout-Kopf der Kopf-Datei und erzeugt die passende
+            // SaveableFile-Verwaltung. Bestände ohne Layout-Kopf (leere
+            // Head-Dummies und Komplettstände vor dem Kopf-Datei-Muster)
+            // werden bewusst nicht mehr geraten.
+            var fsFragment = f + "." + TableFileNew.SuffixMainFile;
+
+            if (FileExists(fsFragment)) {
+                if (!SaveableFile.TryReadHeadClassId(fsFragment, out var layoutClassId)) {
+                    throw new InvalidDataException("Die Kopf-Datei '" + fsFragment + "' trägt keinen gültigen Layout-Kopf (alter Bestand oder beschädigt) und kann nicht geladen werden.");
+                }
+
+                if (ParseableItem.NewByTypeName<SaveableFile>(layoutClassId, fsFragment) is not { } saveable) {
+                    throw new InvalidDataException("Das Datei-Layout '" + layoutClassId + "' wird von dieser Version nicht unterstützt: " + fsFragment);
+                }
+
+                var tfn = new TableFileNew(key, saveable);
+                LoadingOnThisThread.Push(tfn);
+                try {
+                    tfn.LoadFromFile(fsFragment, string.Empty);
+                } finally {
+                    LoadingOnThisThread.Pop();
+                }
+                return tfn;
+            }
+
             foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
                 var fs = f + suffix;
 
@@ -3055,9 +3085,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private static bool HasActiveThreadsExcept(string excludeThreadId) {
         try {
             return ExecutingScriptThreadsAnyTable.Exists(thread => thread != excludeThreadId);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return HasActiveThreadsExcept(excludeThreadId);
+        } catch (Exception ex) {
+            // Kein Wiederholen per Rekursion: Ein bleibender Fehler würde den Stack aufbrauchen.
+            Develop.DebugPrint(ErrorType.Warning, "HasActiveThreadsExcept fehlgeschlagen", ex);
+            return false;
         }
     }
 
@@ -3066,7 +3097,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Laufzeit-Statistiken (AverageRunTime, StoppedTimeCount) unterscheiden.
     /// true = nur Statistik geändert, kein Eingriff in die Zeilen-Prüfung nötig.
     /// </summary>
-    private static bool IsOnlyStatisticsUpdate(ReadOnlyCollection<TableScriptDescription> oldScripts, List<TableScriptDescription> newScripts) {
+    private static bool IsOnlyStatisticsUpdate(List<TableScriptDescription> oldScripts, List<TableScriptDescription> newScripts) {
         if (oldScripts.Count != newScripts.Count) { return false; }
 
         foreach (var ns in newScripts) {
@@ -3095,27 +3126,51 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         RepairAfterParse();
     }
 
-    /// <summary>
-    /// Liefert einen logischen Zeitstempel, der mindestens eine Millisekunde nach dem vorherigen liegt,
-    /// damit Undo-Log-Einträge eindeutig sortierbar bleiben.
-    /// </summary>
-    private DateTime EnsureLogTimeUtc(DateTime datetimeutc) {
-        lock (_undoLock) {
-            var t = datetimeutc;
-            if (t <= _lastChangeUtc) { t = _lastChangeUtc.AddMilliseconds(1); }
-            _lastChangeUtc = t;
-            return t;
-        }
-    }
-
     private string ExternalAbortScriptReason(bool extended) {
         var e = new CanDoScriptEventArgs(extended);
         OnCanDoScript(e);
         return e.CancelReason;
     }
 
+    private bool NewMasterPossible() {
+        if (!IsAdministrator()) { return false; }
+
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
+
+        // Master wurde bewusst freigegeben (UnMasterMe) — ein neuer Master darf sofort übernehmen.
+        if (TemporaryTableMasterUser.Contains("Unset")) { return true; }
+
+        if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
+            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < TableFile.MasterBlockedMax) { return false; }
+            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
+        }
+
+        if (RowCollection.WaitDelay > 90) { return true; }
+
+        if (MasterNeeded) { return true; }
+
+        try {
+            var masters = 0;
+            List<Table> snapshot;
+            lock (AllFilesLocker) {
+                snapshot = [.. LiveInstances.Values];
+            }
+
+            foreach (var thisTb in snapshot) {
+                if (thisTb is { IsDisposed: false, MultiUserPossible: true } tbf &&
+                    tbf.AmITemporaryMaster(TableFile.MasterBlockedMin, TableFile.MasterCount, false)) {
+                    masters++;
+                    if (masters >= TableFile.MaxMasterCount) { return false; }
+                }
+            }
+        } catch {
+            return false;
+        }
+
+        return true;
+    }
+
     private void InitDummyTable() {
-        LogUndo = false;
         DropMessages = false;
 
         PauseTimer();
@@ -3139,7 +3194,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
-        if (_suppressEvents > 0) { return; }
+        if (IsEventsSuppressed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -3178,25 +3233,157 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         }
     }
 
+    #endregion
+
     #region IFragmentStoreable
 
     /// <summary>
-    /// Bubbling-Event für Fragment-Änderungen im Sub-Baum (Pendant zu PropertyChangedExt).
+    /// Empfänger- und Pfad-Typen der Table im binären Fragment-Format. Dichter,
+    /// eigenständiger Zahlraum (1 bis < 230); Überschneidungen mit den
+    /// Klassenzahlräumen der Kinder sind bewusst und unschädlich, denn die Stufen
+    /// werden strukturgenau geroutet: Jeder Segmenteintritt trägt einen leeren
+    /// Key, der Block des Kindes folgt eine Ebene tiefer und beginnt dort mit
+    /// dessen eigenem Zahlraum.
     /// </summary>
-    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+    protected enum TableFragmentType : byte {
+
+        /// <summary>
+        /// Segmenteintritt in die Spalten; die Folge-Sätze liest die Sammlung.
+        /// </summary>
+        Columns = 1,
+
+        /// <summary>
+        /// Nav-Satz je Undo-Eintrag (Content leer); der Block des Eintrags —
+        /// klassischer Satz oder Sub*-Block — folgt eine Ebene tiefer.
+        /// </summary>
+        UndoHistory = 2,
+
+        /// <summary>
+        /// Segmenteintritt in die Unique-Wert-Definitionen.
+        /// </summary>
+        UniqueDefinitions = 3,
+
+        /// <summary>
+        /// Segmenteintritt in die Tabellen-Skripte.
+        /// </summary>
+        Scripts = 4,
+
+        /// <summary>
+        /// Segmenteintritt in die Kopf-Variablen.
+        /// </summary>
+        VariableCollection = 5,
+
+        /// <summary>
+        /// Segmenteintritt in die Spaltenanordnungen.
+        /// </summary>
+        ColumnArrangements = 6,
+
+        /// <summary>
+        /// Segmenteintritt in die Sortier-Definition; deren Sätze folgen eine
+        /// Ebene tiefer.
+        /// </summary>
+        SortDefinition = 7,
+
+        /// <summary>
+        /// Segmenteintritt in die Zeilen.
+        /// </summary>
+        Rows = 8,
+
+        TableVersion = 9,
+
+        TemporaryTableMasterTimeUTC = 10,
+
+        TemporaryTableMasterUser = 11,
+
+        TemporaryTableMasterMachine = 12,
+
+        TemporaryTableMasterApp = 13,
+
+        TemporaryTableMasterId = 14,
+
+        GlobalShowPass = 15,
+
+        Creator = 16,
+
+        CreateDateUTC = 17,
+
+        Caption = 18,
+
+        Tags = 19,
+
+        DictionaryWords = 20,
+
+        PermissionGroupsNewRow = 21,
+
+        TableAdminGroups = 22,
+
+        CliRights = 23,
+
+        AssetFolder = 24,
+
+        SymbolFolder = 25,
+
+        RowQuickInfo = 26,
+
+        StandardFormulaFile = 27,
+
+        EventScriptVersion = 28
+    }
 
     /// <summary>
-    /// Spalten-Keys der Spalten-Sätze des aktuellen binären Ladevorgangs; die
-    /// Nachbereitung (FinishMainParse) entfernt Spalten, die nicht darin stehen.
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged
+    /// und die übrigen On-Methoden.
     /// </summary>
-    internal HashSet<string> FragmentLoadedColumns { get; } = new(StringComparer.OrdinalIgnoreCase);
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Löst das Fragment-Änderungs-Event aus; Kopf-Property-Setter rufen sie nach
+    /// erfolgreichem ChangeData auf, die Datei-Verwaltung schreibt die Änderung
+    /// in ihr Journal. Der Typ-Selektor trägt einen TableFragmentType-Wert —
+    /// das Journal-Replay dispatched über dieses Enum, nicht über TableDataType.
+    /// </summary>
+    public virtual void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// Reicht eine Kind-Änderung eine Ebene höher und stellt jedem Blatt den eigenen
+    /// Navigationssatz (Segmenteintritt, leerer Key) voran; die tieferen Stufen
+    /// ergänzen ihre Sätze ihrerseits in deren ChildFragmentChanged (Item-Nav mit Schlüssel).
+    /// </summary>
+    public virtual void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
+        Enum? navigationType = null;
+
+        switch (sender) {
+            case ColumnCollection: navigationType = TableFragmentType.Columns; break;
+
+            case RowCollection: navigationType = TableFragmentType.Rows; break;
+
+            case UniqueValueCollection: navigationType = TableFragmentType.UniqueDefinitions; break;
+
+            case TableScriptCollection: navigationType = TableFragmentType.Scripts; break;
+
+            case ColumnArrangementCollection: navigationType = TableFragmentType.ColumnArrangements; break;
+
+            case VariableCollection: navigationType = TableFragmentType.VariableCollection; break;
+
+            case RowSortDefinition: navigationType = TableFragmentType.SortDefinition; break;
+        }
+
+        if (navigationType is { } navigation) { e = e.WithNavigation(navigation, string.Empty); }
+
+        OnFragmentChanged(e);
+    }
 
     /// <summary>
     /// Schreibt den kompletten Tabellenstand als tiefenbasierte Fragment-Blöcke:
     /// Kopf-Werte, Spalten als Liste, Sortier-Definition, Ansichten, Uniques,
-    /// Skripte und Kopf-Variablen, danach die Zeilen über SubRow und den Undo-Marker
-    /// samt Undo-Sektion. Reihenfolge wie der Classic-Content, damit Referenzen
-    /// (Spalten) vor ihren Nutzern da sind.
+    /// Skripte, Kopf-Variablen und Zeilen. Reihenfolge wie der Classic-Content,
+    /// damit Referenzen (Spalten) vor ihren Nutzern da sind.
     /// </summary>
     public virtual bool SerializeCore(Stream stream, int depth) {
         var allok = true;
@@ -3234,11 +3421,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             allok &= FragmentRecord.Append(stream, depth, TableFragmentType.SortDefinition, sortDefinition);
         }
 
+        // Ansichten, Unique-Definitionen und Skripte: je ein Segmenteintritt
+        // der Tabelle, darunter der ListKeyObject der Sammlung eine Ebene tiefer
         allok &= FragmentRecord.Append(stream, depth, TableFragmentType.ColumnArrangements, _columnArrangements);
 
-        allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UniqueDefinitions, _uniqueValues);
+        allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UniqueDefinitions, UniqueValues);
 
-        allok &= FragmentRecord.Append(stream, depth, TableFragmentType.Scripts, _eventScript);
+        allok &= FragmentRecord.Append(stream, depth, TableFragmentType.Scripts, EventScript);
 
         // Kopf-Variablen (Classic: Variables-Chunk)
         allok &= FragmentRecord.Append(stream, depth, TableFragmentType.VariableCollection, _variables);
@@ -3246,63 +3435,24 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Zeilen (Classic: RowChunk) — die RowCollection schreibt die Zeilen als Liste
         allok &= FragmentRecord.Append(stream, depth, TableFragmentType.Rows, Row);
 
-
-        List<UndoItem> undoSave;
-        List<FragmentChange> blockSave;
-        lock (_undoLock) {
-            undoSave = [.. Undo];
-            blockSave = [.. FragmentUndos];
-        }
-
-        foreach (var u in undoSave) {
-            // Steuer-Typen (z. B. der Undo-Satz selbst) haben keinen Daten-Satz.
-            if ((byte)u.Command > FragmentRecord.MaxUserTypeValue) { continue; }
-
-            var item = new FragmentChange(KeyName, u.Command, u.ColName, u.RowKey, u.ChangedTo, u.User, u.DateTimeUtc, u.Comment, "[Hauptdatei]");
-            allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UndoHistory, string.Empty)
-                  && FragmentChange.AppendFragment(stream, depth + 1, item);
-        }
-
-        foreach (var f in blockSave) {
-            allok &= FragmentRecord.Append(stream, depth, TableFragmentType.UndoHistory, string.Empty)
-                  && FragmentChange.AppendBlock(stream, depth + 1, f);
-        }
-
         return allok;
     }
 
     /// <summary>
-    /// Verarbeitet den Tabellen-Block: Kopf-Werte und Kommandos im Switch,
-    /// Unter-Objekte über ihre Sub*-Sätze suchen bzw. erzeugen und deren Block
-    /// eine Ebene tiefer lesen.
+    /// Verarbeitet den Tabellen-Block: Kopf-Werte im Switch, Segmenteintritte
+    /// reichen an die Unter-Objekte weiter, deren Block eine Ebene tiefer gelesen
+    /// wird.
     /// </summary>
-    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+    public virtual bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) { return false; }
 
         LastChange = DateTime.UtcNow;
 
         switch ((TableFragmentType)record.LeafType) {
-            // Sub*-Navigation: Empfänger direkt zuordnen oder erzeugen, dann deren Block lesen
+            // Segmenteintritte: der Block des Kindes folgt eine Ebene tiefer und
+            // beginnt dort mit dessen klasseneigenem Zahlraum
             case TableFragmentType.Columns:
                 return Column.Deserialize(stream, record.Depth + 1);
-
-            case TableFragmentType.UndoHistory:
-                // Je Eintrag ein eigener Block eine Ebene unter dem Nav-Satz; die
-                // Eintrags-Bytes liegen einen Tab tiefer als im Fragment-Datei-Layout
-                // und werden vor dem Parsen auf Basis-Tiefe 1 zurückgeschoben.
-                var undoEntries = FragmentChange.ReadFragments(FragmentChange.ReadEntryBlock(stream, record.Depth), KeyName, "[Hauptdatei]");
-
-                lock (_undoLock) {
-                    foreach (var undoEntry in undoEntries) {
-                        if (undoEntry.Block is { Length: > 0 }) {
-                            FragmentUndos.Add(undoEntry);
-                        } else {
-                            Undo.Add(new UndoItem(undoEntry.TableName, undoEntry.Command, undoEntry.ColName, undoEntry.RowKey, string.Empty, undoEntry.ChangedTo, undoEntry.User, undoEntry.DateTimeUtc, undoEntry.Comment, undoEntry.Container));
-                        }
-                    }
-                }
-
-                break;
 
             case TableFragmentType.VariableCollection:
                 return _variables.Deserialize(stream, record.Depth + 1);
@@ -3311,44 +3461,37 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 return Row.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.SortDefinition:
-                // Navigations-Satz (leerer Key); der Block folgt eine Ebene tiefer
+                // Teil-Sätze (granularer Journal-Schreibweg) auf die bestehende
+                // Instanz anwenden — nur so überlebt ein Einzel-Satz (z. B. nur
+                // Reverse) die übrigen Werte. Akkumulationsfrei sind die Blätter
+                // selbst: ColumnsList leert die Spalten vorab, Reverse ist ein
+                // Blatt-Wert; ein kompletter Block trifft nur frische Instanzen.
                 if (FragmentStoreableExtension.DeserializeOrCreate(stream, record.Depth, _sortDefinition, SortDefinitionCreate) is not { } sortDefinition) { return false; }
 
                 ReplaceSortDefinition(sortDefinition);
                 break;
 
             case TableFragmentType.UniqueDefinitions:
-                if (FragmentStoreableExtension.DeserializeList(stream, record.Depth, UniqueCreate) is not { } uniques) { return false; }
-
-                this.Unregister(_uniqueValues);
-                _uniqueValues = uniques;
-                this.Reregister(uniques);
-                break;
+                return UniqueValues.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.Scripts:
-                if (FragmentStoreableExtension.DeserializeList(stream, record.Depth, ScriptCreateOrGet) is not { } scripts) { return false; }
-
-                this.Unregister(_eventScript);
-                _eventScript = scripts;
-                this.Reregister(scripts);
-                break;
+                return EventScript.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.ColumnArrangements:
-                if (FragmentStoreableExtension.DeserializeList(stream, record.Depth, ViewCreateOrGet) is not { } arrangements) { return false; }
-
-                this.Unregister(_columnArrangements);
-                _columnArrangements = arrangements;
-                this.Reregister(arrangements);
-                break;
-
-
+                return _columnArrangements.Deserialize(stream, record.Depth + 1);
 
             case TableFragmentType.TableVersion:
                 LoadedVersion = record.StringContent.Trim();
                 break;
 
-            case TableFragmentType.TemporaryTableMasterId:
-                _temporaryTableMasterId = record.StringContent;
+            // Blatt-Werte: Direkte Feld-Zuordnung, denn die Nummernkreise der beiden
+            // Enums (Fragment/Classic) laufen künftig auseinander.
+            case TableFragmentType.TemporaryTableMasterUser:
+                _temporaryTableMasterUser = record.StringContent;
+                break;
+
+            case TableFragmentType.TemporaryTableMasterTimeUTC:
+                _temporaryTableMasterTimeUtc = record.StringContent;
                 break;
 
             case TableFragmentType.TemporaryTableMasterApp:
@@ -3359,12 +3502,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 _temporaryTableMasterMachine = record.StringContent;
                 break;
 
-            case TableFragmentType.TemporaryTableMasterUser:
-                _temporaryTableMasterUser = record.StringContent;
+            case TableFragmentType.TemporaryTableMasterId:
+                _temporaryTableMasterId = record.StringContent;
                 break;
 
-            case TableFragmentType.TemporaryTableMasterTimeUTC:
-                _temporaryTableMasterTimeUtc = record.StringContent;
+            case TableFragmentType.GlobalShowPass:
+                _globalShowPass = record.StringContent;
                 break;
 
             case TableFragmentType.Creator:
@@ -3379,27 +3522,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 _caption = record.StringContent;
                 break;
 
-            case TableFragmentType.AssetFolder:
-                _assetFolder = record.StringContent;
-                break;
-
-            case TableFragmentType.SymbolFolder:
-                _symbolFolder = record.StringContent;
-                RegisterSymbolFolder();
-                break;
-
-            case TableFragmentType.StandardFormulaFile:
-                _standardFormulaFile = record.StringContent;
-                break;
-
-            case TableFragmentType.RowQuickInfo:
-                _rowQuickInfo = record.StringContent;
-                break;
-
-            case TableFragmentType.GlobalShowPass:
-                _globalShowPass = record.StringContent;
-                break;
-
             case TableFragmentType.Tags:
                 _tags.Clear();
                 _tags.AddRange(record.ListContent);
@@ -3410,9 +3532,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 _dictionaryWords.AddRange(record.ListContent);
                 break;
 
+            case TableFragmentType.PermissionGroupsNewRow:
+                _permissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(string.Join('\r', record.ListContent));
+                break;
+
             case TableFragmentType.TableAdminGroups:
-                _tableAdmin.Clear();
-                _tableAdmin.AddRange(record.ListContent);
+                _tableAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(string.Join('\r', WithoutCliAdmin(record.ListContent)));
                 break;
 
             case TableFragmentType.CliRights:
@@ -3420,218 +3545,36 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 _cliRights.AddRange(ClassesStatic.CliRights.Repair(record.ListContent));
                 break;
 
-            case TableFragmentType.PermissionGroupsNewRow:
-                _permissionGroupsNewRow.Clear();
-                _permissionGroupsNewRow.AddRange(record.ListContent);
-
+            case TableFragmentType.AssetFolder:
+                _assetFolder = record.StringContent;
                 break;
 
+            case TableFragmentType.SymbolFolder:
+                _symbolFolder = record.StringContent;
+                RegisterSymbolFolder();
+                break;
 
+            case TableFragmentType.RowQuickInfo:
+                _rowQuickInfo = record.StringContent;
+                break;
+
+            case TableFragmentType.StandardFormulaFile:
+                _standardFormulaFile = record.StringContent;
+                break;
 
             case TableFragmentType.EventScriptVersion:
-                _eventScriptVersion = record.DateTimeContent;
+                _eventScriptVersion = DateTimeParse(record.StringContent);
                 InvalidateHeadCaches();
-                break;
-
-            default:
-                // Unbekannter Blatt-Typ — Satz überspringen
                 break;
         }
 
         return true;
-    }
-
-    /// <summary>
-    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu
-    /// OnPropertyChangedExt). Die Ableitung TableFragmentsNew überschreibt sie und
-    /// schreibt die Änderung in die eigene Fragmentdatei.
-    /// </summary>
-    public virtual void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
-
-        FragmentChanged?.Invoke(this, e);
-    }
-
-    /// <summary>
-    /// Reicht eine Kind-Änderung eine Ebene höher: Einzelkinder mit dem passenden Pfad-Segment
-    /// (Crumb-Typ, je Ereignis frisch gelesener Key des Kindes), die Spalten-/Zeilen-Sammlung
-    /// als Durchleitung — ihr Pfad ist bereits komplett.
-    /// </summary>
-    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
-        switch (sender) {
-            case VariableCollection:
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(TableFragmentType.VariableCollection, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-                break;
-
-            case RowSortDefinition:
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(TableFragmentType.SortDefinition, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-                break;
-
-            case UniqueValueDefinition:
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(TableFragmentType.UniqueDefinitions, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-                break;
-
-            case TableScriptDescription:
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(TableFragmentType.Scripts, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-                break;
-
-            case ColumnViewCollection:
-                OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(TableFragmentType.ColumnArrangements, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
-                break;
-
-            default:
-                // Spalten-/Zeilen-Sammlung: Der Pfad ist bereits komplett — Durchleitung
-                OnFragmentChanged(e);
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Ersetzt die Sortier-Definition und verdrahtet das Bubbling neu
-    /// (Crumb = SortDefinition, leerer Key); null löst die Verdrahtung.
-    /// </summary>
-    private void ReplaceSortDefinition(RowSortDefinition? newDefinition) {
-        this.Unregister(_sortDefinition);
-        _sortDefinition = newDefinition;
-        this.Register(newDefinition);
-    }
-
-    /// <summary>
-    /// Liefert das Skript unter dem Schlüssel des ersten Blocksatzes; fehlt es, wird
-    /// es neu erzeugt. Wird beim Einlesen von Skript-Listen als Empfänger-Fabrik genutzt.
-    /// </summary>
-    private TableScriptDescription ScriptCreateOrGet(FragmentRecord first) {
-        foreach (var script in _eventScript) {
-            if (string.Equals(script.KeyName, first.StringContent, StringComparison.OrdinalIgnoreCase)) { return script; }
-        }
-
-        return new TableScriptDescription(this, first.StringContent, string.Empty);
-    }
-
-    /// <summary>
-    /// Erzeugt eine leere Unique-Wert-Definition; den KeyName baut das Einlesen aus
-    /// den Spalten neu auf, der erste Blocksatz bleibt unberücksichtigt.
-    /// </summary>
-    private UniqueValueDefinition UniqueCreate(FragmentRecord first) => new(this, []);
-
-    /// <summary>
-    /// Liefert die Ansicht unter dem Schlüssel des ersten Blocksatzes; fehlt sie,
-    /// wird sie neu erzeugt.
-    /// </summary>
-    private ColumnViewCollection ViewCreateOrGet(FragmentRecord first) {
-        foreach (var arrangement in _columnArrangements) {
-            if (string.Equals(arrangement.KeyName, first.StringContent, StringComparison.OrdinalIgnoreCase)) { return arrangement; }
-        }
-
-        return new ColumnViewCollection(this, string.Empty, first.StringContent);
     }
 
     /// <summary>
     /// Erzeugt eine leere Sortier-Definition; die Werte liefert das Einlesen.
     /// </summary>
     private RowSortDefinition SortDefinitionCreate() => new(this, [], false);
-
-    /// <summary>
-    /// Wendet einen Sub*-Fragment-Block (Navigations-Satz 92-96 + Kind-Block mit Meta)
-    /// als Fragment-Baum an: Der Empfänger wird über den Schlüssel des Navigations-Satzes
-    /// gesucht, notfalls erzeugt, und liest seinen Block selbst ein. Listen-Kinder
-    /// ergänzen die bestehende Sammlung, ohne die übrigen Einträge anzutasten.
-    /// </summary>
-    internal bool ApplyFragmentBlock(byte[] block) {
-        if (IsDisposed) { return false; }
-
-        using var ms = new MemoryStream(block);
-
-        if (FragmentRecord.TryReadNext(ms, 1) is not { } record) { return false; }
-
-        switch ((TableFragmentType)record.LeafType) {
-            case TableFragmentType.UniqueDefinitions: {
-                    var uniques = new List<UniqueValueDefinition>(_uniqueValues);
-                    UniqueValueDefinition? target = null;
-
-                    foreach (var unique in uniques) {
-                        if (string.Equals(unique.KeyName, record.StringContent, StringComparison.OrdinalIgnoreCase)) {
-                            target = unique;
-                            break;
-                        }
-                    }
-
-                    if (target is null) {
-                        target = new UniqueValueDefinition(this, []);
-                        uniques.Add(target);
-                    }
-
-                    if (!target.Deserialize(ms, record.Depth + 1)) { return false; }
-
-                    _uniqueValues = uniques.AsReadOnly();
-                    this.Reregister(target);
-                    break;
-                }
-
-            case TableFragmentType.Scripts: {
-                    var scripts = new List<TableScriptDescription>(_eventScript);
-                    TableScriptDescription? target = null;
-
-                    foreach (var script in scripts) {
-                        if (string.Equals(script.KeyName, record.StringContent, StringComparison.OrdinalIgnoreCase)) {
-                            target = script;
-                            break;
-                        }
-                    }
-
-                    if (target is null) {
-                        target = new TableScriptDescription(this, record.StringContent, string.Empty);
-                        scripts.Add(target);
-                    }
-
-                    if (!target.Deserialize(ms, record.Depth + 1)) { return false; }
-
-                    _eventScript = scripts.AsReadOnly();
-                    this.Reregister(target);
-                    break;
-                }
-
-            case TableFragmentType.VariableCollection:
-                return _variables.Deserialize(ms, record.Depth + 1);
-
-            case TableFragmentType.ColumnArrangements: {
-                    var arrangements = new List<ColumnViewCollection>(_columnArrangements);
-                    ColumnViewCollection? target = null;
-
-                    foreach (var arrangement in arrangements) {
-                        if (string.Equals(arrangement.KeyName, record.StringContent, StringComparison.OrdinalIgnoreCase)) {
-                            target = arrangement;
-                            break;
-                        }
-                    }
-
-                    if (target is null) {
-                        target = new ColumnViewCollection(this, string.Empty, record.StringContent);
-                        arrangements.Add(target);
-                    }
-
-                    if (!target.Deserialize(ms, record.Depth + 1)) { return false; }
-
-                    _columnArrangements = arrangements.AsReadOnly();
-                    this.Reregister(target);
-                    break;
-                }
-
-            case TableFragmentType.SortDefinition:
-                if (FragmentStoreableExtension.DeserializeOrCreate(ms, record.Depth, _sortDefinition, SortDefinitionCreate) is not { } sortDefinition) { return false; }
-
-                ReplaceSortDefinition(sortDefinition);
-                break;
-
-            default:
-                // Unbekannte Navigation — Block verwerfen
-                return false;
-        }
-
-        return true;
-    }
-
-    #endregion
 
     #endregion
 }

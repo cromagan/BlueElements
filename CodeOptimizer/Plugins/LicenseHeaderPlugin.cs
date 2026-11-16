@@ -9,7 +9,9 @@ public class LicenseHeaderPlugin : CodeOptimizerPlugin {
 
     #region Fields
 
-    private const string LicenseHeader = "// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.\r\n\r\n";
+    private const string LicenseHeaderText = "// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.";
+
+    private const string LicenseHeader = LicenseHeaderText + "\r\n\r\n";
 
     #endregion
 
@@ -28,31 +30,52 @@ public class LicenseHeaderPlugin : CodeOptimizerPlugin {
         var counterOk = 0;
         var counterAdded = 0;
         var counterStripped = 0;
+        var skipped = new List<string>();
 
         foreach (var file in SourceFiles.Enumerate(rootPath)) {
-            var content = File.ReadAllText(file);
+            // Dateien ohne gültiges UTF-8 dürfen nicht umgeschrieben werden - das übernimmt das Encoding-Modul
+            if (!SourceFiles.IsUtf8(file)) {
+                skipped.Add(file);
+                continue;
+            }
 
-            if (content.StartsWith(LicenseHeader, StringComparison.Ordinal) && !content.StartsWith(LicenseHeader + "\r\n", StringComparison.Ordinal)) {
+            var content = File.ReadAllText(file).TrimStart('\uFEFF');
+
+            // Leere Dateien bleiben leer
+            if (content.Length == 0) { continue; }
+
+            var lines = new List<string>(content.Split(["\r\n", "\n"], StringSplitOptions.None));
+            string newContent;
+            var stripped = 0;
+
+            if (lines.Count > 0 && lines[0].Trim() == LicenseHeaderText) {
+                // Header vorhanden: Kommentare dahinter bleiben erhalten, nur überzählige Leerzeilen direkt danach entfernen
+                var rest = lines.Skip(1).ToList();
+
+                while (rest.Count > 0 && rest[0].Length == 0) {
+                    rest.RemoveAt(0);
+                    stripped++;
+                }
+
+                newContent = LicenseHeader + string.Join("\r\n", rest);
+            } else {
+                // Kein Header: führende Leer- und Kommentarzeilen (alter Header) entfernen und Header ergänzen
+                while (lines.Count > 0 && (string.IsNullOrWhiteSpace(lines[0]) || lines[0].TrimStart(' ', '\t').StartsWith("//", StringComparison.Ordinal))) {
+                    lines.RemoveAt(0);
+                    stripped++;
+                }
+
+                newContent = LicenseHeader + string.Join("\r\n", lines);
+            }
+
+            if (newContent == content) {
                 counterOk++;
                 continue;
             }
 
-            var lines = new List<string>(content.Split(["\r\n", "\n"], StringSplitOptions.None));
-            var stripped = 0;
-
-            while (lines.Count > 0 && (string.IsNullOrWhiteSpace(lines[0]) || lines[0].TrimStart(' ', '\t').StartsWith("//", StringComparison.Ordinal))) {
-                lines.RemoveAt(0);
-                stripped++;
-            }
-
-            var newContent = LicenseHeader + string.Join("\r\n", lines);
-
-            if (newContent == content) { continue; }
-
             File.WriteAllText(file, newContent, new UTF8Encoding(true));
             counterAdded++;
-
-            if (stripped > 0) { counterStripped++; }
+            counterStripped += stripped;
         }
 
         var report = new StringBuilder();
@@ -60,6 +83,7 @@ public class LicenseHeaderPlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"Bereits vorhanden: {counterOk}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Ergänzt:           {counterAdded}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Zeilen entfernt:   {counterStripped}");
+        AppendSkipped(report, skipped);
         return report.ToString();
     }
 

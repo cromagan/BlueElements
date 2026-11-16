@@ -9,6 +9,7 @@ public static partial class Extensions {
 
     #region Methods
 
+    // TODO: Unused
     public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
         if (l is not { Count: not 0 }) { return false; }
 

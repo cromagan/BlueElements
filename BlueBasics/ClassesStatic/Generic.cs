@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Principal;
+using System.Threading;
 using System.Windows.Forms;
 using LoxSmoke.DocXml;
 
@@ -402,7 +403,11 @@ public static class Generic {
         var endTicks = Environment.TickCount + (long)(seconds * 1000);
 
         while (Environment.TickCount < endTicks) {
-            if (allowEvents) { Develop.DoEvents(); }
+            if (allowEvents) {
+                Develop.DoEvents();
+            } else {
+                Thread.Sleep(1);
+            }
         }
     }
 

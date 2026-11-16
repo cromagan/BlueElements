@@ -14,16 +14,6 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     private volatile int _isDisposedFlag;
 
-    /// <summary>
-    /// Verschachtelungssicherer Zhler fr BeginInit / EndInit.
-    /// Bei Werten &gt; 0 werden OnPropertyChanged(string) und
-    /// OnPropertyChangedExt unterdrckt - typischerweise whrend
-    /// des Parsens / Initialisierens, damit Property-Setter keine Change-Events
-    /// auf halb initialisierte Objekte feuern. Das Disposed-Event
-    /// wird bewusst NIEMALS supprimiert (safety-relevant).
-    /// </summary>
-    private int _suspendCount;
-
     #endregion
 
     #region Events
@@ -40,14 +30,11 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    /// <summary>
-    /// <c>true</c>, whrend sich das Objekt in einer Initialisierungs- oder
-    /// Parse-Phase befindet (zwischen BeginInit und
-    /// EndInit). Consumer und Subklassen drfen darauf prfen,
-    /// um reaktive Logik zu verzgern. Change-Events werden in diesem Zustand
-    /// nicht gefeuert - mit Ausnahme des Disposed-Events.
-    /// </summary>
-    public bool IsEventsSuppressed => _suspendCount > 0;
+
+    private int _eventsSuppressCount;
+
+
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
 
     public string MyClassId {
         get {
@@ -173,16 +160,14 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Implementiert ISupportInitialize. Erhht den
-    /// _suspendCount-Zhler; alle nachfolgenden
-    /// OnPropertyChanged(string)- und
-    /// OnPropertyChangedExt-Aufrufe werden unterdrckt,
+    /// Implementiert ISupportInitialize. Erhöht den Suppress-Zähler; alle nachfolgenden
+    /// OnPropertyChanged- und OnPropertyChangedExt-Aufrufe werden unterdrückt,
     /// bis entsprechend oft EndInit aufgerufen wurde.
     /// Verschachtelungssicher. Siehe auch IsEventsSuppressed.
     /// </summary>
     public void BeginInit() {
         if (IsDisposed) { return; }
-        _suspendCount++;
+        _eventsSuppressCount++;
     }
 
     public object Clone() {
@@ -208,13 +193,12 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    /// Implementiert ISupportInitialize. Dekrementiert den
-    /// _suspendCount-Zhler. Sobald der Zhler wieder 0
-    /// erreicht, feuern die On-Methoden wieder normal.
+    /// Implementiert ISupportInitialize. Dekrementiert den Suppress-Zähler.
+    /// Sobald der Zähler wieder 0 erreicht, feuern die On-Methoden wieder normal.
     /// </summary>
     public void EndInit() {
         if (IsDisposed) { return; }
-        if (_suspendCount > 0) { _suspendCount--; }
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
     }
 
     /// <summary>

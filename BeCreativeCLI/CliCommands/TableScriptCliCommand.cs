@@ -283,7 +283,8 @@ public class TableScriptCliCommand : CliCommand {
         }
 
         scripts.Add(script);
-        tbl.EventScript = new(scripts);
+
+        tbl.EventScript = new TableScriptCollection(tbl, scripts);
 
         Console.Out.WriteLine("Skript gespeichert: " + script.KeyName);
         return SaveTable(tbl);

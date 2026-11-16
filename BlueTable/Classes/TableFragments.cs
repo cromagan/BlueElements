@@ -61,6 +61,13 @@ public class TableFragments : TableFile {
     /// </summary>
     private DateTime _isInCache = new(0);
 
+    /// <summary>
+    /// Serialisiert Nachladen, Writer-Lebenszyklus und Freigabe gegeneinander, damit
+    /// der periodische Update-Timer und Benutzeraktionen dieselbe Instanz nicht
+    /// gleichzeitig umstrukturieren.
+    /// </summary>
+    private readonly object _updateLock = new();
+
     private bool _masterNeeded;
     private string _myFragmentsFilename = string.Empty;
     private System.IO.StreamWriter? _writer;
@@ -126,36 +133,42 @@ public class TableFragments : TableFile {
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
-        if (firstTime) {
-            _isInCache = LastSaveMainFileUtcDate;
+        // Gegen den periodischen Update-Timer serialisieren: Zwei gleichzeitige
+        // InjectData-Aufrufe auf derselben Instanz würden sich gegenseitig halbfertige
+        // Zustände sehen und mit Freeze/Neustart reagieren. Monitor ist wiedereintrittsfähig,
+        // sodass der aus InjectData heraus angestoßene Master-Pfad denselben Thread nicht blockiert.
+        lock (_updateLock) {
+            if (firstTime) {
+                _isInCache = LastSaveMainFileUtcDate;
 
-            // Dedup-Grundlage ist die Historie des Hauptfiles: Items, deren Hash dort
-            // steht, gelten als verbucht und werden nicht erneut angewendet. Das ist
-            // korrekt, weil Daten und Historie aus demselben Snapshot gespeichert
-            // werden und die Historie nur um erfolgreich angewendete Items wächst.
-            _processedHashes.Clear();
-            List<UndoItem> undoSnapshot;
-            lock (_undoLock) {
-                undoSnapshot = [.. Undo];
+                // Dedup-Grundlage ist die Historie des Hauptfiles: Items, deren Hash dort
+                // steht, gelten als verbucht und werden nicht erneut angewendet. Das ist
+                // korrekt, weil Daten und Historie aus demselben Snapshot gespeichert
+                // werden und die Historie nur um erfolgreich angewendete Items wächst.
+                _processedHashes.Clear();
+                List<UndoItem> undoSnapshot;
+                lock (_undoLock) {
+                    undoSnapshot = [.. Undo];
+                }
+                foreach (var u in undoSnapshot) {
+                    _processedHashes.TryAdd(u.Hash(), default);
+                }
             }
-            foreach (var u in undoSnapshot) {
-                _processedHashes.TryAdd(u.Hash(), default);
-            }
+
+            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
+
+            // Zeitstempel VOR dem Lesen der Fragmente erfassen.
+            // Wird als endTimeUtc an InjectData übergeben und dort als _isInCache gesetzt.
+            // Konservativ: Fragmente, die während des Lesens hinzukommen, werden beim
+            // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
+            var readStartedUtc = DateTime.UtcNow;
+
+            var (changes, files, failed) = GetLastChanges();
+            if (failed) { return false; }
+
+            var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
+            return opr.IsSuccessful;
         }
-
-        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
-
-        // Zeitstempel VOR dem Lesen der Fragmente erfassen.
-        // Wird als endTimeUtc an InjectData übergeben und dort als _isInCache gesetzt.
-        // Konservativ: Fragmente, die während des Lesens hinzukommen, werden beim
-        // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
-        var readStartedUtc = DateTime.UtcNow;
-
-        var (changes, files, failed) = GetLastChanges();
-        if (failed) { return false; }
-
-        var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
-        return opr.IsSuccessful;
     }
 
     /// <summary>
@@ -259,9 +272,12 @@ public class TableFragments : TableFile {
             // Master-Schaft abmelden, bevor der Writer geschlossen wird: Die
             // Freigabe landet in der bestehenden Fragmentdatei, statt beim
             // Abmelden (base.Dispose ruft UnMasterMe) eine neue, nie mit EOF
-            // abgeschlossene Fragmentdatei zu öffnen.
-            UnMasterMe();
-            CloseWriter();
+            // abgeschlossene Fragmentdatei zu öffnen. Der Lock hält das Writer-
+            // Ende gegen den periodischen Update-Timer serialisiert.
+            lock (_updateLock) {
+                UnMasterMe();
+                CloseWriter();
+            }
         }
 
         base.Dispose(disposing);
@@ -269,7 +285,9 @@ public class TableFragments : TableFile {
         // Sicherheitsnetz: Falls das Abmelde-Schreiben im base.Dispose doch
         // einen neuen Writer geöffnet hat, diesen sauber abschließen.
         if (disposing && _writer is not null) {
-            CloseWriter();
+            lock (_updateLock) {
+                CloseWriter();
+            }
         }
     }
 
@@ -513,7 +531,7 @@ public class TableFragments : TableFile {
             List<string> myfiles = [];
             if (checkedDataFiles is not null) {
                 foreach (var thisf in checkedDataFiles) {
-                    if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
+                    if (thisf.Contains("\\" + KeyName + "-", StringComparison.OrdinalIgnoreCase)) {
                         myfiles.AddIfNotExists(thisf);
                     }
                 }
@@ -566,16 +584,22 @@ public class TableFragments : TableFile {
             } finally {
                 ResumeDataReload();
                 Interlocked.Decrement(ref _doingChanges);
-                Column.GetSystems();
-                DoWorkAfterLastChanges(myfiles, startTimeUtc);
-                RepairAfterParse();
-                TryToSetMeTemporaryMaster();
-                OnInvalidateView();
-                OnLoaded(false, affectingHead);
+
+                if (!IsDisposed) {
+                    Column.GetSystems();
+                    DoWorkAfterLastChanges(myfiles, startTimeUtc);
+                    RepairAfterParse();
+                    TryToSetMeTemporaryMaster();
+                    OnInvalidateView();
+                    OnLoaded(false, affectingHead);
+                }
             }
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc, initialload);
+        } catch (Exception ex) {
+            // Kein Wiederholen per Rekursion: Ein bleibender Fehler würde den Stack
+            // aufbrauchen (Stack-Overflow-Meldung und Stillstand). Der nächste
+            // BeSureToBeUpToDate-Aufruf versucht das Einspielen erneut.
+            Develop.DebugPrint(ErrorType.Warning, "InjectData fehlgeschlagen: " + KeyName, ex);
+            return OperationResult.Failed("Fehler beim Einspielen der Fragmente: " + ex.Message);
         }
 
         return OperationResult.Success;
@@ -593,43 +617,53 @@ public class TableFragments : TableFile {
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
         CheckPath();
 
-        var tmp = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
+        // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleichnamige Datei im
+        // selben Sekundentick, gesperrte Datei) werden mit neu erzeugtem Namen erneut
+        // versucht; ein bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
+        for (var versuch = 1; versuch <= 3; versuch++) {
+            _myFragmentsFilename = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
 
-        if (tmp.Contains("_000")) {
-            Pause(1, false);
-            Develop.AbortAppIfStackOverflow();
-            StartWriter();
-            return;
+            // Zähler-Anhang (_000xx) heißt: Der Wunschname war in dieser Sekunde bereits
+            // vergeben. Die Pause verschiebt den Sekunden-Zeitstempel im Namen.
+            for (var nameversuch = 1; nameversuch <= 3 && _myFragmentsFilename.Contains("_000"); nameversuch++) {
+                Pause(1, false);
+                _myFragmentsFilename = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
+            }
+
+            if (_myFragmentsFilename.Contains("_000")) {
+                Freeze("Fragmentdatei konnte nicht eindeutig benannt werden: " + _myFragmentsFilename);
+                return;
+            }
+
+            if (Develop.AllReadOnly) { return; }
+
+            System.IO.FileStream? fileStream = null;
+            try {
+                fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+                _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
+                fileStream = null;
+
+                _writer.AutoFlush = true;
+                _writer.WriteLine("- Version " + TableVersion);
+                _writer.WriteLine("- Filename " + Filename);
+                _writer.WriteLine("- User " + UserName);
+
+                var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+                _writer.WriteLine(l.ParseableItems().FinishParseable());
+                CanDeleteWriter = true;
+                _writer.Flush();
+                return;
+            } catch (Exception ex) {
+                fileStream?.Dispose();
+                _writer?.Dispose();
+                _writer = null;
+
+                Develop.DebugPrint(ErrorType.Warning, "Fragmentdatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myFragmentsFilename.FileNameWithSuffix(), ex);
+                Pause(1, false);
+            }
         }
 
-        _myFragmentsFilename = tmp;
-
-        if (Develop.AllReadOnly) { return; }
-
-        System.IO.FileStream? fileStream = null;
-        try {
-            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
-            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
-            fileStream = null;
-
-            _writer.AutoFlush = true;
-            _writer.WriteLine("- Version " + TableVersion);
-            _writer.WriteLine("- Filename " + Filename);
-            _writer.WriteLine("- User " + UserName);
-
-            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
-            _writer.WriteLine(l.ParseableItems().FinishParseable());
-            CanDeleteWriter = true;
-            _writer.Flush();
-        } catch {
-            fileStream?.Dispose();
-            _writer?.Dispose();
-            _writer = null;
-
-            Pause(3, false);
-            Develop.AbortAppIfStackOverflow();
-            StartWriter();
-        }
+        Freeze("Fragmentdatei konnte nicht geöffnet werden: " + _myFragmentsFilename);
     }
 
     #endregion

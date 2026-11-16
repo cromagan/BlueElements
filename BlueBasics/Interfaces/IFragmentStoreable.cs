@@ -15,11 +15,30 @@ namespace BlueBasics.Interfaces;
 /// </summary>
 public interface IFragmentStoreable {
 
+    #region Properties
+
+    /// <summary>
+    /// Stabiler Typ-Bezeichner des Objekts für den Kopf-Satz „Typ“ des Fragment-Formats.
+    /// Basis: der Klassen-Name; Klassen, deren Name sich ändern kann, liefern hier
+    /// einen festen Wert, damit gespeicherte Dateien unverändert lesbar bleiben.
+    /// </summary>
+    string TypeName => GetType().Name;
+
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind; SuppressEvents setzt das
+    /// für das Objekt und seine Kinder, ResumeEvents hebt es wieder auf.
+    /// Muss je Klasse implementiert werden, da der Zähler klasseneigen ist.
+    /// </summary>
+    bool IsEventsSuppressed { get; }
+
+    #endregion
+
     #region Events
 
     /// <summary>
     /// Bubbling-Event: Container abonnieren ihre Kinder und reichen die Änderung
-    /// mit dem eigenen Pfad-Segment als Präfix weiter zum Root.
+    /// mit dem eigenen Navigationssatz als Präfix weiter zum Root.
     /// </summary>
     event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
@@ -28,13 +47,17 @@ public interface IFragmentStoreable {
     #region Methods
 
     /// <summary>
-    /// Schreibt System-Bytes (User, Machine), den eigenen Block per
+    /// Übernimmt die Inhalte von source; liefert bei Erfolg eine leere Zeichenfolge, sonst eine Fehlermeldung.
+    /// </summary>
+    string Update(IFragmentStoreable source);
+
+    /// <summary>
+    /// Schreibt System-Bytes (SaveUser, Machine, SaveTimeUtc), den eigenen Block per
     /// SerializeCore und abschließend den EOF-Satz. Nur die Wurzel (Tiefe 1) setzt
     /// System-Bytes, Kommentar-Trenner und EOF; Sub-Objekte werden mit
     /// Serialize(stream, depth + 1) aufgerufen und schreiben nur ihren Block.
-    /// Bewusst kein Zeitstempel-Satz: Die Speicherzeit steht im Dateisystem
-    /// (LastWriteTimeUtc), ein UtcNow-Satz würde identische Stände nicht mehr
-    /// byteidentisch speichern. Bewusst kein Kommentar-Trenner bei Sub-Objekten:
+    /// Den Erzeuger-Stempel (CreateUser/CreateTimeUtc) schreibt der Datei-Layer
+    /// vor diesen Kopf-Sätzen. Bewusst kein Kommentar-Trenner bei Sub-Objekten:
     /// Er hätte Item-Tiefe und würde vom Deserialize hinter die Blockgrenze
     /// genommen — die Grenzen zwischen Listen-Items setzt der Listen-Writer
     /// zwei Ebenen unter der Liste.
@@ -48,8 +71,9 @@ public interface IFragmentStoreable {
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SerializerVersion, "1.00");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.CopyrightInfo, "(c) by Christian Peter - see License for details.");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Type,  type);
-            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.User, Generic.UserName);
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveUser, Generic.UserName);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Machine, Environment.MachineName);
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveTimeUtc, DateTime.UtcNow);
 
             // Kommentar-Trenner markiert das Ende der Root-Kopfzeilen
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Comment, FragmentRecord.SeparatorComment);
@@ -88,6 +112,19 @@ public interface IFragmentStoreable {
     bool ParseFinished() => true;
 
     /// <summary>
+    /// Unterdrückt FragmentChanged-Events; zählbasiert, also verschachtelbar — jedes SuppressEvents
+    /// braucht ein ResumeEvents. Muss je Klasse deklariert werden (klasseneigener Zähler);
+    /// Container reichen die Unterdrückung dort an ihre Kinder weiter.
+    /// </summary>
+    void SuppressEvents();
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf. Muss je Klasse deklariert werden
+    /// (klasseneigener Zähler); Container heben sie dort auch bei ihren Kindern auf.
+    /// </summary>
+    void ResumeEvents();
+
+    /// <summary>
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus
     /// (Pendant zu OnPropertyChangedExt).
     /// </summary>
@@ -95,9 +132,9 @@ public interface IFragmentStoreable {
 
     /// <summary>
     /// Wird beim Bubbling aufgerufen, wenn ein verdrahtetes Fragment-Kind eine Änderung meldet.
-    /// Der Default reicht die Änderung unverändert durch (der Pfad des Kindes ist bereits komplett);
-    /// Container mit eigenem Pfad-Segment überschreiben die Routine und stellen ihrem Paar
-    /// (Typ, Key) den Pfad des Kindes voran.
+    /// Der Default reicht die Änderung unverändert durch; Container mit eigenem Segment
+    /// überschreiben die Routine und feuern per WithNavigation um ihren Navigationssatz
+    /// erweiterte Argumente weiter — das Root leitet daraus die Undo-Sätze ab.
     /// </summary>
     void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) => OnFragmentChanged(e);
 
@@ -112,8 +149,8 @@ public static class FragmentStoreableExtension {
     #region Methods
 
     /// <summary>
-    /// Verdrahtet ein neues Fragment-Kind für das FragmentChanged-Bubbling:
-    /// Bei einer Kind-Änderung wird ChildFragmentChanged des Parents aufgerufen.
+    /// Verdrahtet ein neues Fragment-Kind für das Bubbling: Bei einer Kind-Änderung wird
+    /// ChildFragmentChanged des Parents aufgerufen.
     /// </summary>
     public static void Register(this IFragmentStoreable parent, IFragmentStoreable? child) {
         if (child is null) { return; }
@@ -168,12 +205,12 @@ public static class FragmentStoreableExtension {
     }
 
     /// <summary>
-    /// Schreibt System-Bytes (User, DateTimeUtc, Machine), den eigenen Block per
+    /// Schreibt System-Bytes (SaveUser, Machine, SaveTimeUtc), den eigenen Block per
     /// SerializeCore und abschließend den EOF-Satz (Details im Interface). Diese
     /// Überladung ermöglicht den Serialize-Aufruf über konkrete Klassentypen,
     /// da Default-Interface-Methoden nur über den Schnittstellentyp sichtbar sind.
     /// </summary>
-    public static bool Serialize(this IFragmentStoreable sender, Stream stream, int depth) => sender.Serialize(stream, depth, sender.GetType().Name);
+    public static bool Serialize(this IFragmentStoreable sender, Stream stream, int depth) => sender.Serialize(stream, depth, sender.TypeName);
 
     /// <summary>
     /// Liest den eigenen Block bis zu seinem Ende: Sätze genau der Tiefe depth gehen an
@@ -189,7 +226,10 @@ public static class FragmentStoreableExtension {
                 continue;
             }
 
-            if (!sender.DeserializeThis(stream, record)) { return false; }
+            if (!sender.DeserializeThis(stream, record)) {
+                Develop.Diagnose("IFragmentStoreable.Deserialize", "false von " + sender.GetType().Name + ", Leaf=" + record.LeafType + ", T" + record.Depth + ", Content=" + record.StringContent.Left(60) + ", Stack: " + Develop.DiagStack());
+                return false;
+            }
         }
 
         return sender.ParseFinished();
@@ -206,7 +246,7 @@ public static class FragmentStoreableExtension {
     /// DeserializeThis, den Rest liest das Item selbst. Liefert null bei echten
     /// Lesefehlern.
     /// </summary>
-    public static ReadOnlyCollection<T>? DeserializeList<T>(Stream stream, int depth, Func<FragmentRecord, T> create) where T : class, IFragmentStoreable {
+    public static ReadOnlyCollection<T>? DeserializeList<T>(Stream stream, int depth, Func<FragmentRecord, T?> create) where T : class, IFragmentStoreable {
         // Listen-Block in den Puffer kopieren: alle Sätze tiefer als depth.
         // Der stream steht danach exakt am nächsten Satz der List-Ebene.
         using var blockStream = new MemoryStream();
@@ -259,7 +299,14 @@ public static class FragmentStoreableExtension {
                 first = next;
             }
 
-            if (create(first) is not { } item || !item.DeserializeThis(segment, first) || !item.Deserialize(segment, depth + 1)) { return null; }
+            if (create(first) is not { } item) {
+                // Empfänger nicht erzeugbar (z. B. Ansichts-Eintrag einer
+                // entfernten Spalte): das Segment ist unverwertbar und wird
+                // übersprungen — die Nacharbeiten (Repair) räumen ab.
+                continue;
+            }
+
+            if (!item.DeserializeThis(segment, first) || !item.Deserialize(segment, depth + 1)) { return null; }
 
             result.Add(item);
         }

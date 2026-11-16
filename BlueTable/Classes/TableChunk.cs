@@ -212,7 +212,7 @@ public class TableChunk : TableFile {
         return result;
     }
 
-    public static List<byte> GenerateHeadVariableChunks(TableFile tb) {
+    public static List<byte> GenerateHeadVariableChunks(Table tb) {
         var varBytes = new List<byte>();
 
         var vars = tb.Variables.ToList();
@@ -221,7 +221,7 @@ public class TableChunk : TableFile {
         return varBytes;
     }
 
-    public static List<byte> GenerateMainChunk(TableFile tb) {
+    public static List<byte> GenerateMainChunk(Table tb) {
         List<byte> result = new();
 
         // Metadaten schreiben
@@ -248,7 +248,8 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
         SaveToByteList(result, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable()).SortedDistinctList()));
         SaveToByteList(result, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
-        SaveToByteList(result, TableDataType.EventScript, tb.EventScript.ToString(true));
+        // Skripte kanonisch sortiert schreiben — Reihenfolge unabhängig von der Einfüge-Historie
+        SaveToByteList(result, TableDataType.EventScript, tb.EventScript.ToList().ToString(true));
         SaveToByteList(result, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
 
         SaveToByteList(result, TableDataType.CheckPoint, $"~^{Chunk_MainData.ToLowerInvariant()}^~");
@@ -269,7 +270,7 @@ public class TableChunk : TableFile {
         return result;
     }
 
-    public static List<byte> GenerateMasterUserChunk(TableFile tb) {
+    public static List<byte> GenerateMasterUserChunk(Table tb) {
         var masterUserBytes = new List<byte>();
 
         SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterUser, tb.TemporaryTableMasterUser);
@@ -282,7 +283,7 @@ public class TableChunk : TableFile {
         return masterUserBytes;
     }
 
-    public static List<byte> GenerateRowChunk(TableFile tb, bool allrows, string chunkId) {
+    public static List<byte> GenerateRowChunk(Table tb, bool allrows, string chunkId) {
         // Initialisierung der Basis-Listen
         var targetList = new List<byte>();
 
@@ -316,9 +317,21 @@ public class TableChunk : TableFile {
             undoSnapshot = [.. tb.Undo];
         }
 
+        // Kanonische Ordnung: Der Datei-Schlüssel speichert nur Millisekunden — der
+        // Sortiervergleich trunciert deshalb ebenfalls, damit geladene und frisch
+        // aufgezeichnete Einträge in dieselbe Reihenfolge kommen. Die Nachfelder
+        // (alle serialisierten Werte) machen die Ordnung total und vom Listenzustand
+        // der Undo-Historie unabhängig — gleiches Datenstand, gleiche Bytes.
         var sortedUndoItems = undoSnapshot
             .Where(item => item?.LogsUndo(tb) == true)
-            .OrderByDescending(item => item.DateTimeUtc)
+            .OrderByDescending(item => item.DateTimeUtc.Ticks - item.DateTimeUtc.Ticks % TimeSpan.TicksPerMillisecond)
+            .ThenBy(item => (int)item.Command)
+            .ThenBy(item => item.ColName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.RowKey, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.User, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.ChangedTo, StringComparer.Ordinal)
+            .ThenBy(item => item.PreviousValue, StringComparer.Ordinal)
+            .ThenBy(item => item.Comment, StringComparer.Ordinal)
             .ToList();
 
         foreach (var thisWorkItem in sortedUndoItems) {
@@ -348,7 +361,7 @@ public class TableChunk : TableFile {
         return result;
     }
 
-    public static List<byte> GenerateUsesChunk(TableFile tb) {
+    public static List<byte> GenerateUsesChunk(Table tb) {
         List<byte> usesBytes = new();
 
         foreach (var columnitem in tb.ColumnsInSaveOrder()) {
@@ -401,7 +414,7 @@ public class TableChunk : TableFile {
     /// GetChunkId liefert niemals Chunk_MainDataLite,
     /// und die Lite-Datei enthält per Definition keine Row-Daten.
     /// </summary>
-    public static List<RowItem> RowsOfChunk(TableFile tb, string chunkId) {
+    public static List<RowItem> RowsOfChunk(Table tb, string chunkId) {
         if (tb is null || tb.IsDisposed) { return []; }
         if (string.IsNullOrEmpty(chunkId)) { return []; }
         if (tb is not TableChunk) { return []; }
@@ -963,7 +976,7 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc).
     /// Millisekunden sind verpflichtend. Gibt null zurück, wenn das Datum nicht geparst werden kann.
-    /// Wird auch für Snapshot-Dateien (SaveableFileBlockableFile) mit gleichem Namensformat genutzt.
+    /// Wird auch für Snapshot-Dateien des Fragment-Formats (.tbls) mit gleichem Namensformat genutzt.
     /// </summary>
     internal static DateTime? ExtractDateFromFileName(string filePath) {
         var fileName = filePath.FileNameWithoutSuffix();

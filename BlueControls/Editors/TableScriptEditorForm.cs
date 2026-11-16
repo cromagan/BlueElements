@@ -100,7 +100,7 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
     }
 
     private void btnVerlauf_Click(object? sender, System.EventArgs e) {
-        if (IsDisposed || _table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || _table is not TableFile { IsDisposed: false } tb) { return; }
         if (lstEventScripts.SelectedItem is not TableScriptDescription item) { return; }
 
         var l = new List<string>();
@@ -196,10 +196,10 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
     private void TableScriptEditor_Executing(object? sender, System.EventArgs e) => WriteBackEventScripts();
 
     /// <summary>
-    /// Schreibt die Arbeitskopie (EditorForIEnumerable.OutputItem)
-    /// in das Backend (Table.EventScript) zurück. Wird beim
-    /// Schließen des Formulars sowie vor jedem Test/Ausführen (über das
-    /// ScriptEditor.Executing-Event) aufgerufen.
+    /// Schreibt die Arbeitskopie (EditorForIEnumerable.OutputItem) über den
+    /// EventScript-Setter ins Backend. Wird beim Schließen des Formulars
+    /// sowie vor jedem Test/Ausführen (über das ScriptEditor.Executing-Event)
+    /// aufgerufen.
     /// </summary>
     private void WriteBackEventScripts() {
         if (_table is not { IsDisposed: false } tb) { return; }
@@ -210,14 +210,11 @@ public sealed partial class TableScriptEditorForm : Form, IUniqueWindow {
         // bevor diese ans Backend geht.
         lstEventScripts.DemandEditorOutput();
 
-        tb.EventScript = lstEventScripts.OutputItem
-            .Cast<TableScriptDescription>()
-            .ToList()
-            .AsReadOnly();
+        tb.EventScript = new TableScriptCollection(tb, [.. lstEventScripts.OutputItem.Cast<TableScriptDescription>()]);
 
-        // Backend tauscht die Collection-Referenz aus — Quelle neu setzen löst
-        // den Neuaufbau aus (mit Selektionserhalt) und aktualisiert _item im
-        // Editor auf die frische Backend-Instanz.
+        // Das Zurückschreiben tauscht im Legacy-Format die Collection-Referenz
+        // aus — Quelle neu setzen löst den Neuaufbau aus (mit Selektionserhalt)
+        // und aktualisiert _item im Editor auf die frische Backend-Instanz.
         lstEventScripts.InputItem = tb.EventScript;
     }
 

@@ -62,6 +62,7 @@ public class StringScriptVariable : ScriptVariable {
                 return;
             }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+            OnFragmentChanged(new FragmentChangedEventArgs(this, VariableFragmentType.Value, ValueForReplace));
         }
     }
 
@@ -74,8 +75,9 @@ public class StringScriptVariable : ScriptVariable {
     public override string GetValueFrom(ScriptVariable variable) {
         if (variable is not StringScriptVariable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
+
+        // ValueString meldet das Value-Fragment selbst
         ValueString = v.ValueString;
-        OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, ValueForReplace));
         return string.Empty;
     }
 

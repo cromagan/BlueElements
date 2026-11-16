@@ -9,7 +9,6 @@ using BlueTable.ClassesStatic;
 using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using SpellDictionary = BlueControls.ClassesStatic.Dictionary;
@@ -348,7 +347,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     /// <summary>
     /// Vergleicht die bestehenden Unique-Definitionen mit der neuen Arbeitskopie.
     /// </summary>
-    private static bool UniquesChanged(ReadOnlyCollection<UniqueValueDefinition> oldDefinitions, List<UniqueValueDefinition> newDefinitions) {
+    private static bool UniquesChanged(IEnumerable<UniqueValueDefinition> oldDefinitions, List<UniqueValueDefinition> newDefinitions) {
         HashSet<string> oldKeys = [.. oldDefinitions.Select(x => x.KeyName)];
         HashSet<string> newKeys = [.. newDefinitions.Select(x => x.KeyName)];
         return !oldKeys.SetEquals(newKeys);
@@ -438,7 +437,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         // Die Arbeitskopie zuerst ins Backend zurückschreiben, damit die
         // Duplikat-Suche die aktuellen (ggf. im Dialog geänderten) Definitionen nutzt.
-        tb.UniqueValues = WorkingCopyUniques().AsReadOnly();
+        tb.UniqueValues = new UniqueValueCollection(tb, WorkingCopyUniques());
 
         // Fortschritt und Abbrechen nur bei gechunkten Tabellen: Nur dort
         // kann die Reparatur durch Chunk-Zugriffe spürbar dauern.
@@ -586,7 +585,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         var uniquesChanged = UniquesChanged(Table.UniqueValues, neueDefinitions);
 
-        Table.UniqueValues = neueDefinitions.AsReadOnly();
+        Table.UniqueValues = new UniqueValueCollection(Table, neueDefinitions);
 
         // Hat der Benutzer die Unique-Definitionen verändert, werden die
         // Zeilen-Duplikate aller Definitionen repariert (Warnung ab mehr als 5 gleichen Zeilen).

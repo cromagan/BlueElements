@@ -37,15 +37,22 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         var counterTypes = 0;
         var counterRemoved = 0;
         var counterAdded = 0;
+        var skipped = new List<string>();
 
         foreach (var file in SourceFiles.Enumerate(rootPath)) {
             // Designer-Dateien sind generiert und werden nicht angetastet
             if (file.EndsWith(".Designer.cs", StringComparison.OrdinalIgnoreCase)) { continue; }
 
+            // Dateien ohne gültiges UTF-8 dürfen nicht umgeschrieben werden - das übernimmt das Encoding-Modul
+            if (!SourceFiles.IsUtf8(file)) {
+                skipped.Add(file);
+                continue;
+            }
+
             var content = File.ReadAllText(file);
             var result = ReorganizeFile(content, out var types, out var removed, out var added);
 
-            if (result is null) { continue; }
+            if (result is null || result == content) { continue; }
 
             File.WriteAllText(file, result, new UTF8Encoding(true));
             counterChanged++;
@@ -60,6 +67,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"Typen neu geordnet:  {counterTypes}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Regionen entfernt:   {counterRemoved}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Regionen eingefügt:  {counterAdded}");
+        AppendSkipped(report, skipped);
         return report.ToString();
     }
 
@@ -134,7 +142,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
     /// Gruppiert und sortiert die Member des Typkörpers und baut die Regionen neu auf.
     /// </summary>
     private static List<string>? ReorganizeBody(List<string> lines, List<string> clean, int[] depths, int first, int last, int bodyDepth, string typeName, out int regionsRemoved, out int regionsAdded) {
-        var items = ParseBody(lines, clean, depths, first, last, bodyDepth, typeName, out regionsRemoved, out var otherDirectives);
+        var items = ParseBody(lines, clean, depths, first, last, bodyDepth, typeName, out regionsRemoved, out var otherDirectives, out var standardRegions);
         regionsAdded = 0;
 
         // Konservativ: Bei strukturbildenden Präprozessor-Direktiven (#if/#endif, #line) nichts tun
@@ -166,7 +174,8 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
             AppendItems(result, group);
             result.Add(string.Empty);
             result.Add(indent + "#endregion");
-            regionsAdded++;
+
+            if (!standardRegions.Contains(region)) { regionsAdded++; }
         }
 
         var rest = new List<MemberEntry>();
@@ -184,10 +193,12 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     /// <summary>
     /// Zerlegt den Typkörper in Member-Blöcke mit vorausgehenden Kommentaren und Attributen.
+    /// Entfernte Regionen werden nur bei nicht Standard-Regionen gezählt; vorhandene Standard-Regionen landen in standardRegions.
     /// </summary>
-    private static List<MemberEntry> ParseBody(List<string> lines, List<string> clean, int[] depths, int first, int last, int bodyDepth, string typeName, out int regionsRemoved, out int otherDirectives) {
+    private static List<MemberEntry> ParseBody(List<string> lines, List<string> clean, int[] depths, int first, int last, int bodyDepth, string typeName, out int regionsRemoved, out int otherDirectives, out HashSet<string> standardRegions) {
         regionsRemoved = 0;
         otherDirectives = 0;
+        standardRegions = [];
         var items = new List<MemberEntry>();
         var trivia = new List<string>();
         var i = first;
@@ -197,8 +208,20 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
             if (t.Length == 0) { i++; continue; }
 
-            if (t.StartsWith("#region", StringComparison.Ordinal) || t.StartsWith("#endregion", StringComparison.Ordinal)) {
-                regionsRemoved++;
+            if (t.StartsWith("#region", StringComparison.Ordinal)) {
+                var name = t[7..].Trim();
+
+                if (name is not { Length: > 0 } || !RegionOrder.Contains(name)) {
+                    regionsRemoved++;
+                } else {
+                    standardRegions.Add(name);
+                }
+
+                i++;
+                continue;
+            }
+
+            if (t.StartsWith("#endregion", StringComparison.Ordinal)) {
                 i++;
                 continue;
             }
@@ -264,14 +287,35 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
 
     /// <summary>
     /// Liefert die Zeile, in der der ab start beginnende Member endet.
+    /// ';' beendet immer. '}' bei geöffnetem Block, bei Membern ohne Expression-Body oder bei Accessor-Einzeilern
+    /// mit '{' vor '=>'. Expression-Bodied-Köpfe mit Property-Pattern am Zeilenende ('=> ... { ... }') laufen weiter.
     /// </summary>
     private static int MemberEndIndex(int[] depths, List<string> clean, int start, int last, int bodyDepth) {
+        var blockOpened = false;
+        var expressionBodied = false;
+
         for (var j = start; j <= last; j++) {
             if (depths[j] == bodyDepth) {
                 var t = clean[j].TrimEnd();
-                if (t.EndsWith(';') || t.EndsWith('}')) { return j; }
+
+                if (t.EndsWith(';')) { return j; }
+
+                if (t.EndsWith('}')) {
+                    var arrow = t.IndexOf("=>", StringComparison.Ordinal);
+                    var brace = arrow >= 0 ? t.IndexOf('{') : -1;
+
+                    // '}'-Zeilen mit '{' vor '=>' sind vollständige Einzeiler (Accessor/Lambda); '=>' vor '{'
+                    // markiert den Kopf eines mehrzeiligen Expression-Bodied-Members mit Property-Pattern.
+                    var oneLiner = arrow >= 0 && brace >= 0 && brace < arrow;
+
+                    if (blockOpened || oneLiner || (!expressionBodied && arrow < 0)) { return j; }
+                }
             }
+
+            if (depths[j] > bodyDepth) { blockOpened = true; }
+            if (clean[j].Contains("=>", StringComparison.Ordinal)) { expressionBodied = true; }
         }
+
         return last;
     }
 
@@ -287,7 +331,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         if (ContainsWord(pre, "delegate")) { return "Delegates"; }
         if (ContainsWord(pre, "event")) { return "Events"; }
         if (ContainsWord(pre, "struct")) { return "Structs"; }
-        if (ContainsWord(pre, "class") || ContainsWord(pre, "interface") || ContainsWord(pre, "record")) { return string.Empty; }
+        if (ContainsWord(pre, "class") || ContainsWord(pre, "interface") || ContainsWord(pre, "record") || ContainsWord(pre, "enum")) { return string.Empty; }
         if (pre.Contains("this[", StringComparison.Ordinal)) { return "Indexers"; }
         if (ContainsWord(pre, "operator")) { return "Methods"; }
 
@@ -313,7 +357,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         if (category == "Structs") { return WordAfter(header, "struct"); }
         if (category == "Delegates") {
             var p = header.IndexOf('(');
-            return p < 0 ? header : NameBefore(header[..p]);
+            return p < 0 ? header : NameBefore(WithoutGenericSuffix(header[..p]));
         }
         if (category == "Events") {
             var p = header.IndexOfAny(['{', ';', '=']);
@@ -326,12 +370,31 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         if (category == "Methods") {
             var p = header.IndexOf('(');
             if (p < 0) { return header; }
-            var name = NameBefore(header[..p]);
+            var name = NameBefore(WithoutGenericSuffix(header[..p]));
             return name.Length > 0 ? name : header[..p].Trim();
         }
 
         // Fields und Constructors: Originalreihenfolge
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Entfernt eine generische Parameterliste am Zeilenende, damit der Sortierschlüssel den Membernamen enthält.
+    /// </summary>
+    private static string WithoutGenericSuffix(string slice) {
+        if (!slice.TrimEnd().EndsWith('>')) { return slice; }
+
+        var depth = 0;
+        for (var i = slice.Length - 1; i >= 0; i--) {
+            var c = slice[i];
+            if (c == '>') { depth++; }
+            if (c == '<') {
+                depth--;
+                if (depth == 0) { return slice[..i]; }
+            }
+        }
+
+        return slice;
     }
 
     private static string SortKeySelector(MemberEntry item) => item.SortKey;

@@ -5,10 +5,26 @@ namespace CodeOptimizer.Classes;
 /// <summary>
 /// Ersetzt in C#-Quelltext die Inhalte von Kommentaren und Strings durch Leerzeichen,
 /// damit Klammer-Tiefen und Token-Suchen textbasiert ohne Störung durch String-Inhalte laufen.
+/// Zusätzlich liefert sie je Eingabezeichen die Art (Code, String, Kommentar) für Treffer-Prüfungen.
 /// </summary>
 public sealed class CsSanitizer {
 
     #region Fields
+
+    /// <summary>
+    /// Art eines Zeichens: regulärer Code.
+    /// </summary>
+    public const char KindCode = 'c';
+
+    /// <summary>
+    /// Art eines Zeichens: String-, Zeichenliteral- oder Interpolationsinhalt (inkl. Löcher).
+    /// </summary>
+    public const char KindString = 's';
+
+    /// <summary>
+    /// Art eines Zeichens: Kommentar.
+    /// </summary>
+    public const char KindComment = 'k';
 
     private const int StCode = 0;
     private const int StLineComment = 1;
@@ -37,27 +53,71 @@ public sealed class CsSanitizer {
         var result = new List<string>(lines.Count);
         foreach (var line in lines) {
             var sb = new StringBuilder(line.Length);
-            SanitizeInto(sb, line);
+            SanitizeInto(sb, null, line);
             result.Add(sb.ToString());
             if (state == StLineComment) { state = StCode; }
         }
         return result;
     }
 
+    // TODO: Unused
     /// <summary>
-    /// Bereinigt einen zusammenhängenden Textabschnitt (z. B. einen Member-Kopf).
+    /// Bereinigt einen zusammenhängenden Textabschnitt und behält exakt die Zeichenanzahl bei (Positionen bleiben gültig).
     /// </summary>
-    public string Sanitize(string text) {
+    public string SanitizeText(string text) {
         var sb = new StringBuilder(text.Length);
-        foreach (var part in text.Split(["\r\n", "\n"], StringSplitOptions.None)) {
-            SanitizeInto(sb, part);
-            sb.Append(' ');
+        var start = 0;
+
+        while (start < text.Length) {
+            var nl = text.IndexOf('\n', start);
+            var end = nl < 0 ? text.Length : nl + 1;
+            SanitizeInto(sb, null, text[start..end]);
+
             if (state == StLineComment) { state = StCode; }
+
+            start = end;
         }
+
         return sb.ToString();
     }
 
-    private void SanitizeInto(StringBuilder sb, string line) {
+    /// <summary>
+    /// Liefert je Eingabezeichen die Art (KindCode, KindString oder KindComment); die Indizes entsprechen dem Originaltext.
+    /// </summary>
+    public string SanitizeKinds(string text) {
+        var kinds = new StringBuilder(text.Length);
+        var start = 0;
+
+        while (start < text.Length) {
+            var nl = text.IndexOf('\n', start);
+            var end = nl < 0 ? text.Length : nl + 1;
+            SanitizeInto(null, kinds, text[start..end]);
+
+            if (state == StLineComment) { state = StCode; }
+
+            start = end;
+        }
+
+        return kinds.ToString();
+    }
+
+    /// <summary>
+    /// Liefert true, wenn der Bereich ausschließlich Code-Zeichen enthält (kein String, kein Kommentar, keine Interpolation).
+    /// </summary>
+    public static bool IsPureCode(string kinds, int start, int length) {
+        if (start < 0 || start + length > kinds.Length) { return false; }
+        return kinds.AsSpan(start, length).IndexOfAny(KindString, KindComment) < 0;
+    }
+
+    /// <summary>
+    /// Liefert true, wenn der Bereich String- oder Zeichenliteral-Anteile enthält; Kommentare stören nicht.
+    /// </summary>
+    public static bool ContainsString(string kinds, int start, int length) {
+        if (start < 0 || start + length > kinds.Length) { return true; }
+        return kinds.AsSpan(start, length).IndexOf(KindString) >= 0;
+    }
+
+    private void SanitizeInto(StringBuilder? sb, StringBuilder? kinds, string line) {
         var i = 0;
         while (i < line.Length) {
             var c = line[i];
@@ -66,131 +126,144 @@ public sealed class CsSanitizer {
                 case StCode:
                     if (c == '/' && next == '/') {
                         state = StLineComment;
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindComment);
                         i++;
                     } else if (c == '/' && next == '*') {
                         state = StBlockComment;
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindComment);
                         i++;
                     } else if (c == '"') {
-                        HandleQuoteStart(sb, line, ref i);
+                        saved.Push((StCode, holeDepth));
+                        HandleQuoteStart(sb, kinds, line, ref i);
                     } else if (c == '\'') {
+                        saved.Push((StCode, holeDepth));
                         state = StCharLiteral;
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(c);
+                        Append(sb, kinds, c, KindCode);
                     }
                     break;
                 case StLineComment:
-                    sb.Append(' ');
+                    Append(sb, kinds, ' ', KindComment);
                     break;
                 case StBlockComment:
                     if (c == '*' && next == '/') {
                         state = StCode;
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindComment);
                         i++;
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindComment);
                     }
                     break;
                 case StString:
                     if (c == '\\') {
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindString);
                         i++;
                     } else if (c == '"') {
-                        state = StCode;
-                        sb.Append(' ');
+                        CloseStringState();
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     }
                     break;
                 case StVerbatimString:
                     if (c == '"' && next == '"') {
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindString);
                         i++;
                     } else if (c == '"') {
-                        state = StCode;
-                        sb.Append(' ');
+                        CloseStringState();
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     }
                     break;
                 case StRawString:
                     if (c == '"' && QuoteRun(line, i) == rawQuotes) {
-                        sb.Append(' ', rawQuotes);
+                        AppendSpaces(sb, kinds, rawQuotes, KindString);
                         i += rawQuotes - 1;
-                        state = StCode;
+                        CloseStringState();
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     }
                     break;
                 case StCharLiteral:
                     if (c == '\\') {
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindString);
                         i++;
                     } else if (c == '\'') {
-                        state = StCode;
-                        sb.Append(' ');
+                        CloseStringState();
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     }
                     break;
                 case StInterpString:
                 case StInterpVerbatimString:
                     if ((c == '\\' && state == StInterpString) || (c == '"' && state == StInterpVerbatimString && next == '"') || (c == '{' && next == '{')) {
-                        sb.Append("  ");
+                        Append(sb, kinds, "  ", KindString);
                         i++;
                     } else if (c == '"') {
-                        state = StCode;
-                        sb.Append(' ');
+                        CloseStringState();
+                        Append(sb, kinds, ' ', KindString);
                     } else if (c == '{') {
                         saved.Push((state, holeDepth));
                         holeDepth = 0;
                         state = StHole;
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     }
                     break;
                 case StHole:
                     if (c == '{') {
                         holeDepth++;
-                        sb.Append('{');
+                        Append(sb, kinds, '{', KindString);
                     } else if (c == '}') {
                         if (holeDepth == 0) {
                             (state, holeDepth) = saved.Pop();
-                            sb.Append(' ');
+                            Append(sb, kinds, ' ', KindString);
                         } else {
                             holeDepth--;
-                            sb.Append('}');
+                            Append(sb, kinds, '}', KindString);
                         }
                     } else if (c == '"') {
                         saved.Push((state, holeDepth));
                         state = StString;
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     } else if (c == '\'') {
                         saved.Push((state, holeDepth));
                         state = StCharLiteral;
-                        sb.Append(' ');
+                        Append(sb, kinds, ' ', KindString);
                     } else {
-                        sb.Append(c);
+                        Append(sb, kinds, c, KindString);
                     }
                     break;
                 default:
-                    sb.Append(c);
+                    Append(sb, kinds, c, KindCode);
                     break;
             }
             i++;
         }
     }
 
-    private void HandleQuoteStart(StringBuilder sb, string line, ref int i) {
+    /// <summary>
+    /// Beendet einen String- oder Char-Zustand und stellt den Zustand vor dem Öffnen wieder her (Code oder Loch).
+    /// </summary>
+    private void CloseStringState() {
+        if (saved.Count > 0) {
+            (state, holeDepth) = saved.Pop();
+        } else {
+            state = StCode;
+        }
+    }
+
+    private void HandleQuoteStart(StringBuilder? sb, StringBuilder? kinds, string line, ref int i) {
         var run = QuoteRun(line, i);
 
         if (run >= 3) {
             rawQuotes = run;
             state = StRawString;
-            sb.Append(' ', run);
+            AppendSpaces(sb, kinds, run, KindString);
             i += run - 1;
             return;
         }
@@ -206,13 +279,28 @@ public sealed class CsSanitizer {
             state = isVerbatim ? StVerbatimString : StString;
         }
 
-        sb.Append(' ');
+        Append(sb, kinds, ' ', KindString);
     }
 
     private static int QuoteRun(string line, int start) {
         var n = 0;
         while (start + n < line.Length && line[start + n] == '"') { n++; }
         return n;
+    }
+
+    private static void Append(StringBuilder? sb, StringBuilder? kinds, char c, char kind) {
+        sb?.Append(c);
+        kinds?.Append(kind);
+    }
+
+    private static void Append(StringBuilder? sb, StringBuilder? kinds, string text, char kind) {
+        sb?.Append(text);
+        kinds?.Append(kind, text.Length);
+    }
+
+    private static void AppendSpaces(StringBuilder? sb, StringBuilder? kinds, int count, char kind) {
+        sb?.Append(' ', count);
+        kinds?.Append(kind, count);
     }
 
     #endregion

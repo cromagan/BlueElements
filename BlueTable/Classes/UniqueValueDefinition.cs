@@ -5,11 +5,11 @@ using System.IO;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable, IFragmentStoreable {
+public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IComparable, IReadableTextWithKey, IErrorCheckable, IFragmentStoreable {
 
     #region Fields
 
-    private readonly List<ColumnItem> _internal = [];
+    private readonly List<ColumnItem> _columns = [];
 
     #endregion
 
@@ -24,7 +24,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     public UniqueValueDefinition(Table table, List<ColumnItem> columns) {
         Table = table;
         foreach (var thisColumn in columns) {
-            if (thisColumn is { IsDisposed: false }) { _internal.Add(thisColumn); }
+            if (thisColumn is { IsDisposed: false }) { _columns.Add(thisColumn); }
         }
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
@@ -36,7 +36,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public string CaptionForEditor => "Unique-Wert-Definition";
 
-    public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
+    public ReadOnlyCollection<ColumnItem> KeyColumns => _columns.AsReadOnly();
     public string KeyName { get; private set; }
 
     public string QuickInfo => string.Empty;
@@ -53,11 +53,23 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override bool Equals(object? obj) => Equals(obj as UniqueValueDefinition);
 
+    /// <summary>
+    /// Sortiert Definitionen nebenwirkungsfrei nach Schlüssel; nötig für den
+    /// Ganzsatz-Schreibweg im UniqueValues-Setter der Tabelle.
+    /// </summary>
+    public int CompareTo(object? obj) {
+        if (obj is UniqueValueDefinition other) {
+            return string.Compare(KeyName, other.KeyName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return 0;
+    }
+
     public string ErrorReason() {
         if (Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
-        if (_internal.Count == 0) { return "Mindestens eine Spalte muss ausgewählt sein."; }
+        if (_columns.Count == 0) { return "Mindestens eine Spalte muss ausgewählt sein."; }
 
-        var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
+        var linkedColumns = _columns.Where(c => c.RelationType != RelationType.None).ToList();
         if (linkedColumns.Count > 0) {
             return "Verlinkte Spalten können nicht in einer Unique-Definition sein: " + string.Join(", ", linkedColumns.Select(c => c.KeyName));
         }
@@ -77,7 +89,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
     public override List<string> ParseableItems() {
         List<string> result = [];
-        result.ParseableAdd("Columns", _internal, true);
+        result.ParseableAdd("Columns", _columns, true);
         return result;
     }
 
@@ -97,35 +109,35 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
             case "column":
             case "columnkey":
             case "columnname":
-                if (Table.Column[value] is { } c) { _internal.Add(c); }
+                if (Table.Column[value] is { } c) { _columns.Add(c); }
                 return true;
 
             case "columns":
                 var cols = value.FromNonCritical().SplitBy("|");
                 foreach (var thisc in cols) {
-                    if (Table.Column[thisc] is { } c2) { _internal.Add(c2); }
+                    if (Table.Column[thisc] is { } c2) { _columns.Add(c2); }
                 }
                 return true;
         }
         return false;
     }
 
-    public string ReadableText() => _internal.Count == 0 ? "(leer)" : string.Join(";", _internal.Select(x => x.Caption));
+    public string ReadableText() => _columns.Count == 0 ? "(leer)" : string.Join(";", _columns.Select(x => x.Caption));
 
     public void Repair() {
-        if (_internal.Count == 0) { return; }
+        if (_columns.Count == 0) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return; }
 
-        _internal.RemoveAll(c => c is not { IsDisposed: false });
+        _columns.RemoveAll(c => c is not { IsDisposed: false });
 
-        var repaired = ColumnCollection.ColumnsIncludingChunk(tb, _internal);
-        _internal.Clear();
-        _internal.AddRange(repaired);
+        var repaired = ColumnCollection.ColumnsIncludingChunk(tb, _columns);
+        _columns.Clear();
+        _columns.AddRange(repaired);
 
         // Muss hier gemacht werden!
         // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.
-        _internal.RemoveAll(c => c is not { IsDisposed: false } || c.RelationType != RelationType.None);
+        _columns.RemoveAll(c => c is not { IsDisposed: false } || c.RelationType != RelationType.None);
 
         SortColumnsBySaveOrder();
         KeyName = RebuildKeyName();
@@ -136,20 +148,21 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     public override string ToString() => ParseableItems().FinishParseable();
 
     /// <summary>
-    /// Übernimmt alle Werte von <paramref name="other"/>. Wird beim Recycling in
-    /// Table.SetValueInternal (case UniqueValues) verwendet:
-    /// Existierende Instanzen behalten ihre Identität, nur die Spalten und der
-    /// KeyName werden aktualisiert.
+    /// Übernimmt Spalten und Schlüssel der Quelle; die Aufnahme-/Entfernungs-Meldung
+    /// macht die Sammlung.
     /// </summary>
-    internal void UpdateFrom(UniqueValueDefinition other) {
-        _internal.Clear();
-        _internal.AddRange(other._internal);
-        KeyName = other.KeyName;
+    public string Update(IFragmentStoreable source) {
+        if (source is not UniqueValueDefinition sourceDefinition) { return "Quelltyp ungültig"; }
+
+        _columns.Clear();
+        _columns.AddRange(sourceDefinition._columns);
+        KeyName = sourceDefinition.KeyName;
+        return string.Empty;
     }
 
-    private string RebuildKeyName() => _internal.Count == 0
+    private string RebuildKeyName() => _columns.Count == 0
             ? "LEER"
-            : string.Join(";", _internal.Select(x => x.KeyName)).ToUpperInvariant();
+            : string.Join(";", _columns.Select(x => x.KeyName)).ToUpperInvariant();
 
     /// <summary>
     /// Sortiert die Spalten in der Reihenfolge, in der sie auch gespeichert werden
@@ -161,10 +174,32 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         var saveOrder = Table.ColumnsInSaveOrder();
         if (saveOrder.Count == 0) { return; }
 
-        _internal.Sort((a, b) => saveOrder.IndexOf(a).CompareTo(saveOrder.IndexOf(b)));
+        _columns.Sort((a, b) => saveOrder.IndexOf(a).CompareTo(saveOrder.IndexOf(b)));
     }
 
     #region IFragmentStoreable
+
+    /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events; zählbasiert, also verschachtelbar — jedes SuppressEvents braucht ein ResumeEvents.
+    /// </summary>
+    public void SuppressEvents() => _eventsSuppressCount++;
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+    }
 
     /// <summary>
     /// Empfänger-Typen der Unique-Wert-Definition im binären Fragment-Format.
@@ -205,10 +240,10 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
             case UniqueFragmentType.Columns:
                 // Erst leeren: Ein wiederverwendetes Objekt bleibt damit beim
                 // Wieder-Einspielen des Blocks idempotent.
-                _internal.Clear();
+                _columns.Clear();
 
                 foreach (var thisc in record.ListContent) {
-                    if (Table.Column[thisc] is { } c) { _internal.Add(c); }
+                    if (Table.Column[thisc] is { } c) { _columns.Add(c); }
                 }
 
                 SortColumnsBySaveOrder();
@@ -226,7 +261,11 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     /// <summary>
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsEventsSuppressed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
 
     #endregion
 

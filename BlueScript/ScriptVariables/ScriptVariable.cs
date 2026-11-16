@@ -72,7 +72,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
         set {
             if (_comment == value) { return; }
             _comment = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Comment, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, VariableFragmentType.Comment, value));
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.ReadOnly, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, VariableFragmentType.ReadOnly, value));
         }
     }
 
@@ -143,7 +143,7 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
                 Develop.DebugError($"Variablenfehler({MyClassId}): {value}");
             }
             SetValue(result);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, VariableFragmentType.Value, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, VariableFragmentType.Value, value));
         }
     }
 
@@ -324,6 +324,17 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     #region IFragmentStoreable
 
     /// <summary>
+    /// Unterdrückt FragmentChanged-Events über den Zähler der Basis (BeginInit/EndInit),
+    /// damit Parse- und Fragment-Unterdrückung zusammenlaufen.
+    /// </summary>
+    void IFragmentStoreable.SuppressEvents() => BeginInit();
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    void IFragmentStoreable.ResumeEvents() => EndInit();
+
+    /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
@@ -383,9 +394,37 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     }
 
     /// <summary>
+    /// Übernimmt Wert, Kommentar und Schreibschutz typsicher aus der Quelle; die
+    /// Property-Setter melden die Änderungen selbst. Der Schlüssel bleibt unverändert,
+    /// da er die Identität der Variablen trägt.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (source is not ScriptVariable sourceVariable) { return "Quelltyp ungültig"; }
+        if (sourceVariable.MyClassId != MyClassId) { return VerschiedeneTypen(sourceVariable); }
+
+        // Der Schreibschutz wird für die Übernahme gelöst; der Endstand meldet
+        // sich über den ReadOnly-Setter selbst.
+        var wasReadOnly = ReadOnly;
+        ReadOnly = false;
+        var error = GetValueFrom(sourceVariable);
+        Comment = sourceVariable.Comment;
+        ReadOnly = wasReadOnly;
+
+        if (error is not { Length: > 0 } && ToStringPossible) {
+            OnFragmentChanged(new FragmentChangedEventArgs(this, VariableFragmentType.Value, ValueForReplace));
+        }
+
+        return error;
+    }
+
+    /// <summary>
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsEventsSuppressed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
 
     #endregion
 }

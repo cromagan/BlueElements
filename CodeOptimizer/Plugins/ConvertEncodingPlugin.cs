@@ -35,7 +35,7 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
             }
 
             // UTF-8 mit BOM
-            if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
+            if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
                 var content = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
                 if (content.Contains('\uFFFD')) {
                     broken.Add(file);
@@ -45,21 +45,21 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            // UTF-16 LE
-            if (bytes[0] == 0xFF && bytes[1] == 0xFE) {
-                WriteUtf8Bom(file, Encoding.Unicode.GetString(bytes));
+            // UTF-16 LE - ohne BOM-Zeichen übernehmen
+            if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE) {
+                WriteUtf8Bom(file, Encoding.Unicode.GetString(bytes, 2, bytes.Length - 2));
                 counterConverted++;
                 continue;
             }
 
-            // UTF-16 BE
-            if (bytes[0] == 0xFE && bytes[1] == 0xFF) {
-                WriteUtf8Bom(file, Encoding.BigEndianUnicode.GetString(bytes));
+            // UTF-16 BE - ohne BOM-Zeichen übernehmen
+            if (bytes.Length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF) {
+                WriteUtf8Bom(file, Encoding.BigEndianUnicode.GetString(bytes, 2, bytes.Length - 2));
                 counterConverted++;
                 continue;
             }
 
-            if (IsValidUtf8(bytes)) {
+            if (SourceFiles.IsValidUtf8(bytes)) {
                 // Gültiges UTF-8 ohne BOM - BOM ergänzen
                 WriteUtf8Bom(file, Encoding.UTF8.GetString(bytes));
                 counterAddedBom++;
@@ -67,8 +67,7 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
                 // Kein UTF-8 (z. B. CP1252) - konvertieren
                 WriteUtf8Bom(file, Win1252.GetString(bytes));
                 counterConverted++;
-            }
-        }
+            }        }
 
         var report = new StringBuilder();
         report.AppendLine("=== Encoding ===");
@@ -86,28 +85,6 @@ public class ConvertEncodingPlugin : CodeOptimizerPlugin {
 
     private static void WriteUtf8Bom(string file, string content) {
         File.WriteAllText(file, content, new UTF8Encoding(true));
-    }
-
-    private static bool IsValidUtf8(byte[] bytes) {
-        var i = 0;
-
-        while (i < bytes.Length) {
-            var b = bytes[i];
-
-            if (b <= 0x7F) {
-                i++;
-            } else if (b is >= 0xC2 and <= 0xDF && i + 1 < bytes.Length && bytes[i + 1] is >= 0x80 and <= 0xBF) {
-                i += 2;
-            } else if (b is >= 0xE0 and <= 0xEF && i + 2 < bytes.Length && bytes[i + 1] is >= 0x80 and <= 0xBF && bytes[i + 2] is >= 0x80 and <= 0xBF) {
-                i += 3;
-            } else if (b is >= 0xF0 and <= 0xF4 && i + 3 < bytes.Length && bytes[i + 1] is >= 0x80 and <= 0xBF && bytes[i + 2] is >= 0x80 and <= 0xBF && bytes[i + 3] is >= 0x80 and <= 0xBF) {
-                i += 4;
-            } else {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     #endregion

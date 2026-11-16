@@ -10,7 +10,7 @@ public static class TableScriptDescriptionExtension {
 
     #region Methods
 
-    public static List<TableScriptDescription> Get(this ReadOnlyCollection<TableScriptDescription> scripts, ScriptEventTypes type) {
+    public static List<TableScriptDescription> Get(this IEnumerable<TableScriptDescription> scripts, ScriptEventTypes type) {
         try {
             return [.. scripts.Where(script => script.EventTypes.HasFlag(type))];
         } catch {
@@ -27,9 +27,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     #region Enums
 
     /// <summary>
-    /// Empfänger-Typen des Skripts im binären Fragment-Format. Nur dem Skript selbst bekannt.
+    /// Empfänger-Typen des Skripts im binären Fragment-Format. Nur dem Skript
+    /// selbst bekannt.
     /// </summary>
-    private enum ScriptFragmentType : byte {
+    internal enum ScriptFragmentType : byte {
 
         /// <summary>
         /// Der Skript-Text selbst.
@@ -106,13 +107,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
         StoppedTimeCount = stoppedtimecount;
         AverageRunTime = averageruntime;
         _mayAffectUser = null;
-        ObserveFragmentChain();
+        this.Register(SavedVariables);
     }
 
     public TableScriptDescription(Table? table, string name, string script) : base(name, script) {
         Table = table;
         NeedRow = false;
-        ObserveFragmentChain();
+        this.Register(SavedVariables);
     }
 
     public TableScriptDescription(Table? table, string toParse) : this(table) => this.Parse(toParse);
@@ -471,17 +472,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     /// </summary>
     internal static long RoundRunTime(long milliseconds) => ((milliseconds + 250) / 500) * 500;
 
-    /// <summary>
-    /// Verdrahtet die FragmentChanged-Bubbling-Kette: Das Skript meldet sich bei der
-    /// Tabelle (Crumb = SubScript + eigener KeyName, je Event neu gelesen) und die
-    /// gespeicherten Skript-Variablen beim Skript (Crumb = SubVariableCollection,
-    /// leerer Key).
-    /// </summary>
-    private void ObserveFragmentChain() {
-        if (Table is { IsDisposed: false } tb) { tb.Reregister(this); }
-
-        this.Register(SavedVariables);
-    }
 
     /// <summary>
     /// Übernimmt alle Werte von <paramref name="other"/> (Basis + Skript-spezifisch).
@@ -499,10 +489,19 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
         _mayAffectUser = null;
     }
 
+    /// <summary>
+    /// Übernimmt alle Werte der Quelle; die Property-Setter melden die Änderungen selbst.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (IsDisposed) { return "Skript ist verworfen"; }
+        if (source is not TableScriptDescription sourceScript) { return "Quelltyp ungültig"; }
+
+        UpdateFrom(sourceScript);
+        return string.Empty;
+    }
+
     protected override void Dispose(bool disposing) {
         if (!IsDisposed) {
-            if (Table is { IsDisposed: false } tb) { tb.Unregister(this); }
-
             this.Unregister(SavedVariables);
 
             Table = null;
@@ -514,6 +513,32 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     #region IFragmentStoreable
+
+    /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events des Skripts und seiner gespeicherten Variablen.
+    /// </summary>
+    public void SuppressEvents() {
+        _eventsSuppressCount++;
+        SavedVariables.SuppressEvents();
+    }
+
+    /// <summary>
+    /// Hebt die Unterdrückung des Skripts und seiner gespeicherten Variablen wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+        SavedVariables.ResumeEvents();
+    }
 
     /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
@@ -618,18 +643,23 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     }
 
     /// <summary>
-    /// Reicht eine Änderung der gespeicherten Variablen mit dem eigenen Pfad-Segment
-    /// (SubVariableCollection, leerer Key) eine Ebene höher.
+    /// Reicht eine Änderung der gespeicherten Variablen eine Ebene höher und stellt
+    /// dem Blatt den eigenen Navigationssatz (SubVariableCollection, Segmenteintritt)
+    /// voran.
     /// </summary>
     public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
-        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentChangedEventArgs.Crumbs(ScriptNavigationType.SubVariableCollection, FragmentChangedEventArgs.CrumbKey(sender), e.RelativePath), e.TypeSelector, e.ContentType, e.Content) { ListContent = e.ListContent });
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
+        // Nur das Blatt liefert seinen Blatt-Satz; diese Stufe feuert mit dem
+        // SubVariableCollection-Navigationssatz (leerer Key = Segmenteintritt) weiter.
+        FragmentChanged?.Invoke(this, e.WithNavigation(ScriptNavigationType.SubVariableCollection, string.Empty));
     }
 
     /// <summary>
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
 
         FragmentChanged?.Invoke(this, e);
     }

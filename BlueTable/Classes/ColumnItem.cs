@@ -357,7 +357,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_additionalFormatCheck == value) { return; }
 
             Table?.ChangeData(TableDataType.AdditionalFormatCheck, this, ((int)_additionalFormatCheck).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AdditionalFormatCheck, (int)_additionalFormatCheck));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AdditionalFormatCheck, (int)_additionalFormatCheck));
             OnPropertyChanged();
         }
     }
@@ -372,7 +372,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_adminInfo == value) { return; }
 
             Table?.ChangeData(TableDataType.ColumnAdminInfo, this, _adminInfo, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnAdminInfo, _adminInfo));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnAdminInfo, _adminInfo));
             OnPropertyChanged();
         }
     }
@@ -387,7 +387,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditAutoCorrect == value) { return; }
 
             Table?.ChangeData(TableDataType.AutoCorrectAfterEdit, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AutoCorrectAfterEdit, _afterEditAutoCorrect));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AutoCorrectAfterEdit, _afterEditAutoCorrect));
             OnPropertyChanged();
         }
     }
@@ -403,7 +403,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (!_afterEditAutoReplace.IsDifferentTo(v)) { return; }
 
             Table?.ChangeData(TableDataType.AutoReplaceAfterEdit, this, string.Join('\r', _afterEditAutoReplace), string.Join('\r', v));
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AutoReplaceAfterEdit, _afterEditAutoReplace));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AutoReplaceAfterEdit, _afterEditAutoReplace));
             OnPropertyChanged();
         }
     }
@@ -418,7 +418,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditDoUCase == value) { return; }
 
             Table?.ChangeData(TableDataType.DoUcaseAfterEdit, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.DoUcaseAfterEdit, _afterEditDoUCase));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.DoUcaseAfterEdit, _afterEditDoUCase));
             OnPropertyChanged();
         }
     }
@@ -433,7 +433,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditQuickSortRemoveDouble == value) { return; }
 
             Table?.ChangeData(TableDataType.SortAndRemoveDoubleAfterEdit, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.SortAndRemoveDoubleAfterEdit, _afterEditQuickSortRemoveDouble));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.SortAndRemoveDoubleAfterEdit, _afterEditQuickSortRemoveDouble));
             OnPropertyChanged();
         }
     }
@@ -448,7 +448,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditRound == value) { return; }
 
             Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToString1(), value.ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AfterEditRound, _afterEditRound));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AfterEditRound, _afterEditRound));
             OnPropertyChanged();
         }
     }
@@ -463,7 +463,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_align == value) { return; }
 
             Table?.ChangeData(TableDataType.ColumnAlign, this, ((int)_align).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnAlign, (int)_align));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnAlign, (int)_align));
             OnPropertyChanged();
         }
     }
@@ -478,7 +478,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_allowedChars == value) { return; }
 
             Table?.ChangeData(TableDataType.AllowedChars, this, _allowedChars, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AllowedChars, _allowedChars));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AllowedChars, _allowedChars));
             OnPropertyChanged();
         }
     }
@@ -495,7 +495,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_autoFilterJoker == value) { return; }
 
             Table?.ChangeData(TableDataType.AutoFilterJoker, this, _autoFilterJoker, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.AutoFilterJoker, _autoFilterJoker));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.AutoFilterJoker, _autoFilterJoker));
             OnPropertyChanged();
         }
     }
@@ -507,7 +507,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_backColor.ToArgb() == value.ToArgb()) { return; }
 
             Table?.ChangeData(TableDataType.BackColor, this, _backColor.ToArgb().ToString1(), value.ToArgb().ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.BackColor, _backColor));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.BackColor, _backColor));
             OnPropertyChanged();
         }
     }
@@ -522,7 +522,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_backgroundStyle == value) { return; }
 
             Table?.ChangeData(TableDataType.BackgroundStyle, this, ((long)_backgroundStyle).ToString1(), ((long)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.BackgroundStyle, (long)_backgroundStyle));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.BackgroundStyle, (long)_backgroundStyle));
             OnPropertyChanged();
         }
     }
@@ -538,7 +538,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_caption == value) { return; }
 
             Table?.ChangeData(TableDataType.ColumnCaption, this, _caption, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnCaption, _caption));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnCaption, _caption));
             OnPropertyChanged();
         }
     }
@@ -554,7 +554,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Table?.ChangeData(TableDataType.CaptionBitmapCode, this, _captionBitmapCode, value);
             _captionBitmapCode = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.CaptionBitmapCode, _captionBitmapCode));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.CaptionBitmapCode, _captionBitmapCode));
             OnPropertyChanged();
         }
     }
@@ -572,7 +572,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_captionGroup1 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup1, this, _captionGroup1, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.CaptionGroup1, _captionGroup1));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.CaptionGroup1, _captionGroup1));
             OnPropertyChanged();
         }
     }
@@ -588,7 +588,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_captionGroup2 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup2, this, _captionGroup2, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.CaptionGroup2, _captionGroup2));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.CaptionGroup2, _captionGroup2));
             OnPropertyChanged();
         }
     }
@@ -604,7 +604,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_captionGroup3 == value) { return; }
 
             Table?.ChangeData(TableDataType.CaptionGroup3, this, _captionGroup3, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.CaptionGroup3, _captionGroup3));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.CaptionGroup3, _captionGroup3));
             OnPropertyChanged();
         }
     }
@@ -626,7 +626,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Table?.ChangeData(TableDataType.ColumnKeyOfLinkedTable, this, _columnKeyOfLinkedTable, value);
             Invalidate_ColumAndContent();
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnKeyOfLinkedTable, _columnKeyOfLinkedTable));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnKeyOfLinkedTable, _columnKeyOfLinkedTable));
             OnPropertyChanged();
         }
     }
@@ -638,7 +638,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_columnSystemInfo == value) { return; }
 
             Table?.ChangeData(TableDataType.ColumnSystemInfo, this, _columnSystemInfo, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnSystemInfo, _columnSystemInfo));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnSystemInfo, _columnSystemInfo));
             OnPropertyChanged();
         }
     }
@@ -653,7 +653,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (!_columnTags.IsDifferentTo(value)) { return; }
 
             Table?.ChangeData(TableDataType.ColumnTags, this, _columnTags, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnTags, _columnTags));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnTags, _columnTags));
             OnPropertyChanged();
         }
     }
@@ -668,7 +668,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_controlStrategy == value) { return; }
 
             Table?.ChangeData(TableDataType.ControlStrategy, this, _controlStrategy, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ControlStrategy, _controlStrategy));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ControlStrategy, _controlStrategy));
             OnPropertyChanged();
         }
     }
@@ -683,7 +683,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_controlStrategyParameter.ToJsonString() == value.ToJsonString()) { return; }
 
             Table?.ChangeData(TableDataType.ControlStrategyParameter, this, _controlStrategyParameter.ToJsonString(), value.ToJsonString());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ControlStrategyParameter, _controlStrategyParameter.ToJsonString()));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ControlStrategyParameter, _controlStrategyParameter));
             OnPropertyChanged();
         }
     }
@@ -698,7 +698,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_defaultRenderer == value) { return; }
 
             Table?.ChangeData(TableDataType.DefaultRenderer, this, _defaultRenderer, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.DefaultRenderer, _defaultRenderer));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.DefaultRenderer, _defaultRenderer));
             OnPropertyChanged();
         }
     }
@@ -713,7 +713,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_doOpticalTranslation == value) { return; }
 
             Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.DoOpticalTranslation, (int)_doOpticalTranslation));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.DoOpticalTranslation, (int)_doOpticalTranslation));
             OnPropertyChanged();
         }
     }
@@ -728,7 +728,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (!_dropDownItems.IsDifferentTo(value)) { return; }
 
             Table?.ChangeData(TableDataType.DropDownItems, this, string.Join('\r', _dropDownItems), string.Join('\r', value));
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.DropDownItems, _dropDownItems));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.DropDownItems, _dropDownItems));
             OnPropertyChanged();
         }
     }
@@ -743,7 +743,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_editableWithTextInput == value) { return; }
 
             Table?.ChangeData(TableDataType.EditableWithTextInput, this, _editableWithTextInput.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.EditableWithTextInput, _editableWithTextInput));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.EditableWithTextInput, _editableWithTextInput));
             OnPropertyChanged();
         }
     }
@@ -758,7 +758,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_editAllowedDespiteLock == value) { return; }
 
             Table?.ChangeData(TableDataType.EditAllowedDespiteLock, this, _editAllowedDespiteLock.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.EditAllowedDespiteLock, _editAllowedDespiteLock));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.EditAllowedDespiteLock, _editAllowedDespiteLock));
             OnPropertyChanged();
         }
     }
@@ -773,7 +773,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_filterOptions == value) { return; }
 
             Table?.ChangeData(TableDataType.FilterOptions, this, ((int)_filterOptions).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.FilterOptions, (int)_filterOptions));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.FilterOptions, (int)_filterOptions));
             OnPropertyChanged();
         }
     }
@@ -787,7 +787,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_fixedColumnWidth == value) { return; }
             Table?.ChangeData(TableDataType.FixedColumnWidth, this, _fixedColumnWidth.ToString1(), value.ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.FixedColumnWidth, _fixedColumnWidth));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.FixedColumnWidth, _fixedColumnWidth));
             OnPropertyChanged();
         }
     }
@@ -802,7 +802,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_forbiddenChars == value) { return; }
 
             Table?.ChangeData(TableDataType.ForbiddenChars, this, _forbiddenChars, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ForbiddenChars, _forbiddenChars));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ForbiddenChars, _forbiddenChars));
             OnPropertyChanged();
         }
     }
@@ -814,7 +814,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_foreColor.ToArgb() == value.ToArgb()) { return; }
 
             Table?.ChangeData(TableDataType.ForeColor, this, _foreColor.ToArgb().ToString1(), value.ToArgb().ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ForeColor, _foreColor));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ForeColor, _foreColor));
             OnPropertyChanged();
         }
     }
@@ -845,7 +845,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_ignoreAtRowFilter == value) { return; }
 
             Table?.ChangeData(TableDataType.IgnoreAtRowFilter, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.IgnoreAtRowFilter, _ignoreAtRowFilter));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.IgnoreAtRowFilter, _ignoreAtRowFilter));
             OnPropertyChanged();
         }
     }
@@ -863,7 +863,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isFirst == value) { return; }
 
             Table?.ChangeData(TableDataType.IsFirst, this, _isFirst.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.IsFirst, _isFirst));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.IsFirst, _isFirst));
             OnPropertyChanged();
         }
     }
@@ -884,7 +884,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isKeyColumn == value) { return; }
 
             Table?.ChangeData(TableDataType.IsKeyColumn, this, _isKeyColumn.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.IsKeyColumn, _isKeyColumn));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.IsKeyColumn, _isKeyColumn));
             OnPropertyChanged();
         }
     }
@@ -910,7 +910,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             }
 
             Table?.ChangeData(TableDataType.ColumnKey, this, _keyName, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnKey, _keyName));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnKey, _keyName));
             OnPropertyChanged();
             CheckIfIAmAKeyColumn();
         }
@@ -926,7 +926,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_lineStyleLeft == value) { return; }
 
             Table?.ChangeData(TableDataType.LineStyleLeft, this, ((int)_lineStyleLeft).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.LineStyleLeft, (int)_lineStyleLeft));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.LineStyleLeft, (int)_lineStyleLeft));
             OnPropertyChanged();
         }
     }
@@ -949,7 +949,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_lineStyleRight == value) { return; }
 
             Table?.ChangeData(TableDataType.LineStyleRight, this, ((int)_lineStyleRight).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.LineStyleRight, (int)_lineStyleRight));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.LineStyleRight, (int)_lineStyleRight));
             OnPropertyChanged();
         }
     }
@@ -962,7 +962,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (!_linkedCellFilter.IsDifferentTo(l)) { return; }
 
             Table?.ChangeData(TableDataType.LinkedCellFilter, this, string.Join('\r', _linkedCellFilter), string.Join('\r', l));
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.LinkedCellFilter, _linkedCellFilter));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.LinkedCellFilter, _linkedCellFilter));
             OnPropertyChanged();
             foreach (var thisColumn in tb.Column) {
                 thisColumn.CheckIfIAmAKeyColumn();
@@ -1007,7 +1007,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Table?.ChangeData(TableDataType.LinkedTableTableName, this, _linkedTableTableName, value);
             Invalidate_LinkedTable();
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.LinkedTableTableName, _linkedTableTableName));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.LinkedTableTableName, _linkedTableTableName));
             OnPropertyChanged();
         }
     }
@@ -1021,7 +1021,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_maxTextLength == value) { return; }
             Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString1(), value.ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.MaxTextLength, _maxTextLength));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.MaxTextLength, _maxTextLength));
             OnPropertyChanged();
         }
     }
@@ -1035,7 +1035,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_maxTextLineLength == value) { return; }
             Table?.ChangeData(TableDataType.MaxTextLineLength, this, _maxTextLineLength.ToString1(), value.ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.MaxTextLineLength, _maxTextLineLength));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.MaxTextLineLength, _maxTextLineLength));
             OnPropertyChanged();
         }
     }
@@ -1050,7 +1050,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_minTextLength == value) { return; }
 
             Table?.ChangeData(TableDataType.MinTextLength, this, _minTextLength.ToString1(), value.ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.MinTextLength, _minTextLength));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.MinTextLength, _minTextLength));
             OnPropertyChanged();
         }
     }
@@ -1087,7 +1087,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Table?.ChangeData(TableDataType.MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus());
             Invalidate_ColumAndContent();
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.MultiLine, _multiLine));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.MultiLine, _multiLine));
             OnPropertyChanged();
         }
     }
@@ -1102,7 +1102,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (!_permissionGroupsChangeCell.IsDifferentTo(repaired)) { return; }
 
             Table?.ChangeData(TableDataType.PermissionGroupsChangeCell, this, string.Join('\r', _permissionGroupsChangeCell), string.Join('\r', repaired));
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.PermissionGroupsChangeCell, _permissionGroupsChangeCell));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.PermissionGroupsChangeCell, _permissionGroupsChangeCell));
             OnPropertyChanged();
         }
     }
@@ -1117,7 +1117,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_quickInfo == value) { return; }
 
             Table?.ChangeData(TableDataType.ColumnQuickInfo, this, _quickInfo, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ColumnQuickInfo, _quickInfo));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ColumnQuickInfo, _quickInfo));
             OnPropertyChanged();
         }
     }
@@ -1132,7 +1132,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_regexCheck == value) { return; }
 
             Table?.ChangeData(TableDataType.RegexCheck, this, _regexCheck, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.RegexCheck, _regexCheck));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.RegexCheck, _regexCheck));
             OnPropertyChanged();
         }
     }
@@ -1148,7 +1148,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_relationship_to_First == value) { return; }
 
             Table?.ChangeData(TableDataType.Relationship_to_First, this, _relationship_to_First.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.Relationship_to_First, _relationship_to_First));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.Relationship_to_First, _relationship_to_First));
             OnPropertyChanged();
         }
     }
@@ -1165,7 +1165,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             Table?.ChangeData(TableDataType.RelationType, this, ((int)_relationType).ToString1(), ((int)value).ToString1());
             Invalidate_ColumAndContent();
 
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.RelationType, (int)_relationType));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.RelationType, (int)_relationType));
             OnPropertyChanged();
         }
     }
@@ -1177,7 +1177,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_rendererSettings == value) { return; }
 
             Table?.ChangeData(TableDataType.RendererSettings, this, _rendererSettings, value);
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.RendererSettings, _rendererSettings));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.RendererSettings, _rendererSettings));
             OnPropertyChanged();
         }
     }
@@ -1191,7 +1191,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_saveContent == value) { return; }
             Table?.ChangeData(TableDataType.SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.SaveContent, _saveContent));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.SaveContent, _saveContent));
             OnPropertyChanged();
         }
     }
@@ -1206,7 +1206,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_scriptType == value) { return; }
 
             Table?.ChangeData(TableDataType.ScriptType, this, ((int)_scriptType).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ScriptType, (int)_scriptType));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ScriptType, (int)_scriptType));
             OnPropertyChanged();
         }
     }
@@ -1227,7 +1227,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_showValuesOfOtherCellsInDropdown == value) { return; }
 
             Table?.ChangeData(TableDataType.ShowValuesOfOtherCellsInDropdown, this, _showValuesOfOtherCellsInDropdown.ToPlusMinus(), value.ToPlusMinus());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.ShowValuesOfOtherCellsInDropdown, _showValuesOfOtherCellsInDropdown));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.ShowValuesOfOtherCellsInDropdown, _showValuesOfOtherCellsInDropdown));
             OnPropertyChanged();
         }
     }
@@ -1244,7 +1244,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_similarityWeight == value) { return; }
 
             Table?.ChangeData(TableDataType.SimilarityWeight, this, _similarityWeight.ToString1_5(), value.ToString1_5());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.SimilarityWeight, _similarityWeight));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.SimilarityWeight, _similarityWeight));
             OnPropertyChanged();
         }
     }
@@ -1259,7 +1259,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_sortType == value) { return; }
 
             Table?.ChangeData(TableDataType.SortType, this, ((int)_sortType).ToString1(), ((int)value).ToString1());
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.SortType, (int)_sortType));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.SortType, (int)_sortType));
             OnPropertyChanged();
         }
     }
@@ -1308,7 +1308,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             Table?.ChangeData(TableDataType.Value_for_Chunk, this, ((int)_value_for_Chunk).ToString1(), ((int)value).ToString1());
             Invalidate_ColumAndContent();
 
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ColumnFragmentType.Value_for_Chunk, (int)_value_for_Chunk));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ColumnFragmentType.Value_for_Chunk, (int)_value_for_Chunk));
 
             if (oldd != _value_for_Chunk) {
                 Table?.ReorganizeChunks();
@@ -1570,46 +1570,54 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return list.SortedDistinctList();
     }
 
-    public void CopyTo(ColumnItem target, bool nameAndKeyToo) {
-        if (target.Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
+    /// <summary>
+    /// Übernimmt alle Spalten-Werte der Quellspalte inklusive Schlüssel; die
+    /// Property-Setter melden die Änderungen selbst.
+    /// </summary>
+    public string Update(IFragmentStoreable source) {
+        if (source is not ColumnItem sourceColumn) { return "Quelltyp ungültig"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle ungültig"; }
 
-        if (Table is not null) { Repair(); }
+        var error = tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master);
+        if (!string.IsNullOrEmpty(error)) { return error; }
 
-        if (nameAndKeyToo) { target.KeyName = KeyName; }
+        if (sourceColumn.Table is not null) { sourceColumn.Repair(); }
 
-        target.Caption = Caption;
-        target.IsKeyColumn = IsKeyColumn;
-        target.RelationType = RelationType;
-        target.Relationship_to_First = Relationship_to_First;
-        target.Value_for_Chunk = Value_for_Chunk;
-        target.IsFirst = IsFirst;
-        target.CaptionBitmapCode = CaptionBitmapCode;
-        target.LineStyleLeft = LineStyleLeft;
-        target.LineStyleRight = LineStyleRight;
-        target.BackgroundStyle = BackgroundStyle;
-        target.QuickInfo = QuickInfo;
-        target.ForeColor = ForeColor;
-        target.BackColor = BackColor;
-        target.EditAllowedDespiteLock = EditAllowedDespiteLock;
-        target.PermissionGroupsChangeCell = PermissionGroupsChangeCell;
-        target.ColumnTags = ColumnTags;
-        target.AdminInfo = AdminInfo;
-        target.ColumnSystemInfo = ColumnSystemInfo;
-        target.FilterOptions = FilterOptions;
-        target.IgnoreAtRowFilter = IgnoreAtRowFilter;
-        target.FixedColumnWidth = FixedColumnWidth;
-        target.AfterEditAutoCorrect = AfterEditAutoCorrect;
-        target.AutoFilterJoker = AutoFilterJoker;
-        target.ColumnKeyOfLinkedTable = ColumnKeyOfLinkedTable;
-        target.LinkedCellFilter = LinkedCellFilter;
-        target.AfterEditAutoReplace = AfterEditAutoReplace;
-        target.GetStyleFrom(this);
-        target.SaveContent = SaveContent;
-        target.CaptionGroup1 = CaptionGroup1;
-        target.CaptionGroup2 = CaptionGroup2;
-        target.CaptionGroup3 = CaptionGroup3;
-        target.LinkedTableTableName = LinkedTableTableName;
+        KeyName = sourceColumn.KeyName;
+        Caption = sourceColumn.Caption;
+        IsKeyColumn = sourceColumn.IsKeyColumn;
+        RelationType = sourceColumn.RelationType;
+        Relationship_to_First = sourceColumn.Relationship_to_First;
+        Value_for_Chunk = sourceColumn.Value_for_Chunk;
+        IsFirst = sourceColumn.IsFirst;
+        SimilarityWeight = sourceColumn.SimilarityWeight;
+        CaptionBitmapCode = sourceColumn.CaptionBitmapCode;
+        LineStyleLeft = sourceColumn.LineStyleLeft;
+        LineStyleRight = sourceColumn.LineStyleRight;
+        BackgroundStyle = sourceColumn.BackgroundStyle;
+        QuickInfo = sourceColumn.QuickInfo;
+        ForeColor = sourceColumn.ForeColor;
+        BackColor = sourceColumn.BackColor;
+        EditAllowedDespiteLock = sourceColumn.EditAllowedDespiteLock;
+        PermissionGroupsChangeCell = sourceColumn.PermissionGroupsChangeCell;
+        ColumnTags = sourceColumn.ColumnTags;
+        AdminInfo = sourceColumn.AdminInfo;
+        ColumnSystemInfo = sourceColumn.ColumnSystemInfo;
+        FilterOptions = sourceColumn.FilterOptions;
+        IgnoreAtRowFilter = sourceColumn.IgnoreAtRowFilter;
+        FixedColumnWidth = sourceColumn.FixedColumnWidth;
+        AfterEditAutoCorrect = sourceColumn.AfterEditAutoCorrect;
+        AutoFilterJoker = sourceColumn.AutoFilterJoker;
+        ColumnKeyOfLinkedTable = sourceColumn.ColumnKeyOfLinkedTable;
+        LinkedCellFilter = sourceColumn.LinkedCellFilter;
+        AfterEditAutoReplace = sourceColumn.AfterEditAutoReplace;
+        this.GetStyleFrom(sourceColumn);
+        SaveContent = sourceColumn.SaveContent;
+        CaptionGroup1 = sourceColumn.CaptionGroup1;
+        CaptionGroup2 = sourceColumn.CaptionGroup2;
+        CaptionGroup3 = sourceColumn.CaptionGroup3;
+        LinkedTableTableName = sourceColumn.LinkedTableTableName;
+        return string.Empty;
     }
 
     /// <summary>
@@ -1630,9 +1638,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         var cols = l_tb.Column.Where(cc => cc is { IsDisposed: false } occ && keys.Contains(occ._keyName)).ToList();
         if (l_tb.Column.ChunkValueColumn is { IsDisposed: false } cvc && !cols.Contains(cvc)) { cols.Add(cvc); }
 
-        var newList = l_tb.UniqueValues.ToList();
-        newList.Add(new UniqueValueDefinition(l_tb, cols));
-        l_tb.UniqueValues = newList.AsReadOnly();
+        var neu = new UniqueValueDefinition(l_tb, cols);
+
+        // Formatgerechte Aufnahme: Legacy überschreibt den ganzen Satz,
+        // binär läuft die Aufnahme granular je Definition.
+        l_tb.UniqueValues = new UniqueValueCollection(l_tb, [.. l_tb.UniqueValues, neu]);
+
         return true;
     }
 
@@ -2794,6 +2805,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string? ErrorReason_ScriptType(Table tb) {
         if (_scriptType is not ScriptType.ListElement) { return null; }
 
+        // Führende Nullen in der Endzahl verbieten: SP01 wäre dasselbe Element wie SP1
+        var z = _keyName.Length;
+        while (z > 0 && char.IsAsciiDigit(_keyName[z - 1])) { z--; }
+        if (_keyName.Length - z > 1 && _keyName[z] == '0') { return ListElementNameLeadingZero; }
+
         if (!TrySplitListElementName(_keyName, out var basename, out _)) { return ListElementNameInvalid; }
 
         // Der Listen-Name darf nicht bereits von einer anderen Skript-Spalte verwendet werden
@@ -2909,6 +2925,28 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     #region IFragmentStoreable
 
     /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events; zählbasiert, also verschachtelbar — jedes SuppressEvents braucht ein ResumeEvents.
+    /// </summary>
+    public void SuppressEvents() => _eventsSuppressCount++;
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+    }
+
+    /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
@@ -3003,6 +3041,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
 
             case ColumnFragmentType.ColumnCaption:
+                Develop.Diagnose("ColumnCaption", $"Setze Caption='{record.StringContent}', Stack: {Develop.DiagStack()}");
                 _caption = record.StringContent;
                 break;
 
@@ -3246,7 +3285,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsEventsSuppressed) { return; }
 
         FragmentChanged?.Invoke(this, e);
     }

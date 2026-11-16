@@ -334,7 +334,6 @@ public class TableControlStrategy : ControlStrategy {
         if (_table is { IsDisposed: false }) { _table.Dispose(); }
 
         _table = Table.Get();
-        _table.LogUndo = false;
         _table.DropMessages = false;
         // Tabelle für jeden Benutzer voll editierbar machen, damit die TableView
         // den Hinzufügen-Button anbietet und Zellen bearbeitet werden können.
@@ -452,8 +451,15 @@ public class TableControlStrategy : ControlStrategy {
             null,
             0,
             0);
+        // Anlegen nur, wenn das Skript noch fehlt — schon vorhandene bleiben
+        // unangetastet. Das formatgerechte Zurückschreiben (Legacy Ganzsatz,
+        // binär granular je Skript) macht der EventScript-Setter.
+        var neu = new List<TableScriptDescription> { deleteScript, headingScript };
+        neu.RemoveAll(s => tb.EventScript.GetByKey(s.KeyName) is not null);
 
-        tb.EventScript = new[] { deleteScript, headingScript }.AsReadOnly();
+        if (neu.Count == 0) { return; }
+
+        tb.EventScript = new TableScriptCollection(tb, [.. tb.EventScript, .. neu]);
     }
 
     private void LoadCsvIntoTable(string value) {

@@ -4,108 +4,118 @@ namespace BlueBasics.Interfaces;
 
 /// <summary>
 /// Event-Argumente für IFragmentStoreable.FragmentChanged.
-/// Beschreibt eine einzelne Fragment-Änderung im Sub-Baum; RelativePath trägt die
-/// Crumb-Kette der Container als Paare aus Typ-Nummer und Key, getrennt durch US.
+/// Beschreibt eine einzelne Fragment-Änderung im Sub-Baum (Wert-Selektor, Content-Typ
+/// und Wert). Die Stufen der Kette feuern per WithNavigation um ihren Navigationssatz
+/// erweiterte Argumente weiter; das Original bleibt unverändert, das Root leitet
+/// daraus per UndoRecords die Undo-Sätze der Änderung ab.
 /// </summary>
 /// <remarks>
 /// Die typisierten Konstruktoren nehmen den Rohtyp des Wertes entgegen und legen
 /// Content und ContentType fertig konvertiert fest; der Wert-Selektor wird als
 /// klasseneigenes Enum übergeben.
 /// </remarks>
-/// <param name="sender">Der ursprüngliche Auslöser der Änderung.</param>
-/// <param name="relativePath">Relativer Pfad vom Auslöser zum Abonnenten: Paare aus Typ und Key.</param>
-/// <param name="typeSelector">Wert-Selektor als Byte des klasseneigenen Enums des Auslösers.</param>
-/// <param name="contentType">Content-Typ (FragmentDataType).</param>
-/// <param name="content">Der neue Wert, fertig konvertiert für das Fragment-Format.</param>
-public class FragmentChangedEventArgs(object sender, string relativePath, byte typeSelector, FragmentDataType contentType, string content) : System.EventArgs {
-
-    #region Fields
-
-    /// <summary>
-    /// Trennzeichen der Crumb-Pfade (Unit Separator); nur diese Klasse baut und liest sie.
-    /// </summary>
-    public const char PathSeparator = (char)0x1F;
-
-    #endregion
+public class FragmentChangedEventArgs : System.EventArgs {
 
     #region Constructors
 
     /// <summary>
+    /// Kern-Konstruktor: legt Content und ContentType fest.
+    /// </summary>
+    private FragmentChangedEventArgs(object sender, byte typeSelector, FragmentDataType contentType, string content, IReadOnlyList<string>? listContent) {
+        SourceKey = (sender as IHasKeyName)?.KeyName ?? sender.GetType().Name;
+        TypeSelector = typeSelector;
+        ContentType = contentType;
+        Content = content;
+        ListContent = listContent;
+    }
+
+    /// <summary>
+    /// Kopier-Konstruktor für WithNavigation: übernimmt die Änderung und stellt den
+    /// Navigationssatz der Stufe vor die bereits gesammelten — Journal-Reihenfolge.
+    /// </summary>
+    private FragmentChangedEventArgs(FragmentChangedEventArgs basis, FragmentRecord navigation) {
+        SourceKey = basis.SourceKey;
+        TypeSelector = basis.TypeSelector;
+        ContentType = basis.ContentType;
+        Content = basis.Content;
+        ListContent = basis.ListContent;
+        _navigations = [navigation, .. basis._navigations];
+    }
+
+    /// <summary>
     /// Bool-Wert; Content als "+/-".
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, bool content) : this(sender, relativePath, typeSelector, FragmentDataType.Bool, content.ToPlusMinus()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, bool content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Bool, content.ToPlusMinus(), null) { }
 
     /// <summary>
     /// String-Wert.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, string content) : this(sender, relativePath, typeSelector, FragmentDataType.String, content) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, string content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.String, content, null) { }
 
     /// <summary>
     /// Int-Wert; Content als ToString1.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, int content) : this(sender, relativePath, typeSelector, FragmentDataType.Int, content.ToString1()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, int content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, content.ToString1(), null) { }
 
     /// <summary>
     /// Long-Wert; Content als ToString1.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, long content) : this(sender, relativePath, typeSelector, FragmentDataType.Int, content.ToString1()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, long content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, content.ToString1(), null) { }
 
     /// <summary>
     /// Float-Wert; Content als ToString1_5.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, float content) : this(sender, relativePath, typeSelector, FragmentDataType.Double, content.ToString1_5()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, float content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Double, content.ToString1_5(), null) { }
 
     /// <summary>
     /// DateTime-Wert; Content als ToString5.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, DateTime content) : this(sender, relativePath, typeSelector, FragmentDataType.DateTime, content.ToString5()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, DateTime content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.DateTime, content.ToString5(), null) { }
 
     /// <summary>
     /// Color-Wert; Content als Hex-Code (ToHtmlCode).
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, Color content) : this(sender, relativePath, typeSelector, FragmentDataType.Color, content.ToHtmlCode()) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, Color content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Color, content.ToHtmlCode(), null) { }
+
+    /// <summary>
+    /// JsonObject-Wert; Content als ToJsonString.
+    /// </summary>
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, JsonObject content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Json, content.ToJsonString(), null) { }
 
     /// <summary>
     /// String-Liste als ListSet-Satz: der ListContent bleibt erhalten, der Writer
     /// schreibt ihn als Count + Einträge mit je 2 Längenbytes (kein Join).
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, IReadOnlyList<string> content) : this(sender, relativePath, typeSelector, FragmentDataType.ListSet, string.Empty) {
-        ListContent = content;
-    }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.ListSet, string.Empty, content) { }
 
     /// <summary>
     /// Ganzes Objekt im Classic-Format; Content als Parseable-String (ParseableItems).
     /// </summary>
-    public FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, IFragmentStoreable content) : this(sender, relativePath, typeSelector, content is IStringable s ? s.ParseableItems().FinishParseable() : string.Empty) { }
-
-    /// <summary>
-    /// Brücke für den Enum-Selektor: übernimmt die fertige Konvertierung zum Byte.
-    /// </summary>
-    private FragmentChangedEventArgs(object sender, string relativePath, Enum typeSelector, FragmentDataType contentType, string content) : this(sender, relativePath, FragmentRecord.EnumByte(typeSelector), contentType, content) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, IFragmentStoreable content) : this(sender, typeSelector, content is IStringable s ? s.ParseableItems().FinishParseable() : string.Empty) { }
 
     #endregion
 
     #region Properties
 
     /// <summary>
-    /// Relativer Pfad vom Auslöser zum Abonnenten: Paare aus Typ und Key.
+    /// Navigationssätze der Stufen; die Aufnahme hält sie in Journal-Reihenfolge.
     /// </summary>
-    public string RelativePath { get; init; } = relativePath;
+    private readonly List<FragmentRecord> _navigations = [];
 
     /// <summary>
     /// Wert-Selektor im klasseneigenen Enum des Empfängers.
     /// </summary>
-    public byte TypeSelector { get; init; } = typeSelector;
+    public byte TypeSelector { get; init; }
 
     /// <summary>
     /// Content-Typ (FragmentDataType).
     /// </summary>
-    public FragmentDataType ContentType { get; init; } = contentType;
+    public FragmentDataType ContentType { get; init; }
 
     /// <summary>
     /// Der neue Wert.
     /// </summary>
-    public string Content { get; init; } = content;
+    public string Content { get; init; } = string.Empty;
 
     /// <summary>
     /// Der neue Wert bei ListSet-Inhalten; null bei Skalar-Werten.
@@ -115,46 +125,36 @@ public class FragmentChangedEventArgs(object sender, string relativePath, byte t
     /// <summary>
     /// KeyName des ursprünglichen Auslösers.
     /// </summary>
-    public string SourceKey { get; init; } = (sender as IHasKeyName)?.KeyName ?? sender.GetType().Name;
+    public string SourceKey { get; init; } = string.Empty;
 
     #endregion
 
     #region Methods
 
     /// <summary>
-    /// Baut eine Crumb-Kette: stellt das eigene Paar (Typ, Key) vor den Pfad des Kindes.
+    /// Liefert neue Argumente, die um den Navigationssatz dieser Stufe erweitert sind;
+    /// tiefere Stufen melden vor der eigenen, das Original bleibt unverändert.
     /// </summary>
-    public static string Crumbs(byte crumbType, string crumbKey, string childPath) {
-        if (childPath is not { Length: > 0 }) { return crumbType.ToString1() + PathSeparator + crumbKey + PathSeparator; }
-
-        return crumbType.ToString1() + PathSeparator + crumbKey + PathSeparator + childPath;
-    }
+    public FragmentChangedEventArgs WithNavigation(Enum navigationType, string key) => new(this, FragmentRecord.CreateNavigation(navigationType, key));
 
     /// <summary>
-    /// Baut eine Crumb-Kette; der Typ wird als klasseneigenes Enum übergeben.
+    /// Liefert die Undo-Sätze der Änderung in Journal-Reihenfolge: die Navigationssätze
+    /// der Stufen, zuletzt der Blatt-Satz mit Meta-Stempel.
     /// </summary>
-    public static string Crumbs(Enum crumbType, string crumbKey, string childPath) => Crumbs(FragmentRecord.EnumByte(crumbType), crumbKey, childPath);
+    public IReadOnlyList<FragmentRecord> UndoRecords() => [.. _navigations, CreateUndoRecord()];
+
+    /// <summary>
+    /// Erzeugt den Blatt-Satz der Änderung mit Meta-Stempel (User, Zeitpunkt) als
+    /// Undo-Eintrag auf Basis-Tiefe 1.
+    /// </summary>
+    public FragmentRecord CreateUndoRecord() =>
+        FragmentRecord.Create(TypeSelector, ContentType, Content, ListContent, Generic.UserName, DateTime.UtcNow);
 
     /// <summary>
     /// Liest den Key des auslösenden Kindes frisch beim Ereignis (umbenennungssicher);
     /// Kinder ohne Schlüssel liefern einen leeren Key.
     /// </summary>
-    public static string CrumbKey(object? sender) => sender is IHasKeyName named ? named.KeyName : string.Empty;
-
-    /// <summary>
-    /// Liefert die Paare (Typ, Key) der Crumb-Kette in Reihenfolge.
-    /// </summary>
-    public List<(byte CrumbType, string CrumbKey)> CrumbPath() {
-        List<(byte CrumbType, string CrumbKey)> result = [];
-
-        var segments = RelativePath.Split(PathSeparator);
-
-        for (var i = 0; i + 1 < segments.Length; i += 2) {
-            if (byte.TryParse(segments[i], out var crumbType)) { result.Add((crumbType, segments[i + 1])); }
-        }
-
-        return result;
-    }
+    public static string SenderKey(object? sender) => sender is IHasKeyName named ? named.KeyName : string.Empty;
 
     #endregion
 }

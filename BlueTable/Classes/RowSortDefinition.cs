@@ -27,7 +27,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         Reverse = 2,
 
         /// <summary>
-        /// Komplette Spaltenliste (ListSet; Content = CR-getrennte ColumnNames).
+        /// Komplette Spaltenliste (ListSet; Einträge = ColumnNames).
         /// </summary>
         ColumnsList = 3
     }
@@ -79,7 +79,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         private set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, SortDefinitionFragmentType.Reverse, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, SortDefinitionFragmentType.Reverse, value));
         }
     }
 
@@ -220,40 +220,72 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     #region IFragmentStoreable
 
     /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
+
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events; zählbasiert, also verschachtelbar — jedes SuppressEvents braucht ein ResumeEvents.
+    /// </summary>
+    public void SuppressEvents() => _eventsSuppressCount++;
+
+    /// <summary>
+    /// Hebt die Unterdrückung von SuppressEvents wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+    }
+
+    /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     /// <summary>
-    /// Schreibt die Sortier-Definition: Reverse nur wenn gesetzt, danach die
-    /// Sortier-Spalten als Blatt-Sätze (Content = ColumnName).
+    /// Schreibt die Sortier-Definition: Reverse-Blatt, danach die Sortier-Spalten
+    /// als ein ColumnsList-Satz. Das List-Blatt leert beim Einlesen vorab — der
+    /// komplette Block ist damit auch beim mehrfachen Einlesen (Chunk-Format)
+    /// akkumulationsfrei.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
-        var allok = true;
+        var allok = FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.Reverse, Reverse);
 
-        allok &= FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.Reverse, Reverse);
+        List<string> cols = [];
 
-        foreach (var thisColumn in _internal) {
-            allok &= FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.ColumnKeyName, thisColumn.ColumnName ?? string.Empty);
-        }
+        foreach (var thisColumn in _internal) { cols.Add(thisColumn.ColumnName ?? string.Empty); }
+
+        allok &= FragmentRecord.Append(stream, depth, SortDefinitionFragmentType.ColumnsList, cols);
 
         return allok;
     }
 
     /// <summary>
-    /// Verarbeitet den Sortier-Definitions-Block: Reverse im Switch, Sortier-Spalten
-    /// über den ColumnKeyName-Satz nur auflösen — fehlende Spalten werden
-    /// übersprungen, nicht neu angelegt. ColumnsList setzt die komplette Liste neu
-    /// (ListSet; Replay mehrerer Blöcke bleibt damit deterministisch).
+    /// Verarbeitet den Sortier-Definitions-Block: Reverse stumm anwenden (das
+    /// Bubbling wäre beim Laden/Replay ein Echo ins Journal), Sortier-Spalten
+    /// als ColumnsList komplett neu setzen — fehlende Spalten werden
+    /// übersprungen, nicht neu angelegt. Der Block bleibt damit beim mehrfachen
+    /// Einlesen deterministisch; ColumnKeyName dient nur dem Alt-Format.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((SortDefinitionFragmentType)record.LeafType) {
             case SortDefinitionFragmentType.Reverse:
+                // Stumm anwenden: Das Bubbling wäre beim Laden/Replay ein Echo ins Journal.
+                SuppressEvents();
                 Reverse = record.BoolContent;
+                ResumeEvents();
                 break;
 
             case SortDefinitionFragmentType.ColumnKeyName:
-                if (SortedColumnByName(record.StringContent) is { } target) { _internal.Add(target); }
+                // Nur noch Alt-Dateien (vor dem ColumnsList-Blatt). Dopplungen
+                // übersprungen, damit das mehrfache Einlesen eines kompletten
+                // Blocks (Chunk-Format) nicht akkumuliert.
+                if (SortedColumnByName(record.StringContent) is { } target && !_internal.Exists(c => SameSortColumn(c, target))) { _internal.Add(target); }
+
                 break;
 
             case SortDefinitionFragmentType.ColumnsList:
@@ -272,9 +304,40 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     }
 
     /// <summary>
-    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// Übernimmt Richtung und Sortier-Spalten; Reverse meldet der Setter selbst, die
+    /// Spaltenliste als ColumnsList-Satz. Die Spalten werden in der eigenen Tabelle
+    /// aufgelöst — fehlende werden übersprungen, nicht neu angelegt.
     /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
+    public string Update(IFragmentStoreable source) {
+        if (source is not RowSortDefinition sourceDefinition) { return "Quelltyp ungültig"; }
+
+        Reverse = sourceDefinition.Reverse;
+
+        List<string> columnNames = [];
+        _internal.Clear();
+
+        foreach (var thisColumn in sourceDefinition.SortColumns) {
+            var name = thisColumn.ColumnName ?? string.Empty;
+
+            if (SortedColumnByName(name) is { } target) {
+                _internal.Add(target);
+                columnNames.Add(name);
+            }
+        }
+
+        OnFragmentChanged(new FragmentChangedEventArgs(this, SortDefinitionFragmentType.ColumnsList, columnNames));
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt);
+    /// den Segment-Satz stellt der Empfänger (Table) in deren ChildFragmentChanged voran.
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsEventsSuppressed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
 
 
     #endregion

@@ -1,14 +1,19 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IFragmentStoreable {
+/// <summary>
+/// Ansichten-Sammlung einer Tabelle (Spaltenanordnung). Erbt Schlüssel-Ablage,
+/// ReadOnly-Verwaltung und das Fragment-Gerüst von KeyedItemCollection; die
+/// Reihenfolge der persistenten Einträge führt sie selbst (_internal), die
+/// on-demand virtuellen Spalten liegen separat (_onDemand) und werden nicht
+/// serialisiert.
+/// </summary>
+public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, IParseable, ICloneable, IHasTable, IReadableTextWithKey, IEditable {
 
     #region Enums
 
@@ -22,6 +27,19 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         /// Navigation in einen Ansichts-Eintrag (Key = ColumnName bzw. StorageKey).
         /// </summary>
         SubViewItem = 90,
+
+        /// <summary>
+        /// Blatt-Satz: übernimmt einen ganzen neuen Ansichts-Eintrag im
+        /// Classic-Format (Content = Parseable-String des Eintrags). Nur relevant,
+        /// solange die Ansicht zur granularen Änderung frei gegeben ist.
+        /// </summary>
+        ItemAdd = 21,
+
+        /// <summary>
+        /// Blatt-Satz: entfernt den Ansichts-Eintrag des Journal-Blocks
+        /// (Nav-Schlüssel = ColumnName bzw. StorageKey).
+        /// </summary>
+        ItemRemove = 22,
 
         ShowHead = 1,
 
@@ -66,10 +84,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
+    /// <summary>
+    /// Reihenfolge-Träger der persistenten Einträge; parallel dazu liegt die
+    /// Schlüssel-Ablage der Basis (Internal).
+    /// </summary>
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<ColumnViewItem> _onDemand = [];
     private readonly List<string> _permissionGroups_show = [];
-    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -78,16 +99,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public ColumnViewCollection(Table? table, string toParse) {
         Table = table;
         KeyName = string.Empty;
+        ReadOnly = true;
         this.Parse(toParse);
     }
 
     public ColumnViewCollection(Table table, string toParse, string newname) : this(table, toParse) => KeyName = newname;
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? Disposed;
 
     #endregion
 
@@ -103,7 +119,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.AnsichtAnzeigen, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.AnsichtAnzeigen, value));
         }
     } = true;
 
@@ -115,7 +131,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.AehnlicheAnzeigen, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.AehnlicheAnzeigen, value));
         }
     } = true;
 
@@ -124,7 +140,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (!value.IsDifferentTo(field)) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ExecuteableScripts, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ExecuteableScripts, value));
         }
     } = new List<string>().AsReadOnly();
 
@@ -135,7 +151,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ChapterColumn, value?.KeyName ?? string.Empty));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ChapterColumn, value?.KeyName ?? string.Empty));
         }
     }
 
@@ -149,7 +165,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ChaptersUnique, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ChaptersUnique, value));
         }
     } = true;
 
@@ -161,7 +177,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.CollapseButtonAnzeigen, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.CollapseButtonAnzeigen, value));
         }
     } = true;
 
@@ -170,18 +186,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ColumnHeaderMode, (int)value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ColumnHeaderMode, (int)value));
         }
     }
-
-    public int Count => _internal.Count;
 
     public ReadOnlyCollection<string> Filter_immer_Anzeigen {
         get;
         set {
             if (!value.IsDifferentTo(field)) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ColumnsShowAlwaysFilter, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ColumnsShowAlwaysFilter, value));
         }
     } = new List<string>().AsReadOnly();
 
@@ -190,13 +204,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.FilterRows, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.FilterRows, value));
         }
     } = 1;
 
     public bool Invalidated { get; set; } = true;
-
-    public bool IsDisposed => _isDisposedFlag == 1;
 
     public string KeyName { get; set; }
 
@@ -205,7 +217,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (!value.IsDifferentTo(field)) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ContextmenuScripts, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ContextmenuScripts, value));
         }
     } = new List<string>().AsReadOnly();
 
@@ -217,7 +229,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (l.IsDifferentTo(_permissionGroups_show)) {
                 _permissionGroups_show.Clear();
                 _permissionGroups_show.AddRange(l);
-                OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.PermissionGroups, l));
+                OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.PermissionGroups, l));
             }
         }
     }
@@ -230,7 +242,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.PinAnzeigen, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.PinAnzeigen, value));
         }
     } = true;
 
@@ -239,7 +251,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.QuickInfo, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.QuickInfo, value));
         }
     } = string.Empty;
 
@@ -271,7 +283,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ScaleToFit, (int)value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ScaleToFit, (int)value));
         }
     } = ScaleToFitMode.Normal;
 
@@ -283,7 +295,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.ShowHead, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.ShowHead, value));
         }
     } = true;
 
@@ -296,7 +308,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         set {
             if (field == value) { return; }
             field = value;
-            OnFragmentChanged(new FragmentChangedEventArgs(this, string.Empty, ViewFragmentType.StartCollapsed, value));
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ViewFragmentType.StartCollapsed, value));
         }
     }
 
@@ -330,17 +342,17 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     /// <summary>
-    /// Liefert die Spalte mit dem angegebenen Namen (Spaltenschlüssel bzw.
-    /// StorageKey virtueller Spalten), inklusive der on-demand Spalten.
+    /// Liefert den Ansichts-Eintrag zum Schlüssel (ColumnName bzw. StorageKey),
+    /// inklusive der on-demand Spalten.
     /// </summary>
-    public ColumnViewItem? this[string? columnName] {
-        get {
-            if (string.IsNullOrEmpty(columnName)) { return null; }
-            foreach (var thisViewItem in _internal.Concat(_onDemand)) {
-                if (thisViewItem is not null && string.Equals(thisViewItem.ColumnName, columnName, StringComparison.OrdinalIgnoreCase)) { return thisViewItem; }
-            }
-            return null;
+    public override ColumnViewItem? GetByKey(string? keyName) {
+        if (string.IsNullOrEmpty(keyName)) { return null; }
+
+        foreach (var thisViewItem in _onDemand) {
+            if (thisViewItem is not null && string.Equals(thisViewItem.ColumnName, keyName, StringComparison.OrdinalIgnoreCase)) { return thisViewItem; }
         }
+
+        return base.GetByKey(keyName);
     }
 
     #endregion
@@ -353,7 +365,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         foreach (var item in tb.ColumnArrangements) {
             var c = new ColumnViewCollection(tb, item.ParseableItems().FinishParseable());
             // Persistente Hinzufügen-Spalten auflösen — sie werden nur on-demand geführt.
-            foreach (var add in c.OfType<AddColumnItem>().ToList()) { c.Remove(add); }
+            foreach (var add in c.OfType<AddColumnItem>().ToList()) { _ = c.RemoveCore(add, false); }
             tcvc.Add(c);
         }
 
@@ -364,37 +376,58 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return tcvc;
     }
 
-    public void Add(ColumnViewItem columnViewItem) => Add(columnViewItem, null);
+    /// <summary>
+    /// Nimmt einen Ansichts-Eintrag ans Ende auf.
+    /// </summary>
+    public override bool Add(ColumnViewItem? columnViewItem) => Add(columnViewItem, null);
 
-    public void Add(ColumnViewItem columnViewItem, ColumnItem? insertAfterColumn) {
-        columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
+    /// <summary>
+    /// Nimmt einen Ansichts-Eintrag auf: verdrahtet PropertyChanged und das
+    /// FragmentChanged-Bubbling des Eintrags und hängt ihn hinter
+    /// <paramref name="insertAfterColumn"/> ein; die Aufnahme wird über
+    /// FragmentChanged gemeldet, sofern die Events nicht unterdrückt sind.
+    /// </summary>
+    public bool Add(ColumnViewItem? columnViewItem, ColumnItem? insertAfterColumn) {
+        var silent = ReadOnly;
+        if (silent) { SuppressEvents(); }
+        try {
+            if (columnViewItem is null || IsDisposed) { return false; }
 
-        var insertIndex = _internal.Count;
-        if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
-            insertIndex = _internal.IndexOf(afterViewItem) + 1;
+            // Bereits in der Ablage: nur fortführen, wenn es dieselbe Instanz ist (Neupositionierung beim Laden).
+            if (Internal.TryGetValue(columnViewItem.KeyName, out var present) && !ReferenceEquals(present, columnViewItem)) { return false; }
+            _ = Internal.TryAdd(columnViewItem.KeyName, columnViewItem);
+
+            columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
+            this.Reregister(columnViewItem);
+
+            var insertIndex = _internal.Count;
+            if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
+                insertIndex = _internal.IndexOf(afterViewItem) + 1;
+            }
+
+            _internal.Insert(insertIndex, columnViewItem);
+            Invalidated = true;
+
+            var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
+                .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
+            OnFragmentChanged(e);
+
+            return true;
+        } finally {
+            if (silent) { ResumeEvents(); }
         }
-
-        _internal.Insert(insertIndex, columnViewItem);
-        Invalidated = true;
     }
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
-    public void Dispose() {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
     public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column is not null);
 
-    public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
+    public override IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
             if (thisViewItem is not null && (thisViewItem.Column is null || thisViewItem.Column.IsSystemColumn())) {
-                Remove(thisViewItem);
+                _ = RemoveCore(thisViewItem, !ReadOnly);
                 HideSystemColumns();
                 return;
             }
@@ -403,7 +436,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem is null ? -1 : _internal.IndexOf(columnViewItem);
 
-    public string IsNowEditable() {
+    public override string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
         return tb.IsValueEditable(TableDataType.ColumnArrangement, string.Empty);
@@ -422,8 +455,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <summary>
     /// Verschiebt ein Element von <paramref name="oldIndex"/> nach <paramref name="newIndex"/>.
     /// Alle dazwischenliegenden Elemente werden entsprechend verschoben.
+    /// Im Legacy-Format (schreibgeschützte Live-Ansicht) abgelehnt.
     /// </summary>
     public void Move(int oldIndex, int newIndex) {
+        if (ReadOnly) { return; }
         if (oldIndex < 0 || newIndex < 0 || oldIndex >= _internal.Count) { return; }
         if (newIndex > _internal.Count) { newIndex = _internal.Count; }
         if (oldIndex == newIndex) { return; }
@@ -497,7 +532,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                if (ColumnViewItem.Create(Table, value.FromNonCritical()) is { } cvi) { Add(cvi); }
+                if (ColumnViewItem.Create(Table, value.FromNonCritical()) is { } cvi) {
+                    SuppressEvents();
+                    try {
+                        _ = Add(cvi, null);
+                    } finally {
+                        ResumeEvents();
+                    }
+                }
                 return true;
 
             case "chaptercolumn":
@@ -643,7 +685,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         // ausschließlich on-demand bereitgestellt und dürfen nicht in der
         // Ansicht gespeichert werden.
         foreach (var add in _internal.OfType<AddColumnItem>().ToList()) {
-            Remove(add);
+            _ = RemoveCore(add, !ReadOnly);
             changed = true;
         }
 
@@ -689,14 +731,58 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return x;
     }
 
+    /// <summary>
+    /// Entfernt einen Ansichts-Eintrag. Im Legacy-Format (schreibgeschützte
+    /// Live-Ansicht) abgelehnt — dort läuft die Änderung über den
+    /// ColumnArrangements-Setter der Tabelle.
+    /// </summary>
     public void Remove(ColumnViewItem? columnViewItem) {
-        if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
-        columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
-        _internal.Remove(columnViewItem);
-        Invalidated = true;
+        if (ReadOnly) { return; }
+
+        _ = RemoveCore(columnViewItem, true);
     }
 
+    /// <summary>
+    /// Entfernt den Ansichts-Eintrag zum Schlüssel; die Entfernung meldet den
+    /// Journal-Block, wenn die Ansicht granular änderbar ist.
+    /// </summary>
+    public override bool Remove(string keyName) {
+        if (IsDisposed || ReadOnly || GetByKey(keyName) is not { } item) { return false; }
+
+        return RemoveCore(item, true);
+    }
+
+    /// <summary>
+    /// Entfernt einen Ansichts-Eintrag stillschweigend möglich (Systempfad);
+    /// meldet die Entfernung als Journal-Block mit dem SubViewItem-Navigationssatz,
+    /// wenn die Ansicht granular änderbar ist und <paramref name="fireEvent"/>
+    /// gesetzt ist.
+    /// </summary>
+    private bool RemoveCore(ColumnViewItem? columnViewItem, bool fireEvent) {
+        if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return false; }
+
+        columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
+        this.Unregister(columnViewItem);
+        _ = Internal.TryRemove(columnViewItem.KeyName, out _);
+        _ = _internal.Remove(columnViewItem);
+        Invalidated = true;
+
+        if (fireEvent) {
+            var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemRemove, string.Empty)
+                .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
+            OnFragmentChanged(e);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Entfernt alle Ansichts-Einträge. Im Legacy-Format (schreibgeschützte
+    /// Live-Ansicht) abgelehnt.
+    /// </summary>
     public void RemoveAll() {
+        if (ReadOnly) { return; }
+
         List<ColumnViewItem> l = [.. _internal];
 
         foreach (var thiscol in l) {
@@ -729,7 +815,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             // Der Eintrag bleibt erhalten und wird nach dem Reload bereinigt.
             if (tb.IsDataReloading) { continue; }
 
-            _internal.Remove(thisViewItem);
+            // Reparatur ist ein Systempfad: still entfernen, kein Journal-Eintrag
+            _ = RemoveCore(thisViewItem, false);
             z--;
         }
 
@@ -764,32 +851,45 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void ShowAllColumns() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var thisColumn in tb.Column) {
-            if (this[thisColumn] is null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn));
+        var silent = ReadOnly;
+        if (silent) { SuppressEvents(); }
+        try {
+            foreach (var thisColumn in tb.Column) {
+                if (this[thisColumn] is null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
+                    _ = Add(new ColumnViewItem(thisColumn), null);
+                }
             }
-        }
 
-        foreach (var thisColumn in tb.Column) {
-            if (this[thisColumn] is null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn));
+            foreach (var thisColumn in tb.Column) {
+                if (this[thisColumn] is null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
+                    _ = Add(new ColumnViewItem(thisColumn), null);
+                }
             }
+        } finally {
+            if (silent) { ResumeEvents(); }
         }
     }
 
     public void ShowColumns(params string[] columnKeys) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        foreach (var thisColumnKey in columnKeys) {
-            var thisColumn = Table?.Column[thisColumnKey];
+        var silent = ReadOnly;
+        if (silent) { SuppressEvents(); }
+        try {
+            foreach (var thisColumnKey in columnKeys) {
+                var thisColumn = Table?.Column[thisColumnKey];
 
-            if (thisColumn is not null && this[thisColumn] is null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn));
+                if (thisColumn is not null && this[thisColumn] is null && !thisColumn.IsDisposed) {
+                    _ = Add(new ColumnViewItem(thisColumn), null);
+                }
             }
+        } finally {
+            if (silent) { ResumeEvents(); }
         }
     }
 
     public void Swap(int index1, int index2) {
+        if (ReadOnly) { return; }
         if (index1 < 0 || index2 < 0 || index1 >= _internal.Count || index2 >= _internal.Count) { return; }
         if (index1 == index2) { return; }
         (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
@@ -805,19 +905,60 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
     /// <summary>
-    /// Liefert den Ansichts-Eintrag zum Schlüssel des ersten Blocksatzes
-    /// (ColumnName bzw. StorageKey), inklusive der on-demand Spalten; fehlt er,
-    /// wird er erzeugt und angehängt. Ein bereits vorhandener Eintrag wandert an
-    /// seine Position gemäß Block — die Datei-Reihenfolge ist maßgeblich.
+    /// Pfad-Typen: die Liste unter dem SubViewItem-Satz; Navigation über SubViewItem.
     /// </summary>
-    private ColumnViewItem? GetViewItemCreateOrGet(FragmentRecord first) {
-        var keyName = first.StringContent;
+    protected override Enum ListType => ViewFragmentType.SubViewItem;
 
-        if (this[keyName] is { } existing) {
-            _ = _internal.Remove(existing);
-            Add(existing);
-            return existing;
+    /// <summary>
+    /// Aufnahmen eines ganzen Classic-Eintrags (Journal-Block).
+    /// </summary>
+    protected override Enum AddItemType => ViewFragmentType.ItemAdd;
+
+    /// <summary>
+    /// Entfernungen per Journal-Block.
+    /// </summary>
+    protected override Enum RemoveItemType => ViewFragmentType.ItemRemove;
+
+    /// <summary>
+    /// Pfad-Segment des Bubbling.
+    /// </summary>
+    protected override Enum ItemSubType => ViewFragmentType.SubViewItem;
+
+    /// <summary>
+    /// Übernimmt einen ganzen Ansichts-Eintrag im Classic-Format: den Eintrag zum
+    /// Schlüssel des Strings beschaffen — fehlt er, wird der erstellte still
+    /// angehängt —, sonst die Werte in die bestehende Instanz übernehmen.
+    /// </summary>
+    protected override bool ApplyItemAdd(string toParse, string keyName) {
+        if (ColumnViewItem.Create(Table, toParse) is not { } item) { return false; }
+
+        // Bereits vorhanden: die Werte in die bestehende Instanz übernehmen (Identität bleibt)
+        if (GetByKey(item.KeyName) is { } existing) { return existing.Parse(toParse); }
+
+        SuppressEvents();
+        try {
+            return Add(item, null);
+        } finally {
+            ResumeEvents();
         }
+    }
+
+    /// <summary>
+    /// Entfernt den benannten Ansichts-Eintrag still (Journal-Replay meldet nicht zurück).
+    /// </summary>
+    protected override bool ApplyItemRemove(string keyName) {
+        if (GetByKey(keyName) is { } gone) { _ = RemoveCore(gone, false); }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Liefert den Ansichts-Eintrag zum Schlüssel (ColumnName bzw. StorageKey),
+    /// inklusive der on-demand Spalten; fehlt er, wird er erzeugt und still
+    /// angehängt (Journal kann vor der Aufnahme eintreffen).
+    /// </summary>
+    protected override ColumnViewItem? GetOrCreateItem(string keyName) {
+        if (GetByKey(keyName) is { } existing) { return existing; }
 
         ColumnViewItem? newItem = null;
 
@@ -829,47 +970,64 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         if (newItem is null) { return null; }
 
-        Add(newItem);
+        SuppressEvents();
+        try {
+            _ = Add(newItem, null);
+        } finally {
+            ResumeEvents();
+        }
+
         return newItem;
     }
 
-    private void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+    /// <summary>
+    /// Liefert den Ansichts-Eintrag zum Schlüssel des ersten Blocksatzes; ein
+    /// bereits vorhandener Eintrag wandert an seine Position gemäß Block — die
+    /// Datei-Reihenfolge ist maßgeblich.
+    /// </summary>
+    protected override ColumnViewItem? CreateItem(FragmentRecord first) {
+        if (GetByKey(first.StringContent) is { } existing) {
+            _ = _internal.Remove(existing);
+            SuppressEvents();
+            try {
+                _ = Add(existing, null);
+            } finally {
+                ResumeEvents();
+            }
+            return existing;
+        }
+
+        return GetOrCreateItem(first.StringContent);
+    }
+
+    /// <summary>
+    /// Räumt die Ansicht ab: on-demand Spalten verwerfen und die Tabelle lösen;
+    /// die persistenten Einträge und die Events übernimmt die Basis.
+    /// </summary>
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
 
         if (disposing) {
-            OnDisposed();
-            Disposed = null;
             Table = null;
-            foreach (var item in _internal) {
-                item.Dispose();
-            }
             foreach (var item in _onDemand) {
                 item.Dispose();
             }
         }
-        _internal.Clear();
         _onDemand.Clear();
-        Table = null;
-    }
 
-    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+        base.Dispose(disposing);
+    }
 
     #endregion
 
     #region IFragmentStoreable
 
     /// <summary>
-    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
-    /// </summary>
-    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
-
-
-    /// <summary>
     /// Schreibt die Ansicht: eigene Werte nur wenn nicht im Standard, danach die
     /// persistenten Ansichts-Einträge als Sub*-Sätze (Key = ColumnName) mit
     /// eigenem Block eine Ebene tiefer.
     /// </summary>
-    public bool SerializeCore(Stream stream, int depth) {
+    public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
         var allok = true;
@@ -886,7 +1044,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
 
 
-        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.QuickInfo, QuickInfo); 
+        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.QuickInfo, QuickInfo);
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ColumnHeaderMode, (int)ColumnHeaderMode);
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ScaleToFit, (int)ScaleToFit);
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.PinAnzeigen, Pin_anzeigen);
@@ -908,10 +1066,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     /// <summary>
-    /// Verarbeitet den Ansicht-Block: eigene Werte im Switch, Ansichts-Einträge über
-    /// den SubViewItem-Satz suchen bzw. erzeugen und deren Block eine Ebene tiefer lesen.
+    /// Verarbeitet die eigenen Werte im Switch; Nav-, Listen- und Journal-Sätze
+    /// übernimmt das Gerüst der Basis.
     /// </summary>
-    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+    public override bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((ViewFragmentType)record.LeafType) {
             case ViewFragmentType.ShowHead:
                 ShowHead = record.BoolContent;
@@ -981,27 +1139,58 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 PermissionGroups_Show = [.. record.ListContent];
                 break;
 
-            case ViewFragmentType.SubViewItem:
-                // Ansichts-Einträge als Liste: Items liegen eine Ebene unter dem
-                // ListKeyObject-Satz, je Trenner leitet ein neues Item ein
-                FragmentStoreableExtension.DeserializeList(stream, record.Depth, GetViewItemCreateOrGet);
-
-                break;
             default:
-                // Unbekannter Blatt-Typ — Satz überspringen
-                break;
+                // Nav-, Listen- und übrige Sätze: das Gerüst der Basis
+                return base.DeserializeThis(stream, record);
         }
 
         return true;
     }
 
     /// <summary>
-    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus (Pendant zu OnPropertyChangedExt).
+    /// Übernimmt die Ansicht aus der Quelle: Die Property-Setter melden ihre Änderungen
+    /// selbst, die Ansichts-Einträge werden abgeglichen — fehlende entfernt, neue
+    /// aufgenommen (beides meldet die Journal-Ereignisse), gemeinsame per Eintrag-Update
+    /// beschrieben. Die Spalten werden in der eigenen Tabelle aufgelöst.
     /// </summary>
-    public void OnFragmentChanged(FragmentChangedEventArgs e) {
-        if (IsDisposed) { return; }
+    public override string Update(IFragmentStoreable source) {
+        if (IsDisposed) { return "Ansicht ist verworfen"; }
+        if (ReadOnly) { return "Ansicht ist schreibgeschützt"; }
+        if (source is not ColumnViewCollection sourceView) { return "Quelltyp ungültig"; }
 
-        FragmentChanged?.Invoke(this, e);
+        ShowHead = sourceView.ShowHead;
+        StartCollapsed = sourceView.StartCollapsed;
+        ChaptersUnique = sourceView.ChaptersUnique;
+        FilterRows = sourceView.FilterRows;
+        ColumnForChapter = sourceView.ColumnForChapter is { IsDisposed: false } chapter ? Table?.Column[chapter.KeyName] : null;
+        QuickInfo = sourceView.QuickInfo;
+        ColumnHeaderMode = sourceView.ColumnHeaderMode;
+        ScaleToFit = sourceView.ScaleToFit;
+        Pin_anzeigen = sourceView.Pin_anzeigen;
+        Ansicht_anzeigen = sourceView.Ansicht_anzeigen;
+        Ähnliche_anzeigen = sourceView.Ähnliche_anzeigen;
+        CollapseButton_anzeigen = sourceView.CollapseButton_anzeigen;
+        Kontextmenu_Skripte = sourceView.Kontextmenu_Skripte;
+        Ausführbare_Skripte = sourceView.Ausführbare_Skripte;
+        Filter_immer_Anzeigen = sourceView.Filter_immer_Anzeigen;
+        PermissionGroups_Show = sourceView.PermissionGroups_Show;
+
+        foreach (var thisItem in _internal.ToList()) {
+            if (sourceView[thisItem.KeyName] is null) { Remove(thisItem); }
+        }
+
+        foreach (var sourceItem in sourceView._internal) {
+            if (sourceItem is not { IsDisposed: false }) { continue; }
+
+            if (this[sourceItem.KeyName] is not { } existing) {
+                if (ColumnViewItem.Create(Table, sourceItem.ParseableItems().FinishParseable()) is { } newItem) { _ = Add(newItem); }
+            } else {
+                var error = existing.Update(sourceItem);
+                if (error is { Length: > 0 }) { return error; }
+            }
+        }
+
+        return string.Empty;
     }
 
     #endregion
