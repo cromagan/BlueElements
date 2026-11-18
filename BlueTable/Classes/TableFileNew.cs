@@ -388,7 +388,7 @@ public class TableFileNew : Table {
     public override bool SerializeCore(Stream stream, int depth) {
         var allok = base.SerializeCore(stream, depth);
 
-        allok &= Saveable.SerializeUndo(stream, depth, (byte)TableFragmentType.UndoHistory);
+        allok &= Saveable.SerializeUndo(stream, depth, TableFragmentType.UndoHistory);
 
         return allok;
     }

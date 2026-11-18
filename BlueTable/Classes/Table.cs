@@ -3561,7 +3561,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 break;
 
             case TableFragmentType.EventScriptVersion:
-                _eventScriptVersion = DateTimeParse(record.StringContent);
+                _eventScriptVersion = record.DateTimeContent;
                 InvalidateHeadCaches();
                 break;
         }

@@ -243,7 +243,15 @@ public abstract class CliCommand : IHasKeyName {
             }
 
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            return FragmentRecord.HeadUser(stream) is { } headUser && headUser.Equals(user, StringComparison.OrdinalIgnoreCase);
+
+            while (FragmentRecord.TryReadNext(stream) is { } record) {
+                if (record.IsTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent.Equals(user, StringComparison.OrdinalIgnoreCase); }
+
+                // Kopf-Ende: Erster Daten-Satz oder der Kommentar-Trenner
+                if (!record.IsTag || record.TagType == FragmentTagType.Comment) { return false; }
+            }
+
+            return false;
         } catch {
             // Unlesbare Datei (z. B. exklusiv gesperrt) überspringen.
             return false;

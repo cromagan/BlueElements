@@ -5,28 +5,27 @@ namespace BlueBasics.Interfaces;
 /// <summary>
 /// Event-Argumente für IFragmentStoreable.FragmentChanged.
 /// Beschreibt eine einzelne Fragment-Änderung im Sub-Baum (Wert-Selektor, Content-Typ
-/// und Wert). Die Stufen der Kette feuern per WithNavigation um ihren Navigationssatz
-/// erweiterte Argumente weiter; das Original bleibt unverändert, das Root leitet
-/// daraus per UndoRecords die Undo-Sätze der Änderung ab.
+/// und fertig kodierter Wert). Die Stufen der Kette feuern per WithNavigation um ihren
+/// Navigationssatz erweiterte Argumente weiter; das Original bleibt unverändert, das Root
+/// leitet daraus per UndoRecords die Undo-Sätze der Änderung ab.
 /// </summary>
 /// <remarks>
-/// Die typisierten Konstruktoren nehmen den Rohtyp des Wertes entgegen und legen
-/// Content und ContentType fertig konvertiert fest; der Wert-Selektor wird als
-/// klasseneigenes Enum übergeben.
+/// Die typisierten Konstruktoren nehmen den Rohtyp des Wertes entgegen und kodieren den
+/// Content sofort nach den Regeln des Fragment-Formats; CreateUndoRecord reicht diesen
+/// unverändert an FragmentRecord.Create weiter.
 /// </remarks>
 public class FragmentChangedEventArgs : System.EventArgs {
 
     #region Constructors
 
     /// <summary>
-    /// Kern-Konstruktor: legt Content und ContentType fest.
+    /// Kern-Konstruktor: legt den fertig kodierten Content und den ContentType fest.
     /// </summary>
-    private FragmentChangedEventArgs(object sender, byte typeSelector, FragmentDataType contentType, string content, IReadOnlyList<string>? listContent) {
+    private FragmentChangedEventArgs(object sender, byte typeSelector, FragmentDataType contentType, byte[] content) {
         SourceKey = (sender as IHasKeyName)?.KeyName ?? sender.GetType().Name;
         TypeSelector = typeSelector;
         ContentType = contentType;
         Content = content;
-        ListContent = listContent;
     }
 
     /// <summary>
@@ -38,55 +37,72 @@ public class FragmentChangedEventArgs : System.EventArgs {
         TypeSelector = basis.TypeSelector;
         ContentType = basis.ContentType;
         Content = basis.Content;
-        ListContent = basis.ListContent;
         _navigations = [navigation, .. basis._navigations];
     }
 
     /// <summary>
     /// Bool-Wert; Content als "+/-".
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, bool content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Bool, content.ToPlusMinus(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, bool content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Bool, Encoding.Latin1.GetBytes(content.ToPlusMinus())) { }
 
     /// <summary>
-    /// String-Wert.
+    /// String-Wert; Content als UTF-8.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, string content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.String, content, null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, string content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.String, Encoding.UTF8.GetBytes(content)) { }
 
     /// <summary>
-    /// Int-Wert; Content als ToString1.
+    /// Int-Wert; Content als 4 Little-Endian-Bytes.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, int content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, content.ToString1(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, int content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, FragmentRecord.IntBytes(content)) { }
 
     /// <summary>
-    /// Long-Wert; Content als ToString1.
+    /// Long-Wert; Content als 8 Little-Endian-Bytes.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, long content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, content.ToString1(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, long content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Long, FragmentRecord.LongBytes(content)) { }
 
     /// <summary>
-    /// Float-Wert; Content als ToString1_5.
+    /// Float-Wert; Content als 4 Little-Endian-Bytes.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, float content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Double, content.ToString1_5(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, float content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Float, FragmentRecord.FloatBytes(content)) { }
 
     /// <summary>
-    /// DateTime-Wert; Content als ToString5.
+    /// Double-Wert; Content als 8 Little-Endian-Bytes.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, DateTime content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.DateTime, content.ToString5(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, double content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Double, FragmentRecord.DoubleBytes(content)) { }
 
     /// <summary>
-    /// Color-Wert; Content als Hex-Code (ToHtmlCode).
+    /// Decimal-Wert; Content als 16 Little-Endian-Bytes.
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, Color content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Color, content.ToHtmlCode(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, decimal content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Decimal, FragmentRecord.DecimalBytes(content)) { }
 
     /// <summary>
-    /// JsonObject-Wert; Content als ToJsonString.
+    /// DateTime-Wert; Content als 8 Tick-Bytes (Little-Endian).
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, JsonObject content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Json, content.ToJsonString(), null) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, DateTime content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.DateTime, FragmentRecord.LongBytes(content.Ticks)) { }
 
     /// <summary>
-    /// String-Liste als ListSet-Satz: der ListContent bleibt erhalten, der Writer
-    /// schreibt ihn als Count + Einträge mit je 2 Längenbytes (kein Join).
+    /// Color-Wert; Content als 4 ARGB-Bytes (Little-Endian).
     /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.ListSet, string.Empty, content) { }
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, Color content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Color, FragmentRecord.IntBytes(content.ToArgb())) { }
+
+    /// <summary>
+    /// JsonObject-Wert; Content als ToJsonString-Text (UTF-8).
+    /// </summary>
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, JsonObject content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Json, Encoding.UTF8.GetBytes(content.ToJsonString())) { }
+
+    /// <summary>
+    /// String-Liste als ListSet-Satz: die Einträge werden je UTF-8-kodiert und sofort
+    /// zum Content (je Eintrag Tab, 2 Längenbytes, Inhalt, 0x0D) zusammengebaut; der
+    /// Writer schreibt diesen Content unverändert (kein Join, kein Sort, kein Trim).
+    /// </summary>
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) {
+        var payload = FragmentRecord.EncodeListPayload(content) ?? throw Develop.DebugError($"Ein List-Eintrag überschreitet {FragmentRecord.MaxListEntryLength} Bytes. Stack: {Develop.DiagStack()}");
+
+        SourceKey = (sender as IHasKeyName)?.KeyName ?? sender.GetType().Name;
+        TypeSelector = FragmentRecord.EnumByte(typeSelector);
+        ContentType = FragmentDataType.ListSet;
+        Content = payload;
+    }
 
     #endregion
 
@@ -108,14 +124,9 @@ public class FragmentChangedEventArgs : System.EventArgs {
     public FragmentDataType ContentType { get; init; }
 
     /// <summary>
-    /// Der neue Wert.
+    /// Der neue Wert, fertig kodiert (Kodier-Regeln der Append-Überladungen von FragmentRecord).
     /// </summary>
-    public string Content { get; init; } = string.Empty;
-
-    /// <summary>
-    /// Der neue Wert bei ListSet-Inhalten; null bei Skalar-Werten.
-    /// </summary>
-    public IReadOnlyList<string>? ListContent { get; init; }
+    public byte[] Content { get; init; } = [];
 
     /// <summary>
     /// KeyName des ursprünglichen Auslösers.
@@ -143,7 +154,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// Undo-Eintrag auf Basis-Tiefe 0.
     /// </summary>
     public FragmentRecord CreateUndoRecord() =>
-        FragmentRecord.Create(TypeSelector, ContentType, Content, ListContent, Generic.UserName, DateTime.UtcNow);
+        FragmentRecord.Create(TypeSelector, ContentType, Content, Generic.UserName, DateTime.UtcNow);
 
     /// <summary>
     /// Liest den Key des auslösenden Kindes frisch beim Ereignis (umbenennungssicher);

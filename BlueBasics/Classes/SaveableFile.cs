@@ -480,7 +480,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// <param name="stream">Ziel-Stream.</param>
     /// <param name="depth">Tiefe der Steuer-Sätze.</param>
     /// <param name="undoLeafType">Empfänger-Typ der Steuer-Sätze.</param>
-    public bool SerializeUndo(Stream stream, int depth, byte undoLeafType) {
+    public bool SerializeUndo(Stream stream, int depth, Enum undoLeafType) {
         List<FragmentRecord> undoSave;
         lock (UndoLock) {
             undoSave = [.. Undos];

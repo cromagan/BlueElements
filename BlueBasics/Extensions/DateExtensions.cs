@@ -36,15 +36,5 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string ToString9(this DateTime value) => value.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
-    /// <summary>
-    /// Kodiert die Zeit als Ticks (invarianter Ziffern-String, keine lesbare Zeit).
-    /// </summary>
-    public static string ToTickString(this DateTime value) => value.Ticks.ToString1();
-
-    /// <summary>
-    /// Rechnet einen ToTickString zurück in DateTime; ungültige Eingaben liefern DateTime.MinValue.
-    /// </summary>
-    public static DateTime FromTickString(this string value) => new(Converter.LongParse(value));
-
     #endregion
 }

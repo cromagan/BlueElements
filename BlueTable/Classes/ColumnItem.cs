@@ -3260,7 +3260,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case ColumnFragmentType.SortType:
-                _sortType = (SortierTyp)record.LongContent;
+                _sortType = (SortierTyp)record.IntContent;
                 break;
 
             case ColumnFragmentType.SimilarityWeight:

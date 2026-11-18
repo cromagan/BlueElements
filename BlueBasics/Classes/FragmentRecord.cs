@@ -7,11 +7,13 @@ namespace BlueBasics.Classes;
 /// <summary>
 /// Ein einzelner Satz im binären Fragment-Format „Typ + Key“.
 /// Aufbau: Tabs (Einrücktiefe, Tiefe 0 = Wurzel-Ebene ohne Tab), SpeicherTyp, len1, [Empfänger-Typ], 0x20, valueId,
-/// [Content-Typ], len2, Content, optional Meta (User, DateTimeUtc als Ticks, Comment; durch US getrennt), 0x0D.
+/// [Content-Typ], len2, Content, optional Meta (User, DateTimeUtc als 8 Tick-Bytes, Comment; durch US getrennt), 0x0D.
 /// Daten-Sätze tragen den Content-Typ direkt als valueId; Steuer-Sätze (valueId ≥ 231)
 /// tragen ihren Tag als valueId, gefolgt vom Content-Typ.
-/// ListSet-Sätze haben kein len2: Count als lesbare Dezimalzahl, dann je Eintrag
-/// Tab, 2 Längenbytes, Inhalt und 0x0D.
+/// ListSet-Sätze tragen im Content je Eintrag als Tab, 2 Längenbytes, Inhalt und 0x0D.
+/// Werte-Typen liegen kompakt vor: Int 4 Bytes, Float 4 Bytes, Double 8 Bytes, Long 8 Bytes,
+/// DateTime 8 Tick-Bytes, Color 4 ARGB-Bytes, Decimal 16 Bytes (Little-Endian); Text-Typen
+/// nutzen UTF-8 (String, Json) bzw. Latin1 (Bool).
 /// Die Pfad-Navigation wird nicht gespeichert: Jeder Satz trägt nur seine Tiefe;
 /// Sub*-Sätze (Empfänger-Typ des Containers, Content = Key) eröffnen den Block des
 /// Kind-Objekts eine Ebene tiefer. Ein Block endet am ersten Satz geringerer Tiefe
@@ -52,8 +54,6 @@ public sealed class FragmentRecord {
     /// </summary>
     public const string SeparatorComment = "---------------------------------------------------------------";
 
-    private List<string> _listContent = [];
-
     #endregion
 
     #region Constructors
@@ -61,33 +61,30 @@ public sealed class FragmentRecord {
     private FragmentRecord() { }
 
     /// <summary>
-    /// Erzeugt im Speicher einen Satz auf Basis-Tiefe 0. Mit Meta-Stempel (User/Zeit)
-    /// gilt der Satz als Undo-Eintrag; ohne Meta (DateTimeUtc = MinValue) als Navigationssatz.
+    /// Erzeugt im Speicher einen Satz auf Basis-Tiefe 0; der Content kommt fertig kodiert
+    /// herein (Kodier-Regeln der Append-Überladungen, bei ListSet die komplette Payload).
+    /// Mit Meta-Stempel (User/Zeit) gilt der Satz als Undo-Eintrag; ohne Meta
+    /// (DateTimeUtc = MinValue) als Navigationssatz.
     /// </summary>
-    public static FragmentRecord Create(byte leafType, FragmentDataType dataType, string content, IReadOnlyList<string>? listContent, string user, DateTime dateTimeUtc) {
-        var result = new FragmentRecord {
+    public static FragmentRecord Create(byte leafType, FragmentDataType dataType, byte[] content, string user, DateTime dateTimeUtc) =>
+        new FragmentRecord {
             StorageType = StandardStorageType,
             Depth = 0,
             LeafType = leafType,
             DataType = dataType,
             TagType = FragmentTagType.None,
-            StringContent = content,
+            ByteContent = content,
             User = user,
             DateTimeUtc = dateTimeUtc,
             Comment = string.Empty,
             HasMeta = dateTimeUtc != DateTime.MinValue
         };
 
-        if (listContent is not null) { result._listContent = [.. listContent]; }
-
-        return result;
-    }
-
     /// <summary>
     /// Erzeugt im Speicher einen Navigationssatz (Navigation einer Stufe, ohne Meta) auf Basis-Tiefe 0.
     /// </summary>
-    public static FragmentRecord CreateNavigation(Enum leafType, string content) =>
-        Create(EnumByte(leafType), FragmentDataType.String, content, null, string.Empty, DateTime.MinValue);
+    public static FragmentRecord CreateNavigation(Enum leafType, string key) =>
+        Create(EnumByte(leafType), FragmentDataType.String, Encoding.UTF8.GetBytes(key), string.Empty, DateTime.MinValue);
 
     #endregion
 
@@ -127,9 +124,20 @@ public sealed class FragmentRecord {
     public bool IsTag => TagType != FragmentTagType.None;
 
     /// <summary>
-    /// Content des Satzes, roh als UTF-8 gespeichert.
+    /// Content roh als Byte-Folge; alle Ausgaben reichen den passenden Konverter nach.
     /// </summary>
-    public string StringContent { get; private set; } = string.Empty;
+    public byte[] ByteContent { get; private set; } = [];
+
+    /// <summary>
+    /// Content als String-Sicht: Text-Typen per Konverter (UTF-8 bzw. Latin1),
+    /// binäre Typen als lesbarer Wert (Pendant zur Append-Überladung).
+    /// </summary>
+    public string StringContent {
+        get {
+            CheckDataType(FragmentDataType.String);
+            return Encoding.UTF8.GetString(ByteContent);
+        }
+    }
 
     /// <summary>
     /// Content als Bool (Plus/Minus, Pendant zur Append-Überladung).
@@ -137,7 +145,7 @@ public sealed class FragmentRecord {
     public bool BoolContent {
         get {
             CheckDataType(FragmentDataType.Bool);
-            return StringContent.FromPlusMinus();
+            return Encoding.Latin1.GetString(ByteContent).FromPlusMinus();
         }
     }
 
@@ -147,7 +155,7 @@ public sealed class FragmentRecord {
     public int IntContent {
         get {
             CheckDataType(FragmentDataType.Int);
-            return Converter.IntParse(StringContent);
+            return ByteContent is { Length: 4 } bytes ? ToInt(bytes) : 0;
         }
     }
 
@@ -156,28 +164,48 @@ public sealed class FragmentRecord {
     /// </summary>
     public long LongContent {
         get {
-            CheckDataType(FragmentDataType.Int);
-            return Converter.LongParse(StringContent);
+            CheckDataType(FragmentDataType.Long);
+            return ByteContent is { Length: 8 } bytes ? ToLong(bytes) : 0;
         }
     }
 
     /// <summary>
-    /// Content als Float (Pendant zur Append-Überladung mit ToString1_5).
+    /// Content als Float (Pendant zur Append-Überladung).
     /// </summary>
     public float FloatContent {
         get {
-            CheckDataType(FragmentDataType.Double);
-            return Converter.FloatParse(StringContent);
+            CheckDataType(FragmentDataType.Float);
+            return ByteContent is { Length: 4 } bytes ? ToFloat(bytes) : 0f;
         }
     }
 
     /// <summary>
-    /// Content als DateTime (Ticks, Pendant zur Append-Überladung).
+    /// Content als Double (Pendant zur Append-Überladung).
+    /// </summary>
+    public double DoubleContent {
+        get {
+            CheckDataType(FragmentDataType.Double);
+            return ByteContent is { Length: 8 } bytes ? ToDouble(bytes) : 0d;
+        }
+    }
+
+    /// <summary>
+    /// Content als Decimal (Pendant zur Append-Überladung).
+    /// </summary>
+    public decimal DecimalContent {
+        get {
+            CheckDataType(FragmentDataType.Decimal);
+            return ByteContent is { Length: 16 } bytes ? ToDecimal(bytes) : 0m;
+        }
+    }
+
+    /// <summary>
+    /// Content als DateTime (Pendant zur Append-Überladung).
     /// </summary>
     public DateTime DateTimeContent {
         get {
             CheckDataType(FragmentDataType.DateTime);
-            return StringContent.FromTickString();
+            return ByteContent is { Length: 8 } bytes ? new DateTime(ToLong(bytes), DateTimeKind.Utc) : DateTime.MinValue;
         }
     }
 
@@ -187,20 +215,44 @@ public sealed class FragmentRecord {
     public Color ColorContent {
         get {
             CheckDataType(FragmentDataType.Color);
-            return Converter.ColorParse(StringContent);
+            return ByteContent is { Length: 4 } bytes ? Color.FromArgb(ToInt(bytes)) : Color.Empty;
         }
     }
 
     /// <summary>
-    /// Content als String-Liste: ListSet-Sätze strikt über Count und Längenfelder
-    /// (ohne Sortierung oder Abschneiden), String-Sätze CR-getrennt.
+    /// Content als String-Liste: ListSet-Content je Eintrag (Tab, 2 Längenbytes,
+    /// UTF-8-Inhalt, 0x0D) dekodiert, ohne Sortierung oder Abschneiden; String-Sätze
+    /// liefern ihre CR-getrennten Teile.
     /// </summary>
     public string[] ListContent {
         get {
             if (DataType == FragmentDataType.String) { return StringContent.SplitAndCutByCr(); }
 
             CheckDataType(FragmentDataType.ListSet);
-            return [.. _listContent];
+
+            var entries = new List<string>();
+            var pos = 0;
+
+            while (pos < ByteContent.Length) {
+                // Eintrag: Tab, 2 Längenbytes, UTF-8-Inhalt, 0x0D.
+                if (pos + 4 > ByteContent.Length || ByteContent[pos] != TabByte) { return []; }
+
+                var len = ByteContent[pos + 1] | (ByteContent[pos + 2] << 8);
+
+                pos += 3;
+
+                if (pos + len + 1 > ByteContent.Length) { return []; }
+
+                entries.Add(Encoding.UTF8.GetString(ByteContent, pos, len));
+
+                pos += len;
+
+                if (ByteContent[pos] != CarriageReturnByte) { return []; }
+
+                pos++;
+            }
+
+            return entries.ToArray();
         }
     }
 
@@ -230,6 +282,23 @@ public sealed class FragmentRecord {
 
     public string Comment { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Roh-Bytes des Journal-Eintrags, aus dem der Satz beim Nachladen eines fremden
+    /// Journals stammt; null bei Sätzen ohne Journal-Bezug.
+    /// </summary>
+    public byte[]? Entry { get; private set; }
+
+    /// <summary>
+    /// Journal-Datei des Eintrags; leer bei Sätzen ohne Journal-Bezug.
+    /// </summary>
+    public string Container { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// UTC-Zeitstempel des Journal-Eintrags (Meta des ersten Meta-Satzes des Eintrags);
+    /// MinValue bei Sätzen ohne Journal-Bezug.
+    /// </summary>
+    public DateTime EntryDateTimeUtc { get; private set; }
+
     #endregion
 
     #region Methods
@@ -253,176 +322,80 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Schreibt einen Steuer-Satz mit Content-Typ DateTime (Ticks, kein Klartext).
+    /// Schreibt einen Steuer-Satz mit Content-Typ DateTime (8 Tick-Bytes).
     /// </summary>
     public static bool Append(Stream stream, int depth, FragmentTagType tag, DateTime content) {
-        return AppendTag(stream, depth, tag, FragmentDataType.DateTime, Encoding.UTF8.GetBytes(content.ToTickString()));
+        return AppendTag(stream, depth, tag, FragmentDataType.DateTime, LongBytes(content.Ticks));
     }
-    /// <summary>
-    /// Schreibt einen ListSet-Satz mit Meta: Count (lesbar) + Einträge mit je
-    /// Tab, 2 Längenbytes, Inhalt und 0x0D. Die Meta-Sektion kennzeichnet den
-    /// Satz als Undo-Eintrag. Liefert false bei ungültigem Content-Typ, US in
-    /// User/Comment oder Überschreiten der Längenbegrenzung.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, FragmentDataType contentType, IReadOnlyList<string> content, string user, DateTime dateTimeUtc, string comment) {
-        if (contentType != FragmentDataType.ListSet) { return false; }
-        if (user.Contains((char)UnitSeparatorByte) || comment.Contains((char)UnitSeparatorByte)) { return false; }
-
-        var encodedEntries = EncodeListEntries(content, out var countBytes);
-
-        if (encodedEntries is null) { return false; }
-
-        return AppendListData(stream, depth, leafType, countBytes, encodedEntries, BuildMetaBytes(user, dateTimeUtc, comment));
-    }
-
-    /// <summary>
-    /// Schreibt einen Daten-Satz mit Meta (User, DateTimeUtc, Comment). Die Meta-Sektion
-    /// kennzeichnet den Satz als Undo-Eintrag. Liefert false bei US in User/Comment,
-    /// ungültigem Empfänger-Typ oder Überschreiten der Längenbegrenzung.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, string content, string user, DateTime dateTimeUtc, string comment) {
-        if (user.Contains((char)UnitSeparatorByte) || comment.Contains((char)UnitSeparatorByte)) { return false; }
-
-        var contentBytes = Encoding.UTF8.GetBytes(content);
-
-        return AppendData(stream, depth, leafType, FragmentDataType.String, contentBytes, BuildMetaBytes(user, dateTimeUtc, comment));
-    }
-
     /// <summary>
     /// Schreibt einen String-Wert als Daten-Satz.
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, string content) {
+    public static bool Append(Stream stream, int depth, Enum leafType, string content) {
         var contentBytes = Encoding.UTF8.GetBytes(content);
 
-        return AppendData(stream, depth, leafType, FragmentDataType.String, contentBytes, null);
+        return AppendData(stream, depth, EnumByte(leafType), FragmentDataType.String, contentBytes, null);
     }
 
     /// <summary>
     /// Schreibt einen Bool-Wert als Daten-Satz (FragmentDataType.Bool, Content "+/-").
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, bool content) => AppendData(stream, depth, leafType, FragmentDataType.Bool, Encoding.UTF8.GetBytes(content.ToPlusMinus()), null);
+    public static bool Append(Stream stream, int depth, Enum leafType, bool content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Bool, Encoding.Latin1.GetBytes(content.ToPlusMinus()), null);
 
     /// <summary>
-    /// Schreibt einen Int-Wert als Daten-Satz (FragmentDataType.Int, Content ToString1).
+    /// Schreibt einen Int-Wert als Daten-Satz (FragmentDataType.Int, 4 Little-Endian-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, int content) {
-        var contentBytes = Encoding.UTF8.GetBytes(content.ToString1());
-
-        return AppendData(stream, depth, leafType, FragmentDataType.Int, contentBytes, null);
-    }
+    public static bool Append(Stream stream, int depth, Enum leafType, int content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Int, IntBytes(content), null);
 
     /// <summary>
-    /// Schreibt einen Long-Wert als Daten-Satz (FragmentDataType.Int, Content ToString1).
+    /// Schreibt einen Long-Wert als Daten-Satz (FragmentDataType.Long, 8 Little-Endian-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, long content) {
-        var contentBytes = Encoding.UTF8.GetBytes(content.ToString1());
-
-        return AppendData(stream, depth, leafType, FragmentDataType.Int, contentBytes, null);
-    }
+    public static bool Append(Stream stream, int depth, Enum leafType, long content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Long, LongBytes(content), null);
 
     /// <summary>
-    /// Schreibt einen DateTime-Wert als Daten-Satz (FragmentDataType.DateTime, Format ToString5).
+    /// Schreibt einen DateTime-Wert als Daten-Satz (FragmentDataType.DateTime, 8 Tick-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, DateTime content) {
-        var contentBytes = Encoding.UTF8.GetBytes(content.ToString5());
-
-        return AppendData(stream, depth, leafType, FragmentDataType.DateTime, contentBytes, null);
-    }
+    public static bool Append(Stream stream, int depth, Enum leafType, DateTime content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.DateTime, LongBytes(content.Ticks), null);
 
     /// <summary>
-    /// Schreibt einen Color-Wert als Daten-Satz (FragmentDataType.Color, Content ToHtmlCode).
+    /// Schreibt einen Color-Wert als Daten-Satz (FragmentDataType.Color, 4 ARGB-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, Color content) {
-        var contentBytes = Encoding.UTF8.GetBytes(content.ToHtmlCode());
-
-        return AppendData(stream, depth, leafType, FragmentDataType.Color, contentBytes, null);
-    }
+    public static bool Append(Stream stream, int depth, Enum leafType, Color content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Color, IntBytes(content.ToArgb()), null);
 
     /// <summary>
-    /// Schreibt einen Float-Wert als Daten-Satz (FragmentDataType.Double, Format ToString1_5).
+    /// Schreibt einen Float-Wert als Daten-Satz (FragmentDataType.Float, 4 Little-Endian-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, float content) {
-        var contentBytes = Encoding.UTF8.GetBytes(content.ToString1_5());
-
-        return AppendData(stream, depth, leafType, FragmentDataType.Double, contentBytes, null);
-    }
+    public static bool Append(Stream stream, int depth, Enum leafType, float content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Float, FloatBytes(content), null);
 
     /// <summary>
-    /// Schreibt eine String-Liste als ListSet-Satz: Count (lesbar) + Einträge
-    /// mit je Tab, 2 Längenbytes, Inhalt und 0x0D. Kein Join, kein Sort, kein Trim.
+    /// Schreibt einen Double-Wert als Daten-Satz (FragmentDataType.Double, 8 Little-Endian-Bytes).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, IReadOnlyList<string> content) {
-        var encodedEntries = EncodeListEntries(content, out var countBytes);
+    public static bool Append(Stream stream, int depth, Enum leafType, double content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Double, DoubleBytes(content), null);
 
-        if (encodedEntries is null) { return false; }
+    /// <summary>
+    /// Schreibt einen Decimal-Wert als Daten-Satz (FragmentDataType.Decimal, 16 Little-Endian-Bytes).
+    /// </summary>
+    public static bool Append(Stream stream, int depth, Enum leafType, decimal content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Decimal, DecimalBytes(content), null);
 
-        return AppendListData(stream, depth, leafType, countBytes, encodedEntries, null);
-    }
+    /// <summary>
+    /// Schreibt eine String-Liste als ListSet-Satz: je Eintrag Tab, 2 Längenbytes,
+    /// Inhalt und 0x0D. Kein Join, kein Sort, kein Trim.
+    /// </summary>
+    public static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<string> content) =>
+        EncodeListPayload(content) is { } payload && AppendData(stream, depth, EnumByte(leafType), FragmentDataType.ListSet, payload, null);
 
     /// <summary>
     /// Schreibt einen JsonNode als Daten-Satz (FragmentDataType.Json, Content ToJsonString).
     /// </summary>
-    public static bool Append(Stream stream, int depth, byte leafType, JsonNode content) {
+    public static bool Append(Stream stream, int depth, Enum leafType, JsonNode content) {
         var contentBytes = Encoding.UTF8.GetBytes(content.ToJsonString());
 
-        return AppendData(stream, depth, leafType, FragmentDataType.Json, contentBytes, null);
+        return AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Json, contentBytes, null);
     }
-
-    #region Append mit Enum als Empfänger-Typ
-
-    /// <summary>
-    /// Schreibt einen String-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, string content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Bool-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, bool content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Int-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, int content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Long-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, long content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen DateTime-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, DateTime content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Color-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, Color content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Float-Wert als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, float content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt eine String-Liste als ListSet-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<string> content) => Append(stream, depth, EnumByte(leafType), content);
 
     /// <summary>
     /// Schreibt einen Sub*-Satz (Content = KeyName des Objekts) und darunter dessen
-    /// Block eine Ebene tiefer; der Empfänger-Typ wird als klasseneigenes Enum
-    /// übergeben. Der Key kommt von IHasKeyName.KeyName; ohne Key wird ein leerer
-    /// Key geschrieben.
+    /// Block eine Ebene tiefer. Der Key kommt von IHasKeyName.KeyName; ohne Key
+    /// wird ein leerer Key geschrieben.
     /// </summary>
     public static bool Append(Stream stream, int depth, Enum leafType, IFragmentStoreable content) => Append(stream, depth, leafType, (content as IHasKeyName)?.KeyName ?? string.Empty, content);
 
@@ -436,8 +409,7 @@ public sealed class FragmentRecord {
     /// <summary>
     /// Schreibt einen ListKeyObject-Satz (die Liste beginnt) und darunter die Items
     /// eine Ebene tiefer; zwischen den Items steht je ein Kommentar-Trenner zwei
-    /// Ebenen unter der Liste, damit DeserializeList die Blockgrenzen erkennt. Der
-    /// Empfänger-Typ wird als klasseneigenes Enum übergeben.
+    /// Ebenen unter der Liste, damit DeserializeList die Blockgrenzen erkennt.
     /// </summary>
     public static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<IFragmentStoreable> content) {
         var allok = AppendData(stream, depth, EnumByte(leafType), FragmentDataType.ListKeyObject, [], null);
@@ -454,37 +426,34 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Schreibt einen JsonNode als Daten-Satz; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
+    /// Kodiert den ListSet-Content: je Eintrag Tab, 2 Längenbytes, UTF-8-Inhalt und 0x0D.
+    /// Liefert null bei zu langen Einträgen.
     /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, JsonNode content) => Append(stream, depth, EnumByte(leafType), content);
-
-    /// <summary>
-    /// Schreibt einen Daten-Satz mit Meta; der Empfänger-Typ wird als
-    /// klasseneigenes Enum übergeben.
-    /// </summary>
-    public static bool Append(Stream stream, int depth, Enum leafType, string content, string user, DateTime dateTimeUtc, string comment) => Append(stream, depth, EnumByte(leafType), content, user, dateTimeUtc, comment);
-
-    #endregion
-
-    /// <summary>
-    /// Kodiert die List-Einträge: Count-Zeile (lesbare Dezimalzahl) und je Eintrag
-    /// Tab, 2 Längenbytes, UTF-8-Inhalt und 0x0D. Liefert null bei zu langen Einträgen.
-    /// </summary>
-    internal static byte[][]? EncodeListEntries(IReadOnlyList<string> content, out byte[] countBytes) {
-        countBytes = Encoding.UTF8.GetBytes(content.Count.ToString1());
-
+    internal static byte[]? EncodeListPayload(IReadOnlyList<string> content) {
         var encodedEntries = new byte[content.Count][];
+        var length = 0;
 
         for (var i = 0; i < content.Count; i++) {
-            var entryBytes = Encoding.UTF8.GetBytes(content[i]);
+            encodedEntries[i] = Encoding.UTF8.GetBytes(content[i]);
 
-            if (entryBytes.Length > MaxListEntryLength) { return null; }
+            if (encodedEntries[i].Length > MaxListEntryLength) { return null; }
 
-            encodedEntries[i] = entryBytes;
+            length += 1 + 2 + encodedEntries[i].Length + 1;
         }
 
-        return encodedEntries;
+        var payload = new byte[length];
+        var pos = 0;
+
+        foreach (var entryBytes in encodedEntries) {
+            payload[pos++] = TabByte;
+            payload[pos++] = (byte)(entryBytes.Length & 0xFF);
+            payload[pos++] = (byte)((entryBytes.Length >> 8) & 0xFF);
+            Array.Copy(entryBytes, 0, payload, pos, entryBytes.Length);
+            pos += entryBytes.Length;
+            payload[pos++] = CarriageReturnByte;
+        }
+
+        return payload;
     }
 
     /// <summary>
@@ -492,6 +461,61 @@ public sealed class FragmentRecord {
     /// keine (byte)-Casts brauchen.
     /// </summary>
     internal static byte EnumByte(Enum leafType) => Convert.ToByte(leafType, CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Kodiert Ganzzahlen und ARGB-Farben als Little-Endian-Bytes (gleiches Byte-Muster wie die Längenfelder).
+    /// </summary>
+    internal static byte[] IntBytes(int value) => [(byte)value, (byte)(value >> 8), (byte)(value >> 16), (byte)(value >> 24)];
+
+    /// <summary>
+    /// Kodiert Long-Werte (auch DateTime-Ticks) als 8 Little-Endian-Bytes.
+    /// </summary>
+    internal static byte[] LongBytes(long value) => [
+        (byte)value,
+        (byte)(value >> 8),
+        (byte)(value >> 16),
+        (byte)(value >> 24),
+        (byte)(value >> 32),
+        (byte)(value >> 40),
+        (byte)(value >> 48),
+        (byte)(value >> 56)
+    ];
+
+    /// <summary>
+    /// Kodiert Float-Werte als 4 Little-Endian-Bytes (IEEE-754-Bits).
+    /// </summary>
+    internal static byte[] FloatBytes(float value) => IntBytes(BitConverter.SingleToInt32Bits(value));
+
+    /// <summary>
+    /// Kodiert Double-Werte als 8 Little-Endian-Bytes (IEEE-754-Bits).
+    /// </summary>
+    internal static byte[] DoubleBytes(double value) => LongBytes(BitConverter.DoubleToInt64Bits(value));
+
+    /// <summary>
+    /// Kodiert Decimal-Werte als 16 Little-Endian-Bytes (GetBits: Lo, Mid, Hi, Flags).
+    /// </summary>
+    internal static byte[] DecimalBytes(decimal value) {
+        var bits = decimal.GetBits(value);
+
+        return [.. IntBytes(bits[0]), .. IntBytes(bits[1]), .. IntBytes(bits[2]), .. IntBytes(bits[3])];
+    }
+
+    private static int ToInt(byte[] bytes) => bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
+
+    private static long ToLong(byte[] bytes) => bytes[0]
+        | (long)bytes[1] << 8
+        | (long)bytes[2] << 16
+        | (long)bytes[3] << 24
+        | (long)bytes[4] << 32
+        | (long)bytes[5] << 40
+        | (long)bytes[6] << 48
+        | (long)bytes[7] << 56;
+
+    private static float ToFloat(byte[] bytes) => BitConverter.Int32BitsToSingle(ToInt(bytes));
+
+    private static double ToDouble(byte[] bytes) => BitConverter.Int64BitsToDouble(ToLong(bytes));
+
+    private static decimal ToDecimal(byte[] bytes) => new decimal([ToInt(bytes[0..4]), ToInt(bytes[4..8]), ToInt(bytes[8..12]), ToInt(bytes[12..16])]);
 
     /// <summary>
     /// Kern des Steuer-Satz-Schreibens: Tag an der valueId-Position, gefolgt vom
@@ -509,29 +533,6 @@ public sealed class FragmentRecord {
         if (len1 > MaxFieldLength) { return false; }
 
         WriteRecord(stream, depth, [SpaceByte], [(byte)tag, (byte)dataType], contentBytes, null, len1);
-        return true;
-    }
-
-    /// <summary>
-    /// Kern des ListSet-Satz-Schreibens: prüft Tiefe und Empfänger-Typ, berechnet len1
-    /// (ohne len2-Feld, inkl. abschließendem 0x0D) und schreibt Count-Zeile, Einträge
-    /// und optionale Meta-Sektion.
-    /// </summary>
-    private static bool AppendListData(Stream stream, int depth, byte leafType, byte[] countBytes, byte[][] encodedEntries, byte[]? metaBytes) {
-        if (depth < 0 || leafType > MaxUserTypeValue) { return false; }
-
-        var payloadLength = countBytes.Length + 1;
-
-        foreach (var entryBytes in encodedEntries) {
-            payloadLength += 1 + 2 + entryBytes.Length + 1;
-        }
-
-        // Empfänger-Typ + 0x20-Trenner + DataType + Payload + Meta + 0x0D
-        var len1 = 2 + 1 + payloadLength + (metaBytes?.Length ?? 0) + 1;
-
-        if (len1 > MaxFieldLength) { return false; }
-
-        WriteListRecord(stream, depth, [leafType, SpaceByte], (byte)FragmentDataType.ListSet, countBytes, encodedEntries, metaBytes, len1);
         return true;
     }
 
@@ -711,30 +712,22 @@ public sealed class FragmentRecord {
             pos++;
         }
 
-        string content;
-        List<string> listContent = [];
+        byte[] contentBytes;
 
-        if (dataType == FragmentDataType.ListSet) {
-            // ListSet-Satz: kein len2 — Count (lesbar) + Einträge mit je 2 Längenbytes
-            if (!TryParseListPayload(buffer, recordEnd, ref pos, out listContent)) { return false; }
+        if (pos + 4 > recordEnd) { return false; }
 
-            content = string.Empty;
-        } else {
-            if (pos + 4 > recordEnd) { return false; }
+        var len2 = buffer[pos] | (buffer[pos + 1] << 8) | (buffer[pos + 2] << 16) | (buffer[pos + 3] << 24);
+        pos += 4;
 
-            var len2 = buffer[pos] | (buffer[pos + 1] << 8) | (buffer[pos + 2] << 16) | (buffer[pos + 3] << 24);
-            pos += 4;
+        // len2 kann durch das High-Bit des letzten Längen-Bytes negativ werden; der Vergleich
+        // ohne Addition vermeidet den int-Überlauf bei absurden Längen.
+        if (len2 < 0 || len2 > recordEnd - pos - 1) { return false; }
 
-            if (pos + len2 + 1 > recordEnd) { return false; }
-
-            content = Encoding.UTF8.GetString(buffer, pos, len2);
-            pos += len2;
-        }
+        contentBytes = buffer[pos..(pos + len2)];
+        pos += len2;
 
         // Rest prüfen (Längen-Arithmetik, kein Marker): Rest = 1 → nur das 0x0D, keine Meta.
         var metaLength = recordEnd - 1 - pos;
-
-        if (metaLength < 0) { return false; }
 
         var result = new FragmentRecord {
             StorageType = storageType,
@@ -742,10 +735,8 @@ public sealed class FragmentRecord {
             LeafType = leafType,
             DataType = dataType,
             TagType = isTag ? (FragmentTagType)valueId : FragmentTagType.None,
-            StringContent = content
+            ByteContent = contentBytes
         };
-
-        result._listContent = listContent;
 
         if (metaLength > 0) {
             if (buffer[recordEnd - 1] != CarriageReturnByte) { return false; }
@@ -793,27 +784,11 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Liest den Benutzer aus dem Kopf des Streams (Satz 233, FragmentTagType.SaveUser).
-    /// Liefert null, wenn kein Kopf-Benutzer gefunden wird.
-    /// </summary>
-    public static string? HeadUser(Stream stream) {
-        while (TryReadNext(stream) is { } record) {
-            if (record.IsTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent; }
-
-            // Kopf-Ende: Erster Daten-Satz oder der Kommentar-Trenner
-            if (!record.IsTag || record.TagType == FragmentTagType.Comment) { return null; }
-        }
-
-        return null;
-    }
-
-
-    /// <summary>
-    /// Baut die Meta-Bytes (User, DateTimeUtc als Ticks und Comment, durch US getrennt).
+    /// Baut die Meta-Bytes (User, DateTimeUtc als 8 Tick-Bytes und Comment, durch US getrennt).
     /// </summary>
     private static byte[] BuildMetaBytes(string user, DateTime dateTimeUtc, string comment) {
         var userBytes = Encoding.UTF8.GetBytes(user);
-        var dateBytes = Encoding.UTF8.GetBytes(dateTimeUtc.ToTickString());
+        var dateBytes = LongBytes(dateTimeUtc.Ticks);
         var commentBytes = Encoding.UTF8.GetBytes(comment);
 
         var result = new byte[userBytes.Length + 1 + dateBytes.Length + 1 + commentBytes.Length];
@@ -831,60 +806,21 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Parst die ListSet-Payload: Count als lesbare Dezimalzahl bis 0x0D, dann je
-    /// Eintrag Tab, 2 Längenbytes, UTF-8-Inhalt und 0x0D — strikt nach Count, ohne
-    /// Sortierung oder Abschneiden. Liefert false bei verstimmter Struktur.
-    /// </summary>
-    private static bool TryParseListPayload(byte[] buffer, int recordEnd, ref int pos, out List<string> entries) {
-        entries = [];
-
-        var digitsStart = pos;
-
-        while (pos < recordEnd && buffer[pos] is >= (byte)'0' and <= (byte)'9') { pos++; }
-
-        if (pos == digitsStart || pos >= recordEnd || buffer[pos] != CarriageReturnByte) { return false; }
-
-        var count = (int)Math.Min(Converter.LongParse(Encoding.UTF8.GetString(buffer, digitsStart, pos - digitsStart)), int.MaxValue);
-        pos++;
-
-        // Jeder Eintrag braucht mindestens Tab + 2 Längenbytes + 0x0D; absurd große
-        // Counts werden damit abgelehnt, bevor Speicher reserviert wird.
-        if (count > (recordEnd - pos) / 4) { return false; }
-
-        for (var i = 0; i < count; i++) {
-            if (pos + 4 > recordEnd || buffer[pos] != TabByte) { return false; }
-
-            pos++;
-
-            var len = buffer[pos] | (buffer[pos + 1] << 8);
-            pos += 2;
-
-            if (pos + len + 1 > recordEnd) { return false; }
-
-            entries.Add(Encoding.UTF8.GetString(buffer, pos, len));
-            pos += len;
-
-            if (buffer[pos] != CarriageReturnByte) { return false; }
-
-            pos++;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Parst die Meta-Sektion (genau 3 Felder User, DateTimeUtc, Comment, durch US getrennt).
+    /// Parst die Meta-Sektion (User, DateTimeUtc als 8 Tick-Bytes, Comment; durch US getrennt).
+    /// Das Zeitfeld fester Breite (8 Bytes) wird positionsbasiert gelesen, da Tick-Bytes den
+    /// US-Trenner zufällig enthalten können.
     /// </summary>
     private bool ParseMeta(byte[] buffer, int start, int length) {
         var first = Array.IndexOf(buffer, UnitSeparatorByte, start, length);
         if (first < 0) { return false; }
 
-        var second = Array.IndexOf(buffer, UnitSeparatorByte, first + 1, start + length - first - 1);
-        if (second < 0) { return false; }
+        var dateStart = first + 1;
+
+        if (dateStart + 9 > start + length || buffer[dateStart + 8] != UnitSeparatorByte) { return false; }
 
         User = Encoding.UTF8.GetString(buffer, start, first - start);
-        DateTimeUtc = Encoding.UTF8.GetString(buffer, first + 1, second - first - 1).FromTickString();
-        Comment = Encoding.UTF8.GetString(buffer, second + 1, start + length - second - 1);
+        DateTimeUtc = new DateTime(ToLong(buffer[dateStart..(dateStart + 8)]), DateTimeKind.Utc);
+        Comment = Encoding.UTF8.GetString(buffer, dateStart + 9, start + length - dateStart - 9);
         HasMeta = true;
 
         return true;
@@ -923,52 +859,6 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Schreibt einen ListSet-Satz: Tabs, SpeicherTyp, len1, Empfänger-Typ, 0x20,
-    /// DataType, Count-Zeile, Einträge (je Tab, 2 Längenbytes, Inhalt, 0x0D),
-    /// optionale Meta-Sektion und abschließendem 0x0D.
-    /// </summary>
-    private static void WriteListRecord(Stream stream, int depth, byte[] leafBytes, byte dataType, byte[] countBytes, byte[][] encodedEntries, byte[]? metaBytes, int len1) {
-        var total = depth + 1 + 4 + leafBytes.Length + 1 + countBytes.Length + 1 + (metaBytes?.Length ?? 0) + 1;
-
-        foreach (var entryBytes in encodedEntries) { total += 1 + 2 + entryBytes.Length + 1; }
-
-        var record = new byte[total];
-        var pos = 0;
-
-        for (var i = 0; i < depth; i++) { record[pos++] = TabByte; }
-
-        record[pos++] = StandardStorageType;
-        record[pos++] = (byte)(len1 & 0xFF);
-        record[pos++] = (byte)((len1 >> 8) & 0xFF);
-        record[pos++] = (byte)((len1 >> 16) & 0xFF);
-        record[pos++] = (byte)((len1 >> 24) & 0xFF);
-        Array.Copy(leafBytes, 0, record, pos, leafBytes.Length);
-        pos += leafBytes.Length;
-        record[pos++] = dataType;
-        Array.Copy(countBytes, 0, record, pos, countBytes.Length);
-        pos += countBytes.Length;
-        record[pos++] = CarriageReturnByte;
-
-        foreach (var entryBytes in encodedEntries) {
-            record[pos++] = TabByte;
-            record[pos++] = (byte)(entryBytes.Length & 0xFF);
-            record[pos++] = (byte)((entryBytes.Length >> 8) & 0xFF);
-            Array.Copy(entryBytes, 0, record, pos, entryBytes.Length);
-            pos += entryBytes.Length;
-            record[pos++] = CarriageReturnByte;
-        }
-
-        if (metaBytes is not null) {
-            Array.Copy(metaBytes, 0, record, pos, metaBytes.Length);
-            pos += metaBytes.Length;
-        }
-
-        record[pos] = CarriageReturnByte;
-
-        stream.Write(record);
-    }
-
-    /// <summary>
     /// Liefert eine Kopie des Satzes mit verschobener Einrücktiefe.
     /// </summary>
     public FragmentRecord WithDepth(int depth) {
@@ -978,14 +868,65 @@ public sealed class FragmentRecord {
             LeafType = LeafType,
             DataType = DataType,
             TagType = TagType,
-            StringContent = StringContent,
+            ByteContent = ByteContent,
             User = User,
             DateTimeUtc = DateTimeUtc,
             Comment = Comment,
-            HasMeta = HasMeta
+            HasMeta = HasMeta,
+            Entry = Entry,
+            Container = Container,
+            EntryDateTimeUtc = EntryDateTimeUtc
         };
 
-        result._listContent = [.. _listContent];
+        return result;
+    }
+
+    /// <summary>
+    /// Liefert eine Kopie des Satzes mit gesetztem Benutzer. Für das Lesen von
+    /// Fragment-Journals: Dessen Meta trägt den Benutzer nicht mehr, daher wird
+    /// der Journal-Eigentümer aus dem Kopf-Satz injiziert.
+    /// </summary>
+    public FragmentRecord WithUser(string user) {
+        var result = new FragmentRecord {
+            StorageType = StorageType,
+            Depth = Depth,
+            LeafType = LeafType,
+            DataType = DataType,
+            TagType = TagType,
+            ByteContent = ByteContent,
+            User = user,
+            DateTimeUtc = DateTimeUtc,
+            Comment = Comment,
+            HasMeta = HasMeta,
+            Entry = Entry,
+            Container = Container,
+            EntryDateTimeUtc = EntryDateTimeUtc
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Liefert eine Kopie des Satzes mit den Daten des Journal-Eintrags, aus dem er
+    /// stammt (Roh-Bytes, Container-Datei, Eintrags-Zeitstempel). Für das Nachladen
+    /// fremder Fragment-Journale.
+    /// </summary>
+    public FragmentRecord WithEntry(byte[] entry, string container, DateTime entryDateTimeUtc) {
+        var result = new FragmentRecord {
+            StorageType = StorageType,
+            Depth = Depth,
+            LeafType = LeafType,
+            DataType = DataType,
+            TagType = TagType,
+            ByteContent = ByteContent,
+            User = User,
+            DateTimeUtc = DateTimeUtc,
+            Comment = Comment,
+            HasMeta = HasMeta,
+            Entry = entry,
+            Container = container,
+            EntryDateTimeUtc = entryDateTimeUtc
+        };
 
         return result;
     }
@@ -1000,14 +941,15 @@ public sealed class FragmentRecord {
             LeafType = LeafType,
             DataType = DataType,
             TagType = TagType,
-            StringContent = StringContent,
+            ByteContent = ByteContent,
             User = string.Empty,
             DateTimeUtc = DateTime.MinValue,
             Comment = string.Empty,
-            HasMeta = false
+            HasMeta = false,
+            Entry = Entry,
+            Container = Container,
+            EntryDateTimeUtc = EntryDateTimeUtc
         };
-
-        result._listContent = [.. _listContent];
 
         return result;
     }
@@ -1022,15 +964,9 @@ public sealed class FragmentRecord {
     public bool Append(Stream stream, int depth) {
         if (IsTag) { return false; }
 
-        if (DataType == FragmentDataType.ListSet) {
-            var encodedEntries = EncodeListEntries(_listContent, out var countBytes);
+        var metaBytes = HasMeta ? BuildMetaBytes(string.Empty, DateTimeUtc, Comment) : null;
 
-            if (encodedEntries is null) { return false; }
-
-            return AppendListData(stream, depth, LeafType, countBytes, encodedEntries, HasMeta ? BuildMetaBytes(string.Empty, DateTimeUtc, Comment) : null);
-        }
-
-        return AppendData(stream, depth, LeafType, DataType, Encoding.UTF8.GetBytes(StringContent), HasMeta ? BuildMetaBytes(string.Empty, DateTimeUtc, Comment) : null);
+        return AppendData(stream, depth, LeafType, DataType, ByteContent, metaBytes);
     }
 
     /// <summary>

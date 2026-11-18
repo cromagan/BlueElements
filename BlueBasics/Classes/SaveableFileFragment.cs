@@ -15,9 +15,10 @@ namespace BlueBasics.Classes;
 /// überschrieben. Alle Benutzer laden die Journale der anderen nach; bei der
 /// Komplettierung schreibt der Master einen neuen Snapshot und räumt alte Journale
 /// und überzählige Snapshots auf. Journale werden generisch als
-/// rohe Eintrags-Bytes (Basis-Tiefe 0) gelesen und über den Inhalts-Seam
-/// (ParseMainContent) angewendet — das Layout kennt weder den Inhaltstyp noch
-/// den Empfänger.
+/// rohe Eintrags-Bytes (Basis-Tiefe 0) gelesen, über den Inhalts-Seam
+/// (ParseMainContent) angewendet und mit dem Benutzer des Journal-Kopfes in
+/// die Änderungs-Historie übernommen — das Layout kennt weder den Inhaltstyp
+/// noch den Empfänger.
 /// </summary>
 public class SaveableFileFragment : SaveableFileOnefile {
 
@@ -223,10 +224,13 @@ public class SaveableFileFragment : SaveableFileOnefile {
         // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
         var readStartedUtc = DateTime.UtcNow;
 
-        var (changes, files, failed) = GetLastChanges();
-        if (failed) { return false; }
+        var fragmentFiles = IO.GetFiles(FragmengtsPath(), KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments, SearchOption.TopDirectoryOnly).ToList();
+        fragmentFiles.Remove(MyJournalFile);
 
-        var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
+        var undoRecords = GetLastChanges(fragmentFiles);
+        if (undoRecords.IsFailed) { return false; }
+
+        var opr = InjectData(fragmentFiles, undoRecords, DateTime.UtcNow, readStartedUtc, firstTime);
         return opr.IsSuccessful;
     }
 
@@ -515,7 +519,9 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// Führt Aufräumarbeiten nach dem Laden von Fragmenten durch,
     /// inkl. Komplettierung und Bereinigung alter Dateien.
     /// </summary>
-    protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
+    /// <param name="fragmentFiles">Die im selben Lesezyklus ermittelten Fragment-Dateien.</param>
+    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
+    private void DoWorkAfterLastChanges(List<string> fragmentFiles, DateTime startTimeUtc) {
         if (Generic.Ending) { return; }
         if (!string.IsNullOrEmpty(EditableError(false))) { return; }
 
@@ -528,7 +534,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
         // Fragmente gelesen wurden.
         CleanupOldSnapshots(startTimeUtc);
 
-        if (files is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster(true)) {
+        if (fragmentFiles is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster(true)) {
             Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
 
             var f = WriteNewSnapshot();
@@ -547,7 +553,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
             }
         }
 
-        if (files is not { Count: >= 1 }) { return; }
+        if (fragmentFiles is not { Count: >= 1 }) { return; }
 
         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { return; }
 
@@ -560,15 +566,15 @@ public class SaveableFileFragment : SaveableFileOnefile {
         // dann greift ausschließlich die Zeitstempel-Prüfung.
         if (FilesNotIncluded.Count != 0) {
             foreach (var thisch in FilesNotIncluded) {
-                files.Remove(thisch);
+                fragmentFiles.Remove(thisch);
             }
         }
 
         #endregion
 
-        files.Shuffle();
+        fragmentFiles.Shuffle();
 
-        foreach (var thisf in files) {
+        foreach (var thisf in fragmentFiles) {
             var f = thisf.FileNameWithoutSuffix();
             if (f.Length > 19) {
                 var da = f[^19..];
@@ -587,39 +593,39 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Journal-Dateien: Jede Datei wird
-    /// generisch in Eintrags-Bytes (Basis-Tiefe 0) zerlegt; Einträge, die sicher
-    /// vor der letzten Snapshot-Speicherung liegen, und bereits verbuchte
-    /// Einträge werden übersprungen.
+    /// generisch in Eintrags-Bytes (Basis-Tiefe 0) zerlegt und als flache Liste der
+    /// Undo-Sätze geliefert; diese tragen ihre Eintrags-Daten (Entry, Container,
+    /// EntryDateTimeUtc) als Felder. Einträge, die sicher vor der letzten
+    /// Snapshot-Speicherung liegen, und bereits verbuchte Einträge werden übersprungen.
     /// </summary>
-    private (List<(byte[] Entry, DateTime DateTimeUtc, string Container)>? Changes, List<string>? Files, bool Failed) GetLastChanges() {
-        if (!string.IsNullOrEmpty(EditableError(true))) { return (null, null, true); }
+    /// <param name="fragmentFiles">Die zuvor mit GetFragmentFiles ermittelten Journal-Dateien.</param>
+    private OperationResult GetLastChanges(List<string> fragmentFiles) {
+        if (EditableError(true) is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
         CheckPath();
 
         try {
-            var frgma = IO.GetFiles(FragmengtsPath(), KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments, SearchOption.TopDirectoryOnly).ToList();
-            frgma.Remove(MyJournalFile);
+            List<FragmentRecord> undoRecords = [];
 
-            if (frgma.Count == 0) { return ([], [], false); }
-
-            List<(byte[] Entry, DateTime DateTimeUtc, string Container)> changes = [];
-
-            foreach (var thisf in frgma) {
-                ReadJournalFile(thisf, changes);
+            foreach (var thisf in fragmentFiles) {
+                ReadJournalFile(thisf, undoRecords);
             }
 
-            return (changes, frgma, false);
+            return new OperationResult(undoRecords);
         } catch { }
-        return (null, null, true);
+        return OperationResult.Failed("Fehler beim Lesen der Fragment-Journale.");
     }
 
     /// <summary>
     /// Zerlegt eine Journal-Datei in Einträge: Ein Eintrag beginnt an einem
     /// Daten-Satz der Tiefe 0 und umfasst alle tieferen Sätze; der Zeitstempel
     /// kommt aus dem Meta des ersten Satzes mit Meta. Steuer-Sätze der Tiefe 0
-    /// und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen.
+    /// und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen. Die
+    /// Meta trägt den Benutzer nicht mehr; er kommt aus dem Kopf-Satz des
+    /// Journals und wird den Undo-Sätzen des Eintrags injiziert. Jeder Undo-Satz
+    /// erhält die Eintrags-Daten (Entry, Container, EntryDateTimeUtc) als Felder.
     /// </summary>
-    private void ReadJournalFile(string container, List<(byte[] Entry, DateTime DateTimeUtc, string Container)> changes) {
+    private void ReadJournalFile(string container, List<FragmentRecord> undoRecords) {
         if (IO.ReadAllBytes(container, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) { return; }
 
         byte[] data;
@@ -629,6 +635,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
         } else {
             data = rawBytes;
         }
+
+        var headUser = string.Empty;
 
         var pos = 0;
 
@@ -643,10 +651,15 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
             if (FragmentRecord.TryParse(data, pos, out var first, out var afterFirst) && first is not null) {
                 if (first.Depth > 0 || first.IsTag) {
-                    // Blockreste ohne Eintrag bzw. Steuer-Satz: einzeln überspringen
+                    // Kopf-Benutzer merken; Blockreste ohne Eintrag bzw. übrige Steuer-Sätze überspringen
+                    if (first.IsTag && first.TagType == FragmentTagType.SaveUser) { headUser = first.StringContent; }
+
                     pos = afterFirst;
                     continue;
                 }
+
+                // Die Eintrags-Sätze tragen den Journal-Eigentümer und werden als Undo-Sätze übernommen.
+                List<FragmentRecord> entryRecords = [first.WithUser(headUser)];
 
                 var entryStart = pos;
                 var entryEnd = afterFirst;
@@ -669,6 +682,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
                         hasMeta = true;
                         dateTimeUtc = inner.DateTimeUtc;
                     }
+
+                    if (!inner.IsTag) { entryRecords.Add(inner.WithUser(headUser)); }
                 }
 
                 pos = entryEnd;
@@ -686,7 +701,9 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 // Atomar als verarbeitet markieren; bei Duplikat sofort überspringen.
                 if (!MarkProcessed(EntryHash(entry))) { continue; }
 
-                changes.Add((entry, dateTimeUtc, container));
+                foreach (var thisRecord in entryRecords) {
+                    undoRecords.Add(thisRecord.WithEntry(entry, container, dateTimeUtc));
+                }
             } else {
                 // Unlesbarer Satz: Rest der Datei verwerfen.
                 pos = data.Length;
@@ -695,34 +712,27 @@ public class SaveableFileFragment : SaveableFileOnefile {
     }
 
     /// <summary>
-    /// Injiziert die geladenen Journal-Einträge in die aktuelle Struktur: Sie
-    /// werden sortiert nach Zeitstempel über den Inhalts-Seam angewendet.
+    /// Injiziert die geladenen Journal-Einträge in die aktuelle Struktur: Die
+    /// Undo-Sätze werden nach Eintrags-Zeitstempel sortiert; jeder Eintrag (gleiche
+    /// Entry-Referenz) wird einmalig über den Inhalts-Seam angewendet und seine
+    /// Sätze (mit injiziertem Benutzer) in die Änderungs-Historie übernommen.
     /// </summary>
-    /// <param name="checkedDataFiles"></param>
-    /// <param name="data"></param>
+    /// <param name="fragmentFiles">Die im selben Lesezyklus ermittelten Fragment-Dateien.</param>
+    /// <param name="undoRecords">Die Undo-Sätze aus GetLastChanges.</param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
     /// <param name="initialload"></param>
-    private OperationResult InjectData(List<string>? checkedDataFiles, List<(byte[] Entry, DateTime DateTimeUtc, string Container)>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
-        if (data is null) { return OperationResult.Success; }
+    private OperationResult InjectData(List<string> fragmentFiles, OperationResult undoRecords, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
+        if (undoRecords.Value is not List<FragmentRecord> data) { return OperationResult.Success; }
 
         // Bei initialload die MainLoadDone-Sperre umgehen - das Objekt
         // befindet sich gerade im ersten Ladevorgang (EditableError prüft
         // mit isloading=true). Freeze- und Prozess-Prüfungen bleiben aktiv.
         if (CheckInjectAllowed(initialload) is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
-        var dataSorted = data.OrderBy(obj => obj.DateTimeUtc);
+        var dataSorted = data.OrderBy(obj => obj.EntryDateTimeUtc);
 
         try {
-            List<string> myfiles = [];
-            if (checkedDataFiles is not null) {
-                foreach (var thisf in checkedDataFiles) {
-                    if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
-                        myfiles.AddIfNotExists(thisf);
-                    }
-                }
-            }
-
             Interlocked.Increment(ref _doingChanges);
             // Während des Einspielens sind Schlüssel kurzzeitig nicht
             // auflösbar. In diesem Fenster dürfen Ansichten keine Einträge
@@ -730,7 +740,29 @@ public class SaveableFileFragment : SaveableFileOnefile {
             // Bereiche dauerhaft aus der Ansicht.
             PauseDataReload();
             try {
+                // Die Sätze eines Journal-Eintrags tragen dieselbe Entry-Referenz und
+                // stehen nach dem Sortieren direkt hintereinander; der Eintrag wird
+                // einmalig angewendet, seine Sätze sammeln sich bis zum nächsten Eintrag.
+                var pendingRecords = new List<FragmentRecord>();
+                byte[]? appliedEntry = null;
+
                 foreach (var thisWork in dataSorted) {
+                    if (ReferenceEquals(appliedEntry, thisWork.Entry)) {
+                        pendingRecords.Add(thisWork);
+                        continue;
+                    }
+
+                    // Der vorherige Eintrag ist vollständig angewendet; seine
+                    // Undo-Sätze in die Änderungs-Historie übernehmen.
+                    if (appliedEntry is not null) {
+                        lock (UndoLock) {
+                            Undos.AddRange(pendingRecords);
+                        }
+
+                        pendingRecords.Clear();
+                    }
+
+                    appliedEntry = thisWork.Entry;
                     FilesNotIncluded.Add(thisWork.Container);
 
                     using var ms = new MemoryStream(thisWork.Entry);
@@ -742,7 +774,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                     } catch (Exception ex) {
                         // Ein kaputter Eintrag darf den Prozess nicht beenden:
                         // als Freeze mit Ursache quittieren und den Rest verwerfen.
-                        Freeze($"Fehler beim Übernehmen: {thisWork.DateTimeUtc.ToString9()} aus {thisWork.Container.FileNameWithSuffix()} — {ex.Message} | {ex.StackTrace}");
+                        Freeze($"Fehler beim Übernehmen: {thisWork.EntryDateTimeUtc.ToString9()} aus {thisWork.Container.FileNameWithSuffix()} — {ex.Message} | {ex.StackTrace}");
                         return OperationResult.Failed("Journal-Eintrag konnte nicht angewendet werden");
                     }
 
@@ -759,10 +791,21 @@ public class SaveableFileFragment : SaveableFileOnefile {
                             detail += " [Typ " + failRecord.LeafType + ", T" + failRecord.Depth + ", '" + failRecord.StringContent.Left(20) + "']";
                         }
 
-                        Freeze($"Fehler beim Übernehmen: {thisWork.DateTimeUtc.ToString9()} aus {thisWork.Container.FileNameWithSuffix()}{detail}");
+                        Freeze($"Fehler beim Übernehmen: {thisWork.EntryDateTimeUtc.ToString9()} aus {thisWork.Container.FileNameWithSuffix()}{detail}");
                         return OperationResult.Failed("Journal-Eintrag konnte nicht angewendet werden");
                     }
+
+                    pendingRecords.Add(thisWork);
                 }
+
+                // Undo-Sätze des letzten Eintrags übernehmen (LogUndo bleibt beim
+                // Einspielen still).
+                if (appliedEntry is not null) {
+                    lock (UndoLock) {
+                        Undos.AddRange(pendingRecords);
+                    }
+                }
+
                 _isInCache = endTimeUtc;
             } finally {
                 ResumeDataReload();
@@ -770,7 +813,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
                 if (!IsDisposed) {
                     OnRefreshDataSystems();
-                    DoWorkAfterLastChanges(myfiles, startTimeUtc);
+                    DoWorkAfterLastChanges(fragmentFiles, startTimeUtc);
                     TryToSetMeTemporaryMaster();
                     OnInvalidateView();
                     // Loaded zuletzt: Die Nacharbeiten (RepairAfterParse) des
