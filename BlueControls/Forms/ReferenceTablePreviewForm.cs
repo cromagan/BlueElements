@@ -101,7 +101,7 @@ public sealed partial class ReferenceTablePreviewForm : Form {
         if (feedback.Failed) {
             vc = [new StringScriptVariable("Fehler", feedback.ProtocolText, true, "Fehler beim Ausführen des Export-Skripts")];
         } else if (feedback.Variables is { Count: > 0 } vars) {
-            vc = new VariableCollection(vars.ToList(), false);
+            vc = new VariableCollection(vars.ToList());
         } else {
             vc = [new StringScriptVariable("Hinweis", "Keine Variablen berechnet.", true, "Export-Skript lieferte keine Variablen")];
         }

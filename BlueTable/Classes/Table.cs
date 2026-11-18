@@ -260,7 +260,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
         get => new(_columnArrangements.ToList());
         set {
-            if (_columnArrangements.ReadOnly) {
+            if (IsLegacyFormat) {
                 // Legacy-Format: Der ganze Ansichten-Satz wird neu geschrieben
                 var l = new List<ColumnViewCollection>();
                 l.AddRange(value);
@@ -275,7 +275,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 OnViewChanged();
             } else {
                 // Binärformat: granular je Ansicht (Navigationspfad in die Fragmente)
-                _ = _columnArrangements.Update(value, false);
+                _ = _columnArrangements.Update(value);
 
                 OnViewChanged();
             }
@@ -321,7 +321,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             lock (_eventScriptLock) { return _eventScript; }
         }
         set {
-            if (_eventScript.ReadOnly) {
+            if (IsLegacyFormat) {
                 // Legacy-Format: Der ganze Skript-Satz wird neu geschrieben
                 var l = new List<TableScriptDescription>();
                 l.AddRange(value);
@@ -625,7 +625,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public UniqueValueCollection UniqueValues {
         get => _uniqueValues;
         set {
-            if (_uniqueValues.ReadOnly) {
+            if (IsLegacyFormat) {
                 // Legacy-Format: Der ganze Definitions-Satz wird neu geschrieben
                 var l = new List<UniqueValueDefinition>();
                 l.AddRange(value);
@@ -640,7 +640,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 OnFragmentChanged(new FragmentChangedEventArgs(this, TableDataType.UniqueValues, newStr));
             } else {
                 // Binärformat: granular je Definition (Navigationspfad in die Fragmente)
-                _ = _uniqueValues.Update(value);
+                _ = _uniqueValues.Update((IFragmentStoreable)value);
             }
         }
     }
@@ -772,13 +772,13 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public static Table Create(string key) => CreateInstance(key);
 
     /// <summary>
-    /// Legt eine neue Tabellendatei an: .fbdb über TableFileNew mit
+    /// Legt eine neue Tabellendatei an: .btb über TableFileNew mit
     /// Fragment-Journal, alle übrigen Endungen über TableFile.Create.
     /// </summary>
     public static OperationResult Create(string targetPath, Table? source) => Create(targetPath, source, SaveableFileFragment.ClassId);
 
     /// <summary>
-    /// Legt eine neue Tabellendatei an: .fbdb über TableFileNew mit dem über die
+    /// Legt eine neue Tabellendatei an: .btb über TableFileNew mit dem über die
     /// Layout-ClassId gewählten Datei-Layout (der Layout-Kopf der Kopf-Datei wird
     /// sofort geschrieben), alle übrigen Endungen über TableFile.Create.
     /// </summary>
@@ -789,7 +789,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
 
             var tbl = new TableFileNew(targetPath, source, saveable);
-            SaveableFile.WriteHeadFile(targetPath, layoutClassId);
+            saveable.WriteHeadFile();
             return tbl.Save();
         }
 
@@ -1163,7 +1163,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // UI-Thread invoken. Unter dem Lock deadlockt das mit UI-Lesern des Getters.
         if (updatedScript is null) {
             // found && isDisposed: das Skript wird entfernt
-            if (tb.EventScript.ReadOnly) {
+            if (tb.IsLegacyFormat) {
                 // Legacy-Format: Collections werden komplett überschrieben
                 var rest = new List<TableScriptDescription>();
 
@@ -1181,7 +1181,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             return tb.EventScript.Remove(script.KeyName);
         }
 
-        if (tb.EventScript.ReadOnly) {
+        if (tb.IsLegacyFormat) {
             // Legacy-Format: Collections werden komplett überschrieben
             var scripts = new List<TableScriptDescription>();
             var replaced = false;
@@ -1420,9 +1420,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
         }
 
-        // Klassischer Ganzsatz-Schreibweg: Die frische Zieltabelle ist im
-        // Legacy-Zustand (ReadOnly), das binäre Format gibt die Sammlung
-        // erst nach dem Kopieren zum granularen Ändern frei.
+        // Klassischer Ganzsatz-Schreibweg: Der Setter schreibt im Legacy-Format
+        // den ganzen Definitions-Satz, im binären Format granular.
         UniqueValues = new(this, uniqueCopies);
 
         // Tief kopiert und per Update übernehmen: Bestehende Ansichten
@@ -1438,7 +1437,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
         }
 
-        _ = _columnArrangements.Update(viewsCopy, true);
+        _ = _columnArrangements.Update(viewsCopy);
 
         List<TableScriptDescription> scriptCopies = [];
 
@@ -1448,9 +1447,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             }
         }
 
-        // Klassischer Ganzsatz-Schreibweg: Die frische Zieltabelle ist im
-        // Legacy-Zustand (ReadOnly), das binäre Format gibt die Sammlung
-        // erst nach dem Kopieren zum granularen Ändern frei.
+        // Klassischer Ganzsatz-Schreibweg: Der Setter schreibt im Legacy-Format
+        // den ganzen Skript-Satz, im binären Format granular.
         EventScript = new(this, scriptCopies);
 
         Variables = sourceTable.Variables;
@@ -2319,7 +2317,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         // UniqueValueDefinitions ohne Spalten entfernen
         if (_uniqueValues.Any(uv => uv.KeyColumns.Count == 0)) {
-            _ = _uniqueValues.Update(_uniqueValues.Where(uv => uv.KeyColumns.Count > 0).ToList(), true);
+            _ = _uniqueValues.Update(_uniqueValues.Where(uv => uv.KeyColumns.Count > 0).ToList());
         }
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
@@ -2332,7 +2330,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 .Select(g => g.OrderByDescending(s => s.Script.Length).First())
                 .ToList();
             deduplicated.Sort();
-            _ = _eventScript.Update(deduplicated, true);
+            _ = _eventScript.Update(deduplicated);
             InvalidateHeadCaches();
         }
 
@@ -2647,8 +2645,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 Row.Dispose();
 
                 // Listen leeren
-                _ = _eventScript.Update([], true);
-                _ = _uniqueValues.Update([], true);
+                _ = _eventScript.Update([]);
+                _ = _uniqueValues.Update([]);
                 _tableAdmin.Clear();
                 _cliRights.Clear();
                 _permissionGroupsNewRow.Clear();
@@ -2847,7 +2845,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                         .ToList();
 
                     // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
-                    _ = _uniqueValues.Update(parsed, true);
+                    _ = _uniqueValues.Update(parsed);
                     break;
                 }
 
@@ -2891,7 +2889,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                     var isOnlyStatisticsUpdate = IsOnlyStatisticsUpdate(_eventScript.ToList(), parsed);
 
                     // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
-                    _ = _eventScript.Update(parsed, true);
+                    _ = _eventScript.Update(parsed);
 
                     InvalidateHeadCaches();
 
@@ -2921,7 +2919,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 var cas = value.SplitAndCutByCr();
 
                 // Bestehende Instanzen behalten ihre Identität (Referenzen in UI und Skripten)
-                _ = _columnArrangements.Update(cas.Select(t => new ColumnViewCollection(this, t)).ToList(), true);
+                _ = _columnArrangements.Update(cas.Select(t => new ColumnViewCollection(this, t)).ToList());
                 break;
 
             case TableDataType.PermissionGroupsNewRow:

@@ -88,11 +88,6 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// </summary>
     public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.ListSet, string.Empty, content) { }
 
-    /// <summary>
-    /// Ganzes Objekt im Classic-Format; Content als Parseable-String (ParseableItems).
-    /// </summary>
-    public FragmentChangedEventArgs(object sender, Enum typeSelector, IFragmentStoreable content) : this(sender, typeSelector, content is IStringable s ? s.ParseableItems().FinishParseable() : string.Empty) { }
-
     #endregion
 
     #region Properties
@@ -145,7 +140,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
 
     /// <summary>
     /// Erzeugt den Blatt-Satz der Änderung mit Meta-Stempel (User, Zeitpunkt) als
-    /// Undo-Eintrag auf Basis-Tiefe 1.
+    /// Undo-Eintrag auf Basis-Tiefe 0.
     /// </summary>
     public FragmentRecord CreateUndoRecord() =>
         FragmentRecord.Create(TypeSelector, ContentType, Content, ListContent, Generic.UserName, DateTime.UtcNow);

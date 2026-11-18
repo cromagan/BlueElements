@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueTable.EventArgs;
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace BlueTable.Classes;
@@ -176,12 +175,16 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
     }
 
     /// <summary>
-    /// Entfernt nach dem Übernehmen einer geladenen Spalten-Liste alle Spalten,
-    /// die nicht darin stehen (Überbleibsel beim Nachladen in eine gefüllte Instanz).
+    /// Gleicht die Spalten per Basis-Update an und bildet die System-Spaltenzeiger neu.
     /// </summary>
-    protected override bool ApplyLoadedItems(ReadOnlyCollection<ColumnItem> items) {
-        RemoveObsoleteColumns(this, [.. items.Select(i => i.KeyName)], ChangeFlags.IgnoreFreeze);
-        return true;
+    public override string Update(IEnumerable<ColumnItem> sourceItems) {
+        var result = base.Update(sourceItems);
+
+        if (result is { Length: 0 }) {
+            GetSystems();
+        }
+
+        return result;
     }
 
     public void DisableAllEditing() {

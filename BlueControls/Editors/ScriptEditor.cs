@@ -241,7 +241,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
         if (_debugOutputLines.Count > 0) {
             // Live-Ausgabe steht bereits im Fenster — Ergebnis anhängen statt überschreiben.
             txbErrorInfo.Text += "###################\r\n" + resultText;
-            grpVariablen.InputItem = f.Variables?.ToList() is { Count: > 0 } v ? new VariableCollection(v, true) : null;
+            grpVariablen.InputItem = f.Variables?.ToList() is { Count: > 0 } v ? new VariableCollection(v) : null;
         } else {
             UpdateState(resultText, f.Variables?.ToList(), false);
         }
@@ -250,7 +250,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
     public void UpdateState(string txt, List<ScriptVariable>? variables, bool updateSpecialFields) {
         txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
-        grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
+        grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v) : null;
 
         if (updateSpecialFields) {
             VariablesToSpecialField(DummyJson(variables), false);

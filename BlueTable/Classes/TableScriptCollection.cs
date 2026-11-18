@@ -1,18 +1,15 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace BlueTable.Classes;
 
 /// <summary>
 /// Beobachtbare Skript-Sammlung der Tabelle. Zwei Betriebsarten: Im Legacy-Format
-/// ist sie schreibgeschützt — jede Skript-Änderung überschreibt den ganzen
-/// Skript-Satz über den EventScript-Setter der Tabelle. Im binären Fragment-Format
-/// gibt die Tabelle die Sammlung zum direkten Ändern frei (ReadOnly = false): Add,
-/// Remove und granulare Ersetzungen reichen FragmentChanged mit dem fertigen
-/// Scripts-Navigationspfad bis zur Tabelle durch, die sie als gezielte Änderung in die
-/// Fragmentdatei schreibt.
+/// läuft jede Skript-Änderung als ganzer Skript-Satz über den EventScript-Setter
+/// der Tabelle. Im binären Fragment-Format reichen Add, Remove und granulare
+/// Ersetzungen FragmentChanged mit dem fertigen Scripts-Navigationspfad bis zur
+/// Tabelle durch, die sie als gezielte Änderung in die Fragmentdatei schreibt.
 /// </summary>
 public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescription>, IHasTable {
 
@@ -21,9 +18,8 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     /// <summary>
     /// Pfad-Typen der Sammlung im binären Fragment-Format; eigener Zahlraum der
     /// Sammlung, die Tabelle routet über ihren eigenen Segmenteintritt eine Stufe
-    /// darüber. Der Scripts-Satz trägt als ListKeyObject die ganze Liste bzw. als
-    /// Nav-Satz den Schlüssel des Journal-Blocks. Die Werte 21/22 kollidieren
-    /// bewusst nicht mit den Skript-Eigenschaften (1-13).
+    /// darüber. Überschneidungen mit dem Zahlraum der Skript-Eigenschaften sind
+    /// unschädlich, denn die Stufen werden strukturgenau geroutet.
     /// </summary>
     private enum ScriptCollectionFragmentType : byte {
 
@@ -34,15 +30,22 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
         Scripts = 1,
 
         /// <summary>
-        /// Blatt-Satz: übernimmt ein ganzes neues Skript im Classic-Format
-        /// (Content = Parseable-String des Skripts).
+        /// Blatt-Satz: übernimmt ein ganzes neues Skript (Content = kompletter
+        /// Skript-Block im binären Fragment-Format; ältere Journale reichen den
+        /// Classic-Parseable-String des Skripts).
         /// </summary>
         ScriptAdd = 2,
 
         /// <summary>
         /// Blatt-Satz: entfernt das Skript des Journal-Blocks (Nav-Schlüssel).
         /// </summary>
-        ScriptRemove = 3
+        ScriptRemove = 3,
+
+        /// <summary>
+        /// Nav-Satz des Bubbling; Content = Schlüssel des Skripts, dessen Block
+        /// eine Ebene tiefer folgt.
+        /// </summary>
+        SubScript = 4
     }
 
     #endregion
@@ -50,23 +53,19 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     #region Constructors
 
     /// <summary>
-    /// Erstellt die schreibgeschützte Sammlung (Legacy); die Tabellen-Referenz
-    /// wird zum Erzeugen neuer Skripte beim Einlesen benötigt.
+    /// Erstellt die Sammlung; die Tabellen-Referenz wird zum Erzeugen neuer
+    /// Skripte beim Einlesen benötigt.
     /// </summary>
     public TableScriptCollection(Table? table) {
-        ReadOnly = true;
         Table = table;
     }
 
     /// <summary>
-    /// Erstellt die Sammlung mit Startbestand für den klassischen Ganzsatz-Schreibweg
-    /// (Legacy): die Items werden normal aufgenommen und die Sammlung danach gesperrt;
-    /// gleichnamige Doppel werden verworfen.
+    /// Erstellt die Sammlung mit Startbestand; gleichnamige Doppel werden verworfen.
     /// </summary>
     public TableScriptCollection(Table? table, IEnumerable<TableScriptDescription> scripts) {
         Table = table;
         _ = AddRange(scripts);
-        ReadOnly = true;
     }
 
     #endregion
@@ -83,13 +82,13 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     #region Methods
 
     /// <summary>
-    /// Ersetzt ein Skript granular (Binärformat): Ein geändertes Skript wird als
-    /// ScriptRemove/ScriptAdd gemeldet, bei Namenswechsel unter dem alten bzw. neuen
-    /// Namen. Fehlt das Skript, wird es aufgenommen; inhaltlich unveränderte Skripte
-    /// erzeugen keinen Journal-Eintrag.
+    /// Ersetzt ein Skript granular (Binärformat): Ein geändertes Skript übernimmt die
+    /// Werte auf die beobachtete Instanz — die Setter melden nur geänderte Blätter
+    /// unter dem Pfad Scripts/Skriptname. Fehlt das Skript, wird es als Aufnahme
+    /// gemeldet; bei Namenswechsel als Entfernung unter dem alten und Aufnahme unter
+    /// dem neuen Namen. Inhaltlich unveränderte Skripte erzeugen keinen Journal-Eintrag.
     /// </summary>
     public bool Update(TableScriptDescription? script) {
-        if (ReadOnly) { return false; }
         if (script is null) { return false; }
 
         // Bestehende Instanz suchen: gleicher Name oder gleiche Instanz (umbenannt)
@@ -101,20 +100,33 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
         // Unverändert und nicht die beobachtete Instanz selbst: kein Journal-Eintrag
         if (!ReferenceEquals(existing, script) && existing.ParseableItems().FinishParseable() == script.ParseableItems().FinishParseable()) { return true; }
 
-        // Entfernung und Aufnahme melden die Journal-Sätze selbst (ScriptRemove vor ScriptAdd)
+        // Gleicher Name: die Setter melden nur die tatsächlich geänderten Blätter
+        if (string.Equals(existing.KeyName, script.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            return existing.Update(script) is { Length: 0 };
+        }
+
+        // Umbenennung: Entfernung unter dem alten und Aufnahme unter dem neuen Namen
         _ = Remove(existing.KeyName);
         return Add(script);
     }
 
     /// <summary>
-    /// Übernimmt ein frisch gelesenes Skript: fehlt es, wird es aufgenommen;
-    /// sonst behält die bestehende Instanz ihre Identität (alle Werte übernommen).
+    /// Gleicht die Sammlung granular an: Fehlende Skripte werden entfernt, neue als
+    /// Aufnahme gemeldet; geänderte übernehmen die Werte auf die beobachtete Instanz,
+    /// sodass nur geänderte Blätter journalt werden.
     /// </summary>
-    private bool ApplyScript(TableScriptDescription script) {
-        if (GetByKey(script.KeyName) is not { } existing) { return Add(script); }
+    public override void UpdateChild(IEnumerable<TableScriptDescription> sourceItems) {
+        if (IsDisposed) { return; }
 
-        existing.UpdateFrom(script);
-        return true;
+        var sourceKeys = new HashSet<string>(sourceItems.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var keyName in Keys()) {
+            if (!sourceKeys.Contains(keyName)) { _ = Remove(keyName); }
+        }
+
+        foreach (var sourceItem in sourceItems) {
+            _ = Update(sourceItem);
+        }
     }
 
     /// <summary>
@@ -139,7 +151,7 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     protected override Enum ListType => ScriptCollectionFragmentType.Scripts;
 
     /// <summary>
-    /// Aufnahmen eines ganzen Classic-Skript-Strings.
+    /// Aufnahmen eines ganzen Skripts als Fragment-Block.
     /// </summary>
     protected override Enum AddItemType => ScriptCollectionFragmentType.ScriptAdd;
 
@@ -151,35 +163,29 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     /// <summary>
     /// Pfad-Segment des Bubbling.
     /// </summary>
-    protected override Enum ItemSubType => ScriptCollectionFragmentType.Scripts;
+    protected override Enum ItemSubType => ScriptCollectionFragmentType.SubScript;
 
     /// <summary>
     /// Erzeugt das Skript zum Name-Satz des Segment-Anfangs; die Übernahme in die
-    /// Sammlung macht ApplyLoadedItems (bestehende Instanzen behalten ihre Identität).
+    /// Sammlung macht Update (bestehende Instanzen behalten ihre Identität).
     /// </summary>
     protected override TableScriptDescription? CreateItem(FragmentRecord first) => new(Table, first.StringContent, string.Empty);
 
     /// <summary>
-    /// Übernimmt die gelesene Liste per Update; bestehende Instanzen behalten ihre Identität.
+    /// Übernimmt ein ganzes neues Skript aus einem Add-Blatt: Bei älteren Journalen
+    /// ist der Content der Classic-Parseable-String des Skripts; der Fragment-Block
+    /// neuer Journale läuft über die Basis (ApplyItemAddFragment).
     /// </summary>
-    protected override bool ApplyLoadedItems(ReadOnlyCollection<TableScriptDescription> items) {
-        _ = Update(items.ToList(), true);
-        return true;
-    }
+    protected override bool ApplyItemAdd(string toParse, string keyName) => ApplyItemAdd(new TableScriptDescription(Table, toParse));
 
     /// <summary>
-    /// Übernimmt ein ganzes, im Classic-Format gereichtes Skript.
-    /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) => ApplyScript(new TableScriptDescription(Table, toParse));
-
-    /// <summary>
-    /// Fängt den Scripts-Nav-Satz des Journals ab: Vor dem Anwenden wird der
+    /// Fängt den SubScript-Nav-Satz des Journals ab: Vor dem Anwenden wird der
     /// erste Blocksatz gelesen, um reine Laufzeit-Statistik zu erkennen — in dem
     /// Fall bleiben Zeilen-Prüfung und Script-Event aus. Alles andere macht die
     /// Basis.
     /// </summary>
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (record.LeafType == (byte)ScriptCollectionFragmentType.Scripts && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
+        if (record.LeafType == (byte)ScriptCollectionFragmentType.SubScript && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
             // Ersten Blocksatz vorab lesen; die Anwendung selbst macht ApplySubItem (liest den Satz erneut).
             var blockStart = stream.Position;
             FragmentRecord? firstLeaf = FragmentRecord.TryReadNext(stream, record.Depth + 1);

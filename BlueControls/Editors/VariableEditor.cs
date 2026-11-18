@@ -154,8 +154,16 @@ public partial class VariableEditor : EditorEasy {
 
     private void TableVariablen_CellValueChanged(object? sender, CellEventArgs e) {
         var c = tableVariablen.Table?.Column.First;
-        if (e.Column == c && string.IsNullOrEmpty(e.Row.CellGetString(c))) {
+        if (e.Column != c) { return; }
+
+        if (string.IsNullOrEmpty(e.Row.CellGetString(c))) {
             RowCollection.Remove(e.Row, "Variable gelöscht");
+            return;
+        }
+
+        // Neue Variablen erhalten beim Anlegen direkt den Typ String, damit der Fallback in CreateNewItem nicht greift
+        if (string.IsNullOrEmpty(e.Row.CellGetString("Typ"))) {
+            e.Row.CellSet("Typ", StringScriptVariable.ClassId, string.Empty);
         }
     }
 

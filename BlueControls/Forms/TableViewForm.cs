@@ -411,12 +411,12 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         var tb = Table.Get(tablename);
         if (tb is { IsDisposed: false }) {
-            if (btnLetzteDateien.Parent?.Parent?.Visible == true && tb is TableFile tbf) {
-                if (!string.IsNullOrEmpty(tbf.Filename)) {
-                    btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
-                    LoadTab.FileName = tbf.Filename;
-                } else {
-                    btnLetzteDateien.AddFileName(tbf.Filename, tbf.KeyName);
+            if (btnLetzteDateien.Parent?.Parent?.Visible == true) {
+                var filename = string.Empty;
+                if (tb is TableFile tbf) { filename = tbf.Filename; } else if (tb is TableFileNew tfn) { filename = tfn.Filename; }
+                if (filename is { Length: > 0 }) {
+                    btnLetzteDateien.AddFileName(filename, tb.KeyName);
+                    LoadTab.FileName = filename;
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
@@ -553,7 +553,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        var createResult = TableFile.Create(SaveTab.FileName, null);
+        var layoutClassId = ChooseSaveableLayout(SaveTab.FileName);
+        if (layoutClassId is null) { return; }
+
+        var createResult = Table.Create(SaveTab.FileName, null, layoutClassId);
         if (createResult.IsFailed) {
             Notification.Show("Fehler beim Erstellen:<br>" + createResult.FailedReason, ImageCode.Warnung);
             return;
@@ -587,7 +590,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            var result = TableFile.Create(SaveTab.FileName, tbf);
+            var layoutClassId = ChooseSaveableLayout(SaveTab.FileName);
+            if (layoutClassId is null) { return; }
+
+            var result = Table.Create(SaveTab.FileName, tbf, layoutClassId);
             if (result.IsFailed) {
                 Notification.Show("Fehler beim Speichern:<br>" + result.FailedReason, ImageCode.Warnung);
                 return;
@@ -595,6 +601,25 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             SwitchTabToTable(SaveTab.FileName);
         }
+    }
+
+    /// <summary>
+    /// Ermittelt die ClassId der Speichermethode: Bei der neuen Dateiendung (.btb) fragt
+    /// ein Dialog die verfügbaren Datei-Verwaltungen (SaveableFile-Layouts) ab, alle
+    /// übrigen Endungen erhalten den Standard, den Table.Create ignoriert. Null bei Abbruch.
+    /// </summary>
+    private static string? ChooseSaveableLayout(string fileName) {
+        if (!fileName.FileSuffix().Equals(TableFileNew.SuffixMainFile, StringComparison.OrdinalIgnoreCase)) {
+            return SaveableFileFragment.ClassId;
+        }
+
+        List<ListItem> layouts = [];
+        foreach (var thisLayout in SaveableFile.AllFileSaveTypes.Instances) {
+            layouts.Add(ItemOf(thisLayout, thisLayout.MyClassId));
+        }
+
+        var wahl = InputBoxListBoxStyle.Show("Speichermethode wählen:", layouts, CheckBehavior.SingleSelection, [SaveableFileFragment.ClassId], AddType.None);
+        return wahl is { Count: 1 } ? wahl[0].KeyName : null;
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {

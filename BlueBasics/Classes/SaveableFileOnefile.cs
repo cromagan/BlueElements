@@ -27,6 +27,16 @@ public class SaveableFileOnefile : SaveableFile {
     /// </summary>
     protected override string LayoutId => ClassId;
 
+    /// <summary>
+    /// Anzeigename des Komplettstand-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string ReadableText() => "Komplettstand";
+
+    /// <summary>
+    /// Kurzinfo des Komplettstand-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string QuickInfo => "Der komplette Datenstand liegt als eine Datei im Arbeitsunterordner.";
+
     #endregion
 
     #region Fields
@@ -51,6 +61,11 @@ public class SaveableFileOnefile : SaveableFile {
     #endregion
 
     #region Constructors
+
+    /// <summary>
+    /// Erstellt eine Layout-Instanz ohne Datei-Bezug für die Aufzählung der Datei-Layouts.
+    /// </summary>
+    public SaveableFileOnefile() { }
 
     /// <summary>
     /// Erstellt die Datei-Verwaltung für eine Hauptdatei.
@@ -196,7 +211,7 @@ public class SaveableFileOnefile : SaveableFile {
             return false;
         }
 
-        if (content is not { Length: > 0 } || content[0] != 0x09) {
+        if (content is not { Length: > 0 } || content[0] != FragmentRecord.StandardStorageType) {
             Freeze("Kein gültiger Fragment-Inhalt");
             return false;
         }

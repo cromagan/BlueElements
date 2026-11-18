@@ -16,9 +16,68 @@ public delegate ScriptEndedFeedback ExecuteScriptDelegate(string script, bool te
 
 public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable, INotifyPropertyChanged {
 
+    #region Enums
+
+    /// <summary>
+    /// Empfänger-Typen des Skripts im binären Fragment-Format (Blatt-Werte unterhalb
+    /// des Scripts-Pfades). Nur dem Skript selbst bekannt.
+    /// </summary>
+    public enum ScriptFragmentType : byte {
+
+        /// <summary>
+        /// Der Skript-Text selbst.
+        /// </summary>
+        Script = 1,
+
+        QuickInfo = 2,
+
+        AdminInfo = 3,
+
+        Image = 4,
+
+        /// <summary>
+        /// Benutzergruppen; Content = Gruppennamen, durch „|“ getrennt.
+        /// </summary>
+        UserGroups = 5,
+
+        FailedReason = 6,
+
+        NeedRow = 8,
+
+        ValuesReadOnly = 9,
+
+        /// <summary>
+        /// Auslösende Ereignisse; Content = int-Wert von ScriptEventTypes.
+        /// </summary>
+        Events = 10,
+
+        StoppedTimeCount = 11,
+
+        AverageRunTime = 12,
+
+        /// <summary>
+        /// Name des Skripts; erster Satz des Blocks, die Empfänger-Fabrik baut das
+        /// Objekt daraus.
+        /// </summary>
+        ScriptName = 13,
+
+        /// <summary>
+        /// Segmenteintritt in die gespeicherten Variablen; Content = leerer Key,
+        /// der Variablen-Block folgt eine Ebene tiefer.
+        /// </summary>
+        SubVariableCollection = 94
+    }
+
+    #endregion
+
     #region Fields
 
     private volatile int _isDisposedFlag;
+
+    /// <summary>
+    /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
+    /// </summary>
+    private int _eventsSuppressCount;
 
     #endregion
 
@@ -61,6 +120,11 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
     #endregion
 
     #region Properties
@@ -71,6 +135,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.AdminInfo, value));
         }
     }
 
@@ -93,6 +158,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.FailedReason, value));
         }
     }
 
@@ -102,14 +168,22 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.Image, value));
         }
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
+    /// <summary>
+    /// Zeigt an, ob FragmentChanged-Events aktuell unterdrückt sind.
+    /// </summary>
+    public bool IsEventsSuppressed => _eventsSuppressCount > 0;
+
     public string KeyName {
         get;
         set {
+            // Eine Namensänderung meldet die Sammlung als Entfernung + Aufnahme;
+            // hier bewusst kein Fragment-Blatt, der Nav-Schlüssel muss stabil bleiben.
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
@@ -122,6 +196,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.QuickInfo, value));
         }
     }
 
@@ -138,15 +213,19 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.Script, value));
         }
     }
 
     public ReadOnlyCollection<string> UserGroups {
         get;
         set {
-            if (field == value) { return; }
+            // Inhaltsvergleich statt Referenzvergleich: gleich große Listen
+            // (z. B. beim Übernehmen frischer Instanzen) erzeugen kein Fragment-Blatt.
+            if (!field.IsDifferentTo(value)) { return; }
             field = value;
             OnPropertyChanged();
+            OnFragmentChanged(new FragmentChangedEventArgs(this, ScriptFragmentType.UserGroups, value));
         }
     }
 
@@ -285,6 +364,7 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
             OnDisposed();
             Disposed = null;
             PropertyChanged = null;
+            FragmentChanged = null;
         }
     }
 
@@ -308,6 +388,47 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Unterdrückt FragmentChanged-Events des Skripts und seiner gespeicherten Variablen.
+    /// </summary>
+    public void SuppressEvents() {
+        _eventsSuppressCount++;
+        SavedVariables.SuppressEvents();
+    }
+
+    /// <summary>
+    /// Hebt die Unterdrückung des Skripts und seiner gespeicherten Variablen wieder auf.
+    /// </summary>
+    public void ResumeEvents() {
+        if (_eventsSuppressCount > 0) { _eventsSuppressCount--; }
+        SavedVariables.ResumeEvents();
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event mit den fertigen Argumenten aus.
+    /// </summary>
+    public virtual void OnFragmentChanged(FragmentChangedEventArgs e) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
+        FragmentChanged?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// Reicht eine Änderung der gespeicherten Variablen eine Ebene höher und stellt
+    /// dem Blatt den eigenen Navigationssatz (SubVariableCollection, Segmenteintritt)
+    /// voran. Nur das Blatt liefert seinen Blatt-Satz; diese Stufe feuert mit dem
+    /// SubVariableCollection-Navigationssatz (leerer Key = Segmenteintritt) weiter.
+    /// </summary>
+    public void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
+        OnFragmentChanged(e.WithNavigation(ScriptFragmentType.SubVariableCollection, string.Empty));
+    }
+
+    #endregion
 
     #endregion
 }

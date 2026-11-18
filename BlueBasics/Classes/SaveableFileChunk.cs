@@ -42,6 +42,16 @@ public class SaveableFileChunk : SaveableFile {
     /// </summary>
     protected override string LayoutId => ClassId;
 
+    /// <summary>
+    /// Anzeigename des Chunk-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string ReadableText() => "Chunk basiert";
+
+    /// <summary>
+    /// Kurzinfo des Chunk-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string QuickInfo => "Die Daten liegen als unveränderliche Chunk-Dateien im Arbeitsunterordner.\r\nEs werden nicht die kompletten Daten geladen. Bei Bedarf werden Daten nachgeladen.";
+
     #endregion
 
     #region Fields
@@ -137,6 +147,11 @@ public class SaveableFileChunk : SaveableFile {
     /// <summary>
     /// Erstellt die Chunk-Verwaltung für eine Lite-Hauptdatei.
     /// </summary>
+    /// <summary>
+    /// Erstellt eine Layout-Instanz ohne Datei-Bezug für die Aufzählung der Datei-Layouts.
+    /// </summary>
+    public SaveableFileChunk() { }
+
     public SaveableFileChunk(string filename) : base(filename) {
         InitialSavePending = true;
         SaveRequired = true;
@@ -354,13 +369,13 @@ public class SaveableFileChunk : SaveableFile {
 
         using var ms = new MemoryStream();
 
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.SerializerVersion, "1.00");
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.MasterUser, Generic.UserName);
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.MasterMachine, Environment.MachineName);
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.MasterApp, Develop.AppExe());
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.MasterId, MyId);
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.MasterTimeUtc, DateTime.UtcNow.AddMinutes(MasterClaimValidMinutes));
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.Eof, string.Empty);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.SerializerVersion, "1.00");
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterUser, Generic.UserName);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterMachine, Environment.MachineName);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterApp, Develop.AppExe());
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterId, MyId);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterTimeUtc, DateTime.UtcNow.AddMinutes(MasterClaimValidMinutes));
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.Eof, string.Empty);
 
         return [.. ms.ToArray()];
     }

@@ -843,7 +843,7 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.TBLH;*.TBLJ;*.MTBLJ)|*.BDB;*.MBDB;*.TBLH;*.TBLJ;*.MTBLJ|Alle Dateien (*.*)|*.*";
+            LoadTab.Filter = "Tabellen (*.BTB;*.BDB;*.NBDB;*.MBDB;*.TBLH)|*.BTB;*.BDB;*.NBDB;*.MBDB;*.TBLH|Alle Dateien (*.*)|*.*";
             LoadTab.Title = "Bitte Tabelle laden!";
             LoadTab.FileOk += LoadTab_FileOk;
             // 

@@ -171,8 +171,7 @@ public class TableFile : Table {
 
     /// <summary>
     /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
-    /// Binäres Fragment-Format: beginnt mit einem Tab-Satz und endet
-    /// auf den 255-EOF-Satz (valueId FF, leerer Content, 0x0D).
+    /// Binäres Fragment-Format: endet auf den 255-EOF-Satz (valueId FF, leerer Content, 0x0D).
     /// Classic-Format: Der Marker besteht aus
     /// [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"].
     /// </summary>
@@ -190,9 +189,9 @@ public class TableFile : Table {
 
             if (data.Length < 9) { return false; }
 
-            if (data[0] == 0x09) {
+            if (data[0] == 0x01) { // Fragment-Format: erster Satz der Wurzel-Ebene, ohne Tab
                 // 255-EOF-Satz: ... 0x20, valueId 0xFF, Content-Typ, 4 Längen-Bytes (leerer Content), 0x0D
-                return data[^7] == 0xFF
+                return data[^7] == (byte)FragmentTagType.Eof
                     && data[^6] <= FragmentRecord.MaxUserTypeValue
                     && data[^5] == 0x00
                     && data[^4] == 0x00
@@ -203,7 +202,7 @@ public class TableFile : Table {
 
             var offset = data.Length - 8;
             return data[offset] == 0x03
-                && data[offset + 1] == 0xFF
+                && data[offset + 1] == (byte)FragmentTagType.Eof
                 && data[offset + 2] == 0x00
                 && data[offset + 3] == 0x00
                 && data[offset + 4] == 0x03

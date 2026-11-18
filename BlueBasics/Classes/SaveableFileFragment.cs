@@ -15,7 +15,7 @@ namespace BlueBasics.Classes;
 /// überschrieben. Alle Benutzer laden die Journale der anderen nach; bei der
 /// Komplettierung schreibt der Master einen neuen Snapshot und räumt alte Journale
 /// und überzählige Snapshots auf. Journale werden generisch als
-/// rohe Eintrags-Bytes (Basis-Tiefe 1) gelesen und über den Inhalts-Seam
+/// rohe Eintrags-Bytes (Basis-Tiefe 0) gelesen und über den Inhalts-Seam
 /// (ParseMainContent) angewendet — das Layout kennt weder den Inhaltstyp noch
 /// den Empfänger.
 /// </summary>
@@ -32,6 +32,16 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// Die ClassId des konkreten Layouts.
     /// </summary>
     protected override string LayoutId => ClassId;
+
+    /// <summary>
+    /// Anzeigename des Fragment-Journal-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string ReadableText() => "Fragment-Journal (Standard)";
+
+    /// <summary>
+    /// Kurzinfo des Fragment-Journal-Layouts für Auswahldialoge.
+    /// </summary>
+    public override string QuickInfo => "Jede Änderung wird einzeln in ein Benutzer-Journal geschrieben und regelmäßig in Snapshots gesichert.";
 
     #endregion
 
@@ -71,7 +81,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// <summary>
     /// Gibt das Suffix für Fragmentdateien zurück.
     /// </summary>
-    public static readonly string SuffixOfFragments = "frg";
+    public static readonly string SuffixOfFragments = "tblf";
 
     /// <summary>
     /// Wert in Sekunden. Toleranz-Fenster zwischen dem Lesen der Journale und dem
@@ -127,6 +137,11 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// <summary>
     /// Erstellt die Fragment-Journal-Verwaltung für eine Head-Datei.
     /// </summary>
+    /// <summary>
+    /// Erstellt eine Layout-Instanz ohne Datei-Bezug für die Aufzählung der Datei-Layouts.
+    /// </summary>
+    public SaveableFileFragment() { }
+
     public SaveableFileFragment(string filename) : base(filename) { }
 
     #endregion
@@ -293,7 +308,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
             if (!FragmentRecord.HasValidEofMarker(content)) { continue; }
 
             // Binärer Snapshot (Fragment-Sätze): Blockweise über den Inhalts-Seam einlesen
-            if (content is not { Length: > 0 } || content[0] != 0x09) {
+            if (content is not { Length: > 0 } || content[0] != FragmentRecord.StandardStorageType) {
                 Freeze("Snapshot '" + candidate.FileNameWithSuffix() + "' konnte nicht geparsest werden");
                 return false;
             }
@@ -382,7 +397,6 @@ public class SaveableFileFragment : SaveableFileOnefile {
         try {
             lock (_writer) {
                 _undoEntry ??= new MemoryStream();
-                _undoEntryDepth++;
 
                 if (!record.Append(_undoEntry, _undoEntryDepth)) {
                     Freeze("Undo-Satz ungültig oder zu groß: Typ " + record.LeafType);
@@ -394,6 +408,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 lock (UndoLock) {
                     Undos.Add(record.WithDepth(_undoEntryDepth));
                 }
+
+                _undoEntryDepth++;
 
                 if (!record.HasMeta) { return; } // Eintrag noch nicht komplett
 
@@ -427,13 +443,13 @@ public class SaveableFileFragment : SaveableFileOnefile {
     protected virtual void WriteJournalStartRecords(Stream writer) {
         var nowUtc = DateTime.UtcNow;
 
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.SerializerVersion, "1.00");
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.Type, Owner.TypeName);
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.CreateUser, Generic.UserName);
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.CreateTimeUtc, nowUtc);
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.SaveUser, Generic.UserName);
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.Machine, Environment.MachineName);
-        _ = FragmentRecord.Append(writer, 1, FragmentTagType.SaveTimeUtc, nowUtc);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SerializerVersion, "1.00");
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.Type, Owner.TypeName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateUser, Generic.UserName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateTimeUtc, nowUtc);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SaveUser, Generic.UserName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.Machine, Environment.MachineName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SaveTimeUtc, nowUtc);
     }
 
     /// <summary>
@@ -481,7 +497,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
             _writer = null;
 
             try {
-                _ = FragmentRecord.Append(writerToClose, 1, FragmentTagType.Eof, string.Empty);
+                _ = FragmentRecord.Append(writerToClose, 0, FragmentTagType.Eof, string.Empty);
                 writerToClose.Flush();
             } catch { } finally {
                 try {
@@ -571,7 +587,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Journal-Dateien: Jede Datei wird
-    /// generisch in Eintrags-Bytes (Basis-Tiefe 1) zerlegt; Einträge, die sicher
+    /// generisch in Eintrags-Bytes (Basis-Tiefe 0) zerlegt; Einträge, die sicher
     /// vor der letzten Snapshot-Speicherung liegen, und bereits verbuchte
     /// Einträge werden übersprungen.
     /// </summary>
@@ -599,8 +615,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
     /// <summary>
     /// Zerlegt eine Journal-Datei in Einträge: Ein Eintrag beginnt an einem
-    /// Daten-Satz der Tiefe 1 und umfasst alle tieferen Sätze; der Zeitstempel
-    /// kommt aus dem Meta des ersten Satzes mit Meta. Steuer-Sätze der Tiefe 1
+    /// Daten-Satz der Tiefe 0 und umfasst alle tieferen Sätze; der Zeitstempel
+    /// kommt aus dem Meta des ersten Satzes mit Meta. Steuer-Sätze der Tiefe 0
     /// und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen.
     /// </summary>
     private void ReadJournalFile(string container, List<(byte[] Entry, DateTime DateTimeUtc, string Container)> changes) {
@@ -617,15 +633,16 @@ public class SaveableFileFragment : SaveableFileOnefile {
         var pos = 0;
 
         while (pos < data.Length) {
-            // Müll-Zeilen (z. B. unvollständiger Schreibvorgang): bis zum Zeilenende überspringen
-            if (data[pos] != 0x09) {
+            // Müll-Zeilen (z. B. unvollständiger Schreibvorgang): bis zum Zeilenende überspringen;
+            // ein Satz beginnt mit SpeicherTyp (Wurzel-Ebene, ohne Tab) oder Tab (tiefere Ebenen)
+            if (data[pos] is not (0x09 or FragmentRecord.StandardStorageType)) {
                 var lineEnd = Array.IndexOf(data, (byte)'\n', pos);
                 pos = lineEnd < 0 ? data.Length : lineEnd + 1;
                 continue;
             }
 
             if (FragmentRecord.TryParse(data, pos, out var first, out var afterFirst) && first is not null) {
-                if (first.Depth > 1 || first.IsTag) {
+                if (first.Depth > 0 || first.IsTag) {
                     // Blockreste ohne Eintrag bzw. Steuer-Satz: einzeln überspringen
                     pos = afterFirst;
                     continue;
@@ -643,7 +660,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 while (pos < data.Length && data[pos] == 0x09) {
                     if (!FragmentRecord.TryParse(data, pos, out var inner, out var innerNext) || inner is null) { break; }
 
-                    if (inner.Depth <= 1) { break; }
+                    if (inner.Depth <= 0) { break; }
 
                     pos = innerNext;
                     entryEnd = innerNext;
@@ -961,7 +978,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
             writer = fileStream;
             fileStream = null;
 
-            _ = FragmentRecord.Append(writer, 1, FragmentTagType.ContinueEof, string.Empty);
+            _ = FragmentRecord.Append(writer, 0, FragmentTagType.ContinueEof, string.Empty);
             writer.Flush();
 
             return string.Empty;

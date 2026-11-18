@@ -2,7 +2,6 @@
 
 using System.Collections.Concurrent;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace BlueBasics.Classes;
@@ -15,26 +14,32 @@ namespace BlueBasics.Classes;
 /// Lebenszyklus-Schritte über Ereignisse. Die konkrete Vorgehensweise beim Laden,
 /// Speichern und beim Verbuchen einer Änderung (Changed) entscheiden die
 /// Ableitungen (Komplettstand, Fragment-Journal, Snapshots, Chunks). Das
-/// Kopf-Datei-Muster stellt die Basis bereit: Die Kopf-Datei trägt einen
-/// Layout-Kopf (Magic, Version, Layout-ClassId), aus dem der Loader die
-/// passende Verwaltung erzeugt; die Daten liegen im Arbeitsunterordner gleichen
-/// Namens ohne Suffix. Ein statischer Watcher tickt alle Instanzen periodisch
+/// Kopf-Datei-Muster stellt die Basis bereit: Die Kopf-Datei trägt die
+/// Verwaltung selbst als Fragment-Baum mit der Layout-ClassId im Blatt-Satz,
+/// aus dem der Loader die passende Verwaltung erzeugt; die Daten liegen im
+/// Arbeitsunterordner gleichen Namens ohne Suffix. Ein statischer Watcher tickt alle Instanzen periodisch
 /// und antreibt deren CheckerTick (Nachladen und bedarfsgesteuertes Speichern).
 /// </summary>
-public abstract class SaveableFile : IDisposableExtended {
+public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, IFragmentStoreable {
+
+    #region Enums
+
+    /// <summary>
+    /// Empfänger-Typen der Kopf-Datei im Fragment-Format; nur der Verwaltung selbst bekannt.
+    /// </summary>
+    private enum SaveableFileFragmentType : byte {
+        LayoutClassId = 0
+    }
+
+    #endregion
 
     #region Fields
 
     /// <summary>
-    /// Magic-Kennung des Layout-Kopfs; kennzeichnet die Kopf-Datei als
-    /// Fragment-Format-Ablage.
+    /// Alle konkreten Datei-Layouts über alle geladenen Assemblies; Instanzen
+    /// ohne Datei-Bezug, erzeugt über den parameterlosen Konstruktor.
     /// </summary>
-    private const string HeadFileMagic = "TFNH";
-
-    /// <summary>
-    /// Format-Version des Layout-Kopfs.
-    /// </summary>
-    private const byte HeadFileVersion = 1;
+    public static readonly AssemblyAwareCache<SaveableFile> AllFileSaveTypes = new();
 
     /// <summary>
     /// Zuletzt vergebener Zeitstempel für Undo-Einträge; garantiert eindeutigen Millisekunden-Abstand.
@@ -89,6 +94,12 @@ public abstract class SaveableFile : IDisposableExtended {
     #region Constructors
 
     /// <summary>
+    /// Erstellt eine Layout-Instanz ohne Datei-Bezug (Aufzählung der Datei-Layouts);
+    /// sie ist nicht im Live-Bestand registriert und wird vom Watcher nicht betickt.
+    /// </summary>
+    protected SaveableFile() { }
+
+    /// <summary>
     /// Erstellt die Verwaltung; das besitzende Objekt wird über Bind() zugeordnet,
     /// sobald sein Konstruktor die Instanz übernommen hat.
     /// </summary>
@@ -112,8 +123,8 @@ public abstract class SaveableFile : IDisposableExtended {
     public object UndoLock { get; } = new();
 
     /// <summary>
-    /// Änderungs-Historie als Fragment-Sätze (Basis-Tiefe 1): je Eintrag eine
-    /// Navigationskette plus Blatt-Satz mit Meta. Eintragsgrenze ist der Satz mit Tiefe 1.
+    /// Änderungs-Historie als Fragment-Sätze (Basis-Tiefe 0): je Eintrag eine
+    /// Navigationskette plus Blatt-Satz mit Meta. Eintragsgrenze ist der Satz mit Tiefe 0.
     /// Inhaltstyp-frei; der Empfänger versteht seine eigenen Navigationstypen.
     /// </summary>
     public List<FragmentRecord> Undos { get; } = [];
@@ -276,6 +287,26 @@ public abstract class SaveableFile : IDisposableExtended {
     protected abstract string LayoutId { get; }
 
     /// <summary>
+    /// Die ClassId des konkreten Layouts als Instanz-Zugriff (z. B. für Aufzählungen).
+    /// </summary>
+    public string MyClassId => LayoutId;
+
+    /// <summary>
+    /// Anzeigename des Datei-Layouts für Auswahldialoge.
+    /// </summary>
+    public abstract string ReadableText();
+
+    /// <summary>
+    /// Symbol zum Anzeigename; die Basis liefert kein Symbol.
+    /// </summary>
+    public virtual QuickImage? SymbolForReadableText() => null;
+
+    /// <summary>
+    /// Kurzinfo des Datei-Layouts für Auswahldialoge.
+    /// </summary>
+    public abstract string QuickInfo { get; }
+
+    /// <summary>
     /// Speichert alle relevanten Dateien.
     /// </summary>
     public abstract OperationResult Save();
@@ -289,6 +320,67 @@ public abstract class SaveableFile : IDisposableExtended {
     /// Periodischer Aufruf: Nachladen und bedarfsgesteuertes Speichern.
     /// </summary>
     public abstract void CheckerTick();
+
+    #endregion
+
+    #region IFragmentStoreable
+
+    /// <summary>
+    /// Die Verwaltung ist passiv; ihre Events sind nie unterdrückt.
+    /// </summary>
+    public bool IsEventsSuppressed => false;
+
+    /// <summary>
+    /// Bubbling-Event der Schnittstelle; die Verwaltung löst es nie aus.
+    /// </summary>
+    public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
+
+    /// <summary>
+    /// Eine Verwaltung hat keine übernehmbaren Inhalte; jede Übernahme wird abgelehnt.
+    /// </summary>
+    public string Update(IFragmentStoreable source) => "Verwaltung hat keine übernehmbaren Inhalte";
+
+    /// <summary>
+    /// Schreibt den Kopf-Block: den Blatt-Satz mit der Layout-ClassId.
+    /// </summary>
+    public bool SerializeCore(Stream stream, int depth) => FragmentRecord.Append(stream, depth, SaveableFileFragmentType.LayoutClassId, LayoutId);
+
+    /// <summary>
+    /// Verarbeitet den Kopf-Block; die Layout-ClassId muss dieser Verwaltung entsprechen,
+    /// unbekannte Blatt-Typen werden übersprungen.
+    /// </summary>
+    public bool DeserializeThis(Stream stream, FragmentRecord record) {
+        switch ((SaveableFileFragmentType)record.LeafType) {
+            case SaveableFileFragmentType.LayoutClassId:
+                if (!string.Equals(record.StringContent, LayoutId, StringComparison.OrdinalIgnoreCase)) { return false; }
+                break;
+
+            default:
+                // Unbekannter Blatt-Typ — Satz überspringen
+                break;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Die Verwaltung hat keinen Event-Bestand.
+    /// </summary>
+    public void SuppressEvents() {
+        // Absichtlich leer
+    }
+
+    /// <summary>
+    /// Die Verwaltung hat keinen Event-Bestand.
+    /// </summary>
+    public void ResumeEvents() {
+        // Absichtlich leer
+    }
+
+    /// <summary>
+    /// Löst das FragmentChanged-Event aus; die Verwaltung ändert sich nie über diesen Weg.
+    /// </summary>
+    public void OnFragmentChanged(FragmentChangedEventArgs e) => FragmentChanged?.Invoke(this, e);
 
     #endregion
 
@@ -381,7 +473,7 @@ public abstract class SaveableFile : IDisposableExtended {
     }
 
     /// <summary>
-    /// Serialisiert die Änderungs-Historie: Je Eintrag (Basis-Tiefe 1) ein
+    /// Serialisiert die Änderungs-Historie: Je Eintrag (Basis-Tiefe 0) ein
     /// Steuer-Satz des Empfänger-Typs, darunter die Historien-Sätze ohne Meta;
     /// die Meta lebt nur im RAM und Journal, nie im Snapshot.
     /// </summary>
@@ -396,11 +488,12 @@ public abstract class SaveableFile : IDisposableExtended {
 
         var allok = true;
         foreach (var u in undoSave) {
-            if (u.Depth == 1) {
+            if (u.Depth == 0) {
                 allok &= FragmentRecord.Append(stream, depth, undoLeafType, string.Empty);
             }
 
-            allok &= u.WithoutMeta().Append(stream, u.Depth + depth);
+            // Die Historien-Sätze leben eine Ebene unter dem Steuer-Satz.
+            allok &= u.WithoutMeta().Append(stream, depth + 1 + u.Depth);
         }
 
         return allok;
@@ -503,7 +596,7 @@ public abstract class SaveableFile : IDisposableExtended {
     protected virtual bool ParseMainContent(Stream stream) {
         ReadCreationStamp(stream);
 
-        return Owner.Deserialize(stream, 1);
+        return Owner.Deserialize(stream, 0);
     }
 
     /// <summary>
@@ -516,10 +609,10 @@ public abstract class SaveableFile : IDisposableExtended {
     protected virtual List<byte> GenerateContentToSave() {
         using var ms = new MemoryStream();
 
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : Generic.UserName);
-        _ = FragmentRecord.Append(ms, 1, FragmentTagType.CreateTimeUtc, _createTimeUtc > DateTime.MinValue ? _createTimeUtc : DateTime.UtcNow);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : Generic.UserName);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateTimeUtc, _createTimeUtc > DateTime.MinValue ? _createTimeUtc : DateTime.UtcNow);
 
-        return Owner.Serialize(ms, 1) ? [.. ms.ToArray()] : [];
+        return Owner.Serialize(ms, 0) ? [.. ms.ToArray()] : [];
     }
 
     /// <summary>
@@ -554,8 +647,8 @@ public abstract class SaveableFile : IDisposableExtended {
     }
 
     /// <summary>
-    /// Stellt sicher, dass die Kopf-Datei existiert und den Layout-Kopf (Magic,
-    /// Version, Layout-ClassId) trägt. Fehlt sie oder ist sie leer (abgebrochene
+    /// Stellt sicher, dass die Kopf-Datei existiert und den Layout-Kopf mit der
+    /// Layout-ClassId trägt. Fehlt sie oder ist sie leer (abgebrochene
     /// Erstanlage), wird sie neu geschrieben; ein abweichender Inhalt bleibt
     /// unangetastet und führt beim Laden zu einer klaren Fehlermeldung.
     /// </summary>
@@ -563,48 +656,48 @@ public abstract class SaveableFile : IDisposableExtended {
         if (Filename is not { Length: > 0 }) { return; }
         if (IO.FileExists(Filename) && IO.ReadAllBytes(Filename, 5).Value is byte[] { Length: > 0 }) { return; }
 
-        WriteHeadFile(Filename, LayoutId);
+        WriteHeadFile();
     }
 
     /// <summary>
-    /// Schreibt die Kopf-Datei mit dem Layout-Kopf: Magic-Kennung,
-    /// Format-Version und Layout-ClassId. Ein bestehender Inhalt wird überschrieben.
+    /// Schreibt die Kopf-Datei: Diese Verwaltung serialisiert sich als Fragment-Baum
+    /// (Standard-Kopf mit Typ-Satz, darunter der Blatt-Satz mit der Layout-ClassId).
+    /// Ein bestehender Inhalt wird überschrieben.
     /// </summary>
-    public static void WriteHeadFile(string filename, string classId) {
-        if (filename is not { Length: > 0 }) { throw Develop.DebugError("Dateiname für die Kopf-Datei fehlt."); }
-        if (classId is not { Length: > 0 }) { throw Develop.DebugError("ClassId für die Kopf-Datei fehlt."); }
+    public void WriteHeadFile() {
+        if (Filename is not { Length: > 0 }) { throw Develop.DebugError("Dateiname für die Kopf-Datei fehlt."); }
 
-        var idBytes = Encoding.UTF8.GetBytes(classId);
-        if (idBytes.Length > 255) { throw Develop.DebugError("ClassId ist zu lang (max. 255 Bytes)."); }
+        using var ms = new MemoryStream();
 
-        var head = new byte[6 + idBytes.Length];
-        Encoding.ASCII.GetBytes(HeadFileMagic).CopyTo(head, 0);
-        head[4] = HeadFileVersion;
-        head[5] = (byte)idBytes.Length;
-        idBytes.CopyTo(head, 6);
+        if (!this.Serialize(ms, 0)) { throw Develop.DebugError("Kopf-Datei konnte nicht erzeugt werden."); }
 
-        var opr = IO.WriteAllBytes(filename, head);
+        var opr = IO.WriteAllBytes(Filename, ms.ToArray());
         if (opr.IsFailed) { throw Develop.DebugError("Kopf-Datei konnte nicht geschrieben werden: " + opr.FailedReason); }
     }
 
     /// <summary>
-    /// Liest die Layout-ClassId aus dem Kopf der Kopf-Datei. False bei fehlender,
-    /// leerer oder ungültiger Datei (z. B. Bestand vor dem Kopf-Datei-Muster).
+    /// Liest die Layout-ClassId aus dem Blatt-Satz der Kopf-Datei. False bei
+    /// fehlender, leerer oder ungültiger Datei. Läuft bewusst ohne Instanz:
+    /// Die ClassId bestimmt erst, welche Verwaltung erzeugt wird.
     /// </summary>
     public static bool TryReadHeadClassId(string filename, out string classId) {
         classId = string.Empty;
 
         if (filename is not { Length: > 0 }) { return false; }
-        if (IO.ReadAllBytes(filename, 5).Value is not byte[] bytes || bytes.Length < 6) { return false; }
+        if (IO.ReadAllBytes(filename, 5).Value is not byte[] bytes || bytes.Length == 0) { return false; }
 
-        if (Encoding.ASCII.GetString(bytes, 0, 4) != HeadFileMagic) { return false; }
-        if (bytes[4] != HeadFileVersion) { return false; }
+        using var ms = new MemoryStream(bytes);
 
-        var len = bytes[5];
-        if (len == 0 || bytes.Length < 6 + len) { return false; }
+        while (FragmentRecord.TryReadNext(ms) is { } record) {
+            if (record.IsTag) { continue; } // Kopf- und Steuer-Sätze überspringen
 
-        classId = Encoding.UTF8.GetString(bytes, 6, len);
-        return classId is { Length: > 0 };
+            if ((SaveableFileFragmentType)record.LeafType != SaveableFileFragmentType.LayoutClassId) { return false; }
+
+            classId = record.StringContent;
+            return classId is { Length: > 0 };
+        }
+
+        return false;
     }
 
     /// <summary>

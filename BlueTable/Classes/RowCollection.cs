@@ -28,24 +28,24 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
         /// <summary>
         /// Pfad-Segment einer Zeilen-Änderung (Key = RowKey).
         /// </summary>
-        SubRow = 210,
+        SubRow = 1,
 
         /// <summary>
         /// ListKeyObject-Satz: die Zeilen folgen als Liste eine Ebene tiefer,
         /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
         /// </summary>
-        RowList = 211,
+        RowList = 2,
 
         /// <summary>
         /// Blatt-Satz: übernimmt eine ganze neue Zeile im Classic-Format
         /// (Content = Parseable-String der Zeile).
         /// </summary>
-        RowAdd = 212,
+        RowAdd = 3,
 
         /// <summary>
         /// Blatt-Satz: entfernt die Zeile des Journal-Blocks (Nav-Schlüssel).
         /// </summary>
-        RowRemove = 213
+        RowRemove = 4
     }
 
     #endregion
@@ -1098,6 +1098,8 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     /// der betroffenen Zeile als zuletzt verwendet.
     /// </summary>
     public override void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) {
+        if (IsDisposed || IsEventsSuppressed) { return; }
+
         if (Table is { IsDisposed: false } tb && GetByKey(FragmentChangedEventArgs.SenderKey(sender)) is { IsDisposed: false } row) {
             tb.TouchChunk(row.ChunkValue);
         }

@@ -7,8 +7,8 @@ using System.IO;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// Ansichten-Sammlung einer Tabelle (Spaltenanordnung). Erbt Schlüssel-Ablage,
-/// ReadOnly-Verwaltung und das Fragment-Gerüst von KeyedItemCollection; die
+/// Ansichten-Sammlung einer Tabelle (Spaltenanordnung). Erbt Schlüssel-Ablage
+/// und das Fragment-Gerüst von KeyedItemCollection; die
 /// Reihenfolge der persistenten Einträge führt sie selbst (_internal), die
 /// on-demand virtuellen Spalten liegen separat (_onDemand) und werden nicht
 /// serialisiert.
@@ -99,7 +99,6 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     public ColumnViewCollection(Table? table, string toParse) {
         Table = table;
         KeyName = string.Empty;
-        ReadOnly = true;
         this.Parse(toParse);
     }
 
@@ -388,34 +387,28 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// FragmentChanged gemeldet, sofern die Events nicht unterdrückt sind.
     /// </summary>
     public bool Add(ColumnViewItem? columnViewItem, ColumnItem? insertAfterColumn) {
-        var silent = ReadOnly;
-        if (silent) { SuppressEvents(); }
-        try {
-            if (columnViewItem is null || IsDisposed) { return false; }
+        if (columnViewItem is null || IsDisposed) { return false; }
 
-            // Bereits in der Ablage: nur fortführen, wenn es dieselbe Instanz ist (Neupositionierung beim Laden).
-            if (Internal.TryGetValue(columnViewItem.KeyName, out var present) && !ReferenceEquals(present, columnViewItem)) { return false; }
-            _ = Internal.TryAdd(columnViewItem.KeyName, columnViewItem);
+        // Bereits in der Ablage: nur fortführen, wenn es dieselbe Instanz ist (Neupositionierung beim Laden).
+        if (Internal.TryGetValue(columnViewItem.KeyName, out var present) && !ReferenceEquals(present, columnViewItem)) { return false; }
+        _ = Internal.TryAdd(columnViewItem.KeyName, columnViewItem);
 
-            columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-            this.Reregister(columnViewItem);
+        columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
+        this.Reregister(columnViewItem);
 
-            var insertIndex = _internal.Count;
-            if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
-                insertIndex = _internal.IndexOf(afterViewItem) + 1;
-            }
-
-            _internal.Insert(insertIndex, columnViewItem);
-            Invalidated = true;
-
-            var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
-                .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
-            OnFragmentChanged(e);
-
-            return true;
-        } finally {
-            if (silent) { ResumeEvents(); }
+        var insertIndex = _internal.Count;
+        if (insertAfterColumn is not null && this[insertAfterColumn] is { } afterViewItem) {
+            insertIndex = _internal.IndexOf(afterViewItem) + 1;
         }
+
+        _internal.Insert(insertIndex, columnViewItem);
+        Invalidated = true;
+
+        var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
+            .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
+        OnFragmentChanged(e);
+
+        return true;
     }
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
@@ -427,7 +420,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
             if (thisViewItem is not null && (thisViewItem.Column is null || thisViewItem.Column.IsSystemColumn())) {
-                _ = RemoveCore(thisViewItem, !ReadOnly);
+                _ = RemoveCore(thisViewItem, true);
                 HideSystemColumns();
                 return;
             }
@@ -455,10 +448,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// <summary>
     /// Verschiebt ein Element von <paramref name="oldIndex"/> nach <paramref name="newIndex"/>.
     /// Alle dazwischenliegenden Elemente werden entsprechend verschoben.
-    /// Im Legacy-Format (schreibgeschützte Live-Ansicht) abgelehnt.
     /// </summary>
     public void Move(int oldIndex, int newIndex) {
-        if (ReadOnly) { return; }
         if (oldIndex < 0 || newIndex < 0 || oldIndex >= _internal.Count) { return; }
         if (newIndex > _internal.Count) { newIndex = _internal.Count; }
         if (oldIndex == newIndex) { return; }
@@ -685,7 +676,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         // ausschließlich on-demand bereitgestellt und dürfen nicht in der
         // Ansicht gespeichert werden.
         foreach (var add in _internal.OfType<AddColumnItem>().ToList()) {
-            _ = RemoveCore(add, !ReadOnly);
+            _ = RemoveCore(add, true);
             changed = true;
         }
 
@@ -732,22 +723,18 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     }
 
     /// <summary>
-    /// Entfernt einen Ansichts-Eintrag. Im Legacy-Format (schreibgeschützte
-    /// Live-Ansicht) abgelehnt — dort läuft die Änderung über den
-    /// ColumnArrangements-Setter der Tabelle.
+    /// Entfernt einen Ansichts-Eintrag.
     /// </summary>
     public void Remove(ColumnViewItem? columnViewItem) {
-        if (ReadOnly) { return; }
-
         _ = RemoveCore(columnViewItem, true);
     }
 
     /// <summary>
     /// Entfernt den Ansichts-Eintrag zum Schlüssel; die Entfernung meldet den
-    /// Journal-Block, wenn die Ansicht granular änderbar ist.
+    /// Journal-Block.
     /// </summary>
     public override bool Remove(string keyName) {
-        if (IsDisposed || ReadOnly || GetByKey(keyName) is not { } item) { return false; }
+        if (IsDisposed || GetByKey(keyName) is not { } item) { return false; }
 
         return RemoveCore(item, true);
     }
@@ -755,8 +742,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// <summary>
     /// Entfernt einen Ansichts-Eintrag stillschweigend möglich (Systempfad);
     /// meldet die Entfernung als Journal-Block mit dem SubViewItem-Navigationssatz,
-    /// wenn die Ansicht granular änderbar ist und <paramref name="fireEvent"/>
-    /// gesetzt ist.
+    /// wenn <paramref name="fireEvent"/> gesetzt ist.
     /// </summary>
     private bool RemoveCore(ColumnViewItem? columnViewItem, bool fireEvent) {
         if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return false; }
@@ -777,12 +763,9 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     }
 
     /// <summary>
-    /// Entfernt alle Ansichts-Einträge. Im Legacy-Format (schreibgeschützte
-    /// Live-Ansicht) abgelehnt.
+    /// Entfernt alle Ansichts-Einträge.
     /// </summary>
     public void RemoveAll() {
-        if (ReadOnly) { return; }
-
         List<ColumnViewItem> l = [.. _internal];
 
         foreach (var thiscol in l) {
@@ -851,45 +834,32 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     public void ShowAllColumns() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var silent = ReadOnly;
-        if (silent) { SuppressEvents(); }
-        try {
-            foreach (var thisColumn in tb.Column) {
-                if (this[thisColumn] is null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
-                    _ = Add(new ColumnViewItem(thisColumn), null);
-                }
+        foreach (var thisColumn in tb.Column) {
+            if (this[thisColumn] is null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
+                _ = Add(new ColumnViewItem(thisColumn), null);
             }
+        }
 
-            foreach (var thisColumn in tb.Column) {
-                if (this[thisColumn] is null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
-                    _ = Add(new ColumnViewItem(thisColumn), null);
-                }
+        foreach (var thisColumn in tb.Column) {
+            if (this[thisColumn] is null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
+                _ = Add(new ColumnViewItem(thisColumn), null);
             }
-        } finally {
-            if (silent) { ResumeEvents(); }
         }
     }
 
     public void ShowColumns(params string[] columnKeys) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        var silent = ReadOnly;
-        if (silent) { SuppressEvents(); }
-        try {
-            foreach (var thisColumnKey in columnKeys) {
-                var thisColumn = Table?.Column[thisColumnKey];
+        foreach (var thisColumnKey in columnKeys) {
+            var thisColumn = Table?.Column[thisColumnKey];
 
-                if (thisColumn is not null && this[thisColumn] is null && !thisColumn.IsDisposed) {
-                    _ = Add(new ColumnViewItem(thisColumn), null);
-                }
+            if (thisColumn is not null && this[thisColumn] is null && !thisColumn.IsDisposed) {
+                _ = Add(new ColumnViewItem(thisColumn), null);
             }
-        } finally {
-            if (silent) { ResumeEvents(); }
         }
     }
 
     public void Swap(int index1, int index2) {
-        if (ReadOnly) { return; }
         if (index1 < 0 || index2 < 0 || index1 >= _internal.Count || index2 >= _internal.Count) { return; }
         if (index1 == index2) { return; }
         (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
@@ -1179,14 +1149,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         foreach (var thisItem in _internal.ToList()) {
             if (sourceView[thisItem.KeyName] is not null) { continue; }
 
-            // Schreibgeschützte Ansichten (Legacy) werden still bereinigt —
-            // das Ansichts-Set wird ohnehin als Ganzes gejournalt; in der
-            // schreibbaren Variante meldet Remove den Eintrag selbst.
-            if (ReadOnly) {
-                RemoveCore(thisItem, false);
-            } else {
-                Remove(thisItem);
-            }
+            // Remove meldet die Entfernung selbst als Journal-Eintrag.
+            Remove(thisItem);
         }
 
         foreach (var sourceItem in sourceView._internal) {

@@ -22,7 +22,7 @@ public class TableFileNew : Table {
     /// <summary>
     /// Datei-Suffix der Kopf-Datei im Fragment-Format.
     /// </summary>
-    public const string SuffixMainFile = "fbdb";
+    public const string SuffixMainFile = "btb";
 
     #endregion
 
@@ -50,10 +50,6 @@ public class TableFileNew : Table {
         // Änderungs-Events dieser Stufe als Undo-Einträge an die Datei-Verwaltung verdrahten
         FragmentChanged += SaveableFragmentChanged;
 
-        // Neues Format: Skripte und Unique-Definitionen werden granular über die Sammlungen geändert
-        EventScript.ReadOnly = false;
-        UniqueValues.ReadOnly = false;
-
         // Kopf-Variablen als Fragment-Kind verdrahten (Navigationssatz = SubVariableCollection, leerer Key)
         this.Register(_variables);
 
@@ -77,9 +73,6 @@ public class TableFileNew : Table {
         // selbst mit dem SubRow-Navigationssatz, die Tabelle ergänzt kein eigenes Segment.
         this.Register(Row);
 
-        // Ansichten zum granularen Ändern freigeben
-        _columnArrangements.MakeWriteable();
-
         // Eine neue Tabelle ist vollständig im Speicher; der Datei-Stand entsteht mit der Erstanlage.
         MainChunkLoadDone = true;
     }
@@ -99,10 +92,8 @@ public class TableFileNew : Table {
         }
 
         if (source is not null) {
+            // Update übernimmt die Ansichten und schaltet sie zum granularen Ändern frei
             _ = Update(source);
-
-            // Die übernommenen Ansichten sind frisch gesperrt; zum granularen Ändern freigeben
-            _columnArrangements.MakeWriteable();
         }
     }
 

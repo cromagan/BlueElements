@@ -201,10 +201,22 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Prüft, ob die Fragment-Datei sauber abgeschlossen ist: auf den Eof-Marker (255).
+    /// Prüft, ob die Fragment-Datei sauber abgeschlossen ist: Text-Fragmente
+    /// (.mbdb, TableFragments) enden auf die Zeile "- EOF", binäre Fragmente
+    /// (.btb) auf den Eof-Marker (255).
     /// </summary>
     protected static bool FragmentEndsAtEof(string filename, string suffix) {
         try {
+            if (suffix.Equals(TableFragments.SuffixOfFragments, StringComparison.OrdinalIgnoreCase)) {
+                var lastLine = string.Empty;
+
+                foreach (var line in File.ReadLines(filename)) {
+                    if (line.Length > 0) { lastLine = line; }
+                }
+
+                return lastLine.Equals("- EOF", StringComparison.Ordinal);
+            }
+
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             return FragmentRecord.EndsOnEof(stream);
         } catch {
@@ -214,11 +226,22 @@ public abstract class CliCommand : IHasKeyName {
     }
 
     /// <summary>
-    /// Liest den Benutzer aus dem Kopf der Fragment-Datei (Satz 233, User) und
-    /// vergleicht ihn.
+    /// Liest den Benutzer aus dem Kopf der Fragment-Datei: Text-Fragmente
+    /// (.mbdb) führen ihn in der Kopfzeile "- User &lt;name&gt;", binäre
+    /// Fragmente (.btb) im Satz 233 (SaveUser).
     /// </summary>
     protected static bool FragmentIsMine(string filename, string suffix, string user) {
         try {
+            if (suffix.Equals(TableFragments.SuffixOfFragments, StringComparison.OrdinalIgnoreCase)) {
+                foreach (var line in File.ReadLines(filename).Take(5)) {
+                    if (line.StartsWith("- User ", StringComparison.Ordinal)) {
+                        return line["- User ".Length..].Equals(user, StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+
+                return false;
+            }
+
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             return FragmentRecord.HeadUser(stream) is { } headUser && headUser.Equals(user, StringComparison.OrdinalIgnoreCase);
         } catch {

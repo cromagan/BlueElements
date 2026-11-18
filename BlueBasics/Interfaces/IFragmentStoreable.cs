@@ -53,7 +53,7 @@ public interface IFragmentStoreable {
 
     /// <summary>
     /// Schreibt System-Bytes (SaveUser, Machine, SaveTimeUtc), den eigenen Block per
-    /// SerializeCore und abschließend den EOF-Satz. Nur die Wurzel (Tiefe 1) setzt
+    /// SerializeCore und abschließend den EOF-Satz. Nur die Wurzel (Tiefe 0) setzt
     /// System-Bytes, Kommentar-Trenner und EOF; Sub-Objekte werden mit
     /// Serialize(stream, depth + 1) aufgerufen und schreiben nur ihren Block.
     /// Den Erzeuger-Stempel (CreateUser/CreateTimeUtc) schreibt der Datei-Layer
@@ -64,7 +64,7 @@ public interface IFragmentStoreable {
     /// </summary>
     bool Serialize(Stream stream, int depth, string type) {
         var allok = true;
-        var isRoot = depth == 1;
+        var isRoot = depth == 0;
 
         if (isRoot) {
             // Anfangs bytes nur im Root schreiben, weil sie durchgehend gleich sind

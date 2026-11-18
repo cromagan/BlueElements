@@ -1,19 +1,16 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using System.Collections.ObjectModel;
-
 namespace BlueTable.Classes;
 
 /// <summary>
 /// Beobachtbare Sammlung der Spaltenanordnungen (Ansichten) der Tabelle. Zwei
-/// Betriebsarten: Im Legacy-Format ist sie schreibgeschützt — jede Änderung
-/// überschreibt den ganzen Ansichten-Satz über den ColumnArrangements-Setter
-/// der Tabelle. Im binären Fragment-Format gibt die Tabelle die Sammlung zum
-/// direkten Ändern frei (ReadOnly = false): Add, Remove und granulare
-/// Ersetzungen reichen FragmentChanged mit dem fertigen ColumnArrangements-
-/// Navigationspfad bis zur Tabelle durch, die sie als gezielte Änderung in die
-/// Fragmentdatei schreibt. Die Reihenfolge der Ansichten führt sie selbst
-/// (_internal) — Index 0 ist die Standard-Ansicht.
+/// Betriebsarten: Im Legacy-Format läuft jede Änderung als ganzer
+/// Ansichten-Satz über den ColumnArrangements-Setter der Tabelle. Im binären
+/// Fragment-Format reichen Add, Remove und granulare Ersetzungen
+/// FragmentChanged mit dem fertigen ColumnArrangements-Navigationspfad bis zur
+/// Tabelle durch, die sie als gezielte Änderung in die Fragmentdatei schreibt.
+/// Die Reihenfolge der Ansichten führt sie selbst (_internal) — Index 0 ist die
+/// Standard-Ansicht.
 /// </summary>
 public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnViewCollection>, IHasTable {
 
@@ -28,8 +25,8 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
         Arrangements = 1,
 
         /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Ansicht im Classic-Format
-        /// (Content = Parseable-String der Ansicht).
+        /// Blatt-Satz: übernimmt eine ganze neue Ansicht (Content = Item-Block
+        /// im Fragment-Format; Classic-String nur ältere Journale).
         /// </summary>
         ArrangementAdd = 2,
 
@@ -54,11 +51,10 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     #region Constructors
 
     /// <summary>
-    /// Erstellt die schreibgeschützte Sammlung (Legacy); die Tabellen-Referenz
-    /// wird zum Erzeugen neuer Ansichten beim Einlesen benötigt.
+    /// Erstellt die Sammlung; die Tabellen-Referenz wird zum Erzeugen neuer
+    /// Ansichten beim Einlesen benötigt.
     /// </summary>
     public ColumnArrangementCollection(Table? table) {
-        ReadOnly = true;
         Table = table;
     }
 
@@ -79,15 +75,6 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Gibt die Sammlung und ihre Ansichten zum granularen Ändern frei
-    /// (binäres Fragment-Format).
-    /// </summary>
-    public void MakeWriteable() {
-        ReadOnly = false;
-        foreach (var view in _internal) { view.ReadOnly = false; }
-    }
 
     /// <summary>
     /// Liefert die Ansichten in ihrer gespeicherten Reihenfolge — Index 0
@@ -114,18 +101,6 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     protected override void OnItemRemoved(ColumnViewCollection item) {
         _ = _internal.Remove(item);
         base.OnItemRemoved(item);
-    }
-
-    /// <summary>
-    /// Übernimmt eine frisch gelesene Ansicht: fehlt sie, wird sie aufgenommen;
-    /// sonst behält die bestehende Instanz ihre Identität (alle Werte übernommen).
-    /// </summary>
-    private bool ApplyArrangement(ColumnViewCollection arrangement) {
-        if (string.IsNullOrEmpty(arrangement.KeyName)) { return false; }
-        if (GetByKey(arrangement.KeyName) is not { } existing) { return Add(arrangement); }
-
-        _ = existing.Update(arrangement);
-        return true;
     }
 
     #endregion
@@ -155,7 +130,7 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     /// <summary>
     /// Erzeugt die Ansicht zum Namen-Satz des Segment-Anfangs; den Inhalt
     /// (Einträge) liefert der Block der Ansicht, die Übernahme in die Sammlung
-    /// macht ApplyLoadedItems (bestehende Instanzen behalten ihre Identität).
+    /// macht Update (bestehende Instanzen behalten ihre Identität).
     /// </summary>
     protected override ColumnViewCollection? CreateItem(FragmentRecord first) {
         if (Table is not { IsDisposed: false } table) { return null; }
@@ -164,39 +139,24 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     }
 
     /// <summary>
-    /// Übernimmt die gelesene Liste per Update; bestehende Instanzen
-    /// behalten ihre Identität. Danach werden Sammlung und Ansichten zum
-    /// granularen Ändern freigegeben.
-    /// </summary>
-    protected override bool ApplyLoadedItems(ReadOnlyCollection<ColumnViewCollection> items) {
-        _ = Update(items.ToList(), true);
-        MakeWriteable();
-        return true;
-    }
-
-    /// <summary>
-    /// Übernimmt eine ganze, im Classic-Format gereichte Ansicht.
+    /// Übernimmt eine ganze, im Classic-Format gereichte Ansicht (ältere Journale).
     /// </summary>
     protected override bool ApplyItemAdd(string toParse, string keyName) {
         if (Table is not { IsDisposed: false } table) { return false; }
 
-        return ApplyArrangement(new ColumnViewCollection(table, toParse));
+        return ApplyItemAdd(new ColumnViewCollection(table, toParse));
     }
 
     /// <summary>
-    /// Liefert die Ansicht unter dem Schlüssel; fehlt sie, wird sie erzeugt,
-    /// zum granularen Ändern freigegeben und aufgenommen (Journal kann vor der
-    /// Aufnahme eintreffen).
+    /// Liefert die Ansicht unter dem Schlüssel; fehlt sie, wird sie erzeugt und
+    /// aufgenommen (Journal kann vor der Aufnahme eintreffen).
     /// </summary>
     protected override ColumnViewCollection? GetOrCreateItem(string keyName) {
-        if (GetByKey(keyName) is { } view) {
-            view.ReadOnly = false;
-            return view;
-        }
+        if (GetByKey(keyName) is { } view) { return view; }
 
         if (Table is not { IsDisposed: false } table) { return null; }
 
-        var neu = new ColumnViewCollection(table, string.Empty, keyName) { ReadOnly = false };
+        var neu = new ColumnViewCollection(table, string.Empty, keyName);
         _ = Add(neu);
         return neu;
     }

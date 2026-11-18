@@ -2,7 +2,6 @@
 
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,8 +10,8 @@ namespace BlueBasics.Classes;
 
 /// <summary>
 /// Schlüsselbasierte Item-Sammlung auf ConcurrentDictionary-Basis (Key = KeyName,
-/// Groß-/Kleinschreibung wird ignoriert). Stellt Speicher, Lese-/Schreib-API,
-/// ReadOnly-Verwaltung und das komplette Fragment-Gerüst bereit: Add/Remove/Clear
+/// Groß-/Kleinschreibung wird ignoriert). Stellt Speicher, Lese-/Schreib-API
+/// und das komplette Fragment-Gerüst bereit: Add/Remove/Clear
 /// melden die Änderung als Journal-Satz, SerializeCore/DeserializeThis implementieren
 /// IFragmentStoreable — der konkrete Typ wird beim Serialize über TypeName abgefragt.
 /// Die Pfad-/Blatt-Typen kommen unverändert aus den privaten Enums der Ableitungen
@@ -37,11 +36,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// </summary>
     private readonly Lock _mutationLock = new();
 
-    /// <summary>
-    /// Backing-Feld von ReadOnly; volatile für threadsichere Sichtbarkeit.
-    /// </summary>
-    private volatile bool _readOnly;
-
     #endregion
 
     #region Constructors
@@ -52,11 +46,10 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     protected KeyedItemCollection() { }
 
     /// <summary>
-    /// Übernimmt die Items (gleichnamige Doppel werden verworfen) und startet ggf. gesperrt.
+    /// Übernimmt die Items (gleichnamige Doppel werden verworfen).
     /// </summary>
-    protected KeyedItemCollection(IEnumerable<TItem> items, bool readOnly) {
+    protected KeyedItemCollection(IEnumerable<TItem> items) {
         AddRange(items);
-        ReadOnly = readOnly;
     }
 
     #endregion
@@ -101,12 +94,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// True, wenn die Sammlung verworfen wurde; schaltet den FragmentChanged-Versand ab und schützt alle schreibenden Calls.
     /// </summary>
     public bool IsDisposed => _isDisposedFlag == 1;
-
-    /// <summary>
-    /// True im Legacy-Schreibweg: Änderungen laufen als ganzer Satz über den Besitzer, direkte
-    /// Änderungen werden abgelehnt. Auf false setzen, um die Sammlung zum direkten Ändern freizugeben.
-    /// </summary>
-    public bool ReadOnly { get => _readOnly; set => _readOnly = value; }
 
     /// <summary>
     /// Zähler der aktiven SuppressEvents-Aufrufe; Werte größer 0 unterdrücken FragmentChanged.
@@ -261,10 +248,10 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Nimmt ein Item unter seinem KeyName auf; die Aufnahme meldet OnItemAdded.
     /// </summary>
     public virtual bool Add(TItem? item) {
-        if (IsDisposed || ReadOnly || item is null) { return false; }
+        if (IsDisposed || item is null) { return false; }
 
         lock (_mutationLock) {
-            if (IsDisposed || ReadOnly || !Internal.TryAdd(item.KeyName, item)) { return false; }
+            if (IsDisposed || !Internal.TryAdd(item.KeyName, item)) { return false; }
         }
 
         OnItemAdded(item);
@@ -275,7 +262,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Nimmt mehrere Items auf; true, wenn alle erfolgreich aufgenommen wurden.
     /// </summary>
     public bool AddRange(IEnumerable<TItem> items) {
-        if (IsDisposed || ReadOnly) { return false; }
+        if (IsDisposed) { return false; }
 
         var ok = true;
         foreach (var item in items) {
@@ -289,12 +276,12 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Entfernt das Item zum KeyName; die Entfernung meldet OnItemRemoved.
     /// </summary>
     public virtual bool Remove(string keyName) {
-        if (IsDisposed || ReadOnly) { return false; }
+        if (IsDisposed) { return false; }
 
         TItem? item;
 
         lock (_mutationLock) {
-            if (IsDisposed || ReadOnly || !Internal.TryRemove(keyName, out item)) { return false; }
+            if (IsDisposed || !Internal.TryRemove(keyName, out item)) { return false; }
         }
 
         OnItemRemoved(item);
@@ -305,7 +292,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Entfernt alle Items; jede Entfernung meldet OnItemRemoved.
     /// </summary>
     public virtual bool Clear() {
-        if (IsDisposed || ReadOnly) { return false; }
+        if (IsDisposed) { return false; }
 
         var ok = true;
         foreach (var item in ToList()) {
@@ -324,63 +311,63 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// </summary>
     public virtual string Update(IFragmentStoreable source) {
         if (IsDisposed) { return "Sammlung ist verworfen"; }
-        if (ReadOnly) { return "Sammlung ist schreibgeschützt"; }
         if (source is not KeyedItemCollection<TItem> sourceCollection) { return "Quelltyp ungültig"; }
         if (sourceCollection.IsDisposed) { return "Quellsammlung ist verworfen"; }
 
-        return Update(sourceCollection.ToList(), false);
+        return Update(sourceCollection.ToList());
     }
 
     /// <summary>
     /// Gleicht die Sammlung an die Quelle an: Items, die in der Quelle fehlen, werden
-    /// entfernt und neue aufgenommen — beides meldet OnItemRemoved/OnItemAdded — und
+    /// entfernt und verworfen, neue aufgenommen — beides meldet OnItemRemoved/OnItemAdded — und
     /// gemeinsame Items übernehmen die Werte per Item-Update und behalten ihre Instanz.
-    /// Verworfene Quell-Items gelten als fehlend. Mit ignoreReadOnly wird die Sammlung
-    /// für die Dauer der Übernahme freigeschaltet (Classic-Anwendepfad, Einlesen und
-    /// Reparatur). Liefert einen Fehlergrund oder string.Empty.
+    /// Verworfene Quell-Items gelten als fehlend. Liefert einen Fehlergrund oder
+    /// string.Empty. Ableitungen überschreiben die Routine für sammlungsspezifische
+    /// Nacharbeit.
     /// </summary>
-    public string Update(IEnumerable<TItem> sourceItems, bool ignoreReadOnly) {
+    public virtual string Update(IEnumerable<TItem> sourceItems) {
         if (IsDisposed) { return "Sammlung ist verworfen"; }
-        if (!ignoreReadOnly && ReadOnly) { return "Sammlung ist schreibgeschützt"; }
 
         var source = sourceItems.Where(s => !s.IsDisposed).ToList();
         var sourceKeys = new HashSet<string>(source.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+        var obsolete = new List<TItem>();
 
+        foreach (var keyName in Keys()) {
+            if (sourceKeys.Contains(keyName)) { continue; }
 
-        var wasReadOnly = ReadOnly;
-        if (ignoreReadOnly) { ReadOnly = false; }
+            if (this[keyName] is not { } item || !Remove(keyName)) { return "Entfernen von '" + keyName + "' fehlgeschlagen"; }
 
-        try {
-            foreach (var keyName in Keys()) {
-                if (!sourceKeys.Contains(keyName) && !Remove(keyName)) { return "Entfernen von '" + keyName + "' fehlgeschlagen"; }
-            }
-
-            foreach (var sourceItem in source) {
-                if (GetByKey(sourceItem.KeyName) is not { } existing) {
-                    if (!Add(sourceItem)) { return "Hinzufügen von '" + sourceItem.KeyName + "' fehlgeschlagen"; }
-                } else if (!ReferenceEquals(existing, sourceItem)) {
-                    // Identische Instanz: nichts zu übernehmen — ein Selbst-Update würde
-                    // Inhalte zerstören (Clear + AddRange derselben Liste).
-                    var error = existing.Update(sourceItem);
-
-                    if (error is { Length: > 0 }) { return error; }
-                }
-            }
-
-            return string.Empty;
-        } finally {
-            ReadOnly = wasReadOnly;
+            obsolete.Add(item);
         }
+
+        foreach (var sourceItem in source) {
+            if (GetByKey(sourceItem.KeyName) is not { } existing) {
+                if (!Add(sourceItem)) { return "Hinzufügen von '" + sourceItem.KeyName + "' fehlgeschlagen"; }
+            } else if (!ReferenceEquals(existing, sourceItem)) {
+                // Identische Instanz: nichts zu übernehmen — ein Selbst-Update würde
+                // Inhalte zerstören (Clear + AddRange derselben Liste).
+                var error = existing.Update(sourceItem);
+
+                if (error is { Length: > 0 }) { return error; }
+            }
+        }
+
+        foreach (var item in obsolete) {
+            if (item is { IsDisposed: false }) { item.Dispose(); }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
     /// Gleicht die Sammlung granular an: Items, die in der Quelle fehlen, werden
     /// entfernt, neue aufgenommen; geänderte werden als Entfernung + Aufnahme gemeldet,
     /// sodass Add/Remove die Journal-Sätze erzeugen. Inhaltlich unveränderte Items
-    /// (erkennbar bei IStringable) erzeugen keinen Journal-Eintrag.
+    /// (erkennbar bei IStringable) erzeugen keinen Journal-Eintrag. Ableitungen mit
+    /// granular journallenden Items überschreiben die Routine.
     /// </summary>
-    public void UpdateChild(IEnumerable<TItem> sourceItems) {
-        if (IsDisposed || ReadOnly) { return; }
+    public virtual void UpdateChild(IEnumerable<TItem> sourceItems) {
+        if (IsDisposed) { return; }
 
         var sourceKeys = new HashSet<string>(sourceItems.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
 
@@ -413,10 +400,10 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// gemeldet — die Routine ist deren Anwendepfad und erzeugt keinen eigenen Journal-Satz.
     /// </summary>
     protected bool RenameKey(string oldKey, string newKey) {
-        if (IsDisposed || ReadOnly) { return false; }
+        if (IsDisposed) { return false; }
 
         lock (_mutationLock) {
-            if (IsDisposed || ReadOnly || !Internal.TryRemove(oldKey, out var item)) { return false; }
+            if (IsDisposed || !Internal.TryRemove(oldKey, out var item)) { return false; }
 
             if (Internal.TryAdd(newKey, item)) { return true; }
 
@@ -437,7 +424,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         if (oldKey == newKey) { return string.Empty; }
         if (IsDisposed) { return "Sammlung ist verworfen"; }
-        if (ReadOnly) { return "Sammlung ist schreibgeschützt"; }
 
         if (GetByKey(oldKey) is null) { return string.Empty; }
 
@@ -481,15 +467,17 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// <summary>
     /// Nach einer erfolgreichen Aufnahme: verdrahtet das Kind neu, erzeugt bei eigenem
     /// Segment die Argumente mit Navigationssatz und meldet die Aufnahme als
-    /// Journal-Blatt AddFragmentType (Classic-Parseable-String des Items) ans Root.
-    /// Ableitungen überschreiben die Routine, um z. B. Caches zu invalidieren.
+    /// Journal-Blatt AddFragmentType mit dem kompletten Item-Block im binären
+    /// Fragment-Format ans Root. Ableitungen überschreiben die Routine, um z. B.
+    /// Caches zu invalidieren.
     /// </summary>
     protected virtual void OnItemAdded(TItem item) {
         this.Reregister(item);
 
-        var e = new FragmentChangedEventArgs(this, AddItemType, item);
+        using var block = new MemoryStream();
+        _ = item.SerializeCore(block, 1);
 
-        e = e.WithNavigation(ItemSubType, item.KeyName); 
+        var e = new FragmentChangedEventArgs(this, AddItemType, Encoding.UTF8.GetString(block.ToArray())).WithNavigation(ItemSubType, item.KeyName);
 
         OnFragmentChanged(e);
     }
@@ -562,8 +550,8 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Schlüssel) wenden den Block eine Ebene tiefer granular auf den benannten
     /// Eintrag an, ListFragmentType liest die ganze Liste; Add- und Remove-Blätter
     /// stammen aus Journal-Fragmenten, nie aus der Voll-Speicherung (das Add-Blatt
-    /// trägt den Classic-Parseable-String des Items); alles andere geht an
-    /// DeserializeOther.
+    /// trägt den Item-Block im Fragment-Format bzw. den Classic-String älterer
+    /// Journale); alles andere geht an DeserializeOther.
     /// </summary>
     public virtual bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) { return false; }
@@ -578,55 +566,74 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
                 : this.Deserialize(stream, record.Depth + 1);
         }
 
-        if (record.LeafType == FragmentRecord.EnumByte(ListType)) { return DeserializeListCore(stream, record); }
-        if (record.LeafType == FragmentRecord.EnumByte(AddItemType)) { return ApplyItemAdd(record.StringContent, record.StringContent); }
+        // Die ganze Liste lesen und per Update angleichen: bestehende Instanzen
+        // behalten ihre Identität, Überbleibsel werden entfernt.
+        if (record.LeafType == FragmentRecord.EnumByte(ListType)) {
+            if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) { return false; }
+
+            return Update(items) is { Length: 0 };
+        }
+
+        if (record.LeafType == FragmentRecord.EnumByte(AddItemType)) { return ApplyItemAddFragment(record.StringContent); }
+
         if (record.LeafType == FragmentRecord.EnumByte(RemoveItemType)) { return ApplyItemRemove(record.StringContent); }
 
         return DeserializeOther(stream, record);
     }
 
     /// <summary>
-    /// Liest den kompletten Listen-Block und übernimmt ihn per ApplyLoadedItems.
-    /// </summary>
-    protected bool DeserializeListCore(Stream stream, FragmentRecord record) {
-        if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) { return false; }
-
-        return ApplyLoadedItems(items);
-    }
-
-    /// <summary>
-    /// Übernimmt eine frisch gelesene ganze Liste; leer bei Ableitungen, die ihre Items bereits Segment-für-Segment anlegen.
-    /// </summary>
-    protected virtual bool ApplyLoadedItems(ReadOnlyCollection<TItem> items) => true;
-
-    /// <summary>
-    /// Übernimmt ein Item aus einem Journal-Add-Blatt (Classic-Parseable-String).
+    /// Übernimmt ein Item aus einem Journal-Add-Blatt im Classic-Parseable-Format
+    /// (ältere Journale); die Basis kennt kein Classic-Format. Neue Journale tragen
+    /// den Item-Block im Fragment-Format und laufen über ApplyItemAdd(TItem).
     /// </summary>
     protected virtual bool ApplyItemAdd(string toParse, string keyName) => true;
 
     /// <summary>
+    /// Übernimmt ein deserialisiertes Item aus einem Journal-Add-Blatt: fehlt der
+    /// Eintrag, wird er aufgenommen; sonst behält die bestehende Instanz ihre
+    /// Identität (Werte per Item-Update übernommen, ein Fehlergrund ergibt false).
+    /// CreateItem bereits angehängte Instanzen gelten als angewendet.
+    /// </summary>
+    protected bool ApplyItemAdd(TItem item) {
+        if (string.IsNullOrEmpty(item.KeyName)) { return false; }
+
+        var existing = GetByKey(item.KeyName);
+
+        if (ReferenceEquals(existing, item)) { return true; }
+
+        return existing is not null ? existing.Update(item) is { Length: 0 } : Add(item);
+    }
+
+     /// <summary>
+    /// Wendet ein Add-Blatt im Fragment-Format an: Der komplette Item-Block wird über
+    /// CreateItem (erster Satz) beschafft, frisch deserialisiert und über
+    /// ApplyItemAdd(TItem) übernommen.
+    /// </summary>
+    protected bool ApplyItemAddFragment(string block) {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(block));
+
+        if (FragmentRecord.TryReadNext(stream, 0) is not { } first) { return false; }
+        if (CreateItem(first) is not { } item) { return false; }
+
+        stream.Position = 0;
+
+        if (!item.Deserialize(stream, 0)) { return false; }
+
+        return ApplyItemAdd(item);
+    }
+
+    /// <summary>
     /// Wendet eine Entfernung aus einem Journal-Block an; true, auch wenn der Eintrag
-    /// fehlt. Umgeht ReadOnly für die Dauer der Entfernung — das Journal-Anwenden
-    /// (Laden) muss Entfernungen auch auf schreibgeschützten Instanzen vollziehen
-    /// können (Vorbild: Update(sourceItems, ignoreReadOnly)). Ableitungen überschreiben
-    /// die Routine, um z. B. still zu entfernen.
+    /// fehlt. Ableitungen überschreiben die Routine, um z. B. still zu entfernen.
     /// </summary>
     protected virtual bool ApplyItemRemove(string keyName) {
         if (IsDisposed || GetByKey(keyName) is null) { return true; }
 
-        Develop.Diagnose("ApplyItemRemove", "Key=" + keyName + ", Start - Count=" + Internal.Count + ", Keys=[" + string.Join(",", Keys()) + "], ReadOnly=" + ReadOnly);
 
-        var wasReadOnly = ReadOnly;
-        ReadOnly = false;
-        try {
-            var removed = Remove(keyName);
+        var removed = Remove(keyName);
 
-            Develop.Diagnose("ApplyItemRemove", $"Key={keyName}, Remove={removed}, Count nachher={Internal.Count}, Stack: {Develop.DiagStack()}");
 
-            return removed;
-        } finally {
-            ReadOnly = wasReadOnly;
-        }
+        return removed;
     }
 
     /// <summary>
@@ -639,8 +646,9 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// <summary>
     /// Wendet einen Journal-Block an (Nav-Satz mit Schlüssel + tiefere Sätze): Der
     /// erste Blocksatz entscheidet — RemoveItemType entfernt den benannten Eintrag,
-    /// AddItemType übernimmt das Item aus seinem Classic-Parseable-String, übrige
-    /// Sätze gehen als Property-Block direkt auf den Eintrag; fehlt er, wird er über GetOrCreateItem
+    /// AddItemType übernimmt das Item aus seinem Block (Fragment-Format bzw.
+    /// Classic-String älterer Journale), übrige Sätze gehen als Property-Block
+    /// direkt auf den Eintrag; fehlt er, wird er über GetOrCreateItem
     /// beschafft. Ein leerer Block wird übersprungen.
     /// </summary>
     protected bool ApplySubItem(Stream stream, FragmentRecord record) {
@@ -655,7 +663,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         if (firstLeaf is { IsTag: false } leaf && leaf.LeafType == FragmentRecord.EnumByte(RemoveItemType)) { return ApplyItemRemove(record.StringContent); }
 
-        if (firstLeaf is { IsTag: false } addLeaf && addLeaf.LeafType == FragmentRecord.EnumByte(AddItemType)) { return ApplyItemAdd(addLeaf.StringContent, record.StringContent); }
+        if (firstLeaf is { IsTag: false } addLeaf && addLeaf.LeafType == FragmentRecord.EnumByte(AddItemType)) { return ApplyItemAddFragment(addLeaf.StringContent); }
 
         // Property-Journal: Eintrag beschaffen, notfalls erzeugen, Block anwenden.
         // Fehlt der Eintrag (kein Auto-Create — nur Add-Blätter erzeugen), muss der

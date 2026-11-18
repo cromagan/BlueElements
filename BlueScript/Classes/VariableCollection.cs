@@ -1,6 +1,5 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace BlueScript.ScriptVariables;
@@ -21,24 +20,24 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
         /// Navigation in eine Variable (Key = KeyName der Variablen);
         /// Journal-Einzelsätze.
         /// </summary>
-        SubVariable = 94,
+        SubVariable = 1,
 
         /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Variable im Classic-Format
-        /// (Content = Parseable-String der Variablen).
+        /// Blatt-Satz: übernimmt eine ganze neue Variable (Content = Item-Block
+        /// im Fragment-Format; Classic-String nur ältere Journale).
         /// </summary>
-        VariableAdd = 99,
+        VariableAdd = 2,
 
         /// <summary>
         /// Blatt-Satz: entfernt die Variable des Journal-Blocks (Nav-Schlüssel).
         /// </summary>
-        VariableRemove = 100,
+        VariableRemove = 3,
 
         /// <summary>
         /// ListKeyObject-Satz: die Variablen folgen als Liste eine Ebene tiefer,
         /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
         /// </summary>
-        VariableList = 91
+        VariableList = 4
     }
 
     #endregion
@@ -54,14 +53,9 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     public VariableCollection() { }
 
     /// <summary>
-    /// Erstellt eine schreibgeschützte Sammlung mit den gegebenen Variablen.
+    /// Erstellt eine Sammlung mit den gegebenen Variablen.
     /// </summary>
-    public VariableCollection(List<ScriptVariable> v) : this(v, true) { }
-
-    /// <summary>
-    /// Übernimmt die Variablen und startet ggf. schreibgeschützt.
-    /// </summary>
-    public VariableCollection(List<ScriptVariable> v, bool readOnly) : base(v, readOnly) { }
+    public VariableCollection(List<ScriptVariable> v) : base(v) { }
 
     #endregion
 
@@ -195,7 +189,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
         List<string> result = [];
 
         result.ParseableAdd("Variable", Items());
-        result.ParseableAdd("ReadOnly", ReadOnly);
 
         return result;
     }
@@ -210,7 +203,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
                 return true;
 
             case "readonly":
-                ReadOnly = value.FromPlusMinus();
+                // Legacy-Format: der Sammlungs-Schutz ist entfallen, der Wert wird ignoriert.
                 return true;
         }
 
@@ -227,8 +220,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     public void RemoveWithComment(string comment) {
-        if (ReadOnly) { return; }
-
         foreach (var thisvar in Items()) {
             if (!thisvar.Comment.Contains(comment)) { continue; }
 
@@ -250,9 +241,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// (Wert und Kommentar werden übernommen), damit bestehende Referenzen gültig bleiben.
     /// </summary>
     public void ReplaceWith(IEnumerable<ScriptVariable>? vars) {
-        var wasReadOnly = ReadOnly;
-        ReadOnly = false;
-
         List<ScriptVariable> neu = vars is null ? [] : [.. vars.Where(v => v is not null)];
         var neueKeys = new HashSet<string>(neu.Select(v => v.KeyName), StringComparer.OrdinalIgnoreCase);
 
@@ -283,8 +271,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
         foreach (var keyName in Keys()) {
             if (!neueKeys.Contains(keyName)) { Remove(keyName); }
         }
-
-        ReadOnly = wasReadOnly;
     }
 
     /// <summary>
@@ -293,8 +279,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, string value) {
-        if (ReadOnly) { return false; }
-
         var n = name.ToUpperInvariant();
         var v = GetByKey(name);
         if (v is null) {
@@ -319,8 +303,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, double value) {
-        if (ReadOnly) { return false; }
-
         var n = name.ToUpperInvariant();
         var v = GetByKey(name);
         if (v is null) {
@@ -345,8 +327,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, List<string> value) {
-        if (ReadOnly) { return false; }
-
         var n = name.ToUpperInvariant();
         var v = GetByKey(name);
         if (v is null) {
@@ -371,8 +351,6 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, bool value) {
-        if (ReadOnly) { return false; }
-
         var n = name.ToUpperInvariant();
         var v = GetByKey(name);
         if (v is null) {
@@ -455,25 +433,14 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
-    /// Übernimmt die gelesenen Variablen einzeln; bestehende Instanzen behalten ihre Identität.
-    /// </summary>
-    protected override bool ApplyLoadedItems(ReadOnlyCollection<ScriptVariable> items) {
-        foreach (var thisvar in items) {
-            if (!ApplyVariable(thisvar.KeyName, thisvar)) { return false; }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Ganze Variable im Classic-Format: fehlt sie, wird sie zugefügt,
-    /// sonst behält die bestehende Instanz ihre Identität (das Journal
+    /// Ganze Variable im Classic-Format (ältere Journale): fehlt sie, wird sie
+    /// zugefügt, sonst behält die bestehende Instanz ihre Identität (das Journal
     /// kann VariableAdd-Sätze wiederholen).
     /// </summary>
     protected override bool ApplyItemAdd(string toParse, string keyName) {
         if (ParseableItem.NewByParsing<ScriptVariable>(toParse) is not { } newVariable) { return false; }
 
-        return ApplyVariable(newVariable.KeyName, newVariable);
+        return ApplyItemAdd(newVariable);
     }
 
     /// <summary>
@@ -504,7 +471,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
 
         if (first.LeafType == (byte)VariableCollectionNavigationType.VariableRemove) { return ApplyItemRemove(record.StringContent); }
 
-        if (first.LeafType == (byte)VariableCollectionNavigationType.VariableAdd) { return ApplyItemAdd(first.StringContent, record.StringContent); }
+        if (first.LeafType == (byte)VariableCollectionNavigationType.VariableAdd) { return ApplyItemAddFragment(first.StringContent); }
 
         if (first.LeafType != (byte)ScriptVariable.VariableFragmentType.Type) {
             // Bestehende Variable: Wert-/Kommentar-Sätze direkt auf die Instanz anwenden.
@@ -527,24 +494,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
         // Gespeicherte Variablen sind immer schreibgeschützt (wie im Classic-Pfad)
         newVar.ReadOnly = true;
 
-        return ApplyVariable(record.StringContent, newVar);
-    }
-
-    /// <summary>
-    /// Übernimmt die frisch gelesene Variable: fehlt sie, wird sie zugefügt; sonst
-    /// behält die bestehende Instanz ihre Identität (Wert und Kommentar übernommen).
-    /// </summary>
-    private bool ApplyVariable(string keyName, ScriptVariable newVar) {
-        if (GetByKey(keyName) is not { } existing) { return Add(newVar); }
-
-        // Bestehende Instanz behalten — Wert und Kommentar in die Instanz übernehmen
-        var wasReadOnly = existing.ReadOnly;
-        existing.ReadOnly = false;
-        var error = existing.GetValueFrom(newVar);
-        existing.ReadOnly = wasReadOnly;
-        existing.Comment = newVar.Comment;
-
-        return error is not { Length: > 0 };
+        return ApplyItemAdd(newVar);
     }
 
     #endregion
