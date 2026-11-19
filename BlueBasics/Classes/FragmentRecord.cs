@@ -129,8 +129,7 @@ public sealed class FragmentRecord {
     public byte[] ByteContent { get; private set; } = [];
 
     /// <summary>
-    /// Content als String-Sicht: Text-Typen per Konverter (UTF-8 bzw. Latin1),
-    /// binäre Typen als lesbarer Wert (Pendant zur Append-Überladung).
+    /// Content als UTF-8-Text; nur bei FragmentDataType.String, sonst Absturz.
     /// </summary>
     public string StringContent {
         get {
@@ -264,7 +263,7 @@ public sealed class FragmentRecord {
         get {
             CheckDataType(FragmentDataType.Json);
             try {
-                return StringContent is { Length: > 0 } ? JsonNode.Parse(StringContent) : null;
+                return ByteContent is { Length: > 0 } ? JsonNode.Parse(Encoding.UTF8.GetString(ByteContent)) : null;
             } catch {
                 return null;
             }
@@ -307,7 +306,7 @@ public sealed class FragmentRecord {
     /// Stellt sicher, dass der Satz den geforderten Content-Typ hat, sonst Absturz.
     /// </summary>
     private void CheckDataType(FragmentDataType required) {
-        if (DataType != required) { throw Develop.DebugError($"Content-Typ {DataType} passt nicht zum geforderten Typ {required}. Stack: {Develop.DiagStack()}"); }
+        if (DataType != required) { throw Develop.DebugError($"Content-Typ {DataType} passt nicht zum geforderten Typ {required}."); }
     }
 
     /// <summary>

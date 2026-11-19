@@ -15,7 +15,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
     /// <summary>
     /// Reihenfolge und Namen der Standard-Regionen.
     /// </summary>
-    private static readonly string[] RegionOrder = ["Fields", "Delegates", "Constructors", "Events", "Properties", "Indexers", "Methods", "Structs"];
+    private static readonly string[] RegionOrder = ["Enums", "Fields", "Delegates", "Constructors", "Events", "Properties", "Indexers", "Methods", "Structs"];
 
     private static readonly char[] TokenChars = ['(', '{', ';', '='];
 
@@ -331,7 +331,8 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
         if (ContainsWord(pre, "delegate")) { return "Delegates"; }
         if (ContainsWord(pre, "event")) { return "Events"; }
         if (ContainsWord(pre, "struct")) { return "Structs"; }
-        if (ContainsWord(pre, "class") || ContainsWord(pre, "interface") || ContainsWord(pre, "record") || ContainsWord(pre, "enum")) { return string.Empty; }
+        if (ContainsWord(pre, "enum")) { return "Enums"; }
+        if (ContainsWord(pre, "class") || ContainsWord(pre, "interface") || ContainsWord(pre, "record")) { return string.Empty; }
         if (pre.Contains("this[", StringComparison.Ordinal)) { return "Indexers"; }
         if (ContainsWord(pre, "operator")) { return "Methods"; }
 
@@ -355,6 +356,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
     private static string SortKeyOf(string category, string header) {
         if (category == "Indexers") { return "this"; }
         if (category == "Structs") { return WordAfter(header, "struct"); }
+        if (category == "Enums") { return WordAfter(header, "enum"); }
         if (category == "Delegates") {
             var p = header.IndexOf('(');
             return p < 0 ? header : NameBefore(WithoutGenericSuffix(header[..p]));

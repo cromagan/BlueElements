@@ -2310,7 +2310,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.BackgroundStyle:
-                _backgroundStyle = (ColumnBackgroundStyle)IntParse(value);
+                _backgroundStyle = (ColumnBackgroundStyle)LongParse(value);
                 break;
 
             case TableDataType.ColumnQuickInfo:
@@ -3062,7 +3062,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case ColumnFragmentType.BackgroundStyle:
-                _backgroundStyle = (ColumnBackgroundStyle)record.IntContent;
+                _backgroundStyle = (ColumnBackgroundStyle)record.LongContent;
                 break;
 
             case ColumnFragmentType.ColumnQuickInfo:

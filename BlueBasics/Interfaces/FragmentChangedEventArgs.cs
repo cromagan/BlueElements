@@ -96,7 +96,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// Writer schreibt diesen Content unverändert (kein Join, kein Sort, kein Trim).
     /// </summary>
     public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) {
-        var payload = FragmentRecord.EncodeListPayload(content) ?? throw Develop.DebugError($"Ein List-Eintrag überschreitet {FragmentRecord.MaxListEntryLength} Bytes. Stack: {Develop.DiagStack()}");
+        var payload = FragmentRecord.EncodeListPayload(content) ?? throw Develop.DebugError($"Ein List-Eintrag überschreitet {FragmentRecord.MaxListEntryLength} Bytes.");
 
         SourceKey = (sender as IHasKeyName)?.KeyName ?? sender.GetType().Name;
         TypeSelector = FragmentRecord.EnumByte(typeSelector);
