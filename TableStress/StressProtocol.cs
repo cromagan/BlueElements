@@ -17,6 +17,8 @@ public sealed class StressProtocol : IDisposable {
 
     private readonly object locker = new();
     private readonly StreamWriter writer;
+    private string lastMeldung = string.Empty;
+    private int meldungRepeat;
 
     #endregion
 
@@ -76,15 +78,19 @@ public sealed class StressProtocol : IDisposable {
 
     public void Dispose() {
         Develop.MessageDG -= OnDevelopMessage;
-        lock (locker) { writer.Dispose(); }
+        lock (locker) {
+            FlushRepeatedMeldung();
+            writer.Dispose();
+        }
         GC.SuppressFinalize(this);
     }
 
     /// <summary>
-    /// Schreibt eine Aktions-Zeile: Protokollname|Uhrzeit|Aktion|Detail.
+    /// Schreibt eine Aktions-Zeile: Protokollname|Uhrzeit|Aktion|Detail. Zeilenumbrüche
+    /// im Detail werden ersetzt, damit jede Protokollzeile dem Format entspricht.
     /// </summary>
     public void Write(string aktion, string detail) {
-        var line = $"{Name}|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{detail}";
+        var line = $"{Name}|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{OneLine(detail)}";
 
         lock (locker) {
             try {
@@ -98,13 +104,42 @@ public sealed class StressProtocol : IDisposable {
     }
 
     /// <summary>
-    /// Develop-Meldungen ab Warning mit ins Protokoll aufnehmen.
+    /// Develop-Meldungen ab Warning mit ins Protokoll aufnehmen. Identische
+    /// aufeinanderfolgende Meldungen werden gezählt und nur einmal angemerkt.
     /// </summary>
     private void OnDevelopMessage(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        _ = reference;
+        _ = symbol;
+        _ = indent;
         if (type > ErrorType.Warning) { return; }
 
-        Write("MELDUNG", $"{type} {category}: {message}");
+        lock (locker) {
+            var text = $"{type} {category}: {OneLine(message)}";
+
+            if (text == lastMeldung) {
+                meldungRepeat++;
+                return;
+            }
+
+            FlushRepeatedMeldung();
+            lastMeldung = text;
+            Write("MELDUNG", text);
+        }
     }
+
+    /// <summary>
+    /// Schreibt die Anzahl der unterdrückten Wiederholungen der letzten Meldung.
+    /// </summary>
+    private void FlushRepeatedMeldung() {
+        if (meldungRepeat <= 0) { return; }
+        Write("MELDUNG", $"{lastMeldung} — weitere identische Meldungen unterdrückt: {meldungRepeat}");
+        meldungRepeat = 0;
+    }
+
+    /// <summary>
+    /// Ersetzt Zeilenumbrüche, damit eine Meldung eine Protokollzeile bleibt.
+    /// </summary>
+    private static string OneLine(string text) => text.Replace("\r\n", " / ").Replace('\r', ' ').Replace('\n', ' ');
 
     #endregion
 }

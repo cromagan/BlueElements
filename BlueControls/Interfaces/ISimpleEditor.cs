@@ -71,7 +71,7 @@ public static class SimpleEditorExtension {
             flexis.Insert(0, new FlexiControl("Achtung!", control.Width, true));
         }
 
-        var summary = Generic.Summary(element.GetType());
+        var summary = Summary(element.GetType());
         if (summary is { Length: > 0 }) {
             flexis.Insert(0, new FlexiControl(summary, control.Width, false));
             flexis.Insert(0, new FlexiControl("Beschreibung:", control.Width, true));

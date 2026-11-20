@@ -55,7 +55,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string ChunkValue {
         get {
-            if (IsDisposed || Table is not TableChunk) { return string.Empty; }
+            if (IsDisposed || !IsTableChunk(Table)) { return string.Empty; }
 
             if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return CellGetStringCore(spc); }
             return string.Empty;

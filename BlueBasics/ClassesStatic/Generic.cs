@@ -430,7 +430,7 @@ public static class Generic {
             var comment = member is Type type
                 ? Reader.GetTypeComments(type).Summary
                 : Reader.GetMemberComment(member);
-            return System.Net.WebUtility.HtmlDecode(comment ?? string.Empty);
+            return WebUtility.HtmlDecode(comment ?? string.Empty);
         }
     }
 

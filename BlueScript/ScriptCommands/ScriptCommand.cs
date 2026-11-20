@@ -755,7 +755,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
         co += "\r\n";
         co += "Beschreibung:\r\n";
         co += "~~~~~~~~~~~\r\n";
-        co = co + Generic.Summary(GetType()) + "\r\n";
+        co = co + Summary(GetType()) + "\r\n";
 
         if (Constants.Count > 0) {
             co += "\r\n";

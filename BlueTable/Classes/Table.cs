@@ -910,6 +910,12 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return string.Empty;
     }
 
+    /// <summary>
+    /// True, wenn die Tabelle Chunk-Werte unterstützt: das klassische TableChunk-Format
+    /// oder ein TableFileNew mit Chunk-Datei-Verwaltung (SaveableFileChunk).
+    /// </summary>
+    public static bool IsTableChunk(Table? table) => table is TableChunk || table is TableFileNew { Saveable: SaveableFileChunk };
+
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
 
@@ -1595,7 +1601,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public void EnableCustomSort() {
         if (IsDisposed) { return; }
-        if (this is TableChunk) { return; }
+        if (IsTableChunk(this)) { return; }
         if (Column.SysRowSortIndex is { IsDisposed: false }) { return; }
 
         var r = SortDefinition?.SortedRows(Row) ?? [.. Row];

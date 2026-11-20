@@ -147,12 +147,12 @@ public sealed partial class ColumnOverview : FormWithStatusBar, IUniqueWindow, I
                 return true;
 
             case "FARBE":
-                if (!Converter.ColorTryParse(value, out var back)) { RejectValue(value); return false; }
+                if (!ColorTryParse(value, out var back)) { RejectValue(value); return false; }
                 c.BackColor = back;
                 return true;
 
             case "SCHRIFTFARBE":
-                if (!Converter.ColorTryParse(value, out var fore)) { RejectValue(value); return false; }
+                if (!ColorTryParse(value, out var fore)) { RejectValue(value); return false; }
                 c.ForeColor = fore;
                 return true;
 

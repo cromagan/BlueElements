@@ -6,6 +6,7 @@ Stresstest-Console für BlueTable-Tabellen: Probiert in kurzen Abständen alle �
 Öffne die angeforderte Datei. Die Dateien sind im Unterordner Test-Tabellen. Starte das Programm 10 mal mit der gleichen Datei. Jeweils mit der Usernummer 0 bis 9.
 Nachdem alle 10 Programme fertig sind, prüfen die erste Zeile des Protokolls - dort findest du, welche Protokolldatei dazugehört.
 Alle Fehler, alle Warnungen, alle Infos reparieren. Dann so lange neu starten, bis keine Fehler mehr auftreten.
+Das gilt ausdrücklich auch für das Stresstest-Programm selbst: Es ist **gewollt und Teil der Aufgabe**, TableStress laufend zu verbessern — etwa wenn Protokollzeilen fehlen (zu wenige Meldungen), das Protokoll flutet (zu viele Meldungen), Kontexte zur Fehlerursache fehlen oder neue Testszenarien und bessere Auswertbarkeit helfen würden.
 Wenn das Programm nicht funktioniert wie es soll oder du nicht weiterkommst, baue in TableStress neue Tests, neue Ausgaben oder was auch immer ein, dass es klappt.
 
 ## Aufruf
@@ -65,3 +66,18 @@ Aktionen: `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`,
 - `StressProtocol.cs` — Protokolldatei, Develop-Umleitung, Watchdog-Anhang
 - `Watchdog.cs` — eigener Prozess derselben exe
 - `StressAction.cs` — Enum der Aktionen
+
+
+## Bereits abgeklärte Konventionen
+
+Entscheidungen aus bisherigen Läufen — nicht neu diskutieren, sondern beachten:
+
+- Die `_000`-Prüfung in den `StartWriter`-Routinen (BlueBasics/BlueTable) **muss bleiben**: Ein Zähler-Anhang macht den Namen unbrauchbar, weil die Aufräumarbeit den Zeitstempel aus den letzten 19 Zeichen des Namens liest. Namen mit `_000` führen bewusst zum Freeze mit klarer Ursache.
+
+## WICHTIG
+Bereits abgeklärte Konventionen nur nach Anweisung ergänzen.
+Niemals Rückfragen machen, der Stresstest und deine Auswertung laufen ohne Aufsicht.
+Formate, die mit BTB enden (TableFileNew), dürfen intern verändert werden. Diese Formate sind noch nicht aktiv.
+Andere Formate dürfen nicht verändert werden. (TableFile)
+Wiederhole den Stresstest, bis alles wie gewünscht funktioniert.
+

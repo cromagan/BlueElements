@@ -25,7 +25,7 @@ public static class SnapshotStore {
     /// </summary>
     public static WindowSnapshot Copy(WindowSnapshot snapshot, string newName) {
         var copy = new WindowSnapshot {
-            Id = Generic.GetUniqueKey(),
+            Id = GetUniqueKey(),
             Name = newName,
             Created = DateTime.Now
         };
@@ -47,7 +47,7 @@ public static class SnapshotStore {
         SaveAll(all);
     }
 
-    public static WindowSnapshot? Load(string id) => SnapshotStore.LoadFile().FirstOrDefault(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase));
+    public static WindowSnapshot? Load(string id) => LoadFile().FirstOrDefault(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase));
 
 
 

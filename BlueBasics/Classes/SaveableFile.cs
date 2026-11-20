@@ -208,7 +208,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// <summary>
     /// True, wenn anstehende Änderungen aktuell gespeichert werden dürfen.
     /// </summary>
-    public virtual bool MaySaveNow => !IsFreezed && !Generic.Ending;
+    public virtual bool MaySaveNow => !IsFreezed && !Ending;
 
     /// <summary>
     /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
@@ -615,7 +615,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     protected virtual List<byte> GenerateContentToSave() {
         using var ms = new MemoryStream();
 
-        _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : Generic.UserName);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : UserName);
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateTimeUtc, _createTimeUtc > DateTime.MinValue ? _createTimeUtc : DateTime.UtcNow);
 
         return Owner.Serialize(ms, 0) ? [.. ms.ToArray()] : [];

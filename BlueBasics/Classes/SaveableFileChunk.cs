@@ -353,7 +353,7 @@ public class SaveableFileChunk : SaveableFile {
         if (ReadMasterClaim() is not { } claim) { return true; }
 
         // Eigener Stempel: Ich bin (noch) Master.
-        if (claim.User.Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (claim.User.Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
 
         // Fremder Stempel: nur übernehmbar, wenn er abgelaufen ist.
         return claim.ValidUntilUtc <= DateTime.UtcNow;
@@ -370,7 +370,7 @@ public class SaveableFileChunk : SaveableFile {
         using var ms = new MemoryStream();
 
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.SerializerVersion, "1.00");
-        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterUser, Generic.UserName);
+        _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterUser, UserName);
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterMachine, Environment.MachineName);
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterApp, Develop.AppExe());
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.MasterId, MyId);
@@ -675,7 +675,7 @@ public class SaveableFileChunk : SaveableFile {
     /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.
     /// </summary>
     internal string GenerateChunkTimestamp() =>
-        $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{Generic.UserName}-{MyId}";
+        $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MyId}";
 
     /// <summary>
     /// Extrahiert das UTC-Datum aus einem Bereichs-Dateinamen
@@ -868,7 +868,7 @@ public class SaveableFileChunk : SaveableFile {
     /// </summary>
     private bool IsFileFromCurrentUser(string filePath) {
         var creator = ExtractUserNameFromFileName(filePath);
-        return string.Equals(creator, Generic.UserName, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

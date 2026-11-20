@@ -271,7 +271,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         // Fortschritt und Abbrechen nur bei gechunkten Tabellen: Nur dort
         // kann die Reparatur durch Chunk-Zugriffe spürbar dauern.
-        var _uniqueProgressbar = tb is TableChunk ? Progressbar.Show("Unique-Definitionen aufräumen", tb.Row.Count) : null;
+        var _uniqueProgressbar = Table.IsTableChunk(tb) ? Progressbar.Show("Unique-Definitionen aufräumen", tb.Row.Count) : null;
         _uniqueProgressbar?.CancelSupported = true;
 
         try {

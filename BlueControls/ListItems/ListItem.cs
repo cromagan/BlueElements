@@ -359,7 +359,7 @@ public static class ListItemExtension {
             item = ItemOf(text, key, QuickImage.Get(i.ImageName));
         }
 
-        item.QuickInfo = Generic.Summary(field);
+        item.QuickInfo = Summary(field);
         return item;
     }
 

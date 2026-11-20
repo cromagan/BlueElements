@@ -11,7 +11,7 @@ internal class GenerateAiBmpScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[AiScriptVariable.ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
+    public override List<List<string>> Args => [[ClassId], [StringScriptVariable.ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "generateaibmp";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;

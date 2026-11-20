@@ -21,6 +21,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     private readonly TimeSpan masterTime = TimeSpan.FromMinutes(2);
     private readonly AutoResetEvent tickSignal = new(false);
     private DateTime startUtc;
+    private bool freezeReported;
     private int scriptCount;
     private System.Threading.Timer? timer;
     private int tickCount;
@@ -174,6 +175,11 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void DoRandomAction() {
+        if (!freezeReported && tbl.IsFreezed) {
+            freezeReported = true;
+            prot.Write("FEHLER", $"Tabelle eingefroren: {tbl.FreezedReason}");
+        }
+
         tickCount++;
         var value = random.Next(0, 27);
         var action = ActionOf(value);

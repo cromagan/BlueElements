@@ -96,7 +96,7 @@ public partial class TextmarkerTool {
 
         var p = new Point(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
 
-        if (Control.ModifierKeys.HasFlag(Keys.Shift)) {
+        if (ModifierKeys.HasFlag(Keys.Shift)) {
             // Mit Shift wird, wie im Snipping-Tool, eine gerade Linie vom Startpunkt gezogen
             if (_strokePoints.Count > 1) { _strokePoints.RemoveAt(_strokePoints.Count - 1); }
             _strokePoints.Add(p);

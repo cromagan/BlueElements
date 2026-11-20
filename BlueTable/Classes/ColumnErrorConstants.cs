@@ -21,7 +21,7 @@ public static class ColumnErrorConstants {
     public const string ChunkMustIgnoreRowFilter = "Diese Spalte muss bei Zeilenfiltern ignoriert werden.";
     public const string ChunkMustSaveContent = "Chunk Spalten der Inhalt gespeichert werden.";
     public const string ChunkNoRelation = "Beziehungen zu anderen Zeilen und Chunk-Wert nicht kombinierbar.";
-    public const string ChunkOnlyInCbcb = "Chunk-Spalten nur in Tabellen des Typs CBCB erlaubt.";
+    public const string ChunkOnlyInCbcb = "Chunk-Spalten nur in gechunkten Tabellen erlaubt.";
     public const string ChunkScriptReadonly = "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
     public const string ChunkTextFilterRequired = "Texteingabe-Filter sind bei dieser Spalte nötig.";
     public const string CircularReference = "Zirkelbezug mit verknüpfter Tabelle.";

@@ -46,7 +46,7 @@ public sealed class RowCaptionTableElement : TableElement {
 
     /// <summary>
     /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
-    /// Mit vorhandener Kapitel-Spalte, außerhalb von TableChunk und wenn die
+    /// Mit vorhandener Kapitel-Spalte, außerhalb von Chunk-Tabellen und wenn die
     /// Benutzerrechte es erlauben. Auch leere Kapitel (Anzeige "-") sind
     /// bearbeitbar — dabei wird das Kapitel neu gesetzt statt umbenannt.
     /// </summary>
@@ -54,7 +54,7 @@ public sealed class RowCaptionTableElement : TableElement {
         get {
             if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
             if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
-            if (tb is TableChunk) { return false; }
+            if (Table.IsTableChunk(tb)) { return false; }
             return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null, true);
         }
     }

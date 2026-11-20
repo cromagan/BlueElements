@@ -240,7 +240,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
     public override string ErrorReason() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (tb is TableChunk) {
+        if (Table.IsTableChunk(tb)) {
             if (!NeedRow && !ValuesReadOnly && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstützen nur Zeilenskripte."; }
         }
 

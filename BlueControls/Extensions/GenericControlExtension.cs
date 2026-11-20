@@ -56,7 +56,7 @@ public static class GenericControlExtension {
     public static void SetAddButtonInfo<T>(this Button b) where T : IReadableText, IDisposable, new() {
         using var t = new T();
         b.ImageCode = t.SymbolForReadableText()?.KeyName ?? string.Empty;
-        b.QuickInfo = Generic.Summary(typeof(T));
+        b.QuickInfo = Summary(typeof(T));
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public static class GenericControlExtension {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";
-        txt += "<br>" + Generic.Summary(from.GetType());
+        txt += "<br>" + Summary(from.GetType());
 
         txt += "<br><br><b><u>Eigenschaften:</b></u>";
 
@@ -107,7 +107,7 @@ public static class GenericControlExtension {
     private static void SetQuickInfo<T>(GenericControl control, Expression<Func<T>> property) {
         if (property.Body is not MemberExpression memberExpression) { return; }
 
-        var summary = Generic.Summary(memberExpression.Member);
+        var summary = Summary(memberExpression.Member);
         if (summary is { Length: > 0 }) { control.QuickInfo = summary; }
     }
 

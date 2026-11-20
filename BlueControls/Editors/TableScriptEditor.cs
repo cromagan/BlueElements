@@ -98,7 +98,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     /// und diesen erneut hashen würden.
     /// </summary>
     public static List<ListItem> BuildChunkDropdownItems(Table? table) {
-        if (table is not TableChunk { IsDisposed: false } tc) { return []; }
+        if (table is not { IsDisposed: false } tc || !Table.IsTableChunk(tc)) { return []; }
 
         if (tc.Row.Count < 5) {
             tc.LoadTableRows(false, 10);
@@ -383,7 +383,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!_loaded && Table is { Row.Count: 0 }) {
             _loaded = true;
-            if (Table is TableChunk && !string.IsNullOrEmpty(txbChunk.Text)) {
+            if (Table.IsTableChunk(Table) && !string.IsNullOrEmpty(txbChunk.Text)) {
                 Table.BeSureRowIsLoaded(txbChunk.Text, false);
             } else {
                 Table.LoadTableRows(false, 5);
@@ -548,15 +548,12 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
-        // Bei TableChunk: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
-        if (Table is TableChunk tc) {
-            btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
-            txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
+        // Bei Chunk-Tabellen: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
+        if (Table is not { } tc || !Table.IsTableChunk(tc)) { return; }
+        btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
+        txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
 
-            if (tc.Row.Count == 0) { return; }
-        } else {
-            return;
-        }
+        if (tc.Row.Count == 0) { return; }
 
         if (string.IsNullOrEmpty(txbChunk.Text)) {
             var firstRow = tc.Row.First();
@@ -582,7 +579,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
     }
 
     private void UpdateChunkUiState() {
-        var isChunk = Table is TableChunk;
+        var isChunk = Table.IsTableChunk(Table);
         txbChunk.Enabled = isChunk;
         capChunk.Enabled = isChunk;
         btnChunkDropDown.Enabled = isChunk;

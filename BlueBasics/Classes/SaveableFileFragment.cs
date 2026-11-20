@@ -389,7 +389,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// Nur-Lese-Modus still.
     /// </summary>
     public override void LogUndo(FragmentRecord record) {
-        if (IsDisposed || Generic.Ending) { return; }
+        if (IsDisposed || Ending) { return; }
         if (Develop.AllReadOnly) { return; }
         if (InitialSavePending) { return; }
         if (_doingChanges > 0) { return; }
@@ -449,9 +449,9 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.SerializerVersion, "1.00");
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.Type, Owner.TypeName);
-        _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateUser, Generic.UserName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateUser, UserName);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateTimeUtc, nowUtc);
-        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SaveUser, Generic.UserName);
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SaveUser, UserName);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.Machine, Environment.MachineName);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.SaveTimeUtc, nowUtc);
     }
@@ -522,7 +522,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// <param name="fragmentFiles">Die im selben Lesezyklus ermittelten Fragment-Dateien.</param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     private void DoWorkAfterLastChanges(List<string> fragmentFiles, DateTime startTimeUtc) {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
         if (!string.IsNullOrEmpty(EditableError(false))) { return; }
 
         // Auch fremde Komplettierungen erkennen: Neuesten Snapshot-Stand übernehmen.
@@ -579,7 +579,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
             if (f.Length > 19) {
                 var da = f[^19..];
 
-                if (Converter.DateTimeTryParse(da, out var d2)) {
+                if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
                         Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
@@ -841,23 +841,25 @@ public class SaveableFileFragment : SaveableFileOnefile {
             return;
         }
 
-        // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleichnamige Datei im
-        // selben Sekundentick, gesperrte Datei) werden mit neu erzeugtem Namen erneut
-        // versucht; ein bleibender Fehler Freezt das Objekt, statt den Stack aufzubrauchen.
-        for (var versuch = 1; versuch <= 3; versuch++) {
+        // Begrenzte Wiederholungen statt Rekursion: Kollisionen werden mit neuem
+        // Sekunden-Stempel erneut versucht; ein bleibender Fehler Freezt das Objekt,
+        // statt den Stack aufzubrauchen.
+        for (var versuch = 1; versuch <= 5; versuch++) {
             if (!string.IsNullOrEmpty(EditableError(false))) { return; }
             CheckPath();
 
-            MyJournalFile = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
+            // Der Benutzer gehört in den Namen: Jeder Benutzer führt sein eigenes
+            // Journal, und mehrere Prozesse auf derselben Maschine kollidieren nicht
+            // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
+            // probiert die nächste Sekunde.
+            var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
-            // Zähler-Anhang (_000xx) heißt: Der Wunschname war in dieser Sekunde bereits
-            // vergeben. Die Pause verschiebt den Sekunden-Zeitstempel im Namen.
-            // Geprüft wird nur der Dateiname — der Ordner darf `_000` gefahrlos enthalten.
-            for (var nameversuch = 1; nameversuch <= 3 && MyJournalFile.FileNameWithSuffix().Contains("_000"); nameversuch++) {
-                Generic.Pause(1, false);
-                MyJournalFile = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
-            }
+            if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
+            MyJournalFile = FragmengtsPath().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
+
+            // Ein Zähler-Anhang (_000xx) macht den Namen unbrauchbar: Die Aufräumarbeit
+            // liest den Zeitstempel aus den letzten 19 Zeichen des Namens.
             if (MyJournalFile.FileNameWithSuffix().Contains("_000")) {
                 Freeze("Journaldatei konnte nicht eindeutig benannt werden: " + MyJournalFile.FileNameWithSuffix());
                 return;
@@ -867,7 +869,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
             FileStream? fileStream = null;
             try {
-                fileStream = new FileStream(MyJournalFile, FileMode.Append, FileAccess.Write, FileShare.Read);
+                fileStream = new FileStream(MyJournalFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                 _writer = fileStream;
                 fileStream = null;
 
@@ -882,7 +884,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 _writer = null;
 
                 Develop.DebugPrint(ErrorType.Warning, "Journaldatei nicht offen (Versuch " + versuch.ToString1() + "): " + MyJournalFile.FileNameWithSuffix(), ex);
-                Generic.Pause(1, false);
+                Pause(1, false);
             }
         }
 
@@ -979,7 +981,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
         if (IO.CreateDirectory(WorkFolder()).IsFailed) { return "Verzeichnis konnte nicht erstellt werden."; }
 
         // UTC-Zeitstempel, Benutzer, Maschinen/Instanz-Hash.
-        var path = WorkFolder() + $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{Generic.UserName}-{MyId}.{SuffixOfSnapshots}";
+        var path = WorkFolder() + $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MyId}.{SuffixOfSnapshots}";
 
         // Snapshots werden gezippt gespeichert.
         var zipped = content.ToArray().ZipIt();

@@ -148,7 +148,7 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
             FragmentRecord? firstLeaf = FragmentRecord.TryReadNext(stream, record.Depth + 1);
             stream.Position = blockStart;
 
-            var statisticsOnly = firstLeaf is { IsTag: false } first && (TableScriptDescription.ScriptFragmentType)first.LeafType is TableScriptDescription.ScriptFragmentType.StoppedTimeCount or TableScriptDescription.ScriptFragmentType.AverageRunTime;
+            var statisticsOnly = firstLeaf is { IsTag: false } first && (TableScriptDescription.ScriptFragmentType)first.LeafType is ScriptDescription.ScriptFragmentType.StoppedTimeCount or ScriptDescription.ScriptFragmentType.AverageRunTime;
 
             if (!base.DeserializeThis(stream, record)) { return false; }
 

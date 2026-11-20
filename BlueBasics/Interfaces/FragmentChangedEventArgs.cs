@@ -170,7 +170,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// Undo-Eintrag auf Basis-Tiefe 0.
     /// </summary>
     public FragmentRecord CreateUndoRecord() =>
-        FragmentRecord.Create(TypeSelector, ContentType, Content, Generic.UserName, DateTime.UtcNow, Comment);
+        FragmentRecord.Create(TypeSelector, ContentType, Content, UserName, DateTime.UtcNow, Comment);
 
     /// <summary>
     /// Liest den Key des auslösenden Kindes frisch beim Ereignis (umbenennungssicher);

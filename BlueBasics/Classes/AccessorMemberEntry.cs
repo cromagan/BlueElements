@@ -31,7 +31,7 @@ internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
                 Name = prop.Name;
                 CanRead = prop.CanRead;
                 CanWrite = prop.CanWrite;
-                QuickInfo = Generic.Summary(prop);
+                QuickInfo = Summary(prop);
                 _property = prop;
                 break;
 
@@ -39,7 +39,7 @@ internal sealed class AccessorMemberEntry<T> : IHasQuickInfo {
                 Name = field.Name;
                 CanRead = true;
                 CanWrite = !field.IsInitOnly;
-                QuickInfo = Generic.Summary(field);
+                QuickInfo = Summary(field);
                 _field = field;
                 break;
         }

@@ -22,7 +22,7 @@ public static class DesktopSnapshot {
     /// Erfasst den aktuellen Desktop in den gegebenen Snap (neu anlegen oder aktualisieren) und speichert die Ablage.
     /// </summary>
     public static WindowSnapshot CaptureInto(WindowSnapshot snap) {
-        if (snap.Id.Length == 0) { snap.Id = Generic.GetUniqueKey(); }
+        if (snap.Id.Length == 0) { snap.Id = GetUniqueKey(); }
         snap.Created = DateTime.Now;
         Develop.Diagnose("Snap", "Capture gestartet: " + snap.Name);
 
@@ -306,7 +306,7 @@ public static class DesktopSnapshot {
 
     private static IntPtr WaitForWindow(WindowInfo info, Dictionary<int, string> processNames, HashSet<IntPtr> busyHandles) {
         for (var i = 0; i < 16; i++) {
-            Generic.Pause(0.25, false);
+            Pause(0.25, false);
 
             // Frisch enumerieren, weil das Fenster gerade neu gestartet wurde
             var windows = DesktopWindows();

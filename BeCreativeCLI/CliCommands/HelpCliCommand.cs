@@ -24,7 +24,7 @@ public class HelpCliCommand : CliCommand {
     public override int DoIt(CliArgs args) {
         if (args.PositionalCount == 0) {
             foreach (var command in All.Where(c => !c.Hidden || args.Flag("dev"))) {
-                Console.Out.WriteLine(command.Command + ": " + Generic.Summary(command.GetType()));
+                Console.Out.WriteLine(command.Command + ": " + Summary(command.GetType()));
             }
 
             return 0;
@@ -39,7 +39,7 @@ public class HelpCliCommand : CliCommand {
 
         Console.Out.WriteLine("Befehl: " + cmd.Command);
         Console.Out.WriteLine("Syntax: " + cmd.Syntax);
-        Console.Out.WriteLine("Beschreibung: " + Generic.Summary(cmd.GetType()));
+        Console.Out.WriteLine("Beschreibung: " + Summary(cmd.GetType()));
 
         var flags = cmd.Flags.Where(f => !f.Equals("dev", StringComparison.OrdinalIgnoreCase)).ToList();
 

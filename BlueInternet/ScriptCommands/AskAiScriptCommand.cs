@@ -11,7 +11,7 @@ internal class AskAiScriptCommand : ScriptCommand {
 
     #region Properties
 
-    public override List<List<string>> Args => [[AiScriptVariable.ClassId], [StringScriptVariable.ClassId]];
+    public override List<List<string>> Args => [[ClassId], [StringScriptVariable.ClassId]];
     public override string Command => "askai";
     public override ScriptCommandType ScriptCommandLevel => ScriptCommandType.LongTime;
     public override bool MustUseReturnValue => true;

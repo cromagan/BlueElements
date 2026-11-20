@@ -68,7 +68,7 @@ public interface IFragmentStoreable {
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SerializerVersion, "1.00");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.CopyrightInfo, "(c) by Christian Peter - see License for details.");
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Type,  type);
-            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveUser, Generic.UserName);
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveUser, UserName);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Machine, Environment.MachineName);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveTimeUtc, DateTime.UtcNow);
 

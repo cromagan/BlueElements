@@ -227,7 +227,7 @@ public class ScriptExecuteControlStrategy : ControlStrategy, IHasScript, INotify
         var t = ExecuteScript(Script, true, ReadOnly, row, OwnerForm);
 
         if (t.Failed) {
-            Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{t.ProtocolText}", ImageCode.Kritisch, "Ok");
+            MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{t.ProtocolText}", ImageCode.Kritisch, "Ok");
         }
     }
 

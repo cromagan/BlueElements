@@ -145,7 +145,7 @@ public class ReadableListItem : ListItem {
         var qi = string.IsNullOrEmpty(baseQuickInfo) ? _text.CreateHtmlCodes() : baseQuickInfo;
 
         if (item is ISimpleEditor se) {
-            var summary = Generic.Summary(se.GetType());
+            var summary = Summary(se.GetType());
             if (summary is { Length: > 0 }) {
                 qi += "<br><hr><br>" + summary.CreateHtmlCodes();
             }
