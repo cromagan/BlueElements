@@ -6,42 +6,6 @@ namespace BlueScript.ScriptVariables;
 
 public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable, IParseable {
 
-    #region Enums
-
-    /// <summary>
-    /// Pfad-Typen der VariableCollection im binären Fragment-Format. Nur der
-    /// Collection selbst bekannt. Die Werte liegen bewusst oberhalb des
-    /// Variablen-Kreises (VariableFragmentType 1-5), damit der erste Satz eines
-    /// SubVariable-Blocks nie mit einem Variablen-Blatt verwechselt wird.
-    /// </summary>
-    private enum VariableCollectionNavigationType : byte {
-
-        /// <summary>
-        /// Navigation in eine Variable (Key = KeyName der Variablen);
-        /// Journal-Einzelsätze.
-        /// </summary>
-        SubVariable = 1,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Variable (Content = Item-Block
-        /// im Fragment-Format; Classic-String nur ältere Journale).
-        /// </summary>
-        VariableAdd = 2,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt die Variable des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        VariableRemove = 3,
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Variablen folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        VariableList = 4
-    }
-
-    #endregion
-
     #region Fields
 
     private List<string>? _cachedStringableNames;
@@ -391,34 +355,14 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     #region IFragmentStoreable
 
     /// <summary>
-    /// Schreibt alle Variablen mit Textdarstellung als Liste: ein VariableList-Satz,
+    /// Schreibt alle Variablen mit Textdarstellung als Liste: ein ItemList-Satz,
     /// darunter je Variable der Variablen-Block eine Ebene tiefer (Type-Satz zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
-        return FragmentRecord.Append(stream, depth, VariableCollectionNavigationType.VariableList, ToStringableListVariable());
+        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, ToStringableListVariable());
     }
-
-    /// <summary>
-    /// Pfad-Typen: die Liste unter dem VariableList-Satz, Aufnahmen über VariableAdd.
-    /// </summary>
-    protected override Enum ListType => VariableCollectionNavigationType.VariableList;
-
-    /// <summary>
-    /// Aufnahmen eines ganzen Classic-Variable-Strings.
-    /// </summary>
-    protected override Enum AddItemType => VariableCollectionNavigationType.VariableAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => VariableCollectionNavigationType.VariableRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => VariableCollectionNavigationType.SubVariable;
 
     /// <summary>
     /// Erzeugt die Variable zum Type-Satz des Segment-Anfangs; der konkrete Typ
@@ -433,38 +377,44 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
-    /// Ganze Variable im Classic-Format (ältere Journale): fehlt sie, wird sie
-    /// zugefügt, sonst behält die bestehende Instanz ihre Identität (das Journal
-    /// kann VariableAdd-Sätze wiederholen).
+    /// Übernimmt ein Journal-Add-Blatt: Mit Typ-Anteil („KeyName|TypeName“) wird die
+    /// Variable sofort mit dem richtigen Typ angelegt; Classic-Blätter ohne Typ-Anteil
+    /// bleiben ohne Wirkung (der Classic-Block legt die Variable an).
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) {
-        if (ParseableItem.NewByParsing<ScriptVariable>(toParse) is not { } newVariable) { return false; }
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) {
+        if (typeName is not { Length: > 0 }) { return true; }
 
-        return ApplyItemAdd(newVariable);
+        if (ParseableItem.NewByTypeName<ScriptVariable>(typeName) is not { } newVar) { return false; }
+
+        // Die Konstruktoren erzeugen Variablen schreibgeschützt — zum Einlesen freigeben
+        newVar.ReadOnly = false;
+        newVar.KeyName = keyName;
+
+        return ApplyItemAdd(newVar);
     }
 
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Variablen-Pfad: Der Listen- oder
-    /// Nav-Satz (SubVariable) leitet den Zahlraum der Variable ein, sonst eigener
+    /// Nav-Satz (ItemPath) leitet den Zahlraum der Variable ein, sonst eigener
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((VariableCollectionNavigationType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType is (byte)VariableCollectionNavigationType.SubVariable or (byte)VariableCollectionNavigationType.VariableList
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? ScriptVariable.GetNameOf(path[1..])
-            : ((VariableCollectionNavigationType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     /// <summary>
-    /// Wendet SubVariable-Journal-Blöcke auf die benannte Variable an: Add- und
+    /// Wendet ItemPath-Journal-Blöcke auf die benannte Variable an: Add- und
     /// Remove-Blätter buchen die Variable, die übrigen Blöcke folgen dem
     /// Variablen-Format (Type-Satz festlegt den konkreten Typ).
     /// </summary>
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) { return false; }
 
-        if (record.LeafType == (byte)VariableCollectionNavigationType.SubVariable && record.DataType == BlueBasics.Enums.FragmentDataType.String) { return DeserializeVariable(stream, record); }
+        if (record.LeafType == (byte)CollectionFragmentType.ItemPath && record.DataType == BlueBasics.Enums.FragmentDataType.String) { return DeserializeVariable(stream, record); }
 
         return base.DeserializeThis(stream, record);
     }
@@ -482,9 +432,9 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
 
         if (first is null) { return false; }
 
-        if (first.LeafType == (byte)VariableCollectionNavigationType.VariableRemove) { return ApplyItemRemove(record.StringContent); }
+        if (first.LeafType == (byte)CollectionFragmentType.ItemRemove) { return ApplyItemRemove(record.StringContent); }
 
-        if (first.LeafType == (byte)VariableCollectionNavigationType.VariableAdd) { return ApplyItemAddFragment(first.StringContent); }
+        if (first.LeafType == (byte)CollectionFragmentType.ItemAdd) { return ApplyItemAddFragment(first.StringContent); }
 
         if (first.LeafType != (byte)ScriptVariable.VariableFragmentType.Type) {
             // Bestehende Variable: Wert-/Kommentar-Sätze direkt auf die Instanz anwenden.

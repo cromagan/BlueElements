@@ -12,41 +12,17 @@ namespace BlueTable.Classes;
 /// </summary>
 public sealed class UniqueValueCollection : KeyedItemCollection<UniqueValueDefinition>, IHasTable {
 
-    #region Enums
-
-    private enum UniqueCollectionFragmentType : byte {
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Definitionen folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        Uniques = 1,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Definition (Content = Item-Block
-        /// im Fragment-Format; Classic-String nur ältere Journale).
-        /// </summary>
-        UniqueAdd = 2,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt die Definition des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        UniqueRemove = 3
-    }
-
-    #endregion
-
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Unique-Pfad: Der Listen- oder
-    /// Nav-Satz (Uniques) leitet den Zahlraum der Definition ein, sonst eigener
+    /// Nav-Satz (ItemPath) leitet den Zahlraum der Definition ein, sonst eigener
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((UniqueCollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType == (byte)UniqueCollectionFragmentType.Uniques
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? UniqueValueDefinition.GetNameOf(path[1..])
-            : ((UniqueCollectionFragmentType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     #region Constructors
@@ -97,26 +73,6 @@ public sealed class UniqueValueCollection : KeyedItemCollection<UniqueValueDefin
     #region IFragmentStoreable
 
     /// <summary>
-    /// Die Liste unter dem Uniques-Satz.
-    /// </summary>
-    protected override Enum ListType => UniqueCollectionFragmentType.Uniques;
-
-    /// <summary>
-    /// Aufnahmen eines ganzen Classic-Definitions-Strings.
-    /// </summary>
-    protected override Enum AddItemType => UniqueCollectionFragmentType.UniqueAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => UniqueCollectionFragmentType.UniqueRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => UniqueCollectionFragmentType.Uniques;
-
-    /// <summary>
     /// Erzeugt die Definition zum Namens-Satz des Segment-Anfangs; den Inhalt
     /// (Spalten) liefert der Block der Definition, die Übernahme in die Sammlung
     /// macht Update (bestehende Instanzen behalten ihre Identität).
@@ -124,9 +80,11 @@ public sealed class UniqueValueCollection : KeyedItemCollection<UniqueValueDefin
     protected override UniqueValueDefinition? CreateItem(FragmentRecord first) => new(Table, []);
 
     /// <summary>
-    /// Übernimmt eine ganze, im Classic-Format gereichte Definition (ältere Journale).
+    /// Übernimmt ein Journal-Add-Blatt: die Definition wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt; ihre Spalten tragen
+    /// die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) => ApplyItemAdd(new UniqueValueDefinition(Table, toParse));
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     #endregion
 }

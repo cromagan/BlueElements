@@ -63,10 +63,10 @@ public sealed class FragmentRecord {
     /// <summary>
     /// Erzeugt im Speicher einen Satz auf Basis-Tiefe 0; der Content kommt fertig kodiert
     /// herein (Kodier-Regeln der Append-Überladungen, bei ListSet die komplette Payload).
-    /// Mit Meta-Stempel (User/Zeit) gilt der Satz als Undo-Eintrag; ohne Meta
+    /// Mit Meta-Stempel (User/Zeit/Kommentar) gilt der Satz als Undo-Eintrag; ohne Meta
     /// (DateTimeUtc = MinValue) als Navigationssatz.
     /// </summary>
-    public static FragmentRecord Create(byte leafType, FragmentDataType dataType, byte[] content, string user, DateTime dateTimeUtc) =>
+    public static FragmentRecord Create(byte leafType, FragmentDataType dataType, byte[] content, string user, DateTime dateTimeUtc, string comment) =>
         new FragmentRecord {
             StorageType = StandardStorageType,
             Depth = 0,
@@ -76,7 +76,7 @@ public sealed class FragmentRecord {
             ByteContent = content,
             User = user,
             DateTimeUtc = dateTimeUtc,
-            Comment = string.Empty,
+            Comment = comment,
             HasMeta = dateTimeUtc != DateTime.MinValue
         };
 
@@ -84,7 +84,7 @@ public sealed class FragmentRecord {
     /// Erzeugt im Speicher einen Navigationssatz (Navigation einer Stufe, ohne Meta) auf Basis-Tiefe 0.
     /// </summary>
     public static FragmentRecord CreateNavigation(Enum leafType, string key) =>
-        Create(EnumByte(leafType), FragmentDataType.String, Encoding.UTF8.GetBytes(key), string.Empty, DateTime.MinValue);
+        Create(EnumByte(leafType), FragmentDataType.String, Encoding.UTF8.GetBytes(key), string.Empty, DateTime.MinValue, string.Empty);
 
     #endregion
 
@@ -135,6 +135,34 @@ public sealed class FragmentRecord {
         get {
             CheckDataType(FragmentDataType.String);
             return Encoding.UTF8.GetString(ByteContent);
+        }
+    }
+
+    /// <summary>
+    /// KeyName-Anteil des Contents „KeyName|TypeName“ (Text vor dem |); nur bei
+    /// FragmentDataType.KeyNameType, sonst Absturz. Ohne Trenner der ganze Text.
+    /// </summary>
+    public string KeyNameContent {
+        get {
+            CheckDataType(FragmentDataType.KeyNameType);
+            var text = Encoding.UTF8.GetString(ByteContent);
+            var pos = text.IndexOf('|');
+
+            return pos < 0 ? text : text[..pos];
+        }
+    }
+
+    /// <summary>
+    /// Typ-Anteil des Contents „KeyName|TypeName“ (Text nach dem |); nur bei
+    /// FragmentDataType.KeyNameType, sonst Absturz. Ohne Trenner leer.
+    /// </summary>
+    public string TypeContent {
+        get {
+            CheckDataType(FragmentDataType.KeyNameType);
+            var text = Encoding.UTF8.GetString(ByteContent);
+            var pos = text.IndexOf('|');
+
+            return pos < 0 ? string.Empty : text[(pos + 1)..];
         }
     }
 

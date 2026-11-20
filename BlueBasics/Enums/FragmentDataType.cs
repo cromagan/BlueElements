@@ -62,7 +62,14 @@ public enum FragmentDataType : byte {
     /// <summary>
     /// 128-Bit-Decimal; Content als 16 Little-Endian-Bytes (GetBits: Lo, Mid, Hi, Flags).
     /// </summary>
-    Decimal = 14
+    Decimal = 14,
 
-       // 15 - 230 frei für künftige Typen
+    /// <summary>
+    /// Schlüssel-Objekt-Aufnahme; Content als UTF-8-Text „KeyName|TypeName“ — der |
+    /// trennt den Schlüssel vom Typen, damit der Empfänger beim Einlesen sofort
+    /// den richtigen Typ erzeugen kann (z. B. Variablen).
+    /// </summary>
+    KeyNameType = 15
+
+    // 16 - 230 frei für künftige Typen
 }

@@ -17,50 +17,17 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     /// </summary>
     public readonly record struct FailedRowEntry(string Reason, DateTime FailedUtc);
 
-    #region Enums
-
-    /// <summary>
-    /// Pfad-Typen der Zeilensammlung im binären Fragment-Format.
-    /// Nur der Sammlung selbst bekannt.
-    /// </summary>
-    private enum RowCollectionFragmentType : byte {
-
-        /// <summary>
-        /// Pfad-Segment einer Zeilen-Änderung (Key = RowKey).
-        /// </summary>
-        SubRow = 1,
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Zeilen folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        RowList = 2,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Zeile im Classic-Format
-        /// (Content = Parseable-String der Zeile).
-        /// </summary>
-        RowAdd = 3,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt die Zeile des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        RowRemove = 4
-    }
-
-    #endregion
-
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Zeilen-Pfad: Der Listen- oder
-    /// Nav-Satz (SubRow) leitet den Zahlraum der Zeile ein, sonst eigener Raum;
+    /// Nav-Satz (ItemPath) leitet den Zahlraum der Zeile ein, sonst eigener Raum;
     /// unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((RowCollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType is (byte)RowCollectionFragmentType.SubRow or (byte)RowCollectionFragmentType.RowList
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? RowItem.GetNameOf(path[1..])
-            : ((RowCollectionFragmentType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     #region Fields
@@ -947,12 +914,12 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
             }
 
             if (user is not null && datetimeutc is { } dt && reason.HasFlag(ChangeFlags.PostProcess)) {
-                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user); }
-                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5()); }
-                if (tb.Column.SysRowCreateComment is { IsDisposed: false } srcc) { row.CellSetInMemory(srcc, comment); }
-                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus()); }
-                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInMemory(sc, true.ToPlusMinus()); }
-                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey); }
+                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user, string.Empty); }
+                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5(), string.Empty); }
+                if (tb.Column.SysRowCreateComment is { IsDisposed: false } srcc) { row.CellSetInMemory(srcc, comment, string.Empty); }
+                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus(), string.Empty); }
+                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInMemory(sc, true.ToPlusMinus(), string.Empty); }
+                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey, string.Empty); }
             }
 
             return OperationResult.SuccessTrue;
@@ -974,7 +941,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn is not null) {
-                    row.CellSetInMemory(thisColumn, string.Empty);
+                    row.CellSetInMemory(thisColumn, string.Empty, string.Empty);
                 }
             }
 
@@ -1068,7 +1035,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     #region FragmentChanged
 
     /// <summary>
-    /// Schreibt alle Zeilen als Liste nach RowKey sortiert: ein RowList-Satz,
+    /// Schreibt alle Zeilen als Liste nach RowKey sortiert: ein ItemList-Satz,
     /// darunter je Zeile der Zeilen-Block eine Ebene tiefer (RowKey zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
@@ -1077,28 +1044,8 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
         List<RowItem> saveRows = ToList();
         saveRows.RemoveAll(row => row is not { IsDisposed: false });
 
-        return FragmentRecord.Append(stream, depth, RowCollectionFragmentType.RowList, saveRows);
+        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, saveRows);
     }
-
-    /// <summary>
-    /// Die Liste unter dem RowList-Satz.
-    /// </summary>
-    protected override Enum ListType => RowCollectionFragmentType.RowList;
-
-    /// <summary>
-    /// Aufnahmen einer ganzen Classic-Zeile.
-    /// </summary>
-    protected override Enum AddItemType => RowCollectionFragmentType.RowAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => RowCollectionFragmentType.RowRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => RowCollectionFragmentType.SubRow;
 
     /// <summary>
     /// Liefert die Zeile zum Schlüssel; fehlt sie, wird sie still angelegt
@@ -1142,6 +1089,13 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
             ? null
             : GetByKey(keyName);
     }
+
+    /// <summary>
+    /// Übernimmt ein Journal-Add-Blatt: die Zeile wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) still angelegt; ihre Zellen tragen die
+    /// Property-Blätter.
+    /// </summary>
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => RowCreateOrGet(keyName) is not null;
 
     /// <summary>
     /// Liefert die Zeile zum RowKey des ersten Segment-Satzes einer Zeilen-Liste;

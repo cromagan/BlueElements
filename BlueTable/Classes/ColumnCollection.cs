@@ -7,51 +7,17 @@ namespace BlueTable.Classes;
 
 public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTable {
 
-    #region Enums
-
-    /// <summary>
-    /// Pfad-Typen der Spaltensammlung im binären Fragment-Format.
-    /// Nur der Sammlung selbst bekannt.
-    /// </summary>
-    private enum ColumnCollectionFragmentType : byte {
-
-        /// <summary>
-        /// Pfad-Segment einer Spalten-Änderung (Key = ColumnKey).
-        /// </summary>
-        SubColumn = 90,
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Spalten folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        Columns = 91,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Spalte im Classic-Format
-        /// (Content = Parseable-String der Spalte). Oberhalb des
-        /// Spalten-Eigenschaften-Kreises (bis 98), damit es keine Verwechslung gibt.
-        /// </summary>
-        ColumnAdd = 99,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt die Spalte des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        ColumnRemove = 100
-    }
-
-    #endregion
-
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Spalten-Pfad: Der Listen- oder
-    /// Nav-Satz (SubColumn) leitet den Zahlraum der Spalte ein, sonst eigener Raum;
+    /// Nav-Satz (ItemPath) leitet den Zahlraum der Spalte ein, sonst eigener Raum;
     /// unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((ColumnCollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType is (byte)ColumnCollectionFragmentType.SubColumn or (byte)ColumnCollectionFragmentType.Columns
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? ColumnItem.GetNameOf(path[1..])
-            : ((ColumnCollectionFragmentType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     #region Constructors
@@ -133,26 +99,6 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
     }
 
     /// <summary>
-    /// Pfad-Typen: die Liste unter dem Columns-Satz; Navigation über SubColumn.
-    /// </summary>
-    protected override Enum ListType => ColumnCollectionFragmentType.Columns;
-
-    /// <summary>
-    /// Aufnahmen einer ganzen Classic-Spalte.
-    /// </summary>
-    protected override Enum AddItemType => ColumnCollectionFragmentType.ColumnAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => ColumnCollectionFragmentType.ColumnRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => ColumnCollectionFragmentType.SubColumn;
-
-    /// <summary>
     /// Liefert die Spalte zum Schlüssel eines Journal-Blocks oder null; Property-Blätter
     /// erzeugen bewusst keine Spalten — nur ApplyItemAdd (Add-Blatt) und CreateItem
     /// (Snapshot-Liste) erzeugen, damit Entfernungen durch spätere Blätter nicht
@@ -161,11 +107,11 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
     protected override ColumnItem? GetOrCreateItem(string keyName) => this[keyName];
 
     /// <summary>
-    /// Übernimmt ein Journal-Add-Blatt: ColumnItem ist kein IStringable, der Blatt-Inhalt
-    /// ist leer — die Spalte wird anhand des Pfad-Schlüssels idempotent erzeugt; ihre
-    /// Eigenschaften tragen die Property-Blätter.
+    /// Übernimmt ein Journal-Add-Blatt: die Spalte wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt; ihre Eigenschaften
+    /// tragen die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) {
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) {
         if (!ColumnItem.IsValidColumnKey(keyName)) { return true; }
 
         if (this[keyName] is { IsDisposed: false }) { return true; }
@@ -414,7 +360,7 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
     }
 
     /// <summary>
-    /// Schreibt alle Spalten als Liste in der Speicherreihenfolge: ein ColumnList-
+    /// Schreibt alle Spalten als Liste in der Speicherreihenfolge: ein ItemList-
     /// Satz, darunter je Spalte der Spalten-Block eine Ebene tiefer (ColumnKey zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
@@ -426,7 +372,7 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
         var saveColumns = Table is { IsDisposed: false } st ? st.ColumnsInSaveOrder() : [.. this];
         saveColumns.RemoveAll(column => column is not { IsDisposed: false });
 
-        return FragmentRecord.Append(stream, depth, ColumnCollectionFragmentType.Columns, saveColumns);
+        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, saveColumns);
     }
 
     /// <summary>

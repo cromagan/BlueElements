@@ -426,7 +426,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var col in tb.Column) {
             if (targetColumns[col.KeyName] is not { } targetCol) { continue; }
             var val = CellGetString(col);
-            if (!string.IsNullOrEmpty(val)) { _ = targetRow.CellSetInMemory(targetCol, val); }
+            if (!string.IsNullOrEmpty(val)) { _ = targetRow.CellSetInMemory(targetCol, val, string.Empty); }
         }
     }
 
@@ -532,9 +532,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             CellSet(srs, newState, comment, writeReason);
             CellSet(scd, datetimeutc, comment, writeReason);
         } else {
-            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, user); }
-            CellSetInMemory(srs, newState);
-            CellSetInMemory(scd, datetimeutc.ToString5());
+            if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != sourceColumn) { CellSetInMemory(src, user, string.Empty); }
+            CellSetInMemory(srs, newState, string.Empty);
+            CellSetInMemory(scd, datetimeutc.ToString5(), string.Empty);
         }
 
         // Erst stempeln, dann einreihen — der Manager prüft den Status über NeedsRowUpdate()
@@ -993,7 +993,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         column.UcaseNamesSortedByLength = null;
 
         if (!column.SaveContent) {
-            return CellSetInMemory(column, value);
+            return CellSetInMemory(column, value, comment);
         }
 
         if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, UserName, DateTime.UtcNow, comment, reason) is { Length: > 0 } message) { return message; }
@@ -1023,10 +1023,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     /// Setzt den Wert direkt im Speicher, ohne Undo-Logging, Events oder Reparaturen.
     /// Orchestrierung (Events, SysRowState-Reset) erfolgt durch den Aufrufer (z.B. Table.SetValueInternal).
+    /// Der Änderungs-Kommentar geht in den Meta-Stempel der Fragment-Meldung ein.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="value"></param>
-    internal string CellSetInMemory(ColumnItem column, string value) {
+    /// <param name="comment"></param>
+    internal string CellSetInMemory(ColumnItem column, string value, string comment) {
         var tries = 0;
         var startTime = DateTime.UtcNow;
 
@@ -1040,7 +1042,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
 
             if (tb.Cell.TryGetCell(column, this, out var c) && c is not null) {
-                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+                c.SetValue(value, comment); // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
                     if (!tb.Cell.TryRemove(column, this)) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
@@ -1063,7 +1065,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         this.Reregister(newCell);
                         // Erst nach der Anmeldung setzen — der Konstruktor-Wert würde
                         // vor dem Bubbling verloren gehen (Satz fehlt im Fragment-Journal).
-                        newCell.Value = value;
+                        newCell.SetValue(value, comment);
                     }
                 }
             }
@@ -1087,9 +1089,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return; }
 
-        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
-        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
-        if (tb.Column.SysRowChangeComment is { IsDisposed: false } scc && scc != column) { CellSetInMemory(scc, comment); }
+        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user, string.Empty); }
+        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5(), string.Empty); }
+        if (tb.Column.SysRowChangeComment is { IsDisposed: false } scc && scc != column) { CellSetInMemory(scc, comment, string.Empty); }
 
         // user durchreichen: Bei nachgeladenen Fragmenten ist das der Original-Autor,
         // nicht der lokale Benutzer. Sonst würde der Stempel den Autor überschreiben.
@@ -1140,19 +1142,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
             if (string.IsNullOrEmpty(CellGetStringCore(sc))) {
-                CellSetInMemory(sc, true.ToPlusMinus());
+                CellSetInMemory(sc, true.ToPlusMinus(), string.Empty);
             }
         }
 
         if (tb.Column.SysLocked is { IsDisposed: false } sl) {
             if (string.IsNullOrEmpty(CellGetStringCore(sl))) {
-                CellSetInMemory(sl, false.ToPlusMinus());
+                CellSetInMemory(sl, false.ToPlusMinus(), string.Empty);
             }
         }
 
         if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
             if (string.IsNullOrEmpty(CellGetStringCore(srk))) {
-                CellSetInMemory(srk, KeyName);
+                CellSetInMemory(srk, KeyName, string.Empty);
             }
         }
     }

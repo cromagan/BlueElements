@@ -14,41 +14,17 @@ namespace BlueTable.Classes;
 /// </summary>
 public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnViewCollection>, IHasTable {
 
-    #region Enums
-
-    private enum ArrangementFragmentType : byte {
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Ansichten folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        Arrangements = 1,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt eine ganze neue Ansicht (Content = Item-Block
-        /// im Fragment-Format; Classic-String nur ältere Journale).
-        /// </summary>
-        ArrangementAdd = 2,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt die Ansicht des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        ArrangementRemove = 3
-    }
-
-    #endregion
-
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Ansichten-Pfad: Der Listen- oder
-    /// Nav-Satz (Arrangements) leitet den Zahlraum der Ansicht ein, sonst eigener
+    /// Nav-Satz (ItemPath) leitet den Zahlraum der Ansicht ein, sonst eigener
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((ArrangementFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType == (byte)ArrangementFragmentType.Arrangements
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? ColumnViewCollection.GetNameOf(path[1..])
-            : ((ArrangementFragmentType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     #region Fields
@@ -121,26 +97,6 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     #region IFragmentStoreable
 
     /// <summary>
-    /// Die Liste unter dem Ansichten-Satz.
-    /// </summary>
-    protected override Enum ListType => ArrangementFragmentType.Arrangements;
-
-    /// <summary>
-    /// Aufnahmen einer ganzen Classic-Ansicht.
-    /// </summary>
-    protected override Enum AddItemType => ArrangementFragmentType.ArrangementAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => ArrangementFragmentType.ArrangementRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => ArrangementFragmentType.Arrangements;
-
-    /// <summary>
     /// Erzeugt die Ansicht zum Namen-Satz des Segment-Anfangs; den Inhalt
     /// (Einträge) liefert der Block der Ansicht, die Übernahme in die Sammlung
     /// macht Update (bestehende Instanzen behalten ihre Identität).
@@ -152,13 +108,11 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     }
 
     /// <summary>
-    /// Übernimmt eine ganze, im Classic-Format gereichte Ansicht (ältere Journale).
+    /// Übernimmt ein Journal-Add-Blatt: die Ansicht wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt; ihre Einträge tragen
+    /// die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) {
-        if (Table is not { IsDisposed: false } table) { return false; }
-
-        return ApplyItemAdd(new ColumnViewCollection(table, toParse));
-    }
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     /// <summary>
     /// Liefert die Ansicht unter dem Schlüssel; fehlt sie, wird sie erzeugt und

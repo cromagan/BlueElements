@@ -2778,7 +2778,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             var previousValue = row.CellGetStringCore(column);
 
-            if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
+            if (row.CellSetInMemory(column, value, comment) is { Length: > 0 } f) { return f; }
 
             row.DoSystemColumns(column, user, datetimeutc, comment, changeFlags);
 

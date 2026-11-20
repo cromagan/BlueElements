@@ -37,17 +37,20 @@ public class CellItem : IFragmentStoreable {
     #region Properties
 
 
-    public string Value {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
+    public string Value { get; set; } = string.Empty;
 
-            // FragmentChanged dient ausschließlich dem Bubbling des binären
-            // Fragment-Formats; die Zelle hat keine Sub-Items, die Kette bleibt beim Blatt.
-            OnFragmentChanged(new FragmentChangedEventArgs(this, CellFragmentType.UTF8Value_withoutSizeData, value));
-        }
-    } = string.Empty;
+    /// <summary>
+    /// Setzt den Wert und meldet die Änderung als Fragment-Event; der Änderungs-Kommentar
+    /// geht in den Meta-Stempel des Undo-Eintrags ein.
+    /// </summary>
+    public void SetValue(string value, string comment) {
+        if (Value == value) { return; }
+        Value = value;
+
+        // FragmentChanged dient ausschließlich dem Bubbling des binären
+        // Fragment-Formats; die Zelle hat keine Sub-Items, die Kette bleibt beim Blatt.
+        OnFragmentChanged(new FragmentChangedEventArgs(this, CellFragmentType.UTF8Value_withoutSizeData, value) { Comment = comment });
+    }
 
     #endregion
 

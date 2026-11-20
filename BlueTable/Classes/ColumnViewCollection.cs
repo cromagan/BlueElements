@@ -18,79 +18,62 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     #region Enums
 
     /// <summary>
-    /// Pfad- und Empfänger-Typen der Ansicht im binären Fragment-Format.
-    /// Nur der Ansicht selbst bekannt.
+    /// Empfänger-Typen der Ansichts-Eigenschaften im binären Fragment-Format;
+    /// Pfad-, Listen- und Journal-Blätter stammen aus dem reservierten Zahlraum
+    /// der Basis (CollectionFragmentType).
     /// </summary>
     private enum ViewFragmentType : byte {
 
-        /// <summary>
-        /// Navigation in einen Ansichts-Eintrag (Key = ColumnName bzw. StorageKey).
-        /// </summary>
-        SubViewItem = 90,
+        ShowHead = 21,
 
-        /// <summary>
-        /// Blatt-Satz: übernimmt einen ganzen neuen Ansichts-Eintrag im
-        /// Classic-Format (Content = Parseable-String des Eintrags). Nur relevant,
-        /// solange die Ansicht zur granularen Änderung frei gegeben ist.
-        /// </summary>
-        ItemAdd = 21,
+        StartCollapsed = 22,
 
-        /// <summary>
-        /// Blatt-Satz: entfernt den Ansichts-Eintrag des Journal-Blocks
-        /// (Nav-Schlüssel = ColumnName bzw. StorageKey).
-        /// </summary>
-        ItemRemove = 22,
+        ChaptersUnique = 23,
 
-        ShowHead = 1,
+        FilterRows = 24,
 
-        StartCollapsed = 2,
+        ChapterColumn = 25,
 
-        ChaptersUnique = 3,
+        QuickInfo = 26,
 
-        FilterRows = 4,
+        ColumnHeaderMode = 27,
 
-        ChapterColumn = 5,
+        ScaleToFit = 28,
 
-        QuickInfo = 6,
+        PinAnzeigen = 29,
 
-        ColumnHeaderMode = 7,
+        AnsichtAnzeigen = 30,
 
-        ScaleToFit = 8,
+        AehnlicheAnzeigen = 31,
 
-        PinAnzeigen = 9,
+        CollapseButtonAnzeigen = 32,
 
-        AnsichtAnzeigen = 10,
+        ContextmenuScripts = 33,
 
-        AehnlicheAnzeigen = 11,
+        ExecuteableScripts = 34,
 
-        CollapseButtonAnzeigen = 12,
+        ColumnsShowAlwaysFilter = 35,
 
-        ContextmenuScripts = 13,
-
-        ExecuteableScripts = 14,
-
-        ColumnsShowAlwaysFilter = 15,
-
-        PermissionGroups = 16,
+        PermissionGroups = 36,
 
         /// <summary>
         /// Name der Ansicht; erster Satz des Blocks, die Empfänger-Fabrik baut das
         /// Objekt daraus.
         /// </summary>
-        ViewName = 17
+        ViewName = 37
     }
 
     #endregion
 
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Ansicht-Pfad: Der Listen- oder
-    /// Nav-Satz (SubViewItem) leitet den Zahlraum des Ansichts-Eintrags ein, sonst
+    /// Nav-Satz (ItemPath) leitet den Zahlraum des Ansichts-Eintrags ein, sonst
     /// eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((ViewFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType == (byte)ViewFragmentType.SubViewItem
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? ColumnViewItem.GetNameOf(path[1..])
             : ((ViewFragmentType)path[^1].LeafType).ToString();
     }
@@ -417,8 +400,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         _internal.Insert(insertIndex, columnViewItem);
         Invalidated = true;
 
-        var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
-            .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
+        var e = new FragmentChangedEventArgs(this, CollectionFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
+            .WithNavigation(CollectionFragmentType.ItemPath, columnViewItem.KeyName);
         OnFragmentChanged(e);
 
         return true;
@@ -754,7 +737,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
     /// <summary>
     /// Entfernt einen Ansichts-Eintrag stillschweigend möglich (Systempfad);
-    /// meldet die Entfernung als Journal-Block mit dem SubViewItem-Navigationssatz,
+    /// meldet die Entfernung als Journal-Block mit dem ItemPath-Navigationssatz,
     /// wenn <paramref name="fireEvent"/> gesetzt ist.
     /// </summary>
     private bool RemoveCore(ColumnViewItem? columnViewItem, bool fireEvent) {
@@ -767,8 +750,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         Invalidated = true;
 
         if (fireEvent) {
-            var e = new FragmentChangedEventArgs(this, ViewFragmentType.ItemRemove, string.Empty)
-                .WithNavigation(ViewFragmentType.SubViewItem, columnViewItem.KeyName);
+            var e = new FragmentChangedEventArgs(this, CollectionFragmentType.ItemRemove, string.Empty)
+                .WithNavigation(CollectionFragmentType.ItemPath, columnViewItem.KeyName);
             OnFragmentChanged(e);
         }
 
@@ -888,43 +871,11 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
     /// <summary>
-    /// Pfad-Typen: die Liste unter dem SubViewItem-Satz; Navigation über SubViewItem.
+    /// Übernimmt ein Journal-Add-Blatt: der Eintrag wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt und still angehängt;
+    /// seine Eigenschaften tragen die Property-Blätter.
     /// </summary>
-    protected override Enum ListType => ViewFragmentType.SubViewItem;
-
-    /// <summary>
-    /// Aufnahmen eines ganzen Classic-Eintrags (Journal-Block).
-    /// </summary>
-    protected override Enum AddItemType => ViewFragmentType.ItemAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => ViewFragmentType.ItemRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => ViewFragmentType.SubViewItem;
-
-    /// <summary>
-    /// Übernimmt einen ganzen Ansichts-Eintrag im Classic-Format: den Eintrag zum
-    /// Schlüssel des Strings beschaffen — fehlt er, wird der erstellte still
-    /// angehängt —, sonst die Werte in die bestehende Instanz übernehmen.
-    /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) {
-        if (ColumnViewItem.Create(Table, toParse) is not { } item) { return false; }
-
-        // Bereits vorhanden: die Werte in die bestehende Instanz übernehmen (Identität bleibt)
-        if (GetByKey(item.KeyName) is { } existing) { return existing.Parse(toParse); }
-
-        SuppressEvents();
-        try {
-            return Add(item, null);
-        } finally {
-            ResumeEvents();
-        }
-    }
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     /// <summary>
     /// Entfernt den benannten Ansichts-Eintrag still (Journal-Replay meldet nicht zurück).
@@ -1007,8 +958,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
     /// <summary>
     /// Schreibt die Ansicht: eigene Werte nur wenn nicht im Standard, danach die
-    /// persistenten Ansichts-Einträge als Sub*-Sätze (Key = ColumnName) mit
-    /// eigenem Block eine Ebene tiefer.
+    /// persistenten Ansichts-Einträge als ItemList-Satz, je Eintrag ein eigener
+    /// Block eine Ebene tiefer.
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
@@ -1043,7 +994,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.PermissionGroups, tmp);
 
-        allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.SubViewItem, _internal);
+        allok &= FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, _internal);
 
         return allok;
     }

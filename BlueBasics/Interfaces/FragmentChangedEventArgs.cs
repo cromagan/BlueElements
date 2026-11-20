@@ -29,14 +29,15 @@ public class FragmentChangedEventArgs : System.EventArgs {
     }
 
     /// <summary>
-    /// Kopier-Konstruktor für WithNavigation: übernimmt die Änderung und stellt den
-    /// Navigationssatz der Stufe vor die bereits gesammelten — Journal-Reihenfolge.
+    /// Kopier-Konstruktor für WithNavigation: übernimmt die Änderung samt Kommentar und stellt
+    /// den Navigationssatz der Stufe vor die bereits gesammelten — Journal-Reihenfolge.
     /// </summary>
-    private FragmentChangedEventArgs(FragmentChangedEventArgs basis, FragmentRecord navigation) {
+    private FragmentChangedEventArgs(FragmentChangedEventArgs basis, FragmentRecord navigation, string comment) {
         SourceKey = basis.SourceKey;
         TypeSelector = basis.TypeSelector;
         ContentType = basis.ContentType;
         Content = basis.Content;
+        Comment = comment;
         _navigations = [navigation, .. basis._navigations];
     }
 
@@ -49,6 +50,13 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// String-Wert; Content als UTF-8.
     /// </summary>
     public FragmentChangedEventArgs(object sender, Enum typeSelector, string content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.String, Encoding.UTF8.GetBytes(content)) { }
+
+    /// <summary>
+    /// Schlüssel-Objekt (z. B. Aufnahme in eine Sammlung); Content als
+    /// „KeyName|TypeName“ (FragmentDataType.KeyNameType), damit der Empfänger
+    /// beim Einlesen sofort den richtigen Typ erzeugen kann.
+    /// </summary>
+    public FragmentChangedEventArgs(object sender, Enum typeSelector, IFragmentStoreable content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.KeyNameType, Encoding.UTF8.GetBytes(((content as IHasKeyName)?.KeyName ?? string.Empty) + "|" + content.TypeName)) { }
 
     /// <summary>
     /// Int-Wert; Content als 4 Little-Endian-Bytes.
@@ -133,6 +141,12 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// </summary>
     public string SourceKey { get; init; } = string.Empty;
 
+    /// <summary>
+    /// Änderungs-Kommentar des Auslösers; wird durch alle Stufen gereicht und
+    /// in den Meta-Stempel des Undo-Eintrags übernommen.
+    /// </summary>
+    public string Comment { get; init; } = string.Empty;
+
     #endregion
 
     #region Methods
@@ -141,7 +155,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// Liefert neue Argumente, die um den Navigationssatz dieser Stufe erweitert sind;
     /// tiefere Stufen melden vor der eigenen, das Original bleibt unverändert.
     /// </summary>
-    public FragmentChangedEventArgs WithNavigation(Enum navigationType, string key) => new(this, FragmentRecord.CreateNavigation(navigationType, key));
+    public FragmentChangedEventArgs WithNavigation(Enum navigationType, string key) => new(this, FragmentRecord.CreateNavigation(navigationType, key), Comment);
 
     /// <summary>
     /// Liefert die Undo-Sätze der Änderung in Journal-Reihenfolge: die Navigationssätze
@@ -150,11 +164,11 @@ public class FragmentChangedEventArgs : System.EventArgs {
     public IReadOnlyList<FragmentRecord> UndoRecords() => [.. _navigations, CreateUndoRecord()];
 
     /// <summary>
-    /// Erzeugt den Blatt-Satz der Änderung mit Meta-Stempel (User, Zeitpunkt) als
+    /// Erzeugt den Blatt-Satz der Änderung mit Meta-Stempel (User, Zeitpunkt, Kommentar) als
     /// Undo-Eintrag auf Basis-Tiefe 0.
     /// </summary>
     public FragmentRecord CreateUndoRecord() =>
-        FragmentRecord.Create(TypeSelector, ContentType, Content, Generic.UserName, DateTime.UtcNow);
+        FragmentRecord.Create(TypeSelector, ContentType, Content, Generic.UserName, DateTime.UtcNow, Comment);
 
     /// <summary>
     /// Liest den Key des auslösenden Kindes frisch beim Ereignis (umbenennungssicher);

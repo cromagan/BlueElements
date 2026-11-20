@@ -14,54 +14,17 @@ namespace BlueTable.Classes;
 /// </summary>
 public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescription>, IHasTable {
 
-    #region Enums
-
-    /// <summary>
-    /// Pfad-Typen der Sammlung im binären Fragment-Format; eigener Zahlraum der
-    /// Sammlung, die Tabelle routet über ihren eigenen Segmenteintritt eine Stufe
-    /// darüber. Überschneidungen mit dem Zahlraum der Skript-Eigenschaften sind
-    /// unschädlich, denn die Stufen werden strukturgenau geroutet.
-    /// </summary>
-    private enum ScriptCollectionFragmentType : byte {
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Skripte folgen als Liste eine Ebene tiefer,
-        /// zwischen ihnen je ein Trenner zwei Ebenen unter der Liste.
-        /// </summary>
-        Scripts = 1,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt ein ganzes neues Skript (Content = kompletter
-        /// Skript-Block im binären Fragment-Format; ältere Journale reichen den
-        /// Classic-Parseable-String des Skripts).
-        /// </summary>
-        ScriptAdd = 2,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt das Skript des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        ScriptRemove = 3,
-
-        /// <summary>
-        /// Nav-Satz des Bubbling; Content = Schlüssel des Skripts, dessen Block
-        /// eine Ebene tiefer folgt.
-        /// </summary>
-        SubScript = 4
-    }
-
-    #endregion
-
     /// <summary>
     /// Verständlicher Name eines Empfänger-Typs im Skript-Pfad: Der Listen- oder
-    /// Nav-Satz (SubScript) leitet den Zahlraum des Skripts ein, sonst eigener
+    /// Nav-Satz (ItemPath) leitet den Zahlraum des Skripts ein, sonst eigener
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((ScriptCollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
 
-        return path[0].LeafType is (byte)ScriptCollectionFragmentType.SubScript or (byte)ScriptCollectionFragmentType.Scripts
+        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
             ? ScriptDescription.GetNameOf(path[1..])
-            : ((ScriptCollectionFragmentType)path[^1].LeafType).ToString();
+            : ((CollectionFragmentType)path[^1].LeafType).ToString();
     }
 
     #region Constructors
@@ -160,46 +123,26 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     #region IFragmentStoreable
 
     /// <summary>
-    /// Die Liste unter dem Scripts-Satz.
-    /// </summary>
-    protected override Enum ListType => ScriptCollectionFragmentType.Scripts;
-
-    /// <summary>
-    /// Aufnahmen eines ganzen Skripts als Fragment-Block.
-    /// </summary>
-    protected override Enum AddItemType => ScriptCollectionFragmentType.ScriptAdd;
-
-    /// <summary>
-    /// Entfernungen per Journal-Block.
-    /// </summary>
-    protected override Enum RemoveItemType => ScriptCollectionFragmentType.ScriptRemove;
-
-    /// <summary>
-    /// Pfad-Segment des Bubbling.
-    /// </summary>
-    protected override Enum ItemSubType => ScriptCollectionFragmentType.SubScript;
-
-    /// <summary>
     /// Erzeugt das Skript zum Name-Satz des Segment-Anfangs; die Übernahme in die
     /// Sammlung macht Update (bestehende Instanzen behalten ihre Identität).
     /// </summary>
     protected override TableScriptDescription? CreateItem(FragmentRecord first) => new(Table, first.StringContent, string.Empty);
 
     /// <summary>
-    /// Übernimmt ein ganzes neues Skript aus einem Add-Blatt: Bei älteren Journalen
-    /// ist der Content der Classic-Parseable-String des Skripts; der Fragment-Block
-    /// neuer Journale läuft über die Basis (ApplyItemAddFragment).
+    /// Übernimmt ein Journal-Add-Blatt: das Skript wird anhand des Schlüssels
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt; seine Werte tragen
+    /// die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName) => ApplyItemAdd(new TableScriptDescription(Table, toParse));
+    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     /// <summary>
-    /// Fängt den SubScript-Nav-Satz des Journals ab: Vor dem Anwenden wird der
+    /// Fängt den ItemPath-Nav-Satz des Journals ab: Vor dem Anwenden wird der
     /// erste Blocksatz gelesen, um reine Laufzeit-Statistik zu erkennen — in dem
     /// Fall bleiben Zeilen-Prüfung und Script-Event aus. Alles andere macht die
     /// Basis.
     /// </summary>
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (record.LeafType == (byte)ScriptCollectionFragmentType.SubScript && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
+        if (record.LeafType == (byte)CollectionFragmentType.ItemPath && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
             // Ersten Blocksatz vorab lesen; die Anwendung selbst macht ApplySubItem (liest den Satz erneut).
             var blockStart = stream.Position;
             FragmentRecord? firstLeaf = FragmentRecord.TryReadNext(stream, record.Depth + 1);
