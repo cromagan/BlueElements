@@ -123,14 +123,14 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
     }
 
     /// <summary>
-    /// Liefert die Spalte zum ColumnKey des ersten Segment-Satzes; fehlende Spalten
+    /// Liefert die Spalte zum ColumnKey des ItemAdd-Kopfs; fehlende Spalten
     /// werden erzeugt.
     /// </summary>
     protected override ColumnItem? CreateItem(FragmentRecord first) {
-        if (this[first.StringContent] is { IsDisposed: false } column) { return column; }
+        if (this[first.KeyNameContent] is { IsDisposed: false } column) { return column; }
 
-        ExecuteCommand(TableDataType.Command_AddColumnByName, first.StringContent, ChangeFlags.IgnoreFreeze);
-        return this[first.StringContent];
+        ExecuteCommand(TableDataType.Command_AddColumnByName, first.KeyNameContent, ChangeFlags.IgnoreFreeze);
+        return this[first.KeyNameContent];
     }
 
     /// <summary>
@@ -361,7 +361,8 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
 
     /// <summary>
     /// Schreibt alle Spalten als Liste in der Speicherreihenfolge: ein ItemList-
-    /// Satz, darunter je Spalte der Spalten-Block eine Ebene tiefer (ColumnKey zuerst).
+    /// Satz, darunter je Spalte ein ItemAdd-Kopf („KeyName|TypeName“) und der
+    /// Spalten-Block (ColumnKey zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }

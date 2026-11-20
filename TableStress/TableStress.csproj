@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <StartupObject>TableStress.Program</StartupObject>
+    <Deterministic>false</Deterministic>
+    <AnalysisMode>Recommended</AnalysisMode>
+
+    <!-- Assembly-Metadaten -->
+    <AssemblyTitle>TableStress</AssemblyTitle>
+    <Product>TableStress</Product>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2026 Christian Peter</Copyright>
+
+    <!-- Versionierung -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+
+    <Platforms>AnyCPU;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Code-Analyzer -->
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Projekt-Referenzen -->
+    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
+    <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
+    <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text" />
+    <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics.Enums" />
+    <Using Include="BlueBasics.Interfaces" />
+    <Using Include="BlueScript.Classes" />
+    <Using Include="BlueTable.Classes" />
+    <Using Include="BlueTable.ClassesStatic" />
+    <Using Include="BlueTable.Enums" />
+    <Using Include="BlueBasics.ClassesStatic.Develop" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Generic" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Constants" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.Converter" Static="true" />
+    <Using Include="BlueBasics.ClassesStatic.IO" Static="true" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+  </ItemGroup>
+
+</Project>

@@ -783,10 +783,10 @@ public class TableRoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Entfernt den System-Kopf (Erzeuger-, Speicher- und Trenn-Sätze) vom Anfang
+    /// Entfernt den System-Kopf (Erzeuger- und Speicher-Sätze) vom Anfang
     /// eines serialisierten Inhalts: Diese Sätze tragen den Zustand des jeweiligen
-    /// Speichervorgangs (CreateUser/CreateTimeUtc, SaveUser/Machine/SaveTimeUtc,
-    /// Kommentar-Trenner) und sind wie das Zip-Datum nicht inhaltsbestimmend.
+    /// Speichervorgangs (CreateUser/CreateTimeUtc, SaveUser/Machine/SaveTimeUtc)
+    /// und sind wie das Zip-Datum nicht inhaltsbestimmend.
     /// </summary>
     private static byte[] WithoutHeadRecords(byte[] payload) {
         using var ms = new MemoryStream(payload);

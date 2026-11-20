@@ -1508,8 +1508,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     /// Schreibt den RowKey und danach die Zellen der Zeile: SaveContent-Spalten
     /// mit nicht-leerem Inhalt als Cell-Satz (Key = ColumnKey) mit Zell-Block eine
-    /// Ebene tiefer, in der Speicherreihenfolge der Spalten. Der RowKey kommt
-    /// zuerst, da er die Zeile beim Laden anlegt.
+    /// Ebene tiefer, in der Speicherreihenfolge der Spalten. Die Zeile selbst legt
+    /// der ItemAdd-Kopf der Zeilen-Liste an.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
@@ -1552,7 +1552,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool DeserializeThis(Stream stream, FragmentRecord record) {
         switch ((RowNavigationType)record.LeafType) {
             case RowNavigationType.RowKey:
-                // Der RowKey hat den Empfänger bereits benannt (RowCreateOrGet der Collection)
+                // Der RowKey hat den Empfänger bereits benannt (CreateItem über den ItemAdd-Kopf)
                 return true;
 
             case RowNavigationType.ColumnKey:

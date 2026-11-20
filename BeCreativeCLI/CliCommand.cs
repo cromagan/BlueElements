@@ -247,8 +247,8 @@ public abstract class CliCommand : IHasKeyName {
             while (FragmentRecord.TryReadNext(stream) is { } record) {
                 if (record.IsFileTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent.Equals(user, StringComparison.OrdinalIgnoreCase); }
 
-                // Kopf-Ende: Erster Daten-Satz oder der Kommentar-Trenner
-                if (!record.IsFileTag || record.TagType == FragmentTagType.Comment) { return false; }
+                // Kopf-Ende: Erster Daten-Satz
+                if (!record.IsFileTag) { return false; }
             }
 
             return false;

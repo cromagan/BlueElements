@@ -335,13 +335,19 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     void IFragmentStoreable.ResumeEvents() => EndInit();
 
     /// <summary>
+    /// Stabiler Typ-Bezeichner: die ClassId (z. B. „str“), damit ItemAdd-Köpfe
+    /// und Journal-Blätter per NewByTypeName auflösbar sind.
+    /// </summary>
+    public string TypeName => MyClassId;
+
+    /// <summary>
     /// Bubbling-Event für Fragment-Änderungen (Pendant zu OnPropertyChangedExt).
     /// </summary>
     public event EventHandler<FragmentChangedEventArgs>? FragmentChanged;
 
     /// <summary>
-    /// Schreibt den Variablen-Block: Type (immer zuerst, damit der Empfänger den
-    /// konkreten Typ kennt), KeyName, Wert, Kommentar und Schreibschutz.
+    /// Schreibt den Variablen-Block: Type (prüft den konkreten Typ gegen den
+    /// ItemAdd-Kopf), KeyName, Wert, Kommentar und Schreibschutz.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) {
         var allok = true;

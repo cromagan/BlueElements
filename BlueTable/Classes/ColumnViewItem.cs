@@ -424,7 +424,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
 
         var allok = true;
 
-        // Der Schlüssel ist der erste Satz: Die Empfänger-Fabrik baut das Objekt daraus
+        // Der Schlüssel zuerst; den Eintrag selbst benennt der ItemAdd-Kopf der Liste
         allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.KeyName, KeyName);
         allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.Permanent, Permanent);
         allok &= FragmentRecord.Append(stream, depth, ViewItemFragmentType.FontHorizontal, Horizontal);

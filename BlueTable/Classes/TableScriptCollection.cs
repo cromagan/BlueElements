@@ -123,10 +123,10 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     #region IFragmentStoreable
 
     /// <summary>
-    /// Erzeugt das Skript zum Name-Satz des Segment-Anfangs; die Übernahme in die
+    /// Erzeugt das Skript zum ItemAdd-Kopf des Segment-Anfangs; die Übernahme in die
     /// Sammlung macht Update (bestehende Instanzen behalten ihre Identität).
     /// </summary>
-    protected override TableScriptDescription? CreateItem(FragmentRecord first) => new(Table, first.StringContent, string.Empty);
+    protected override TableScriptDescription? CreateItem(FragmentRecord first) => new(Table, first.KeyNameContent, string.Empty);
 
     /// <summary>
     /// Übernimmt ein Journal-Add-Blatt: das Skript wird anhand des Schlüssels

@@ -97,14 +97,14 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
     #region IFragmentStoreable
 
     /// <summary>
-    /// Erzeugt die Ansicht zum Namen-Satz des Segment-Anfangs; den Inhalt
+    /// Erzeugt die Ansicht zum ItemAdd-Kopf des Segment-Anfangs; den Inhalt
     /// (Einträge) liefert der Block der Ansicht, die Übernahme in die Sammlung
     /// macht Update (bestehende Instanzen behalten ihre Identität).
     /// </summary>
     protected override ColumnViewCollection? CreateItem(FragmentRecord first) {
         if (Table is not { IsDisposed: false } table) { return null; }
 
-        return new ColumnViewCollection(table, string.Empty, first.StringContent);
+        return new ColumnViewCollection(table, string.Empty, first.KeyNameContent);
     }
 
     /// <summary>

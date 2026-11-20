@@ -57,7 +57,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     #region Abstract
 
     /// <summary>
-    /// Erzeugt das Item zum ersten Satz eines Listen-Segments; null lässt das Segment fallen.
+    /// Erzeugt das Item zum ItemAdd-Kopf („KeyName|TypeName“) eines Listen-Segments; null lässt das Segment fallen.
     /// </summary>
     protected abstract TItem? CreateItem(FragmentRecord first);
 
@@ -514,8 +514,8 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
     /// <summary>
     /// Schreibt die Items als Liste: ein ItemList-Satz (ListKeyObject), darunter je Item
-    /// der Item-Block eine Ebene tiefer. Reihenfolge = ToList(); Ableitungen mit anderer
-    /// Reihenfolge oder Teilmengen überschreiben die Routine.
+    /// ein ItemAdd-Kopf („KeyName|TypeName“) und darunter der Item-Block. Reihenfolge =
+    /// ToList(); Ableitungen mit anderer Reihenfolge oder Teilmengen überschreiben die Routine.
     /// </summary>
     public virtual bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }

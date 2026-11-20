@@ -1036,7 +1036,8 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
     /// <summary>
     /// Schreibt alle Zeilen als Liste nach RowKey sortiert: ein ItemList-Satz,
-    /// darunter je Zeile der Zeilen-Block eine Ebene tiefer (RowKey zuerst).
+    /// darunter je Zeile ein ItemAdd-Kopf („KeyName|TypeName“) und der
+    /// Zeilen-Block (RowKey zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
@@ -1098,10 +1099,10 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     protected override bool ApplyItemAdd(string keyName, string typeName) => RowCreateOrGet(keyName) is not null;
 
     /// <summary>
-    /// Liefert die Zeile zum RowKey des ersten Segment-Satzes einer Zeilen-Liste;
+    /// Liefert die Zeile zum RowKey des ItemAdd-Kopfs einer Zeilen-Liste;
     /// fehlende Zeilen werden angelegt.
     /// </summary>
-    protected override RowItem? CreateItem(FragmentRecord first) => RowCreateOrGet(first.StringContent);
+    protected override RowItem? CreateItem(FragmentRecord first) => RowCreateOrGet(first.KeyNameContent);
 
     #endregion
 }

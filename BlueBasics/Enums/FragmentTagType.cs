@@ -20,7 +20,8 @@ public enum FragmentTagType : byte {
     ItemPath = 200,
 
     /// <summary>
-    /// ListKeyObject-Satz: die Einträge folgen als Liste eine Ebene tiefer.
+    /// ListKeyObject-Satz: je Item folgt ein ItemAdd-Kopf eine Ebene tiefer,
+    /// darunter der Item-Block.
     /// </summary>
     ItemList = 201,
 

@@ -17,11 +17,10 @@ namespace BlueBasics.Classes;
 /// Die Pfad-Navigation wird nicht gespeichert: Jeder Satz trägt nur seine Tiefe;
 /// Sub*-Sätze (Empfänger-Typ des Containers, Content = Key) eröffnen den Block des
 /// Kind-Objekts eine Ebene tiefer. Ein Block endet am ersten Satz geringerer Tiefe
-/// oder am Datei-Ende. Steuer-Sätze dürfen an jeder Tiefe stehen
-/// (Kommentar-Trenner markieren Blockgrenzen). Listen von
-/// Schlüssel-Objekten beginnen mit einem ListKeyObject-Satz; die Items liegen eine
-/// Ebene tiefer, zwischen ihnen je ein Kommentar-Trenner zwei Ebenen unter der
-/// Liste. Kein Escaping: Eindeutigkeit kommt aus den Längenfeldern; nur die
+/// oder am Datei-Ende. Listen von Schlüssel-Objekten beginnen mit einem
+/// ListKeyObject-Satz; je Item folgt ein ItemAdd-Kopf („KeyName|TypeName“) eine
+/// Ebene tiefer und der Item-Block eine weitere, bis ein Satz auf die Listen-Ebene
+/// zurückfällt. Kein Escaping: Eindeutigkeit kommt aus den Längenfeldern; nur die
 /// Meta-Felder nutzen den US (0x1F).
 /// </summary>
 public sealed class FragmentRecord {
@@ -46,11 +45,6 @@ public sealed class FragmentRecord {
     /// Längenbegrenzung eines List-Eintrags (2 Längenbytes).
     /// </summary>
     public const int MaxListEntryLength = 256 * 256 - 1;
-
-    /// <summary>
-    /// Text der Kommentar-Trenner zwischen Objekt-Blöcken.
-    /// </summary>
-    public const string SeparatorComment = "-";
 
     #endregion
 
@@ -356,6 +350,58 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
+    /// Decodiert den Content je Content-Typ als anzeigbaren Text;
+    /// defekte Sätze liefern einen Fehlerhinweis statt Absturz.
+    /// </summary>
+    public string ReadableContent() {
+        try {
+            switch (DataType) {
+                case FragmentDataType.String:
+                    return StringContent;
+
+                case FragmentDataType.Bool:
+                    return BoolContent ? "+" : "-";
+
+                case FragmentDataType.Int:
+                    return IntContent.ToString1();
+
+                case FragmentDataType.Long:
+                    return LongContent.ToString1();
+
+                case FragmentDataType.Float:
+                    return FloatContent.ToString1_5();
+
+                case FragmentDataType.Double:
+                    return DoubleContent.ToString1_5();
+
+                case FragmentDataType.Decimal:
+                    return DecimalContent.ToString(CultureInfo.InvariantCulture);
+
+                case FragmentDataType.DateTime:
+                    return DateTimeContent == DateTime.MinValue ? string.Empty : DateTimeContent.ToString7();
+
+                case FragmentDataType.Color:
+                    return ColorContent.IsEmpty ? string.Empty : ColorContent.ToHtmlCode();
+
+                case FragmentDataType.Json:
+                    return JsonContent?.ToJsonString() ?? string.Empty;
+
+                case FragmentDataType.ListSet:
+                    return string.Join("\r", ListContent);
+
+                case FragmentDataType.KeyNameType:
+                    return TypeContent + ": " + KeyNameContent;
+
+                default:
+                    // ListKeyObject: Content leer, die Items folgen als eigene Sätze.
+                    return string.Empty;
+            }
+        } catch (Exception ex) {
+            return "<Fehler: " + ex.Message + ">";
+        }
+    }
+
+    /// <summary>
     /// Schreibt einen Steuer-Satz (kein Empfänger-Typ, nie Meta) mit einem
     /// Standard-Tag und Content-Typ String in den Stream; die Tiefe markiert den
     /// Kontext des Satzes. Klasseneigene Steuer-Werte werden per Cast auf
@@ -364,6 +410,14 @@ public sealed class FragmentRecord {
     /// </summary>
     public static bool Append(Stream stream, int depth, FragmentTagType tag, string content) {
         return AppendTag(stream, depth, tag, FragmentDataType.String, Encoding.UTF8.GetBytes(content));
+    }
+
+    /// <summary>
+    /// Schreibt einen Steuer-Satz mit Content „KeyName|TypeName“ (FragmentDataType.KeyNameType).
+    /// Liefert false bei None oder Überschreiten der Längenbegrenzung.
+    /// </summary>
+    public static bool Append(Stream stream, int depth, FragmentTagType tag, string keyName, string typeName) {
+        return AppendTag(stream, depth, tag, FragmentDataType.KeyNameType, Encoding.UTF8.GetBytes(keyName + "|" + typeName));
     }
 
     /// <summary>
@@ -452,19 +506,17 @@ public sealed class FragmentRecord {
     public static bool Append(Stream stream, int depth, Enum leafType, string content, IFragmentStoreable subObject) => Append(stream, depth, leafType, content) && subObject.Serialize(stream, depth + 1);
 
     /// <summary>
-    /// Schreibt einen ListKeyObject-Satz (die Liste beginnt) und darunter die Items
-    /// eine Ebene tiefer; zwischen den Items steht je ein Kommentar-Trenner zwei
-    /// Ebenen unter der Liste, damit DeserializeList die Blockgrenzen erkennt.
+    /// Schreibt einen ListKeyObject-Satz (die Liste beginnt) und darunter je Item
+    /// einen ItemAdd-Kopf („KeyName|TypeName“) eine Ebene tiefer, gefolgt vom
+    /// Item-Block eine weitere Ebene tiefer; das Listen-Ende erkennt der Reader
+    /// am Zurückfallen auf die Listen-Ebene.
     /// </summary>
     public static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<IFragmentStoreable> content) {
         var allok = AppendData(stream, depth, EnumByte(leafType), FragmentDataType.ListKeyObject, [], null);
 
-        for (var i = 0; i < content.Count; i++) {
-            allok &= content[i].Serialize(stream, depth + 1);
-
-            if (i < content.Count - 1) {
-                allok &= Append(stream, depth + 2, FragmentTagType.Comment, SeparatorComment);
-            }
+        foreach (var item in content) {
+            allok &= Append(stream, depth + 1, FragmentTagType.ItemAdd, (item as IHasKeyName)?.KeyName ?? string.Empty, item.TypeName);
+            allok &= item.SerializeCore(stream, depth + 2);
         }
 
         return allok;

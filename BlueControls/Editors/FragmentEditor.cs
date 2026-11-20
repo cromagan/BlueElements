@@ -102,55 +102,6 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
         VisibleRowsChanged?.Invoke(this, e);
     }
 
-    /// <summary>
-    /// Decodiert den Content je Content-Typ als anzeigbaren Text; defekte Sätze liefern
-    /// einen Fehlerhinweis statt Absturz.
-    /// </summary>
-    private static string ContentText(FragmentRecord record) {
-        try {
-            switch (record.DataType) {
-                case FragmentDataType.String:
-                    return record.StringContent;
-
-                case FragmentDataType.Bool:
-                    return record.BoolContent ? "+" : "-";
-
-                case FragmentDataType.Int:
-                    return record.IntContent.ToString1();
-
-                case FragmentDataType.Long:
-                    return record.LongContent.ToString1();
-
-                case FragmentDataType.Float:
-                    return record.FloatContent.ToString1_5();
-
-                case FragmentDataType.Double:
-                    return record.DoubleContent.ToString1_5();
-
-                case FragmentDataType.Decimal:
-                    return record.DecimalContent.ToString(CultureInfo.InvariantCulture);
-
-                case FragmentDataType.DateTime:
-                    return record.DateTimeContent == DateTime.MinValue ? string.Empty : record.DateTimeContent.ToString7();
-
-                case FragmentDataType.Color:
-                    return record.ColorContent.IsEmpty ? string.Empty : record.ColorContent.ToHtmlCode();
-
-                case FragmentDataType.Json:
-                    return record.JsonContent?.ToJsonString() ?? string.Empty;
-
-                case FragmentDataType.ListSet:
-                    return string.Join("\r", record.ListContent);
-
-                default:
-                    // ListKeyObject: Content leer, die Items folgen als eigene Sätze.
-                    return string.Empty;
-            }
-        } catch (Exception ex) {
-            return "<Fehler: " + ex.Message + ">";
-        }
-    }
-
     private static string SymbolFor(FragmentRecord record) {
         if (record.IsTag) { return ImageCode.Information + "|24"; }
         if (record.HasMeta) { return ImageCode.Stift + "|24"; }
@@ -324,7 +275,7 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
                 r.CellSet("Tiefe", record.Depth, string.Empty);
                 r.CellSet("Typ", typeText, string.Empty);
                 r.CellSet("Datentyp", record.DataType.ToString(), string.Empty);
-                r.CellSet("Wert", ContentText(record), string.Empty);
+                r.CellSet("Wert", record.ReadableContent(), string.Empty);
                 r.CellSet("Benutzer", record.User, string.Empty);
                 if (record.HasMeta) { r.CellSet("Zeit", record.DateTimeUtc, string.Empty); }
                 r.CellSet("Kommentar", record.Comment, string.Empty);

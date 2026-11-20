@@ -356,7 +356,8 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
 
     /// <summary>
     /// Schreibt alle Variablen mit Textdarstellung als Liste: ein ItemList-Satz,
-    /// darunter je Variable der Variablen-Block eine Ebene tiefer (Type-Satz zuerst).
+    /// darunter je Variable ein ItemAdd-Kopf („KeyName|TypeName“) und der
+    /// Variablen-Block (Type-Satz zuerst).
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
@@ -365,14 +366,15 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
-    /// Erzeugt die Variable zum Type-Satz des Segment-Anfangs; der konkrete Typ
-    /// liegt im Content. Konstruktoren erzeugen schreibgeschützt — zum Einlesen
+    /// Erzeugt die Variable zum ItemAdd-Kopf des Segment-Anfangs; der konkrete Typ
+    /// liegt im Typ-Anteil. Konstruktoren erzeugen schreibgeschützt — zum Einlesen
     /// wird freigegeben (wie im Classic-Pfad).
     /// </summary>
     protected override ScriptVariable? CreateItem(FragmentRecord first) {
-        if (ParseableItem.NewByTypeName<ScriptVariable>(first.StringContent) is not { } newVar) { return null; }
+        if (ParseableItem.NewByTypeName<ScriptVariable>(first.TypeContent) is not { } newVar) { return null; }
 
         newVar.ReadOnly = false;
+        newVar.KeyName = first.KeyNameContent;
         return newVar;
     }
 
@@ -422,7 +424,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// Verarbeitet den Block einer einzelnen Variable.
     /// </summary>
     private bool DeserializeVariable(Stream stream, FragmentRecord record) {
-        // Führende Steuer-Sätze (Kommentar-Trenner) überspringen
+        // Führende Steuer-Sätze überspringen
         FragmentRecord? first;
 
         do {

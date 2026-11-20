@@ -915,12 +915,12 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     }
 
     /// <summary>
-    /// Liefert den Ansichts-Eintrag zum Schlüssel des ersten Blocksatzes; ein
+    /// Liefert den Ansichts-Eintrag zum Schlüssel des ItemAdd-Kopfs; ein
     /// bereits vorhandener Eintrag wandert an seine Position gemäß Block — die
     /// Datei-Reihenfolge ist maßgeblich.
     /// </summary>
     protected override ColumnViewItem? CreateItem(FragmentRecord first) {
-        if (GetByKey(first.StringContent) is { } existing) {
+        if (GetByKey(first.KeyNameContent) is { } existing) {
             _ = _internal.Remove(existing);
             SuppressEvents();
             try {
@@ -931,7 +931,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
             return existing;
         }
 
-        return GetOrCreateItem(first.StringContent);
+        return GetOrCreateItem(first.KeyNameContent);
     }
 
     /// <summary>
@@ -958,15 +958,14 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
     /// <summary>
     /// Schreibt die Ansicht: eigene Werte nur wenn nicht im Standard, danach die
-    /// persistenten Ansichts-Einträge als ItemList-Satz, je Eintrag ein eigener
-    /// Block eine Ebene tiefer.
+    /// persistenten Ansichts-Einträge als ItemList-Satz mit je einem ItemAdd-Kopf
+    /// und Einträge-Block.
     /// </summary>
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
         var allok = true;
 
-        // Der Name ist der erste Satz: Die Empfänger-Fabrik baut das Objekt daraus
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ViewName, KeyName);
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.ShowHead, ShowHead);
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.StartCollapsed, StartCollapsed);
