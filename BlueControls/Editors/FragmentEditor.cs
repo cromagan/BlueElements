@@ -1,0 +1,383 @@
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
+
+using BlueControls.Editoren;
+using BlueControls.Renderer;
+using BlueTable.ColumnFormats;
+using BlueTable.EventArgs;
+using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace BlueControls.BlueTableDialogs;
+
+/// <summary>
+/// Editor zur Anzeige von Fragment-Sätzen als Tabelle: Ein Satz je Zeile.
+/// Als Quelle dienen ein Stream, ein Dateiname oder eine Liste von Fragment-Sätzen.
+/// Der Editor ist rein lesend; ein Zurückschreiben ist nicht vorgesehen.
+/// </summary>
+public sealed partial class FragmentEditor : UserControl, IIsEditor {
+
+    #region Fields
+
+    /// <summary>
+    /// Arbeitskopie der Sätze in Datei-Reihenfolge; die Spalte "Quelle" jeder Zeile
+    /// hält den Index in diese Liste.
+    /// </summary>
+    private List<FragmentRecord> _records = [];
+
+    /// <summary>
+    /// Die temporäre Anzeige-Tabelle.
+    /// </summary>
+    private Table? _table;
+
+    #endregion
+
+    #region Constructors
+
+    public FragmentEditor() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        tblFragments.VisibleRowsChanged += TblFragments_VisibleRowsChanged;
+    }
+
+    #endregion
+
+    #region Events
+
+    /// <summary>
+    /// Durchgereichtes Ereignis der eingebetteten Tabelle, z. B. für Statuszeilen der Hosts.
+    /// </summary>
+    public event EventHandler<TableEventArgs>? VisibleRowsChanged;
+
+    #endregion
+
+    #region Properties
+
+    public Type? EditorFor => null;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public object? InputItem {
+        get => _records;
+        set {
+            switch (value) {
+                case null:
+                    LoadFragments([]);
+                    break;
+
+                case string filename:
+                    LoadFragments(filename);
+                    break;
+
+                case Stream stream:
+                    LoadFragments(stream);
+                    break;
+
+                case IEnumerable<FragmentRecord> fragments:
+                    LoadFragments(fragments.ToList());
+                    break;
+            }
+        }
+    }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public EditorMode Mode { get; set; } = EditorMode.OnlyShow;
+
+    public EditorMode SupportedModes => EditorMode.OnlyShow;
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Der Editor ist rein lesend; es wird kein verändertes Objekt erzeugt.
+    /// </summary>
+    public object? CreateNewItem() => null;
+
+    /// <summary>
+    /// Löst das VisibleRowsChanged-Ereignis aus (inkl. Disposed-Prüfung).
+    /// </summary>
+    private void OnVisibleRowsChanged(TableEventArgs e) {
+        if (IsDisposed) { return; }
+        VisibleRowsChanged?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// Decodiert den Content je Content-Typ als anzeigbaren Text; defekte Sätze liefern
+    /// einen Fehlerhinweis statt Absturz.
+    /// </summary>
+    private static string ContentText(FragmentRecord record) {
+        try {
+            switch (record.DataType) {
+                case FragmentDataType.String:
+                    return record.StringContent;
+
+                case FragmentDataType.Bool:
+                    return record.BoolContent ? "+" : "-";
+
+                case FragmentDataType.Int:
+                    return record.IntContent.ToString1();
+
+                case FragmentDataType.Long:
+                    return record.LongContent.ToString1();
+
+                case FragmentDataType.Float:
+                    return record.FloatContent.ToString1_5();
+
+                case FragmentDataType.Double:
+                    return record.DoubleContent.ToString1_5();
+
+                case FragmentDataType.Decimal:
+                    return record.DecimalContent.ToString(CultureInfo.InvariantCulture);
+
+                case FragmentDataType.DateTime:
+                    return record.DateTimeContent == DateTime.MinValue ? string.Empty : record.DateTimeContent.ToString7();
+
+                case FragmentDataType.Color:
+                    return record.ColorContent.IsEmpty ? string.Empty : record.ColorContent.ToHtmlCode();
+
+                case FragmentDataType.Json:
+                    return record.JsonContent?.ToJsonString() ?? string.Empty;
+
+                case FragmentDataType.ListSet:
+                    return string.Join("\r", record.ListContent);
+
+                default:
+                    // ListKeyObject: Content leer, die Items folgen als eigene Sätze.
+                    return string.Empty;
+            }
+        } catch (Exception ex) {
+            return "<Fehler: " + ex.Message + ">";
+        }
+    }
+
+    private static string SymbolFor(FragmentRecord record) {
+        if (record.IsTag) { return ImageCode.Information + "|24"; }
+        if (record.HasMeta) { return ImageCode.Stift + "|24"; }
+        return ImageCode.Puzzle + "|24";
+    }
+
+    /// <summary>
+    /// Typbezeichner der Zeile: Der Kette-Schluss wird über die Vorfahren benannt
+    /// (empfangender Zahlraum) bzw. als roher Wert.
+    /// </summary>
+    private static string TypeText(ReadOnlySpan<FragmentRecord> path, bool tableRoot, string layoutTypeName) {
+        // Kopf-Datei: Nur das Layout-Blatt gehört der Verwaltung; darunter beginnt
+        // der Block des verwalteten Objekts. Nur Tabellen-Layouts erhalten echte
+        // Typ-Namen, fremde Layouts zeigen die Zahl.
+        if (!tableRoot) {
+            if (path.Length == 1) { return SaveableFile.GetNameOf(path[^1].LeafType); }
+
+            return path.Length > 2 && layoutTypeName.Contains("Table", StringComparison.OrdinalIgnoreCase)
+                ? Table.GetNameOf(path[1..])
+                : path[^1].LeafType.ToString1();
+        }
+
+        return Table.GetNameOf(path);
+    }
+
+    private void EnsureTable() {
+        if (_table is { IsDisposed: false }) { return; }
+
+        _table = Table.Get();
+
+        var cNr = _table.Column.GenerateAndAdd("Nr", "Nr.", LongOnlyPositiveColumnFormat.Instance);
+        if (cNr is { IsDisposed: false }) { cNr.IsFirst = true; }
+
+        _ = _table.Column.GenerateAndAdd("Tiefe", "Tiefe", LongOnlyPositiveColumnFormat.Instance);
+        var cTyp = _table.Column.GenerateAndAdd("Typ", "Typ", TextOneLineColumnFormat.Instance);
+        var cDatentyp = _table.Column.GenerateAndAdd("Datentyp", "Datentyp", TextOneLineColumnFormat.Instance);
+        var cWert = _table.Column.GenerateAndAdd("Wert", "Wert", TextMultilineColumnFormat.Instance);
+        var cBenutzer = _table.Column.GenerateAndAdd("Benutzer", "Benutzer", TextOneLineColumnFormat.Instance);
+        var cZeit = _table.Column.GenerateAndAdd("Zeit", "Zeit (UTC)", DateTimeColumnFormat.Instance);
+        var cKommentar = _table.Column.GenerateAndAdd("Kommentar", "Kommentar", TextOneLineColumnFormat.Instance);
+        var cSymbol = _table.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
+
+        // "Quelle" bleibt unsichtbar und verknüpft die Zeile mit dem Arbeitssatz.
+        _ = _table.Column.GenerateAndAdd("Quelle", "Quelle", LongOnlyPositiveColumnFormat.Instance);
+
+        // Nur Ansicht: keinerlei Spalte ist veränderbar.
+        _table.Column.DisableAllEditing();
+
+        foreach (var thisColumn in _table.Column) {
+            if (thisColumn.IsSystemColumn()) { continue; }
+            if (thisColumn == cTyp || thisColumn == cDatentyp || thisColumn == cWert || thisColumn == cBenutzer || thisColumn == cKommentar) {
+                thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
+            }
+        }
+
+        cWert?.MultiLine = true;
+        cKommentar?.MultiLine = true;
+
+        if (cZeit is { IsDisposed: false }) {
+            var o = new DateTimeRenderer {
+                UTCToLocal = true,
+                ShowSymbol = true
+            };
+            cZeit.DefaultRenderer = o.MyClassId;
+            cZeit.RendererSettings = o.ParseableItems().FinishParseable();
+        }
+
+        if (cSymbol is { IsDisposed: false }) {
+            var o = new ImageAndTextRenderer {
+                Text_anzeigen = false,
+                Bild_anzeigen = true
+            };
+            cSymbol.DefaultRenderer = o.MyClassId;
+            cSymbol.RendererSettings = o.ParseableItems().FinishParseable();
+        }
+
+        _table.RepairAfterParse();
+
+        var tcvc = ColumnViewCollection.ParseAll(_table);
+        tcvc[1].ShowColumns("Nr", "Tiefe", "Typ", "Datentyp", "Wert", "Benutzer", "Zeit", "Kommentar", "Symbol");
+        tcvc[1].ScaleToFit = ScaleToFitMode.Aggressiv;
+        _table.ColumnArrangements = tcvc.AsReadOnly();
+
+        _table.RepairAfterParse();
+
+        // Die Anzeige-Tabelle färbt jede Zeile je Tiefe-Stufe 10 % dunkler.
+        _table.EventScript = new TableScriptCollection(_table, [RowColorScript(_table)]);
+
+        tblFragments.Table = _table;
+        tblFragments.Arrangement = string.Empty;
+        tblFragments.ColumnMoveAllowed = false;
+        tblFragments.SortDefinitionTemporary = new RowSortDefinition(_table, cNr, false);
+    }
+
+    /// <summary>
+    /// Zeilen-Skript der Anzeige-Tabelle: färbt die Zeile je Tiefe-Stufe 10 % dunkler
+    /// (Stufe 0 = weiß, Stufe 2 = 20 % Grau) als HexCode.
+    /// </summary>
+    private static TableScriptDescription RowColorScript(Table tb) {
+        List<string> zeilen = [];
+
+        for (var stufe = 0; stufe <= 10; stufe++) {
+            var hell = (int)(255L * (10 - stufe) / 10);
+            var hex = hell.ToString("X2", CultureInfo.InvariantCulture);
+            zeilen.Add($"If(Tiefe=={stufe}) {{ RowColor=\"{hex}{hex}{hex}\"; }}");
+        }
+
+        return new TableScriptDescription(
+            tb,
+            "RowColor",
+            string.Join("\r\n", zeilen),
+            string.Empty,
+            "Färbt die Zeile je Tiefe-Stufe 10 % dunkler.",
+            string.Empty,
+            new System.Collections.ObjectModel.ReadOnlyCollection<string>([]),
+            ScriptEventTypes.prepare_formula,
+            true,
+            true,
+            string.Empty,
+            null,
+            0,
+            0);
+    }
+
+    private void FillRows() {
+        if (_table is not { IsDisposed: false } tb) { return; }
+
+        tb.SuppressEvents();
+        try {
+            tb.Row.Clear(string.Empty);
+
+            // Kette der Sätze: Die Vorfahren bestimmen den Zahlraum der Typ-Spalte,
+            // der Schluss ist der gerade benannte Satz. Kopf-Dateien beginnen mit
+            // dem Layout-Blatt (Typ 0), Journal- und Chunk-Dateien direkt im
+            // Tabellen-Raum.
+            List<FragmentRecord> path = [];
+            var tableRoot = true;
+            var layoutTypeName = string.Empty;
+            var rootChecked = false;
+
+            for (var i = 0; i < _records.Count; i++) {
+                var record = _records[i];
+                var r = tb.Row.GenerateAndAdd((i + 1).ToString1(), string.Empty);
+                if (r is not { IsDisposed: false }) { continue; }
+
+                // Vorfahren enden am ersten Satz gleicher oder geringerer Tiefe.
+                while (path.Count > 0 && path[^1].Depth >= record.Depth) {
+                    path.RemoveAt(path.Count - 1);
+                }
+
+                string typeText;
+                if (record.IsTag) {
+                    if (record.TagType == FragmentTagType.Type) { layoutTypeName = record.StringContent; }
+                    typeText = record.TagType.ToString();
+                } else {
+                    if (!rootChecked) {
+                        // Erster Daten-Satz: Typ 0 = Layout-Blatt einer Kopf-Datei.
+                        rootChecked = true;
+                        tableRoot = record.LeafType != 0;
+                    }
+
+                    // Daten-Sätze schließen die Kette ab und werden aus ihr benannt.
+                    path.Add(record);
+                    typeText = TypeText(CollectionsMarshal.AsSpan(path), tableRoot, layoutTypeName);
+                }
+
+                r.CellSet("Tiefe", record.Depth, string.Empty);
+                r.CellSet("Typ", typeText, string.Empty);
+                r.CellSet("Datentyp", record.DataType.ToString(), string.Empty);
+                r.CellSet("Wert", ContentText(record), string.Empty);
+                r.CellSet("Benutzer", record.User, string.Empty);
+                if (record.HasMeta) { r.CellSet("Zeit", record.DateTimeUtc, string.Empty); }
+                r.CellSet("Kommentar", record.Comment, string.Empty);
+                r.CellSet("Symbol", SymbolFor(record), string.Empty);
+                r.CellSet("Quelle", i, string.Empty);
+            }
+        } finally {
+            tb.ResumeEvents();
+        }
+
+        tb.RepairAfterParse();
+    }
+
+    private void LoadFragments(List<FragmentRecord> fragments) {
+        _records = fragments;
+        EnsureTable();
+        FillRows();
+    }
+
+    private void LoadFragments(Stream stream) {
+        List<FragmentRecord> fragments = [];
+
+        try {
+            while (FragmentRecord.TryReadNext(stream) is { } record) {
+                fragments.Add(record);
+            }
+        } catch (Exception ex) {
+            Notification.Show("Fragment-Daten unlesbar:<br>" + ex.Message, ImageCode.Warnung);
+            return;
+        }
+
+        LoadFragments(fragments);
+    }
+
+    private void LoadFragments(string filename) {
+        var data = IO.ReadAllBytes(filename, 10);
+
+        if (data.IsFailed || data.Value is not byte[] content) {
+            Notification.Show($"Fragment-Datei konnte nicht geladen werden:<br>{filename}<br><br>{data.FailedReason}", ImageCode.Warnung);
+            return;
+        }
+
+        if (content.IsZipped()) { content = content.UnzipIt() ?? []; }
+
+        using var ms = new MemoryStream(content);
+
+        LoadFragments(ms);
+    }
+
+    private void TblFragments_VisibleRowsChanged(object? sender, TableEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => TblFragments_VisibleRowsChanged(sender, e)));
+            return;
+        }
+
+        OnVisibleRowsChanged(e);
+    }
+
+    #endregion
+}

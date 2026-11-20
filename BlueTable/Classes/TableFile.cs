@@ -215,11 +215,6 @@ public class TableFile : Table {
     }
 
     public static bool IsFileAllowedToLoad(string fileName) {
-        // Develop-Stresstest: doppeltes Laden explizit erlaubt.
-        // Der Schalter bleibt aktiv, bis der Stresstest-Button ihn ausschaltet
-        // (wird nicht mehr nach jedem LoadFromFile zurückgesetzt).
-        if (AllowDuplicates) { return true; }
-
         lock (AllFilesLocker) {
             foreach (var thisFile in LiveInstances.Values) {
                 if (thisFile is TableFile { IsDisposed: false } tbf) {
@@ -341,12 +336,6 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(Filename)) { throw DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
         var allowed = IsFileAllowedToLoad(fileNameToLoad);
-        // Develop-Stresstest: Table.AllowDuplicates wird NICHT mehr hier
-        // zurückgesetzt. Der Öffnen-Vorgang einer Tabelle benötigt mehrere
-        // Table.Get-Aufrufe (SwitchTabToTable + ShowTab); würde das Flag nach
-        // dem ersten Load konsumiert, bekäme das zweite Form immer noch die
-        // alte Instanz. Der Schalter bleibt aktiv, bis der Stresstest-Button
-        // (btnStresstest) ihn ausschaltet.
 
         if (!allowed) {
             // Eine andere Instanz lädt diese Datei bereits (Race-Condition).

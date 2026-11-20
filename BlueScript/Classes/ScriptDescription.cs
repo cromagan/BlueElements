@@ -70,6 +70,19 @@ public class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableEx
 
     #endregion
 
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Skript-Pfad: Der Segmenteintritt
+    /// (SubVariableCollection) leitet den Zahlraum der gespeicherten Variablen ein,
+    /// sonst eigener Raum; unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((ScriptFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType == (byte)ScriptFragmentType.SubVariableCollection
+            ? VariableCollection.GetNameOf(path[1..])
+            : ((ScriptFragmentType)path[^1].LeafType).ToString();
+    }
+
     #region Fields
 
     private volatile int _isDisposedFlag;

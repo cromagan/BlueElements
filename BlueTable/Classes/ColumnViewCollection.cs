@@ -82,6 +82,19 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
     #endregion
 
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Ansicht-Pfad: Der Listen- oder
+    /// Nav-Satz (SubViewItem) leitet den Zahlraum des Ansichts-Eintrags ein, sonst
+    /// eigener Raum; unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((ViewFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType == (byte)ViewFragmentType.SubViewItem
+            ? ColumnViewItem.GetNameOf(path[1..])
+            : ((ViewFragmentType)path[^1].LeafType).ToString();
+    }
+
     #region Fields
 
     /// <summary>

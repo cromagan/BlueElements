@@ -108,8 +108,7 @@ public static class Animator {
     /// Wenn <paramref name="layered" /> false ist, wird das Fenster NICHT als
     /// Layered-Window markiert und AnimationFrame.Opacity wird
     /// ignoriert. Das ist für Child-Controls gedacht, die nur ihre Position
-    /// ändern (z.B. Controls.SlideOutPanel) und weder
-    /// Transparenz noch das WS_EX_LAYERED-Flag benötigen.
+    /// ändern und weder Transparenz noch das WS_EX_LAYERED-Flag benötigen.
     /// </summary>
     public static void Start(nint hwnd, Func<TimeSpan, AnimationFrame> compute, Action? onFinished, bool layered) {
         if (hwnd == nint.Zero) { return; }
@@ -138,8 +137,8 @@ public static class Animator {
     /// <summary>
     /// Startet eine Animation für <paramref name="target" /> mit expliziter
     /// Wahl, ob das Fenster als Layered-Window markiert wird. Child-Controls
-    /// (z.B. Controls.SlideOutPanel) übergeben hier false,
-    /// da sie nur ihre Position animieren und kein WS_EX_LAYERED benötigen.
+    /// übergeben hier false, da sie nur ihre Position animieren und kein
+    /// WS_EX_LAYERED benötigen.
     /// </summary>
     public static void Start(IAnimatable target, bool layered) {
         if (target is null) { return; }

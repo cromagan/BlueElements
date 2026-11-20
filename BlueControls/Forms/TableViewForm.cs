@@ -5,8 +5,6 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
@@ -18,19 +16,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     #region Fields
 
     private bool _firstOne = true;
-
-    /// <summary>
-    /// Lfd. Nummer für die vom Stresstest erzeugten Zeilen.
-    /// </summary>
-    private int _stressTestCounter;
-
-    /// <summary>
-    /// Develop-Stresstest: Timer, der im 5-Sekunden-Takt prüft, ob in der
-    /// geladenen TableChunk (mit gesetzter Chunk-Spalte) eine neue Zeile mit
-    /// der eigenen Instanz-ID angelegt werden kann. Bei Erfolg wird der Timer
-    /// gestoppt und nach 50 Sekunden (Hintergrund-Thread) wieder gestartet.
-    /// </summary>
-    private System.Windows.Forms.Timer? _stressTestTimer;
 
     private bool _switchingTabs;
 
@@ -303,14 +288,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         TableView.SaveCurrentView(ViewManager.Last);
 
-        if (_stressTestTimer is { } stressTimer) {
-            stressTimer.Stop();
-            stressTimer.Tick -= StressTestTimer_Tick;
-            stressTimer.Dispose();
-            _stressTestTimer = null;
-            Table.AllowDuplicates = false;
-        }
-
         base.OnFormClosing(e);
 
         if (e.Cancel) { return; }
@@ -543,8 +520,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnLetzteDateien_ItemClicked(object sender, ListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
-    private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
-
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         FormManager.SaveAllFiles();
 
@@ -633,29 +608,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         IUniqueWindowExtension.ShowOrCreate<ColumnOverview>(tb);
     }
 
-    private void btnStresstest_CheckedChanged(object sender, System.EventArgs e) {
-        if (!IsAdministrator()) { return; }
-
-        if (btnStresstest.Checked) {
-            // Schalter aktivieren: doppeltes Laden der gleichen Tabelle wird
-            // erlaubt, bis der Button wieder ausgeschaltet wird.
-            Table.AllowDuplicates = true;
-            TableChunk.EditLockSeconds = 30;
-
-            _stressTestTimer ??= new System.Windows.Forms.Timer();
-            // Defensive Abonnierung: falls der Timer aus einem früheren Lauf
-            // noch angehängt ist, nicht doppelt abonnieren.
-            _stressTestTimer.Tick -= StressTestTimer_Tick;
-            _stressTestTimer.Tick += StressTestTimer_Tick;
-            _stressTestTimer.Interval = 5000;
-            _stressTestTimer.Start();
-        } else {
-            if (_stressTestTimer is { } t) { t.Stop(); }
-            Table.AllowDuplicates = false;
-            TableChunk.EditLockSeconds = 300;
-        }
-    }
-
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplaceInCells();
 
     private void btnSuchFenster_Click(object sender, System.EventArgs e) => TableView.OpenSearchInCells();
@@ -678,11 +630,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         FormManager.SaveAllFiles();
         ExecuteFile(System.IO.Path.GetTempPath());
-    }
-
-    private void btnUserInfo_Click(object sender, System.EventArgs e) {
-        var t = new UsesInfo();
-        t.Show();
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
@@ -927,57 +874,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         SwitchTabToTable(LoadTab.FileName);
-    }
-
-    private void StressTestPause() {
-        Thread.Sleep(TimeSpan.FromSeconds(50));
-
-        if (IsDisposed) { return; }
-        if (_stressTestTimer is not { } timer) { return; }
-
-        try {
-            // Invoke wirft InvalidOperationException, wenn das Fenster kein
-            // Handle mehr hat; ObjectDisposedException (abgeleitet) wenn der
-            // Timer zwischenzeitlich disposed wurde. Beide ignorieren — der
-            // Stresstest wird dann beim Schließen ohnehin beendet.
-            Invoke(new Action(timer.Start));
-        } catch (InvalidOperationException) { }
-    }
-
-    private void StressTestTimer_Tick(object? sender, System.EventArgs e) {
-        if (IsDisposed || _stressTestTimer is not { } timer) { return; }
-
-        // Aktuelle Tabelle muss eine TableChunk mit gesetzter Chunk-Spalte sein.
-        if (TableView.Table is not TableChunk tc) { return; }
-        if (tc.Column.ChunkValueColumn is not { IsDisposed: false } cvc) { return; }
-
-        // Ein aktiver Chunk-Filter ist zwingend nötig — ohne ihn wüsste eine neue
-        // Zeile nicht, zu welchem Chunk sie gehört. Der Chunk-Wert wird aus dem
-        // kombinierten Filter des TableView übernommen.
-        if (TableView.FilterCombined[cvc] is not { } chunkFilter) { return; }
-
-        // Filter für die neue Zeile aufbauen: First-Spalte (Eindeutigkeit über
-        // Instanz-ID + Zähler) und der übernommene Chunk-Filter. Ist die Chunk-
-        // Spalte gleichzeitig die erste Spalte, fällt beides zusammen und der
-        // Chunk-Wert bestimmt die erste Spalte.
-        List<FilterItem> filter = [chunkFilter];
-        if (tc.Column.First is { IsDisposed: false } cf && cf != cvc) {
-            filter.Insert(0, new FilterItem(cf, FilterType.Istgleich, $"{tc.MyId}_{_stressTestCounter}"));
-        }
-
-        if (tc.Row.GenerateAndAdd([.. filter], "Stresstest").Value is not RowItem) {
-            // Zeile konnte nicht erstellt werden (z.B. Edit-Sperre durch andere
-            // Instanz) — nichts tun, der nächste Tick kommt in 5 s wieder.
-            return;
-        }
-
-        _stressTestCounter++;
-        tc.Save();
-
-        // Erfolg: Timer stoppen und 50 Sekunden im Hintergrund warten, damit die
-        // UI nicht blockiert. Anschließend wird der Timer wieder gestartet.
-        timer.Stop();
-        Task.Run(StressTestPause);
     }
 
     private void Table_CellClicked(object sender, CellEventArgs e) {

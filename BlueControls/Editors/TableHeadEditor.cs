@@ -3,10 +3,8 @@
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
 using BlueScript.ScriptVariables;
 using BlueTable.ClassesStatic;
-using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
@@ -71,179 +69,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Methods
 
-    public static void AddUndosToTable(TableViewWithFilters tblUndo, Table? table, float maxAgeInDays) {
-        if (table is TableFile { IsDisposed: false } tb) {
-            Develop.Message(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
-
-            List<UndoItem> un = [.. tb.Undo]; // Kann und wird verändert!
-
-            foreach (var thisUndo in un) {
-                AddUndoToTable(tblUndo, thisUndo, tb, maxAgeInDays);
-            }
-        }
-    }
-
-    public static void AddUndoToTable(TableViewWithFilters tblUndo, UndoItem work, Table db, float maxAgeInDays) {
-        if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
-        var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
-        if (r is null) { return; }
-
-        r.CellSet("ColumnKey", work.ColName, string.Empty);
-        r.CellSet("RowKey", work.RowKey, string.Empty);
-        if (db.Column[work.ColName] is { IsDisposed: false } col) {
-            r.CellSet("columnCaption", col.Caption, string.Empty);
-        }
-        if (db.Row.GetByKey(work.RowKey) is { IsDisposed: false } row) {
-            r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
-        } else if (!string.IsNullOrEmpty(work.RowKey)) {
-            r.CellSet("RowFirst", "[gelöscht]", string.Empty);
-        }
-        r.CellSet("Aenderer", work.User, string.Empty);
-        r.CellSet("AenderZeit", work.DateTimeUtc, string.Empty);
-        r.CellSet("Kommentar", work.Comment, string.Empty);
-
-        r.CellSet("Table", db.Caption, string.Empty);
-
-        if (work.Container.IsValidFilepathAndName()) {
-            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
-        }
-
-        var symb = ImageCode.Fragezeichen;
-        var alt = work.PreviousValue;
-        var neu = work.ChangedTo;
-
-        switch (work.Command) {
-            case TableDataType.UTF8Value_withoutSizeData:
-                symb = ImageCode.Stift;
-                break;
-
-            case TableDataType.TableVariables:
-                alt = "[Variablen alt]";
-                neu = "[Variablen neu]";
-                symb = ImageCode.Variable;
-                break;
-
-            case TableDataType.EventScript:
-                alt = "[Skript alt (" + alt.Length + " Zeichen)]";
-                neu = "[Skript neu (" + neu.Length + " Zeichen)]";
-                symb = ImageCode.Skript;
-                break;
-
-            //case TableDataType.EventScriptEdited:
-            //    alt = "[Skript alt (" + alt.Length + " Zeichen)]";
-            //    neu = "[Skript neu (" + neu.Length + " Zeichen)]";
-            //    symb = ImageCode.Skript;
-            //    break;
-
-            case TableDataType.Command_AddRow:
-                symb = ImageCode.PlusZeichen;
-                break;
-
-            case TableDataType.ColumnArrangement:
-                symb = ImageCode.Spalte;
-                alt = "[Spaltenanordnung alt]";
-                neu = "[Spaltenanordnung neu]";
-                break;
-
-            case TableDataType.Command_RemoveRow:
-                symb = ImageCode.MinusZeichen;
-                break;
-
-            case TableDataType.Command_NewStart:
-                symb = ImageCode.Abspielen;
-                break;
-
-            case TableDataType.ColumnSystemInfo:
-                symb = ImageCode.Information;
-                break;
-
-            case TableDataType.TemporaryTableMasterTimeUTC:
-                symb = ImageCode.Uhr;
-                break;
-
-            case TableDataType.TemporaryTableMasterUser:
-                symb = ImageCode.Person;
-                break;
-
-            case TableDataType.TemporaryTableMasterMachine:
-                symb = ImageCode.Monitor;
-                break;
-
-            case TableDataType.TemporaryTableMasterApp:
-                symb = ImageCode.Anwendung;
-                break;
-
-            case TableDataType.TemporaryTableMasterId:
-                symb = ImageCode.Formel;
-
-                break;
-        }
-        r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
-        r.CellSet("symbol", symb + "|24", string.Empty);
-        r.CellSet("Wertalt", alt, string.Empty);
-        r.CellSet("Wertneu", neu, string.Empty);
-    }
-
-    public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
-        var tb = Table.Get();
-        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormats.TextOneLine.Instance);
-        if (tb.Column.GenerateAndAdd("ID", "ID", TextOneLineColumnFormat.Instance) is { } f) {
-            f.IsFirst = true;
-        }
-        tb.Column.GenerateAndAdd("Table", "Tabelle", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", LongOnlyPositiveColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", TextOneLineColumnFormat.Instance);
-        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", DateTimeColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Aenderer", "Änderer", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Aenderung", "Änderung", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", TextOneLineColumnFormat.Instance);
-        tb.Column.DisableAllEditing();
-        foreach (var thisColumn in tb.Column) {
-            if (!thisColumn.IsSystemColumn()) {
-                thisColumn.MultiLine = true;
-                thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
-            }
-        }
-
-        if (az is { IsDisposed: false }) {
-            var o = new DateTimeRenderer {
-                UTCToLocal = true,
-                ShowSymbol = true
-            };
-            az.DefaultRenderer = o.MyClassId;
-            az.RendererSettings = o.ParseableItems().FinishParseable();
-        }
-
-        if (tb.Column["Symbol"] is { IsDisposed: false } c) {
-            var o = new ImageAndTextRenderer {
-                Text_anzeigen = false,
-                Bild_anzeigen = true
-            };
-            c.DefaultRenderer = o.MyClassId;
-            c.RendererSettings = o.ParseableItems().FinishParseable();
-        }
-
-        tb.RepairAfterParse();
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc[1].ShowColumns("Table", "ColumnKey", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
-
-        tb.ColumnArrangements = tcvc.AsReadOnly();
-
-        //x.SortDefinition = new RowSortDefinition(db, "Index", true);
-
-        tblUndo.Table = tb;
-        tblUndo.Arrangement = string.Empty;
-        tblUndo.ColumnMoveAllowed = false;
-        tblUndo.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
-    }
-
     public object? CreateNewItem() => null;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -273,6 +98,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var isTableFile = tb is TableFile;
         txbKennwort.Enabled = isTableFile;
         txbKennwort.Set(isTableFile ? tb.GlobalShowPass : string.Empty, () => tb.GlobalShowPass);
+
+        // Undo nur bei Tabellen im neuen Fragment-Format anbieten.
+        if (tb is not TableFileNew) {
+            GlobalTab.Controls.Remove(tabUndo);
+        }
 
         rowSortDefinitionEditor.InputItem = tb.SortDefinition;
 
@@ -513,16 +343,13 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) {
         if (GlobalTab.SelectedTab == tabUndo && !UndoDone) {
             UndoDone = true;
-            GenerateUndoTabelle(tblUndo);
-            if (tblUndo.Table is { IsDisposed: false } tb) {
-                tb.SuppressEvents();
-                try {
-                    AddUndosToTable(tblUndo, Table, -1);
-                } finally {
-                    tb.ResumeEvents();
+            if (Table is TableFileNew { IsDisposed: false, Saveable: var saveable }) {
+                List<FragmentRecord> undo;
+                lock (saveable.UndoLock) {
+                    undo = [.. saveable.Undos];
                 }
+                fragmentUndo.InputItem = undo;
             }
-            tblUndo.Table?.Freeze("Nur Ansicht");
         }
     }
 

@@ -65,13 +65,10 @@ namespace BlueControls.Forms {
             btnSuchenUndErsetzen = new Button();
             btnZeileLöschen = new Button();
             grpAdminAllgemein = new GroupBox();
-            btnMonitoring = new Button();
-            btnUserInfo = new Button();
             btnSaveLoad = new Button();
             btnPowerBearbeitung = new Button();
             btnAnsichtbearbeitung = new Button();
             btnSpaltenUebersicht = new Button();
-            btnStresstest = new Button();
             grpAdminBearbeiten = new GroupBox();
             btnSuchInScript = new Button();
             btnSkripteBearbeiten = new Button();
@@ -476,13 +473,10 @@ namespace BlueControls.Forms {
             // 
             grpAdminAllgemein.BackColor = Color.FromArgb(244, 245, 246);
             grpAdminAllgemein.CausesValidation = false;
-            grpAdminAllgemein.Controls.Add(btnMonitoring);
-            grpAdminAllgemein.Controls.Add(btnUserInfo);
             grpAdminAllgemein.Controls.Add(btnSaveLoad);
             grpAdminAllgemein.Controls.Add(btnPowerBearbeitung);
             grpAdminAllgemein.Controls.Add(btnAnsichtbearbeitung);
             grpAdminAllgemein.Controls.Add(btnSpaltenUebersicht);
-            grpAdminAllgemein.Controls.Add(btnStresstest);
             grpAdminAllgemein.Dock = DockStyle.Left;
             grpAdminAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminAllgemein.Location = new Point(312, 0);
@@ -491,30 +485,6 @@ namespace BlueControls.Forms {
             grpAdminAllgemein.TabIndex = 7;
             grpAdminAllgemein.TabStop = false;
             grpAdminAllgemein.Text = "Allgemein";
-            // 
-            // btnMonitoring
-            // 
-            btnMonitoring.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnMonitoring.ImageCode = "Monitor|16";
-            btnMonitoring.Location = new Point(296, 2);
-            btnMonitoring.Name = "btnMonitoring";
-            btnMonitoring.QuickInfo = "Zeigt alle Ereignisse des Programms in einem Überwachungsfenster an.";
-            btnMonitoring.Size = new Size(72, 66);
-            btnMonitoring.TabIndex = 45;
-            btnMonitoring.Text = "Monitoring starten";
-            btnMonitoring.Click += btnMonitoring_Click;
-            // 
-            // btnUserInfo
-            // 
-            btnUserInfo.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnUserInfo.ImageCode = "Uhr||||||||||Stift";
-            btnUserInfo.Location = new Point(240, 2);
-            btnUserInfo.Name = "btnUserInfo";
-            btnUserInfo.QuickInfo = "Übersicht aller Änderungen, Tabellenunabhängig";
-            btnUserInfo.Size = new Size(56, 66);
-            btnUserInfo.TabIndex = 44;
-            btnUserInfo.Text = "Änder Info";
-            btnUserInfo.Click += btnUserInfo_Click;
             // 
             // btnSaveLoad
             // 
@@ -563,18 +533,6 @@ namespace BlueControls.Forms {
             btnSpaltenUebersicht.TabIndex = 36;
             btnSpaltenUebersicht.Text = "Spalten-Übersicht";
             btnSpaltenUebersicht.Click += btnSpaltenUebersicht_Click;
-            // 
-            // btnStresstest
-            // 
-            btnStresstest.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
-            btnStresstest.ImageCode = "Blitz";
-            btnStresstest.Location = new Point(376, 2);
-            btnStresstest.Name = "btnStresstest";
-            btnStresstest.QuickInfo = resources.GetString("btnStresstest.QuickInfo");
-            btnStresstest.Size = new Size(48, 66);
-            btnStresstest.TabIndex = 47;
-            btnStresstest.Text = "Stress-test";
-            btnStresstest.CheckedChanged += btnStresstest_CheckedChanged;
             // 
             // grpAdminBearbeiten
             // 
@@ -948,9 +906,6 @@ namespace BlueControls.Forms {
         private ListBox lstAufgaben;
         private Button btnAufräumen;
 
-        private Button btnUserInfo;
         private Button btnSuchInScript;
-        private Button btnMonitoring;
-        private Button btnStresstest;
     }
 }

@@ -14,7 +14,7 @@ public class TextMultilineColumnFormat : ColumnFormat {
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
-        ScriptType = ScriptType.String;
+        ScriptType = ScriptType.List;
         ControlStrategy = "Textbox";
         ControlStrategyParameter.Set("spellcheckingenabled", true);
         EditableWithTextInput = true;

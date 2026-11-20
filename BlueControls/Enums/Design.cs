@@ -80,7 +80,5 @@ public enum Design {
     Note_Default,
 
     Badge_Caption,
-    Badge_Warning,
-
-    GroupBox_BoldBottom
+    Badge_Warning
 }

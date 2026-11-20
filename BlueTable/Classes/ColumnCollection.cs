@@ -41,6 +41,19 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
 
     #endregion
 
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Spalten-Pfad: Der Listen- oder
+    /// Nav-Satz (SubColumn) leitet den Zahlraum der Spalte ein, sonst eigener Raum;
+    /// unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((ColumnCollectionFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType is (byte)ColumnCollectionFragmentType.SubColumn or (byte)ColumnCollectionFragmentType.Columns
+            ? ColumnItem.GetNameOf(path[1..])
+            : ((ColumnCollectionFragmentType)path[^1].LeafType).ToString();
+    }
+
     #region Constructors
 
     public ColumnCollection(Table table) => Table = table;

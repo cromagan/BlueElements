@@ -299,7 +299,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable, IFrag
         //    if (NeedRow) { return "Routinen nach dem Laden einer Tabelle, dürfen sich nicht auf Zeilen beziehen."; }
         //}
 
-        if (NeedRow && !Table.IsRowScriptPossible()) { return "Zeilenskripte in dieser Tabelle nicht möglich"; }
+        if (NeedRow && EventTypes != ScriptEventTypes.prepare_formula && !Table.IsRowScriptPossible()) { return "Zeilenskripte in dieser Tabelle nicht möglich"; }
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString1()) { return "Skripte öffnen und neu speichern."; }
 

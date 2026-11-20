@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueScript.Classes;
 using System.IO;
 
 namespace BlueTable.Classes;
@@ -49,6 +50,19 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     }
 
     #endregion
+
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Skript-Pfad: Der Listen- oder
+    /// Nav-Satz (SubScript) leitet den Zahlraum des Skripts ein, sonst eigener
+    /// Raum; unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((ScriptCollectionFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType is (byte)ScriptCollectionFragmentType.SubScript or (byte)ScriptCollectionFragmentType.Scripts
+            ? ScriptDescription.GetNameOf(path[1..])
+            : ((ScriptCollectionFragmentType)path[^1].LeafType).ToString();
+    }
 
     #region Constructors
 

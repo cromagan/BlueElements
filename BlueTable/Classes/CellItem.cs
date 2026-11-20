@@ -90,6 +90,12 @@ public class CellItem : IFragmentStoreable {
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((CellFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Zell-Block; der Inhalt ist das Blatt UTF8Value_withoutSizeData.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {

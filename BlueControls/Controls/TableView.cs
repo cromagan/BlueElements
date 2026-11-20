@@ -977,6 +977,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (sender is not Table tbl) { return; }
         if (!FormManager.Running) { e.CancelReason = "Programm wird beendet"; return; }
 
+        // prepare_formula (Zeilenvalidierung) darf auch bei geöffneten Editoren laufen.
+        if (e.ScriptType == ScriptEventTypes.prepare_formula) { return; }
+
         foreach (var thisf in FormManager.Forms) {
             if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
             if (thisf is TableScriptEditorForm tsf && tsf.Object != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
@@ -2457,10 +2460,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // Rahmen um die gesamte Tabelle zeichnen
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
-
-            if (Table.AllowDuplicates) {
-                CreativePad.DrawNotEditableOverlay(gr, base.DisplayRectangle, ImageCode.Information, $"ID: {tb.MyId}", States.Standard);
-            }
 
             // Verzögerte LinkedCell-Reparatur: gezeichnete Zeilen nach Ablauf der Frist reparieren
             RepairVisibleRowsAfterDraw();

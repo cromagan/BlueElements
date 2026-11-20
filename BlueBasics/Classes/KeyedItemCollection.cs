@@ -321,9 +321,9 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Gleicht die Sammlung an die Quelle an: Items, die in der Quelle fehlen, werden
     /// entfernt und verworfen, neue aufgenommen — beides meldet OnItemRemoved/OnItemAdded — und
     /// gemeinsame Items übernehmen die Werte per Item-Update und behalten ihre Instanz.
-    /// Verworfene Quell-Items gelten als fehlend. Liefert einen Fehlergrund oder
-    /// string.Empty. Ableitungen überschreiben die Routine für sammlungsspezifische
-    /// Nacharbeit.
+    /// Verworfene Quell-Items gelten als fehlend; bereits verworfene Items der Ablage
+    /// werden still entfernt. Liefert einen Fehlergrund oder string.Empty. Ableitungen
+    /// überschreiben die Routine für sammlungsspezifische Nacharbeit.
     /// </summary>
     public virtual string Update(IEnumerable<TItem> sourceItems) {
         if (IsDisposed) { return "Sammlung ist verworfen"; }
@@ -335,7 +335,10 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         foreach (var keyName in Keys()) {
             if (sourceKeys.Contains(keyName)) { continue; }
 
-            if (this[keyName] is not { } item || !Remove(keyName)) { return "Entfernen von '" + keyName + "' fehlgeschlagen"; }
+            // Direkt in der Ablage nachsehen, nicht über den Indexer: Verworfene Rest-Items
+            // (z. B. Skripte, die sich beim Disposed-Event der Tabelle selbst verwerfen)
+            // werden beim Aufräumen still entfernt statt als interner Fehler zu gelten.
+            if (!Internal.TryGetValue(keyName, out var item) || !Remove(keyName)) { return "Entfernen von '" + keyName + "' fehlgeschlagen"; }
 
             obsolete.Add(item);
         }

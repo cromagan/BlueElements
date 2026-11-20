@@ -341,6 +341,11 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     public string Update(IFragmentStoreable source) => "Verwaltung hat keine übernehmbaren Inhalte";
 
     /// <summary>
+    /// Verständlicher Name eines Kopf-Satzes der Verwaltung; bei unbekannten Werten dessen Zahl.
+    /// </summary>
+    public static string GetNameOf(byte leafType) => ((SaveableFileFragmentType)leafType).ToString();
+
+    /// <summary>
     /// Schreibt den Kopf-Block: den Blatt-Satz mit der Layout-ClassId.
     /// </summary>
     public bool SerializeCore(Stream stream, int depth) => FragmentRecord.Append(stream, depth, SaveableFileFragmentType.LayoutClassId, LayoutId);

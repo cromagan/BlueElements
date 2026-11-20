@@ -3020,6 +3020,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((ColumnFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Spalten-Block; die Blatt-Typen spiegeln die TableDataType-Werte (Versatz -100).
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {

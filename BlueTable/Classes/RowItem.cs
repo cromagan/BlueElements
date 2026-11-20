@@ -339,13 +339,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return _lastCheckedEventArgs;
         }
 
+        // RowColor setzt das prepare_formula-Skript als Hex-Code (RGB/ARGB, mit oder ohne #).
         Brush? b = null;
-        if (sef.Variables?.GetByKey("RowColor") is StringScriptVariable vs) {
-            if (!string.IsNullOrEmpty(vs.ValueString)) {
-                if (ColorTryParse(vs.ValueString, out var c)) {
-                    b = new SolidBrush(c);
-                }
-            }
+        if (sef.Variables?.GetByKey("RowColor") is StringScriptVariable vs && vs.ValueString is { Length: > 0 } hex && ColorTryParse(hex, out var c)) {
+            b = new SolidBrush(c);
         }
 
         if (RowCollection.TryGetFailedReason(this, out var reason)) {
@@ -1530,6 +1527,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         return allok;
+    }
+
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Zeilen-Pfad: Der Cell-Satz
+    /// leitet den Zahlraum der Zelle ein, sonst eigener Raum; unbekannte Werte
+    /// liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1 || path[0].LeafType != (byte)RowNavigationType.Cell) {
+            return ((RowNavigationType)path[^1].LeafType).ToString();
+        }
+
+        return CellItem.GetNameOf(path[1..]);
     }
 
     /// <summary>

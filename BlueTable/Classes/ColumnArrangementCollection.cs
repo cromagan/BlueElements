@@ -38,6 +38,19 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
 
     #endregion
 
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Ansichten-Pfad: Der Listen- oder
+    /// Nav-Satz (Arrangements) leitet den Zahlraum der Ansicht ein, sonst eigener
+    /// Raum; unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((ArrangementFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType == (byte)ArrangementFragmentType.Arrangements
+            ? ColumnViewCollection.GetNameOf(path[1..])
+            : ((ArrangementFragmentType)path[^1].LeafType).ToString();
+    }
+
     #region Fields
 
     /// <summary>

@@ -433,6 +433,12 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((ViewItemFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Block des Ansichts-Eintrags: Permanent immer, FontHorizontal nur wenn gesetzt.
     /// </summary>
     public bool DeserializeThis(Stream stream, FragmentRecord record) {

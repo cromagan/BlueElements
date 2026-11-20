@@ -358,6 +358,12 @@ public abstract class ScriptVariable : ParseableItem, IComparable, IParseable, I
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((VariableFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Variablen-Block: Type, KeyName, Wert, Kommentar und
     /// Schreibschutz.
     /// </summary>

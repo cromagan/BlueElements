@@ -13,7 +13,7 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            tblChunk = new TableViewWithFilters();
+            fragmentInsight = new FragmentEditor();
             pnlHeader = new Panel();
             capInfo = new Caption();
             btnOeffnen = new Button();
@@ -36,17 +36,14 @@ namespace BlueControls.BlueTableDialogs {
             pnlStatusBar.Controls.SetChildIndex(capZeilen2, 0);
             pnlStatusBar.Controls.SetChildIndex(capStatusBar, 0);
             // 
-            // tblChunk
+            // fragmentInsight
             // 
-            tblChunk.Ansichtbearbeitung = false;
-            tblChunk.ColumnMoveAllowed = false;
-            tblChunk.Dock = DockStyle.Fill;
-            tblChunk.Location = new Point(0, 31);
-            tblChunk.Name = "tblChunk";
-            tblChunk.PowerEdit = false;
-            tblChunk.Size = new Size(984, 514);
-            tblChunk.TabIndex = 1;
-            tblChunk.VisibleRowsChanged += Table_VisibleRowsChanged;
+            fragmentInsight.Dock = DockStyle.Fill;
+            fragmentInsight.Location = new Point(0, 31);
+            fragmentInsight.Name = "fragmentInsight";
+            fragmentInsight.Size = new Size(984, 514);
+            fragmentInsight.TabIndex = 1;
+            fragmentInsight.VisibleRowsChanged += FragmentInsight_VisibleRowsChanged;
             // 
             // pnlHeader
             // 
@@ -65,7 +62,7 @@ namespace BlueControls.BlueTableDialogs {
             capInfo.Location = new Point(136, 0);
             capInfo.Name = "capInfo";
             capInfo.Size = new Size(840, 24);
-            capInfo.Text = "Kein Chunk geladen";
+            capInfo.Text = "Keine Fragment-Daten geladen";
             capInfo.Translate = false;
             // 
             // btnOeffnen
@@ -73,16 +70,16 @@ namespace BlueControls.BlueTableDialogs {
             btnOeffnen.ImageCode = "Ordner|16";
             btnOeffnen.Location = new Point(8, 0);
             btnOeffnen.Name = "btnOeffnen";
-            btnOeffnen.QuickInfo = "Chunk-Datei (.bdb, .btb, .mbdb, .tblc, .tblh) auswählen";
+            btnOeffnen.QuickInfo = "Fragment-Datei (.btb, .tbls, .tblf) auswählen";
             btnOeffnen.Size = new Size(120, 24);
             btnOeffnen.TabIndex = 0;
-            btnOeffnen.Text = "Chunk öffnen";
+            btnOeffnen.Text = "Öffnen";
             btnOeffnen.Click += btnOeffnen_Click;
             // 
             // OpenTab
             // 
-            OpenTab.Filter = "Chunk-Dateien|*.bdb;*.btb;*.mbdb;*.tblc;*.tblh;*.tblt|Alle Dateien|*.*";
-            OpenTab.Title = "Chunk-Datei öffnen";
+            OpenTab.Filter = "Fragment-Dateien|*.btb;*.tbls;*.tblf|Alle Dateien|*.*";
+            OpenTab.Title = "Fragment-Datei öffnen";
             // 
             // capZeilen2
             // 
@@ -97,24 +94,24 @@ namespace BlueControls.BlueTableDialogs {
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(984, 569);
-            Controls.Add(tblChunk);
+            Controls.Add(fragmentInsight);
             Controls.Add(pnlHeader);
             GlobalMenuHeight = 0;
             MinimumSize = new Size(600, 400);
             Name = "ChunkInsight";
             StartPosition = FormStartPosition.CenterScreen;
             Tag = "";
-            Text = "Chunk-Insight";
+            Text = "Fragment-Insight";
             Controls.SetChildIndex(pnlHeader, 0);
             Controls.SetChildIndex(pnlStatusBar, 0);
-            Controls.SetChildIndex(tblChunk, 0);
+            Controls.SetChildIndex(fragmentInsight, 0);
             pnlStatusBar.ResumeLayout(false);
             pnlHeader.ResumeLayout(false);
             ResumeLayout(false);
 
         }
 
-        private TableViewWithFilters tblChunk;
+        private FragmentEditor fragmentInsight;
         private Panel pnlHeader;
         private Button btnOeffnen;
         private Caption capInfo;

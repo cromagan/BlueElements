@@ -1,9 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueControls.Controls;
-using BlueTable.ColumnFormats;
 using BlueTable.EventArgs;
-using System.Windows.Forms;
+using System.IO;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -21,92 +19,18 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
 
     #region Methods
 
-    [StandaloneInfo("Chunk-Insight", ImageCode.Puzzle, "Admin", "Rohe Chunk-Daten ohne Semantic-Parsing als Tabelle anzeigen", 900)]
+    [StandaloneInfo("Fragment-Insight", ImageCode.Puzzle, "Admin", "Rohe Fragment-Sätze als Tabelle anzeigen", 900)]
     public static System.Windows.Forms.Form Start() => new ChunkInsight();
 
-    protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        tblChunk.Table?.Dispose();
-    }
-
-    protected override void OnShown(System.EventArgs e) {
-        base.OnShown(e);
-        GenerateTable(tblChunk);
-    }
-
-    private static void FillTable(Table tb, byte[] data) {
-        var nr = 1;
-        var pointer = 0;
-
-        try {
-            while (pointer < data.Length) {
-                var startPos = pointer;
-                var (newPointer, type, value, colName, rowKey) = Table.Parse(data, pointer);
-
-                if (newPointer <= pointer) { break; } // Schutz vor Endlosschleife bei Defekt
-
-                pointer = newPointer;
-
-                // Bei passwortgeschützten Tabellen das Passwort abfragen,
-                // bevor die (geschützten) Chunk-Daten angezeigt werden.
-                if (type == TableDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
-                    var pwd = TableView.Table_NeedPassword();
-                    if (pwd != value) {
-                        Notification.Show("Falsches Passwort.<br>Der Chunk kann nicht angezeigt werden.", ImageCode.Schloss);
-                        return;
-                    }
-                }
-
-                var r = tb.Row.GenerateAndAdd(nr.ToString1(), "Chunk-Insight");
-                if (r is not { IsDisposed: false }) { continue; }
-
-                r.CellSet("Position", startPos.ToString1(), string.Empty);
-                r.CellSet("Routine", $"{(Routinen)data[startPos]} ({data[startPos]})", string.Empty);
-                r.CellSet("DataType", $"{type} ({(int)type})", string.Empty);
-                r.CellSet("ColumnKey", colName, string.Empty);
-                r.CellSet("RowKey", rowKey, string.Empty);
-                r.CellSet("Wert", value, string.Empty);
-
-                nr++;
-
-                if (type == TableDataType.EOF) { break; }
-            }
-        } catch (Exception ex) {
-            DebugPrint($"Fehler beim Lesen des Chunks bei Position {pointer}", ex);
-        }
-    }
-
-    private static void GenerateTable(TableViewWithFilters tableView) {
-        var tb = Table.Get();
-
-        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", LongOnlyPositiveColumnFormat.Instance);
-        if (cNr is { IsDisposed: false }) { cNr.IsFirst = true; }
-
-        tb.Column.GenerateAndAdd("Position", "Position", LongOnlyPositiveColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Routine", "Routine", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("DataType", "DataType", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", TextOneLineColumnFormat.Instance);
-        tb.Column.GenerateAndAdd("Wert", "Wert", TextOneLineColumnFormat.Instance);
-
-        tb.Column.DisableAllEditing();
-
-        foreach (var thisColumn in tb.Column) {
-            if (!thisColumn.IsSystemColumn()) { thisColumn.MultiLine = true; }
+    private void FragmentInsight_VisibleRowsChanged(object sender, TableEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => FragmentInsight_VisibleRowsChanged(sender, e)));
+            return;
         }
 
-        tb.RepairAfterParse();
+        capZeilen2.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {e.Table?.Row.Count ?? 0} {LanguageTool.DoTranslate("St.")}";
 
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc[1].ShowColumns("Nr", "Position", "Routine", "DataType", "ColumnKey", "RowKey", "Wert");
-
-        tb.ColumnArrangements = tcvc.AsReadOnly();
-
-        tb.RepairAfterParse();
-        tableView.Table = tb;
-
-        tableView.Arrangement = string.Empty;
-        tableView.SortDefinitionTemporary = new RowSortDefinition(tb, cNr, false);
+        capZeilen2.Refresh();
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
@@ -124,7 +48,7 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
         var data = ReadAllBytes(filename, 10);
 
         if (data.IsFailed || data.Value is not byte[] content) {
-            Notification.Show($"Chunk konnte nicht geladen werden:<br>{filename}<br><br>{data.FailedReason}", ImageCode.Warnung);
+            Notification.Show($"Fragment-Daten konnten nicht geladen werden:<br>{filename}<br><br>{data.FailedReason}", ImageCode.Warnung);
             return;
         }
 
@@ -132,31 +56,12 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
 
         capInfo.Text = QuickImage.Get(ImageCode.Puzzle, 16).HTMLCode + " " +
                        filename.FileNameWithSuffix() +
-                       "  |  Key: <b>" + filename.FileNameWithSuffix() + "</b>" +
+                       "  |  Key: <b>" + filename.FileNameWithoutSuffix() + "</b>" +
                        "  |  Größe (ungepackt): <b>" + (content.Length / 1024 / 1024).ToString($"N2", OriginCultureInfo) + " mb</b>";
 
-        Text = "Chunk-Insight - " + filename.FileNameWithSuffix();
+        Text = "Fragment-Insight - " + filename.FileNameWithSuffix();
 
-        if (tblChunk.Table is not { IsDisposed: false } tb) { return; }
-
-        tb.SuppressEvents();
-        try {
-            tb.Row.Clear("Neuer Chunk geladen");
-            FillTable(tb, content);
-        } finally {
-            tb.ResumeEvents();
-        }
-    }
-
-    private void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
-            return;
-        }
-
-        capZeilen2.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {tblChunk.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
-
-        capZeilen2.Refresh();
+        fragmentInsight.InputItem = new MemoryStream(content);
     }
 
     #endregion

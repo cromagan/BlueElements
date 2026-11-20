@@ -134,7 +134,6 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Wert in Sekunden. Eine Benutzer-Datei, die jünger ist, blockiert andere Benutzer.
     /// Nur der Ersteller der Datei darf in diesem Zeitraum bearbeiten.
-    /// Wird während des Develop-Stresstests reduziert (siehe btnStresstest).
     /// </summary>
     public static int EditLockSeconds { get; set; } = 300;
 
@@ -1167,7 +1166,7 @@ public class TableChunk : TableFile {
     /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
     /// TableChunk-Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
     /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session
-    /// oder andere Instanz im selben Prozess — z.B. Develop-Stresstest).
+    /// oder andere Instanz im selben Prozess).
     /// </summary>
     private bool IsFileFromCurrentUser(string filePath) {
         var creator = ExtractUserNameFromFileName(filePath);

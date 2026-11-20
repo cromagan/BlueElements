@@ -444,6 +444,19 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Variablen-Pfad: Der Listen- oder
+    /// Nav-Satz (SubVariable) leitet den Zahlraum der Variable ein, sonst eigener
+    /// Raum; unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((VariableCollectionNavigationType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType is (byte)VariableCollectionNavigationType.SubVariable or (byte)VariableCollectionNavigationType.VariableList
+            ? ScriptVariable.GetNameOf(path[1..])
+            : ((VariableCollectionNavigationType)path[^1].LeafType).ToString();
+    }
+
+    /// <summary>
     /// Wendet SubVariable-Journal-Blöcke auf die benannte Variable an: Add- und
     /// Remove-Blätter buchen die Variable, die übrigen Blöcke folgen dem
     /// Variablen-Format (Type-Satz festlegt den konkreten Typ).

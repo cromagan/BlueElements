@@ -36,8 +36,8 @@ public sealed class LiveInstanceEventArgs<T> : System.EventArgs {
 /// </summary>
 /// <remarks>
 /// Da statisch abstrakte Member nur in Interfaces, nicht aber in Klassen
-/// erlaubt sind, wird der Typ-spezifische Zustand (Register, Event,
-/// AllowDuplicates-Schalter) als statische Member auf dem generischen Typ
+/// erlaubt sind, wird der Typ-spezifische Zustand (Register, Event)
+/// als statische Member auf dem generischen Typ
 /// <c>LiveInstanceCache&lt;T&gt;</c> untergebracht — jedes <c>T</c> erhält
 /// dadurch seine eigenen statischen Felder. Die konkrete Klasse implementiert
 /// ihre eigene <c>Get(string key)</c>-Methode und ruft darin
@@ -99,13 +99,6 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     #region Properties
 
     /// <summary>
-    /// Stresstest-Schalter: ist er <c>true</c>, wird für jeden Aufruf von
-    /// GetOrCreate eine neue Instanz erzeugt und nicht im
-    /// Register gehalten. Default: <c>false</c>.
-    /// </summary>
-    public static bool AllowDuplicates { get; set; }
-
-    /// <summary>
     /// Eigenes Register aller lebenden Instanzen dieses Typs, geordnet nach
     /// KeyName. Schlüsselseitig Case-Insensitive
     /// (StringComparer.OrdinalIgnoreCase). Protected —
@@ -145,15 +138,6 @@ public abstract class LiveInstanceCache<T> where T : LiveInstanceCache<T>, IDisp
     /// OnAdded ausgelöst.</param>
     protected static T? GetOrCreate(string key, Func<string, T> factory) {
         if (string.IsNullOrEmpty(key)) { return null; }
-
-        // Bei erlaubten Duplikaten: nicht cachen, einfach Factory aufrufen.
-        // Die Factory (bzw. der Konstruktor) registriert die Instanz ggf. selbst.
-        if (AllowDuplicates) {
-            var duplicate = factory(key);
-            if (duplicate is null) { return null; }
-            OnAdded(duplicate);
-            return duplicate;
-        }
 
         // Fast Path: bestehende lebende Instanz ohne Lock zurückgeben.
         // Der teure Konstruktions-/Lade-Pfad wird nur betreten, wenn wirklich

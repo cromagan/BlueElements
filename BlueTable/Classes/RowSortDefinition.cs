@@ -265,6 +265,12 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((SortDefinitionFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Sortier-Definitions-Block: Reverse stumm anwenden (das
     /// Bubbling wäre beim Laden/Replay ein Echo ins Journal), Sortier-Spalten
     /// als ColumnsList komplett neu setzen — fehlende Spalten werden

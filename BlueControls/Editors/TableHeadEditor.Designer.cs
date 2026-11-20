@@ -77,7 +77,7 @@ namespace BlueControls.BlueTableDialogs {
             txbDictionary = new TextBox();
             capDictionary = new Caption();
             tabUndo = new TabPage();
-            tblUndo = new TableViewWithFilters();
+            fragmentUndo = new FragmentEditor();
             pnlStatusBar.SuspendLayout();
             grpBenutzergruppen.SuspendLayout();
             grpKennwort.SuspendLayout();
@@ -689,23 +689,20 @@ namespace BlueControls.BlueTableDialogs {
             // tabUndo
             // 
             tabUndo.BackColor = Color.FromArgb(255, 255, 255);
-            tabUndo.Controls.Add(tblUndo);
+            tabUndo.Controls.Add(fragmentUndo);
             tabUndo.Location = new Point(4, 25);
             tabUndo.Name = "tabUndo";
             tabUndo.Size = new Size(1178, 678);
             tabUndo.TabIndex = 6;
             tabUndo.Text = "Undo";
-            // 
-            // tblUndo
-            // 
-            tblUndo.Ansichtbearbeitung = false;
-            tblUndo.Dock = DockStyle.Fill;
-            tblUndo.Location = new Point(0, 0);
-            tblUndo.Name = "tblUndo";
-            tblUndo.PowerEdit = false;
-            tblUndo.Size = new Size(1178, 678);
-            tblUndo.TabIndex = 0;
-            tblUndo.Text = "UndoTab";
+            //
+            // fragmentUndo
+            //
+            fragmentUndo.Dock = DockStyle.Fill;
+            fragmentUndo.Location = new Point(0, 0);
+            fragmentUndo.Name = "fragmentUndo";
+            fragmentUndo.Size = new Size(1178, 678);
+            fragmentUndo.TabIndex = 0;
             // 
             // TableHeadEditor
             // 
@@ -757,7 +754,7 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabUndo;
         private Caption capKennwort;
         private Button btnSpaltenuebersicht;
-        private TableViewWithFilters tblUndo;
+        private FragmentEditor fragmentUndo;
         private Caption capNeueZeilenInfo;
         private TabControl GlobalTab;
         private TextBoxSuggestions txbZeilenQuickInfo;

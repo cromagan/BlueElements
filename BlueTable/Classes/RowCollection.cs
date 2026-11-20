@@ -50,6 +50,19 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
     #endregion
 
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Zeilen-Pfad: Der Listen- oder
+    /// Nav-Satz (SubRow) leitet den Zahlraum der Zeile ein, sonst eigener Raum;
+    /// unbekannte Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((RowCollectionFragmentType)path[0].LeafType).ToString(); }
+
+        return path[0].LeafType is (byte)RowCollectionFragmentType.SubRow or (byte)RowCollectionFragmentType.RowList
+            ? RowItem.GetNameOf(path[1..])
+            : ((RowCollectionFragmentType)path[^1].LeafType).ToString();
+    }
+
     #region Fields
 
     public static readonly ConcurrentDictionary<RowItem, FailedRowEntry> FailedRows = [];

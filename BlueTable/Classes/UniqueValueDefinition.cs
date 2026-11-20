@@ -231,6 +231,12 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
     }
 
     /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im eigenen Zahlraum; unbekannte
+    /// Werte liefern die Zahl.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) => ((UniqueFragmentType)path[^1].LeafType).ToString();
+
+    /// <summary>
     /// Verarbeitet den Definitions-Block; der Content der Spalten enthält die
     /// ColumnKeys als ListSet-Einträge. Danach werden Sortierung und KeyName neu gebaut,
     /// damit eine beim Lesen neu erzeugte Definition per KeyName auffindbar bleibt.

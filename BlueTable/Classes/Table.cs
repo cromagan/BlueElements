@@ -456,8 +456,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public virtual bool MultiUserPossible => false;
     /// <summary>
     /// Pro Instanz einmalig generierter Hash aus MachineName und einer Guid.
-    /// Unterscheidet verschiedene Tabellen-Instanzen — auch im selben Prozess
-    /// (z.B. für den Develop-Stresstest mit mehrfach geladener gleicher Tabelle).
+    /// Unterscheidet verschiedene Tabellen-Instanzen — auch im selben Prozess.
     /// Taucht im Dateinamen der .tblc-Dateien auf und in der Master-Id.
     /// </summary>
     public string MyId { get; } = $"{Environment.MachineName}|{Guid.NewGuid()}".GetMD5Hash()[..3].ToUpperInvariant();
@@ -854,7 +853,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             file = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(file);
 
-            // Race-Safe über den Helper: Caching, Locking und AllowDuplicates
+            // Race-Safe über den Helper: Caching und Locking
             // werden dort behandelt. Create (bzw. CreateInstance) macht die
             // Datei-Suche + Laden.
             return GetOrCreate<Table>(file);
@@ -1627,7 +1626,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError, VariableCollection? additionalVariables) {
         // Vorab-Prüfungen
-        var f = ExternalAbortScriptReason(extended);
+        var f = ExternalAbortScriptReason(script.EventTypes, extended);
         if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
 
         f = IsGenericEditable(false);
@@ -1823,9 +1822,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         } while (true);
     }
 
-    public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
+    public string ExternalAbortScriptReason() => ExternalAbortScriptReason(ScriptEventTypes.Ohne_Auslöser, false);
 
-    public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(true);
+    public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(ScriptEventTypes.Ohne_Auslöser, true);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -1892,6 +1891,46 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
                                     CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
+
+    /// <summary>
+    /// Verständlicher Name eines Empfänger-Typs im Pfad-Kontext: Die Vorfahren-Sätze
+    /// bestimmen den Zahlraum (Tabelle, Sammlung, Item); unbekannte Werte liefern die
+    /// Zahl. Grundlage der Typ-Spalte im Fragment-Editor.
+    /// </summary>
+    public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        if (path.Length == 1) { return ((TableFragmentType)path[0].LeafType).ToString(); }
+
+        // Der erste Kette-Eintrag benennt den Empfänger; dessen Zahlraum gilt für den Rest der Kette.
+        switch ((TableFragmentType)path[0].LeafType) {
+            case TableFragmentType.Columns:
+                return ColumnCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.Rows:
+                return RowCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.UniqueDefinitions:
+                return UniqueValueCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.Scripts:
+                return TableScriptCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.VariableCollection:
+                return VariableCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.ColumnArrangements:
+                return ColumnArrangementCollection.GetNameOf(path[1..]);
+
+            case TableFragmentType.SortDefinition:
+                return RowSortDefinition.GetNameOf(path[1..]);
+
+            case TableFragmentType.UndoHistory:
+                // Undo-Blöcke enthalten nachgestellte Journal-Einträge — wieder Tabellen-Raum.
+                return GetNameOf(path[1..]);
+
+            default:
+                return ((TableFragmentType)path[^1].LeafType).ToString();
+        }
+    }
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Cli, StringComparison.OrdinalIgnoreCase)) { return false; } // Die CLI ist nie Tabellen-Administrator
@@ -2611,7 +2650,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 
         // Script-Überprüfung
-        var e = new CanDoScriptEventArgs(false);
+        var e = new CanDoScriptEventArgs(ScriptEventTypes.value_changed, false);
         OnCanDoScript(e);
         if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
     }
@@ -3124,8 +3163,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         RepairAfterParse();
     }
 
-    private string ExternalAbortScriptReason(bool extended) {
-        var e = new CanDoScriptEventArgs(extended);
+    private string ExternalAbortScriptReason(ScriptEventTypes scriptType, bool extended) {
+        var e = new CanDoScriptEventArgs(scriptType, extended);
         OnCanDoScript(e);
         return e.CancelReason;
     }
