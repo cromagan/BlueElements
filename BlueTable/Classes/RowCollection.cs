@@ -23,11 +23,11 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     /// unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
             ? RowItem.GetNameOf(path[1..])
-            : ((CollectionFragmentType)path[^1].LeafType).ToString();
+            : ((FragmentTagType)path[^1].ValueId).ToString();
     }
 
     #region Fields
@@ -1044,7 +1044,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
         List<RowItem> saveRows = ToList();
         saveRows.RemoveAll(row => row is not { IsDisposed: false });
 
-        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, saveRows);
+        return FragmentRecord.Append(stream, depth, FragmentTagType.ItemList, saveRows);
     }
 
     /// <summary>
@@ -1095,7 +1095,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     /// (Blatt-Inhalt bzw. Nav-Schlüssel) still angelegt; ihre Zellen tragen die
     /// Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => RowCreateOrGet(keyName) is not null;
+    protected override bool ApplyItemAdd(string keyName, string typeName) => RowCreateOrGet(keyName) is not null;
 
     /// <summary>
     /// Liefert die Zeile zum RowKey des ersten Segment-Satzes einer Zeilen-Liste;

@@ -361,7 +361,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     public override bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
-        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, ToStringableListVariable());
+        return FragmentRecord.Append(stream, depth, BlueBasics.Enums.FragmentTagType.ItemList, ToStringableListVariable());
     }
 
     /// <summary>
@@ -377,11 +377,10 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
-    /// Übernimmt ein Journal-Add-Blatt: Mit Typ-Anteil („KeyName|TypeName“) wird die
-    /// Variable sofort mit dem richtigen Typ angelegt; Classic-Blätter ohne Typ-Anteil
-    /// bleiben ohne Wirkung (der Classic-Block legt die Variable an).
+    /// Übernimmt ein Journal-Add-Blatt „KeyName|TypeName“: die Variable wird sofort
+    /// mit dem richtigen Typ angelegt; fehlt der Typ-Anteil, bleibt das Blatt ohne Wirkung.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) {
+    protected override bool ApplyItemAdd(string keyName, string typeName) {
         if (typeName is not { Length: > 0 }) { return true; }
 
         if (ParseableItem.NewByTypeName<ScriptVariable>(typeName) is not { } newVar) { return false; }
@@ -399,11 +398,11 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((BlueBasics.Enums.FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
+        return path[0].TagType is BlueBasics.Enums.FragmentTagType.ItemPath or BlueBasics.Enums.FragmentTagType.ItemList
             ? ScriptVariable.GetNameOf(path[1..])
-            : ((CollectionFragmentType)path[^1].LeafType).ToString();
+            : ((BlueBasics.Enums.FragmentTagType)path[^1].ValueId).ToString();
     }
 
     /// <summary>
@@ -414,7 +413,7 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) { return false; }
 
-        if (record.LeafType == (byte)CollectionFragmentType.ItemPath && record.DataType == BlueBasics.Enums.FragmentDataType.String) { return DeserializeVariable(stream, record); }
+        if (record.TagType == BlueBasics.Enums.FragmentTagType.ItemPath && record.DataType == BlueBasics.Enums.FragmentDataType.String) { return DeserializeVariable(stream, record); }
 
         return base.DeserializeThis(stream, record);
     }
@@ -428,13 +427,13 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
 
         do {
             first = FragmentRecord.TryReadNext(stream, record.Depth + 1);
-        } while (first is { IsTag: true });
+        } while (first is { IsFileTag: true });
 
         if (first is null) { return false; }
 
-        if (first.LeafType == (byte)CollectionFragmentType.ItemRemove) { return ApplyItemRemove(record.StringContent); }
+        if (first.TagType == BlueBasics.Enums.FragmentTagType.ItemRemove) { return ApplyItemRemove(record.StringContent); }
 
-        if (first.LeafType == (byte)CollectionFragmentType.ItemAdd) { return ApplyItemAddFragment(first.StringContent); }
+        if (first.TagType == BlueBasics.Enums.FragmentTagType.ItemAdd) { return ApplyItemAdd(record.StringContent, first.TypeContent); }
 
         if (first.LeafType != (byte)ScriptVariable.VariableFragmentType.Type) {
             // Bestehende Variable: Wert-/Kommentar-Sätze direkt auf die Instanz anwenden.

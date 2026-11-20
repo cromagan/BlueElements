@@ -3,14 +3,38 @@
 namespace BlueBasics.Enums;
 
 /// <summary>
-/// Standardisierte Tags (valueId 231–255) des binären Fragment-Formats — Steuer-Sätze
-/// auf Datei-Ebene ohne Empfänger-Typ: genau 1 Tab, nie Meta, werden vom Reader
-/// abgefangen, bevor der Satz an eine Klasse gereicht wird. Klasseneigene Enums
-/// dürfen keine Steuer-Werte ≥ 231 definieren und teilen sich die Bytes mit
-/// diesem Enum.
+/// Standardisierte Tags (valueId ≥ 200) des binären Fragment-Formats. Der gesamte
+/// Bereich ab 200 ist geschützt: Klasseneigene Enums dürfen dort keine Werte
+/// definieren und teilen sich die Bytes mit diesem Enum.
+/// 200–229: standardisierte Empfänger-Tags der Sammlungen — werden an die
+/// Empfänger-Klasse gereicht und dort über TagType geroutet.
+/// 231–255: Steuer-Sätze auf Datei-Ebene ohne Empfänger-Typ: genau 1 Tab, nie Meta,
+/// werden vom Reader abgefangen, bevor der Satz an eine Klasse gereicht wird.
 /// </summary>
 public enum FragmentTagType : byte {
     None = 0,
+
+    /// <summary>
+    /// Navigation in einen Eintrag (Key = KeyName des Eintrags).
+    /// </summary>
+    ItemPath = 200,
+
+    /// <summary>
+    /// ListKeyObject-Satz: die Einträge folgen als Liste eine Ebene tiefer.
+    /// </summary>
+    ItemList = 201,
+
+    /// <summary>
+    /// Blatt-Satz: übernimmt einen neuen Eintrag (Content = „KeyName|TypeName“).
+    /// </summary>
+    ItemAdd = 202,
+
+    /// <summary>
+    /// Blatt-Satz: entfernt den Eintrag des Journal-Blocks (Nav-Schlüssel).
+    /// </summary>
+    ItemRemove = 203,
+
+    // 204 - 230 frei für künftige standardisierte Empfänger-Tags
 
     /// <summary>
     /// Kommentar, der in die Datei geschrieben wurde.

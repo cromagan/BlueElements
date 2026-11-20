@@ -6,13 +6,13 @@ namespace BlueBasics.Classes;
 
 /// <summary>
 /// Ein einzelner Satz im binären Fragment-Format „Typ + Key“.
-/// Aufbau: Tabs (Einrücktiefe, Tiefe 0 = Wurzel-Ebene ohne Tab), SpeicherTyp, len1, [Empfänger-Typ], 0x20, valueId,
-/// [Content-Typ], len2, Content, optional Meta (User, DateTimeUtc als 8 Tick-Bytes, Comment; durch US getrennt), 0x0D.
-/// Daten-Sätze tragen den Content-Typ direkt als valueId; Steuer-Sätze (valueId ≥ 231)
+/// Aufbau: SpeicherTyp, Tiefe (1 Byte), len1, Empfänger-Typ bzw. Tag, Content-Typ, len2, Content,
+/// optional Meta (User, DateTimeUtc als 8 Tick-Bytes, Comment; durch US getrennt).
+/// Daten-Sätze tragen den Empfänger-Typ direkt als valueId; geschützte Sätze (valueId ≥ 200)
 /// tragen ihren Tag als valueId, gefolgt vom Content-Typ.
-/// ListSet-Sätze tragen im Content je Eintrag als Tab, 2 Längenbytes, Inhalt und 0x0D.
+/// ListSet-Sätze tragen im Content je Eintrag 2 Längenbytes und den Inhalt.
 /// Werte-Typen liegen kompakt vor: Int 4 Bytes, Float 4 Bytes, Double 8 Bytes, Long 8 Bytes,
-/// DateTime 8 Tick-Bytes, Color 4 ARGB-Bytes, Decimal 16 Bytes (Little-Endian); Text-Typen
+/// DateTime 8 Tick-Bytes, Color 4 ARGB-Bytes, Decimal 16 Bytes, UInt 4 Bytes (Little-Endian); Text-Typen
 /// nutzen UTF-8 (String, Json) bzw. Latin1 (Bool).
 /// Die Pfad-Navigation wird nicht gespeichert: Jeder Satz trägt nur seine Tiefe;
 /// Sub*-Sätze (Empfänger-Typ des Containers, Content = Key) eröffnen den Block des
@@ -33,16 +33,14 @@ public sealed class FragmentRecord {
     /// </summary>
     public const byte StandardStorageType = 1;
 
-    private const byte TabByte = 0x09;
-    private const byte CarriageReturnByte = 0x0D;
     private const byte UnitSeparatorByte = 0x1F;
-    private const byte SpaceByte = 0x20;
     private const long MaxFieldLength = 256L * 256 * 256 * 256 - 1;
 
     /// <summary>
-    /// Obergrenze für klasseneigene Empfänger-Typen; darüber liegen Steuer-Werte.
+    /// Obergrenze für klasseneigene Empfänger-Typen; darüber beginnt der geschützte
+    /// Bereich des FragmentTagType.
     /// </summary>
-    public const byte MaxUserTypeValue = 230;
+    public const byte MaxUserTypeValue = 199;
 
     /// <summary>
     /// Längenbegrenzung eines List-Eintrags (2 Längenbytes).
@@ -52,7 +50,7 @@ public sealed class FragmentRecord {
     /// <summary>
     /// Text der Kommentar-Trenner zwischen Objekt-Blöcken.
     /// </summary>
-    public const string SeparatorComment = "---------------------------------------------------------------";
+    public const string SeparatorComment = "-";
 
     #endregion
 
@@ -96,32 +94,46 @@ public sealed class FragmentRecord {
     public byte StorageType { get; private set; }
 
     /// <summary>
-    /// Einrücktiefe des Satzes (0 = Wurzel-Ebene); die Tiefe entspricht der Tab-Anzahl.
+    /// Einrücktiefe des Satzes (0 = Wurzel-Ebene), gespeichert als Byte.
     /// Ein Objekt-Block endet am ersten Satz geringerer Tiefe bzw. am Datei-Ende.
     /// </summary>
     public int Depth { get; private set; }
 
     /// <summary>
-    /// Empfänger-Typ (klasseneigenes Enum des Empfängers). Bei Steuer-Sätzen 0.
+    /// Empfänger-Typ (klasseneigenes Enum des Empfängers) bzw. bei geschützten
+    /// Sätzen (TagType ≥ ItemPath) 0.
     /// </summary>
     public byte LeafType { get; private set; }
 
     /// <summary>
-    /// Content-Typ des Satzes (FragmentDataType) — auch bei Steuer-Sätzen.
+    /// Content-Typ des Satzes (FragmentDataType) — auch bei geschützten Sätzen.
     /// </summary>
     public FragmentDataType DataType { get; private set; }
 
     /// <summary>
-    /// Standard-Tag des Steuer-Satzes (FragmentTagType); None bei Daten-Sätzen.
-    /// Klasseneigene Steuer-Werte ≥ 231 stehen hier als roher FragmentTagType-Wert.
+    /// Tag des Satzes (FragmentTagType) bei valueId ≥ 200; None bei klasseneigenen Daten-Sätzen.
+    /// 200–229 sind standardisierte Empfänger-Tags und werden an die Empfänger-Klasse
+    /// gereicht; ab 231 liegen die Steuer-Sätze der Datei-Ebene.
     /// </summary>
     public FragmentTagType TagType { get; private set; }
 
     /// <summary>
-    /// True, wenn der Satz ein Steuer-Satz auf Datei-Ebene ist (valueId ≥ 231).
-    /// Solche Sätze haben einen leeren Pfad, nie Meta und werden nie an eine Klasse gereicht.
+    /// True, wenn der Satz im geschützten Bereich liegt (valueId ≥ 200) und damit
+    /// per FragmentTagType geroutet wird statt über den klasseneigenen Empfänger-Typ.
     /// </summary>
     public bool IsTag => TagType != FragmentTagType.None;
+
+    /// <summary>
+    /// True, wenn der Satz ein Steuer-Satz der Datei-Ebene ist (TagType ≥ Comment).
+    /// Solche Sätze haben einen leeren Pfad, nie Meta und werden nie an eine Klasse gereicht.
+    /// </summary>
+    public bool IsFileTag => TagType >= FragmentTagType.Comment;
+
+    /// <summary>
+    /// Das Routing-Byte des Satzes, wie es beim Lesen an der valueId-Position stand:
+    /// im geschützten Bereich der FragmentTagType-Wert, sonst der klasseneigene Empfänger-Typ.
+    /// </summary>
+    public byte ValueId => IsTag ? (byte)TagType : LeafType;
 
     /// <summary>
     /// Content roh als Byte-Folge; alle Ausgaben reichen den passenden Konverter nach.
@@ -187,6 +199,16 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
+    /// Content als UInt (Pendant zur Append-Überladung).
+    /// </summary>
+    public uint UIntContent {
+        get {
+            CheckDataType(FragmentDataType.UInt);
+            return ByteContent is { Length: 4 } bytes ? ToUInt(bytes) : 0u;
+        }
+    }
+
+    /// <summary>
     /// Content als Long (Pendant zur Append-Überladung).
     /// </summary>
     public long LongContent {
@@ -247,8 +269,8 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Content als String-Liste: ListSet-Content je Eintrag (Tab, 2 Längenbytes,
-    /// UTF-8-Inhalt, 0x0D) dekodiert, ohne Sortierung oder Abschneiden; String-Sätze
+    /// Content als String-Liste: ListSet-Content je Eintrag (2 Längenbytes,
+    /// UTF-8-Inhalt) dekodiert, ohne Sortierung oder Abschneiden; String-Sätze
     /// liefern ihre CR-getrennten Teile.
     /// </summary>
     public string[] ListContent {
@@ -261,22 +283,18 @@ public sealed class FragmentRecord {
             var pos = 0;
 
             while (pos < ByteContent.Length) {
-                // Eintrag: Tab, 2 Längenbytes, UTF-8-Inhalt, 0x0D.
-                if (pos + 4 > ByteContent.Length || ByteContent[pos] != TabByte) { return []; }
+                // Eintrag: 2 Längenbytes, UTF-8-Inhalt.
+                if (pos + 2 > ByteContent.Length) { return []; }
 
-                var len = ByteContent[pos + 1] | (ByteContent[pos + 2] << 8);
+                var len = ByteContent[pos] | (ByteContent[pos + 1] << 8);
 
-                pos += 3;
+                pos += 2;
 
-                if (pos + len + 1 > ByteContent.Length) { return []; }
+                if (pos + len > ByteContent.Length) { return []; }
 
                 entries.Add(Encoding.UTF8.GetString(ByteContent, pos, len));
 
                 pos += len;
-
-                if (ByteContent[pos] != CarriageReturnByte) { return []; }
-
-                pos++;
             }
 
             return entries.ToArray();
@@ -404,8 +422,8 @@ public sealed class FragmentRecord {
     public static bool Append(Stream stream, int depth, Enum leafType, decimal content) => AppendData(stream, depth, EnumByte(leafType), FragmentDataType.Decimal, DecimalBytes(content), null);
 
     /// <summary>
-    /// Schreibt eine String-Liste als ListSet-Satz: je Eintrag Tab, 2 Längenbytes,
-    /// Inhalt und 0x0D. Kein Join, kein Sort, kein Trim.
+    /// Schreibt eine String-Liste als ListSet-Satz: je Eintrag 2 Längenbytes
+    /// und Inhalt. Kein Join, kein Sort, kein Trim.
     /// </summary>
     public static bool Append(Stream stream, int depth, Enum leafType, IReadOnlyList<string> content) =>
         EncodeListPayload(content) is { } payload && AppendData(stream, depth, EnumByte(leafType), FragmentDataType.ListSet, payload, null);
@@ -453,7 +471,7 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Kodiert den ListSet-Content: je Eintrag Tab, 2 Längenbytes, UTF-8-Inhalt und 0x0D.
+    /// Kodiert den ListSet-Content: je Eintrag 2 Längenbytes und UTF-8-Inhalt.
     /// Liefert null bei zu langen Einträgen.
     /// </summary>
     internal static byte[]? EncodeListPayload(IReadOnlyList<string> content) {
@@ -465,27 +483,25 @@ public sealed class FragmentRecord {
 
             if (encodedEntries[i].Length > MaxListEntryLength) { return null; }
 
-            length += 1 + 2 + encodedEntries[i].Length + 1;
+            length += 2 + encodedEntries[i].Length;
         }
 
         var payload = new byte[length];
         var pos = 0;
 
         foreach (var entryBytes in encodedEntries) {
-            payload[pos++] = TabByte;
             payload[pos++] = (byte)(entryBytes.Length & 0xFF);
             payload[pos++] = (byte)((entryBytes.Length >> 8) & 0xFF);
             Array.Copy(entryBytes, 0, payload, pos, entryBytes.Length);
             pos += entryBytes.Length;
-            payload[pos++] = CarriageReturnByte;
         }
 
         return payload;
     }
 
     /// <summary>
-    /// Liefert das Byte eines klasseneigenen Empfänger-Typ-Enums, damit Aufrufer
-    /// keine (byte)-Casts brauchen.
+    /// Liefert das Byte eines Empfänger-Typ-Enums (klasseneigen oder FragmentTagType),
+    /// damit Aufrufer keine (byte)-Casts brauchen.
     /// </summary>
     internal static byte EnumByte(Enum leafType) => Convert.ToByte(leafType, CultureInfo.InvariantCulture);
 
@@ -493,6 +509,11 @@ public sealed class FragmentRecord {
     /// Kodiert Ganzzahlen und ARGB-Farben als Little-Endian-Bytes (gleiches Byte-Muster wie die Längenfelder).
     /// </summary>
     internal static byte[] IntBytes(int value) => [(byte)value, (byte)(value >> 8), (byte)(value >> 16), (byte)(value >> 24)];
+
+    /// <summary>
+    /// Kodiert UInt-Werte als 4 Little-Endian-Bytes.
+    /// </summary>
+    internal static byte[] UIntBytes(uint value) => [(byte)value, (byte)(value >> 8), (byte)(value >> 16), (byte)(value >> 24)];
 
     /// <summary>
     /// Kodiert Long-Werte (auch DateTime-Ticks) als 8 Little-Endian-Bytes.
@@ -529,6 +550,8 @@ public sealed class FragmentRecord {
 
     private static int ToInt(byte[] bytes) => bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
 
+    private static uint ToUInt(byte[] bytes) => unchecked((uint)ToInt(bytes));
+
     private static long ToLong(byte[] bytes) => bytes[0]
         | (long)bytes[1] << 8
         | (long)bytes[2] << 16
@@ -546,36 +569,27 @@ public sealed class FragmentRecord {
 
     /// <summary>
     /// Kern des Steuer-Satz-Schreibens: Tag an der valueId-Position, gefolgt vom
-    /// Content-Typ, damit der Reader den Content typiert lesen kann. Prüft Tag und
-    /// Längen, berechnet len1 (inkl. abschließendem 0x0D) und schreibt den Satz.
+    /// Content-Typ, damit der Reader den Content typiert lesen kann.
+    /// Liefert false bei None oder Überschreiten der Längenbegrenzung.
     /// </summary>
-    private static bool AppendTag(Stream stream, int depth, FragmentTagType tag, FragmentDataType dataType, byte[] contentBytes) {
-        if (depth < 0 || tag == FragmentTagType.None || (byte)dataType > MaxUserTypeValue) { return false; }
-
-        if (contentBytes.Length > MaxFieldLength) { return false; }
-
-        // 0x20-Trenner + Tag + Content-Typ + len2-Feld + Content + 0x0D
-        var len1 = 1 + 2 + 4 + contentBytes.Length + 1;
-
-        if (len1 > MaxFieldLength) { return false; }
-
-        WriteRecord(stream, depth, [SpaceByte], [(byte)tag, (byte)dataType], contentBytes, null, len1);
-        return true;
-    }
+    private static bool AppendTag(Stream stream, int depth, FragmentTagType tag, FragmentDataType dataType, byte[] contentBytes) =>
+        AppendData(stream, depth, (byte)tag, dataType, contentBytes, null);
 
     /// <summary>
-    /// Kern des Daten-Satz-Schreibens: prüft Tiefe und Empfänger-Typ, berechnet len1
-    /// (inkl. abschließendem 0x0D) und schreibt den Satz mit optionaler Meta-Sektion.
+    /// Kern des Daten-Satz-Schreibens: prüft Tiefe und Empfänger-Typ bzw. Tag,
+    /// berechnet len1 und schreibt den Satz mit optionaler Meta-Sektion. Der
+    /// Empfänger-Typ darf 1–255 sein: Werte ab 200 (FragmentTagType) werden beim
+    /// Lesen als Tag geroutet.
     /// </summary>
     private static bool AppendData(Stream stream, int depth, byte leafType, FragmentDataType dataType, byte[] contentBytes, byte[]? metaBytes) {
-        if (depth < 0 || leafType > MaxUserTypeValue) { return false; }
+        if (depth is < 0 or > byte.MaxValue || leafType == 0 || (byte)dataType > MaxUserTypeValue) { return false; }
 
-        // Empfänger-Typ + 0x20-Trenner + valueId + len2-Feld + Content + Meta + 0x0D
-        var len1 = 2 + 1 + 4 + contentBytes.Length + (metaBytes?.Length ?? 0) + 1;
+        // Empfänger-Typ + valueId + len2-Feld + Content + Meta
+        var len1 = 2 + 4 + contentBytes.Length + (metaBytes?.Length ?? 0);
 
         if (len1 > MaxFieldLength) { return false; }
 
-        WriteRecord(stream, depth, [leafType, SpaceByte], [(byte)dataType], contentBytes, metaBytes, len1);
+        WriteRecord(stream, depth, [leafType, (byte)dataType], contentBytes, metaBytes, len1);
         return true;
     }
 
@@ -621,60 +635,41 @@ public sealed class FragmentRecord {
     }
 
     /// <summary>
-    /// Liest einen kompletten Roh-Satz (Tabs, SpeicherTyp, len1, Rest) aus dem Stream.
+    /// Liest einen kompletten Roh-Satz (SpeicherTyp, Tiefe, len1, Rest) aus dem Stream.
     /// Liefert false bei Datei-Ende vor dem Satz oder abgeschnittener Struktur.
     /// </summary>
     private static bool TryReadRawRecord(Stream stream, long start, out byte[] buffer) {
         buffer = [];
-        var current = stream.ReadByte();
+        var header = new byte[6];
+        if (stream.Read(header, 0, header.Length) != header.Length) { stream.Position = start; return false; }
 
-        if (current < 0) { return false; }
-
-        var tabs = 0;
-        while (current == TabByte) {
-            tabs++;
-            current = stream.ReadByte();
-            if (current < 0) { stream.Position = start; return false; }
-        }
-
-        var header = new byte[5] { (byte)current, 0, 0, 0, 0 };
-        if (stream.Read(header, 1, 4) != 4) { stream.Position = start; return false; }
-
-        var len1 = header[1] | (header[2] << 8) | (header[3] << 16) | (header[4] << 24);
+        var len1 = header[2] | (header[3] << 8) | (header[4] << 16) | (header[5] << 24);
         var rest = new byte[Math.Max(len1, 0)];
         if (len1 < 1 || stream.Read(rest, 0, len1) != len1) { stream.Position = start; return false; }
 
-        buffer = new byte[tabs + header.Length + rest.Length];
-        for (var i = 0; i < tabs; i++) { buffer[i] = TabByte; }
-        Array.Copy(header, 0, buffer, tabs, header.Length);
-        Array.Copy(rest, 0, buffer, tabs + header.Length, rest.Length);
+        buffer = new byte[header.Length + rest.Length];
+        Array.Copy(header, buffer, header.Length);
+        Array.Copy(rest, 0, buffer, header.Length, rest.Length);
 
         return true;
     }
 
     /// <summary>
-    /// Parst einen Satz ab startPosition (die Wurzel-Ebene beginnt ohne Tab): Tabs zählen, SpeicherTyp
-    /// lesen, len1 lesen, Empfänger-Typ bzw. Steuer-Kennung und Content-Typ lesen,
-    /// len2/Content/Meta validieren. Bei strukturiert erkennbarem Satzende wird nextPosition über das
-    /// Satzende gesetzt, sonst auf das Puffer-Ende. Bei Verletzung der Format-Regeln
-    /// liefert die Methode false und record bleibt null.
+    /// Parst einen Satz ab startPosition: SpeicherTyp und Tiefe (1 Byte) lesen, len1 lesen,
+    /// Empfänger-Typ bzw. Steuer-Kennung und Content-Typ lesen, len2/Content/Meta validieren.
+    /// Bei strukturiert erkennbarem Satzende wird nextPosition über das Satzende gesetzt, sonst
+    /// auf das Puffer-Ende. Bei Verletzung der Format-Regeln liefert die Methode false und record
+    /// bleibt null.
     /// </summary>
     public static bool TryParse(byte[] buffer, int startPosition, out FragmentRecord? record, out int nextPosition) {
         record = null;
         nextPosition = startPosition;
         var pos = startPosition;
 
-        var tabs = 0;
-        while (pos < buffer.Length && buffer[pos] == TabByte) {
-            tabs++;
-            pos++;
-        }
-
-        if (pos >= buffer.Length) { nextPosition = buffer.Length; return false; }
+        if (pos + 6 > buffer.Length) { nextPosition = buffer.Length; return false; }
 
         var storageType = buffer[pos++];
-
-        if (pos + 4 > buffer.Length) { nextPosition = buffer.Length; return false; }
+        var depth = buffer[pos++];
 
         var len1 = buffer[pos] | (buffer[pos + 1] << 8) | (buffer[pos + 2] << 16) | (buffer[pos + 3] << 24);
         pos += 4;
@@ -688,56 +683,18 @@ public sealed class FragmentRecord {
 
         nextPosition = recordEnd;
 
-        // Empfänger-Typ bzw. Steuer-Kennung: Nach len1 folgt entweder direkt das
-        // 0x20 (Steuer-Satz, kein Empfänger-Typ) oder genau ein Typ-Byte ≤ 230, dann 0x20.
-        // Blatt-Typ 32 (0x20, ColumnArrangement) kollidiert mit dem Trenner: Die
-        // Bytesfolge 0x20 0x20 ist eindeutig Blatt 32 + Trenner — ein echter
-        // Steuer-Satz hat als nächstes Byte einen Steuer-Wert (≥ 231), nie 0x20.
-        byte leafType;
-        var hasLeaf = false;
-
-        if (buffer[pos] == SpaceByte) {
-            if (pos + 1 < recordEnd && buffer[pos + 1] == SpaceByte) {
-                leafType = SpaceByte;
-                hasLeaf = true;
-                pos += 2;
-            } else {
-                leafType = 0;
-                pos++;
-            }
-        } else {
-            leafType = buffer[pos++];
-
-            if (leafType > MaxUserTypeValue) { return false; }
-            if (pos >= recordEnd || buffer[pos] != SpaceByte) { return false; }
-
-            pos++;
-            hasLeaf = true;
-        }
+        // Empfänger-Typ bzw. Tag: das erste Byte des Payloads ist bei klasseneigenen
+        // Daten-Sätzen der Empfänger-Typ (< 200), im geschützten Bereich (≥ 200) der
+        // FragmentTagType-Wert; dahinter folgt je Content-Typ.
+        var valueId = buffer[pos++];
+        var isTag = valueId > MaxUserTypeValue;
 
         if (pos >= recordEnd) { return false; }
 
-        var valueId = buffer[pos];
-        var isTag = valueId > MaxUserTypeValue;
+        if (buffer[pos] > MaxUserTypeValue) { return false; }
 
-        if (!hasLeaf && !isTag) { return false; }
-
-        FragmentDataType dataType;
-
-        if (isTag) {
-            // Steuer-Satz: Tag an der valueId-Position, dahinter der Content-Typ.
-            pos++;
-
-            if (pos + 5 > recordEnd) { return false; }
-
-            if (buffer[pos] > MaxUserTypeValue) { return false; }
-
-            dataType = (FragmentDataType)buffer[pos];
-            pos++;
-        } else {
-            dataType = (FragmentDataType)valueId;
-            pos++;
-        }
+        var dataType = (FragmentDataType)buffer[pos];
+        pos++;
 
         byte[] contentBytes;
 
@@ -748,25 +705,24 @@ public sealed class FragmentRecord {
 
         // len2 kann durch das High-Bit des letzten Längen-Bytes negativ werden; der Vergleich
         // ohne Addition vermeidet den int-Überlauf bei absurden Längen.
-        if (len2 < 0 || len2 > recordEnd - pos - 1) { return false; }
+        if (len2 < 0 || len2 > recordEnd - pos) { return false; }
 
         contentBytes = buffer[pos..(pos + len2)];
         pos += len2;
 
-        // Rest prüfen (Längen-Arithmetik, kein Marker): Rest = 1 → nur das 0x0D, keine Meta.
-        var metaLength = recordEnd - 1 - pos;
+        // Rest ist die optionale Meta-Sektion (Längen-Arithmetik, kein Marker).
+        var metaLength = recordEnd - pos;
 
         var result = new FragmentRecord {
             StorageType = storageType,
-            Depth = tabs,
-            LeafType = leafType,
+            Depth = depth,
+            LeafType = isTag ? (byte)0 : valueId,
             DataType = dataType,
             TagType = isTag ? (FragmentTagType)valueId : FragmentTagType.None,
             ByteContent = contentBytes
         };
 
         if (metaLength > 0) {
-            if (buffer[recordEnd - 1] != CarriageReturnByte) { return false; }
             if (!result.ParseMeta(buffer, pos, metaLength)) { return false; }
         }
 
@@ -776,8 +732,9 @@ public sealed class FragmentRecord {
 
     /// <summary>
     /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker im binären
-    /// Fragment-Format enthalten: Der Tag FragmentTagType.Eof an der valueId-Position
-    /// genügt (Position ^7; dahinter Content-Typ, 4 Längen-Bytes, 0x0D).
+    /// Fragment-Format enthalten: Der EOF-Satz ist der 12-Byte-Abschluss
+    /// (Storage-Type, Tiefe, len1=6, Tag Eof, Content-Typ, len2=0); geprüft wird
+    /// der Tag an der valueId-Position.
     /// </summary>
     public static bool HasValidEofMarker(byte[] rawBytes) {
         try {
@@ -786,7 +743,9 @@ public sealed class FragmentRecord {
                 rawBytes = unzipped;
             }
 
-            return rawBytes is { Length: >= 7 } && rawBytes[^7] == (byte)FragmentTagType.Eof;
+            return rawBytes is { Length: >= 12 }
+                && rawBytes[^12] == StandardStorageType
+                && rawBytes[^6] == (byte)FragmentTagType.Eof;
         } catch {
             return false;
         }
@@ -853,19 +812,16 @@ public sealed class FragmentRecord {
         return true;
     }
 
-    private static void WriteRecord(Stream stream, int depth, byte[] leafBytes, byte[] typeBytes, byte[] contentBytes, byte[]? metaBytes, int len1) {
-        var record = new byte[depth + 1 + 4 + leafBytes.Length + typeBytes.Length + 4 + contentBytes.Length + (metaBytes?.Length ?? 0) + 1];
+    private static void WriteRecord(Stream stream, int depth, byte[] typeBytes, byte[] contentBytes, byte[]? metaBytes, int len1) {
+        var record = new byte[2 + 4 + typeBytes.Length + 4 + contentBytes.Length + (metaBytes?.Length ?? 0)];
         var pos = 0;
 
-        for (var i = 0; i < depth; i++) { record[pos++] = TabByte; }
-
         record[pos++] = StandardStorageType;
+        record[pos++] = (byte)depth;
         record[pos++] = (byte)(len1 & 0xFF);
         record[pos++] = (byte)((len1 >> 8) & 0xFF);
         record[pos++] = (byte)((len1 >> 16) & 0xFF);
         record[pos++] = (byte)((len1 >> 24) & 0xFF);
-        Array.Copy(leafBytes, 0, record, pos, leafBytes.Length);
-        pos += leafBytes.Length;
         Array.Copy(typeBytes, 0, record, pos, typeBytes.Length);
         pos += typeBytes.Length;
         record[pos++] = (byte)(contentBytes.Length & 0xFF);
@@ -877,10 +833,7 @@ public sealed class FragmentRecord {
 
         if (metaBytes is not null) {
             Array.Copy(metaBytes, 0, record, pos, metaBytes.Length);
-            pos += metaBytes.Length;
         }
-
-        record[pos] = CarriageReturnByte;
 
         stream.Write(record);
     }
@@ -984,16 +937,16 @@ public sealed class FragmentRecord {
     /// <summary>
     /// Schreibt den Satz auf der Ziel-Tiefe in den Stream (Pendant zum Einlesen per
     /// TryParse). Die Meta-Sektion enthält bewusst keinen Benutzer: Fragment-Journale
-    /// sind benutzerbezogen, der Benutzer steht in den Kopf-Sätzen. Steuer-Sätze
-    /// liefern false; außerdem false bei ungültigem Empfänger-Typ oder Überschreitung
-    /// der Längenbegrenzung.
+    /// sind benutzerbezogen, der Benutzer steht in den Kopf-Sätzen. Steuer-Sätze der
+    /// Datei-Ebene liefern false; außerdem false bei ungültigem Empfänger-Typ bzw.
+    /// Tag oder Überschreitung der Längenbegrenzung.
     /// </summary>
     public bool Append(Stream stream, int depth) {
-        if (IsTag) { return false; }
+        if (IsFileTag) { return false; }
 
         var metaBytes = HasMeta ? BuildMetaBytes(string.Empty, DateTimeUtc, Comment) : null;
 
-        return AppendData(stream, depth, LeafType, DataType, ByteContent, metaBytes);
+        return AppendData(stream, depth, ValueId, DataType, ByteContent, metaBytes);
     }
 
     /// <summary>

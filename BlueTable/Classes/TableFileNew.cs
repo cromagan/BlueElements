@@ -160,8 +160,15 @@ public class TableFileNew : Table {
         // alle weiteren Läufe spielen nur Zeilen-/Zell-Daten nach.
         OnLoaded(e.IsFirst, e.IsFirst);
 
-        // Nacharbeiten immer nach dem Loaded-Durchlauf der Ansichten.
-        RepairAfterParse();
+        // Nacharbeiten immer nach dem Loaded-Durchlauf der Ansichten. Stumm:
+        // Reparaturen sind keine Benutzer-Änderungen und dürfen weder Undo-Journal-
+        // Einträge erzeugen noch als Änderung beim Nachspielen fremder Journale landen.
+        SuppressEvents();
+        try {
+            RepairAfterParse();
+        } finally {
+            ResumeEvents();
+        }
 
         if (e.IsFirst) { CreateWatcher(); }
     }
@@ -203,8 +210,14 @@ public class TableFileNew : Table {
 
     /// <summary>
     /// Speichert alle relevanten Dateien — Delegation an die Datei-Verwaltung.
+    /// Vorab läuft die Reparatur, damit auch der erste Speicherstand bereits im
+    /// reparierten Zustand vorliegt und Laden/Speichern denselben Inhalt erzeugen.
     /// </summary>
-    public OperationResult Save() => Saveable.Save();
+    public OperationResult Save() {
+        RepairAfterParse();
+
+        return Saveable.Save();
+    }
 
     /// <summary>
     /// Öffnet und lädt die Datei — Delegation an die Datei-Verwaltung.

@@ -215,14 +215,15 @@ public static class FragmentStoreableExtension {
     /// <summary>
     /// Liest den eigenen Block bis zu seinem Ende: Sätze genau der Tiefe depth gehen an
     /// DeserializeThis, ein Satz anderer Tiefe beendet den Block (der Stream bleibt an
-    /// dessen Satzanfang stehen). Steuer-Sätze werden übersprungen; Nach dem
-    /// erfolgreichen Block-Ende wird ParseFinished aufgerufen. Liefert false bei echten
-    /// Lesefehlern.
+    /// dessen Satzanfang stehen). Steuer-Sätze der Datei-Ebene werden übersprungen;
+    /// standardisierte Sammlungs-Tags (FragmentTagType ab 200) gehen an DeserializeThis.
+    /// Nach dem erfolgreichen Block-Ende wird ParseFinished aufgerufen. Liefert false
+    /// bei echten Lesefehlern.
     /// </summary>
     public static bool Deserialize(this IFragmentStoreable sender, Stream stream, int depth) {
         while (FragmentRecord.TryReadNext(stream, depth) is { } record) {
-            if (record.IsTag) {
-                // Steuer-Sätze tragen keine Klassen-Daten.
+            if (record.IsFileTag) {
+                // Steuer-Sätze der Datei-Ebene tragen keine Klassen-Daten.
                 continue;
             }
 
@@ -270,13 +271,13 @@ public static class FragmentStoreableExtension {
             blockStream.Write(tmp, 0, size);
         }
 
-        // Segmentgrenzen: Trenner-Sätze (Tiefe depth+2, Tag) beenden ein Segment.
+        // Segmentgrenzen: Trenner-Sätze (Tiefe depth+2, Datei-Tag) beenden ein Segment.
         var buffer = blockStream.ToArray();
         List<long> cuts = [0];
         blockStream.Position = 0;
 
         while (FragmentRecord.TryReadNext(blockStream) is { } rec) {
-            if (rec.Depth == depth + 2 && rec.IsTag) { cuts.Add(blockStream.Position); }
+            if (rec.Depth == depth + 2 && rec.IsFileTag) { cuts.Add(blockStream.Position); }
         }
 
         cuts.Add(blockStream.Length);
@@ -294,7 +295,7 @@ public static class FragmentStoreableExtension {
             if (FragmentRecord.TryReadNext(segment) is not { } first) { continue; }
 
             // Kommentar-Trenner am Segment-Anfang überspringen (Alt-Format)
-            if (first.IsTag) {
+            if (first.IsFileTag) {
                 if (FragmentRecord.TryReadNext(segment) is not { } next) { continue; }
                 first = next;
             }

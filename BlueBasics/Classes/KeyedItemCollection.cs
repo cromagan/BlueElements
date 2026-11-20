@@ -15,7 +15,7 @@ namespace BlueBasics.Classes;
 /// melden die Änderung als Journal-Satz, SerializeCore/DeserializeThis implementieren
 /// IFragmentStoreable — der konkrete Typ wird beim Serialize über TypeName abgefragt.
 /// Alle Ableitungen nutzen dieselben reservierten Pfad-/Blatt-Typen
-/// (CollectionFragmentType); die Bytes sind je Rolle fest vergeben.
+/// (FragmentTagType, Werte ab 200); die Bytes sind je Rolle fest vergeben.
 /// Journal-Nav-Sätze (ItemPath mit Schlüssel-Content) wendet die Klasse granular
 /// auf den benannten Eintrag an (ApplySubItem); unbekannte Sätze gehen an
 /// DeserializeOther.
@@ -55,34 +55,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     #endregion
 
     #region Abstract
-
-    /// <summary>
-    /// Reservierte Pfad-/Blatt-Typen jeder schlüsselbasierten Sammlung im binären
-    /// Fragment-Format. Alle Ableitungen teilen diese Werte; Sätze werden strukturgenau
-    /// geroutet, daher ist die Zahl je Rolle fest vergeben.
-    /// </summary>
-    protected enum CollectionFragmentType : byte {
-
-        /// <summary>
-        /// Navigation in einen Eintrag (Key = KeyName des Eintrags).
-        /// </summary>
-        ItemPath = 1,
-
-        /// <summary>
-        /// ListKeyObject-Satz: die Einträge folgen als Liste eine Ebene tiefer.
-        /// </summary>
-        ItemList = 2,
-
-        /// <summary>
-        /// Blatt-Satz: übernimmt einen neuen Eintrag (Content = „KeyName|TypeName“).
-        /// </summary>
-        ItemAdd = 3,
-
-        /// <summary>
-        /// Blatt-Satz: entfernt den Eintrag des Journal-Blocks (Nav-Schlüssel).
-        /// </summary>
-        ItemRemove = 4
-    }
 
     /// <summary>
     /// Erzeugt das Item zum ersten Satz eines Listen-Segments; null lässt das Segment fallen.
@@ -477,7 +449,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
     /// <summary>
     /// Nach einer erfolgreichen Aufnahme: verdrahtet das Kind neu und meldet die
-    /// Aufnahme als Journal-Blatt AddFragmentType mit „KeyName|TypeName“ ans
+    /// Aufnahme als Journal-Blatt ItemAdd mit „KeyName|TypeName“ ans
     /// Root — direkt unter dem eigenen Segment, ohne Nav-Satz und ohne Item-Block;
     /// die Eigenschaften tragen die Property-Blätter. Ableitungen überschreiben
     /// die Routine, um z. B. Caches zu invalidieren.
@@ -485,19 +457,19 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     protected virtual void OnItemAdded(TItem item) {
         this.Reregister(item);
 
-        OnFragmentChanged(new FragmentChangedEventArgs(this, CollectionFragmentType.ItemAdd, item));
+        OnFragmentChanged(new FragmentChangedEventArgs(this, FragmentTagType.ItemAdd, item));
     }
 
     /// <summary>
     /// Nach einer erfolgreichen Entfernung: löst die Verdrahtung, meldet die Entfernung
-    /// mit Navigationssatz (Nav-Schlüssel = KeyName des Items) und RemoveFragmentType
+    /// mit Navigationssatz (Nav-Schlüssel = KeyName des Items) und ItemRemove-Blatt
     /// ans Root. Ableitungen überschreiben die Routine, um z. B. Caches zu invalidieren.
     /// </summary>
     protected virtual void OnItemRemoved(TItem item) {
         this.Unregister(item);
 
-        var e = new FragmentChangedEventArgs(this, CollectionFragmentType.ItemRemove, string.Empty)
-            .WithNavigation(CollectionFragmentType.ItemPath, item.KeyName);
+        var e = new FragmentChangedEventArgs(this, FragmentTagType.ItemRemove, string.Empty)
+            .WithNavigation(FragmentTagType.ItemPath, item.KeyName);
 
         OnFragmentChanged(e);
     }
@@ -521,7 +493,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         // Nur das Blatt liefert seinen Blatt-Satz; diese Stufe feuert mit ihrem
         // eigenen Navigationssatz weiter.
-        FragmentChanged?.Invoke(this, e.WithNavigation(CollectionFragmentType.ItemPath, FragmentChangedEventArgs.SenderKey(sender)));
+        FragmentChanged?.Invoke(this, e.WithNavigation(FragmentTagType.ItemPath, FragmentChangedEventArgs.SenderKey(sender)));
     }
 
     /// <summary>
@@ -541,23 +513,22 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     }
 
     /// <summary>
-    /// Schreibt die Items als Liste: ein ListFragmentType-Satz (ListKeyObject), darunter je Item
+    /// Schreibt die Items als Liste: ein ItemList-Satz (ListKeyObject), darunter je Item
     /// der Item-Block eine Ebene tiefer. Reihenfolge = ToList(); Ableitungen mit anderer
     /// Reihenfolge oder Teilmengen überschreiben die Routine.
     /// </summary>
     public virtual bool SerializeCore(Stream stream, int depth) {
         if (IsDisposed) { return true; }
 
-        return FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, ToList());
+        return FragmentRecord.Append(stream, depth, FragmentTagType.ItemList, ToList());
     }
 
     /// <summary>
     /// Verarbeitet die Listen- und Journal-Sätze der Sammlung: Nav-Sätze (Content =
     /// Schlüssel) wenden den Block eine Ebene tiefer granular auf den benannten
-    /// Eintrag an, ListFragmentType liest die ganze Liste; Add- und Remove-Blätter
+    /// Eintrag an, ItemList liest die ganze Liste; Add- und Remove-Blätter
     /// stammen aus Journal-Fragmenten, nie aus der Voll-Speicherung (das Add-Blatt
-    /// trägt „KeyName|TypeName“, ältere Journale den Item-Block im Fragment-Format
-    /// bzw. den Classic-String); alles andere geht an DeserializeOther.
+    /// trägt „KeyName|TypeName“); alles andere geht an DeserializeOther.
     /// </summary>
     public virtual bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) { return false; }
@@ -566,7 +537,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         // tiefer auf den benannten Eintrag anwenden. Leerer Key = Segmenteintritt
         // des Übergeordneten: die Folge-Sätze gehören dieser Ebene und werden
         // dort gelesen (Granular-Navs tragen den Item-Schlüssel).
-        if (record.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemPath) && record.DataType == FragmentDataType.String) {
+        if (record.TagType == FragmentTagType.ItemPath && record.DataType == FragmentDataType.String) {
             return record.StringContent is { Length: > 0 }
                 ? ApplySubItem(stream, record)
                 : this.Deserialize(stream, record.Depth + 1);
@@ -574,29 +545,25 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         // Die ganze Liste lesen und per Update angleichen: bestehende Instanzen
         // behalten ihre Identität, Überbleibsel werden entfernt.
-        if (record.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemList)) {
+        if (record.TagType == FragmentTagType.ItemList) {
             if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) { return false; }
 
             return Update(items) is { Length: 0 };
         }
 
-        if (record.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemAdd)) {
-           return ApplyItemAdd(record.KeyNameContent, record.KeyNameContent, record.TypeContent);
-        }
+        if (record.TagType == FragmentTagType.ItemAdd) { return ApplyItemAdd(record.KeyNameContent, record.TypeContent); }
 
-        if (record.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemRemove)) { return ApplyItemRemove(record.StringContent); }
+        if (record.TagType == FragmentTagType.ItemRemove) { return ApplyItemRemove(record.StringContent); }
 
         return DeserializeOther(stream, record);
     }
 
     /// <summary>
-    /// Übernimmt ein Journal-Add-Blatt: toParse ist der Blatt-Inhalt
-    /// (der Schlüssel bzw. der Classic-String älterer Journale), keyName der
-    /// Schlüssel (Blatt-Inhalt bzw. Nav-Schlüssel), typeName der Typ-Anteil eines
-    /// „KeyName|TypeName“-Blattes (leer bei Classic-Blättern). Die Basis übernimmt
-    /// nichts; Ableitungen erzeugen das Item idempotent.
+    /// Übernimmt ein Journal-Add-Blatt „KeyName|TypeName“: keyName der Schlüssel
+    /// (Blatt-Inhalt bzw. Nav-Schlüssel), typeName der Typ-Anteil. Die Basis
+    /// übernimmt nichts; Ableitungen erzeugen das Item idempotent.
     /// </summary>
-    protected virtual bool ApplyItemAdd(string toParse, string keyName, string typeName) => true;
+    protected virtual bool ApplyItemAdd(string keyName, string typeName) => true;
 
     /// <summary>
     /// Übernimmt ein deserialisiertes Item aus einem Journal-Add-Blatt: fehlt der
@@ -612,25 +579,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         if (ReferenceEquals(existing, item)) { return true; }
 
         return existing is not null ? existing.Update(item) is { Length: 0 } : Add(item);
-    }
-
-     /// <summary>
-    /// Wendet ein Add-Blatt im Fragment-Block-Format (ältere Journale) an: Der
-    /// komplette Item-Block wird über CreateItem (erster Satz) beschafft, frisch
-    /// deserialisiert und über ApplyItemAdd(TItem) übernommen. Der Block ist auf
-    /// Tiefe 1 geschrieben und wird auch auf Tiefe 1 gelesen.
-    /// </summary>
-    protected bool ApplyItemAddFragment(string block) {
-        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(block));
-
-        if (FragmentRecord.TryReadNext(stream, 1) is not { } first) { return false; }
-        if (CreateItem(first) is not { } item) { return false; }
-
-        stream.Position = 0;
-
-        if (!item.Deserialize(stream, 1)) { return false; }
-
-        return ApplyItemAdd(item);
     }
 
     /// <summary>
@@ -657,10 +605,9 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// <summary>
     /// Wendet einen Journal-Block an (Nav-Satz mit Schlüssel + tiefere Sätze): Der
     /// erste Blocksatz entscheidet — ItemRemove entfernt den benannten Eintrag,
-    /// ItemAdd übernimmt das Item aus seinem Block (Fragment-Format bzw.
-    /// Classic-String älterer Journale), übrige Sätze gehen als Property-Block
-    /// direkt auf den Eintrag; fehlt er, wird er über GetOrCreateItem
-    /// beschafft. Ein leerer Block wird übersprungen.
+    /// ItemAdd übernimmt den benannten Eintrag, übrige Sätze gehen als
+    /// Property-Block direkt auf den Eintrag; fehlt er, wird er über
+    /// GetOrCreateItem beschafft. Ein leerer Block wird übersprungen.
     /// </summary>
     protected bool ApplySubItem(Stream stream, FragmentRecord record) {
         // Ersten Blocksatz vorab lesen: Journal-Blatt oder Property-Satz; danach zurückschauen.
@@ -670,14 +617,12 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         if (firstLeaf is null) { return true; }
 
-        Develop.Diagnose("ApplySubItem", "Key=" + record.StringContent + ", Leaf=" + firstLeaf.LeafType + "@T" + firstLeaf.Depth + ", IsTag=" + firstLeaf.IsTag + ", RemoveByte=" + FragmentRecord.EnumByte(CollectionFragmentType.ItemRemove) + ", AddByte=" + FragmentRecord.EnumByte(CollectionFragmentType.ItemAdd) + ", Stack: " + Develop.DiagStack());
+        Develop.Diagnose("ApplySubItem", "Key=" + record.StringContent + ", Leaf=" + firstLeaf.ValueId + "@T" + firstLeaf.Depth + ", IsTag=" + firstLeaf.IsTag + ", RemoveByte=" + (byte)FragmentTagType.ItemRemove + ", AddByte=" + (byte)FragmentTagType.ItemAdd + ", Stack: " + Develop.DiagStack());
 
-        if (firstLeaf is { IsTag: false } leaf && leaf.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemRemove)) { return ApplyItemRemove(record.StringContent); }
+        if (firstLeaf is { TagType: FragmentTagType.ItemRemove }) { return ApplyItemRemove(record.StringContent); }
 
-        if (firstLeaf is { IsTag: false } addLeaf && addLeaf.LeafType == FragmentRecord.EnumByte(CollectionFragmentType.ItemAdd)) {
-           return ApplyItemAdd(addLeaf.KeyNameContent, record.StringContent, addLeaf.TypeContent); 
-
- 
+        if (firstLeaf is { TagType: FragmentTagType.ItemAdd } addLeaf) {
+            return ApplyItemAdd(record.StringContent, addLeaf.TypeContent);
         }
 
         // Property-Journal: Eintrag beschaffen, notfalls erzeugen, Block anwenden.

@@ -34,7 +34,9 @@ public class TableSaveAsCliCommand : CliCommand {
 
         var targetPath = args[1] ?? string.Empty;
 
-        var opr = TableFile.Create(targetPath, tbl);
+        // Über Table.Create: .btb-Ziele landen im Fragment-Layout (TableFileNew),
+        // alle übrigen Endungen im klassischen Format.
+        var opr = Table.Create(targetPath, tbl);
 
         if (opr.IsFailed) {
             Console.Error.WriteLine("Speichern unter fehlgeschlagen: " + opr.FailedReason);

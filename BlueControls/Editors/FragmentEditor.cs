@@ -13,7 +13,8 @@ namespace BlueControls.BlueTableDialogs;
 
 /// <summary>
 /// Editor zur Anzeige von Fragment-Sätzen als Tabelle: Ein Satz je Zeile.
-/// Als Quelle dienen ein Stream, ein Dateiname oder eine Liste von Fragment-Sätzen.
+/// Als Quelle dienen ein Stream, ein Dateiname, ein IFragmentStoreable-Objekt
+/// oder eine Liste von Fragment-Sätzen.
 /// Der Editor ist rein lesend; ein Zurückschreiben ist nicht vorgesehen.
 /// </summary>
 public sealed partial class FragmentEditor : UserControl, IIsEditor {
@@ -25,11 +26,6 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
     /// hält den Index in diese Liste.
     /// </summary>
     private List<FragmentRecord> _records = [];
-
-    /// <summary>
-    /// Die temporäre Anzeige-Tabelle.
-    /// </summary>
-    private Table? _table;
 
     #endregion
 
@@ -75,6 +71,10 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
 
                 case IEnumerable<FragmentRecord> fragments:
                     LoadFragments(fragments.ToList());
+                    break;
+
+                case IFragmentStoreable storeable:
+                    LoadFragments(storeable);
                     break;
             }
         }
@@ -177,29 +177,29 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
     }
 
     private void EnsureTable() {
-        if (_table is { IsDisposed: false }) { return; }
+        if (tblFragments.Table is { IsDisposed: false }) { return; }
 
-        _table = Table.Get();
+        var tb = Table.Get();
 
-        var cNr = _table.Column.GenerateAndAdd("Nr", "Nr.", LongOnlyPositiveColumnFormat.Instance);
+        var cNr = tb.Column.GenerateAndAdd("Nr", "Nr.", LongOnlyPositiveColumnFormat.Instance);
         if (cNr is { IsDisposed: false }) { cNr.IsFirst = true; }
 
-        _ = _table.Column.GenerateAndAdd("Tiefe", "Tiefe", LongOnlyPositiveColumnFormat.Instance);
-        var cTyp = _table.Column.GenerateAndAdd("Typ", "Typ", TextOneLineColumnFormat.Instance);
-        var cDatentyp = _table.Column.GenerateAndAdd("Datentyp", "Datentyp", TextOneLineColumnFormat.Instance);
-        var cWert = _table.Column.GenerateAndAdd("Wert", "Wert", TextMultilineColumnFormat.Instance);
-        var cBenutzer = _table.Column.GenerateAndAdd("Benutzer", "Benutzer", TextOneLineColumnFormat.Instance);
-        var cZeit = _table.Column.GenerateAndAdd("Zeit", "Zeit (UTC)", DateTimeColumnFormat.Instance);
-        var cKommentar = _table.Column.GenerateAndAdd("Kommentar", "Kommentar", TextOneLineColumnFormat.Instance);
-        var cSymbol = _table.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
+        _ = tb.Column.GenerateAndAdd("Tiefe", "Tiefe", LongOnlyPositiveColumnFormat.Instance);
+        var cTyp = tb.Column.GenerateAndAdd("Typ", "Typ", TextOneLineColumnFormat.Instance);
+        var cDatentyp = tb.Column.GenerateAndAdd("Datentyp", "Datentyp", TextOneLineColumnFormat.Instance);
+        var cWert = tb.Column.GenerateAndAdd("Wert", "Wert", TextMultilineColumnFormat.Instance);
+        var cBenutzer = tb.Column.GenerateAndAdd("Benutzer", "Benutzer", TextOneLineColumnFormat.Instance);
+        var cZeit = tb.Column.GenerateAndAdd("Zeit", "Zeit (UTC)", DateTimeColumnFormat.Instance);
+        var cKommentar = tb.Column.GenerateAndAdd("Kommentar", "Kommentar", TextOneLineColumnFormat.Instance);
+        var cSymbol = tb.Column.GenerateAndAdd("Symbol", "Symbol", ImageAndTextColumnFormat.Instance);
 
         // "Quelle" bleibt unsichtbar und verknüpft die Zeile mit dem Arbeitssatz.
-        _ = _table.Column.GenerateAndAdd("Quelle", "Quelle", LongOnlyPositiveColumnFormat.Instance);
+        _ = tb.Column.GenerateAndAdd("Quelle", "Quelle", LongOnlyPositiveColumnFormat.Instance);
 
         // Nur Ansicht: keinerlei Spalte ist veränderbar.
-        _table.Column.DisableAllEditing();
+        tb.Column.DisableAllEditing();
 
-        foreach (var thisColumn in _table.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (thisColumn.IsSystemColumn()) { continue; }
             if (thisColumn == cTyp || thisColumn == cDatentyp || thisColumn == cWert || thisColumn == cBenutzer || thisColumn == cKommentar) {
                 thisColumn.DefaultRenderer = TextOneLineRenderer.ClassId;
@@ -227,22 +227,22 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
             cSymbol.RendererSettings = o.ParseableItems().FinishParseable();
         }
 
-        _table.RepairAfterParse();
+        tb.RepairAfterParse();
 
-        var tcvc = ColumnViewCollection.ParseAll(_table);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Nr", "Tiefe", "Typ", "Datentyp", "Wert", "Benutzer", "Zeit", "Kommentar", "Symbol");
         tcvc[1].ScaleToFit = ScaleToFitMode.Aggressiv;
-        _table.ColumnArrangements = tcvc.AsReadOnly();
+        tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        _table.RepairAfterParse();
+        tb.RepairAfterParse();
 
         // Die Anzeige-Tabelle färbt jede Zeile je Tiefe-Stufe 10 % dunkler.
-        _table.EventScript = new TableScriptCollection(_table, [RowColorScript(_table)]);
+        tb.EventScript = new TableScriptCollection(tb, [RowColorScript(tb)]);
 
-        tblFragments.Table = _table;
+        tblFragments.Table = tb;
         tblFragments.Arrangement = string.Empty;
         tblFragments.ColumnMoveAllowed = false;
-        tblFragments.SortDefinitionTemporary = new RowSortDefinition(_table, cNr, false);
+        tblFragments.SortDefinitionTemporary = new RowSortDefinition(tb, cNr, false);
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
     }
 
     private void FillRows() {
-        if (_table is not { IsDisposed: false } tb) { return; }
+        if (tblFragments.Table is not { IsDisposed: false } tb) { return; }
 
         tb.SuppressEvents();
         try {
@@ -304,6 +304,10 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
                 string typeText;
                 if (record.IsTag) {
                     if (record.TagType == FragmentTagType.Type) { layoutTypeName = record.StringContent; }
+
+                    // ItemPath/ItemList benennen den Zahlraum der Folge-Sätze und bleiben in der Kette.
+                    if (record.TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList) { path.Add(record); }
+
                     typeText = record.TagType.ToString();
                 } else {
                     if (!rootChecked) {
@@ -353,6 +357,21 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
         }
 
         LoadFragments(fragments);
+    }
+
+    /// <summary>
+    /// Serialisiert das Objekt ins Fragment-Format und zeigt dessen Sätze an.
+    /// </summary>
+    private void LoadFragments(IFragmentStoreable storeable) {
+        using var ms = new MemoryStream();
+
+        if (!storeable.Serialize(ms, 0)) {
+            Notification.Show("Fragment-Daten konnten nicht erzeugt werden.", ImageCode.Warnung);
+            return;
+        }
+
+        ms.Position = 0;
+        LoadFragments(ms);
     }
 
     private void LoadFragments(string filename) {

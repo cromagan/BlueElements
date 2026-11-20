@@ -5,7 +5,7 @@ namespace BlueBasics.Enums;
 /// <summary>
 /// Globales Content-Enum (valueId) des binären Fragment-Formats „Typ + Key“.
 /// Beschreibt, wie der Content eines Daten-Satzes zu interpretieren ist.
-/// Steuer-Sätze (valueId ≥ 231) liegen im separaten FragmentTagType bzw. als
+/// Steuer-Sätze (valueId ≥ 200) liegen im separaten FragmentTagType bzw. als
 /// klasseneigene Steuer-Werte und werden vom Reader abgefangen, bevor der
 /// Satz an eine Klasse gereicht wird.
 /// </summary>
@@ -43,7 +43,7 @@ public enum FragmentDataType : byte {
 
     /// <summary>
     /// Komplette String-Liste als ListSet-Satz: Content enthält je Eintrag
-    /// Tab, 2 Längenbytes, Inhalt und 0x0D.
+    /// 2 Längenbytes und Inhalt.
     /// </summary>
     ListSet = 10,
 
@@ -69,7 +69,13 @@ public enum FragmentDataType : byte {
     /// trennt den Schlüssel vom Typen, damit der Empfänger beim Einlesen sofort
     /// den richtigen Typ erzeugen kann (z. B. Variablen).
     /// </summary>
-    KeyNameType = 15
+    KeyNameType = 15,
 
-    // 16 - 230 frei für künftige Typen
+    /// <summary>
+    /// Content als 4 Little-Endian-Bytes (uint).
+    /// TODO: Unused
+    /// </summary>
+    UInt = 16
+
+    // 17 - 230 frei für künftige Typen
 }

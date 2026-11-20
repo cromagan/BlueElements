@@ -20,11 +20,11 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     /// Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
             ? ScriptDescription.GetNameOf(path[1..])
-            : ((CollectionFragmentType)path[^1].LeafType).ToString();
+            : ((FragmentTagType)path[^1].ValueId).ToString();
     }
 
     #region Constructors
@@ -133,7 +133,7 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt; seine Werte tragen
     /// die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
+    protected override bool ApplyItemAdd(string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     /// <summary>
     /// Fängt den ItemPath-Nav-Satz des Journals ab: Vor dem Anwenden wird der
@@ -142,7 +142,7 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
     /// Basis.
     /// </summary>
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (record.LeafType == (byte)CollectionFragmentType.ItemPath && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
+        if (record.TagType == FragmentTagType.ItemPath && record.DataType == FragmentDataType.String && record.StringContent is { Length: > 0 }) {
             // Ersten Blocksatz vorab lesen; die Anwendung selbst macht ApplySubItem (liest den Satz erneut).
             var blockStart = stream.Position;
             FragmentRecord? firstLeaf = FragmentRecord.TryReadNext(stream, record.Depth + 1);

@@ -403,7 +403,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 _undoEntry ??= new MemoryStream();
 
                 if (!record.Append(_undoEntry, _undoEntryDepth)) {
-                    Freeze("Undo-Satz ungültig oder zu groß: Typ " + record.LeafType);
+                    Freeze("Undo-Satz ungültig oder zu groß: Typ " + record.ValueId);
                     return;
                 }
 
@@ -619,8 +619,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// <summary>
     /// Zerlegt eine Journal-Datei in Einträge: Ein Eintrag beginnt an einem
     /// Daten-Satz der Tiefe 0 und umfasst alle tieferen Sätze; der Zeitstempel
-    /// kommt aus dem Meta des ersten Satzes mit Meta. Steuer-Sätze der Tiefe 0
-    /// und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen. Die
+    /// kommt aus dem Meta des ersten Satzes mit Meta. Kopf- und Steuer-Sätze der
+    /// Datei-Ebene der Tiefe 0 und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen. Die
     /// Meta trägt den Benutzer nicht mehr; er kommt aus dem Kopf-Satz des
     /// Journals und wird den Undo-Sätzen des Eintrags injiziert. Jeder Undo-Satz
     /// erhält die Eintrags-Daten (Entry, Container, EntryDateTimeUtc) als Felder.
@@ -642,17 +642,17 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
         while (pos < data.Length) {
             // Müll-Zeilen (z. B. unvollständiger Schreibvorgang): bis zum Zeilenende überspringen;
-            // ein Satz beginnt mit SpeicherTyp (Wurzel-Ebene, ohne Tab) oder Tab (tiefere Ebenen)
-            if (data[pos] is not (0x09 or FragmentRecord.StandardStorageType)) {
+            // jeder Satz beginnt mit dem SpeicherTyp
+            if (data[pos] != FragmentRecord.StandardStorageType) {
                 var lineEnd = Array.IndexOf(data, (byte)'\n', pos);
                 pos = lineEnd < 0 ? data.Length : lineEnd + 1;
                 continue;
             }
 
             if (FragmentRecord.TryParse(data, pos, out var first, out var afterFirst) && first is not null) {
-                if (first.Depth > 0 || first.IsTag) {
-                    // Kopf-Benutzer merken; Blockreste ohne Eintrag bzw. übrige Steuer-Sätze überspringen
-                    if (first.IsTag && first.TagType == FragmentTagType.SaveUser) { headUser = first.StringContent; }
+                if (first.Depth > 0 || first.IsFileTag) {
+                    // Kopf-Benutzer merken; Blockreste ohne Eintrag bzw. übrige Kopf-Sätze überspringen
+                    if (first.IsFileTag && first.TagType == FragmentTagType.SaveUser) { headUser = first.StringContent; }
 
                     pos = afterFirst;
                     continue;
@@ -670,7 +670,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
                 // Alle tieferen Sätze gehören zum Eintrag; der Meta-Stempel kommt
                 // aus dem ersten Blatt-Satz mit Meta (Navigationssätze tragen keine).
-                while (pos < data.Length && data[pos] == 0x09) {
+                while (pos < data.Length && data[pos] == FragmentRecord.StandardStorageType) {
                     if (!FragmentRecord.TryParse(data, pos, out var inner, out var innerNext) || inner is null) { break; }
 
                     if (inner.Depth <= 0) { break; }
@@ -678,12 +678,12 @@ public class SaveableFileFragment : SaveableFileOnefile {
                     pos = innerNext;
                     entryEnd = innerNext;
 
-                    if (!hasMeta && !inner.IsTag && inner.HasMeta) {
+                    if (!hasMeta && !inner.IsFileTag && inner.HasMeta) {
                         hasMeta = true;
                         dateTimeUtc = inner.DateTimeUtc;
                     }
 
-                    if (!inner.IsTag) { entryRecords.Add(inner.WithUser(headUser)); }
+                    if (!inner.IsFileTag) { entryRecords.Add(inner.WithUser(headUser)); }
                 }
 
                 pos = entryEnd;

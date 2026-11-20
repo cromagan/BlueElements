@@ -24,11 +24,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// Nur der Spalte selbst bekannt.
     /// </summary>
     private enum ColumnFragmentType : byte {
-        ColumnKey = 0,
+        // 0 ist reserviert (None); Empfänger-Typen müssen ≥ 1 sein.
+        ColumnKey = 1,
 
-        ColumnCaption = 1,
+        ColumnCaption = 2,
 
-        MultiLine = 2,
+        MultiLine = 3,
 
         ForeColor = 4,
 

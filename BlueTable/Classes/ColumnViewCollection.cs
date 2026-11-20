@@ -19,8 +19,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
     /// <summary>
     /// Empfänger-Typen der Ansichts-Eigenschaften im binären Fragment-Format;
-    /// Pfad-, Listen- und Journal-Blätter stammen aus dem reservierten Zahlraum
-    /// der Basis (CollectionFragmentType).
+    /// Pfad-, Listen- und Journal-Blätter stammen aus dem geschützten Zahlraum
+    /// der Basis (FragmentTagType ab 200).
     /// </summary>
     private enum ViewFragmentType : byte {
 
@@ -71,9 +71,9 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1) { return ((CollectionFragmentType)path[0].LeafType).ToString(); }
+        if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].LeafType is (byte)CollectionFragmentType.ItemPath or (byte)CollectionFragmentType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
             ? ColumnViewItem.GetNameOf(path[1..])
             : ((ViewFragmentType)path[^1].LeafType).ToString();
     }
@@ -400,8 +400,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         _internal.Insert(insertIndex, columnViewItem);
         Invalidated = true;
 
-        var e = new FragmentChangedEventArgs(this, CollectionFragmentType.ItemAdd, columnViewItem.ParseableItems().FinishParseable())
-            .WithNavigation(CollectionFragmentType.ItemPath, columnViewItem.KeyName);
+        var e = new FragmentChangedEventArgs(this, FragmentTagType.ItemAdd, columnViewItem)
+            .WithNavigation(FragmentTagType.ItemPath, columnViewItem.KeyName);
         OnFragmentChanged(e);
 
         return true;
@@ -750,8 +750,8 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
         Invalidated = true;
 
         if (fireEvent) {
-            var e = new FragmentChangedEventArgs(this, CollectionFragmentType.ItemRemove, string.Empty)
-                .WithNavigation(CollectionFragmentType.ItemPath, columnViewItem.KeyName);
+            var e = new FragmentChangedEventArgs(this, FragmentTagType.ItemRemove, string.Empty)
+                .WithNavigation(FragmentTagType.ItemPath, columnViewItem.KeyName);
             OnFragmentChanged(e);
         }
 
@@ -875,7 +875,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt und still angehängt;
     /// seine Eigenschaften tragen die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string toParse, string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
+    protected override bool ApplyItemAdd(string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
 
     /// <summary>
     /// Entfernt den benannten Ansichts-Eintrag still (Journal-Replay meldet nicht zurück).
@@ -994,7 +994,7 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
 
         allok &= FragmentRecord.Append(stream, depth, ViewFragmentType.PermissionGroups, tmp);
 
-        allok &= FragmentRecord.Append(stream, depth, CollectionFragmentType.ItemList, _internal);
+        allok &= FragmentRecord.Append(stream, depth, FragmentTagType.ItemList, _internal);
 
         return allok;
     }

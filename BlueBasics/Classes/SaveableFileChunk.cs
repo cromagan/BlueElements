@@ -400,7 +400,7 @@ public class SaveableFileChunk : SaveableFile {
             using var ms = new MemoryStream(content);
 
             while (FragmentRecord.TryReadNext(ms) is { } record) {
-                if (!record.IsTag) { break; }
+                if (!record.IsFileTag) { break; }
 
                 switch (record.TagType) {
                     case FragmentTagType.MasterUser:
@@ -860,17 +860,15 @@ public class SaveableFileChunk : SaveableFile {
     protected string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
     /// <summary>
-    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
-    /// Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
-    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session
-    /// oder andere Instanz im selben Prozess).
+    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer erstellt wurde.
+    /// Der Machine/Instance-Hash dient nur der Anzeige: Auch eine neue Instanz
+    /// (neue Session, neuer Prozess) darf die eigenen Dateien ihres Benutzers
+    /// weiterbearbeiten; die Edit-Sperre schützt ausschließlich vor fremden
+    /// Benutzern.
     /// </summary>
     private bool IsFileFromCurrentUser(string filePath) {
         var creator = ExtractUserNameFromFileName(filePath);
-        if (!string.Equals(creator, Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
-
-        var creatorHash = ExtractMachineInstanceHashFromFileName(filePath);
-        return string.Equals(creatorHash, MyId, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(creator, Generic.UserName, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

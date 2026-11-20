@@ -21,7 +21,7 @@ public abstract class CliCommand : IHasKeyName {
     /// <summary>
     /// Dateiendungen, die als Tabelle geladen werden dürfen — oder der Name ganz ohne Endung.
     /// </summary>
-    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "mbdb", "tblh" };
+    private static readonly HashSet<string> LoadableTableSuffixes = new(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "mbdb", "tblh", "btb" };
 
     #endregion
 
@@ -245,10 +245,10 @@ public abstract class CliCommand : IHasKeyName {
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             while (FragmentRecord.TryReadNext(stream) is { } record) {
-                if (record.IsTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent.Equals(user, StringComparison.OrdinalIgnoreCase); }
+                if (record.IsFileTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent.Equals(user, StringComparison.OrdinalIgnoreCase); }
 
                 // Kopf-Ende: Erster Daten-Satz oder der Kommentar-Trenner
-                if (!record.IsTag || record.TagType == FragmentTagType.Comment) { return false; }
+                if (!record.IsFileTag || record.TagType == FragmentTagType.Comment) { return false; }
             }
 
             return false;
@@ -326,7 +326,7 @@ public abstract class CliCommand : IHasKeyName {
         var suffix = name.FileSuffix();
 
         if (suffix is { Length: > 0 } && !LoadableTableSuffixes.Contains(suffix)) {
-            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .nbdb, .mbdb, .tblh (oder ganz ohne Endung).");
+            Console.Error.WriteLine("Ungültige Dateiendung '." + suffix + "' — unterstützt werden .bdb, .nbdb, .mbdb, .tblh, .btb (oder ganz ohne Endung).");
             return null;
         }
 
@@ -530,13 +530,19 @@ public abstract class CliCommand : IHasKeyName {
     protected static int SaveTable(Table tbl) {
         RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
-        if (tbl is TableFile tableFile) {
-            var opr = tableFile.Save();
+        OperationResult opr;
 
-            if (opr.IsFailed) {
-                Console.Error.WriteLine("Speichern fehlgeschlagen: " + opr.FailedReason);
-                return 1;
-            }
+        if (tbl is TableFileNew tableFileNew) {
+            opr = tableFileNew.Save();
+        } else if (tbl is TableFile tableFile) {
+            opr = tableFile.Save();
+        } else {
+            opr = OperationResult.Success;
+        }
+
+        if (opr.IsFailed) {
+            Console.Error.WriteLine("Speichern fehlgeschlagen: " + opr.FailedReason);
+            return 1;
         }
 
         tbl.Dispose();
@@ -614,6 +620,14 @@ public abstract class CliCommand : IHasKeyName {
         Console.Error.WriteLine("Syntax: " + Syntax);
         return 2;
     }
+
+    /// <summary>
+    /// Schreibt eine Zeile auf die Standardausgabe.
+    /// </summary>
+    protected static void Out(string text) => Console.Out.WriteLine(text);
+
+
+
 
     #endregion
 }

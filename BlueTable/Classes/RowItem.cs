@@ -1492,12 +1492,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         /// Blatt-Satz: benennt die Zeile (Content = RowKey); er öffnet den
         /// Zeilen-Block in Listen.
         /// </summary>
-        RowKey = 89,
+        RowKey = 20,
 
         /// <summary>
         /// Navigation in eine Zelle der Zeile (Key = Spalten-Key).
         /// </summary>
-        Cell = 90
+        ColumnKey = 21
     }
 
     /// <summary>
@@ -1525,7 +1525,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!tb.Cell.TryGetCell(column, this, out var cell) || cell is null) { continue; }
 
-            allok &= FragmentRecord.Append(stream, depth, RowNavigationType.Cell, column.KeyName, cell);
+            allok &= FragmentRecord.Append(stream, depth, RowNavigationType.ColumnKey, column.KeyName, cell);
         }
 
         return allok;
@@ -1537,7 +1537,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
-        if (path.Length == 1 || path[0].LeafType != (byte)RowNavigationType.Cell) {
+        if (path.Length == 1 || path[0].LeafType != (byte)RowNavigationType.ColumnKey) {
             return ((RowNavigationType)path[^1].LeafType).ToString();
         }
 
@@ -1555,7 +1555,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 // Der RowKey hat den Empfänger bereits benannt (RowCreateOrGet der Collection)
                 return true;
 
-            case RowNavigationType.Cell:
+            case RowNavigationType.ColumnKey:
                 if (CellCreateOrGet(record.StringContent) is not { } cell) { return false; }
 
                 return cell.Deserialize(stream, record.Depth + 1);
@@ -1604,7 +1604,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (tb.Cell.TryGetCell(column, this, out var c) && ReferenceEquals(c, cell)) {
                 // Nur das Blatt (Zelle) liefert ihren Blatt-Satz; diese Stufe feuert
                 // mit dem Cell-Navigationssatz (Spalten-Key) weiter.
-                OnFragmentChanged(e.WithNavigation(RowNavigationType.Cell, column.KeyName));
+                OnFragmentChanged(e.WithNavigation(RowNavigationType.ColumnKey, column.KeyName));
                 return;
             }
         }

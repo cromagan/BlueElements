@@ -26,9 +26,10 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
 
     /// <summary>
     /// Empfänger-Typen der Kopf-Datei im Fragment-Format; nur der Verwaltung selbst bekannt.
+    /// Gültige Werte: 1–199 (0 ist reserviert, ≥ 200 sind systemeigene Tags).
     /// </summary>
     private enum SaveableFileFragmentType : byte {
-        LayoutClassId = 0
+        LayoutClassId = 1
     }
 
     #endregion
@@ -631,7 +632,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
         var createTimeUtc = DateTime.MinValue;
 
         while (FragmentRecord.TryReadNext(stream) is { } record) {
-            if (!record.IsTag) { break; }
+            if (!record.IsFileTag) { break; }
 
             switch (record.TagType) {
                 case FragmentTagType.CreateUser:

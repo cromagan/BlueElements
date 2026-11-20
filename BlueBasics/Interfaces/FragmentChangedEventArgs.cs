@@ -63,6 +63,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
     /// </summary>
     public FragmentChangedEventArgs(object sender, Enum typeSelector, int content) : this(sender, FragmentRecord.EnumByte(typeSelector), FragmentDataType.Int, FragmentRecord.IntBytes(content)) { }
 
+
     /// <summary>
     /// Long-Wert; Content als 8 Little-Endian-Bytes.
     /// </summary>
@@ -100,7 +101,7 @@ public class FragmentChangedEventArgs : System.EventArgs {
 
     /// <summary>
     /// String-Liste als ListSet-Satz: die Einträge werden je UTF-8-kodiert und sofort
-    /// zum Content (je Eintrag Tab, 2 Längenbytes, Inhalt, 0x0D) zusammengebaut; der
+    /// zum Content (je Eintrag 2 Längenbytes, Inhalt) zusammengebaut; der
     /// Writer schreibt diesen Content unverändert (kein Join, kein Sort, kein Trim).
     /// </summary>
     public FragmentChangedEventArgs(object sender, Enum typeSelector, IReadOnlyList<string> content) {
@@ -122,7 +123,8 @@ public class FragmentChangedEventArgs : System.EventArgs {
     private readonly List<FragmentRecord> _navigations = [];
 
     /// <summary>
-    /// Wert-Selektor im klasseneigenen Enum des Empfängers.
+    /// Wert-Selektor: das Empfänger-Enum-Byte der Änderung — klasseneigen
+    /// (unter 200) oder eine standardisierte Sammlungs-Rolle aus FragmentTagType.
     /// </summary>
     public byte TypeSelector { get; init; }
 

@@ -37,15 +37,21 @@ namespace BlueControls.BlueTableDialogs {
         }
 
         /// <summary>
-        /// Verwendete Ressourcen bereinigen und die temporäre Anzeige-Tabelle freigeben.
+        /// Verwendete Ressourcen bereinigen; die temporäre Arbeits-Tabelle wird explizit freigegeben.
         /// </summary>
         protected override void Dispose(bool disposing) {
-            if (disposing && (components is not null)) {
-                components.Dispose();
-            }
+            if (disposing) {
+                // Die Arbeits-Tabelle aus EnsureTable() gehört allein diesem Editor und wird
+                // vom Control nicht mitfreigegeben; TableViewWithFilters reagiert auf das
+                // Disposed-Ereignis selbst und entfernt die Referenz.
+                if (tblFragments.Table is { IsDisposed: false } tb) {
+                    tb.Dispose();
+                }
 
-            _table?.Dispose();
-            _table = null;
+                if (components is not null) {
+                    components.Dispose();
+                }
+            }
 
             base.Dispose(disposing);
         }

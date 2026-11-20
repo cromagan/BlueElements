@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.PadItems;
-
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
@@ -77,29 +76,6 @@ public class RoundtripCliCommand : CliCommand {
         }
     }
 
-    private static string BytesToHex(byte[] bytes) {
-        var sb = new StringBuilder(bytes.Length * 3);
-
-        foreach (var b in bytes) {
-            if (sb.Length > 0) { sb.Append(' '); }
-            sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
-        }
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Wandelt Bytes in Win1252-Text um und escaped Steuerzeichen, damit die
-    /// Ausgabe verlustfrei kopierbar ist.
-    /// </summary>
-    private static string BytesToPrintable(byte[] bytes) {
-        try {
-            return Win1252.GetString(bytes).EncodeControlChars();
-        } catch {
-            return "<binär nicht darstellbar>";
-        }
-    }
-
     /// <summary>
     /// Vergleicht Original und Roundtrip. Liefert 0 bei Identität, ansonsten 1.
     /// </summary>
@@ -112,7 +88,7 @@ public class RoundtripCliCommand : CliCommand {
 
         Out(string.Empty);
         Out("*** WARNUNG: Dateien unterscheiden sich! ***");
-        GenerateDiffReport(original, roundtrip);
+        TableRoundtripCliCommand.GenerateDiffReport(original, roundtrip);
 
         if (full) {
             DumpFull("Original", original);
@@ -147,62 +123,6 @@ public class RoundtripCliCommand : CliCommand {
             start = i + 1;
         }
     }
-
-    private static void GenerateDiffReport(byte[] original, byte[] roundtrip) {
-        Out(string.Empty);
-        Out("--- Diff-Analyse ---");
-        Out("Längendifferenz (Roundtrip - Original): " + (roundtrip.Length - original.Length) + " Bytes");
-
-        var minLen = Math.Min(original.Length, roundtrip.Length);
-        var firstDiff = -1;
-
-        for (var i = 0; i < minLen; i++) {
-            if (original[i] != roundtrip[i]) {
-                firstDiff = i;
-                break;
-            }
-        }
-
-        if (firstDiff < 0) {
-            // Alle gemeinsamen Bytes sind identisch - der Unterschied liegt in der Länge
-            if (original.Length < roundtrip.Length) {
-                var extra = roundtrip[original.Length..];
-                Out("Inhalt ist im gemeinsamen Bereich (0.." + (original.Length - 1) + ") identisch.");
-                Out("Roundtrip hat zusätzlichen Inhalt ab Position " + original.Length + " (" + extra.Length + " Bytes):");
-                Out(BytesToPrintable(extra));
-            } else {
-                var missing = original[roundtrip.Length..];
-                Out("Inhalt ist im gemeinsamen Bereich (0.." + (roundtrip.Length - 1) + ") identisch.");
-                Out("Roundtrip fehlt Inhalt ab Position " + roundtrip.Length + " (" + missing.Length + " Bytes):");
-                Out(BytesToPrintable(missing));
-            }
-            return;
-        }
-
-        Out("Erste Abweichung an Byte-Position: " + firstDiff);
-
-        // Kontext um die erste Abweichung: als Text (escaped) und als Hex-Dump
-        var contextStart = Math.Max(0, firstDiff - 40);
-        var contextEnd = Math.Min(minLen, firstDiff + 40);
-
-        Out("Kontext Original (Bytes " + contextStart + ".." + (contextEnd - 1) + "):");
-        Out("Text: " + BytesToPrintable(original[contextStart..contextEnd]));
-        Out("Hex : " + BytesToHex(original[contextStart..contextEnd]));
-        Out("Kontext Roundtrip:");
-        Out("Text: " + BytesToPrintable(roundtrip[contextStart..contextEnd]));
-        Out("Hex : " + BytesToHex(roundtrip[contextStart..contextEnd]));
-
-        var diffCount = 0;
-
-        for (var i = 0; i < minLen; i++) {
-            if (original[i] != roundtrip[i]) { diffCount++; }
-        }
-
-        Out("Anzahl unterschiedlicher Bytes im gemeinsamen Bereich (0.." + (minLen - 1) + "): " + diffCount);
-        Out("Größenunterschied: " + Math.Abs(original.Length - roundtrip.Length) + " Bytes");
-    }
-
-    private static void Out(string text) => Console.Out.WriteLine(text);
 
     /// <summary>
     /// CFO/BCR: altes Format laden, als JSON speichern, JSON laden, wieder als
