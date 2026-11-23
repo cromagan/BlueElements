@@ -12,12 +12,14 @@ public class TableAddColumnCliCommand : CliCommand {
     #region Properties
 
     public override string Command => "table-addcolumn";
+    public override List<string> Flags => ["chunk"];
     public override List<string> Options => ["caption", "format", "quickinfo", "password"];
-    public override string Syntax => "bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>] [--password <kennwort>]";
+    public override string Syntax => "bcr table-addcolumn <tabelle> <spaltenname> [--caption <text>] [--format <formatkey>] [--quickinfo <text>] [--password <kennwort>] [--chunk]";
 
     public override string? HelpDetails =>
             "--caption setzt die Beschriftung, --quickinfo die Quickinfo (ohne Angabe leer). " +
             "--format erwartet einen Format-Key, Standard ist TextOneLine; alle Formate listet bcr table-columnformats. " +
+            "--chunk macht die neue Spalte zur Chunk-Spalte (ChunkType.ByName); die Tabelle muss Chunks unterstützen (.btb oder .tblc). " +
             "stdout: der Key der neuen Spalte. " +
             "Beispiel: bcr table-addcolumn Test.tblh PREIS --format Double --caption Preis --quickinfo \"Netto in Euro\".";
 
@@ -50,6 +52,12 @@ public class TableAddColumnCliCommand : CliCommand {
 
         if (tbl is null) { return 1; }
 
+        if (args.Flag("chunk") && !Table.IsTableChunk(tbl)) {
+            Console.Error.WriteLine("Die Tabelle unterstützt keine Chunks — --chunk nur bei .btb/.tblc verwenden.");
+            tbl.Dispose();
+            return 2;
+        }
+
         // Die CLI vergleicht ausschließlich die CLI-Rechte der Tabelle.
         var rightProblem = RightProblem(tbl, CliRights.AddColumn);
 
@@ -74,12 +82,17 @@ public class TableAddColumnCliCommand : CliCommand {
 
         var column = tbl.Column.GenerateAndAdd(name, args.Option("caption") ?? string.Empty, format, args.Option("quickinfo") ?? string.Empty);
 
-        if (column is not { IsDisposed: false }) {
+        if (column is not { IsDisposed: false } neueSpalte) {
             Console.Error.WriteLine("Spalte konnte nicht angelegt werden: " + name);
             return 1;
         }
 
-        Console.Out.WriteLine($"Key der neuen Spalte: {column.KeyName}");
+        if (args.Flag("chunk")) {
+            neueSpalte.Value_for_Chunk = ChunkType.ByName;
+            tbl.Column.GetSystems();
+        }
+
+        Console.Out.WriteLine($"Key der neuen Spalte: {neueSpalte.KeyName}");
         return SaveTable(tbl);
     }
 

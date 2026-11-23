@@ -300,8 +300,8 @@ public sealed partial class DependencyOverviewForm : FormWithStatusBar, IUniqueW
     private static void AngezeigteSpalten((string TableName, string ColumnKey)? einstieg, List<(string TableName, string ColumnKey)> manuelleSpalten, List<Node> nodes) {
         if (einstieg is { } e) { SpaltenKnoten(e.TableName, e.ColumnKey, "Einstieg", nodes); }
 
-        foreach (var thisManual in manuelleSpalten) {
-            SpaltenKnoten(thisManual.TableName, thisManual.ColumnKey, "manuell hinzugefügt", nodes);
+        foreach (var (TableName, ColumnKey) in manuelleSpalten) {
+            SpaltenKnoten(TableName, ColumnKey, "manuell hinzugefügt", nodes);
         }
     }
 

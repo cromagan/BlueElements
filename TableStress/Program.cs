@@ -26,12 +26,35 @@ internal static class Program {
             return Verify.Run(args[1].Trim(), args.Length == 3 ? args[2].Trim() : null);
         }
 
-        if (args.Length != 2 || !int.TryParse(args[1], out var userNummer)) {
-            Console.Error.WriteLine("Benutzung: TableStress <pfad-zur-tabelle> <usernummer>");
+        // Setup-Modus: Chunk-Spalte explizit anlegen und sofort speichern — vor einer
+        // Stress-Runde, damit alle Benutzer die Spalte beim Start vorfinden.
+        if (args.Length == 2 && args[0].Equals("--chunksetup", StringComparison.OrdinalIgnoreCase)) {
+            return ChunkSetup(args[1].Trim());
+        }
+
+        // Chunk-Modus: --chunk stellt sicher, dass eine Chunk-Spalte existiert,
+        // --nochunk sicher, dass keine existiert; ohne Schalter bleibt die
+        // Tabelle, wie sie ist.
+        var chunkModus = 0;
+        List<string> restliche = [];
+
+        foreach (var a in args) {
+            if (a.Equals("--chunk", StringComparison.OrdinalIgnoreCase)) {
+                chunkModus = 1;
+            } else if (a.Equals("--nochunk", StringComparison.OrdinalIgnoreCase)) {
+                chunkModus = -1;
+            } else {
+                restliche.Add(a);
+            }
+        }
+
+        if (restliche.Count != 2 || !int.TryParse(restliche[1], out var userNummer)) {
+            Console.Error.WriteLine("Benutzung: TableStress <pfad-zur-tabelle> <usernummer> [--chunk | --nochunk]");
             return 2;
         }
 
-        var tablePath = args[0].Trim();
+        var tablePath = restliche[0].Trim();
+        if (!Path.IsPathRooted(tablePath)) { tablePath = Path.GetFullPath(tablePath); }
 
         Develop.StartService();
 
@@ -77,18 +100,35 @@ internal static class Program {
                 return 1;
             }
 
-            // Chunk-Spalte sicherstellen: Ohne Spalte mit Chunk-Wert landen alle
-            // Zeilen im Default-Chunk (_) und die Chunk-Verteilung
-            // wird vom Test nicht geübt.
-            if (tbl is TableFileNew { Saveable: SaveableFileChunk } && tbl.Column.ChunkValueColumn is not { IsDisposed: false } && tbl.Column["CHUNK"] is not { IsDisposed: false }) {
-                var neueSpalte = tbl.Column.GenerateAndAdd("CHUNK", "Chunk", null, string.Empty);
+            // Chunk-Modus prüfen: Ohne Chunk-Spalte laufen alle Zeilen als
+            // Kopf-Fragmente; --nochunk verlangt genau das, --chunk die
+            // umgekehrte Phase mit Chunk-Spalte.
+            var chunkSpalte = tbl.Column.ChunkValueColumn;
+            if (chunkSpalte is not { IsDisposed: false }) { chunkSpalte = tbl.Column["CHUNK"]; }
 
-                if (neueSpalte is { IsDisposed: false } chunkSpalte) {
-                    chunkSpalte.Value_for_Chunk = ChunkType.ByName;
-                    tbl.Column.GetSystems();
-                    prot.Write("CHUNKSPALTE", "Spalte CHUNK angelegt (ChunkType.ByName)");
+            if (chunkModus < 0) {
+                if (chunkSpalte is { IsDisposed: false } vorhanden) {
+                    prot.Write("FEHLER", $"--nochunk verlangt eine Tabelle ohne Chunk-Spalte, gefunden: {vorhanden.KeyName}");
+                    tbl.Dispose();
+                    return 1;
+                }
+
+                prot.Write("CHUNKSPALTE", "Keine Chunk-Spalte vorhanden (--nochunk ok)");
+            } else if (chunkModus > 0) {
+                if (chunkSpalte is not { IsDisposed: false }) {
+                    var neueSpalte = tbl.Column.GenerateAndAdd("CHUNK", "Chunk", null, string.Empty);
+
+                    if (neueSpalte is { IsDisposed: false } chunkSpalteNeu) {
+                        chunkSpalteNeu.Value_for_Chunk = ChunkType.ByName;
+                        tbl.Column.GetSystems();
+                        prot.Write("CHUNKSPALTE", "Spalte CHUNK angelegt (ChunkType.ByName)");
+                    } else {
+                        prot.Write("FEHLER", "--chunk: Anlegen der Spalte CHUNK fehlgeschlagen");
+                        tbl.Dispose();
+                        return 1;
+                    }
                 } else {
-                    prot.Write("CHUNKSPALTE", "Anlegen der Spalte CHUNK fehlgeschlagen");
+                    prot.Write("CHUNKSPALTE", $"Chunk-Spalte vorhanden ({chunkSpalte.KeyName}) (--chunk ok)");
                 }
             }
 
@@ -96,6 +136,72 @@ internal static class Program {
             return runner.Run();
         } catch (Exception ex) {
             prot.Write("FEHLER", $"Fatal Typ={ex.GetType().Name} Meldung={ex.Message} Aufrufstack={Develop.DiagStack()}");
+            return 1;
+        }
+    }
+
+    /// <summary>
+    /// Legt die Chunk-Spalte CHUNK (ChunkType.ByName) an und speichert sofort;
+    /// existiert sie bereits, wird das gemeldet. Rückgabe ist der Exit-Code.
+    /// </summary>
+    private static int ChunkSetup(string tablePath) {
+        if (!Path.IsPathRooted(tablePath)) { tablePath = Path.GetFullPath(tablePath); }
+
+        Develop.StartService();
+        Generic.UserName = "SETUP";
+        RowCollection.AllowProcessingAborts = false;
+
+        try {
+            var tbl = Table.Get(tablePath);
+
+            if (tbl is not { IsDisposed: false }) {
+                Console.Error.WriteLine("Tabelle nicht gefunden oder unbrauchbar: " + tablePath);
+                return 1;
+            }
+
+            if (!tbl.BeSureToBeUpToDate(false)) {
+                Console.Error.WriteLine("Tabelle konnte nicht auf den aktuellen Stand gebracht werden: " + tablePath);
+                tbl.Dispose();
+                return 1;
+            }
+
+            _ = tbl.LoadTableRows(false, -1);
+
+            var chunkSpalte = tbl.Column.ChunkValueColumn;
+
+            if (chunkSpalte is not { IsDisposed: false }) { chunkSpalte = tbl.Column["CHUNK"]; }
+
+            if (chunkSpalte is { IsDisposed: false } vorhanden) {
+                Console.Out.WriteLine($"Chunk-Spalte vorhanden: {vorhanden.KeyName} (Value_for_Chunk={vorhanden.Value_for_Chunk})");
+            } else {
+                var neueSpalte = tbl.Column.GenerateAndAdd("CHUNK", "Chunk", null, string.Empty);
+
+                if (neueSpalte is not { IsDisposed: false } cvc) {
+                    Console.Error.WriteLine("Anlegen der Spalte CHUNK fehlgeschlagen");
+                    tbl.Dispose();
+                    return 1;
+                }
+
+                cvc.Value_for_Chunk = ChunkType.ByName;
+                tbl.Column.GetSystems();
+                Console.Out.WriteLine("Spalte CHUNK angelegt (ChunkType.ByName)");
+            }
+
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+
+            var opr = tbl is TableFileNew tfn ? tfn.Save() : (tbl as TableFile)?.Save() ?? OperationResult.Success;
+
+            if (opr.IsFailed) {
+                Console.Error.WriteLine("Speichern fehlgeschlagen: " + opr.FailedReason);
+                tbl.Dispose();
+                return 1;
+            }
+
+            Console.Out.WriteLine($"Gespeichert: Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count}");
+            tbl.Dispose();
+            return 0;
+        } catch (Exception ex) {
+            Console.Error.WriteLine($"ChunkSetup fehlgeschlagen: {ex.GetType().Name} {ex.Message}");
             return 1;
         }
     }

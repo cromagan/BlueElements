@@ -59,7 +59,7 @@ public static class Verify {
     private static string Fingerprint(FragmentRecord r) =>
         $"{r.DateTimeUtc.Ticks}|{r.User}|{r.Comment}|{r.ValueId}|{Convert.ToBase64String(r.ByteContent)}";
 
-    private static List<string> KnownChunkIds(TableFileNew tfn) => tfn.Saveable is SaveableFileChunk sfc ? sfc.KnownChunkIds() : [];
+    private static List<string> KnownChunkIds(TableFileNew tfn) => tfn.Saveable.KnownChunkIds();
 
     private static List<FragmentRecord> MetaSaetzeVonDatei(string file) {
         List<FragmentRecord> result = [];
@@ -105,24 +105,28 @@ public static class Verify {
 
     /// <summary>
     /// Prüft die Änderungs-Historie gegen die Festplatte: Je Eintrag muss der
-    /// Ziel-Chunk die neueste Datei enthalten (Chunk-Layout) bzw. der Eintrag
-    /// muss irgendwo vorliegen (Fragment-Layout).
+    /// Ziel-Chunk die neueste Datei enthalten, bzw. er muss im Kopf-Snapshot
+    /// oder -Journal vorliegen (Kopf-Fragment).
     /// </summary>
     private static void PruefeUndos(Table tbl, string phase) {
         if (tbl is not TableFileNew tfn) { return; }
 
         var saveable = tfn.Saveable;
-        var chunkSaveable = saveable as SaveableFileChunk;
-        var chunkLayout = chunkSaveable is not null;
 
         var datei = tfn.Filename;
         var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
 
+        // Zeilen mit Chunk-Wert → dedizierte Chunk-ID, ohne Chunk-Wert → der
+        // Haupt-Daten-Chunk "_" (die ChunkId-Extension normiert wie die
+        // Verteilung beim Speichern).
         var rowChunk = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var row in tbl.Row) { rowChunk[row.KeyName] = row.ChunkId(); }
+
+        foreach (var row in tbl.Row) {
+            rowChunk[row.KeyName] = row.ChunkId();
+        }
 
         var entries = UndoEintraege(saveable.Undos);
-        var disk = UndoFingerprintsVonDisk(basis, chunkLayout);
+        var disk = UndoFingerprintsVonDisk(basis);
 
         var ok = 0;
         var falscherChunk = 0;
@@ -134,7 +138,7 @@ public static class Verify {
             if (meta is null) { continue; }
 
             var fp = Fingerprint(meta);
-            var ziel = chunkSaveable is not null ? UndoZiel(chunkSaveable, entry, rowChunk) : "*";
+            var ziel = UndoZiel(saveable, entry, rowChunk);
 
             // Gelöschte Zeile: Der Eintrag darf noch im alten Chunk liegen —
             // er zählt als ok, sobald er irgendwo vorliegt.
@@ -144,6 +148,18 @@ public static class Verify {
                 } else {
                     fehlt++;
                     if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(gelöscht) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
+                }
+
+                continue;
+            }
+
+            // Kopf-Fragment: Eintrag muss in Snapshot oder Journal vorliegen.
+            if (ziel is { Length: 0 }) {
+                if (disk.TryGetValue("*", out var head) && head.Contains(fp)) {
+                    ok++;
+                } else {
+                    fehlt++;
+                    if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(Kopf) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
                 }
 
                 continue;
@@ -200,8 +216,7 @@ public static class Verify {
         var dateiGesamt = 0;
         List<string> leereDatenOrdner = [];
 
-        foreach (var dir in Directory.GetDirectories(basis)) {
-            var name = dir.TrimEnd(Path.DirectorySeparatorChar).FileNameWithSuffix();
+        foreach (var dir in Directory.GetDirectories(basis)) {            var name = dir.TrimEnd(Path.DirectorySeparatorChar).FileNameWithSuffix();
             var files = Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
 
             if (name.Length > 0 && name[0] == '_') {
@@ -240,8 +255,6 @@ public static class Verify {
             }
         }
 
-        if ("Chunk".Equals(ReadLayout(datei), StringComparison.OrdinalIgnoreCase) && !Directory.Exists(basis + "_maindata")) { Fehler("System-Ordner _maindata fehlt"); }
-
         // Leere Daten-Ordner entstehen gezielt als „Chunk bekannt, leer“-Marker beim
         // Nachladen; DeleteOrphanedChunkFolders räumt verwaiste später weg. Diese
         // Sammelzeile hält den Bericht kompakt.
@@ -250,16 +263,14 @@ public static class Verify {
             Warnung($"Leere Daten-Ordner={leereDatenOrdner.Count} (Marker/Nachläufer, Aufräumarbeit durch DeleteOrphanedChunkFolders) Beispiele={beispiele}");
         }
 
-        // Beim Chunk-Layout dürfen keine losen Dateien im Arbeitsverzeichnis liegen;
-        // beim Fragment-Layout gehören Snapshots (.tbls) und Journale (.tblf) dorthin
-        // und werden ebenso auf Name und Abschluss geprüft.
+        // Snapshots (.tbls) und Journale (.tblf) liegen im Arbeitsverzeichnis und
+        // werden ebenso auf Name und Abschluss geprüft.
         var loseDateien = Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly);
-        var fragmentLayout = "Fragment".Equals(ReadLayout(datei), StringComparison.OrdinalIgnoreCase);
 
         foreach (var f in loseDateien) {
             var suffix = f.FileSuffix().ToLowerInvariant();
 
-            if (fragmentLayout && suffix is "tbls" or "tblf") {
+            if (suffix is "tbls" or "tblf") {
                 // Snapshots (.tbls) tragen den ISO-Zeitstempel; Journal-Dateien (.tblf)
                 // sind benutzerbezogen benannt und werden nur auf Abschluss geprüft.
                 if (suffix == "tbls" && ParseChunkFileDate(f) is null) { Fehler($"Snapshot-Name ohne gültigen Zeitstempel: {f}"); }
@@ -284,20 +295,19 @@ public static class Verify {
     }
 
     /// <summary>
-    /// Prüft je Zeile, dass ihr Ziel-Chunk-Ordner auf der Festplatte existiert und Daten enthält.
+    /// Prüft je Zeile mit Chunk-Wert, dass ihr Ziel-Chunk-Ordner auf der Festplatte
+    /// existiert und Daten enthält. Zeilen ohne Chunk-Wert laufen als Kopf-Fragment
+    /// und brauchen keinen Chunk-Ordner.
     /// </summary>
     private static void PruefeZeilenZuChunks(Table tbl) {
         if (tbl is not TableFileNew tfn) { return; }
-        if (tfn.Saveable is not SaveableFileChunk) { return; }
 
         var datei = tfn.Filename;
         var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
 
         var chunkSpalte = tbl.Column.ChunkValueColumn;
 
-        if (chunkSpalte is not { IsDisposed: false } cvc) {
-            Fehler("Keine ChunkValue-Spalte gefunden (ChunkValueColumn = null)");
-        } else {
+        if (chunkSpalte is { IsDisposed: false } cvc) {
             Write("CHUNK-INFO", $"ChunkValueColumn={cvc.KeyName} SaveContent={cvc.SaveContent} ValueForChunk={cvc.Value_for_Chunk} SaveOrder={(tbl.ColumnsInSaveOrder().Exists(c => c.KeyName.Equals(cvc.KeyName, StringComparison.OrdinalIgnoreCase)) ? "enthalten" : "FEHLT")}");
         }
 
@@ -310,8 +320,11 @@ public static class Verify {
         Write("CHUNK-IDS", $"Bekannt={bekannteIds}");
 
         var ohneOrdner = 0;
+        var kopfZeilen = 0;
 
         foreach (var row in tbl.Row) {
+            if (row.ChunkValue is not { Length: > 0 }) { kopfZeilen++; continue; }
+
             var id = row.ChunkId();
             var folder = basis + id + "\\";
 
@@ -323,10 +336,20 @@ public static class Verify {
 
         if (ohneOrdner > 20) { Fehler($"Weitere {ohneOrdner - 20} Zeilen ohne Chunk-Dateien (Details unterdrückt)"); }
 
-        Write("CHUNKS", $"Zeilen={tbl.Row.Count} OhneChunkDateien={ohneOrdner}");
-    }
+        Write("CHUNKS", $"Zeilen={tbl.Row.Count} KopfZeilen={kopfZeilen} OhneChunkDateien={ohneOrdner}");
 
-    private static string ReadLayout(string datei) => SaveableFile.TryReadHeadClassId(datei, out var layout) ? layout : string.Empty;
+        // Verteilungsnachweis: je Chunk-Id die Zeilen-Zahl und die Datei-Zahl des
+        // Ordners auf der Festplatte (-1 = Ordner fehlt).
+        List<string> verteilung = [];
+
+        foreach (var gruppe in tbl.Row.GroupBy(r => r.ChunkId(), StringComparer.OrdinalIgnoreCase).OrderBy(g => g.Key, StringComparer.Ordinal)) {
+            var ordner = basis + gruppe.Key + "\\";
+            var dateien = Directory.Exists(ordner) ? Directory.GetFiles(ordner, "*.tblc", SearchOption.TopDirectoryOnly).Length : -1;
+            verteilung.Add($"{gruppe.Key}={gruppe.Count()}/{dateien}");
+        }
+
+        Write("CHUNK-VERTEILUNG", string.Join(" ", verteilung));
+    }
 
     /// <summary>
     /// Führt die Prüfung durch: TableStress --verify "pfad-zur-tabelle" [dump-datei]
@@ -336,6 +359,9 @@ public static class Verify {
         Generic.UserName = "VERIFY";
         RowCollection.AllowProcessingAborts = false;
         tablePath = tablePath.Trim();
+
+        // Relative Pfade auflösen: Table.Get arbeitet mit absoluten Pfaden.
+        if (!Path.IsPathRooted(tablePath)) { tablePath = Path.GetFullPath(tablePath); }
 
         _fehler = 0;
         _warnungen = 0;
@@ -453,67 +479,73 @@ public static class Verify {
     }
 
     /// <summary>
-    /// Liest alle Meta-Fingerabdrücke der Fragment-Dateien im angegebenen Ordner
-    /// (Chunk-Layout: je Ziel-Ordner die neueste .tblc; Fragment-Layout: alle .tbls/.tblf).
+    /// Liest alle Meta-Fingerabdrücke der Fragment-Dateien: je Chunk-Ordner die
+    /// Union aller .tblc (der Ordner hält je Benutzer eine write-once Datei),
+    /// zusätzlich die Kopf-Dateien (Snapshots/Journale) unter "*".
     /// </summary>
-    private static Dictionary<string, HashSet<string>> UndoFingerprintsVonDisk(string basis, bool chunkLayout) {
+    private static Dictionary<string, HashSet<string>> UndoFingerprintsVonDisk(string basis) {
         var result = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-        if (chunkLayout) {
-            foreach (var dir in Directory.GetDirectories(basis)) {
-                var id = dir.TrimEnd(Path.DirectorySeparatorChar).FileNameWithSuffix().ToLowerInvariant();
-                var files = Directory.GetFiles(dir, "*.tblc", SearchOption.TopDirectoryOnly);
+        foreach (var dir in Directory.GetDirectories(basis)) {
+            var id = dir.TrimEnd(Path.DirectorySeparatorChar).FileNameWithSuffix().ToLowerInvariant();
+            var set = new HashSet<string>(StringComparer.Ordinal);
 
-                var newest = files
-                    .OrderByDescending(f => ParseChunkFileDate(f) ?? DateTime.MinValue)
-                    .FirstOrDefault();
-
-                if (newest is null) { continue; }
-
-                var set = new HashSet<string>(StringComparer.Ordinal);
-                foreach (var r in MetaSaetzeVonDatei(newest)) { set.Add(Fingerprint(r)); }
-
-                result[id] = set;
+            foreach (var file in Directory.GetFiles(dir, "*.tblc", SearchOption.TopDirectoryOnly)) {
+                foreach (var r in MetaSaetzeVonDatei(file)) { set.Add(Fingerprint(r)); }
             }
 
-            return result;
+            if (set.Count > 0) { result[id] = set; }
         }
 
-        // Fragment-/Onefile-Layout: Snapshots und Journale zusammen auswerten
-        var union = new HashSet<string>(StringComparer.Ordinal);
+        // Kopf-Fragmente: Snapshots und Journale im Wurzelverzeichnis.
+        var head = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (var f in Directory.GetFiles(basis, "*", SearchOption.AllDirectories)) {
+        foreach (var f in Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly)) {
             var suffix = f.FileSuffix().ToLowerInvariant();
             if (suffix is not ("tbls" or "tblf")) { continue; }
 
-            foreach (var r in MetaSaetzeVonDatei(f)) { union.Add(Fingerprint(r)); }
+            foreach (var r in MetaSaetzeVonDatei(f)) { head.Add(Fingerprint(r)); }
         }
 
-        result["*"] = union;
+        result["*"] = head;
+
         return result;
     }
 
     /// <summary>
-    /// Ziel-Chunk-Id eines Undo-Eintrags: der Chunk des ersten ItemPath-Item-Kennens,
-    /// analog zur Verteilung beim Speichern. Zeilen ohne Chunk-Wert sind in rowChunk
-    /// bereits dem Default-Chunk (_) zugeordnet. Einträge ohne Item-Kenner laufen —
-    /// wie beim Speichern — über die Areas-Regel des Saveables (z. B. Master → _master).
-    /// Liefert null, wenn der Item-Kenner keiner aktuellen Zeile entspricht
-    /// (gelöschte Zeile) — solche Einträge dürfen noch im alten Chunk liegen.
+    /// Ziel eines Undo-Eintrags: der Chunk des ersten Item-Kennens (ItemPath-Nav
+    /// oder ItemAdd-Blatt, analog zur Verteilung beim Speichern). Zeilen ohne
+    /// Chunk-Wert sind in rowChunk über ChunkId() dem Haupt-Daten-Chunk "_"
+    /// zugeordnet. Einträge ohne Item-Kenner laufen über die Chunk-Erkennung des
+    /// Saveables, ersatzweise ebenfalls in den Kopf. Liefert null, wenn der
+    /// Item-Kenner keiner aktuellen Zeile entspricht (gelöschte Zeile) — solche
+    /// Einträge dürfen noch im alten Chunk liegen.
     /// </summary>
-    private static string? UndoZiel(SaveableFileChunk saveable, List<FragmentRecord> entry, Dictionary<string, string> rowChunk) {
-        var hatItemPfad = false;
+    private static string? UndoZiel(SaveableFile saveable, List<FragmentRecord> entry, Dictionary<string, string> rowChunk) {
+        var hatItemKenner = false;
 
         foreach (var r in entry) {
-            if (r.TagType != FragmentTagType.ItemPath || r.DataType != FragmentDataType.String) { continue; }
+            // Item-Kenner: Nav-Satz mit Schlüssel oder ItemAdd-Blatt mit „KeyName|TypeName“.
+            string? key;
 
-            hatItemPfad = true;
-            if (rowChunk.TryGetValue(r.StringContent, out var id)) { return id; }
+            if (r.TagType == FragmentTagType.ItemPath && r.DataType == FragmentDataType.String) {
+                key = r.StringContent;
+            } else if (r.TagType == FragmentTagType.ItemAdd && r.DataType == FragmentDataType.KeyNameType) {
+                key = r.KeyNameContent;
+            } else {
+                continue;
+            }
+
+            hatItemKenner = true;
+
+            if (key is not { Length: > 0 }) { continue; }
+
+            if (rowChunk.TryGetValue(key, out var id)) { return id; }
 
             return null; // Gelöschte/ferne Zeile: Ziel nicht mehr rekonstruierbar
         }
 
-        return hatItemPfad ? null : saveable.UndoEntryChunk(entry, rowChunk);
+        return hatItemKenner ? null : saveable.EntryChunkId(entry, rowChunk);
     }
 
     private static void VergleicheSnapshots(List<ZeilenStand> snap1, List<ZeilenStand> snap2) {

@@ -23,4 +23,5 @@ public enum StressAction {
     ScriptLoeschen = 35,     // 35: Eigenes Stress-Script löschen
     KonsistenzPruefen = 36,  // 36: In-Memory-Konsistenz prüfen
     CsvExportPruefen = 37,   // 37: CSV-Export ausführen
+    ChunkWechsel = 38,       // 38-39: CHUNK-Zelle auf anderen Pool-Wert setzen
 }

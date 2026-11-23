@@ -35,6 +35,12 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     ];
 
     /// <summary>
+    /// Fester Pool von Chunk-Werten: hält die Zahl der Chunk-Ordner überschaubar,
+    /// sodass sich Zeilen nachweisbar zwischen den Ordnern verteilen und wandern.
+    /// </summary>
+    private static readonly string[] ChunkWerte = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"];
+
+    /// <summary>
     /// Master setzen und Komplettierung anstoßen sind nur in dieser Anfangszeit erlaubt; danach ist der Tick Idle.
     /// </summary>
     private readonly TimeSpan masterTime = TimeSpan.FromMinutes(2);
@@ -70,6 +76,30 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         prot.Write("CSV", $"Zeichen={csv.Length} Zeilen={csv.SplitBy("\r\n").Count(l => l.Length > 0)} TabellenZeilen={tbl.Row.Count}");
     }
 
+    /// <summary>
+    /// Setzt die CHUNK-Zelle einer Zufallszeile auf einen anderen Pool-Wert:
+    /// Die Zeile wandert beim Speichern in einen anderen Chunk-Ordner, inklusive
+    /// der zugehörigen Undo-Historie.
+    /// </summary>
+    private void ActionChunkWechsel() {
+        var spalte = ChunkSpalte();
+
+        if (spalte is null) { prot.Write("CHUNK-WECHSEL", "Keine Chunk-Spalte vorhanden"); return; }
+
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("CHUNK-WECHSEL", "Keine Zeile vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var alt = row.CellGetString(spalte);
+        var neu = ZufallsChunk(alt);
+        var failed = row.CellSet(spalte, neu, $"StressTest {user} Chunk wechseln");
+
+        prot.Write("CHUNK-WECHSEL", failed is { Length: > 0 }
+            ? $"Key={row.KeyName} FEHLER: {failed}"
+            : $"Key={row.KeyName} Wert='{Logtext(alt)}'→'{neu}' Id={IHasChunkValueExtension.ChunkId(alt)}→{IHasChunkValueExtension.ChunkId(neu)} ok");
+    }
+
     private void ActionDuplikatePruefen() {
         var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
 
@@ -99,7 +129,9 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     /// <summary>
-    /// Leichte In-Memory-Konsistenzprüfung: doppelte Zeilen-Keys, leere Chunk-Ids, leere Spalten-Keys.
+    /// Leichte In-Memory-Konsistenzprüfung: doppelte Zeilen-Keys, leere Chunk-Ids
+    /// (nur mit Chunk-Spalte — ohne sind alle Zeilen korrekt Kopf-Fragmente),
+    /// leere Spalten-Keys.
     /// </summary>
     private void ActionKonsistenzPruefen() {
         List<string> probleme = [];
@@ -108,15 +140,19 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         var doppelte = rows.GroupBy(r => r.KeyName, StringComparer.OrdinalIgnoreCase).Count(g => g.Count() > 1);
         if (doppelte > 0) { probleme.Add($"DoppelteRowKeys={doppelte}"); }
 
-        var leereChunks = rows.Count(r => r.ChunkId() is not { Length: > 0 });
-        if (leereChunks > 0) { probleme.Add($"LeereChunkIds={leereChunks}"); }
+        if (tbl.Column.ChunkValueColumn is { IsDisposed: false }) {
+            var leereChunks = rows.Count(r => r.ChunkId() is not { Length: > 0 });
+            if (leereChunks > 0) { probleme.Add($"LeereChunkIds={leereChunks}"); }
+        }
 
         var leereKeys = tbl.Column.Count(c => c is { IsDisposed: false } && c.KeyName is not { Length: > 0 });
         if (leereKeys > 0) { probleme.Add($"LeereSpaltenKeys={leereKeys}"); }
 
         if (probleme.Count > 0) { prot.Write("FEHLER", "Konsistenz " + string.Join("; ", probleme)); }
 
-        prot.Write("PRÜFUNG", $"Zeilen={rows.Count} Spalten={tbl.Column.Count} Probleme={probleme.Count}");
+        var chunkIds = tbl is TableFileNew tfn ? tfn.Saveable.KnownChunkIds().Count : 0;
+
+        prot.Write("PRÜFUNG", $"Zeilen={rows.Count} Spalten={tbl.Column.Count} ChunkIds={chunkIds} Probleme={probleme.Count}");
     }
 
     private void ActionMasterSetzen() {
@@ -140,9 +176,10 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     private void ActionNeueZeile() {
         // Muss-Spalten (Erstspalte, Chunk- und Unique-Spalten) per Istgleich-Filter setzen.
         List<FilterItem> filter = [];
+        var chunkSpalte = ChunkSpalte();
         var ordered = tbl.Column.ToList();
 
-        if (tbl.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
+        if (chunkSpalte is { IsDisposed: false } cvc) {
             ordered.Remove(cvc);
             ordered.Insert(0, cvc);
         }
@@ -152,7 +189,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         foreach (var thisColumn in ordered) {
             if (thisColumn is not { IsDisposed: false }) { continue; }
             if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None || uniqueColumns.Contains(thisColumn)) {
-                filter.Add(new FilterItem(thisColumn, FilterType.Istgleich, RandomValue()));
+                filter.Add(new FilterItem(thisColumn, FilterType.Istgleich, MussWert(thisColumn, chunkSpalte)));
             }
         }
 
@@ -167,7 +204,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     /// <summary>
-    /// Bildet den Zufallswert 0-37 auf die Aktion ab.
+    /// Bildet den Zufallswert 0-39 auf die Aktion ab.
     /// </summary>
     private static StressAction ActionOf(int value) {
         switch (value) {
@@ -187,7 +224,8 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             case 34: return StressAction.DuplikatePruefen;
             case 35: return StressAction.ScriptLoeschen;
             case 36: return StressAction.KonsistenzPruefen;
-            default: return StressAction.CsvExportPruefen;
+            case 37: return StressAction.CsvExportPruefen;
+            default: return StressAction.ChunkWechsel;
         }
     }
 
@@ -305,12 +343,13 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
 
         var quelle = rows[random.Next(rows.Length)];
         var uniqueColumns = tbl.Column.ColumnsUsedInUniqueDefinition();
+        var chunkSpalte = ChunkSpalte();
 
         // Muss-Spalten-Ordnung wie beim Neuanlegen: Chunk-Spalte zuerst.
         List<FilterItem> filter = [];
         var ordered = tbl.Column.ToList();
 
-        if (tbl.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
+        if (chunkSpalte is { IsDisposed: false } cvc) {
             ordered.Remove(cvc);
             ordered.Insert(0, cvc);
         }
@@ -319,7 +358,19 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             if (thisColumn is not { IsDisposed: false }) { continue; }
             if (thisColumn.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)) { continue; }
 
-            var wert = uniqueColumns.Contains(thisColumn) ? RandomValue() : quelle.CellGetString(thisColumn);
+            string wert;
+
+            if (thisColumn == chunkSpalte) {
+                // Die Chunk-Spalte ist per ColumnsIncludingChunk zugleich in den
+                // Unique-Definitionen — sie muss VOR den Unique-Spalten geprüft
+                // werden und erhält einen Pool-Wert.
+                wert = ZufallsChunk();
+            } else if (uniqueColumns.Contains(thisColumn)) {
+                wert = RandomValue();
+            } else {
+                wert = quelle.CellGetString(thisColumn);
+            }
+
             filter.Add(new FilterItem(thisColumn, FilterType.Istgleich, wert));
         }
 
@@ -353,7 +404,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
 
         var row = rows[random.Next(rows.Length)];
         var column = columns[random.Next(columns.Length)];
-        var value = RandomValue();
+        var value = column == ChunkSpalte() ? ZufallsChunk() : RandomValue();
         var failed = row.CellSet(column, value, $"StressTest {user} Zelle ändern");
 
         prot.Write("ZELLE", failed is { Length: > 0 }
@@ -391,7 +442,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         }
 
         tickCount++;
-        var value = random.Next(0, 38);
+        var value = random.Next(0, 40);
         var action = ActionOf(value);
 
         try {
@@ -413,6 +464,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
                 case StressAction.ScriptLoeschen: ActionScriptLoeschen(); break;
                 case StressAction.KonsistenzPruefen: ActionKonsistenzPruefen(); break;
                 case StressAction.CsvExportPruefen: ActionCsvExportPruefen(); break;
+                case StressAction.ChunkWechsel: ActionChunkWechsel(); break;
                 default: prot.Write("UNBEKANNT", "Zufallswert " + value); break;
             }
         } catch (Exception ex) {
@@ -452,6 +504,33 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     private bool MasterIdle() => DateTime.UtcNow.Subtract(startUtc) >= masterTime;
 
     private string RandomValue() => $"{user}-{DateTime.Now:HHmmss.fff}-{random.Next(1000, 9999)}";
+
+    /// <summary>
+    /// Die Chunk-Spalte der Tabelle oder null, wenn keine vorhanden ist.
+    /// </summary>
+    private ColumnItem? ChunkSpalte() => tbl.Column.ChunkValueColumn is { IsDisposed: false } c ? c : null;
+
+    /// <summary>
+    /// Muss-Spalten-Wert beim Zeilen-Anlegen: die Chunk-Spalte erhält einen
+    /// Pool-Wert, alles andere einen Zufallswert mit Benutzer-Stempel.
+    /// </summary>
+    private string MussWert(ColumnItem column, ColumnItem? chunkSpalte) => column == chunkSpalte ? ZufallsChunk() : RandomValue();
+
+    /// <summary>
+    /// Zufälliger Chunk-Pool-Wert, möglichst verschieden vom bisherigen Wert.
+    /// </summary>
+    private string ZufallsChunk(string bisher) {
+        var neu = ChunkWerte[random.Next(ChunkWerte.Length)];
+
+        if (neu.Equals(bisher, StringComparison.OrdinalIgnoreCase)) { neu = ChunkWerte[(Array.IndexOf(ChunkWerte, neu) + 1) % ChunkWerte.Length]; }
+
+        return neu;
+    }
+
+    /// <summary>
+    /// Zufälliger Chunk-Pool-Wert.
+    /// </summary>
+    private string ZufallsChunk() => ChunkWerte[random.Next(ChunkWerte.Length)];
 
     /// <summary>
     /// Startet den 2-Sekunden-Timer und läuft 10 Minuten; Rückgabe ist der Exit-Code.
@@ -495,9 +574,9 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     /// <summary>
-    /// Protokolliert die Fragment-Dateien je System-Chunk-Ordner sowie die leeren
-    /// Zeilen-Ordner der Tabelle. Beim Fragment-Layout (Dateien im Wurzelverzeichnis
-    /// statt Chunk-Ordnern) werden Snapshots und Journale direkt gezählt.
+    /// Protokolliert die Fragment-Dateien im Arbeitsverzeichnis: Kopf-Snapshots,
+    /// Journale sowie die System- und Daten-Ordner der Tabelle (je Ordner die
+    /// Datei-Anzahl — so ist die Chunk-Verteilung im Protokoll nachweisbar).
     /// </summary>
     private void WriteFragmentStatistik() {
         if (tbl is not TableFileNew tfn || tfn.Filename is not { Length: > 0 } dateiName) { return; }
@@ -505,15 +584,25 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         var basis = dateiName.FilePath() + dateiName.FileNameWithoutSuffix() + "\\";
         if (!Directory.Exists(basis)) { return; }
 
-        if (tfn.Saveable is not SaveableFileChunk) {
-            var rootDateien = Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly);
-            var snaps = rootDateien.Count(f => f.ToLowerInvariant().EndsWith(".tbls", StringComparison.Ordinal));
-            var journale = rootDateien.Count(f => f.ToLowerInvariant().EndsWith(".tblf", StringComparison.Ordinal));
-            prot.Write("FRAGMENTE", $"Layout=Fragment Snapshots={snaps} Journale={journale}");
-            return;
-        }
+        var kopfDateien = Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly);
+        var snaps = kopfDateien.Count(f => f.ToLowerInvariant().EndsWith(".tbls", StringComparison.Ordinal));
+        var journale = kopfDateien.Count(f => f.ToLowerInvariant().EndsWith(".tblf", StringComparison.Ordinal));
 
-        var systemOrdner = new List<string>();
+        var (zeilenOrdnerGesamt, zeilenOrdnerLeer, systemOrdner, datenOrdner) = OrdnerStatistik(basis);
+
+        var detail = zeilenOrdnerGesamt > 0 ? $" Zeilenordner={zeilenOrdnerGesamt} Leer={zeilenOrdnerLeer}" : string.Empty;
+        var datenDetail = datenOrdner.Count > 0 ? " Daten: " + string.Join(" ", [.. datenOrdner.Take(40)]) : string.Empty;
+
+        prot.Write("FRAGMENTE", $"Layout=ChunkFragment Snapshots={snaps} Journale={journale}{detail} " + string.Join(" ", systemOrdner) + datenDetail);
+    }
+
+    /// <summary>
+    /// Zählt die Chunk-Ordner: System-Ordner („_“-Präfix) je Datei-Anzahl,
+    /// Daten-Ordner gesamt, leer und je Datei-Anzahl.
+    /// </summary>
+    private static (int Gesamt, int Leer, List<string> SystemOrdner, List<string> DatenOrdner) OrdnerStatistik(string basis) {
+        List<string> systemOrdner = [];
+        List<string> datenOrdner = [];
         var zeilenOrdnerGesamt = 0;
         var zeilenOrdnerLeer = 0;
 
@@ -527,12 +616,14 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             }
 
             zeilenOrdnerGesamt++;
+            datenOrdner.Add($"{name}={dateien.Length}");
+
             if (dateien.Length == 0) { zeilenOrdnerLeer++; }
         }
 
         systemOrdner.Sort(StringComparer.Ordinal);
-        var detail = zeilenOrdnerGesamt > 0 ? $" Zeilenordner={zeilenOrdnerGesamt} Leer={zeilenOrdnerLeer}" : string.Empty;
-        prot.Write("FRAGMENTE", detail + " " + string.Join(" ", systemOrdner));
+        datenOrdner.Sort(StringComparer.Ordinal);
+        return (zeilenOrdnerGesamt, zeilenOrdnerLeer, systemOrdner, datenOrdner);
     }
 
     #endregion

@@ -8,11 +8,10 @@ using BlueTable.ColumnFormats;
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
-/// Intern: Roundtrip-Tests für TableFileNew (.btb) über alle Datei-Layouts
-/// (Onefile, Fragment, Chunk): anlegen, speichern, laden, erneut speichern —
-/// die Bytes müssen identisch sein, ausgenommen des Zip-Eintrag-Datums.
-/// Dazu Kopie über eine frische Instanz (bestimmter Inhalt) und
-/// Ändern → Speichern → Laden → Wertprüfung je Layout.
+/// Intern: Roundtrip-Tests für TableFileNew (.btb): anlegen, speichern, laden,
+/// erneut speichern — die Bytes müssen identisch sein, ausgenommen des
+/// Zip-Eintrag-Datums. Dazu Kopie über eine frische Instanz (bestimmter
+/// Inhalt) und Ändern → Speichern → Laden → Wertprüfung.
 /// </summary>
 public class TableRoundtripCliCommand : CliCommand {
 
@@ -29,10 +28,10 @@ public class TableRoundtripCliCommand : CliCommand {
     public override string Syntax => "bcr table-roundtrip [zielordner] [--rows <anzahl>] [--keep]";
 
     public override string? HelpDetails =>
-        "Legt je Layout (Onefile, Fragment, Chunk) eine Testtabelle im Temp-Ordner an und prüft: " +
-        "Erneutes Speichern ohne Änderung liefert byte-identische Daten (Zip-Eintrag-Datum normalisiert), " +
-        "eine Kopie über eine frische Instanz denselben Inhalt (Erzeuger-Stempel ausgenommen) und " +
-        "Ändern → Speichern → Laden die geänderten Werte. --keep behält den Temp-Ordner.";
+        "Legt eine Testtabelle im Temp-Ordner an und prüft: " +
+        "Erneutes Speichern ohne Änderung lässt die Datenbestände unverändert (Zip-Eintrag-Datum normalisiert), " +
+        "eine Kopie über eine frische Instanz liefert denselben Inhalt (Erzeuger-Stempel ausgenommen) und " +
+        "Ändern → Speichern → Laden erhält die geänderten Werte. --keep behält den Temp-Ordner.";
 
     /// <summary>
     /// Feste Referenz für das Zip-Eintrag-Datum: Zwei Speicherungen desselben Inhalts
@@ -75,9 +74,7 @@ public class TableRoundtripCliCommand : CliCommand {
         var keep = args.Flag("keep");
 
         try {
-            CheckLayout(failures, testDir, rows, SaveableFileOnefile.ClassId);
-            CheckLayout(failures, testDir, rows, SaveableFileFragment.ClassId);
-            CheckLayout(failures, testDir, rows, SaveableFileChunk.ClassId);
+            CheckLayout(failures, testDir, rows, SaveableFile.ClassId);
         } finally {
             if (keep) {
                 Out(string.Empty);
@@ -201,6 +198,10 @@ public class TableRoundtripCliCommand : CliCommand {
                 return null;
             }
 
+            // Daten-Chunks nachladen: Datenbereiche mit Chunk-Wert stehen nur in
+            // den Chunk-Dateien und werden nicht automatisch beim Start geladen.
+            _ = tbl.LoadTableRows(false, -1);
+
             return tbl;
         } catch (Exception ex) {
             Fail(failures, classId, "Laden", ex.Message);
@@ -213,7 +214,9 @@ public class TableRoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Legt Spalten und Zeilen mit bestimmten Werten an.
+    /// Legt eine Testtabelle an, füllt Spalten und Zeilen und speichert. Eine
+    /// Chunk-Spalte sorgt dafür, dass die Zeilen je Chunk-Wert auf Daten-Chunks
+    /// verteilt werden.
     /// </summary>
     private static bool FillTable(List<string> failures, string classId, TableFileNew tbl, int rows) {
         var format = ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName.Equals("TextOneLine", StringComparison.OrdinalIgnoreCase));
@@ -232,9 +235,24 @@ public class TableRoundtripCliCommand : CliCommand {
             return false;
         }
 
+        var chunkSpalte = tbl.Column.GenerateAndAdd("chunk", "Chunk", format, string.Empty);
+
+        if (chunkSpalte is { IsDisposed: false } cvc) {
+            cvc.Value_for_Chunk = ChunkType.ByName;
+            tbl.Column.GetSystems();
+        } else {
+            Fail(failures, classId, "Spalten anlegen", "Chunk-Spalte konnte nicht angelegt werden.");
+            return false;
+        }
+
         for (var i = 1; i <= rows; i++) {
-            var filter = new FilterItem(c1, FilterType.Istgleich, c1.AutoCorrect("wert" + i.ToString1(), true));
-            var opr = tbl.Row.GenerateAndAdd([filter], "bcr table-roundtrip");
+            List<FilterItem> filters = [new(c1, FilterType.Istgleich, c1.AutoCorrect("wert" + i.ToString1(), true))];
+
+            // Muss-Spalte: die Chunk-Spalte je Zeile auf drei Werte verteilen; der
+            // Filterwert wird beim Anlegen als Initialwert der Zelle übernommen.
+            if (chunkSpalte is { IsDisposed: false } cvcZeile) { filters.Add(new FilterItem(cvcZeile, FilterType.Istgleich, "cb" + (i % 3).ToString1())); }
+
+            var opr = tbl.Row.GenerateAndAdd([.. filters], "bcr table-roundtrip");
 
             if (opr.IsFailed || opr.Value is not RowItem row) {
                 Fail(failures, classId, "Zeile anlegen", "Zeile " + i.ToString1() + ": " + opr.FailedReason);
@@ -259,11 +277,9 @@ public class TableRoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Phase 2: Laden und ohne Änderung erneut speichern.
-    /// Onefile: Datendatei muss byte-identisch sein (bis auf Zip-Datum).
-    /// Fragment: Es darf nichts geschrieben werden (kein offener Writer).
-    /// Chunk: Dateien bleiben write-once bestehen; die jüngsten Nutzdaten müssen
-    /// identisch sein (Master-Chunks ausgenommen, sie tragen den Master-Stempel).
+    /// Phase 2: Laden und ohne Änderung erneut speichern. Es darf nichts
+    /// geschrieben werden (kein offener Writer, unveränderte Chunks); die
+    /// bestehenden Dateien bleiben unverändert.
     /// </summary>
     private static void CheckResaveIdentity(List<string> failures, string classId, string head, string dir, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
         var tbl = LoadExisting(failures, classId, head);
@@ -280,79 +296,10 @@ public class TableRoundtripCliCommand : CliCommand {
                 return;
             }
 
-            switch (saveable) {
-                case SaveableFileFragment:
-                    CheckInventoryUnchanged(failures, classId, "Zweit-Speicherung", inventoryBefore, InventoryOf(dir, "rta"), [], false);
-                    break;
-
-                case SaveableFileOnefile onefile:
-                    CheckResaveOnefile(failures, classId, onefile, dir, rawBefore, inventoryBefore);
-                    break;
-
-                case SaveableFileChunk:
-                    CheckResaveChunk(failures, classId, head, rawBefore, inventoryBefore);
-                    break;
-            }
+            CheckResaveChunk(failures, classId, head, rawBefore, inventoryBefore);
         } finally {
             tbl.Dispose();
         }
-    }
-
-    /// <summary>
-    /// Zweit-Speicherung des Onefile-Layouts: Die Datendatei wird neu geschrieben
-    /// und muss byte-identisch sein — ausgenommen des Zip-Eintrag-Datums.
-    /// </summary>
-    private static void CheckResaveOnefile(List<string> failures, string classId, SaveableFileOnefile saveable, string dir, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
-        var dataFile = saveable.DataFile;
-
-        if (ReadAllBytes(dataFile, 5).Value is not byte[] rawAfter) {
-            Fail(failures, classId, "Zweit-Speicherung", "Datendatei nicht lesbar: " + dataFile);
-            return;
-        }
-
-        if (rawAfter.Length == 0) {
-            Fail(failures, classId, "Zweit-Speicherung", "Datendatei leer: " + dataFile);
-            return;
-        }
-
-        if (!rawBefore.TryGetValue("dat", out var rawFirst)) {
-            Fail(failures, classId, "Zweit-Speicherung", "Referenz-Inhalt fehlt.");
-            return;
-        }
-
-        if (rawFirst.SequenceEqual(rawAfter)) {
-            Out("  [OK] Datendatei byte-identisch (" + rawAfter.Length + " Bytes)");
-        } else {
-            var n1 = NormalizeZipDate(rawFirst);
-            var n2 = NormalizeZipDate(rawAfter);
-
-            if (n1 is { Length: > 0 } && n1.SequenceEqual(n2 ?? [])) {
-                Out("  [OK] Datendatei identisch bis auf Zip-Datum (" + rawAfter.Length + " Bytes)");
-            } else if (WithoutHeadRecords(PayloadOf(rawFirst)).SequenceEqual(WithoutHeadRecords(PayloadOf(rawAfter)))) {
-                Out("  [OK] Datendatei identisch bis auf Zip-Datum und System-Kopf (SaveUser/Machine/SaveTimeUtc)");
-            } else {
-                Fail(failures, classId, "Zweit-Speicherung", "Datendatei unterscheidet sich.");
-                GenerateDiffReport(WithoutHeadRecords(PayloadOf(rawFirst)), WithoutHeadRecords(PayloadOf(rawAfter)));
-            }
-        }
-
-        if (!WithoutHeadRecords(PayloadOf(rawFirst)).SequenceEqual(WithoutHeadRecords(PayloadOf(rawAfter)))) {
-            Fail(failures, classId, "Zweit-Speicherung", "Inhalt der Datendatei unterscheidet sich (System-Kopf ausgenommen).");
-            GenerateDiffReport(WithoutHeadRecords(PayloadOf(rawFirst)), WithoutHeadRecords(PayloadOf(rawAfter)));
-        }
-
-        // Der Backup-Tausch darf nur die .bak-Datei ergänzen; die Datendatei selbst
-        // wird vom Payload-Vergleich oben geprüft (System-Kopf je Speicherung neu).
-        var skipKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "rta.dat", "rta.dat.bak" };
-        var beforeFiltered = new Dictionary<string, byte[]>(inventoryBefore, StringComparer.OrdinalIgnoreCase);
-        var afterFiltered = new Dictionary<string, byte[]>(InventoryOf(dir, "rta"), StringComparer.OrdinalIgnoreCase);
-
-        foreach (var k in skipKeys) {
-            _ = beforeFiltered.Remove(k);
-            _ = afterFiltered.Remove(k);
-        }
-
-        CheckInventoryUnchanged(failures, classId, "Zweit-Speicherung", beforeFiltered, afterFiltered, [], false);
     }
 
     private static string BytesToHex(byte[] bytes) {
@@ -437,9 +384,8 @@ public class TableRoundtripCliCommand : CliCommand {
         Out("Größenunterschied: " + Math.Abs(original.Length - roundtrip.Length) + " Bytes");
     }
     /// <summary>
-    /// Zweit-Speicherung des Chunk-Layouts: Chunks werden write-once neu
+    /// Zweit-Speicherung: Chunks werden write-once nur bei echten Änderungen neu
     /// abgelegt; die jüngsten Nutzdaten müssen dem ersten Stand entsprechen.
-    /// Master-Chunks sind ausgenommen (Master-Stempel mit Laufzeit-Zeitpunkt).
     /// </summary>
     private static void CheckResaveChunk(List<string> failures, string classId, string head, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
         var rawAfter = ReadDataRaw(failures, classId, head, true);
@@ -529,6 +475,19 @@ public class TableRoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
+    /// Suchfilter für die Zeile 'wert1': Bei Tabellen mit Chunk-Spalte ist der
+    /// Chunk-Filter zwingend (CalculateFilteredRows lädt nur den gefilterten Chunk).
+    /// Die Testzeilen tragen die Chunk-Werte cb0–cb2; wert1 gehört zu cb1.
+    /// </summary>
+    private static FilterItem[] ZeilenFilter(TableFileNew tbl, ColumnItem c1) {
+        List<FilterItem> filters = [new(c1, FilterType.Istgleich, c1.AutoCorrect("wert1", true))];
+
+        if (tbl.Column.ChunkValueColumn is { IsDisposed: false } cvc) { filters.Add(new(cvc, FilterType.Istgleich, "cb1")); }
+
+        return [.. filters];
+    }
+
+    /// <summary>
     /// Phase 4: Zelle ändern, speichern, erneut laden — der neue Wert muss
     /// vorhanden sein, ein Nachbarwert unverändert.
     /// </summary>
@@ -550,7 +509,7 @@ public class TableRoundtripCliCommand : CliCommand {
                 return;
             }
 
-            var row = tbl.Row[new FilterItem(c1, FilterType.Istgleich, c1.AutoCorrect("wert1", true))];
+            var row = tbl.Row[ZeilenFilter(tbl, c1)];
 
             if (row is not { IsDisposed: false }) {
                 Fail(failures, classId, "Ändern", "Zeile 'wert1' nicht gefunden.");
@@ -606,7 +565,7 @@ public class TableRoundtripCliCommand : CliCommand {
                 return;
             }
 
-            var row = tbl.Row[new FilterItem(c1, FilterType.Istgleich, c1.AutoCorrect("wert1", true))];
+            var row = tbl.Row[ZeilenFilter(tbl, c1)];
 
             if (row is not { IsDisposed: false }) {
                 Fail(failures, classId, "Ändern/Nachladen", "Zeile nach Nachladen nicht gefunden.");
@@ -643,39 +602,30 @@ public class TableRoundtripCliCommand : CliCommand {
     #region Helpers
 
     /// <summary>
-    /// Liest die Roh-Bytes der Datendateien: Onefile → Datendatei; Fragment →
-    /// jüngster Snapshot; Chunk → jüngste Datei je Chunk-Ordner (Master
-    /// ausgenommen). Key ist der Bereichsname ('dat', 'snapshot', Chunk-Id).
+    /// Liest die Roh-Bytes der Datendateien: der jüngste Kopf-Snapshot plus die
+    /// jüngste Datei je Chunk-Ordner. Key ist der Bereichsname ('snapshot', Chunk-Id).
     /// </summary>
     private static Dictionary<string, byte[]> ReadDataRaw(List<string> failures, string classId, string head, bool ignoreMaster) {
         var result = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
         var folder = head.FilePath() + head.FileNameWithoutSuffix() + "\\";
 
-        if (classId.Equals(SaveableFileOnefile.ClassId, StringComparison.OrdinalIgnoreCase)) {
-            var dataFile = folder + head.FileNameWithoutSuffix() + "." + SaveableFileOnefile.SuffixDataFile;
-            var bytes = ReadRaw(failures, classId, dataFile);
-            if (bytes is { Length: > 0 }) { result.Add("dat", bytes); }
-        } else if (classId.Equals(SaveableFileFragment.ClassId, StringComparison.OrdinalIgnoreCase)) {
-            var snapshot = NewestFileOf(failures, classId, folder, "*." + SaveableFileFragment.SuffixOfSnapshots);
-            if (snapshot is not null) {
-                var snapBytes = ReadRaw(failures, classId, snapshot);
-                if (snapBytes is { Length: > 0 }) { result.Add("snapshot", snapBytes); }
-            }
-        } else if (classId.Equals(SaveableFileChunk.ClassId, StringComparison.OrdinalIgnoreCase)) {
-            var master = TableFileNew.Chunk_Master.ToLowerInvariant();
+        var snapshot = NewestFileOf(failures, classId, folder, "*.tbls");
+        if (snapshot is not null) {
+            var snapBytes = ReadRaw(failures, classId, snapshot);
+            if (snapBytes is { Length: > 0 }) { result.Add("snapshot", snapBytes); }
+        }
 
-            if (DirectoryExists(folder)) {
-                foreach (var sub in GetDirectories(folder)) {
-                    var chunkId = sub.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+        if (DirectoryExists(folder)) {
+            foreach (var sub in GetDirectories(folder)) {
+                var chunkId = sub.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
 
-                    if (ignoreMaster && chunkId == master) { continue; }
+                if (ignoreMaster && string.Equals(chunkId, TableChunk.Chunk_Master, StringComparison.OrdinalIgnoreCase)) { continue; }
 
-                    var chunkFile = NewestFileOf(failures, classId, sub, "*.tblc");
-                    if (chunkFile is null) { continue; }
+                var chunkFile = NewestFileOf(failures, classId, sub, "*.tblc");
+                if (chunkFile is null) { continue; }
 
-                    var chunkBytes = ReadRaw(failures, classId, chunkFile);
-                    if (chunkBytes is { Length: > 0 }) { result.Add(chunkId, chunkBytes); }
-                }
+                var chunkBytes = ReadRaw(failures, classId, chunkFile);
+                if (chunkBytes is { Length: > 0 }) { result.Add(chunkId, chunkBytes); }
             }
         }
 

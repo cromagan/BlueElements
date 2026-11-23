@@ -178,36 +178,44 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Tabelle per Kommandozeile bearbeitet werden kann.
-    /// Fragment-Tabellen im Altformat (TableFragments, .mbdb) führen automatisch
-    /// die jüngste, sauber mit EOF abgeschlossene Fragment-Datei des eigenen
-    /// Benutzers fort (jünger als 5 Minuten; neue Änderungen werden per Append
-    /// angehängt). Gibt es keine, legt das System beim ersten Schreiben eine neue
-    /// Fragment-Datei an. Das Öffnen hängt sofort einen ContinueEOF-Marker an,
-    /// damit kein zweiter Prozess dieselbe Datei zum Schreiben öffnen kann.
+    /// Fragment-Tabellen führen automatisch die jüngste, sauber mit EOF
+    /// abgeschlossene Fragment-Datei des eigenen Benutzers fort (jünger als
+    /// 5 Minuten; neue Änderungen werden per Append angehängt): Altformat
+    /// (TableFragments, .mbdb) über die Tabelle selbst, neues Format
+    /// (TableFileNew, .btb) über deren SaveableFile. Gibt es keine, legt das
+    /// System beim ersten Schreiben eine neue Fragment-Datei an. Das Öffnen
+    /// hängt sofort einen ContinueEOF-Marker an, damit kein zweiter Prozess
+    /// dieselbe Datei zum Schreiben öffnen kann.
     /// Liefert null, wenn die Bearbeitung erlaubt ist, ansonsten die Fehlermeldung.
     /// </summary>
     protected static string? FragmentEditProblem(Table tbl) {
-        if (tbl is not TableFragments tf) { return null; }
-
         // Geeignete Fragment-Datei automatisch erkennen (EOF am Ende, eigener Benutzer,
         // jünger als 5 Minuten); ohne Fund startet der Writer eine neue Datei.
         var fragmentFile = NewestFragmentOf(tbl);
 
         if (fragmentFile is null) { return null; }
 
-        var f = tf.ContinueFragment(fragmentFile);
+        string f;
+
+        if (tbl is TableFragments tf) {
+            f = tf.ContinueFragment(fragmentFile);
+        } else if (tbl is TableFileNew tfn) {
+            f = tfn.Saveable.ContinueFragment(fragmentFile);
+        } else {
+            return null;
+        }
 
         return f is { Length: > 0 } ? f : null;
     }
 
     /// <summary>
     /// Prüft, ob die Fragment-Datei sauber abgeschlossen ist: Text-Fragmente
-    /// (.mbdb, TableFragments) enden auf die Zeile "- EOF", binäre Fragmente
-    /// (.btb) auf den Eof-Marker (255).
+    /// (TableFragments) enden auf die Zeile "- EOF", binäre Fragmente
+    /// (SaveableFile-Journale) auf den Eof-Marker (255).
     /// </summary>
-    protected static bool FragmentEndsAtEof(string filename, string suffix) {
+    protected static bool FragmentEndsAtEof(string filename, Table tbl) {
         try {
-            if (suffix.Equals(TableFragments.SuffixOfFragments, StringComparison.OrdinalIgnoreCase)) {
+            if (tbl is not TableFileNew) {
                 var lastLine = string.Empty;
 
                 foreach (var line in File.ReadLines(filename)) {
@@ -227,12 +235,12 @@ public abstract class CliCommand : IHasKeyName {
 
     /// <summary>
     /// Liest den Benutzer aus dem Kopf der Fragment-Datei: Text-Fragmente
-    /// (.mbdb) führen ihn in der Kopfzeile "- User &lt;name&gt;", binäre
-    /// Fragmente (.btb) im Satz 233 (SaveUser).
+    /// (TableFragments) führen ihn in der Kopfzeile "- User &lt;name&gt;",
+    /// binäre Fragmente (SaveableFile-Journale) im Satz 233 (SaveUser).
     /// </summary>
-    protected static bool FragmentIsMine(string filename, string suffix, string user) {
+    protected static bool FragmentIsMine(string filename, Table tbl, string user) {
         try {
-            if (suffix.Equals(TableFragments.SuffixOfFragments, StringComparison.OrdinalIgnoreCase)) {
+            if (tbl is not TableFileNew) {
                 foreach (var line in File.ReadLines(filename).Take(5)) {
                     if (line.StartsWith("- User ", StringComparison.Ordinal)) {
                         return line["- User ".Length..].Equals(user, StringComparison.OrdinalIgnoreCase);
@@ -372,6 +380,22 @@ public abstract class CliCommand : IHasKeyName {
             return null;
         }
 
+        // Fragment-Tabellen (.btb) halten die Zeilen lazy: Ohne Nachladen sehen
+        // alle Befehle nur den Kopfstand (0 Zeilen).
+        if (tbl is TableFileNew) {
+            if (!tbl.LoadTableRows(false, -1)) {
+                Console.Error.WriteLine("Tabelle '" + tbl.KeyName + ": Die Zeilen konnten nicht geladen werden.");
+                tbl.Dispose();
+                return null;
+            }
+
+            // Chunk-Tabellen erzwingen ohne PowerEdit einen Chunk-Filter
+            // (CalculateFilteredRows und RowItem.MatchesTo). Die CLI lädt bewusst
+            // alle Zeilen und adressiert sie als Batch — deshalb öffnet sie das
+            // zeitlich begrenzte, rein instanzlokale PowerEdit-Fenster.
+            tbl.PowerEdit = true;
+        }
+
         return tbl;
     }
 
@@ -390,6 +414,12 @@ public abstract class CliCommand : IHasKeyName {
                 suffix = TableFragments.SuffixOfFragments;
                 break;
 
+            case TableFileNew tfn:
+                // Kopf-Journale liegen direkt im Chunk-Basisordner.
+                directory = tfn.Saveable.BaseChunkFolder();
+                suffix = SaveableFile.SuffixOfFragments;
+                break;
+
             default:
                 return null;
         }
@@ -402,8 +432,8 @@ public abstract class CliCommand : IHasKeyName {
             var info = GetFileInfo(file);
 
             if (info is null || info.LastWriteTimeUtc < limitUtc) { continue; }
-            if (!FragmentEndsAtEof(file, suffix)) { continue; }
-            if (!FragmentIsMine(file, suffix, UserName)) { continue; }
+            if (!FragmentEndsAtEof(file, tbl)) { continue; }
+            if (!FragmentIsMine(file, tbl, UserName)) { continue; }
             if (info.LastWriteTimeUtc <= newestUtc) { continue; }
 
             newestUtc = info.LastWriteTimeUtc;

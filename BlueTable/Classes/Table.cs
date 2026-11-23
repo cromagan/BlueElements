@@ -681,6 +681,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var serialized = l.ToString(true);
             if (_variableTmp == serialized) { return; }
 
+            if (!IsLegacyFormat) {
+                // Binärformat: granular über die registrierte Instanz — nur deren
+                // Blatt-Sätze (Add, Remove, Value, Comment, ReadOnly) sind im
+                // Journal-Replay interpretierbar. Bestehende Instanzen behalten
+                // ihre Identität und melden geänderte Werte selbst.
+                _ = _variables.Update(l);
+                _variableTmp = _variables.ToString(true);
+                return;
+            }
+
             #region Kritische Variablen Disposen
 
             foreach (var thisVar in _variables) {
@@ -776,20 +786,14 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     public static Table Create(string key) => CreateInstance(key);
 
     /// <summary>
-    /// Legt eine neue Tabellendatei an: .btb über TableFileNew mit
-    /// Fragment-Journal, alle übrigen Endungen über TableFile.Create.
+    /// Legt eine neue Tabellendatei an: .btb über TableFileNew mit der
+    /// Datei-Verwaltung (der Layout-Kopf der Kopf-Datei wird sofort geschrieben),
+    /// alle übrigen Endungen über TableFile.Create.
     /// </summary>
-    public static OperationResult Create(string targetPath, Table? source) => Create(targetPath, source, SaveableFileFragment.ClassId);
-
-    /// <summary>
-    /// Legt eine neue Tabellendatei an: .btb über TableFileNew mit dem über die
-    /// Layout-ClassId gewählten Datei-Layout (der Layout-Kopf der Kopf-Datei wird
-    /// sofort geschrieben), alle übrigen Endungen über TableFile.Create.
-    /// </summary>
-    public static OperationResult Create(string targetPath, Table? source, string layoutClassId) {
+    public static OperationResult Create(string targetPath, Table? source) {
         if (targetPath.FileSuffix().Equals(TableFileNew.SuffixMainFile, StringComparison.OrdinalIgnoreCase)) {
-            if (ParseableItem.NewByTypeName<SaveableFile>(layoutClassId, targetPath) is not { } saveable) {
-                return OperationResult.Failed("Unbekanntes Datei-Layout: " + layoutClassId);
+            if (ParseableItem.NewByTypeName<SaveableFile>(SaveableFile.ClassId, targetPath) is not { } saveable) {
+                return OperationResult.Failed("Unbekanntes Datei-Layout: " + SaveableFile.ClassId);
             }
 
             var tbl = new TableFileNew(targetPath, source, saveable);
@@ -918,9 +922,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     /// <summary>
     /// True, wenn die Tabelle Chunk-Werte unterstützt: das klassische TableChunk-Format
-    /// oder ein TableFileNew mit Chunk-Fragment-Verwaltung (SaveableFileChunkFragment).
+    /// oder das neue Fragment-Format (TableFileNew).
     /// </summary>
-    public static bool IsTableChunk(Table? table) => table is TableChunk || table is TableFileNew { Saveable: SaveableFileChunkFragment };
+    public static bool IsTableChunk(Table? table) => table is TableChunk || table is TableFileNew;
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }

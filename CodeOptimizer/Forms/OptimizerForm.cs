@@ -2,7 +2,6 @@
 
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Windows.Forms;
 using Form = BlueControls.Forms.Form;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -13,29 +12,24 @@ public sealed partial class OptimizerForm : Form {
     #region Fields
 
     /// <summary>
-    /// Ordner, in dem die JSON-Einstellungsdateien liegen.
+    /// Ordner, in dem die Einstellungsdatei liegt.
     /// </summary>
     private static readonly string SettingsFolder = Develop.AppPath() + "Settings\\";
 
     /// <summary>
-    /// Datei, die den Pfad der zuletzt benutzten Einstellungsdatei enthält.
+    /// Die eine Einstellungsdatei, die immer geladen und immer geschrieben wird.
     /// </summary>
-    private static readonly string LastUsedFile = SettingsFolder + "Zuletzt.json";
-
-    /// <summary>
-    /// Die zuletzt gespeicherte bzw. geladene Einstellungsdatei; leer, wenn noch nie gespeichert wurde.
-    /// </summary>
-    private string _lastFile = string.Empty;
-
-    /// <summary>
-    /// Der JSON-Stand beim letzten Speichern bzw. Laden; Basis der Prüfung auf ungespeicherte Änderungen.
-    /// </summary>
-    private string _savedJson = string.Empty;
+    private static readonly string SettingsFile = SettingsFolder + "CodeOptimizer.json";
 
     /// <summary>
     /// Das Plugin, dessen Optionen gerade angezeigt werden.
     /// </summary>
     private CodeOptimizerPlugin? _currentPlugin;
+
+    /// <summary>
+    /// Unterdrückt das automatische Speichern, während Einstellungen geladen werden.
+    /// </summary>
+    private bool _loading;
 
     #endregion
 
@@ -44,31 +38,14 @@ public sealed partial class OptimizerForm : Form {
     public OptimizerForm() {
         InitializeComponent();
         FillPluginList();
-        LoadLastUsed();
+        txbPath.TextChanged += TxbPath_TextChanged;
+        lstPlugins.ItemCheckedChanged += LstPlugins_ItemCheckedChanged;
+        LoadSettings();
     }
 
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Bietet beim Schließen an, ungespeicherte Änderungen zu sichern.
-    /// </summary>
-    protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        if (e.Cancel) { return; }
-        if (!HasUnsavedChanges()) { return; }
-
-        var pressed = MessageBox.Show("Sollen die Änderungen gespeichert werden?", ImageCode.Warnung, "Ja", "Nein", "Abbrechen");
-        if (pressed == 2) {
-            e.Cancel = true;
-            return;
-        }
-
-        if (pressed == 0 && !SaveProfile()) {
-            e.Cancel = true;
-        }
-    }
 
     private void BtnStart_Click(object? sender, EventArgs e) {
         if (txbPath.Text is not { Length: > 0 } rootPath || !Directory.Exists(rootPath)) {
@@ -97,31 +74,6 @@ public sealed partial class OptimizerForm : Form {
         MessageBox.Show(report.ToString(), ImageCode.Information, "Fertig");
     }
 
-    private void BtnLaden_Click(object? sender, EventArgs e) {
-        if (!ConfirmUnsavedChanges()) { return; }
-
-        using var dlg = new OpenFileDialog {
-            Filter = "CodeOptimizer-Einstellungen (*.json)|*.json",
-            InitialDirectory = SettingsFolder
-        };
-
-        if (dlg.ShowDialog(this) != DialogResult.OK) { return; }
-
-        LoadFromFile(dlg.FileName);
-    }
-
-    private void BtnNeu_Click(object? sender, EventArgs e) {
-        if (!ConfirmUnsavedChanges()) { return; }
-
-        _lastFile = string.Empty;
-        IO.DeleteFile(LastUsedFile, false);
-        SetDefaults();
-    }
-
-    private void BtnSpeichern_Click(object? sender, EventArgs e) {
-        SaveProfile();
-    }
-
     private List<CodeOptimizerPlugin> CheckedPlugins() {
         var result = new List<CodeOptimizerPlugin>();
 
@@ -144,6 +96,8 @@ public sealed partial class OptimizerForm : Form {
     }
 
     private void Plugin_OptionsChanged(object? sender, EventArgs e) {
+        SaveSettings();
+
         if (_currentPlugin is null) { return; }
         if (!ReferenceEquals(sender, _currentPlugin)) { return; }
 
@@ -155,6 +109,10 @@ public sealed partial class OptimizerForm : Form {
 
         ShowOptions(plugin);
     }
+
+    private void LstPlugins_ItemCheckedChanged(object? sender, EventArgs e) => SaveSettings();
+
+    private void TxbPath_TextChanged(object? sender, EventArgs e) => SaveSettings();
 
     private void ShowOptions(CodeOptimizerPlugin plugin) {
         _currentPlugin = plugin;
@@ -174,10 +132,8 @@ public sealed partial class OptimizerForm : Form {
 
         pnlOptions.ChildLayout = ChildLayout.StackVertical | ChildLayout.FullWidth | ChildLayout.Slider;
 
-        foreach (var option in options) {
-            if (option is { IsDisposed: false }) {
-                pnlOptions.Controls.Add(option);
-            }
+        foreach (var option in options.Where(static option => option is { IsDisposed: false })) {
+            pnlOptions.Controls.Add(option);
         }
     }
 
@@ -191,30 +147,18 @@ public sealed partial class OptimizerForm : Form {
     }
 
     /// <summary>
-    /// Lädt die zuletzt benutzte Einstellungsdatei; ohne Pfadangabe gelten die Standardwerte.
+    /// Lädt immer die Einstellungsdatei; ohne Datei gelten die Standardwerte.
     /// </summary>
-    private void LoadLastUsed() {
-        var file = string.Empty;
+    private void LoadSettings() {
+        _loading = true;
 
-        if (IO.FileExists(LastUsedFile)) {
-            file = IO.ReadAllText(LastUsedFile).ParseAsJsonObject().GetString("File", string.Empty);
+        if (IO.FileExists(SettingsFile)) {
+            ApplySettings(IO.ReadAllText(SettingsFile).ParseAsJsonObject());
+        } else {
+            SetDefaults();
         }
 
-        if (file is { Length: > 0 } && IO.FileExists(file)) {
-            LoadFromFile(file);
-            return;
-        }
-
-        SetDefaults();
-    }
-
-    private void LoadFromFile(string filename) {
-        var json = IO.ReadAllText(filename).ParseAsJsonObject();
-
-        ApplySettings(json);
-        _lastFile = filename;
-        WriteLastUsed(filename);
-        _savedJson = CollectSettings().ToJsonString();
+        _loading = false;
     }
 
     /// <summary>
@@ -230,7 +174,6 @@ public sealed partial class OptimizerForm : Form {
         }
 
         RefreshOptions();
-        _savedJson = CollectSettings().ToJsonString();
     }
 
     /// <summary>
@@ -263,10 +206,7 @@ public sealed partial class OptimizerForm : Form {
     /// Liefert den kompletten aktuellen Stand als JSON.
     /// </summary>
     private JsonObject CollectSettings() {
-        var checkedNames = new List<string>();
-        foreach (var plugin in CheckedPlugins()) {
-            checkedNames.Add(plugin.KeyName);
-        }
+        var checkedNames = CheckedPlugins().Select(static plugin => plugin.KeyName).ToList();
 
         var allPlugins = CodeOptimizerPlugin.AllPlugins.Instances.ToList();
         allPlugins.Sort();
@@ -283,62 +223,19 @@ public sealed partial class OptimizerForm : Form {
         return json;
     }
 
-    private bool HasUnsavedChanges() => CollectSettings().ToJsonString() != _savedJson;
-
     /// <summary>
-    /// Bietet bei ungespeicherten Änderungen Sichern, Verwerfen oder Abbrechen an.
-    /// False, wenn abgebrochen bzw. nicht gesichert werden konnte.
+    /// Schreibt den kompletten aktuellen Stand in die Einstellungsdatei.
     /// </summary>
-    private bool ConfirmUnsavedChanges() {
-        if (!HasUnsavedChanges()) { return true; }
+    private void SaveSettings() {
+        if (_loading) { return; }
 
-        var pressed = MessageBox.Show("Sollen die Änderungen gespeichert werden?", ImageCode.Warnung, "Ja", "Nein", "Abbrechen");
-
-        if (pressed == 0) { return SaveProfile(); }
-        return pressed == 1;
-    }
-
-    /// <summary>
-    /// Speichert in die zuletzt benutzte Datei, sonst wird ein Speicherpfad abgefragt. False, wenn nicht gespeichert wurde.
-    /// </summary>
-    private bool SaveProfile() {
-        if (_lastFile is { Length: > 0 }) { return WriteSettings(_lastFile); }
-        return SaveProfileAs();
-    }
-
-    private bool SaveProfileAs() {
-        using var dlg = new SaveFileDialog {
-            Filter = "CodeOptimizer-Einstellungen (*.json)|*.json",
-            InitialDirectory = SettingsFolder,
-            FileName = _lastFile is { Length: > 0 } ? IO.FileNameWithSuffix(_lastFile) : "Einstellungen.json"
-        };
-
-        if (dlg.ShowDialog(this) != DialogResult.OK) { return false; }
-
-        return WriteSettings(dlg.FileName);
-    }
-
-    private bool WriteSettings(string filename) {
         var options = new JsonSerializerOptions { WriteIndented = true };
-        var saved = IO.WriteAllText(filename, CollectSettings().ToJsonString(options), new UTF8Encoding(true), false);
+        IO.CreateDirectory(SettingsFolder);
+        var saved = IO.WriteAllText(SettingsFile, CollectSettings().ToJsonString(options), new UTF8Encoding(true), false);
 
         if (!saved.IsSuccessful) {
             MessageBox.Show("Speichern fehlgeschlagen.", ImageCode.Kritisch, "Ok");
-            return false;
         }
-
-        _lastFile = filename;
-        WriteLastUsed(filename);
-        _savedJson = CollectSettings().ToJsonString();
-        return true;
-    }
-
-    private static void WriteLastUsed(string filename) {
-        var json = new JsonObject();
-        json.Set("File", filename);
-
-        IO.CreateDirectory(SettingsFolder);
-        IO.WriteAllText(LastUsedFile, json.ToJsonString(), new UTF8Encoding(true), false);
     }
 
     #endregion

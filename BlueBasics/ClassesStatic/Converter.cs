@@ -111,6 +111,7 @@ public static class Converter {
         return DateTime.TryParseExact(s, "o", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out result);
     }
 
+    // TODO: Unused
     /// <summary>
     /// Parst einen ISO-UTC-Zeitstempel ("2026-09-26T21:03:33.3898329Z", wie er von der
     /// JSON-Serialisierung erzeugt wird) oder ein Datum/Uhrzeit aus DateTimeFormats und

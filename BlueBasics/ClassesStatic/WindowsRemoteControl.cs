@@ -1,7 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using BlueBasics.Structs;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FormWindowState = System.Windows.Forms.FormWindowState;
 
@@ -14,8 +13,6 @@ public static class WindowsRemoteControl {
     private const int DwmwaCloaked = 14;
 
     private const int GwlExstyle = -20;
-
-    private const int KeyeventfExtendedkey = 0x1;
 
     private const int KeyeventfKeydown = 0x0;
 

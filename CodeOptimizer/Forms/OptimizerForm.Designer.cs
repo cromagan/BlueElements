@@ -24,9 +24,6 @@ public partial class OptimizerForm {
         lstPlugins = new ListBox();
         pnlOptions = new ScrollPanel();
         btnStart = new Button();
-        btnLaden = new Button();
-        btnNeu = new Button();
-        btnSpeichern = new Button();
         SuspendLayout();
         //
         // txbPath
@@ -37,55 +34,25 @@ public partial class OptimizerForm {
         txbPath.Size = new Size(624, 27);
         txbPath.TabIndex = 0;
         //
-        // btnLaden
-        //
-        btnLaden.ImageCode = "Ordner|16";
-        btnLaden.Location = new Point(8, 39);
-        btnLaden.Name = "btnLaden";
-        btnLaden.Size = new Size(96, 27);
-        btnLaden.TabIndex = 1;
-        btnLaden.Text = "Laden";
-        btnLaden.Click += BtnLaden_Click;
-        //
-        // btnNeu
-        //
-        btnNeu.ImageCode = "Datei|16";
-        btnNeu.Location = new Point(108, 39);
-        btnNeu.Name = "btnNeu";
-        btnNeu.Size = new Size(80, 27);
-        btnNeu.TabIndex = 2;
-        btnNeu.Text = "Neu";
-        btnNeu.Click += BtnNeu_Click;
-        //
-        // btnSpeichern
-        //
-        btnSpeichern.ImageCode = "Diskette|16";
-        btnSpeichern.Location = new Point(192, 39);
-        btnSpeichern.Name = "btnSpeichern";
-        btnSpeichern.Size = new Size(110, 27);
-        btnSpeichern.TabIndex = 3;
-        btnSpeichern.Text = "Speichern";
-        btnSpeichern.Click += BtnSpeichern_Click;
-        //
         // lstPlugins
         //
         lstPlugins.AddAllowed = AddType.None;
         lstPlugins.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
         lstPlugins.Appearance = ListBoxAppearance.Listbox_Boxes;
         lstPlugins.CheckBehavior = CheckBehavior.MultiSelection;
-        lstPlugins.Location = new Point(8, 74);
+        lstPlugins.Location = new Point(8, 43);
         lstPlugins.Name = "lstPlugins";
-        lstPlugins.Size = new Size(290, 299);
-        lstPlugins.TabIndex = 4;
+        lstPlugins.Size = new Size(290, 330);
+        lstPlugins.TabIndex = 1;
         lstPlugins.ItemClicked += LstPlugins_ItemClicked;
         //
         // pnlOptions
         //
         pnlOptions.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        pnlOptions.Location = new Point(306, 74);
+        pnlOptions.Location = new Point(306, 43);
         pnlOptions.Name = "pnlOptions";
-        pnlOptions.Size = new Size(326, 299);
-        pnlOptions.TabIndex = 5;
+        pnlOptions.Size = new Size(326, 330);
+        pnlOptions.TabIndex = 2;
         //
         // btnStart
         //
@@ -94,7 +61,7 @@ public partial class OptimizerForm {
         btnStart.Location = new Point(8, 381);
         btnStart.Name = "btnStart";
         btnStart.Size = new Size(624, 40);
-        btnStart.TabIndex = 6;
+        btnStart.TabIndex = 3;
         btnStart.Text = "Start";
         btnStart.Click += BtnStart_Click;
         //
@@ -103,9 +70,6 @@ public partial class OptimizerForm {
         AutoScaleMode = AutoScaleMode.None;
         ClientSize = new Size(640, 429);
         Controls.Add(txbPath);
-        Controls.Add(btnLaden);
-        Controls.Add(btnNeu);
-        Controls.Add(btnSpeichern);
         Controls.Add(lstPlugins);
         Controls.Add(pnlOptions);
         Controls.Add(btnStart);
@@ -123,9 +87,6 @@ public partial class OptimizerForm {
     internal ListBox lstPlugins;
     internal ScrollPanel pnlOptions;
     internal Button btnStart;
-    internal Button btnLaden;
-    internal Button btnNeu;
-    internal Button btnSpeichern;
 
     #endregion
 }

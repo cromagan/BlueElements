@@ -530,10 +530,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        var layoutClassId = ChooseSaveableLayout(SaveTab.FileName);
-        if (layoutClassId is null) { return; }
-
-        var createResult = Table.Create(SaveTab.FileName, null, layoutClassId);
+        var createResult = Table.Create(SaveTab.FileName, null);
         if (createResult.IsFailed) {
             Notification.Show("Fehler beim Erstellen:<br>" + createResult.FailedReason, ImageCode.Warnung);
             return;
@@ -567,10 +564,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            var layoutClassId = ChooseSaveableLayout(SaveTab.FileName);
-            if (layoutClassId is null) { return; }
-
-            var result = Table.Create(SaveTab.FileName, tbf, layoutClassId);
+            var result = Table.Create(SaveTab.FileName, tbf);
             if (result.IsFailed) {
                 Notification.Show("Fehler beim Speichern:<br>" + result.FailedReason, ImageCode.Warnung);
                 return;
@@ -578,25 +572,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             SwitchTabToTable(SaveTab.FileName);
         }
-    }
-
-    /// <summary>
-    /// Ermittelt die ClassId der Speichermethode: Bei der neuen Dateiendung (.btb) fragt
-    /// ein Dialog die verfügbaren Datei-Verwaltungen (SaveableFile-Layouts) ab, alle
-    /// übrigen Endungen erhalten den Standard, den Table.Create ignoriert. Null bei Abbruch.
-    /// </summary>
-    private static string? ChooseSaveableLayout(string fileName) {
-        if (!fileName.FileSuffix().Equals(TableFileNew.SuffixMainFile, StringComparison.OrdinalIgnoreCase)) {
-            return SaveableFileFragment.ClassId;
-        }
-
-        List<ListItem> layouts = [];
-        foreach (var thisLayout in SaveableFile.AllFileSaveTypes.Instances) {
-            layouts.Add(ItemOf(thisLayout, thisLayout.MyClassId));
-        }
-
-        var wahl = InputBoxListBoxStyle.Show("Speichermethode wählen:", layouts, CheckBehavior.SingleSelection, [SaveableFileFragment.ClassId], AddType.None);
-        return wahl is { Count: 1 } ? wahl[0].KeyName : null;
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {

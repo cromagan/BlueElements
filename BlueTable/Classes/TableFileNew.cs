@@ -1,5 +1,6 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using BlueTable.EventArgs;
 using System.ComponentModel;
 using System.IO;
 
@@ -9,10 +10,11 @@ namespace BlueTable.Classes;
 /// Dateibasierte Tabelle im binären Fragment-Format: Alle Datei-Aktionen
 /// (Öffnen, Speichern, Nachladen), die dateirelevanten Editier-Prüfungen,
 /// Dateinamen-Abfragen und das neue Undo-System werden an die zugeordnete
-/// SaveableFile-Instanz delegiert — je nach zugewiesener Datei-Verwaltung
-/// (SaveableFileOnefile, SaveableFileFragment, SaveableFileChunk, …) in einem
-/// anderen Datei-Layout. Das Layout steht im Layout-Kopf der Kopf-Datei und
-/// bestimmt beim Standard-Loader die erzeugte Verwaltung.
+/// SaveableFile-Instanz delegiert (Kopf-Fragment-Journal mit Komplettierung
+/// und Chunk-Verteilung). Der Chunk-Pfad der Verwaltung folgt der Chunk-Spalte:
+/// Nur mit gesetzter Chunk-Spalte verteilen sich die Zeilen je Chunk-Wert,
+/// ohne läuft alles im Kopf-Fragment. Die Layout-ClassId steht im Layout-Kopf der
+/// Kopf-Datei und bestimmt beim Standard-Loader die erzeugte Verwaltung.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFileNew : Table {
@@ -24,11 +26,7 @@ public class TableFileNew : Table {
     /// </summary>
     public const string SuffixMainFile = "btb";
 
-    public static readonly string Chunk_AdditionalUseCases = "_uses";
 
-    public static readonly string Chunk_Master = "_master";
-
-    public static readonly string Chunk_Variables = "_vars";
 
     /// <summary>
     /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
@@ -47,9 +45,8 @@ public class TableFileNew : Table {
 
     /// <summary>
     /// Initialisiert eine neue Tabelle im binären Fragment-Format und ordnet
-    /// sie der übergebenen Datei-Verwaltung zu. Diese entscheidet über das
-    /// Datei-Layout (Komplettstand, Fragment-Journal, Snapshots oder Chunks)
-    /// und trägt ihre ClassId in den Layout-Kopf der Kopf-Datei.
+    /// sie der übergebenen Datei-Verwaltung zu. Diese trägt ihre ClassId in
+    /// den Layout-Kopf der Kopf-Datei.
     /// </summary>
     /// <param name="tablename">Name der Tabelle.</param>
     /// <param name="saveable">Die Datei-Verwaltung für Öffnen, Speichern, Nachladen und Undo.</param>
@@ -64,37 +61,17 @@ public class TableFileNew : Table {
         saveable.InvalidateView += SaveableInvalidateView;
         saveable.RefreshDataSystems += SaveableRefreshDataSystems;
 
-        // Chunk-Zuordnung: nur das Chunk-Layout nutzt Areas. Key = Pfad aus den
-        // Empfänger-Typen (Wurzel-Sektion → Bereich); feste Chunk-ID = kompletter
-        // Bereich, {individual} = Verteilung je Chunk-Wert der Items. Tiefere
-        // Pfade übersteuern die Sektions-Regel.
-        if (saveable is SaveableFileChunk chunkSaveable) {
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.VariableCollection }] = Chunk_Variables;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Columns }] = SaveableFileChunk.Chunk_MainData;
+        // Chunk-Zuordnung: Die Verwaltung kennt genau EINEN Wert — den
+        // Chunk-Pfad. Er wird nur gesetzt, wenn eine Chunk-Spalte gesetzt ist;
+        // ohne Chunk-Spalte läuft alles als Kopf-Fragment. Das Nachziehen und
+        // Entfernen regelt SyncChunkPath anhand der aktuellen Spaltenlage.
+        SyncChunkPath(false);
 
-            // Uses-Bereich der Spalten (Systeminfo) in den Uses-Chunk; der Rest der
-            // Spalten bleibt im Haupt-Chunk
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Columns, (byte)ColumnItem.ColumnFragmentType.ColumnSystemInfo }] = Chunk_AdditionalUseCases;
-
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterUser }] = Chunk_Master;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterTimeUTC }] = Chunk_Master;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterApp }] = Chunk_Master;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterMachine }] = Chunk_Master;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterId }] = Chunk_Master;
-            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Rows }] = SaveableFileChunk.Area_Individual;
-
-            // Startup-Chunks: bei jedem Start bzw. Refresh eingelesen — der Haupt-Chunk
-            // zuerst (Struktur vor den übrigen Bereichen; garantiert durch den
-            // StartupChunkIds-Setter), danach die festen System-Chunks. Daten-Chunks —
-            // inklusive der Ablage für Zeilen ohne Chunk-Wert — werden nur bei Bedarf
-            // geladen, wenn sie angefordert werden.
-            chunkSaveable.StartupChunkIds = [
-                SaveableFileChunk.Chunk_MainData,
-                Chunk_AdditionalUseCases,
-                Chunk_Master,
-                Chunk_Variables
-            ];
-        }
+        // Entfernen und Verwerfen von Spalten erkennt die Tabelle über die
+        // Spalten-Events; ist die Chunk-Spalte betroffen, wird sofort
+        // reorganisiert.
+        Column.ColumnRemoved += ColumnCollectionColumnRemoved;
+        Column.ColumnDisposed += ColumnCollectionColumnDisposed;
 
         // Änderungs-Events dieser Stufe als Undo-Einträge an die Datei-Verwaltung verdrahten
         FragmentChanged += SaveableFragmentChanged;
@@ -143,6 +120,9 @@ public class TableFileNew : Table {
         if (source is not null) {
             // Update übernimmt die Ansichten und schaltet sie zum granularen Ändern frei
             _ = Update(source);
+
+            // Die Chunk-Spalte der Quelle bestimmt die Chunk-Verteilung der neuen Datei.
+            SyncChunkPath(false);
         }
     }
 
@@ -177,7 +157,7 @@ public class TableFileNew : Table {
     protected internal override bool IsLegacyFormat => false;
 
     /// <summary>
-    /// Multi-User-Zugriff ist über das Fragment-Journal bzw. Chunk-Layout möglich.
+    /// Multi-User-Zugriff ist über das Fragment-Journal möglich.
     /// </summary>
     public override bool MultiUserPossible => Saveable?.MultiUserPossible ?? false;
 
@@ -219,6 +199,11 @@ public class TableFileNew : Table {
             ResumeEvents();
         }
 
+        // Der Chunk-Pfad folgt der geladenen Chunk-Spalte; ohne Chunk-Spalte
+        // läuft alles im Kopf-Fragment. Beim Laden wird bewusst nicht
+        // reorganisiert — die Chunk-Ordner sind gerade die Datenquelle.
+        SyncChunkPath(false);
+
         if (e.IsFirst) { CreateWatcher(); }
     }
 
@@ -228,9 +213,23 @@ public class TableFileNew : Table {
     private void SaveableInvalidateView(object? sender, System.EventArgs e) => OnInvalidateView();
 
     /// <summary>
-    /// Fordert die Aktualisierung der Nachschlage-Systeme.
+    /// Fordert die Aktualisierung der Nachschlage-Systeme; anschließend folgt
+    /// der Chunk-Pfad der aktuellen Chunk-Spalten-Lage — eine übernommene
+    /// Änderung an der Chunk-Spalte (z. B. deren Entfernung) reorganisiert sofort.
     /// </summary>
-    private void SaveableRefreshDataSystems(object? sender, System.EventArgs e) => Column.GetSystems();
+    private void SaveableRefreshDataSystems(object? sender, System.EventArgs e) => SyncChunkPath(true);
+
+    /// <summary>
+    /// Meldet das Entfernen einer Spalte; der Chunk-Pfad folgt sofort der
+    /// neuen Lage — ist die Chunk-Spalte betroffen, wird reorganisiert.
+    /// </summary>
+    private void ColumnCollectionColumnRemoved(object? sender, System.EventArgs e) => SyncChunkPath(true);
+
+    /// <summary>
+    /// Meldet das Verwerfen einer Spalte; der Chunk-Pfad folgt sofort der
+    /// neuen Lage — ist die Chunk-Spalte betroffen, wird reorganisiert.
+    /// </summary>
+    private void ColumnCollectionColumnDisposed(object? sender, ColumnEventArgs e) => SyncChunkPath(true);
 
     #endregion
 
@@ -241,7 +240,7 @@ public class TableFileNew : Table {
     /// Nur bei frischem Datenstand.
     /// </summary>
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
-        if (Saveable is SaveableFileFragment { DataFreshEnough: false }) { return false; }
+        if (!Saveable.DataFreshEnough) { return false; }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
@@ -251,7 +250,7 @@ public class TableFileNew : Table {
     /// Datei-Verwaltung erhält zusätzlich den Master-Stempel.
     /// </summary>
     public override void MasterMe() {
-        if (Saveable is SaveableFileFragment { DataFreshEnough: false }) { return; }
+        if (!Saveable.DataFreshEnough) { return; }
 
         Saveable.MasterMe();
         base.MasterMe();
@@ -296,8 +295,7 @@ public class TableFileNew : Table {
     }
 
     /// <summary>
-    /// Lädt Zeilen nach — Delegation an die Datei-Verwaltung. Je nach
-    /// Datei-Layout werden andere Funktionen unterstützt.
+    /// Lädt Zeilen nach — Delegation an die Datei-Verwaltung.
     /// </summary>
     /// <param name="oldest">True wird versucht, die ältesten Zeilen zu laden.</param>
     /// <param name="count">Die Mindestanzahl der Zeilen zum laden. -1 für alle.</param>
@@ -349,10 +347,43 @@ public class TableFileNew : Table {
     public override void TouchChunk(string chunkValue) => Saveable.TouchChunk(chunkValue);
 
     /// <summary>
-    /// Verteilt alle Zeilen nach einer Änderung des Chunk-Typs neu —
-    /// Delegation an die Datei-Verwaltung.
+    /// Verteilt alle Zeilen nach einer Änderung der Chunk-Spalte neu: den
+    /// Chunk-Pfad an die neue Lage anpassen und die alte Verteilung räumen —
+    /// der nächste Speichervorgang schreibt den angepassten Stand.
     /// </summary>
-    public override void ReorganizeChunks() => Saveable.Reorganize();
+    public override void ReorganizeChunks() {
+        SyncChunkPath(false);
+        Saveable.Reorganize();
+    }
+
+    /// <summary>
+    /// Gleicht den Chunk-Pfad der Datei-Verwaltung an die Chunk-Spalte an: Nur
+    /// mit gesetzter Chunk-Spalte werden die Zeilen je Chunk-Wert verteilt;
+    /// ohne Chunk-Spalte speichert die Verwaltung alles im Kopf-Fragment.
+    /// </summary>
+    /// <param name="reorganizeOnChange">True: bei einem Pfad-Wechsel sofort
+    /// reorganisieren (Chunk-Ordner räumen; die Zeilen liegen zuvor vollständig
+    /// im Speicher); False: nur den Pfad setzen.</param>
+    private void SyncChunkPath(bool reorganizeOnChange) {
+        if (IsDisposed) { return; }
+
+        Column.GetSystems();
+
+        List<byte> path = Column.ChunkValueColumn is { IsDisposed: false }
+            ? [(byte)TableFragmentType.Rows]
+            : [];
+
+        // Der Pfad ist nur leer oder genau [Rows]; eine Änderung zeigt sich
+        // an der Länge bzw. dem einzigen Wert.
+        var changed = Saveable.ChunkPath.Count != path.Count
+            || (path.Count == 1 && Saveable.ChunkPath[0] != path[0]);
+
+        if (!changed) { return; }
+
+        Saveable.ChunkPath = path;
+
+        if (reorganizeOnChange) { Saveable.Reorganize(); }
+    }
 
     /// <summary>
     /// Friert die Tabelle ein; der Freeze-Grund und das Schließen der Schreib-Handles
@@ -435,6 +466,10 @@ public class TableFileNew : Table {
             Saveable.Loaded -= SaveableLoaded;
             Saveable.InvalidateView -= SaveableInvalidateView;
             Saveable.RefreshDataSystems -= SaveableRefreshDataSystems;
+
+            // Spalten-Events abmelden
+            Column.ColumnRemoved -= ColumnCollectionColumnRemoved;
+            Column.ColumnDisposed -= ColumnCollectionColumnDisposed;
 
             FragmentChanged -= SaveableFragmentChanged;
 

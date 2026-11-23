@@ -277,7 +277,14 @@ public class TableInfoCliCommand : CliCommand {
     }
 
     private static void WriteSummary(Table tbl) {
-        var filename = tbl is TableFile tableFile ? tableFile.Filename : string.Empty;
+        string filename;
+        if (tbl is TableFile tableFile) {
+            filename = tableFile.Filename;
+        } else if (tbl is TableFileNew tableFileNew) {
+            filename = tableFileNew.Filename;
+        } else {
+            filename = string.Empty;
+        }
         var columns = tbl.Column.Count(c => c is { IsDisposed: false });
         var rows = tbl.Row.Count(r => r is { IsDisposed: false });
 
