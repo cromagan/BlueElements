@@ -245,8 +245,30 @@ füge eine Prüfung hinzu, die bei List Element Variablen wie SP01 verbietet.
 Mach VarTemp als ScriptCommand.
 Legt die Variable an, wenn nicht vorhanden. Wenn vorhanden, wird der Befehl ignoriert.
 
+## Aufgabe
+Variablen werden nicht richtig zusammengeführt
 
 ## Aufgabe
-ist ein If faul (Exists(xx) && b=8) 
-wird Exists angemeckert, anstelle B=8
+Aufräumen von Fragmenten in einen Eigenen Prozess
+
+## Aufgabe
+Komplettieren von Tabellen in einen eignenen Prozess
+
+## Aufgabe
+SaveableFragment oder SaveableChunk kopieren. Die Kopie Umbenennen zu SaveableChunkFragment.
+Die ganzen Kopf-Fragmente werden identisch zu SaveableFragment. Mit komplettierung und löschen der Daten, indentisch mit SaveableFragment.
+
+Wenn nun ein ChunkWert erkannt wird, dann werden die Chunks erstellt wie in SaveableChunk. Die Undos kommen auch in den Chunk.
+Wird kein ChunkWert erkannt, dann verhält es sich identisch zu SaveableFragment.
+
+Wie wird der ChunkWert erkannt? Areas hat nur noch EINEN Wert: Den Chunk-Pfad.
+
+Es ist praktisch eine Mischung aus Fragmenten und Chunks.
+Wichtig: das Ganze verhalten muss in SaveableChunkFragment sein!
+Wenn das System gut klappt, wird SaveableFragment und SaveableChunk komplett gelöscht.
+Der Nächste schritt ist dann, SaveableChunkFragment komplett in Saveable zu integrieren.
+
+
+
+
 
