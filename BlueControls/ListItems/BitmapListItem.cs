@@ -93,7 +93,6 @@ public class BitmapListItem : ListItem {
         return (int)(sc * columnWidth);
     }
 
-    public bool ImageLoaded() => _bitmap is not null;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         try {

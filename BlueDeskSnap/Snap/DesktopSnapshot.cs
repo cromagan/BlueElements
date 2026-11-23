@@ -14,11 +14,6 @@ public static class DesktopSnapshot {
     #region Methods
 
     /// <summary>
-    /// Erfasst alle sichtbaren, nicht minimierten Fenster (das Snap-Fenster selbst ausgenommen) in einen neuen Snap und speichert die Ablage.
-    /// </summary>
-    public static WindowSnapshot Capture(string name) => CaptureInto(new WindowSnapshot { Name = name });
-
-    /// <summary>
     /// Erfasst den aktuellen Desktop in den gegebenen Snap (neu anlegen oder aktualisieren) und speichert die Ablage.
     /// </summary>
     public static WindowSnapshot CaptureInto(WindowSnapshot snap) {

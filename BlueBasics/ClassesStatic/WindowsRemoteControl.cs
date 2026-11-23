@@ -59,9 +59,6 @@ public static class WindowsRemoteControl {
 
     #region Methods
 
-    // Release key
-    public static void AltRelease() => _ = keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
-
     public static void FensterRestore(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.Restore);
 
     public static IntPtr GetAncestor(IntPtr hWnd) {
@@ -96,14 +93,7 @@ public static class WindowsRemoteControl {
 
     public static void KeyUp(KeyCode k) => _ = keybd_event((byte)k, 0, KeyeventfKeyup, 0);
 
-    public static string LastMouseButton() {
-        if (Convert.ToBoolean(GetAsyncKeyState(0x1))) { return "Links"; }
-        if (Convert.ToBoolean(GetAsyncKeyState(0x2))) { return "Rechts"; }
-        if (Convert.ToBoolean(GetAsyncKeyState(0x4))) { return "Mitte"; }
-        return string.Empty;
-    }
 
-    public static void LeftAltRelease() => _ = keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfKeyup, 0);
 
     public static void MouseAction(MouseEventFlags flags, int x, int y) => mouse_event((uint)flags, x, y, 0, 0);
 
@@ -154,33 +144,11 @@ public static class WindowsRemoteControl {
         }
     }
 
-    public static void RebootComputer() {
-        Develop.TraceLogging_End();
 
-        var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        Process.Start(psi);
-
-        Develop.AbortExe(false);
-    }
-
-    public static void ShiftRelease() => _ = keybd_event((byte)KeyCode.VK_SHIFT, 0, KeyeventfKeyup, 0);
 
     public static void ShowWindowNoActivate(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.ShowNoActivate);
 
-    public static void ShutdownComputer() {
-        Develop.TraceLogging_End();
 
-        var psi = new ProcessStartInfo("shutdown", "/s /t 0") {
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        Process.Start(psi);
-
-        Develop.AbortExe(false);
-    }
 
     /// <summary>
     /// Liefert die Bildschirmkoordinaten (Position und Größe) des Fensters.

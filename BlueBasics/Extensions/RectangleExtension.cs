@@ -33,21 +33,6 @@ public static partial class Extensions {
                               rect.Height.CanvasToControl(zoom));
     }
 
-    public static Point NearestPoint(this Point p, List<Point> pl) {
-        if (pl.Count == 0) { return Point.Empty; }
-        var minl = float.MaxValue;
-        var rp = Point.Empty;
-
-        foreach (var thisP in pl) {
-            var l = Geometry.GetLength(p, thisP);
-            if (l > minl) { continue; }
-
-            minl = l;
-            rp = thisP;
-        }
-
-        return rp;
-    }
 
     public static Point PointOf(this Rectangle r, Alignment p) {
         switch (p) {

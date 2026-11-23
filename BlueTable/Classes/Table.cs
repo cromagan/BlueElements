@@ -800,6 +800,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return TableFile.Create(targetPath, source);
     }
 
+    // TODO: Unused
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
         lock (AllFilesLocker) {
@@ -917,9 +918,9 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     /// <summary>
     /// True, wenn die Tabelle Chunk-Werte unterstützt: das klassische TableChunk-Format
-    /// oder ein TableFileNew mit Chunk-Datei-Verwaltung (SaveableFileChunk).
+    /// oder ein TableFileNew mit Chunk-Fragment-Verwaltung (SaveableFileChunkFragment).
     /// </summary>
-    public static bool IsTableChunk(Table? table) => table is TableChunk || table is TableFileNew { Saveable: SaveableFileChunk };
+    public static bool IsTableChunk(Table? table) => table is TableChunk || table is TableFileNew { Saveable: SaveableFileChunkFragment };
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
@@ -3021,34 +3022,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         this.Register(newDefinition);
     }
 
-    /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
-    /// </summary>
-    protected void WaitInitialDone() {
-        if (MainChunkLoadDone) { return; }
-
-        var t = Stopwatch.StartNew();
-
-        var lastMessageTime = 0L;
-
-        while (!MainChunkLoadDone) {
-            Thread.Sleep(1);
-            if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Abbruch, Tabelle {KeyName} wurde nicht richtig initialisiert", 0);
-                return;
-            }
-
-            if (IsFreezed) {
-                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Abbruch, Tabelle {KeyName} eingefrohren {FreezedReason}", 0);
-                return;
-            }
-
-            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
-                lastMessageTime = t.ElapsedMilliseconds;
-                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Warte auf Abschluss der Initialsierung von {KeyName}", 0);
-            }
-        }
-    }
 
     /// <summary>
     /// Schreibt einen Wert auf die Festplatte oder den Server.

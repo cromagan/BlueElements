@@ -183,6 +183,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     public object? CreateNewItem() => null;
 
+    // TODO: Unused
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
 
         #region Tabellen Initialisieren
@@ -217,6 +218,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         ShowTab(tp);
     }
 
+    // TODO: Unused
     /// <summary>
     /// Setzt von allen Reitern die Ansichts- und Filtereinstellungen zurück
     /// </summary>

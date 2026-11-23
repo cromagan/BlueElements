@@ -125,17 +125,6 @@ public static class Generic {
         return false;
     }
 
-    /// <summary>
-    /// Lädt den Inhalt einer URL als String herunter.
-    /// </summary>
-    /// <param name="url">Die herunterzuladende URL.</param>
-    /// <returns>Der heruntergeladene Inhalt als String.</returns>
-    public static string Download(string url) {
-        // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
-        using var wc = new WebClient();
-        wc.Encoding = Encoding.UTF8;
-        return wc.DownloadString(url);
-    }
 
     public static Image? DownloadImage(string url) {
         try {
@@ -152,6 +141,7 @@ public static class Generic {
         }
     }
 
+    // TODO: Unused
     /// <summary>
     /// Wandelt string[] in ein Dictionary um.
     /// Unterstützt: --Key Value, -Key Value, /Key Value

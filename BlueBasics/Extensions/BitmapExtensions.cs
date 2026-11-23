@@ -183,7 +183,6 @@ public static partial class Extensions {
         }
     }
 
-    public static float GetLuminance(this Color color) => GetBrightness(color.R, color.G, color.B);
 
     public static Color GetPixel(this BitmapData sourceBmpData, byte[] bits, int x, int y) {
         var index = sourceBmpData.GetPixelIndex(x, y);
@@ -192,15 +191,7 @@ public static partial class Extensions {
 
     public static int GetPixelIndex(this BitmapData data, int x, int y) => y * data.Stride + x * 4;
 
-    public static Color GetPixelSafe(this BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
-        if (data is null || bits is null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
-        return data.GetPixel(bits, x, y);
-    }
 
-    public static Color GetPixelSafe(this BitmapData data, byte[] bits, int x, int y) {
-        if (x < 0 || y < 0 || x >= data.Width || y >= data.Height) { return Color.FromArgb(0, 0, 0, 0); }
-        return data.GetPixel(bits, x, y);
-    }
 
     public static int GetPixelSafeIndex(this BitmapData data, int x, int y, int w, int h) {
         if (x < 0 || y < 0 || x >= w || y >= h) { return -1; }

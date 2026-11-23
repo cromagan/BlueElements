@@ -782,23 +782,6 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
     /// </summary>
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
 
-    /// <summary>
-    /// Setzt den gecachten Inhalt und behandelt ihn als frisch geladenen Zustand.
-    /// <c>_content</c>, <c>_contentHash</c> und <c>_contentOnDiskHash</c> werden
-    /// auf den übergebenen Wert synchronisiert, IsSaved ist danach
-    /// true. Wird von Ableitungen nach der Verarbeitung der Rohdaten aufgerufen
-    /// — z. B. nachdem die geladenen Bytes geparst und normalisiert wurden —,
-    /// damit der gecachte Inhalt den tatsächlich geladenen Stand abbildet.
-    /// </summary>
-    protected void SetLoadedContent(byte[] content) {
-        var hash = Generic.GetSHA256HashString(content);
-        lock (_lock) {
-            _content = content;
-            _contentHash = hash;
-            _contentOnDiskHash = hash;
-            _isDirty = false;
-        }
-    }
 
     private static void EnsurePollingTimerStarted() {
         if (_pollingTimer is not null) { return; }

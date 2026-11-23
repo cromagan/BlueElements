@@ -549,7 +549,7 @@ public sealed partial class TableScriptEditor : ScriptEditor, IHasTable {
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
         // Bei Chunk-Tabellen: Zeilen-Dropdown erst freigeben, wenn ein Chunk gewählt ist.
-        if (Table is not { } tc || !Table.IsTableChunk(tc)) { return; }
+        if (Table is not { IsDisposed: false } tc || !Table.IsTableChunk(tc)) { return; }
         btnTestZeileDropDown.Enabled = !string.IsNullOrEmpty(txbChunk.Text);
         txbTestZeile.Enabled = btnTestZeileDropDown.Enabled;
 

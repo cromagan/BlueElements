@@ -47,40 +47,6 @@ public sealed class JsonAppendLog : IDisposableExtended {
 
     #region Methods
 
-    /// <summary>
-    /// Liest alle Änderungen aus der Log-Datei (oder <c>null</c> bei Fehler /
-    /// nicht existierender Datei). Andere Log-Dateien im selben Verzeichnis
-    /// mit gleichem Basismuster werden ebenfalls gelesen (Multi-User-Support).
-    /// </summary>
-    public static List<(string Path, JsonNode? Value)> ReadAllChanges(string filename) {
-        var result = new List<(string Path, JsonNode? Value)>();
-
-        if (!FileExists(filename)) { return result; }
-
-        try {
-            var content = ReadAllText(filename, Encoding.UTF8);
-
-            foreach (var line in content.SplitAndCutByCr()) {
-                if (string.IsNullOrWhiteSpace(line)) { continue; }
-                if (line.StartsWith('-')) { continue; }
-
-                try {
-                    var root = JsonNode.Parse(line);
-                    var p = root?["path"]?.GetValue<string>();
-                    if (string.IsNullOrEmpty(p)) { continue; }
-                    if (root?["value"] is { } v) {
-                        result.Add((p, v.DeepClone()));
-                    }
-                } catch {
-                    Develop.DebugPrint("JsonAppendLog: ungültige Zeile übersprungen");
-                }
-            }
-        } catch {
-            Develop.DebugPrint("JsonAppendLog.ReadAllChanges fehlgeschlagen: " + filename);
-        }
-
-        return result;
-    }
 
     /// <summary>
     /// Hängt eine einzelne Property-Änderung an die Log-Datei an.

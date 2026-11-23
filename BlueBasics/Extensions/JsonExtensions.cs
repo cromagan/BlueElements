@@ -6,18 +6,6 @@ public static partial class Extensions {
 
     #region Methods
 
-    /// <summary>
-    /// Liest ein von Set geschriebenes Base64-PNG unter
-    /// <paramref name="key" />. Fehlt der Key, ist er kein String oder leer, wird
-    /// <paramref name="defaultValue" /> geliefert - so bleiben Partial-Updates
-    /// möglich, ohne bestehende Bilder zu überschreiben.
-    /// </summary>
-    public static Bitmap? GetBitmap(this JsonObject json, string key, Bitmap? defaultValue = null) {
-        if (json[key] is JsonValue v && v.TryGetValue(out string? s) && s is { Length: > 0 }) {
-            return Base64ToBitmap(s);
-        }
-        return defaultValue;
-    }
 
     public static bool GetBool(this JsonObject json, string key, bool defaultValue = false) {
         if (json[key] is JsonValue v && v.TryGetValue(out bool f)) { return f; }

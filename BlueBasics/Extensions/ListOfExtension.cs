@@ -71,18 +71,6 @@ public static partial class Extensions {
         l.AddRange(t.SplitAndCutByCr());
     }
 
-    public static string Parseable(this ICollection<string> col, string baseToString) {
-        if (string.IsNullOrEmpty(baseToString) ||
-            !baseToString.StartsWith('{') ||
-            !baseToString.EndsWith('}')) {
-            Develop.DebugError("Basestringfehler!");
-        }
-
-        if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
-
-        return $"{baseToString[..^1]}, {string.Join(", ", col)}}}";
-    }
-
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
         if (value is null || string.IsNullOrEmpty(value)) { return; }
         col.Add($"{tagname}=\"{value.ToNonCritical()}\"");

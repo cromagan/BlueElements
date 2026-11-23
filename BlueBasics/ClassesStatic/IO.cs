@@ -277,6 +277,7 @@ public static class IO {
                                             _ => FileFormat.Unknown
                                         };
 
+    // TODO: Unused
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
     /// </summary>
@@ -310,8 +311,6 @@ public static class IO {
 
     public static string[] GetFiles(string directory)
                                      => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
-
-    public static DateTime? GetFolderWriteTimeUtc(string directory) => ProcessFile(TryGetFolderWriteTimeUtc, [directory], false, 5).Value as DateTime?;
 
     /// <summary>
     /// Prüft, ob der übergebene Text ein gültiger Verzeichnispfad ist

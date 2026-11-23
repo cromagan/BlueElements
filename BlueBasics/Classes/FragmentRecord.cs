@@ -569,11 +569,6 @@ public sealed class FragmentRecord {
     internal static byte[] IntBytes(int value) => [(byte)value, (byte)(value >> 8), (byte)(value >> 16), (byte)(value >> 24)];
 
     /// <summary>
-    /// Kodiert UInt-Werte als 4 Little-Endian-Bytes.
-    /// </summary>
-    internal static byte[] UIntBytes(uint value) => [(byte)value, (byte)(value >> 8), (byte)(value >> 16), (byte)(value >> 24)];
-
-    /// <summary>
     /// Kodiert Long-Werte (auch DateTime-Ticks) als 8 Little-Endian-Bytes.
     /// </summary>
     internal static byte[] LongBytes(long value) => [
@@ -969,28 +964,6 @@ public sealed class FragmentRecord {
         return result;
     }
 
-    /// <summary>
-    /// Liefert eine Kopie des Satzes ohne Meta; User, DateTimeUtc und Comment werden geleert.
-    /// </summary>
-    public FragmentRecord WithoutMeta() {
-        var result = new FragmentRecord {
-            StorageType = StorageType,
-            Depth = Depth,
-            LeafType = LeafType,
-            DataType = DataType,
-            TagType = TagType,
-            ByteContent = ByteContent,
-            User = string.Empty,
-            DateTimeUtc = DateTime.MinValue,
-            Comment = string.Empty,
-            HasMeta = false,
-            Entry = Entry,
-            Container = Container,
-            EntryDateTimeUtc = EntryDateTimeUtc
-        };
-
-        return result;
-    }
 
     /// <summary>
     /// Schreibt den Satz auf der Ziel-Tiefe in den Stream (Pendant zum Einlesen per
