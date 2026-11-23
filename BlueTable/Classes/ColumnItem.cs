@@ -21,9 +21,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Empfänger-Typen der Spalte im binären Fragment-Format; spiegelt die Spalten-Werte
     /// von TableDataType (100-199) mit Versatz -100, Lücken entsprechen dessen Reserveplätzen.
-    /// Nur der Spalte selbst bekannt.
+    /// Intern sichtbar, damit Area-Regeln des Chunk-Layouts Pfade auf den Zahlraum bauen.
     /// </summary>
-    private enum ColumnFragmentType : byte {
+    internal enum ColumnFragmentType : byte {
         // 0 ist reserviert (None); Empfänger-Typen müssen ≥ 1 sein.
         ColumnKey = 1,
 
@@ -1277,10 +1277,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.Disposed -= _table_Disposed;
             field = value;
-
-            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -2586,8 +2583,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// </summary>
     private static bool UniqueDefinitionMatchesKeys(UniqueValueDefinition uvd, HashSet<string> keys) => uvd.KeyColumns.Count == keys.Count && uvd.KeyColumns.All(kc => keys.Contains(kc._keyName));
 
-    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
-
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For.Clear();
 
@@ -3048,7 +3043,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
 
             case ColumnFragmentType.ColumnCaption:
-                Develop.Diagnose("ColumnCaption", $"Setze Caption='{record.StringContent}', Stack: {Develop.DiagStack()}");
                 _caption = record.StringContent;
                 break;
 

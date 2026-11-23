@@ -99,6 +99,8 @@ Wird eine Datei verändert, zusätzlich folgende Reparaturen durchführen:
 - **Keine Wrapper** — Methoden nicht in unnötige Wrapper kapseln. Muss eine Methode erweitert werden, einen neuen Parameter ergänzen und die Aufrufer geben den Wert direkt mit. Muss eine Routine verschoben werden, sprechen die Aufrufer die Methode direkt an.
 - **Eine Datei pro Typ** — jede Klasse, Struktur, jedes Enum und jedes Interface kommt in eine eigene Datei (Dateiname = Typname).
   Ausnahme: Ein Interface `IXxx` soll zusammen mit der zugehörigen statischen Erweiterungsklasse `IXxxExtension` (die es per `Extensions`-Muster erweitert) in derselben Datei stehen.
+- **Neue Typen nur nach Freigabe** — neue Klassen, Enums oder Interfaces nur erstellen, wenn der User es bestätigt oder explizit freigibt. Vorher prüfen, ob ein bestehender Typ passt.
+- **Keine globalen Puffer oder Flags** — Zustand nicht über globale Felder/Statics halten. Bevorzugt alles über Rückgaben von Funktionen oder Parameter/Attribute in Funktionen lösen.
 - **Forms/UserControls brauchen eine Designer-Datei** — visuelle WinForms-Typen besitzen immer eine begleitende `.Designer.cs`-Datei (partial class), auch wenn sie leer ist.
 - **Alle `.cs`-Dateien müssen UTF-8 mit BOM sein.** Das Skript `Convert-Encoding.ps1` normalisiert Kodierung und Stil.
 - **Alle WinForms-Formulare müssen von `BlueControls.Forms.Form` erben**, nicht von `System.Windows.Forms.Form`. Das erzwingt `AutoScaleMode.None`.
@@ -160,5 +162,10 @@ Kein Console.Writeline und auch ein Develop.DebugPrint
 Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden sollen.
 
 **Develop.DiagStack()**: Liefert einen kompakten Aufruf-Stack als String — Methodennamen der Aufrufkette, durch `" <- "` getrennt (max. 8 Frames). Gedacht zum Einbetten in `Develop.Diagnose()`-Meldungen, um zu sehen, woher ein Code-Pfad aufgerufen wurde: `Develop.Diagnose("Typ", $"Stack: {Develop.DiagStack()}")`. Ist `DiagFlag` false, wird ein leerer String geliefert — verursacht also im Normalbetrieb keine Kosten.
+
+
+## Aktuelle Bearbeitung, wichtig!
+TableFileNew ist ein neues Tabellenformat, das noch nicht im Einsatz ist. Das heißt, es gibt keine wichtigen Dateien auf Festplatte. Desegen darfst du ändern, was du willst - ohne Rücksicht auf Legacy.
+TableFile hingegen ist das aktuelle Format, das Legacy wird. Da muss die kompatiblität bestehen bleiben und nur Bugs dürfen gefixt werden.
 
 

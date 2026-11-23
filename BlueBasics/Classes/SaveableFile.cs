@@ -28,7 +28,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// Empfänger-Typen der Kopf-Datei im Fragment-Format; nur der Verwaltung selbst bekannt.
     /// Gültige Werte: 1–199 (0 ist reserviert, ≥ 200 sind systemeigene Tags).
     /// </summary>
-    private enum SaveableFileFragmentType : byte {
+    public enum SaveableFileFragmentType : byte {
         LayoutClassId = 1
     }
 
@@ -127,8 +127,16 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// Änderungs-Historie als Fragment-Sätze (Basis-Tiefe 0): je Eintrag eine
     /// Navigationskette plus Blatt-Satz mit Meta. Eintragsgrenze ist der Satz mit Tiefe 0.
     /// Inhaltstyp-frei; der Empfänger versteht seine eigenen Navigationstypen.
+    /// Beim Speichern wird je Ziel (Datei oder Chunk) auf die neuesten
+    /// MaxUndos Sätze gekürzt.
     /// </summary>
     public List<FragmentRecord> Undos { get; } = [];
+
+    /// <summary>
+    /// Fingerabdrücke der verbuchten Undo-Einträge; Basis der Dubletten-Erkennung
+    /// beim Nachladen bereits bekannter Inhalte.
+    /// </summary>
+    private readonly HashSet<string> _undoEntryHashes = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Instanz-Kennung aus Rechner und Zufallswert; dient der Unterscheidung
@@ -420,14 +428,14 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// Überspringen ungenutzter Bereiche bei der periodischen Aktualisierung.
     /// Basis: nichts.
     /// </summary>
-    public virtual void Touch(string info) { }
+    public virtual void TouchChunk(string chunkValue) { }
 
     /// <summary>
-    /// Nimmt einen Undo-Satz der Stufen-Kette entgegen (Navigationssatz einer Stufe oder
-    /// Blatt-Satz mit Meta). Die Ableitung entscheidet, wie gesichert wird — als
-    /// Fragment ins Journal oder still. Basis: still.
+    /// Nimmt einen kompletten Undo-Eintrag entgegen. Die Ableitung entscheidet,
+    /// wie gesichert wird — als Fragment ins Journal oder still. Basis: still.
     /// </summary>
-    public virtual void LogUndo(FragmentRecord record) { }
+    /// <param name="entry">Die Sätze des Eintrags in Journal-Reihenfolge, Basis-Tiefe 0; der letzte Satz trägt den Meta-Stempel.</param>
+    public virtual void LogUndoEntry(IReadOnlyList<FragmentRecord> entry) { }
 
     /// <summary>
     /// Disposed die Verwaltung: markiert sie als verworfen, trägt sie aus dem
@@ -479,43 +487,72 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     }
 
     /// <summary>
-    /// Serialisiert die Änderungs-Historie: Je Eintrag (Basis-Tiefe 0) ein
-    /// Steuer-Satz des Empfänger-Typs, darunter die Historien-Sätze ohne Meta;
-    /// die Meta lebt nur im RAM und Journal, nie im Snapshot.
-    /// </summary>
-    /// <param name="stream">Ziel-Stream.</param>
-    /// <param name="depth">Tiefe der Steuer-Sätze.</param>
-    /// <param name="undoLeafType">Empfänger-Typ der Steuer-Sätze.</param>
-    public bool SerializeUndo(Stream stream, int depth, Enum undoLeafType) {
-        List<FragmentRecord> undoSave;
-        lock (UndoLock) {
-            undoSave = [.. Undos];
-        }
-
-        var allok = true;
-        foreach (var u in undoSave) {
-            if (u.Depth == 0) {
-                allok &= FragmentRecord.Append(stream, depth, undoLeafType, string.Empty);
-            }
-
-            // Die Historien-Sätze leben eine Ebene unter dem Steuer-Satz.
-            allok &= u.WithoutMeta().Append(stream, depth + 1 + u.Depth);
-        }
-
-        return allok;
-    }
-
-    /// <summary>
-    /// Liest die Sätze eines Undo-Blocks und verbucht sie in der Änderungs-Historie;
-    /// sie werden auf Basis-Tiefe zurückgeschoben.
+    /// Liest die Sätze eines Undo-Blocks und verbucht sie eintragsweise in der
+    /// Änderungs-Historie; sie werden auf Basis-Tiefe zurückgeschoben. Einträge,
+    /// deren Fingerabdruck bereits verbucht ist, werden verworfen — so übersteht
+    /// ein Nachladen desselben Inhalts die Historie ohne Dubletten.
     /// </summary>
     /// <param name="stream">Quell-Stream, positioniert hinter dem Steuer-Satz.</param>
     /// <param name="navDepth">Tiefe des Steuer-Satzes.</param>
     public void DeserializeUndo(Stream stream, int navDepth) {
         lock (UndoLock) {
+            List<FragmentRecord>? entry = null;
+
             foreach (var undoRecord in FragmentRecord.ReadEntryRecords(stream, navDepth)) {
-                Undos.Add(undoRecord);
+                // Die Historien-Sätze liegen eine Ebene unter dem Steuer-Satz;
+                // der erste Satz eines Eintrags gehört auf Basis-Tiefe 0.
+                var basisRecord = undoRecord.WithDepth(undoRecord.Depth - 1);
+
+                if (basisRecord.Depth == 0 && entry is { Count: > 0 }) {
+                    AddUndoEntry(entry);
+                    entry = [];
+                }
+
+                entry ??= [];
+                entry.Add(basisRecord);
             }
+
+            if (entry is { Count: > 0 }) { AddUndoEntry(entry); }
+        }
+    }
+
+    /// <summary>
+    /// Verbucht einen kompletten Undo-Eintrag samt Fingerabdruck; einen bereits
+    /// bekannten Fingerabdruck verwirft sie. Läuft im UndoLock.
+    /// </summary>
+    protected void AddUndoEntry(IReadOnlyList<FragmentRecord> entry) {
+        if (!_undoEntryHashes.Add(UndoEntryHash(entry))) { return; }
+
+        Undos.AddRange(entry);
+    }
+
+    /// <summary>
+    /// Fingerabdruck eines Undo-Eintrags über alle seine Sätze; Basis der
+    /// Dubletten-Erkennung beim Nachladen.
+    /// </summary>
+    private static string UndoEntryHash(IReadOnlyList<FragmentRecord> entry) {
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var record in entry) {
+            _ = sb.Append(record.Depth).Append(':')
+                  .Append(record.ValueId).Append(':')
+                  .Append((int)record.DataType).Append(':')
+                  .Append(Convert.ToBase64String(record.ByteContent)).Append(':')
+                  .Append(record.User).Append(':')
+                  .Append(record.DateTimeUtc.Ticks).Append(':')
+                  .Append(record.Comment).Append('#');
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Verwirft die gesamte Änderungs-Historie samt Dubletten-Merkern.
+    /// </summary>
+    public void ClearUndos() {
+        lock (UndoLock) {
+            Undos.Clear();
+            _undoEntryHashes.Clear();
         }
     }
 
@@ -577,7 +614,7 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// Verteilt die Datenbereiche nach einer Layout-Änderung neu.
     /// Basis: nichts zu tun.
     /// </summary>
-    public virtual void Reorganize(string chunk) { }
+    public virtual void Reorganize() { }
 
     /// <summary>
     /// Liefert die dateirelevanten Gründe, warum das Objekt aktuell nicht
@@ -596,40 +633,44 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// <summary>
     /// Liest den Objekt-Baum aus dem übergebenen Inhalt. Basis: Das besitzende
     /// Objekt liest als Fragment-Baum; Ableitungen mit anderem Inhalt
-    /// überschreiben den Seam. Vorab wird der Erzeuger-Stempel aus den
-    /// Kopf-Sätzen erfasst.
+    /// überschreiben den Seam. Vorab werden Erzeuger-Stempel und Format-Version
+    /// aus den Kopf-Sätzen erfasst; eine abweichende Format-Version bricht ab.
     /// </summary>
     protected virtual bool ParseMainContent(Stream stream) {
-        ReadCreationStamp(stream);
+        if (!ReadCreationStamp(stream)) { return false; }
 
         return Owner.Deserialize(stream, 0);
     }
 
     /// <summary>
-    /// Erzeugt den zu speichernden Inhalt. Basis: Das besitzende Objekt
-    /// schreibt als Fragment-Baum; Ableitungen mit anderem Inhalt überschreiben
-    /// den Seam. Liefert eine leere Liste, wenn der Inhalt ungültig ist.
-    /// Vor dem Objekt-Baum wird der Erzeuger-Stempel geschrieben: beim ersten
-    /// Speichern wird gestempelt, danach bleibt der Stempel der geladenen Datei erhalten.
+    /// Erzeugt den zu speichernden Inhalt: Erzeuger-Stempel und Objekt-Baum des
+    /// besitzenden Objekts. Welche Änderungs-Historie eingeht, entscheidet der
+    /// Aufrufer und übergibt sie. Liefert eine leere Liste, wenn der Inhalt
+    /// ungültig ist. Vor dem Objekt-Baum wird der Erzeuger-Stempel geschrieben:
+    /// beim ersten Speichern wird gestempelt, danach bleibt der Stempel der
+    /// geladenen Datei erhalten.
     /// </summary>
-    protected virtual List<byte> GenerateContentToSave() {
+    protected List<byte> GenerateContentToSave(List<FragmentRecord> undos) {
         using var ms = new MemoryStream();
 
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : UserName);
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateTimeUtc, _createTimeUtc > DateTime.MinValue ? _createTimeUtc : DateTime.UtcNow);
 
-        return Owner.Serialize(ms, 0) ? [.. ms.ToArray()] : [];
+        return Owner.Serialize(ms, 0, Owner.TypeName, undos) ? [.. ms.ToArray()] : [];
     }
 
     /// <summary>
-    /// Liest Erzeuger-Stempel (CreateUser, CreateTimeUtc) aus den Kopf-Sätzen des
-    /// Streams und setzt die Stream-Position danach zurück, damit der Inhalt
-    /// unverändert weitergelesen werden kann.
+    /// Liest Erzeuger-Stempel (CreateUser, CreateTimeUtc) und Format-Version aus
+    /// den Kopf-Sätzen des Streams und setzt die Stream-Position danach zurück,
+    /// damit der Inhalt unverändert weitergelesen werden kann. Liefert false bei
+    /// einer abweichenden Format-Version; ohne Versions-Satz (Fragment-Journal-
+    /// Einträge) wird akzeptiert.
     /// </summary>
-    private void ReadCreationStamp(Stream stream) {
+    private bool ReadCreationStamp(Stream stream) {
         var start = stream.Position;
         string? createUser = null;
         var createTimeUtc = DateTime.MinValue;
+        var serializerVersion = string.Empty;
 
         while (FragmentRecord.TryReadNext(stream) is { } record) {
             if (!record.IsFileTag) { break; }
@@ -641,15 +682,24 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
                 case FragmentTagType.CreateTimeUtc:
                     createTimeUtc = record.DateTimeContent;
                     break;
+                case FragmentTagType.SerializerVersion:
+                    serializerVersion = record.StringContent;
+                    break;
             }
         }
 
         stream.Position = start;
 
+        // Fremde Format-Version (alter Bestand, neuere Anwendung): gar nicht erst
+        // in die Klassen-Parser lassen, sonst knallen fremde Satz-Layouts im Deep-Parse.
+        if (serializerVersion is { Length: > 0 } v && !string.Equals(v, FragmentRecord.SerializerVersionCurrent, StringComparison.Ordinal)) { return false; }
+
         if (createUser is { Length: > 0 } u) {
             _createUser = u;
             _createTimeUtc = createTimeUtc;
         }
+
+        return true;
     }
 
     /// <summary>
@@ -870,7 +920,8 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
     /// <summary>
     /// Tick des statischen Watchers: trägt verworfene Instanzen aus und ruft
     /// CheckerTick aller geladenen, nicht gepausten Instanzen auf — dort liegt
-    /// das Nachladen und das bedarfsgesteuerte Speichern.
+    /// das Nachladen und das bedarfsgesteuerte Speichern. Ein Fehler im Tick
+    /// wird gemeldet, darf den Prozess aber nicht beenden.
     /// </summary>
     private static void WatcherTick(object? state) {
         foreach (var instance in Instances.Keys) {
@@ -882,7 +933,11 @@ public abstract class SaveableFile : IDisposableExtended, IReadableText, IHasQui
             // Während des Ladens/Speicherns und vor dem ersten Laden/Erstanlage nicht ticken.
             if (!instance.MainLoadDone || instance._timerPaused > 0) { continue; }
 
-            instance.CheckerTick();
+            try {
+                instance.CheckerTick();
+            } catch (Exception ex) {
+                Develop.Message(ErrorType.Warning, instance, instance.KeyName, ImageCode.Tabelle, $"CheckerTick fehlgeschlagen: {ex.GetType().Name} {ex.Message} Aufrufstack={Develop.DiagStack()}", 0);
+            }
         }
     }
 

@@ -56,10 +56,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.Disposed -= _table_Disposed;
             field = value;
-
-            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -285,8 +282,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
             return OperationResult.Failed(ex);
         }
     }
-
-    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }

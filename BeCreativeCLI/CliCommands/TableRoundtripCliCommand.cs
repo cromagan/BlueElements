@@ -662,7 +662,7 @@ public class TableRoundtripCliCommand : CliCommand {
                 if (snapBytes is { Length: > 0 }) { result.Add("snapshot", snapBytes); }
             }
         } else if (classId.Equals(SaveableFileChunk.ClassId, StringComparison.OrdinalIgnoreCase)) {
-            var master = SaveableFileChunk.Chunk_Master.ToLowerInvariant();
+            var master = TableFileNew.Chunk_Master.ToLowerInvariant();
 
             if (DirectoryExists(folder)) {
                 foreach (var sub in GetDirectories(folder)) {

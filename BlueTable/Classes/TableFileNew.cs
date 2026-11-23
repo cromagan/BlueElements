@@ -24,6 +24,23 @@ public class TableFileNew : Table {
     /// </summary>
     public const string SuffixMainFile = "btb";
 
+    public static readonly string Chunk_AdditionalUseCases = "_uses";
+
+    public static readonly string Chunk_Master = "_master";
+
+    public static readonly string Chunk_Variables = "_vars";
+
+    /// <summary>
+    /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
+    /// durchgeführt, sofern man Master werden kann.
+    /// </summary>
+    private const int MasterCheckIntervalMinutes = 15;
+
+    /// <summary>
+    /// UTC-Zeitpunkt der letzten Master-Prüfung.
+    /// </summary>
+    private DateTime _lastMasterAttemptUtc = DateTime.MinValue;
+
     #endregion
 
     #region Constructors
@@ -46,6 +63,38 @@ public class TableFileNew : Table {
         saveable.Loaded += SaveableLoaded;
         saveable.InvalidateView += SaveableInvalidateView;
         saveable.RefreshDataSystems += SaveableRefreshDataSystems;
+
+        // Chunk-Zuordnung: nur das Chunk-Layout nutzt Areas. Key = Pfad aus den
+        // Empfänger-Typen (Wurzel-Sektion → Bereich); feste Chunk-ID = kompletter
+        // Bereich, {individual} = Verteilung je Chunk-Wert der Items. Tiefere
+        // Pfade übersteuern die Sektions-Regel.
+        if (saveable is SaveableFileChunk chunkSaveable) {
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.VariableCollection }] = Chunk_Variables;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Columns }] = SaveableFileChunk.Chunk_MainData;
+
+            // Uses-Bereich der Spalten (Systeminfo) in den Uses-Chunk; der Rest der
+            // Spalten bleibt im Haupt-Chunk
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Columns, (byte)ColumnItem.ColumnFragmentType.ColumnSystemInfo }] = Chunk_AdditionalUseCases;
+
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterUser }] = Chunk_Master;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterTimeUTC }] = Chunk_Master;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterApp }] = Chunk_Master;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterMachine }] = Chunk_Master;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.TemporaryTableMasterId }] = Chunk_Master;
+            chunkSaveable.Areas[new byte[] { (byte)TableFragmentType.Rows }] = SaveableFileChunk.Area_Individual;
+
+            // Startup-Chunks: bei jedem Start bzw. Refresh eingelesen — der Haupt-Chunk
+            // zuerst (Struktur vor den übrigen Bereichen; garantiert durch den
+            // StartupChunkIds-Setter), danach die festen System-Chunks. Daten-Chunks —
+            // inklusive der Ablage für Zeilen ohne Chunk-Wert — werden nur bei Bedarf
+            // geladen, wenn sie angefordert werden.
+            chunkSaveable.StartupChunkIds = [
+                SaveableFileChunk.Chunk_MainData,
+                Chunk_AdditionalUseCases,
+                Chunk_Master,
+                Chunk_Variables
+            ];
+        }
 
         // Änderungs-Events dieser Stufe als Undo-Einträge an die Datei-Verwaltung verdrahten
         FragmentChanged += SaveableFragmentChanged;
@@ -228,12 +277,22 @@ public class TableFileNew : Table {
 
     /// <summary>
     /// Prüft alle relevanten Dateien auf Aktualität und lädt Änderungen nach —
-    /// Delegation an die Datei-Verwaltung.
+    /// Delegation an die Datei-Verwaltung. Danach läuft die periodische
+    /// Master-Prüfung der Tabelle.
     /// </summary>
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
-        return Saveable.Refresh(firstTime);
+        var ok = Saveable.Refresh(firstTime);
+
+        // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
+        // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.
+        if (ok && (firstTime || DateTime.UtcNow.Subtract(_lastMasterAttemptUtc).TotalMinutes >= MasterCheckIntervalMinutes)) {
+            _lastMasterAttemptUtc = DateTime.UtcNow;
+            TryToSetMeTemporaryMaster();
+        }
+
+        return ok;
     }
 
     /// <summary>
@@ -287,13 +346,13 @@ public class TableFileNew : Table {
     /// Datei-Verwaltung.
     /// </summary>
     /// <param name="chunkValue">Der Chunk-Wert (Info für die Datei-Verwaltung).</param>
-    public override void TouchChunk(string chunkValue) => Saveable.Touch(chunkValue);
+    public override void TouchChunk(string chunkValue) => Saveable.TouchChunk(chunkValue);
 
     /// <summary>
     /// Verteilt alle Zeilen nach einer Änderung des Chunk-Typs neu —
     /// Delegation an die Datei-Verwaltung.
     /// </summary>
-    public override void ReorganizeChunks() => Saveable.Reorganize(string.Empty);
+    public override void ReorganizeChunks() => Saveable.Reorganize();
 
     /// <summary>
     /// Friert die Tabelle ein; der Freeze-Grund und das Schließen der Schreib-Handles
@@ -322,7 +381,7 @@ public class TableFileNew : Table {
     /// Änderungs-Historie der Datei-Verwaltung.
     /// </summary>
     public override bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if ((TableFragmentType)record.LeafType == TableFragmentType.UndoHistory) {
+        if (record.TagType == FragmentTagType.UndoHistory) {
             if (IsDisposed) { return false; }
 
             Saveable.DeserializeUndo(stream, record.Depth);
@@ -338,9 +397,7 @@ public class TableFileNew : Table {
     /// Änderungs-Historie; die Undo-Sätze der Setter-Aufrufe werden verworfen.
     /// </summary>
     protected internal override void OnUpdateCompleted(Table sourceTable) {
-        lock (Saveable.UndoLock) {
-            Saveable.Undos.Clear();
-        }
+        Saveable.ClearUndos();
     }
 
     /// <summary>
@@ -386,24 +443,10 @@ public class TableFileNew : Table {
     }
 
     /// <summary>
-    /// Übergibt die Undo-Sätze einer über das Bubbling eingetroffenen Änderung der Datei-Verwaltung.
+    /// Übergibt den Undo-Eintrag einer über das Bubbling eingetroffenen Änderung der Datei-Verwaltung.
     /// </summary>
     private void SaveableFragmentChanged(object? sender, FragmentChangedEventArgs e) {
-        foreach (var record in e.UndoRecords()) { Saveable.LogUndo(record); }
-    }
-
-    /// <summary>
-    /// Schreibt den kompletten Tabellenstand als tiefenbasierte Fragment-Blöcke:
-    /// Der Basis-Block mit Kopf-Werten, Spalten, Ansichten, Uniques, Skripten,
-    /// Kopf-Variablen und Zeilen, danach die Undo-Sektion aus der
-    /// Änderungs-Historie der Datei-Verwaltung (ohne Meta).
-    /// </summary>
-    public override bool SerializeCore(Stream stream, int depth) {
-        var allok = base.SerializeCore(stream, depth);
-
-        allok &= Saveable.SerializeUndo(stream, depth, TableFragmentType.UndoHistory);
-
-        return allok;
+        Saveable.LogUndoEntry(e.UndoRecords());
     }
 
     #endregion

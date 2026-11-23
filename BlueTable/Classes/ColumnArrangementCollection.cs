@@ -15,14 +15,14 @@ namespace BlueTable.Classes;
 public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnViewCollection>, IHasTable {
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Ansichten-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum der Ansicht ein, sonst eigener
-    /// Raum; unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Ansichten-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum der Ansicht ein, sonst eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk
             ? ColumnViewCollection.GetNameOf(path[1..])
             : ((FragmentTagType)path[^1].ValueId).ToString();
     }
@@ -124,6 +124,7 @@ public sealed class ColumnArrangementCollection : KeyedItemCollection<ColumnView
         if (Table is not { IsDisposed: false } table) { return null; }
 
         var neu = new ColumnViewCollection(table, string.Empty, keyName);
+        Develop.Diagnose("ArrangementGetOrCreate", $"pid={Environment.ProcessId} Neue Ansicht erzeugt Key={keyName}");
         _ = Add(neu);
         return neu;
     }

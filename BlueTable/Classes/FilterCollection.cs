@@ -183,6 +183,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 // Ohne PowerEdit ist ein Chunk-Filter zwingend erforderlich.
                 return [];
             }
+        } else if (Table.IsTableChunk(tb)) {
+            // Chunk-Tabelle ohne Chunk-Spalte: Alle Zeilen tragen den "leeren" Chunk-Wert.
+            // Dieser wird immer geladen, damit die Zeilen stets angezeigt werden.
+            if (tb.BeSureRowIsLoaded(string.Empty, trustProcessedFile).IsFailed) { return []; }
         }
 
         if (filter.Length == 0) { return [.. tb.Row]; }

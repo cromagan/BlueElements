@@ -113,18 +113,14 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
     /// (empfangender Zahlraum) bzw. als roher Wert.
     /// </summary>
     private static string TypeText(ReadOnlySpan<FragmentRecord> path, bool tableRoot, string layoutTypeName) {
-        // Kopf-Datei: Nur das Layout-Blatt gehört der Verwaltung; darunter beginnt
-        // der Block des verwalteten Objekts. Nur Tabellen-Layouts erhalten echte
-        // Typ-Namen, fremde Layouts zeigen die Zahl.
-        if (!tableRoot) {
-            if (path.Length == 1) { return SaveableFile.GetNameOf(path[^1].LeafType); }
+        // Kopf-Datei: Nur das Layout-Blatt gehört der Verwaltung.
+        if (!tableRoot) { return SaveableFile.GetNameOf(path[^1].LeafType); }
 
-            return path.Length > 2 && layoutTypeName.Contains("Table", StringComparison.OrdinalIgnoreCase)
-                ? Table.GetNameOf(path[1..])
-                : path[^1].LeafType.ToString1();
-        }
-
-        return Table.GetNameOf(path);
+        // Objekt-Raum der verwalteten Datei: Nur Tabellen-Pfade erhalten echte
+        // Typ-Namen, fremde Zahlräume zeigen die Zahl.
+        return layoutTypeName.Contains(nameof(Table), StringComparison.OrdinalIgnoreCase)
+            ? Table.GetNameOf(path)
+            : path[^1].LeafType.ToString1();
     }
 
     private void EnsureTable() {
@@ -235,7 +231,7 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
 
             // Kette der Sätze: Die Vorfahren bestimmen den Zahlraum der Typ-Spalte,
             // der Schluss ist der gerade benannte Satz. Kopf-Dateien beginnen mit
-            // dem Layout-Blatt (Typ 0), Journal- und Chunk-Dateien direkt im
+            // dem Layout-Blatt, Journal- und Chunk-Dateien direkt im
             // Tabellen-Raum.
             List<FragmentRecord> path = [];
             var tableRoot = true;
@@ -256,15 +252,15 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
                 if (record.IsTag) {
                     if (record.TagType == FragmentTagType.Type) { layoutTypeName = record.StringContent; }
 
-                    // ItemPath/ItemList benennen den Zahlraum der Folge-Sätze und bleiben in der Kette.
-                    if (record.TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList) { path.Add(record); }
+                    // ItemPath/ItemList/ItemListChunk benennen den Zahlraum der Folge-Sätze und bleiben in der Kette.
+                    if (record.TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk) { path.Add(record); }
 
                     typeText = record.TagType.ToString();
                 } else {
                     if (!rootChecked) {
-                        // Erster Daten-Satz: Typ 0 = Layout-Blatt einer Kopf-Datei.
+                        // Erster Daten-Satz: Das Layout-Blatt mit bekannter Layout-ClassId kennzeichnet eine Kopf-Datei.
                         rootChecked = true;
-                        tableRoot = record.LeafType != 0;
+                        tableRoot = record.LeafType != (byte)SaveableFile.SaveableFileFragmentType.LayoutClassId || SaveableFile.AllFileSaveTypes[record.StringContent] is null;
                     }
 
                     // Daten-Sätze schließen die Kette ab und werden aus ihr benannt.

@@ -37,7 +37,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// <summary>
     /// Anzeigename des Fragment-Journal-Layouts für Auswahldialoge.
     /// </summary>
-    public override string ReadableText() => "Fragment-Journal (Standard)";
+    public override string ReadableText() => "Fragment-Journal";
 
     /// <summary>
     /// Kurzinfo des Fragment-Journal-Layouts für Auswahldialoge.
@@ -70,9 +70,10 @@ public class SaveableFileFragment : SaveableFileOnefile {
     public static readonly int DeleteSnapshotsAfterHours = 2;
 
     /// <summary>
-    /// Anzahl der zu behaltenden Snapshots im Arbeitsverzeichnis.
+    /// Anzahl der Snapshots im Arbeitsverzeichnis, die immer behalten werden,
+    /// unabhängig von ihrem Alter.
     /// </summary>
-    public const int KeepSnapshots = 3;
+    public const int KeepSnapshots = 5;
 
     /// <summary>
     /// Gibt das Suffix für Snapshot-Dateien (Komplettstände) zurück.
@@ -102,17 +103,6 @@ public class SaveableFileFragment : SaveableFileOnefile {
     private DateTime _isInCache = new(0);
 
     private Stream? _writer;
-
-    /// <summary>
-    /// Puffer des aktuell aufgebauten Undo-Eintrags; er wird mit dem Blatt-Satz
-    /// (Meta) komplett in die Journal-Datei geschrieben.
-    /// </summary>
-    private MemoryStream? _undoEntry;
-
-    /// <summary>
-    /// Tiefe des nächsten Undo-Satzes im aktuellen Eintrag.
-    /// </summary>
-    private int _undoEntryDepth;
 
     /// <summary>
     /// Der aktuell geladene Snapshot. Wird beim Aufräumen nie gelöscht.
@@ -381,43 +371,34 @@ public class SaveableFileFragment : SaveableFileOnefile {
     }
 
     /// <summary>
-    /// Nimmt einen Undo-Satz der Stufen-Kette entgegen und baut daraus den
-    /// Journal-Eintrag: Die Sätze landen im Eintrags-Puffer und in der
-    /// Änderungs-Historie; mit dem Meta-Satz des Blattes ist der Eintrag komplett
-    /// und wird in einem Stück in die Journal-Datei geschrieben und als verarbeitet
-    /// verbucht. Beim Laden, beim Einspielen fremder Fragmente und im
-    /// Nur-Lese-Modus still.
+    /// Nimmt einen kompletten Undo-Eintrag entgegen und schreibt ihn als
+    /// Journal-Eintrag: In einem Stück in die Journal-Datei, als verarbeitet
+    /// verbucht und samt Fingerabdruck in die Änderungs-Historie gebucht.
+    /// Beim Laden, beim Einspielen fremder Fragmente und im Nur-Lese-Modus still.
     /// </summary>
-    public override void LogUndo(FragmentRecord record) {
+    public override void LogUndoEntry(IReadOnlyList<FragmentRecord> entry) {
         if (IsDisposed || Ending) { return; }
         if (Develop.AllReadOnly) { return; }
         if (InitialSavePending) { return; }
         if (_doingChanges > 0) { return; }
-        if (record is null) { return; }
+        if (entry is not { Count: > 0 }) { return; }
 
         if (_writer is null) { StartWriter(); }
         if (_writer is null) { return; }
 
         try {
             lock (_writer) {
-                _undoEntry ??= new MemoryStream();
+                using var ms = new MemoryStream();
 
-                if (!record.Append(_undoEntry, _undoEntryDepth)) {
-                    Freeze("Undo-Satz ungültig oder zu groß: Typ " + record.ValueId);
+                var failedRecord = entry.FirstOrDefault(record => !record.Append(ms, record.Depth));
+                if (failedRecord is not null) {
+                    Freeze("Undo-Satz ungültig oder zu groß: Typ " + failedRecord.ValueId);
                     return;
                 }
 
                 CanDeleteWriter = false;
 
-                lock (UndoLock) {
-                    Undos.Add(record.WithDepth(_undoEntryDepth));
-                }
-
-                _undoEntryDepth++;
-
-                if (!record.HasMeta) { return; } // Eintrag noch nicht komplett
-
-                var entryBytes = _undoEntry.ToArray();
+                var entryBytes = ms.ToArray();
                 _writer.Write(entryBytes, 0, entryBytes.Length);
                 _writer.Flush();
 
@@ -425,20 +406,14 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 // wird beim Nachladen fremder Journale nicht erneut angewendet.
                 _ = MarkProcessed(EntryHash(entryBytes));
 
-                _undoEntry.SetLength(0);
-                _undoEntryDepth = 0;
+                lock (UndoLock) {
+                    AddUndoEntry(entry);
+                }
             }
         } catch {
             Freeze("Netzwerkfehler!");
         }
     }
-
-    /// <summary>
-    /// True, wenn das Anwenden eines Journal-Eintrags Kopf-/Struktur-Daten
-    /// berührt. Basis: immer — der Empfänger reagiert konservativ.
-    /// </summary>
-    // TODO: Unused
-    protected virtual bool EntryAffectsHead(byte[] entry) => true;
 
     /// <summary>
     /// Schreibt die Kopf-Sätze einer neuen Fragment-Datei. Basis: Version,
@@ -447,7 +422,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
     protected virtual void WriteJournalStartRecords(Stream writer) {
         var nowUtc = DateTime.UtcNow;
 
-        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SerializerVersion, "1.00");
+        _ = FragmentRecord.Append(writer, 0, FragmentTagType.SerializerVersion, FragmentRecord.SerializerVersionCurrent);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.Type, Owner.TypeName);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateUser, UserName);
         _ = FragmentRecord.Append(writer, 0, FragmentTagType.CreateTimeUtc, nowUtc);
@@ -620,7 +595,8 @@ public class SaveableFileFragment : SaveableFileOnefile {
     /// Zerlegt eine Journal-Datei in Einträge: Ein Eintrag beginnt an einem
     /// Daten-Satz der Tiefe 0 und umfasst alle tieferen Sätze; der Zeitstempel
     /// kommt aus dem Meta des ersten Satzes mit Meta. Kopf- und Steuer-Sätze der
-    /// Datei-Ebene der Tiefe 0 und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen. Die
+    /// Datei-Ebene der Tiefe 0 und Müll-Zeilen werden übersprungen, Einträge ohne Meta verworfen; eine
+    /// Datei mit abweichender Format-Version wird komplett übergegangen. Die
     /// Meta trägt den Benutzer nicht mehr; er kommt aus dem Kopf-Satz des
     /// Journals und wird den Undo-Sätzen des Eintrags injiziert. Jeder Undo-Satz
     /// erhält die Eintrags-Daten (Entry, Container, EntryDateTimeUtc) als Felder.
@@ -651,8 +627,12 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
             if (FragmentRecord.TryParse(data, pos, out var first, out var afterFirst) && first is not null) {
                 if (first.Depth > 0 || first.IsFileTag) {
-                    // Kopf-Benutzer merken; Blockreste ohne Eintrag bzw. übrige Kopf-Sätze überspringen
+                    // Kopf-Benutzer merken; Blockreste ohne Eintrag bzw. übrige Kopf-Sätze überspringen.
+                    // Abweichende Format-Version: die ganze Datei übergehen.
                     if (first.IsFileTag && first.TagType == FragmentTagType.SaveUser) { headUser = first.StringContent; }
+
+                    if (first.IsFileTag && first.TagType == FragmentTagType.SerializerVersion
+                        && !string.Equals(first.StringContent, FragmentRecord.SerializerVersionCurrent, StringComparison.Ordinal)) { return; }
 
                     pos = afterFirst;
                     continue;
@@ -756,7 +736,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                     // Undo-Sätze in die Änderungs-Historie übernehmen.
                     if (appliedEntry is not null) {
                         lock (UndoLock) {
-                            Undos.AddRange(pendingRecords);
+                            AddUndoEntry(pendingRecords);
                         }
 
                         pendingRecords.Clear();
@@ -802,7 +782,7 @@ public class SaveableFileFragment : SaveableFileOnefile {
                 // Einspielen still).
                 if (appliedEntry is not null) {
                     lock (UndoLock) {
-                        Undos.AddRange(pendingRecords);
+                        AddUndoEntry(pendingRecords);
                     }
                 }
 
@@ -964,7 +944,11 @@ public class SaveableFileFragment : SaveableFileOnefile {
 
         var x = LastChangeUtc;
 
-        var content = GenerateContentToSave();
+        // Kompletten Bestand auf die neuesten MaxUndos Sätze kürzen.
+        List<FragmentRecord> undos;
+        lock (UndoLock) { undos = Undos.TrimUndos(); }
+
+        var content = GenerateContentToSave(undos);
 
         if (x != LastChangeUtc) { return "Daten wurden während der Speicherung geändert."; }
 

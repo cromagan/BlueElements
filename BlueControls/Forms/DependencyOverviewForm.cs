@@ -953,20 +953,6 @@ public sealed partial class DependencyOverviewForm : FormWithStatusBar, IUniqueW
 
         #endregion
 
-        #region Methods
-
-        // TODO: Unused
-        /// <summary>
-        /// Die Beschriftung der Kante als eine Zeile; ohne Label ein leerer Text.
-        /// </summary>
-        public string Label() {
-            if (Labels.Count == 0) { return string.Empty; }
-            if (Labels.Count == 1) { return Labels[0]; }
-
-            return Labels[0] + " …";
-        }
-
-        #endregion
     }
 
     /// <summary>

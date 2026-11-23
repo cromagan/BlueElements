@@ -157,7 +157,6 @@ public static class Develop {
     /// Liefert eine Exception mit der Meldung samt kompaktem Aufruf-Stack — unabhängig von DiagFlag.
     /// </summary>
     public static Exception DebugError(string message) {
-        message += "\r\nStack: " + CompactStack(2, 8);
         DebugPrint(ErrorType.Error, message);
         return new InvalidOperationException(message);
     }
@@ -321,7 +320,7 @@ public static class Develop {
     /// <param name="msg"></param>
     public static void Diagnose(string type, string msg) {
         if (!DiagFlag) { return; }
-        var line = $"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}";
+        var line = $"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg} {DiagStack()}";
         Debug.WriteLine(line);
         try {
             lock (_diagFileLock) {
@@ -331,19 +330,9 @@ public static class Develop {
     }
 
     /// <summary>
-    /// Kompakter Aufruf-Stack für Diagnose-Ausgaben: Methodennamen durch " &lt;- " getrennt;
-    /// bei DiagFlag false leer (keine Kosten im Normalbetrieb).
-    /// </summary>
-    public static string DiagStack(int skipFrames = 1, int maxFrames = 8) {
-        if (!DiagFlag) { return string.Empty; }
-
-        return CompactStack(skipFrames + 1, maxFrames);
-    }
-
-    /// <summary>
     /// Baut den kompakten Aufruf-Stack; skipFrames zählt ab dieser Routine.
     /// </summary>
-    private static string CompactStack(int skipFrames, int maxFrames) {
+    public static string DiagStack(int skipFrames = 1, int maxFrames = 8) {
         var frames = new StackTrace(skipFrames, false).GetFrames();
         if (frames is null) { return string.Empty; }
 

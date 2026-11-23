@@ -13,7 +13,7 @@ using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable, IReadableText, IFragmentStoreable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, IHasKeyName, IHasTable, IEditable, IReadableText, IFragmentStoreable {
 
     #region Fields
 
@@ -72,10 +72,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            field?.Disposed -= _table_Disposed;
             field = value;
-
-            field?.Disposed += _table_Disposed;
         }
     }
 
@@ -172,7 +169,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public string CellFirstString() => Table?.Column.First is not { IsDisposed: false } fc ? string.Empty : CellGetString(fc);
+    public string CellFirstString() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || tb.Column.First is not { IsDisposed: false } fc) { return string.Empty; }
+        return CellGetString(fc);
+    }
 
     public bool CellGetBoolean(string columnKey) => CellGetBoolean(Table?.Column[columnKey]);
 
@@ -243,14 +243,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public string CellGetString(ColumnItem? column) {
         try {
             if (IsDisposed || Table is not { IsDisposed: false }) {
+                // Race mit einem anderen Thread (z. B. Löschen während Checker-Lauf): tolerant leer lesen.
                 Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugError("Tabelle ungültig!");
                 return string.Empty;
             }
 
             if (column is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugError("Spalte ungültig!<br>" + Table?.KeyName);
                 return string.Empty;
             }
 
@@ -1248,8 +1247,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private void _table_Disposed(object? sender, System.EventArgs e) => Dispose();
-
     private string CellGetCompareKey(ColumnItem column) => CellCollection.CompareKey(column, this) ?? string.Empty;
 
     private string ChangeTextFromRowId(string completeRelationText) {
@@ -1556,13 +1553,39 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return true;
 
             case RowNavigationType.ColumnKey:
-                if (CellCreateOrGet(record.StringContent) is not { } cell) { return false; }
+                if (Table is not { IsDisposed: false } tb || tb.Column[record.StringContent] is not { IsDisposed: false }) {
+                    // Spalte im Ziel nicht vorhanden (z. B. von einem anderen Benutzer
+                    // zwischenzeitlich gelöscht): erwartbarer Mehrbenutzer-Zustand —
+                    // den Zell-Block still überspringen, statt abzubrechen oder zu warnen.
+                    SkipCellBlock(stream, record.Depth);
+                    return true;
+                }
+
+                if (CellCreateOrGet(record.StringContent) is not { } cell) {
+                    // Seltene Race zwischen Prüfung und Zugriff: Block trotzdem konsumieren.
+                    SkipCellBlock(stream, record.Depth);
+                    return true;
+                }
 
                 return cell.Deserialize(stream, record.Depth + 1);
 
             default:
                 // Unbekannter Blatt-Typ — Satz überspringen
                 return true;
+        }
+    }
+
+    /// <summary>
+    /// Konsumiert alle Sätze tiefer als depth (der Zell-Block einer fehlenden
+    /// Spalte); der Stream bleibt vor dem nächsten Satz der eigenen Ebene stehen.
+    /// </summary>
+    private static void SkipCellBlock(Stream stream, int depth) {
+        while (true) {
+            var pos = stream.Position;
+
+            if (FragmentRecord.TryReadNext(stream) is not { } skip) { stream.Position = pos; break; }
+
+            if (skip.Depth <= depth) { stream.Position = pos; break; }
         }
     }
 

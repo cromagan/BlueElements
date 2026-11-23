@@ -78,7 +78,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // OpenTab
             // 
-            OpenTab.Filter = "Fragment-Dateien|*.btb;*.tbls;*.tblf|Alle Dateien|*.*";
+            OpenTab.Filter = "Alle Dateien|*.*";
             OpenTab.Title = "Fragment-Datei öffnen";
             // 
             // capZeilen2

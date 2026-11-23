@@ -617,20 +617,22 @@ public class TableFragments : TableFile {
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
         CheckPath();
 
-        // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleichnamige Datei im
-        // selben Sekundentick, gesperrte Datei) werden mit neu erzeugtem Namen erneut
-        // versucht; ein bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
-        for (var versuch = 1; versuch <= 3; versuch++) {
-            _myFragmentsFilename = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
+        // Der Benutzer gehört in den Namen: Jeder Benutzer schreibt sein eigenes
+        // Fragment, und mehrere Prozesse auf derselben Maschine kollidieren nicht
+        // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
+        // probiert die nächste Sekunde.
+        var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
-            // Zähler-Anhang (_000xx) heißt: Der Wunschname war in dieser Sekunde bereits
-            // vergeben. Die Pause verschiebt den Sekunden-Zeitstempel im Namen.
-            // Geprüft wird nur der Dateiname — der Ordner darf `_000` gefahrlos enthalten.
-            for (var nameversuch = 1; nameversuch <= 3 && _myFragmentsFilename.FileNameWithSuffix().Contains("_000"); nameversuch++) {
-                Pause(1, false);
-                _myFragmentsFilename = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
-            }
+        if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
+        // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleicher Sekundentick,
+        // gesperrte Datei) werden mit neuem Sekunden-Stempel erneut versucht; ein
+        // bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
+        for (var versuch = 1; versuch <= 5; versuch++) {
+            _myFragmentsFilename = FragmengtsPath().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
+
+            // Ein Zähler-Anhang (_000xx) macht den Namen unbrauchbar: Die Aufräumarbeit
+            // liest den Zeitstempel aus den letzten 19 Zeichen des Namens.
             if (_myFragmentsFilename.FileNameWithSuffix().Contains("_000")) {
                 Freeze("Fragmentdatei konnte nicht eindeutig benannt werden: " + _myFragmentsFilename.FileNameWithSuffix());
                 return;
@@ -640,7 +642,7 @@ public class TableFragments : TableFile {
 
             System.IO.FileStream? fileStream = null;
             try {
-                fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+                fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write, System.IO.FileShare.Read);
                 _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
                 fileStream = null;
 

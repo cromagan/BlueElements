@@ -160,10 +160,18 @@ public class FragmentChangedEventArgs : System.EventArgs {
     public FragmentChangedEventArgs WithNavigation(Enum navigationType, string key) => new(this, FragmentRecord.CreateNavigation(navigationType, key), Comment);
 
     /// <summary>
-    /// Liefert die Undo-Sätze der Änderung in Journal-Reihenfolge: die Navigationssätze
-    /// der Stufen, zuletzt der Blatt-Satz mit Meta-Stempel.
+    /// Liefert die Undo-Sätze der Änderung in Journal-Reihenfolge und mit fertigen
+    /// Tiefen: die Navigationssätze der Stufen (Basis-Tiefe 0), zuletzt der
+    /// Blatt-Satz mit Meta-Stempel.
     /// </summary>
-    public IReadOnlyList<FragmentRecord> UndoRecords() => [.. _navigations, CreateUndoRecord()];
+    public IReadOnlyList<FragmentRecord> UndoRecords() {
+        List<FragmentRecord> records = [];
+
+        for (var i = 0; i < _navigations.Count; i++) { records.Add(_navigations[i].WithDepth(i)); }
+
+        records.Add(CreateUndoRecord().WithDepth(_navigations.Count));
+        return records;
+    }
 
     /// <summary>
     /// Erzeugt den Blatt-Satz der Änderung mit Meta-Stempel (User, Zeitpunkt, Kommentar) als

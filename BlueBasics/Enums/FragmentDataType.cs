@@ -73,7 +73,6 @@ public enum FragmentDataType : byte {
 
     /// <summary>
     /// Content als 4 Little-Endian-Bytes (uint).
-    /// TODO: Unused
     /// </summary>
     UInt = 16
 

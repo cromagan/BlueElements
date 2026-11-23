@@ -35,7 +35,20 @@ public enum FragmentTagType : byte {
     /// </summary>
     ItemRemove = 203,
 
-    // 204 - 230 frei für künftige standardisierte Empfänger-Tags
+    /// <summary>
+    /// ListKeyObject-Satz eines Teil-Bestands (Content = Chunk-ID): liest wie
+    /// ItemList; das Angleichen entfernt aber nur Bestand des eigenen Chunks
+    /// (Items mit Chunk-Wert, die dem Content entsprechen).
+    /// </summary>
+    ItemListChunk = 204,
+
+    /// <summary>
+    /// Nav-Satz je Undo-Eintrag (Content leer); der Block des Eintrags —
+    /// klassischer Satz oder Sub*-Block — folgt eine Ebene tiefer.
+    /// </summary>
+    UndoHistory = 205,
+
+    // 206 - 230 frei für künftige standardisierte Empfänger-Tags
 
     /// <summary>
     /// Kommentar, der in die Datei geschrieben wurde.

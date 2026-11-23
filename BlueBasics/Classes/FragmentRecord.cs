@@ -46,6 +46,12 @@ public sealed class FragmentRecord {
     /// </summary>
     public const int MaxListEntryLength = 256 * 256 - 1;
 
+    /// <summary>
+    /// Vom aktuellen Writer geschriebene Format-Version; bei inkompatiblen
+    /// Format-Änderungen erhöhen. Loader lehnen abweichende Versionen ab.
+    /// </summary>
+    public const string SerializerVersionCurrent = "1.00";
+
     #endregion
 
     #region Constructors
@@ -988,15 +994,14 @@ public sealed class FragmentRecord {
 
     /// <summary>
     /// Schreibt den Satz auf der Ziel-Tiefe in den Stream (Pendant zum Einlesen per
-    /// TryParse). Die Meta-Sektion enthält bewusst keinen Benutzer: Fragment-Journale
-    /// sind benutzerbezogen, der Benutzer steht in den Kopf-Sätzen. Steuer-Sätze der
-    /// Datei-Ebene liefern false; außerdem false bei ungültigem Empfänger-Typ bzw.
-    /// Tag oder Überschreitung der Längenbegrenzung.
+    /// TryParse). Die Meta-Sektion (Benutzer, Zeitpunkt, Kommentar) wird mit dem
+    /// Satz geführt. Steuer-Sätze der Datei-Ebene liefern false; außerdem false bei
+    /// ungültigem Empfänger-Typ bzw. Tag oder Überschreitung der Längenbegrenzung.
     /// </summary>
     public bool Append(Stream stream, int depth) {
         if (IsFileTag) { return false; }
 
-        var metaBytes = HasMeta ? BuildMetaBytes(string.Empty, DateTimeUtc, Comment) : null;
+        var metaBytes = HasMeta ? BuildMetaBytes(User, DateTimeUtc, Comment) : null;
 
         return AppendData(stream, depth, ValueId, DataType, ByteContent, metaBytes);
     }

@@ -66,14 +66,15 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     #endregion
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Ansicht-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum des Ansichts-Eintrags ein, sonst
-    /// eigener Raum; unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Ansicht-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum des Ansichts-Eintrags ein, sonst eigener Raum; unbekannte Werte
+    /// liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk
             ? ColumnViewItem.GetNameOf(path[1..])
             : ((ViewFragmentType)path[^1].LeafType).ToString();
     }
@@ -875,7 +876,15 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
     /// (Blatt-Inhalt bzw. Nav-Schlüssel) idempotent erzeugt und still angehängt;
     /// seine Eigenschaften tragen die Property-Blätter.
     /// </summary>
-    protected override bool ApplyItemAdd(string keyName, string typeName) => GetOrCreateItem(keyName) is not null;
+    protected override bool ApplyItemAdd(string keyName, string typeName) {
+        if (GetOrCreateItem(keyName) is not null) { return true; }
+
+        // Spalte des Eintrags fehlt im Ziel (z. B. von einem anderen Benutzer
+        // zwischenzeitlich gelöscht): das Add-Blatt konsumieren, statt den
+        // Ladevorgang abzubrechen.
+        Develop.Diagnose("ViewApplyItemAdd", $"pid={Environment.ProcessId} Eintrag übersprungen Key={keyName} an {GetType().Name}");
+        return true;
+    }
 
     /// <summary>
     /// Entfernt den benannten Ansichts-Eintrag still (Journal-Replay meldet nicht zurück).
@@ -902,7 +911,10 @@ public sealed class ColumnViewCollection : KeyedItemCollection<ColumnViewItem>, 
             newItem = new ColumnViewItem(column);
         }
 
-        if (newItem is null) { return null; }
+        if (newItem is null) {
+            Develop.Diagnose("ViewGetOrCreate", $"pid={Environment.ProcessId} Eintrag nicht erzeugbar Key={keyName} an {GetType().Name}");
+            return null;
+        }
 
         SuppressEvents();
         try {

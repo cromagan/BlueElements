@@ -27,7 +27,7 @@ namespace BlueTable.Classes;
 /// Datei-Verwaltung (SaveableFile) daran an.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IFragmentStoreable, IHasKeyName, IHasScript, IEditable {
+public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableExtended, IFragmentStoreable, IHasChunkItems, IHasKeyName, IHasScript, IEditable {
 
     #region Fields
 
@@ -481,6 +481,11 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     public RowCollection Row { get; }
+
+    /// <summary>
+    /// Die Zeilen als Chunk-Quelle; nur sie tragen einen Chunk-Wert (IHasChunkValue).
+    /// </summary>
+    public IEnumerable<IHasKeyName> ChunkItems => Row;
 
     /// <summary>
     /// Vorlage für die Schnellinfo einer Zeile; Platzhalter wie ~Spaltenname~ werden ersetzt.
@@ -1904,6 +1909,16 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// Zahl. Grundlage der Typ-Spalte im Fragment-Editor.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
+        // Scoped Listen-Köpfe der Chunks und Nav-Sätze benennen den Zahlraum der Folge-Sätze.
+        if (path.Length > 1 && path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk) {
+            return GetNameOf(path[1..]);
+        }
+
+        if (path[0].TagType == FragmentTagType.UndoHistory) {
+            // Undo-Blöcke enthalten nachgestellte Journal-Einträge — wieder Tabellen-Raum.
+            return path.Length == 1 ? nameof(FragmentTagType.UndoHistory) : GetNameOf(path[1..]);
+        }
+
         if (path.Length == 1) { return ((TableFragmentType)path[0].LeafType).ToString(); }
 
         // Der erste Kette-Eintrag benennt den Empfänger; dessen Zahlraum gilt für den Rest der Kette.
@@ -1928,10 +1943,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableFragmentType.SortDefinition:
                 return RowSortDefinition.GetNameOf(path[1..]);
-
-            case TableFragmentType.UndoHistory:
-                // Undo-Blöcke enthalten nachgestellte Journal-Einträge — wieder Tabellen-Raum.
-                return GetNameOf(path[1..]);
 
             default:
                 return ((TableFragmentType)path[^1].LeafType).ToString();
@@ -2688,6 +2699,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
                 // Dann Collections disposen
                 Column.Dispose();
                 Row.Dispose();
+                Cell.Dispose();
 
                 // Listen leeren
                 _ = _eventScript.Update([]);
@@ -3281,8 +3293,8 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     #region IFragmentStoreable
 
     /// <summary>
-    /// Empfänger- und Pfad-Typen der Table im binären Fragment-Format. Dichter,
-    /// eigenständiger Zahlraum (1 bis < 230); Überschneidungen mit den
+    /// Empfänger- und Pfad-Typen der Table im binären Fragment-Format.
+    /// Eigenständiger Zahlraum (1 bis < 230); Überschneidungen mit den
     /// Klassenzahlräumen der Kinder sind bewusst und unschädlich, denn die Stufen
     /// werden strukturgenau geroutet: Jeder Segmenteintritt trägt einen leeren
     /// Key, der Block des Kindes folgt eine Ebene tiefer und beginnt dort mit
@@ -3294,12 +3306,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         /// Segmenteintritt in die Spalten; die Folge-Sätze liest die Sammlung.
         /// </summary>
         Columns = 1,
-
-        /// <summary>
-        /// Nav-Satz je Undo-Eintrag (Content leer); der Block des Eintrags —
-        /// klassischer Satz oder Sub*-Block — folgt eine Ebene tiefer.
-        /// </summary>
-        UndoHistory = 2,
 
         /// <summary>
         /// Segmenteintritt in die Unique-Wert-Definitionen.

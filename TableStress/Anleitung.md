@@ -3,8 +3,8 @@
 Stresstest-Console für BlueTable-Tabellen: Probiert in kurzen Abständen alle üblichen Änderungen durch und schreibt dabei ein Protokoll, anhand dessen eine KI Fehlerursachen und Reparaturen ableiten kann.
 
 ## Wenn diese Datei "Ausgeführt" werden soll:
-Öffne die angeforderte Datei. Die Dateien sind im Unterordner Test-Tabellen. Starte das Programm 10 mal mit der gleichen Datei. Jeweils mit der Usernummer 0 bis 9.
-Nachdem alle 10 Programme fertig sind, prüfen die erste Zeile des Protokolls - dort findest du, welche Protokolldatei dazugehört.
+Öffne die angeforderte Datei. Die Dateien sind im Unterordner Test-Tabellen. Starte das Programm 10 mal mit der gleichen Datei - im Versatz von 3 Sekunden. Jeweils mit der Usernummer 0 bis 9.
+Nachdem alle 10 Programme fertig sind, prüfe die erste Zeile des Protokolls - dort findest du, welche Protokoll- und Debug-Protokolldatei dazugehört.
 Alle Fehler, alle Warnungen, alle Infos reparieren. Dann so lange neu starten, bis keine Fehler mehr auftreten.
 Das gilt ausdrücklich auch für das Stresstest-Programm selbst: Es ist **gewollt und Teil der Aufgabe**, TableStress laufend zu verbessern — etwa wenn Protokollzeilen fehlen (zu wenige Meldungen), das Protokoll flutet (zu viele Meldungen), Kontexte zur Fehlerursache fehlen oder neue Testszenarien und bessere Auswertbarkeit helfen würden.
 Wenn das Programm nicht funktioniert wie es soll oder du nicht weiterkommst, baue in TableStress neue Tests, neue Ausgaben oder was auch immer ein, dass es klappt.
@@ -22,9 +22,9 @@ Beim Start startet sich dieselbe exe zusätzlich als **Watchdog-Prozess** (`--wa
 
 ## Ablauf
 
-1. Protokoll anlegen: Dateiname `Benutzer-Uhrzeit.txt` (z. B. `B7-14-05-09.txt`) im **Ordner der Tabelle**; Develop-Meldungen ab Warning laufen dorthin um.
+1. Protokoll anlegen: Dateiname `Benutzer-Uhrzeit.txt` (z. B. `B7-14-05-09.txt`) im **Ordner der Tabelle**; Develop-Meldungen ab Warning laufen dorthin um. Die erste Protokollzeile (`DEBUGLOG`) nennt das Debug-Protokoll; es wird von Anfang an im **Verzeichnis des Stresstests** als `Trace-<Benutzer>-<Uhrzeit>.html` geführt.
 2. Tabelle laden (`Table.Get` + `BeSureToBeUpToDate`).
-3. 2-Sekunden-Timer: pro Tick eine Zufalls-Aktion (Wert 0-26). Master setzen und Komplettierung anstoßen sind nur in den **ersten 2 Minuten** erlaubt — danach laufen diese Ticks als Idle (wird protokolliert, ohne die Tabelle zu ändern).
+3. 2-Sekunden-Timer: pro Tick eine Zufalls-Aktion (Wert 0-37). Master setzen und Komplettierung anstoßen sind nur in den **ersten 2 Minuten** erlaubt — danach laufen diese Ticks als Idle (wird protokolliert, ohne die Tabelle zu ändern).
 4. Alle 15 Ticks: invalidierte Zeilen abarbeiten und speichern — so bleiben Änderungen auch bei einem Kill erhalten.
 5. Nach 10 Minuten reguläres Ende: speichern, Tabelle freigeben, ExitCode 0.
 
@@ -39,6 +39,16 @@ Beim Start startet sich dieselbe exe zusätzlich als **Watchdog-Prozess** (`--wa
 | 22 | Komplettierung anstoßen (Master + Refresh-Zyklus; ein neuer Snapshot entsteht nur, wenn der letzte > 60 min alt ist) — nur in den ersten 2 Minuten, danach Idle |
 | 23 | Table-Script erstellen (Syntax vorab per `ScriptPreCheck` geprüft) |
 | 24-26 | Alle Daten laden (`LoadTableRows(false, -1)`) |
+| 27-28 | Stress-Spalte anlegen (`STRESS_<user>_<nr>`); ab 25 Stress-Spalten wird die älteste vorher entfernt |
+| 29 | Älteste Stress-Spalte löschen |
+| 30 | Zelle mit kritischen Sonderzeichen füllen (Umbruch, Pipe, Anführungszeichen, Unicode, Tabs, leer, sehr lang) |
+| 31 | Zeile duplizieren (alle Werte einer Zufallszeile; Unique-Spalten erhalten neue Zufallswerte) |
+| 32 | Caption und QuickInfo einer Stress-Spalte ändern |
+| 33 | Sortierung einer Zufallsspalte lesen (`RowSortDefinition`, ohne Änderung) |
+| 34 | Duplikat-Suche auf einer Zufallsspalte (`RowCollection.DuplicateGroups`, ohne Änderung) |
+| 35 | Eigenes Stress-Script löschen |
+| 36 | In-Memory-Konsistenz: doppelte Zeilen-Keys, leere Chunk-Ids, leere Spalten-Keys (ohne Änderung) |
+| 37 | CSV-Export ausführen (Zeichen- und Zeilenzahl im Protokoll, ohne Änderung) |
 
 Laufzeit gesamt: **10 Minuten**.
 
@@ -48,7 +58,7 @@ Alle neuen Werte tragen den Benutzernamen (`B<n>-Zeit-Zufall`); Zeilen-Ersteller
 
 Jede Zeile: `Protokolldateiname|Uhrzeit|AKTION|Detail`
 
-Aktionen: `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`, `SCRIPT`, `DATENLADEN`, `SPEICHERN`, `MELDUNG` (Develop ab Warning), `FEHLER`, `ENDE`, `WATCHDOG`.
+Aktionen: `DEBUGLOG` (erste Zeile: Pfad des Debug-Protokolls im Verzeichnis des Stresstests), `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`, `SCRIPT`, `SCRIPT-WEG`, `SPALTE-NEU`, `SPALTE-WEG`, `SPALTE-META`, `ZELLE-SPEZIAL`, `ZEILE-DUP`, `SORTIERUNG`, `DUPLIKATE`, `PRÜFUNG`, `CSV`, `DATENLADEN`, `SPEICHERN`, `MELDUNG` (Develop ab Warning), `FRAGMENTE` (Datei-Zähler der Chunk-Ordner vor dem Ende, nur bei TableFileNew), `FEHLER`, `ENDE`, `WATCHDOG`.
 
 `FEHLER`-Zeilen enthalten Aktion, Exception-Typ, Meldung und `Develop.DiagStack()` — genug Kontext zur Reparatur, aber bewusst keine kompletten Stacktraces oder Zellinhalte.
 
@@ -56,16 +66,33 @@ Aktionen: `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`,
 
 - Zeilen mit `FEHLER` zuerst prüfen; dazu die umliegenden `SPEICHERN`/`ZELLE`/`NEUEZEILE`-Zeilen (Key + Spalte sind immer mitgeloggt).
 - `SPEICHERN … FEHLER:` deutet auf Fragment-/Dateiprobleme hin; betroffene Zeilen-Keys stehen in den vorherigen Aktions-Zeilen.
-- ExitCodes: `0` reguläres Ende, `1` Fehler beim Laden/Lauf, `2` falsche Argumente, Watchdog-Kill → Protokoll endet ohne `ENDE`.
+- ExitCodes: `0` reguläres Ende, `1` Fehler beim Laden/Lauf, `2` falsche Argumente, Watchdog-Kill → Protokoll endet ohne `ENDE`; das Debug-Protokoll liegt trotzdem im Verzeichnis des Stresstests.
 - Der Test **verändert die Tabelle** — immer nur gegen Kopien laufen lassen.
 
 ## Projektstruktur
 
-- `Program.cs` — Einstieg, Argumente, Watchdog-Start
+- `Program.cs` — Einstieg, Argumente, Watchdog-Start; legt bei Chunk-Tabellen ohne Chunk-Spalte eine Spalte `CHUNK` (ChunkType.ByName) an, damit die Chunk-Verteilung geübt wird
 - `StressRunner.cs` — Timer, Zufalls-Aktionen, Speichern
 - `StressProtocol.cs` — Protokolldatei, Develop-Umleitung, Watchdog-Anhang
 - `Watchdog.cs` — eigener Prozess derselben exe
 - `StressAction.cs` — Enum der Aktionen
+- `Verify.cs` — Prüf-Lauf ohne Änderungen: Verzeichnis-, Chunk-, Undo-, Speicher-/Lade-Rundtrip- und Reload-Prüfung
+- `FragmentDump.ps1` — parst eine Fragment-Datei (.tblc/.tbls/.tblf) und listet die Sätze
+- `ProtokollAuswertung.ps1` — fasst Stress-Protokolle zusammen (FEHLER, Warnungen, Aktionen, FRAGMENTE)
+
+## Prüf-Lauf (--verify)
+
+```
+TableStress --verify <pfad-zur-tabelle> [dump-datei]
+```
+
+Lädt die Tabelle, prüft Kopf-Datei, Arbeitsverzeichnis, Ordner- und Dateinamen,
+EOF-Marker jeder Fragment-Datei, die Zuordnung Zeilen → Chunk-Ordner und die
+Änderungs-Historie gegen die Festplatte (je Eintrag der Ziel-Chunk; Fragment-Layout:
+Snapshots und Journale zusammen). Danach Speichern-Neuladen-Rundtrip: Datenstand
+und Historie müssen unverändert bleiben. Schreibt einen Bericht `VERIFY-*.txt`
+im Ordner der Tabelle. ExitCodes: 0 = keine FEHLER, 1 = FEHLER, 2 = Argumente,
+3 = abgebrochen.
 
 
 ## Bereits abgeklärte Konventionen

@@ -745,6 +745,11 @@ public class TableChunk : TableFile {
     /// wieder überschrieben. Die Lite-Hauptdatei (.tblh) wird ebenfalls nur einmal
     /// geschrieben (write-once), da sie keine Nutzdaten enthält.
     /// <para>
+    /// Jeder Row-Chunk wird vor der Generierung geladen — der Inhalt ist ein
+    /// vollständiger Snapshot aus dem Speicher. Wandert ein Wert in einen Chunk,
+    /// muss der Ziel-Chunk also vorher geladen sein.
+    /// </para>
+    /// <para>
     /// Die Editierbarkeit wird PRO CHUNK geprüft: Chunks, die von einem anderen
     /// Benutzer aktiv gesperrt sind (s. CheckEditLock), werden
     /// übersprungen und ihre Änderungen verworfen. Alle bearbeitbaren Chunks
@@ -863,6 +868,21 @@ public class TableChunk : TableFile {
             }
 
             foreach (var thisChunkId in rowChunkIds) {
+                // Ein Chunk wird nur gespeichert, wenn er vorher geladen wurde —
+                // der Inhalt ist ein vollständiger Snapshot aus dem Speicher.
+                // Wandert ein Wert in diesen Chunk, muss der Ziel-Chunk vorher
+                // geladen sein, sonst fehlen seine übrigen Zeilen im Snapshot
+                // und würden beim nächsten Parsen als veraltet entfernt.
+                if (!_processedFile.ContainsKey(thisChunkId)) {
+                    var loadResult = LoadChunkWithChunkId(thisChunkId, false);
+
+                    if (loadResult.IsFailed) {
+                        rowChunksSkipped = true;
+                        Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Chunk '{thisChunkId}' von '{Caption}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
+                        continue;
+                    }
+                }
+
                 AddChunk(thisChunkId, [
                     .. GenerateRowChunk(this, false, thisChunkId),
                   .. GenerateUndoChunk(this, false, thisChunkId)

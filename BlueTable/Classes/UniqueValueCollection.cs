@@ -13,14 +13,15 @@ namespace BlueTable.Classes;
 public sealed class UniqueValueCollection : KeyedItemCollection<UniqueValueDefinition>, IHasTable {
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Unique-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum der Definition ein, sonst eigener
-    /// Raum; unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Unique-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum der Definition ein, sonst eigener Raum; unbekannte Werte
+    /// liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk
             ? UniqueValueDefinition.GetNameOf(path[1..])
             : ((FragmentTagType)path[^1].ValueId).ToString();
     }

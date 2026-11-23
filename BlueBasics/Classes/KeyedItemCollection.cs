@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -531,7 +532,10 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// trägt „KeyName|TypeName“); alles andere geht an DeserializeOther.
     /// </summary>
     public virtual bool DeserializeThis(Stream stream, FragmentRecord record) {
-        if (IsDisposed) { return false; }
+        if (IsDisposed) {
+            Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} IsDisposed bei {GetType().Name}, Leaf={record.LeafType}, T{record.Depth}");
+            return false;
+        }
 
         // Journal-Nav-Satz (Content = Schlüssel statt Liste): den Block eine Ebene
         // tiefer auf den benannten Eintrag anwenden. Leerer Key = Segmenteintritt
@@ -546,14 +550,54 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         // Die ganze Liste lesen und per Update angleichen: bestehende Instanzen
         // behalten ihre Identität, Überbleibsel werden entfernt.
         if (record.TagType == FragmentTagType.ItemList) {
-            if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) { return false; }
+            if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemList=lesen fehlgeschlagen bei {GetType().Name}, T{record.Depth}");
+                return false;
+            }
 
-            return Update(items) is { Length: 0 };
+            var upFehler = Update(items);
+            if (upFehler is { Length: > 0 }) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemList Update fehlgeschlagen bei {GetType().Name}, T{record.Depth}, Grund={upFehler}");
+                return false;
+            }
+
+            return true;
         }
 
-        if (record.TagType == FragmentTagType.ItemAdd) { return ApplyItemAdd(record.KeyNameContent, record.TypeContent); }
+        // Teil-Bestand eines Daten-Chunks: nur den Bestand des eigenen Chunks
+        // angleichen; Items anderer Chunks bleiben unberührt.
+        if (record.TagType == FragmentTagType.ItemListChunk) {
+            if (FragmentStoreableExtension.DeserializeList<TItem>(stream, record.Depth, first => CreateItem(first)) is not { } items) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemListChunk=lesen fehlgeschlagen bei {GetType().Name}, T{record.Depth}");
+                return false;
+            }
 
-        if (record.TagType == FragmentTagType.ItemRemove) { return ApplyItemRemove(record.StringContent); }
+            var chunkFehler = UpdateChunk(items, record.StringContent);
+            if (chunkFehler is { Length: > 0 }) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemListChunk Update fehlgeschlagen bei {GetType().Name}, Chunk={record.StringContent}, Grund={chunkFehler}");
+                return false;
+            }
+
+            return true;
+        }
+
+        if (record.TagType == FragmentTagType.ItemAdd) {
+            var addOk = ApplyItemAdd(record.KeyNameContent, record.TypeContent);
+            if (!addOk) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemAdd=false Key={record.KeyNameContent} Typ={record.TypeContent} an {GetType().Name}");
+            }
+
+            return addOk;
+        }
+
+        if (record.TagType == FragmentTagType.ItemRemove) {
+            var removeOk = ApplyItemRemove(record.StringContent);
+            if (!removeOk) {
+                Develop.Diagnose("KeyedDeserializeThis", $"pid={Environment.ProcessId} ItemRemove=false Key={record.StringContent} an {GetType().Name}");
+            }
+
+            return removeOk;
+        }
 
         return DeserializeOther(stream, record);
     }
@@ -578,7 +622,54 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         if (ReferenceEquals(existing, item)) { return true; }
 
-        return existing is not null ? existing.Update(item) is { Length: 0 } : Add(item);
+        if (existing is not null) {
+            Develop.Diagnose("ApplyItemAdd", $"update {item.KeyName} in bestehender Instanz");
+            return existing.Update(item) is { Length: 0 };
+    }
+
+        Develop.Diagnose("ApplyItemAdd", $"neu {item.KeyName}");
+        return Add(item);
+    }
+
+    /// <summary>
+    /// Gleicht den Teil-Bestand eines Daten-Chunks an (ItemListChunk): Items des
+    /// Chunks werden aufgenommen bzw. übernommen; Bestand mit gleichem Chunk-Wert,
+    /// der im Chunk fehlt, wird entfernt. Items ohne Chunk-Wert und Bestand
+    /// anderer Chunks bleiben unberührt.
+    /// </summary>
+    private string UpdateChunk(ReadOnlyCollection<TItem> items, string chunkId) {
+        if (IsDisposed) { return "Sammlung ist verworfen"; }
+
+        Develop.Diagnose("UpdateChunk", $"chunk={chunkId} anzahl={items.Count}");
+
+        var chunkKeys = new HashSet<string>(items.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var item in items) {
+            if (!ApplyItemAdd(item)) {
+                var grund = "Hinzufügen von '" + item.KeyName + "' fehlgeschlagen";
+                Develop.Diagnose("UpdateChunk", $"chunk={chunkId} FEHLER {grund}");
+                return grund;
+        }
+        }
+
+        List<TItem> obsolete = [];
+
+        foreach (var keyName in Keys()) {
+            if (chunkKeys.Contains(keyName)) { continue; }
+
+            if (!Internal.TryGetValue(keyName, out var item) || item is not IHasChunkValue hasChunkValue ||
+                !string.Equals(hasChunkValue.ChunkId(), chunkId, StringComparison.OrdinalIgnoreCase)) { continue; }
+
+            if (!Remove(keyName)) { return "Entfernen von '" + keyName + "' fehlgeschlagen"; }
+
+            obsolete.Add(item);
+        }
+
+        foreach (var item in obsolete) {
+            if (item is { IsDisposed: false }) { item.Dispose(); }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
@@ -617,11 +708,15 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         if (firstLeaf is null) { return true; }
 
-        Develop.Diagnose("ApplySubItem", "Key=" + record.StringContent + ", Leaf=" + firstLeaf.ValueId + "@T" + firstLeaf.Depth + ", IsTag=" + firstLeaf.IsTag + ", RemoveByte=" + (byte)FragmentTagType.ItemRemove + ", AddByte=" + (byte)FragmentTagType.ItemAdd + ", Stack: " + Develop.DiagStack());
+        //Develop.Diagnose("ApplySubItem", "Key=" + record.StringContent + ", Leaf=" + firstLeaf.ValueId + "@T" + firstLeaf.Depth + ", IsTag=" + firstLeaf.IsTag + ", RemoveByte=" + (byte)FragmentTagType.ItemRemove + ", AddByte=" + (byte)FragmentTagType.ItemAdd);
 
-        if (firstLeaf is { TagType: FragmentTagType.ItemRemove }) { return ApplyItemRemove(record.StringContent); }
+        if (firstLeaf is { TagType: FragmentTagType.ItemRemove }) {
+            Develop.Diagnose("ApplySubItem", $"pid={Environment.ProcessId} Remove Key={record.StringContent} an {GetType().Name}");
+            return ApplyItemRemove(record.StringContent);
+        }
 
         if (firstLeaf is { TagType: FragmentTagType.ItemAdd } addLeaf) {
+            Develop.Diagnose("ApplySubItem", $"pid={Environment.ProcessId} Add Key={record.StringContent} Typ={addLeaf.TypeContent} an {GetType().Name}");
             return ApplyItemAdd(record.StringContent, addLeaf.TypeContent);
         }
 
@@ -629,6 +724,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         // Fehlt der Eintrag (kein Auto-Create — nur Add-Blätter erzeugen), muss der
         // Block dennoch konsumiert werden, damit der Stream nicht versetzt weiterliest.
         if (GetOrCreateItem(record.StringContent) is not { } item) {
+            Develop.Diagnose("ApplySubItem", $"pid={Environment.ProcessId} Block übersprungen (Eintrag fehlt) Key={record.StringContent} an {GetType().Name}");
             // Block konsumieren: alle Sätze tiefer als der Nav-Satz gehören zum
             // fehlenden Eintrag; der Stream bleibt vor dem nächsten Satz der
             // eigenen Ebene stehen, damit die Folgeblöcke korrekt lesen.
@@ -643,7 +739,13 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
             return true;
         }
 
-        return item.Deserialize(stream, record.Depth + 1);
+        Develop.Diagnose("ApplySubItem", $"pid={Environment.ProcessId} Item Key={record.StringContent} Typ={item.GetType().Name} an {GetType().Name}");
+        var ok = item.Deserialize(stream, record.Depth + 1);
+        if (!ok) {
+            Develop.Diagnose("ApplySubItem", $"pid={Environment.ProcessId} Item-Block=false Key={record.StringContent} Typ={item.GetType().Name} an {GetType().Name}");
+        }
+
+        return ok;
     }
 
     /// <summary>

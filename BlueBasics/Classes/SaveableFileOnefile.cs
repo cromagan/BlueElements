@@ -10,8 +10,8 @@ namespace BlueBasics.Classes;
 /// Kopf-Datei trägt den Layout-Kopf, der Datenstand liegt als Einzeldatei
 /// im Unterordner gleichen Namens ohne Suffix — schreiben mit Backup-Rotation,
 /// laden, bedarfsgesteuertes Speichern über den Instanz-Tick. Das Einlesen
-/// und Erzeugen des Inhalts läuft über die Inhalts-Seams der Basis
-/// (ParseMainContent/GenerateContentToSave).
+/// läuft über den Inhalts-Seam der Basis (ParseMainContent); den Speicher-
+/// Inhalt erzeugt das Layout selbst über GenerateContentToSave.
 /// </summary>
 public class SaveableFileOnefile : SaveableFile {
 
@@ -54,7 +54,7 @@ public class SaveableFileOnefile : SaveableFile {
     private int _checkerTickCount = -5;
 
     /// <summary>
-    /// UTC-Zeitpunkt der letzten Nutzung (Touch), steuert IsRecentlyUsed.
+    /// UTC-Zeitpunkt der letzten Nutzung (TouchChunk), steuert IsRecentlyUsed.
     /// </summary>
     private DateTime _lastUsedUtc = DateTime.MinValue;
 
@@ -101,7 +101,7 @@ public class SaveableFileOnefile : SaveableFile {
     }
 
     /// <summary>
-    /// Das Objekt gilt als kürzlich verwendet, wenn seit dem letzten Touch
+    /// Das Objekt gilt als kürzlich verwendet, wenn seit dem letzten TouchChunk
     /// weniger als SkipIfUnusedMinutes vergangen sind.
     /// </summary>
     public override bool IsRecentlyUsed => DateTime.UtcNow.Subtract(_lastUsedUtc).TotalMinutes < SkipIfUnusedMinutes;
@@ -124,7 +124,7 @@ public class SaveableFileOnefile : SaveableFile {
     /// <summary>
     /// Stempelt die letzte Nutzung.
     /// </summary>
-    public override void Touch(string info) => _lastUsedUtc = DateTime.UtcNow;
+    public override void TouchChunk(string chunkValue) => _lastUsedUtc = DateTime.UtcNow;
 
     /// <summary>
     /// Prüft die Hauptdatei. Bei einer Einzeldatei gibt es nichts
@@ -307,7 +307,11 @@ public class SaveableFileOnefile : SaveableFile {
 
         var x = LastChangeUtc;
 
-        var content = GenerateContentToSave();
+        // Kompletten Bestand auf die neuesten MaxUndos Sätze kürzen.
+        List<FragmentRecord> undos;
+        lock (UndoLock) { undos = Undos.TrimUndos(); }
+
+        var content = GenerateContentToSave(undos);
 
         if (x != LastChangeUtc) { return "Daten wurden während der Speicherung geändert."; }
 

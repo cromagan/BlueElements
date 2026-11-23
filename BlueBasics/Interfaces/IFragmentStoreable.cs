@@ -18,6 +18,12 @@ public interface IFragmentStoreable {
     #region Properties
 
     /// <summary>
+    /// Maximale Anzahl Undo-Sätze je Undo-Block; im Chunk-Layout gilt der Wert
+    /// je Chunk. Darüber hinaus bleiben nur die neuesten.
+    /// </summary>
+    const int MaxUndos = 5000;
+
+    /// <summary>
     /// Stabiler Typ-Bezeichner des Objekts für den Kopf-Satz „Typ“ des Fragment-Formats.
     /// Basis: der Klassen-Name; Klassen, deren Name sich ändern kann, liefern hier
     /// einen festen Wert, damit gespeicherte Dateien unverändert lesbar bleiben.
@@ -53,26 +59,47 @@ public interface IFragmentStoreable {
 
     /// <summary>
     /// Schreibt System-Bytes (SaveUser, Machine, SaveTimeUtc), den eigenen Block per
-    /// SerializeCore und abschließend den EOF-Satz. Nur die Wurzel (Tiefe 0) setzt
-    /// System-Bytes und EOF; Sub-Objekte werden mit Serialize(stream, depth + 1)
-    /// aufgerufen und schreiben nur ihren Block.
+    /// SerializeCore, die Änderungs-Historie als Undo-Blöcke und abschließend den
+    /// EOF-Satz. Nur die Wurzel (Tiefe 0) setzt System-Bytes, Historie und EOF;
+    /// Sub-Objekte werden mit Serialize(stream, depth + 1) aufgerufen und
+    /// schreiben nur ihren Block.
     /// Den Erzeuger-Stempel (CreateUser/CreateTimeUtc) schreibt der Datei-Layer
     /// vor diesen Kopf-Sätzen.
     /// </summary>
-    bool Serialize(Stream stream, int depth, string type) {
+    /// <param name="stream">Ziel-Stream.</param>
+    /// <param name="depth">Einrücktiefe des Blocks; 0 = Wurzel.</param>
+    /// <param name="type">Typ-Bezeichner für den Kopf-Satz.</param>
+    /// <param name="undos">Änderungs-Historie (Basis-Tiefe 0); sie wird ausschließlich
+    /// hier geschrieben, direkt vor dem EOF-Satz. Auf die neuesten MaxUndos Sätze
+    /// kürzen die Aufrufer vorab per TrimUndos.</param>
+    bool Serialize(Stream stream, int depth, string type, List<FragmentRecord> undos) {
         var allok = true;
         var isRoot = depth == 0;
 
         if (isRoot) {
             // Anfangs bytes nur im Root schreiben, weil sie durchgehend gleich sind
-            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SerializerVersion, "1.00");
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SerializerVersion, FragmentRecord.SerializerVersionCurrent);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.CopyrightInfo, "(c) by Christian Peter - see License for details.");
-            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Type,  type);
+            allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Type, type);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveUser, UserName);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Machine, Environment.MachineName);
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.SaveTimeUtc, DateTime.UtcNow);
 
             allok &= SerializeCore(stream, depth);
+
+            // Änderungs-Historie ausschließlich hier, vor dem EOF-Satz; die
+            // Kürzung auf MaxUndos übernimmt der Aufrufer (TrimUndos). Die
+            // Meta-Stempel (Benutzer, Zeitpunkt, Kommentar) bleiben erhalten —
+            // ohne sie wäre die Historie nach dem Neuladen nicht mehr
+            // sortier- und mergbar.
+            foreach (var u in undos) {
+                if (u.Depth == 0) {
+                    allok &= FragmentRecord.Append(stream, depth, FragmentTagType.UndoHistory, string.Empty);
+                }
+
+                // Die Historien-Sätze leben eine Ebene unter dem Steuer-Satz.
+                allok &= u.Append(stream, depth + 1 + u.Depth);
+            }
 
             // EOF-Satz nur am Root schreiben: Er markiert das saubere Datei-Ende.
             allok &= FragmentRecord.Append(stream, depth, FragmentTagType.Eof, string.Empty);
@@ -129,7 +156,7 @@ public interface IFragmentStoreable {
     /// Wird beim Bubbling aufgerufen, wenn ein verdrahtetes Fragment-Kind eine Änderung meldet.
     /// Der Default reicht die Änderung unverändert durch; Container mit eigenem Segment
     /// überschreiben die Routine und feuern per WithNavigation um ihren Navigationssatz
-    /// erweiterte Argumente weiter — das Root leitet daraus die Undo-Sätze ab.
+    /// erweiterte Argumente weiter - das Root leitet daraus die Undo-Sätze ab.
     /// </summary>
     void ChildFragmentChanged(object? sender, FragmentChangedEventArgs e) => OnFragmentChanged(e);
 
@@ -201,11 +228,25 @@ public static class FragmentStoreableExtension {
 
     /// <summary>
     /// Schreibt System-Bytes (SaveUser, Machine, SaveTimeUtc), den eigenen Block per
-    /// SerializeCore und abschließend den EOF-Satz (Details im Interface). Diese
-    /// Überladung ermöglicht den Serialize-Aufruf über konkrete Klassentypen,
-    /// da Default-Interface-Methoden nur über den Schnittstellentyp sichtbar sind.
+    /// SerializeCore und abschließend den EOF-Satz, ohne Änderungs-Historie (Details
+    /// im Interface). Diese Überladung ermöglicht den Serialize-Aufruf über konkrete
+    /// Klassentypen, da Default-Interface-Methoden nur über den Schnittstellentyp
+    /// sichtbar sind.
     /// </summary>
-    public static bool Serialize(this IFragmentStoreable sender, Stream stream, int depth) => sender.Serialize(stream, depth, sender.TypeName);
+    public static bool Serialize(this IFragmentStoreable sender, Stream stream, int depth) => sender.Serialize(stream, depth, sender.TypeName, []);
+
+    /// <summary>
+    /// Kürzt eine Änderungs-Historie auf die neuesten MaxUndos Sätze, ausgerichtet
+    /// an Eintrags-Grenzen (Satz mit Tiefe 0). Liefert stets eine neue Liste.
+    /// </summary>
+    public static List<FragmentRecord> TrimUndos(this List<FragmentRecord> undos) {
+        if (undos.Count <= IFragmentStoreable.MaxUndos) { return [.. undos]; }
+
+        var first = undos.Count - IFragmentStoreable.MaxUndos;
+        while (first < undos.Count && undos[first].Depth != 0) { first++; }
+
+        return [.. undos[first..]];
+    }
 
     /// <summary>
     /// Liest den eigenen Block bis zu seinem Ende: Sätze genau der Tiefe depth gehen an
@@ -223,12 +264,19 @@ public static class FragmentStoreableExtension {
             }
 
             if (!sender.DeserializeThis(stream, record)) {
-                Develop.Diagnose("IFragmentStoreable.Deserialize", "false von " + sender.GetType().Name + ", Leaf=" + record.LeafType + ", T" + record.Depth + ", Content=" + record.StringContent.Left(60) + ", Stack: " + Develop.DiagStack());
+                Develop.Diagnose("FragmentDeserialize", $"pid={Environment.ProcessId} DeserializeThis=false von {sender.GetType().Name}, Leaf={record.LeafType}, T{record.Depth}, Content={record.ReadableContent().Left(60)}");
+                Develop.DebugError("IFragmentStoreable.Deserialize: false von " + sender.GetType().Name + ", Leaf=" + record.LeafType + ", T" + record.Depth + ", Content=" + record.ReadableContent().Left(60));
                 return false;
             }
         }
 
-        return sender.ParseFinished();
+        if (!sender.ParseFinished()) {
+            Develop.Diagnose("FragmentDeserialize", $"pid={Environment.ProcessId} ParseFinished=false von {sender.GetType().Name}");
+            Develop.DebugError("IFragmentStoreable.Deserialize: ParseFinished false von " + sender.GetType().Name);
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -294,7 +342,7 @@ public static class FragmentStoreableExtension {
             if (FragmentRecord.TryReadNext(segment) is not { } first) { continue; }
 
             if (first.TagType != FragmentTagType.ItemAdd) {
-                Develop.Diagnose("DeserializeList", "Segment ohne ItemAdd-Kopf, Leaf=" + first.ValueId + ", T" + first.Depth + ", Stack: " + Develop.DiagStack());
+                Develop.DebugError("DeserializeList: Segment ohne ItemAdd-Kopf, Leaf=" + first.ValueId + ", T" + first.Depth);
                 return null;
             }
 

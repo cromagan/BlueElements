@@ -8,14 +8,14 @@ namespace BlueTable.Classes;
 public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTable {
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Spalten-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum der Spalte ein, sonst eigener Raum;
-    /// unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Spalten-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum der Spalte ein, sonst eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk
             ? ColumnItem.GetNameOf(path[1..])
             : ((FragmentTagType)path[^1].ValueId).ToString();
     }
@@ -116,8 +116,6 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
 
         if (this[keyName] is { IsDisposed: false }) { return true; }
 
-        Develop.Diagnose("ColumnAddByName", "Key=" + keyName + ", ApplyItemAdd, Stack: " + Develop.DiagStack());
-
         ExecuteCommand(TableDataType.Command_AddColumnByName, keyName, ChangeFlags.IgnoreFreeze);
         return true;
     }
@@ -170,7 +168,10 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
         var result = Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
         if (item is null) {
-            Develop.DebugError($"Erstellung fehlgeschlagen: '{keyName}' – ChangeData: '{result}'");
+            // Ablehnung durch ChangeData (z. B. Chunk durch anderen Benutzer gesperrt) ist kein Programmierfehler.
+            if (result is { Length: > 0 }) { return null; }
+
+            Develop.DebugError($"Erstellung fehlgeschlagen: '{keyName}'");
             return null;
         }
 
@@ -447,7 +448,8 @@ public sealed class ColumnCollection : KeyedItemCollection<ColumnItem>, IHasTabl
                     Develop.DebugError("Name nicht korrekt!");
                 }
             } else {
-                Develop.DebugError("Spalte nicht erzeugt!");
+                // Abgelehnte Erstellung (z. B. gesperrter Chunk) ist kein Programmierfehler; Spalte überspringen.
+                continue;
             }
         }
     }

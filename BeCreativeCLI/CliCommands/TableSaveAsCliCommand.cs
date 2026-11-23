@@ -1,5 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.IO;
+
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>
@@ -33,6 +35,16 @@ public class TableSaveAsCliCommand : CliCommand {
         if (tbl is null) { return 1; }
 
         var targetPath = args[1] ?? string.Empty;
+
+        // Relative Ziele auflösen: Die Datei-Routinen arbeiten mit absoluten Pfaden.
+        if (targetPath is { Length: > 0 } && !Path.IsPathRooted(targetPath)) {
+            try {
+                targetPath = Path.GetFullPath(targetPath);
+            } catch {
+                Console.Error.WriteLine("Zieldatei ungültig: " + targetPath);
+                return 2;
+            }
+        }
 
         // Über Table.Create: .btb-Ziele landen im Fragment-Layout (TableFileNew),
         // alle übrigen Endungen im klassischen Format.

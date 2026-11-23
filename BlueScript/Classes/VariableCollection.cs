@@ -395,14 +395,14 @@ public class VariableCollection : KeyedItemCollection<ScriptVariable>, IEditable
     }
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Variablen-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum der Variable ein, sonst eigener
-    /// Raum; unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Variablen-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum der Variable ein, sonst eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((BlueBasics.Enums.FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is BlueBasics.Enums.FragmentTagType.ItemPath or BlueBasics.Enums.FragmentTagType.ItemList
+        return path[0].TagType is BlueBasics.Enums.FragmentTagType.ItemPath or BlueBasics.Enums.FragmentTagType.ItemList or BlueBasics.Enums.FragmentTagType.ItemListChunk
             ? ScriptVariable.GetNameOf(path[1..])
             : ((BlueBasics.Enums.FragmentTagType)path[^1].ValueId).ToString();
     }

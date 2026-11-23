@@ -18,14 +18,14 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
     public readonly record struct FailedRowEntry(string Reason, DateTime FailedUtc);
 
     /// <summary>
-    /// Verständlicher Name eines Empfänger-Typs im Zeilen-Pfad: Der Listen- oder
-    /// Nav-Satz (ItemPath) leitet den Zahlraum der Zeile ein, sonst eigener Raum;
-    /// unbekannte Werte liefern die Zahl.
+    /// Verständlicher Name eines Empfänger-Typs im Zeilen-Pfad: Der Listen-,
+    /// Nav- oder Chunk-Satz (ItemPath, ItemList, ItemListChunk) leitet den
+    /// Zahlraum der Zeile ein, sonst eigener Raum; unbekannte Werte liefern die Zahl.
     /// </summary>
     public static string GetNameOf(ReadOnlySpan<FragmentRecord> path) {
         if (path.Length == 1) { return ((FragmentTagType)path[0].ValueId).ToString(); }
 
-        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList
+        return path[0].TagType is FragmentTagType.ItemPath or FragmentTagType.ItemList or FragmentTagType.ItemListChunk
             ? RowItem.GetNameOf(path[1..])
             : ((FragmentTagType)path[^1].ValueId).ToString();
     }
@@ -670,7 +670,6 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
         // Bei kritischen Initialwert-Fehlern Zeile wieder löschen
         if (initErrors.Count > 0) {
-            Develop.Diagnose("Initialwert-Cleanup", $"Entferne Zeile '{nRow.KeyName}', Stack: {Develop.DiagStack()}");
             Remove(nRow, "Cleanup nach Initialwert-Fehler");
             return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
         }
@@ -1047,12 +1046,6 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
         return FragmentRecord.Append(stream, depth, FragmentTagType.ItemList, saveRows);
     }
-
-    /// <summary>
-    /// Liefert die Zeile zum Schlüssel; fehlt sie, wird sie still angelegt
-    /// (Journal kann vor der Aufnahme eintreffen).
-    /// </summary>
-    protected override RowItem? GetOrCreateItem(string keyName) => RowCreateOrGet(keyName);
 
     /// <summary>
     /// Reicht eine Zeilen-Änderung eine Ebene höher und stempelt zuvor den Chunk
