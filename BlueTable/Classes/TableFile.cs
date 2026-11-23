@@ -290,7 +290,7 @@ public class TableFile : Table {
             }
         }
 
-        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "bdb", "nbdb", "mbdb", "tblh" };
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {"btb", "bdb", "nbdb", "mbdb", "tblh" };
         return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
@@ -793,7 +793,7 @@ public class TableFile : Table {
         var suffixTypes = BuildSuffixTypeMap();
 
         if (!suffixTypes.TryGetValue("." + targetSuffix, out var targetType)) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .nbdb, .mbdb, .tblh");
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .btb, .bdb, .nbdb, .mbdb, .tblh");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
@@ -824,6 +824,7 @@ public class TableFile : Table {
     }
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() => new(StringComparer.OrdinalIgnoreCase) {
+        [".btb"] = typeof(TableFileNew),
         [".bdb"] = typeof(TableFile),
         [".nbdb"] = typeof(TableFile),
         [".mbdb"] = typeof(TableFragments),
