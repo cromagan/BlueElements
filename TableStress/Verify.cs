@@ -19,106 +19,33 @@ public static class Verify {
     private static readonly UTF8Encoding Utf8Bom = new(true);
 
     private static StreamWriter? _report;
+
     private static int _fehler;
+
     private static int _warnungen;
+
     private static int _meldungCount;
 
     #endregion
 
     #region Methods
 
-    /// <summary>
-    /// Führt die Prüfung durch: TableStress --verify "pfad-zur-tabelle" [dump-datei]
-    /// </summary>
-    public static int Run(string tablePath, string? dumpPath) {
-        Develop.StartService();
-        Generic.UserName = "VERIFY";
-        RowCollection.AllowProcessingAborts = false;
+    private static void DumpSchreiben(Table tbl, string dumpPath) {
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
 
-        var dir = Path.GetDirectoryName(Path.GetFullPath(tablePath)) ?? AppContext.BaseDirectory;
-        var reportPath = Path.Combine(dir, $"VERIFY-{DateTime.Now:HH-mm-ss}.txt");
+        using var w = new StreamWriter(dumpPath, false, Utf8Bom) { AutoFlush = true };
+        w.WriteLine($"#TABELLE|{tbl.KeyName}");
+        w.WriteLine($"#ZEIT|{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+        w.WriteLine($"#ZEILEN|{tbl.Row.Count}");
 
-        _fehler = 0;
-        _warnungen = 0;
-
-        using var report = new StreamWriter(reportPath, false, Utf8Bom) { AutoFlush = true };
-        _report = report;
-
-        Write("START", $"Tabelle={tablePath} PID={Environment.ProcessId}");
-
-        _meldungCount = 0;
-        Develop.MessageDG += OnDevelopMessage;
-
-        try {
-            var tbl = Table.Get(tablePath);
-
-            if (tbl is not { IsDisposed: false }) {
-                Fehler($"Tabelle nicht ladbar: {tablePath}");
-                return 1;
+        foreach (var row in tbl.Row) {
+            foreach (var c in columns) {
+                var v = row.CellGetString(c).Replace('|', '/');
+                w.WriteLine($"{row.KeyName}|{row.ChunkValue.Replace('|', '/')}|{c.KeyName}|{v}");
             }
-
-            if (!tbl.BeSureToBeUpToDate(false)) { Fehler($"Tabelle {tbl.KeyName} konnte nicht auf den aktuellen Stand gebracht werden"); }
-
-            var okLoad = tbl.LoadTableRows(false, -1);
-            Write("DATENLADEN", okLoad ? $"ok Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count}" : "fehlgeschlagen");
-            if (!okLoad) { Fehler("LoadTableRows fehlgeschlagen"); }
-
-            if (tbl.Column.Count == 0) { Fehler("Tabelle hat keine Spalten"); }
-
-            PruefeVerzeichnis(tbl);
-            PruefeZeilenZuChunks(tbl);
-            PruefeUndos(tbl, "LADEN");
-
-            // Speichern-Laden-Rundtrip: Stand sichern, freigeben, neu laden, vergleichen.
-            var snap1 = Snapshot(tbl);
-            var opr = tbl is TableFileNew tfn1 ? tfn1.Save() : (tbl as TableFile)?.Save() ?? OperationResult.Success;
-            Write("SPEICHERN", opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok");
-            if (opr.IsFailed) { Fehler("Save fehlgeschlagen: " + opr.FailedReason); }
-
-            PruefeUndos(tbl, "NACH-SPEICHERN");
-
-            tbl.Dispose();
-
-            Thread.Sleep(1500);
-
-            tbl = Table.Get(tablePath);
-            if (tbl is not { IsDisposed: false }) {
-                Fehler("Tabelle nach dem Neuladen nicht ladbar");
-                return 1;
-            }
-
-            _ = tbl.BeSureToBeUpToDate(false);
-            _ = tbl.LoadTableRows(false, -1);
-
-            var snap2 = Snapshot(tbl);
-            VergleicheSnapshots(snap1, snap2);
-            PruefeUndos(tbl, "RELOAD");
-
-            if (dumpPath is { Length: > 0 }) { DumpSchreiben(tbl, dumpPath); }
-
-            tbl.Dispose();
-
-            Write("ENDE", $"FEHLER={_fehler} WARNUNGEN={_warnungen} MELDUNGEN={_meldungCount} Bericht={reportPath}");
-            return _fehler == 0 ? 0 : 1;
-        } catch (Exception ex) {
-            Fehler($"Fatal Typ={ex.GetType().Name} Meldung={ex.Message} Aufrufstack={Develop.DiagStack()}");
-            return 3;
-        } finally {
-            Develop.MessageDG -= OnDevelopMessage;
-            _report = null;
-        }
-    }
-
-    #region Bericht
-
-    private static void Write(string aktion, string detail) {
-        var line = $"VERIFY|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{OneLine(detail)}";
-
-        if (_report is { } r) {
-            lock (r) { r.WriteLine(line); }
         }
 
-        Console.Out.WriteLine(line);
+        Write("DUMP", dumpPath);
     }
 
     private static void Fehler(string detail) {
@@ -126,9 +53,29 @@ public static class Verify {
         Write("FEHLER", detail);
     }
 
-    private static void Warnung(string detail) {
-        _warnungen++;
-        Write("WARNUNG", detail);
+    /// <summary>
+    /// Fingerabdruck eines Meta-Satzes; Basis des Vergleichs Speicher ↔ Festplatte.
+    /// </summary>
+    private static string Fingerprint(FragmentRecord r) =>
+        $"{r.DateTimeUtc.Ticks}|{r.User}|{r.Comment}|{r.ValueId}|{Convert.ToBase64String(r.ByteContent)}";
+
+    private static List<string> KnownChunkIds(TableFileNew tfn) => tfn.Saveable is SaveableFileChunk sfc ? sfc.KnownChunkIds() : [];
+
+    private static List<FragmentRecord> MetaSaetzeVonDatei(string file) {
+        List<FragmentRecord> result = [];
+
+        if (IO.ReadAllBytes(file, 5).Value is not byte[] raw || raw.Length == 0) { return result; }
+
+        var content = raw.IsZipped() ? raw.UnzipIt() : raw;
+        if (content is not { Length: > 0 }) { return result; }
+
+        using var ms = new MemoryStream(content);
+
+        while (FragmentRecord.TryReadNext(ms) is { } r) {
+            if (r.HasMeta) { result.Add(r); }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -147,9 +94,85 @@ public static class Verify {
 
     private static string OneLine(string text) => text.Replace("\r\n", " / ").Replace('\r', ' ').Replace('\n', ' ');
 
-    #endregion
+    private static DateTime? ParseChunkFileDate(string filePath) {
+        var n = filePath.FileNameWithoutSuffix();
+        if (n.Length < 23) { return null; }
 
-    #region Verzeichnis
+        return DateTime.TryParseExact(n[..23], "yyyy-MM-dd-HH-mm-ss-fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)
+            ? DateTime.SpecifyKind(d, DateTimeKind.Utc)
+            : null;
+    }
+
+    /// <summary>
+    /// Prüft die Änderungs-Historie gegen die Festplatte: Je Eintrag muss der
+    /// Ziel-Chunk die neueste Datei enthalten (Chunk-Layout) bzw. der Eintrag
+    /// muss irgendwo vorliegen (Fragment-Layout).
+    /// </summary>
+    private static void PruefeUndos(Table tbl, string phase) {
+        if (tbl is not TableFileNew tfn) { return; }
+
+        var saveable = tfn.Saveable;
+        var chunkSaveable = saveable as SaveableFileChunk;
+        var chunkLayout = chunkSaveable is not null;
+
+        var datei = tfn.Filename;
+        var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
+
+        var rowChunk = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var row in tbl.Row) { rowChunk[row.KeyName] = row.ChunkId(); }
+
+        var entries = UndoEintraege(saveable.Undos);
+        var disk = UndoFingerprintsVonDisk(basis, chunkLayout);
+
+        var ok = 0;
+        var falscherChunk = 0;
+        var fehlt = 0;
+        var gesamtSaetze = saveable.Undos.Count;
+
+        foreach (var entry in entries) {
+            var meta = entry.LastOrDefault(r => r.HasMeta);
+            if (meta is null) { continue; }
+
+            var fp = Fingerprint(meta);
+            var ziel = chunkSaveable is not null ? UndoZiel(chunkSaveable, entry, rowChunk) : "*";
+
+            // Gelöschte Zeile: Der Eintrag darf noch im alten Chunk liegen —
+            // er zählt als ok, sobald er irgendwo vorliegt.
+            if (ziel is null) {
+                if (disk.Values.Any(set => set.Contains(fp))) {
+                    ok++;
+                } else {
+                    fehlt++;
+                    if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(gelöscht) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
+                }
+
+                continue;
+            }
+
+            if (disk.TryGetValue(ziel, out var set) && set.Contains(fp)) {
+                ok++;
+                continue;
+            }
+
+            // Anderswo gefunden → falscher Chunk; sonst fehlt der Eintrag auf der Platte.
+            var woanders = disk.Any(kvp => kvp.Key != ziel && kvp.Value.Contains(fp));
+
+            if (woanders) {
+                falscherChunk++;
+                if (falscherChunk <= 10) { Write("UNDO-FALSCH", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
+            } else {
+                fehlt++;
+                if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
+            }
+        }
+
+        if (falscherChunk > 10) { Fehler($"Phase={phase}: weitere {falscherChunk - 10} Undo-Einträge im falschen Chunk (Details unterdrückt)"); }
+        if (fehlt > 10) { Fehler($"Phase={phase}: weitere {fehlt - 10} Undo-Einträge fehlen auf der Festplatte (Details unterdrückt)"); }
+        if (falscherChunk > 0) { Fehler($"Phase={phase}: {falscherChunk} Undo-Einträge im falschen Chunk"); }
+        if (fehlt > 0) { Fehler($"Phase={phase}: {fehlt} Undo-Einträge fehlen auf der Festplatte"); }
+
+        Write("UNDO", $"Phase={phase} Einträge={entries.Count} Sätze={gesamtSaetze} ImZiel={ok} FalscherChunk={falscherChunk} Fehlt={fehlt}");
+    }
 
     /// <summary>
     /// Prüft Kopf-Datei, Arbeitsverzeichnis, Ordner-Namen und alle Fragment-Dateien
@@ -260,23 +283,6 @@ public static class Verify {
         Write("VERZEICHNIS", $"SystemOrdner={systemOrdner} DatenOrdner={datenOrdner} LeereDatenOrdner={leereDatenOrdner.Count} Dateien={dateiGesamt + loseDateien.Length} Basis={basis}");
     }
 
-    private static string ReadLayout(string datei) => SaveableFile.TryReadHeadClassId(datei, out var layout) ? layout : string.Empty;
-
-    private static List<string> KnownChunkIds(TableFileNew tfn) => tfn.Saveable is SaveableFileChunk sfc ? sfc.KnownChunkIds() : [];
-
-    private static DateTime? ParseChunkFileDate(string filePath) {
-        var n = filePath.FileNameWithoutSuffix();
-        if (n.Length < 23) { return null; }
-
-        return DateTime.TryParseExact(n[..23], "yyyy-MM-dd-HH-mm-ss-fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)
-            ? DateTime.SpecifyKind(d, DateTimeKind.Utc)
-            : null;
-    }
-
-    #endregion
-
-    #region Zeilen ↔ Chunks
-
     /// <summary>
     /// Prüft je Zeile, dass ihr Ziel-Chunk-Ordner auf der Festplatte existiert und Daten enthält.
     /// </summary>
@@ -320,15 +326,112 @@ public static class Verify {
         Write("CHUNKS", $"Zeilen={tbl.Row.Count} OhneChunkDateien={ohneOrdner}");
     }
 
-    #endregion
-
-    #region Undos
+    private static string ReadLayout(string datei) => SaveableFile.TryReadHeadClassId(datei, out var layout) ? layout : string.Empty;
 
     /// <summary>
-    /// Fingerabdruck eines Meta-Satzes; Basis des Vergleichs Speicher ↔ Festplatte.
+    /// Führt die Prüfung durch: TableStress --verify "pfad-zur-tabelle" [dump-datei]
     /// </summary>
-    private static string Fingerprint(FragmentRecord r) =>
-        $"{r.DateTimeUtc.Ticks}|{r.User}|{r.Comment}|{r.ValueId}|{Convert.ToBase64String(r.ByteContent)}";
+    public static int Run(string tablePath, string? dumpPath) {
+        Develop.StartService();
+        Generic.UserName = "VERIFY";
+        RowCollection.AllowProcessingAborts = false;
+        tablePath = tablePath.Trim();
+
+        _fehler = 0;
+        _warnungen = 0;
+        _meldungCount = 0;
+
+        Develop.MessageDG += OnDevelopMessage;
+
+        try {
+            // Bericht erst im Try öffnen: Ein ungültiger Tabellen-Pfad darf nicht
+            // als unbehandelte Exception enden, sondern als FEHLER-Zeile.
+            var dir = Path.GetDirectoryName(Path.GetFullPath(tablePath)) ?? AppContext.BaseDirectory;
+            var reportPath = Path.Combine(dir, $"VERIFY-{DateTime.Now:HH-mm-ss}.txt");
+            using var report = new StreamWriter(reportPath, false, Utf8Bom) { AutoFlush = true };
+            _report = report;
+
+            Write("START", $"Tabelle={tablePath} PID={Environment.ProcessId}");
+
+            var tbl = Table.Get(tablePath);
+
+            if (tbl is not { IsDisposed: false }) {
+                Fehler($"Tabelle nicht ladbar: {tablePath}");
+                return 1;
+            }
+
+            if (!tbl.BeSureToBeUpToDate(false)) { Fehler($"Tabelle {tbl.KeyName} konnte nicht auf den aktuellen Stand gebracht werden"); }
+
+            var okLoad = tbl.LoadTableRows(false, -1);
+            Write("DATENLADEN", okLoad ? $"ok Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count}" : "fehlgeschlagen");
+            if (!okLoad) { Fehler("LoadTableRows fehlgeschlagen"); }
+
+            if (tbl.Column.Count == 0) { Fehler("Tabelle hat keine Spalten"); }
+
+            PruefeVerzeichnis(tbl);
+            PruefeZeilenZuChunks(tbl);
+            PruefeUndos(tbl, "LADEN");
+
+            // Speichern-Laden-Rundtrip: Stand sichern, freigeben, neu laden, vergleichen.
+            var snap1 = Snapshot(tbl);
+            var opr = tbl is TableFileNew tfn1 ? tfn1.Save() : (tbl as TableFile)?.Save() ?? OperationResult.Success;
+            Write("SPEICHERN", opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok");
+            if (opr.IsFailed) { Fehler("Save fehlgeschlagen: " + opr.FailedReason); }
+
+            PruefeUndos(tbl, "NACH-SPEICHERN");
+
+            tbl.Dispose();
+
+            Thread.Sleep(1500);
+
+            tbl = Table.Get(tablePath);
+            if (tbl is not { IsDisposed: false }) {
+                Fehler("Tabelle nach dem Neuladen nicht ladbar");
+                return 1;
+            }
+
+            _ = tbl.BeSureToBeUpToDate(false);
+            _ = tbl.LoadTableRows(false, -1);
+
+            var snap2 = Snapshot(tbl);
+            VergleicheSnapshots(snap1, snap2);
+            PruefeUndos(tbl, "RELOAD");
+
+            if (dumpPath is { Length: > 0 }) { DumpSchreiben(tbl, dumpPath); }
+
+            tbl.Dispose();
+
+            Write("ENDE", $"FEHLER={_fehler} WARNUNGEN={_warnungen} MELDUNGEN={_meldungCount} Bericht={reportPath}");
+            return _fehler == 0 ? 0 : 1;
+        } catch (Exception ex) {
+            Fehler($"Fatal Typ={ex.GetType().Name} Meldung={ex.Message} Aufrufstack={Develop.DiagStack()}");
+            return 3;
+        } finally {
+            Develop.MessageDG -= OnDevelopMessage;
+            _report = null;
+        }
+    }
+
+    /// <summary>
+    /// Liest den kompletten Datenstand: je Zeile Key, Chunk-Wert und alle Zellwerte.
+    /// </summary>
+    private static List<ZeilenStand> Snapshot(Table tbl) {
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
+        List<ZeilenStand> result = [];
+
+        foreach (var row in tbl.Row) {
+            List<ZellWert> zellen = [];
+
+            foreach (var c in columns) {
+                var v = row.CellGetString(c).Replace('|', '/');
+                zellen.Add(new ZellWert(c.KeyName, v));
+            }
+
+            result.Add(new ZeilenStand(row.KeyName, row.ChunkValue, zellen));
+        }
+
+        return [.. result.OrderBy(r => r.Key, StringComparer.OrdinalIgnoreCase)];
+    }
 
     /// <summary>
     /// Gruppiert die Änderungs-Historie in Einträge (Sätze ab Tiefe 0 bis zum nächsten Tiefe-0-Satz).
@@ -347,29 +450,6 @@ public static class Verify {
         if (cur is { Count: > 0 }) { entries.Add(cur); }
 
         return entries;
-    }
-
-    /// <summary>
-    /// Ziel-Chunk-Id eines Undo-Eintrags: der Chunk des ersten ItemPath-Item-Kennens,
-    /// analog zur Verteilung beim Speichern. Zeilen ohne Chunk-Wert sind in rowChunk
-    /// bereits dem Default-Chunk (_) zugeordnet. Einträge ohne Item-Kenner laufen —
-    /// wie beim Speichern — über die Areas-Regel des Saveables (z. B. Master → _master).
-    /// Liefert null, wenn der Item-Kenner keiner aktuellen Zeile entspricht
-    /// (gelöschte Zeile) — solche Einträge dürfen noch im alten Chunk liegen.
-    /// </summary>
-    private static string? UndoZiel(SaveableFileChunk saveable, List<FragmentRecord> entry, Dictionary<string, string> rowChunk) {
-        var hatItemPfad = false;
-
-        foreach (var r in entry) {
-            if (r.TagType != FragmentTagType.ItemPath || r.DataType != FragmentDataType.String) { continue; }
-
-            hatItemPfad = true;
-            if (rowChunk.TryGetValue(r.StringContent, out var id)) { return id; }
-
-            return null; // Gelöschte/ferne Zeile: Ziel nicht mehr rekonstruierbar
-        }
-
-        return hatItemPfad ? null : saveable.UndoEntryChunk(entry, rowChunk);
     }
 
     /// <summary>
@@ -413,121 +493,27 @@ public static class Verify {
         return result;
     }
 
-    private static List<FragmentRecord> MetaSaetzeVonDatei(string file) {
-        List<FragmentRecord> result = [];
-
-        if (IO.ReadAllBytes(file, 5).Value is not byte[] raw || raw.Length == 0) { return result; }
-
-        var content = raw.IsZipped() ? raw.UnzipIt() : raw;
-        if (content is not { Length: > 0 }) { return result; }
-
-        using var ms = new MemoryStream(content);
-
-        while (FragmentRecord.TryReadNext(ms) is { } r) {
-            if (r.HasMeta) { result.Add(r); }
-        }
-
-        return result;
-    }
-
     /// <summary>
-    /// Prüft die Änderungs-Historie gegen die Festplatte: Je Eintrag muss der
-    /// Ziel-Chunk die neueste Datei enthalten (Chunk-Layout) bzw. der Eintrag
-    /// muss irgendwo vorliegen (Fragment-Layout).
+    /// Ziel-Chunk-Id eines Undo-Eintrags: der Chunk des ersten ItemPath-Item-Kennens,
+    /// analog zur Verteilung beim Speichern. Zeilen ohne Chunk-Wert sind in rowChunk
+    /// bereits dem Default-Chunk (_) zugeordnet. Einträge ohne Item-Kenner laufen —
+    /// wie beim Speichern — über die Areas-Regel des Saveables (z. B. Master → _master).
+    /// Liefert null, wenn der Item-Kenner keiner aktuellen Zeile entspricht
+    /// (gelöschte Zeile) — solche Einträge dürfen noch im alten Chunk liegen.
     /// </summary>
-    private static void PruefeUndos(Table tbl, string phase) {
-        if (tbl is not TableFileNew tfn) { return; }
+    private static string? UndoZiel(SaveableFileChunk saveable, List<FragmentRecord> entry, Dictionary<string, string> rowChunk) {
+        var hatItemPfad = false;
 
-        var saveable = tfn.Saveable;
-        var chunkSaveable = saveable as SaveableFileChunk;
-        var chunkLayout = chunkSaveable is not null;
+        foreach (var r in entry) {
+            if (r.TagType != FragmentTagType.ItemPath || r.DataType != FragmentDataType.String) { continue; }
 
-        var datei = tfn.Filename;
-        var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
+            hatItemPfad = true;
+            if (rowChunk.TryGetValue(r.StringContent, out var id)) { return id; }
 
-        var rowChunk = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var row in tbl.Row) { rowChunk[row.KeyName] = row.ChunkId(); }
-
-        var entries = UndoEintraege(saveable.Undos);
-        var disk = UndoFingerprintsVonDisk(basis, chunkLayout);
-
-        var ok = 0;
-        var falscherChunk = 0;
-        var fehlt = 0;
-        var gesamtSaetze = saveable.Undos.Count;
-
-        foreach (var entry in entries) {
-            var meta = entry.LastOrDefault(r => r.HasMeta);
-            if (meta is null) { continue; }
-
-            var fp = Fingerprint(meta);
-            var ziel = chunkSaveable is not null ? UndoZiel(chunkSaveable, entry, rowChunk) : "*";
-
-            // Gelöschte Zeile: Der Eintrag darf noch im alten Chunk liegen —
-            // er zählt als ok, sobald er irgendwo vorliegt.
-            if (ziel is null) {
-                if (disk.Values.Any(set => set.Contains(fp))) {
-                    ok++;
-                } else {
-                    fehlt++;
-                    if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(gelöscht) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
-                }
-
-                continue;
-            }
-
-            if (disk.TryGetValue(ziel, out var set) && set.Contains(fp)) {
-                ok++;
-                continue;
-            }
-
-            // Anderswo gefunden → falscher Chunk; sonst fehlt der Eintrag auf der Platte.
-            var woanders = disk.Any(kvp => kvp.Key != ziel && kvp.Value.Contains(fp));
-
-            if (woanders) {
-                falscherChunk++;
-                if (falscherChunk <= 10) { Write("UNDO-FALSCH", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
-            } else {
-                fehlt++;
-                if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
-            }
+            return null; // Gelöschte/ferne Zeile: Ziel nicht mehr rekonstruierbar
         }
 
-        if (falscherChunk > 10) { Fehler($"Phase={phase}: weitere {falscherChunk - 10} Undo-Einträge im falschen Chunk (Details unterdrückt)"); }
-        if (fehlt > 10) { Fehler($"Phase={phase}: weitere {fehlt - 10} Undo-Einträge fehlen auf der Festplatte (Details unterdrückt)"); }
-        if (falscherChunk > 0) { Fehler($"Phase={phase}: {falscherChunk} Undo-Einträge im falschen Chunk"); }
-        if (fehlt > 0) { Fehler($"Phase={phase}: {fehlt} Undo-Einträge fehlen auf der Festplatte"); }
-
-        Write("UNDO", $"Phase={phase} Einträge={entries.Count} Sätze={gesamtSaetze} ImZiel={ok} FalscherChunk={falscherChunk} Fehlt={fehlt}");
-    }
-
-    #endregion
-
-    #region Snapshot & Reload
-
-    private sealed record ZellWert(string Spalte, string Wert);
-
-    private sealed record ZeilenStand(string Key, string ChunkValue, List<ZellWert> Zellen);
-
-    /// <summary>
-    /// Liest den kompletten Datenstand: je Zeile Key, Chunk-Wert und alle Zellwerte.
-    /// </summary>
-    private static List<ZeilenStand> Snapshot(Table tbl) {
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
-        List<ZeilenStand> result = [];
-
-        foreach (var row in tbl.Row) {
-            List<ZellWert> zellen = [];
-
-            foreach (var c in columns) {
-                var v = row.CellGetString(c).Replace('|', '/');
-                zellen.Add(new ZellWert(c.KeyName, v));
-            }
-
-            result.Add(new ZeilenStand(row.KeyName, row.ChunkValue, zellen));
-        }
-
-        return [.. result.OrderBy(r => r.Key, StringComparer.OrdinalIgnoreCase)];
+        return hatItemPfad ? null : saveable.UndoEntryChunk(entry, rowChunk);
     }
 
     private static void VergleicheSnapshots(List<ZeilenStand> snap1, List<ZeilenStand> snap2) {
@@ -570,25 +556,24 @@ public static class Verify {
         Write("RELOAD", $"Zeilen Vorher={snap1.Count} Nachher={snap2.Count} Verloren={verloren.Count} Geister={geister.Count} ChunkDiff={chunkDifferenzen} ZellDiff={zellDifferenzen}");
     }
 
-    private static void DumpSchreiben(Table tbl, string dumpPath) {
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
+    private static void Warnung(string detail) {
+        _warnungen++;
+        Write("WARNUNG", detail);
+    }
 
-        using var w = new StreamWriter(dumpPath, false, Utf8Bom) { AutoFlush = true };
-        w.WriteLine($"#TABELLE|{tbl.KeyName}");
-        w.WriteLine($"#ZEIT|{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-        w.WriteLine($"#ZEILEN|{tbl.Row.Count}");
+    private static void Write(string aktion, string detail) {
+        var line = $"VERIFY|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{OneLine(detail)}";
 
-        foreach (var row in tbl.Row) {
-            foreach (var c in columns) {
-                var v = row.CellGetString(c).Replace('|', '/');
-                w.WriteLine($"{row.KeyName}|{row.ChunkValue.Replace('|', '/')}|{c.KeyName}|{v}");
-            }
+        if (_report is { } r) {
+            lock (r) { r.WriteLine(line); }
         }
 
-        Write("DUMP", dumpPath);
+        Console.Out.WriteLine(line);
     }
 
     #endregion
 
-    #endregion
+    private sealed record ZellWert(string Spalte, string Wert);
+
+    private sealed record ZeilenStand(string Key, string ChunkValue, List<ZellWert> Zellen);
 }

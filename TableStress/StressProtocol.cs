@@ -16,8 +16,11 @@ public sealed class StressProtocol : IDisposable {
     private static readonly UTF8Encoding Utf8Bom = new(true);
 
     private readonly object locker = new();
+
     private readonly StreamWriter writer;
+
     private string lastMeldung = string.Empty;
+
     private int meldungRepeat;
 
     #endregion
@@ -86,28 +89,12 @@ public sealed class StressProtocol : IDisposable {
     }
 
     /// <summary>
-    /// Schreibt eine Aktions-Zeile: Protokollname|Uhrzeit|Aktion|Detail. Zeilenumbrüche
-    /// im Detail werden ersetzt, damit jede Protokollzeile dem Format entspricht.
+    /// Schreibt die Anzahl der unterdrückten Wiederholungen der letzten Meldung.
     /// </summary>
-    public void Write(string aktion, string detail) {
-        var line = $"{Name}|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{OneLine(detail)}";
-
-        lock (locker) {
-            try {
-                writer.WriteLine(line);
-            } catch (Exception ex) {
-                // Ein volles oder gesperrtes Protokoll darf den Stresstest nicht abbrechen —
-                // der Schreibfehler wird aber sichtbar gemacht und per Direktzugriff umgangen.
-                try {
-                    File.AppendAllText(FullPath, line + "\r\n", Utf8Bom);
-                    Console.Error.WriteLine($"Protokoll umgeleitet: {ex.GetType().Name} {ex.Message}");
-                } catch (Exception ex2) {
-                    Console.Error.WriteLine($"Protokoll-Schreibfehler: {ex.GetType().Name} {ex.Message} / Fallback: {ex2.GetType().Name} {ex2.Message}");
-                }
-            }
-        }
-
-        Console.Out.WriteLine(line);
+    private void FlushRepeatedMeldung() {
+        if (meldungRepeat <= 0) { return; }
+        Write("MELDUNG", $"{lastMeldung} — weitere identische Meldungen unterdrückt: {meldungRepeat}");
+        meldungRepeat = 0;
     }
 
     /// <summary>
@@ -135,18 +122,34 @@ public sealed class StressProtocol : IDisposable {
     }
 
     /// <summary>
-    /// Schreibt die Anzahl der unterdrückten Wiederholungen der letzten Meldung.
-    /// </summary>
-    private void FlushRepeatedMeldung() {
-        if (meldungRepeat <= 0) { return; }
-        Write("MELDUNG", $"{lastMeldung} — weitere identische Meldungen unterdrückt: {meldungRepeat}");
-        meldungRepeat = 0;
-    }
-
-    /// <summary>
     /// Ersetzt Zeilenumbrüche, damit eine Meldung eine Protokollzeile bleibt.
     /// </summary>
     private static string OneLine(string text) => text.Replace("\r\n", " / ").Replace('\r', ' ').Replace('\n', ' ');
+
+    /// <summary>
+    /// Schreibt eine Aktions-Zeile: Protokollname|Uhrzeit|Aktion|Detail. Zeilenumbrüche
+    /// im Detail werden ersetzt, damit jede Protokollzeile dem Format entspricht.
+    /// </summary>
+    public void Write(string aktion, string detail) {
+        var line = $"{Name}|{DateTime.Now:HH:mm:ss.fff}|{aktion}|{OneLine(detail)}";
+
+        lock (locker) {
+            try {
+                writer.WriteLine(line);
+            } catch (Exception ex) {
+                // Ein volles oder gesperrtes Protokoll darf den Stresstest nicht abbrechen —
+                // der Schreibfehler wird aber sichtbar gemacht und per Direktzugriff umgangen.
+                try {
+                    File.AppendAllText(FullPath, line + "\r\n", Utf8Bom);
+                    Console.Error.WriteLine($"Protokoll umgeleitet: {ex.GetType().Name} {ex.Message}");
+                } catch (Exception ex2) {
+                    Console.Error.WriteLine($"Protokoll-Schreibfehler: {ex.GetType().Name} {ex.Message} / Fallback: {ex2.GetType().Name} {ex2.Message}");
+                }
+            }
+        }
+
+        Console.Out.WriteLine(line);
+    }
 
     #endregion
 }

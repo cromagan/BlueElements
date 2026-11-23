@@ -23,7 +23,7 @@ internal static class Program {
         }
 
         if (args.Length is 2 or 3 && args[0].Equals("--verify", StringComparison.OrdinalIgnoreCase)) {
-            return Verify.Run(args[1], args.Length == 3 ? args[2] : null);
+            return Verify.Run(args[1].Trim(), args.Length == 3 ? args[2].Trim() : null);
         }
 
         if (args.Length != 2 || !int.TryParse(args[1], out var userNummer)) {
@@ -31,7 +31,7 @@ internal static class Program {
             return 2;
         }
 
-        var tablePath = args[0];
+        var tablePath = args[0].Trim();
 
         Develop.StartService();
 

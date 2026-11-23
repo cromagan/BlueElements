@@ -1,4 +1,6 @@
-﻿namespace TableStress;
+﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
+
+namespace TableStress;
 
 /// <summary>
 /// Zufalls-Aktionen des Stresstests; der Wert markiert den Beginn des zugehörigen Zufallsbereichs.

@@ -40,6 +40,7 @@ public sealed class CsSanitizer {
     private int state = StCode;
     private int holeDepth;
     private int rawQuotes;
+    private bool holesAsCode;
     private readonly Stack<(int State, int HoleDepth)> saved = new();
 
     #endregion
@@ -99,6 +100,32 @@ public sealed class CsSanitizer {
         }
 
         return kinds.ToString();
+    }
+
+    /// <summary>
+    /// Wie SanitizeKinds, aber Inhalte von Interpolationslöchern (z. B. '{name}' in $"...") werden als Code gezählt;
+    /// String-Inhalte innerhalb der Löcher bleiben String. Nützlich für Verwendungsprüfungen von Bezeichnern.
+    /// </summary>
+    public string SanitizeKindsWithCodeHoles(string text) {
+        holesAsCode = true;
+        try {
+            return SanitizeKinds(text);
+        } finally {
+            holesAsCode = false;
+        }
+    }
+
+    /// <summary>
+    /// Wie SanitizeLines, aber Inhalte von Interpolationslöchern (z. B. '{name}' in $"...") bleiben als Code erhalten;
+    /// String-Inhalte innerhalb der Löcher werden geleert. Nützlich für Verwendungsprüfungen von Bezeichnern.
+    /// </summary>
+    public List<string> SanitizeLinesWithCodeHoles(List<string> lines) {
+        holesAsCode = true;
+        try {
+            return SanitizeLines(lines);
+        } finally {
+            holesAsCode = false;
+        }
     }
 
     /// <summary>
@@ -235,7 +262,7 @@ public sealed class CsSanitizer {
                         state = StCharLiteral;
                         Append(sb, kinds, ' ', KindString);
                     } else {
-                        Append(sb, kinds, c, KindString);
+                        Append(sb, kinds, c, holesAsCode ? KindCode : KindString);
                     }
                     break;
                 default:

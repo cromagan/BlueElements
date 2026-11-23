@@ -14,6 +14,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     #region Fields
 
     private readonly Random random = new();
+
     private readonly TimeSpan runTime = TimeSpan.FromMinutes(10);
 
     /// <summary>
@@ -37,60 +38,24 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// Master setzen und Komplettierung anstoßen sind nur in dieser Anfangszeit erlaubt; danach ist der Tick Idle.
     /// </summary>
     private readonly TimeSpan masterTime = TimeSpan.FromMinutes(2);
+
     private readonly AutoResetEvent tickSignal = new(false);
+
     private DateTime startUtc;
+
     private bool freezeReported;
+
     private int scriptCount;
+
     private int spaltenCount;
+
     private System.Threading.Timer? timer;
+
     private int tickCount;
 
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Startet den 2-Sekunden-Timer und läuft 10 Minuten; Rückgabe ist der Exit-Code.
-    /// </summary>
-    public int Run() {
-        startUtc = DateTime.UtcNow;
-        prot.Write("START", $"Laufzeit={runTime.TotalMinutes:0}min Masterzeit={masterTime.TotalMinutes:0}min Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count} Master={tbl.TemporaryTableMasterUser}");
-
-        timer = new System.Threading.Timer(TimerTick, null, 2000, 2000);
-
-        while (DateTime.UtcNow.Subtract(startUtc) < runTime) {
-            if (!tickSignal.WaitOne(1000)) { continue; }
-            DoRandomAction();
-        }
-
-        StopTimer();
-        return Finish();
-    }
-
-    /// <summary>
-    /// Bildet den Zufallswert 0-37 auf die Aktion ab.
-    /// </summary>
-    private static StressAction ActionOf(int value) {
-        switch (value) {
-            case <= 3: return StressAction.NeueZeile;
-            case 4: return StressAction.ZeileLoeschen;
-            case <= 20: return StressAction.ZelleAendern;
-            case 21: return StressAction.MasterSetzen;
-            case 22: return StressAction.Komplettierung;
-            case 23: return StressAction.ScriptErstellen;
-            case <= 26: return StressAction.AlleDatenLaden;
-            case <= 28: return StressAction.SpalteAnlegen;
-            case 29: return StressAction.SpalteLoeschen;
-            case 30: return StressAction.ZelleSonderzeichen;
-            case 31: return StressAction.ZeileDuplizieren;
-            case 32: return StressAction.SpalteMetadaten;
-            case 33: return StressAction.SortierungPruefen;
-            case 34: return StressAction.DuplikatePruefen;
-            case 35: return StressAction.ScriptLoeschen;
-            case 36: return StressAction.KonsistenzPruefen;
-            default: return StressAction.CsvExportPruefen;
-        }
-    }
 
     private void ActionAlleDatenLaden() {
         var ok = tbl.LoadTableRows(false, -1);
@@ -133,24 +98,6 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         prot.Write("KOMPLETTIERUNG", $"Refresh={(refreshed ? "ok" : "fehlgeschlagen")} Master={master}{(masterOk ? string.Empty : " (MasterMe erfolglos)")} KomplettierungFällig={tbl.MasterNeeded}");
     }
 
-    private void ActionMasterSetzen() {
-        if (MasterIdle()) {
-            prot.Write("MASTER", "Idle — Master setzen ist nur in den ersten 2 Minuten erlaubt");
-            return;
-        }
-
-        tbl.BeSureToBeUpToDate(false);
-        tbl.MasterMe();
-        var master = tbl.TemporaryTableMasterUser;
-
-        // MasterMe kann still erfolglos bleiben (Chunk gesperrt, Daten nicht frisch genug) — sichtbar machen.
-        if (string.Equals(master, user, StringComparison.OrdinalIgnoreCase)) {
-            prot.Write("MASTER", $"Master={master} ZeitUtc={tbl.TemporaryTableMasterTimeUtc} Rechner={tbl.TemporaryTableMasterMachine}");
-        } else {
-            prot.Write("MASTER", $"MasterMe erfolglos, Master bleibt {master}");
-        }
-    }
-
     /// <summary>
     /// Leichte In-Memory-Konsistenzprüfung: doppelte Zeilen-Keys, leere Chunk-Ids, leere Spalten-Keys.
     /// </summary>
@@ -170,6 +117,24 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         if (probleme.Count > 0) { prot.Write("FEHLER", "Konsistenz " + string.Join("; ", probleme)); }
 
         prot.Write("PRÜFUNG", $"Zeilen={rows.Count} Spalten={tbl.Column.Count} Probleme={probleme.Count}");
+    }
+
+    private void ActionMasterSetzen() {
+        if (MasterIdle()) {
+            prot.Write("MASTER", "Idle — Master setzen ist nur in den ersten 2 Minuten erlaubt");
+            return;
+        }
+
+        tbl.BeSureToBeUpToDate(false);
+        tbl.MasterMe();
+        var master = tbl.TemporaryTableMasterUser;
+
+        // MasterMe kann still erfolglos bleiben (Chunk gesperrt, Daten nicht frisch genug) — sichtbar machen.
+        if (string.Equals(master, user, StringComparison.OrdinalIgnoreCase)) {
+            prot.Write("MASTER", $"Master={master} ZeitUtc={tbl.TemporaryTableMasterTimeUtc} Rechner={tbl.TemporaryTableMasterMachine}");
+        } else {
+            prot.Write("MASTER", $"MasterMe erfolglos, Master bleibt {master}");
+        }
     }
 
     private void ActionNeueZeile() {
@@ -199,6 +164,31 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         }
 
         prot.Write("NEUEZEILE", $"Key={row.KeyName} ok");
+    }
+
+    /// <summary>
+    /// Bildet den Zufallswert 0-37 auf die Aktion ab.
+    /// </summary>
+    private static StressAction ActionOf(int value) {
+        switch (value) {
+            case <= 3: return StressAction.NeueZeile;
+            case 4: return StressAction.ZeileLoeschen;
+            case <= 20: return StressAction.ZelleAendern;
+            case 21: return StressAction.MasterSetzen;
+            case 22: return StressAction.Komplettierung;
+            case 23: return StressAction.ScriptErstellen;
+            case <= 26: return StressAction.AlleDatenLaden;
+            case <= 28: return StressAction.SpalteAnlegen;
+            case 29: return StressAction.SpalteLoeschen;
+            case 30: return StressAction.ZelleSonderzeichen;
+            case 31: return StressAction.ZeileDuplizieren;
+            case 32: return StressAction.SpalteMetadaten;
+            case 33: return StressAction.SortierungPruefen;
+            case 34: return StressAction.DuplikatePruefen;
+            case 35: return StressAction.ScriptLoeschen;
+            case 36: return StressAction.KonsistenzPruefen;
+            default: return StressAction.CsvExportPruefen;
+        }
     }
 
     private void ActionScriptErstellen() {
@@ -234,6 +224,21 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         tbl.EventScript = new TableScriptCollection(tbl, [.. tbl.EventScript.Where(s => s.KeyName != ziel.KeyName)]);
 
         prot.Write("SCRIPT-WEG", $"Name={ziel.KeyName} ok");
+    }
+
+    private void ActionSortierungPruefen() {
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("SORTIERUNG", "Keine Zeile vorhanden"); return; }
+
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToArray();
+
+        if (columns.Length == 0) { prot.Write("SORTIERUNG", "Keine Spalte vorhanden"); return; }
+
+        var column = columns[random.Next(columns.Length)];
+        var sorted = new RowSortDefinition(tbl, column, random.Next(2) == 0).SortedRows(rows);
+
+        prot.Write("SORTIERUNG", $"Spalte={column.KeyName} Zeilen={sorted.Count} Erste={sorted.FirstOrDefault()?.KeyName} Letzte={sorted.LastOrDefault()?.KeyName}");
     }
 
     /// <summary>
@@ -290,62 +295,6 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         prot.Write("SPALTE-META", $"Key={column.KeyName} Caption='{caption}' QuickInfo='{quickinfo}' ok");
     }
 
-    private void ActionSortierungPruefen() {
-        var rows = tbl.Row.ToArray();
-
-        if (rows.Length == 0) { prot.Write("SORTIERUNG", "Keine Zeile vorhanden"); return; }
-
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToArray();
-
-        if (columns.Length == 0) { prot.Write("SORTIERUNG", "Keine Spalte vorhanden"); return; }
-
-        var column = columns[random.Next(columns.Length)];
-        var sorted = new RowSortDefinition(tbl, column, random.Next(2) == 0).SortedRows(rows);
-
-        prot.Write("SORTIERUNG", $"Spalte={column.KeyName} Zeilen={sorted.Count} Erste={sorted.FirstOrDefault()?.KeyName} Letzte={sorted.LastOrDefault()?.KeyName}");
-    }
-
-    private void ActionZelleAendern() {
-        var rows = tbl.Row.ToArray();
-        if (rows.Length == 0) { prot.Write("ZELLE", "Keine Zeile vorhanden"); return; }
-
-        // Systemspalten (SYS_) pflegt das System selbst und ist nie beschreibbar — für den Stresstest ausgenommen.
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)).ToArray();
-        if (columns.Length == 0) { prot.Write("ZELLE", "Keine bearbeitbare Spalte vorhanden"); return; }
-
-        var row = rows[random.Next(rows.Length)];
-        var column = columns[random.Next(columns.Length)];
-        var value = RandomValue();
-        var failed = row.CellSet(column, value, $"StressTest {user} Zelle ändern");
-
-        prot.Write("ZELLE", failed is { Length: > 0 }
-            ? $"Key={row.KeyName} Spalte={column.KeyName} FEHLER: {failed}"
-            : $"Key={row.KeyName} Spalte={column.KeyName} Wert={value} ok");
-    }
-
-    /// <summary>
-    /// Setzt einen kritischen Wert (Umbruch, Pipe, Unicode, leer, sehr lang) in eine Zufallszelle.
-    /// </summary>
-    private void ActionZelleSonderzeichen() {
-        var rows = tbl.Row.ToArray();
-
-        if (rows.Length == 0) { prot.Write("ZELLE-SPEZIAL", "Keine Zeile vorhanden"); return; }
-
-        // Systemspalten (SYS_) pflegt das System selbst und ist nie beschreibbar — für den Stresstest ausgenommen.
-        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)).ToArray();
-
-        if (columns.Length == 0) { prot.Write("ZELLE-SPEZIAL", "Keine bearbeitbare Spalte vorhanden"); return; }
-
-        var row = rows[random.Next(rows.Length)];
-        var column = columns[random.Next(columns.Length)];
-        var value = SonderWerte[random.Next(SonderWerte.Length)];
-        var failed = row.CellSet(column, value, $"StressTest {user} Sonderzeichen");
-
-        prot.Write("ZELLE-SPEZIAL", failed is { Length: > 0 }
-            ? $"Key={row.KeyName} Spalte={column.KeyName} FEHLER: {failed}"
-            : $"Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(value)} ok");
-    }
-
     /// <summary>
     /// Legt eine Zeile mit den Werten einer Zufallszeile an; Unique-Spalten erhalten neue Zufallswerte.
     /// </summary>
@@ -392,6 +341,47 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         var opr = RowCollection.Remove(row, $"StressTest {user} Zeile löschen");
 
         prot.Write("LÖSCHEN", opr.IsFailed ? $"Key={row.KeyName} FEHLER: {opr.FailedReason}" : $"Key={row.KeyName} ok");
+    }
+
+    private void ActionZelleAendern() {
+        var rows = tbl.Row.ToArray();
+        if (rows.Length == 0) { prot.Write("ZELLE", "Keine Zeile vorhanden"); return; }
+
+        // Systemspalten (SYS_) pflegt das System selbst und ist nie beschreibbar — für den Stresstest ausgenommen.
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)).ToArray();
+        if (columns.Length == 0) { prot.Write("ZELLE", "Keine bearbeitbare Spalte vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var column = columns[random.Next(columns.Length)];
+        var value = RandomValue();
+        var failed = row.CellSet(column, value, $"StressTest {user} Zelle ändern");
+
+        prot.Write("ZELLE", failed is { Length: > 0 }
+            ? $"Key={row.KeyName} Spalte={column.KeyName} FEHLER: {failed}"
+            : $"Key={row.KeyName} Spalte={column.KeyName} Wert={value} ok");
+    }
+
+    /// <summary>
+    /// Setzt einen kritischen Wert (Umbruch, Pipe, Unicode, leer, sehr lang) in eine Zufallszelle.
+    /// </summary>
+    private void ActionZelleSonderzeichen() {
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("ZELLE-SPEZIAL", "Keine Zeile vorhanden"); return; }
+
+        // Systemspalten (SYS_) pflegt das System selbst und ist nie beschreibbar — für den Stresstest ausgenommen.
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+        if (columns.Length == 0) { prot.Write("ZELLE-SPEZIAL", "Keine bearbeitbare Spalte vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var column = columns[random.Next(columns.Length)];
+        var value = SonderWerte[random.Next(SonderWerte.Length)];
+        var failed = row.CellSet(column, value, $"StressTest {user} Sonderzeichen");
+
+        prot.Write("ZELLE-SPEZIAL", failed is { Length: > 0 }
+            ? $"Key={row.KeyName} Spalte={column.KeyName} FEHLER: {failed}"
+            : $"Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(value)} ok");
     }
 
     private void DoRandomAction() {
@@ -441,6 +431,69 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         return 0;
     }
 
+    private void FlushChanges(string reason) {
+        try {
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+            var opr = SaveTable();
+            prot.Write("SPEICHERN", $"{reason}: {(opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok")}");
+        } catch (Exception ex) {
+            prot.Write("FEHLER", $"SPEICHERN Typ={ex.GetType().Name} Meldung={ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Kürzt einen Wert fürs Protokoll und ersetzt das Trennzeichen der Protokollzeile.
+    /// </summary>
+    private static string Logtext(string text) => (text.Length > 80 ? text[..60] + "..." : text).Replace('|', '/');
+
+    /// <summary>
+    /// True, wenn die Master-Zeit (erste 2 Minuten) abgelaufen ist: Master setzen und Komplettierung laufen dann als Idle.
+    /// </summary>
+    private bool MasterIdle() => DateTime.UtcNow.Subtract(startUtc) >= masterTime;
+
+    private string RandomValue() => $"{user}-{DateTime.Now:HHmmss.fff}-{random.Next(1000, 9999)}";
+
+    /// <summary>
+    /// Startet den 2-Sekunden-Timer und läuft 10 Minuten; Rückgabe ist der Exit-Code.
+    /// </summary>
+    public int Run() {
+        startUtc = DateTime.UtcNow;
+        prot.Write("START", $"Laufzeit={runTime.TotalMinutes:0}min Masterzeit={masterTime.TotalMinutes:0}min Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count} Master={tbl.TemporaryTableMasterUser}");
+
+        timer = new System.Threading.Timer(TimerTick, null, 2000, 2000);
+
+        while (DateTime.UtcNow.Subtract(startUtc) < runTime) {
+            if (!tickSignal.WaitOne(1000)) { continue; }
+            DoRandomAction();
+        }
+
+        StopTimer();
+        return Finish();
+    }
+
+    private OperationResult SaveTable() {
+        if (tbl is TableFileNew tfn) { return tfn.Save(); }
+        if (tbl is TableFile tf) { return tf.Save(); }
+        return OperationResult.Success;
+    }
+
+    private void StopTimer() {
+        if (timer is not { } t) { return; }
+        _ = t.Change(Timeout.Infinite, Timeout.Infinite);
+        t.Dispose();
+        timer = null;
+    }
+
+    /// <summary>
+    /// Nicht veränderte Stress-Spalten (STRESS_-Präfix) der Tabelle.
+    /// </summary>
+    private IEnumerable<ColumnItem> StressSpalten() => tbl.Column.Where(c => c is { IsDisposed: false } && c.KeyName.StartsWith("STRESS_", StringComparison.OrdinalIgnoreCase));
+
+    private void TimerTick(object? state) {
+        _ = state;
+        tickSignal.Set();
+    }
+
     /// <summary>
     /// Protokolliert die Fragment-Dateien je System-Chunk-Ordner sowie die leeren
     /// Zeilen-Ordner der Tabelle. Beim Fragment-Layout (Dateien im Wurzelverzeichnis
@@ -480,51 +533,6 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         systemOrdner.Sort(StringComparer.Ordinal);
         var detail = zeilenOrdnerGesamt > 0 ? $" Zeilenordner={zeilenOrdnerGesamt} Leer={zeilenOrdnerLeer}" : string.Empty;
         prot.Write("FRAGMENTE", detail + " " + string.Join(" ", systemOrdner));
-    }
-
-    /// <summary>
-    /// True, wenn die Master-Zeit (erste 2 Minuten) abgelaufen ist: Master setzen und Komplettierung laufen dann als Idle.
-    /// </summary>
-    private bool MasterIdle() => DateTime.UtcNow.Subtract(startUtc) >= masterTime;
-
-    private void FlushChanges(string reason) {
-        try {
-            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-            var opr = SaveTable();
-            prot.Write("SPEICHERN", $"{reason}: {(opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok")}");
-        } catch (Exception ex) {
-            prot.Write("FEHLER", $"SPEICHERN Typ={ex.GetType().Name} Meldung={ex.Message}");
-        }
-    }
-
-    private string RandomValue() => $"{user}-{DateTime.Now:HHmmss.fff}-{random.Next(1000, 9999)}";
-
-    /// <summary>
-    /// Nicht veränderte Stress-Spalten (STRESS_-Präfix) der Tabelle.
-    /// </summary>
-    private IEnumerable<ColumnItem> StressSpalten() => tbl.Column.Where(c => c is { IsDisposed: false } && c.KeyName.StartsWith("STRESS_", StringComparison.OrdinalIgnoreCase));
-
-    /// <summary>
-    /// Kürzt einen Wert fürs Protokoll und ersetzt das Trennzeichen der Protokollzeile.
-    /// </summary>
-    private static string Logtext(string text) => (text.Length > 80 ? text[..60] + "..." : text).Replace('|', '/');
-
-    private OperationResult SaveTable() {
-        if (tbl is TableFileNew tfn) { return tfn.Save(); }
-        if (tbl is TableFile tf) { return tf.Save(); }
-        return OperationResult.Success;
-    }
-
-    private void StopTimer() {
-        if (timer is not { } t) { return; }
-        _ = t.Change(Timeout.Infinite, Timeout.Infinite);
-        t.Dispose();
-        timer = null;
-    }
-
-    private void TimerTick(object? state) {
-        _ = state;
-        tickSignal.Set();
     }
 
     #endregion
