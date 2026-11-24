@@ -153,8 +153,9 @@ public class ComicCompPadItem : PadItem {
         return base.GetSubItemByKey(containerName, key);
     }
 
-    // TODO: Unused
-    public Bitmap GetTransformedBitmap() { //USED: BZL
+
+    public Bitmap GetTransformedBitmap() {
+        //USED: BZL
         var r = CanvasUsedArea;
         var bmp = new Bitmap((int)r.Width, (int)r.Height);
         using var gr = Graphics.FromImage(bmp);
@@ -239,13 +240,6 @@ public class ComicCompPadItem : PadItem {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
 
     public void Verbindungspunkt_hinzu() => AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
-
-    // TODO: Unused
-    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
-        if (!JointPoints.Contains(myPoint)) { return; }
-        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
-    }
-
     protected override RectangleF CalculateCanvasUsedArea() {
         //var wp12 = AngleOfMiddleLine();
         var angleOfMiddleLine = GetAngle(P1, JointMiddle);

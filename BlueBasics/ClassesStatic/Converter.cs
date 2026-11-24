@@ -111,43 +111,6 @@ public static class Converter {
         return DateTime.TryParseExact(s, "o", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out result);
     }
 
-    // TODO: Unused
-    /// <summary>
-    /// Parst einen ISO-UTC-Zeitstempel ("2026-09-26T21:03:33.3898329Z", wie er von der
-    /// JSON-Serialisierung erzeugt wird) oder ein Datum/Uhrzeit aus DateTimeFormats und
-    /// interpretiert zonlose Angaben konsequent als UTC. Liefert false, wenn beides scheitert —
-    /// kein stiller Fallback auf die aktuelle Zeit.
-    /// </summary>
-    public static bool DateTimeUtcTryParse(string s, out DateTime result) {
-        result = default;
-        if (string.IsNullOrEmpty(s)) { return false; }
-
-        s = s.Trim();
-
-        // Exakter ISO-Roundtrip (7 Nachkommastellen). Bewusst als EINZIGES Format probiert:
-        // Zusammen mit weiteren Formaten im selben TryParseExact-Aufruf matcht "o" nicht mehr.
-        if (DateTime.TryParseExact(s, "o", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out result)) { return true; }
-
-        // Kürzere Nachkommastellen-Varianten; 'Z' als escaped Literal, damit die Ticks
-        // unverändert bleiben (unescaped Z würde als Zone interpretiert und nach Local verschoben).
-        // Jedes Format einzeln probieren — das ist deterministisch und auf alle Fälle bewusst geprüft.
-        foreach (var format in new[] {
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffffff'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffff'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffff'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ff'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'f'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'",
-                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss"
-                 }) {
-            if (DateTime.TryParseExact(s, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-        }
-
-        // Klassische Formate ohne Zonen-Suffix als UTC deuten (analog den UTC-Formaten der binären Fragmente).
-        return DateTime.TryParseExact(s, DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out result);
-    }
-
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>

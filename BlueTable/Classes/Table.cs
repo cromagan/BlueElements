@@ -804,7 +804,6 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         return TableFile.Create(targetPath, source);
     }
 
-    // TODO: Unused
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
         lock (AllFilesLocker) {

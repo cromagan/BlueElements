@@ -277,27 +277,6 @@ public static class IO {
                                             _ => FileFormat.Unknown
                                         };
 
-    // TODO: Unused
-    /// <summary>
-    /// Gibt von einem Pfad den letzten Ordner zurück
-    /// </summary>
-    /// <param name="pathx"></param>
-    /// <returns></returns>
-    public static string Folder(this string pathx) {
-        if (string.IsNullOrEmpty(pathx)) { return string.Empty; }
-        // Kann vorkommen, wenn ein Benutzer einen Pfad
-        // per Hand eingeben darf
-        pathx = pathx.Replace('/', '\\').TrimEnd('\\');
-        if (!pathx.Contains('\\')) { return string.Empty; }
-        var z = pathx.Length;
-        if (z < 2) { return string.Empty; }
-        while (true) {
-            z--;
-            if (pathx[z] == '\\') { return pathx[(z + 1)..]; }
-            if (z < 1) { return string.Empty; }
-        }
-    }
-
     public static string[] GetDirectories(string directory) => ProcessFile(TryGetDirectories, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
 
     public static string[] GetDirectories(string directory, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];

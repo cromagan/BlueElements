@@ -194,7 +194,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
         return DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
     }
 
-    // TODO: Unused
     /// <summary>
     ///
     /// </summary>
@@ -202,7 +201,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
     /// <returns>0 bei Fehlern</returns>
     public double CellGetDouble(string columnKey) => CellGetDouble(Table?.Column[columnKey]);
 
-    // TODO: Unused
     /// <summary>
     ///
     /// </summary>
@@ -210,7 +208,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
     /// <returns>0 bei Fehlern</returns>
     public double CellGetDouble(ColumnItem? column) => DoubleParse(CellGetString(column));
 
-    // TODO: Unused
     /// <summary>
     ///
     /// </summary>
@@ -218,7 +215,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
     /// <returns>0 bei Fehlern</returns>
     public int CellGetInteger(string columnKey) => CellGetInteger(Table?.Column[columnKey]);
 
-    // TODO: Unused
     /// <summary>
     ///
     /// </summary>

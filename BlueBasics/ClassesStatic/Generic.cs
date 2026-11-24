@@ -126,23 +126,7 @@ public static class Generic {
     }
 
 
-    public static Image? DownloadImage(string url) {
-        try {
-            var request = WebRequest.Create(url);
-            using var response = request.GetResponse();
-            using var remoteStream = response.GetResponseStream();
-            if (remoteStream is null) { return null; }
-            var ms = new MemoryStream();
-            remoteStream.CopyTo(ms);
-            ms.Position = 0;
-            return Image.FromStream(ms);
-        } catch {
-            return null;
-        }
-    }
-
-    // TODO: Unused
-    /// <summary>
+     /// <summary>
     /// Wandelt string[] in ein Dictionary um.
     /// Unterstützt: --Key Value, -Key Value, /Key Value
     /// </summary>
