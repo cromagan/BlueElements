@@ -44,7 +44,15 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
 
     #region Constructors
 
+    /// <summary>
+    /// Erstellt die Zeilen-Sammlung einer Tabelle; Zeilen-Keys sind groß-/kleinschreibungssensitiv.
+    /// </summary>
     public RowCollection(Table table) => Table = table;
+
+    /// <summary>
+    /// Zeilen-Keys werden groß-/kleinschreibungssensitiv abgelegt und gesucht.
+    /// </summary>
+    protected override bool CaseSensitive => true;
 
     #endregion
 

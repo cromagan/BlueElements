@@ -1,6 +1,7 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
 using System.Drawing.Imaging;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -178,8 +179,7 @@ public class AiScriptVariable : ScriptVariable {
             }
 
             if (root?["data"]?[0]?["url"] is { } url) {
-                var img = DownloadImage(url.ToString());
-                return img is null ? null : new System.Drawing.Bitmap(img);
+                return await DownloadImage(url.ToString()).ConfigureAwait(false);
             }
 
             return null;
@@ -237,6 +237,31 @@ public class AiScriptVariable : ScriptVariable {
             return content;
         } catch (Exception ex) {
             Develop.DebugPrint("KI-HTTP-Aufruf fehlgeschlagen.", ex);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Lädt ein Bild von einer URL herunter und gibt es als vom Stream
+    /// entkoppelte Bitmap zurück. Gibt bei Fehlern null zurück.
+    /// </summary>
+    private static async Task<System.Drawing.Bitmap?> DownloadImage(string url) {
+        try {
+            using var resp = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            if (!resp.IsSuccessStatusCode) {
+                Develop.DebugPrint($"Bild-Download fehlgeschlagen ({(int)resp.StatusCode} {resp.ReasonPhrase}): {url}");
+                return null;
+            }
+
+            using var source = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using var buffer = new MemoryStream();
+            await source.CopyToAsync(buffer).ConfigureAwait(false);
+            buffer.Position = 0;
+
+            using var temp = new System.Drawing.Bitmap(buffer);
+            return new System.Drawing.Bitmap(temp);
+        } catch (Exception ex) {
+            Develop.DebugPrint("Bild-Download fehlgeschlagen.", ex);
             return null;
         }
     }

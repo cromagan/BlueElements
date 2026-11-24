@@ -145,6 +145,13 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     private const int JournalToleranceSeconds = 60;
 
     /// <summary>
+    /// Wert in Minuten. Ein fremder Meister-Anspruch im Journal gilt als aktiv,
+    /// solange er jünger ist; danach darf eine andere Instanz übernehmen —
+    /// Ablauf unterhalb der DoComplete-Kadenz.
+    /// </summary>
+    private const int MasterClaimMinutes = 55;
+
+    /// <summary>
     /// Mindestgröße des Kopf-Snapshot-Inhalts; schützt vor korrupten Re-Saves.
     /// Beim initialen Speichern ist der Inhalt legitim klein.
     /// </summary>
@@ -233,6 +240,38 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Letzter Lade-Stand der Kopf-Daten.
     /// </summary>
     private DateTime _isInCache = new(0);
+
+    /// <summary>
+    /// UTC-Zeitpunkt des Kopf-Snapshots, auf dem der eigene Speicherstand basiert.
+    /// Wurde seitdem ein fremder Snapshot geschrieben, fehlen dem Speicher dessen
+    /// absorbierte Journal-Einträge — eine eigene Komplettierung wäre ein Zurückrollen.
+    /// </summary>
+    private DateTime _loadedSnapshotUtcDate = new(0);
+
+    /// <summary>
+    /// Zuletzt gesehener Meister-Anspruchs-Benutzer aus den Journalen.
+    /// </summary>
+    private string _foreignMasterUser = string.Empty;
+
+    /// <summary>
+    /// Zuletzt gesehener Meister-Anspruchs-Rechner aus den Journalen.
+    /// </summary>
+    private string _foreignMasterMachine = string.Empty;
+
+    /// <summary>
+    /// Zuletzt gesehene Meister-Anspruchs-Instanz-Kennung aus den Journalen.
+    /// </summary>
+    private string _foreignMasterId = string.Empty;
+
+    /// <summary>
+    /// UTC-Zeitpunkt des zuletzt gesehenen Meister-Anspruchs; MinValue, wenn keiner gesehen wurde.
+    /// </summary>
+    private DateTime _foreignMasterSinceUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// Sperrt die Meister-Anspruchs-Felder gegen gleichzeitige Buchung (Lesen der Journale) und Abfrage.
+    /// </summary>
+    private readonly object _masterClaimLock = new();
 
     /// <summary>
     /// Der offene Schreib-Stream der eigenen Journal-Datei; null, wenn keiner offen ist.
@@ -632,6 +671,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         RefreshDataSystems = null;
         Disposed = null;
 
+        // Meister-Anspruch freigeben, BEVOR der Journal-Writer geschlossen wird:
+        // Die Freigabe-Sätze landen in derselben, sauber mit EOF abgeschlossenen Datei.
+        UnMasterMe();
+
         CloseWriter();
     }
 
@@ -726,17 +769,19 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     public virtual bool AllowLoad(string filename) => FilesInLoad.TryAdd(filename.ToUpperInvariant(), default);
 
     /// <summary>
-    /// True, wenn diese Instanz temporärer Master werden darf. Basis: Datenstand
-    /// frisch und nicht eingefroren.
+    /// True, wenn diese Instanz temporärer Master werden darf: Datenstand frisch,
+    /// nicht eingefroren und kein fremder Meister-Anspruch aktiv.
     /// </summary>
-    public virtual bool AmITemporaryMaster(bool updateAllowed) => DataFreshEnough && !IsFreezed;
+    public virtual bool AmITemporaryMaster(bool updateAllowed) => DataFreshEnough && !IsFreezed && ForeignMasterAllowsUs();
 
     /// <summary>
-    /// Setzt den Master-Stempel dieser Instanz.
+    /// Setzt den Master-Stempel dieser Instanz und trägt den Anspruch als
+    /// Steuer-Sätze ins Journal, damit andere Prozesse ihn erkennen.
     /// </summary>
     public virtual void MasterMe() {
         IsMaster = true;
         MasterSinceUtc = DateTime.UtcNow;
+        WriteMasterClaim();
     }
 
     /// <summary>
@@ -745,6 +790,67 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// </summary>
     public virtual void TryToSetMeTemporaryMaster() {
         if (!IsMaster && AmITemporaryMaster(false)) { MasterMe(); }
+    }
+
+    /// <summary>
+    /// Gibt den eigenen Meister-Anspruch prozessübergreifend auf: Steuer-Sätze mit
+    /// „Unset“-Kennung und zurückdatiertem Zeitpunkt werden ins Journal geschrieben.
+    /// </summary>
+    public void UnMasterMe() {
+        if (!IsMaster) { return; }
+        IsMaster = false;
+
+        if (Develop.AllReadOnly) { return; }
+        if (_writer is null) { StartWriter(); }
+        if (_writer is null) { return; }
+
+        try {
+            lock (_writer) {
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterUser, "Unset: " + UserName);
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterTimeUtc, DateTime.UtcNow.AddMinutes(-2 * MasterClaimMinutes));
+                _writer.Flush();
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Warning, "Meister-Freigabe nicht geschrieben: " + KeyName, ex);
+        }
+    }
+
+    /// <summary>
+    /// Trägt den eigenen Meister-Anspruch als Steuer-Sätze ins Journal; andere
+    /// Instanzen erkennen ihn beim Nachladen der Journale. Ein Schreibfehler ist
+    /// unkritisch: Der Anspruch bleibt dann nur prozessintern.
+    /// </summary>
+    private void WriteMasterClaim() {
+        if (Develop.AllReadOnly) { return; }
+        if (_writer is null) { StartWriter(); }
+        if (_writer is null) { return; }
+
+        try {
+            lock (_writer) {
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterUser, UserName);
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterTimeUtc, DateTime.UtcNow);
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterApp, Develop.AppExe());
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterMachine, Environment.MachineName);
+                _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterId, MyId);
+                _writer.Flush();
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Warning, "Meister-Anspruch nicht geschrieben: " + KeyName, ex);
+        }
+    }
+
+    /// <summary>
+    /// True, wenn kein fremder Meister-Anspruch aktiv ist: Ein Anspruch zählt nur
+    /// für andere Benutzer/Rechner/Instanzen und nur bis zum Ablauf von
+    /// MasterClaimMinutes; eine „Unset“-Freigabe hebt ihn sofort auf.
+    /// </summary>
+    private bool ForeignMasterAllowsUs() {
+        lock (_masterClaimLock) {
+            if (_foreignMasterSinceUtc == DateTime.MinValue) { return true; }
+            if (_foreignMasterUser.StartsWith("Unset", StringComparison.Ordinal)) { return true; }
+            if (_foreignMasterUser == UserName && _foreignMasterMachine == Environment.MachineName && _foreignMasterId == MyId) { return true; }
+            return DateTime.UtcNow.Subtract(_foreignMasterSinceUtc).TotalMinutes > MasterClaimMinutes;
+        }
     }
 
     /// <summary>
@@ -843,6 +949,13 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     public void Reorganize() {
         if (IsDisposed || Develop.AllReadOnly) { return; }
 
+        // Fremde Snapshots nach dem eigenen Lade-Stand: Der Speicher kann deren
+        // absorbierte Journal-Einträge fehlen — erst neu laden, dann neu verteilen.
+        if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
+            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, "Reorganize abgebrochen: Der Kopf-Stand von '" + KeyName + "' wurde seit dem eigenen Laden fremd komplementiert. Tabelle neu laden.", 0);
+            return;
+        }
+
         var chunkFolder = BaseChunkFolder();
 
         if (IO.DirectoryExists(chunkFolder) && !EnsureDataLoaded(true, -1, string.Empty)) {
@@ -886,6 +999,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
             return;
         }
+
+        // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
+        _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
 
         CloseWriter();
         StartWriter();
@@ -1132,6 +1248,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             var f = WriteSnapshotFile(content);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
+            // Der Erstanlage-Snapshot ist der Basis-Stand des Speichers.
+            _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
             InitialSavePending = false;
             SaveRequired = false;
             MainLoadDone = true; // der Snapshot entspricht jetzt dem Speicherstand
@@ -1209,7 +1327,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
 
         // Zeitstempel VOR dem Lesen der Fragmente erfassen.
-        // Wird als endTimeUtc an InjectData übergeben und dort als _isInCache gesetzt.
+        // Wird als readStartedUtc an InjectData übergeben und dort als _isInCache
+        // gesetzt sowie für die Toleranz-Prüfung der Komplettierung genutzt.
         // Konservativ: Fragmente, die während des Lesens hinzukommen, werden beim
         // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
         var readStartedUtc = DateTime.UtcNow;
@@ -1220,7 +1339,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         var undoRecords = GetLastChanges(fragmentFiles);
         if (undoRecords.IsFailed) { return false; }
 
-        var opr = InjectData(fragmentFiles, undoRecords, DateTime.UtcNow, readStartedUtc, firstTime);
+        var opr = InjectData(fragmentFiles, undoRecords, readStartedUtc, firstTime);
         return opr.IsSuccessful;
     }
 
@@ -1349,7 +1468,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// inkl. Komplettierung und Bereinigung alter Dateien.
     /// </summary>
     /// <param name="fragmentFiles">Die im selben Lesezyklus ermittelten Fragment-Dateien.</param>
-    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
+    /// <param name="startTimeUtc">UTC-Zeitpunkt des Lese-Starts des Nachlade-Durchlaufs</param>
     private void DoWorkAfterLastChanges(List<string> fragmentFiles, DateTime startTimeUtc) {
         if (Ending) { return; }
         if (!string.IsNullOrEmpty(EditableError(false))) { return; }
@@ -1364,6 +1483,15 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         CleanupOldSnapshots(startTimeUtc);
 
         if (fragmentFiles is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster(true)) {
+            // Fremde Snapshots nach dem eigenen Lade-Stand: Deren absorbierte Journal-
+            // Einträge wurden hier per Toleranz übersprungen und fehlen im Speicher.
+            // Ein Komplett-Schreiben würde sie aus dem Kopf-Stand zurückrollen.
+            if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
+                Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
+                UnMasterMe();
+                return;
+            }
+
             var opr = PrepareNewSnapshot();
 
             if (opr.IsFailed) {
@@ -1386,6 +1514,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                     StartWriter();
 
                     MasterMe();
+
+                    // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
+                    _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
 
                     MasterNeeded = false;
                     OnInvalidateView();
@@ -1502,6 +1633,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                     if (first.IsFileTag && first.TagType == FragmentTagType.SerializerVersion
                         && !string.Equals(first.StringContent, FragmentRecord.SerializerVersionCurrent, StringComparison.Ordinal)) { return; }
 
+                    TrackForeignMasterClaim(first);
+
                     pos = afterFirst;
                     continue;
                 }
@@ -1560,6 +1693,32 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
+    /// Bucht Meister-Anspruchs-Sätze (MasterUser/MasterTimeUtc/MasterMachine/MasterId)
+    /// aus den Journalen; der jeweils neuere Anspruch gewinnt.
+    /// </summary>
+    private void TrackForeignMasterClaim(FragmentRecord record) {
+        lock (_masterClaimLock) {
+            switch (record.TagType) {
+                case FragmentTagType.MasterUser:
+                    _foreignMasterUser = record.StringContent;
+                    break;
+
+                case FragmentTagType.MasterMachine:
+                    _foreignMasterMachine = record.StringContent;
+                    break;
+
+                case FragmentTagType.MasterId:
+                    _foreignMasterId = record.StringContent;
+                    break;
+
+                case FragmentTagType.MasterTimeUtc:
+                    if (record.DateTimeContent > _foreignMasterSinceUtc) { _foreignMasterSinceUtc = record.DateTimeContent; }
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
     /// Injiziert die geladenen Journal-Einträge in die aktuelle Struktur: Die
     /// Undo-Sätze werden nach Eintrags-Zeitstempel sortiert; jeder Eintrag (gleiche
     /// Entry-Referenz) wird einmalig über den Inhalts-Seam angewendet und seine
@@ -1567,10 +1726,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// </summary>
     /// <param name="fragmentFiles">Die im selben Lesezyklus ermittelten Fragment-Dateien.</param>
     /// <param name="undoRecords">Die Undo-Sätze aus GetLastChanges.</param>
-    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
-    /// <param name="endTimeUtc"></param>
+    /// <param name="readStartedUtc">UTC-Zeitpunkt vor dem Lesen der Journale; Grundlage der Toleranz-Prüfung bei der Komplettierung</param>
     /// <param name="initialload"></param>
-    private OperationResult InjectData(List<string> fragmentFiles, OperationResult undoRecords, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
+    private OperationResult InjectData(List<string> fragmentFiles, OperationResult undoRecords, DateTime readStartedUtc, bool initialload) {
         if (undoRecords.Value is not List<FragmentRecord> data) { return OperationResult.Success; }
 
         // Bei initialload die MainLoadDone-Sperre umgehen - das Objekt
@@ -1657,14 +1815,19 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                     }
                 }
 
-                _isInCache = endTimeUtc;
+                _isInCache = readStartedUtc;
             } finally {
                 ResumeDataReload();
                 Interlocked.Decrement(ref _doingChanges);
 
                 if (!IsDisposed) {
                     OnRefreshDataSystems();
-                    DoWorkAfterLastChanges(fragmentFiles, startTimeUtc);
+                    // Lese-Start statt Zeitpunkt nach dem Lesen: Der Toleranz-Guard
+                    // in DoWorkAfterLastChanges muss das gesamte Nachladen messen,
+                    // sonst würden Fremd-Einträge, die während der Lese-Phase
+                    // geschrieben wurden, nach der Komplettierung dauerhaft
+                    // übersprungen.
+                    DoWorkAfterLastChanges(fragmentFiles, readStartedUtc);
                     TryToSetMeTemporaryMaster();
                     OnInvalidateView();
                     // Loaded zuletzt: Die Nacharbeiten (RepairAfterParse) des
@@ -1707,14 +1870,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
             if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
+            // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
+            // Aufräumarbeit ausliest; Namenskollisionen löst CreateNew über den
+            // nächsten Versuch mit neuem Sekunden-Stempel.
             _myJournalFile = BaseChunkFolder().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
-
-            // Ein Zähler-Anhang (_000xx) macht den Namen unbrauchbar: Die Aufräumarbeit
-            // liest den Zeitstempel aus den letzten 19 Zeichen des Namens.
-            if (_myJournalFile.FileNameWithSuffix().Contains("_000")) {
-                Freeze("Journaldatei konnte nicht eindeutig benannt werden: " + _myJournalFile.FileNameWithSuffix());
-                return;
-            }
 
             if (Develop.AllReadOnly) { return; }
 
@@ -2847,6 +3006,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
             _mySnapshotFile = candidate;
             LastSaveMainFileUtcDate = ExtractDateFromFileName(candidate) ?? DateTime.UtcNow;
+
+            // Merker, welche Kopf-Version der eigene Speicherstand abbildet.
+            _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
             InitialSavePending = false; // vollständiger Stand aus dem Snapshot geladen
             return true;
         }

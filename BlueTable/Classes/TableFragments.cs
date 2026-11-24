@@ -69,6 +69,13 @@ public class TableFragments : TableFile {
     private DateTime _isInCache = new(0);
 
     /// <summary>
+    /// UTC-Zeitpunkt der Hauptdatei, auf der der eigene Speicherstand basiert.
+    /// Ist die Datei seitdem fremd komplementiert, fehlen dem Speicher deren
+    /// absorbierte Items — eine eigene Komplettierung wäre ein Zurückrollen.
+    /// </summary>
+    private DateTime _loadedMainFileUtcDate = new(0);
+
+    /// <summary>
     /// Serialisiert Nachladen, Writer-Lebenszyklus und Freigabe gegeneinander, damit
     /// der periodische Update-Timer und Benutzeraktionen dieselbe Instanz nicht
     /// gleichzeitig umstrukturieren.
@@ -173,7 +180,7 @@ public class TableFragments : TableFile {
             var (changes, files, failed) = GetLastChanges();
             if (failed) { return false; }
 
-            var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
+            var opr = InjectData(files, changes, readStartedUtc, firstTime);
             return opr.IsSuccessful;
         }
     }
@@ -306,14 +313,26 @@ public class TableFragments : TableFile {
             if (IO.CreateDirectory(FragmengtsPath()).IsFailed) { return false; }
         }
 
-        return base.LoadMainData();
+        if (!base.LoadMainData()) { return false; }
+
+        // Merker, welche Hauptdatei-Version der eigene Speicherstand abbildet.
+        _loadedMainFileUtcDate = LastSaveMainFileUtcDate;
+        return true;
     }
 
     /// <summary>
     /// Interner Speicheraufruf (Flush des Writers).
     /// </summary>
     protected override string SaveInternal() {
-        if (InitialSavePending) { return base.SaveInternal(); }
+        if (InitialSavePending) {
+            var f = base.SaveInternal();
+
+            if (f is { Length: > 0 }) { return f; }
+
+            // Das initale Voll-Schreiben macht den Speicherstand zur Datei-Wahrheit.
+            _loadedMainFileUtcDate = LastSaveMainFileUtcDate;
+            return string.Empty;
+        }
 
         if (_writer is null) { return "Writer Fehler"; }
 
@@ -406,6 +425,15 @@ public class TableFragments : TableFile {
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
+            // Fremde Komplettierungen nach dem eigenen Lade-Stand: Deren absorbierte
+            // Items wurden hier per Toleranz übersprungen und fehlen im Speicher.
+            // Ein Komplett-Schreiben würde sie aus der Hauptdatei zurückrollen.
+            if (LastSaveMainFileUtcDate.Subtract(_loadedMainFileUtcDate).TotalSeconds > FragmentToleranceSeconds) {
+                Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Hauptdatei seit dem eigenen Lade-Stand ({_loadedMainFileUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}).");
+                UnMasterMe();
+                return;
+            }
+
             var opr = PrepareFullFile(this);
 
             if (opr.IsFailed) {
@@ -432,6 +460,9 @@ public class TableFragments : TableFile {
                 Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
                 return;
             }
+
+            // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
+            _loadedMainFileUtcDate = LastSaveMainFileUtcDate;
 
             CloseWriter();
             StartWriter();
@@ -535,10 +566,9 @@ public class TableFragments : TableFile {
     /// </summary>
     /// <param name="checkedDataFiles"></param>
     /// <param name="data"></param>
-    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
-    /// <param name="endTimeUtc"></param>
+    /// <param name="readStartedUtc">UTC-Zeitpunkt vor dem Lesen der Fragmente; Grundlage der Toleranz-Prüfung bei der Komplettierung</param>
     /// <param name="initialload"></param>
-    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
+    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime readStartedUtc, bool initialload) {
         if (data is null) { return OperationResult.Success; }
 
         // Bei initialload die MainChunkLoadDone-Sperre umgehen - die Tabelle
@@ -605,14 +635,19 @@ public class TableFragments : TableFile {
                         }
                     }
                 }
-                _isInCache = endTimeUtc;
+                _isInCache = readStartedUtc;
             } finally {
                 ResumeDataReload();
                 Interlocked.Decrement(ref _doingChanges);
 
                 if (!IsDisposed) {
                     Column.GetSystems();
-                    DoWorkAfterLastChanges(myfiles, startTimeUtc);
+                    // Lese-Start statt Zeitpunkt nach dem Lesen: Der Toleranz-Guard
+                    // in DoWorkAfterLastChanges muss das gesamte Nachladen messen,
+                    // sonst würden Fremd-Items, die während der Lese-Phase
+                    // geschrieben wurden, nach der Komplettierung dauerhaft
+                    // übersprungen.
+                    DoWorkAfterLastChanges(myfiles, readStartedUtc);
                     RepairAfterParse();
                     TryToSetMeTemporaryMaster();
                     OnInvalidateView();
@@ -654,14 +689,10 @@ public class TableFragments : TableFile {
         // gesperrte Datei) werden mit neuem Sekunden-Stempel erneut versucht; ein
         // bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
         for (var versuch = 1; versuch <= 5; versuch++) {
+            // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
+            // Aufräumarbeit ausliest; Namenskollisionen löst CreateNew über den
+            // nächsten Versuch mit neuem Sekunden-Stempel.
             _myFragmentsFilename = FragmengtsPath().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
-
-            // Ein Zähler-Anhang (_000xx) macht den Namen unbrauchbar: Die Aufräumarbeit
-            // liest den Zeitstempel aus den letzten 19 Zeichen des Namens.
-            if (_myFragmentsFilename.FileNameWithSuffix().Contains("_000")) {
-                Freeze("Fragmentdatei konnte nicht eindeutig benannt werden: " + _myFragmentsFilename.FileNameWithSuffix());
-                return;
-            }
 
             if (Develop.AllReadOnly) { return; }
 
