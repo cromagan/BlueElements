@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 namespace BlueBasics.Classes;
 
 /// <summary>
-/// Schlüsselbasierte Item-Sammlung auf ConcurrentDictionary-Basis (Key = KeyName,
-/// Groß-/Kleinschreibung wird ignoriert). Stellt Speicher, Lese-/Schreib-API
+/// Schlüsselbasierte Item-Sammlung auf ConcurrentDictionary-Basis (Key = KeyName;
+/// Groß-/Kleinschreibung gemäß CaseSensitive). Stellt Speicher, Lese-/Schreib-API
 /// und das komplette Fragment-Gerüst bereit: Add/Remove/Clear
 /// melden die Änderung als Journal-Satz, SerializeCore/DeserializeThis implementieren
 /// IFragmentStoreable — der konkrete Typ wird beim Serialize über TypeName abgefragt.
@@ -42,14 +42,14 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     #region Constructors
 
     /// <summary>
-    /// Erstellt eine leere, änderbare Sammlung.
+    /// Erstellt eine leere, änderbare Sammlung; die Schlüssel-Strategie entspricht CaseSensitive.
     /// </summary>
-    protected KeyedItemCollection() { }
+    protected KeyedItemCollection() => Internal = new(CaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Übernimmt die Items (gleichnamige Doppel werden verworfen).
     /// </summary>
-    protected KeyedItemCollection(IEnumerable<TItem> items) {
+    protected KeyedItemCollection(IEnumerable<TItem> items) : this() {
         AddRange(items);
     }
 
@@ -87,9 +87,16 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     public bool IsEventsSuppressed => _eventsSuppressCount > 0;
 
     /// <summary>
-    /// Interne Ablage der Items unter ihrem KeyName.
+    /// True, wenn Schlüssel groß-/kleinschreibungssensitiv abgelegt und gesucht werden. Default: false.
+    /// Muss je Instanz konstant sein: Der Comparer der Ablage wird im Konstruktor daraus fixiert.
     /// </summary>
-    protected ConcurrentDictionary<string, TItem> Internal { get; } = new(StringComparer.OrdinalIgnoreCase);
+    protected virtual bool CaseSensitive => false;
+
+    /// <summary>
+    /// Schlüssel-Ablage der Items unter ihrem KeyName; Roh-Ablage für Ableitungen,
+    /// die ihre Aufnahme/Entfernung selbst journaled.
+    /// </summary>
+    protected ConcurrentDictionary<string, TItem> Internal { get; }
 
     #endregion
 
@@ -209,12 +216,12 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     }
 
     /// <summary>
-    /// Liefert eine flache Kopie der Items, sortiert nach KeyName (OrdinalIgnoreCase) —
+    /// Liefert eine flache Kopie der Items, sortiert nach KeyName gemäß CaseSensitive —
     /// die einzige stabile Reihenfolge, die die Sammlung anbieten kann.
     /// </summary>
     public virtual List<TItem> ToList() {
         var l = Items();
-        l.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.KeyName, b.KeyName));
+        l.Sort((a, b) => (CaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase).Compare(a.KeyName, b.KeyName));
         return l;
     }
 
@@ -310,7 +317,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
         if (IsDisposed) { return "Sammlung ist verworfen"; }
 
         var source = sourceItems.Where(s => !s.IsDisposed).ToList();
-        var sourceKeys = new HashSet<string>(source.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+        var sourceKeys = new HashSet<string>(source.Select(s => s.KeyName), Internal.Comparer);
         var obsolete = new List<TItem>();
 
         foreach (var keyName in Keys()) {
@@ -353,7 +360,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     public virtual void UpdateChild(IEnumerable<TItem> sourceItems) {
         if (IsDisposed) { return; }
 
-        var sourceKeys = new HashSet<string>(sourceItems.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+        var sourceKeys = new HashSet<string>(sourceItems.Select(s => s.KeyName), Internal.Comparer);
 
         foreach (var keyName in Keys()) {
             if (!sourceKeys.Contains(keyName)) { _ = Remove(keyName); }
@@ -399,14 +406,11 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
     /// <summary>
     /// Benennt das Item zum alten Schlüssel unter dem neuen Schlüssel um (via RenameKey);
-    /// beide Schlüssel werden vorab großgeschrieben. Liefert einen Fehlergrund oder
+    /// der Vergleich beider Schlüssel folgt KeyComparer. Liefert einen Fehlergrund oder
     /// string.Empty; identischer oder fehlender Quell-Schlüssel ist kein Fehler.
     /// </summary>
     public virtual string ChangeKey(string oldKey, string newKey) {
-        oldKey = oldKey.ToUpperInvariant();
-        newKey = newKey.ToUpperInvariant();
-
-        if (oldKey == newKey) { return string.Empty; }
+        if (Internal.Comparer.Equals(oldKey, newKey)) { return string.Empty; }
         if (IsDisposed) { return "Sammlung ist verworfen"; }
 
         if (GetByKey(oldKey) is null) { return string.Empty; }
@@ -642,7 +646,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         Develop.Diagnose("UpdateChunk", $"chunk={chunkId} anzahl={items.Count}");
 
-        var chunkKeys = new HashSet<string>(items.Select(s => s.KeyName), StringComparer.OrdinalIgnoreCase);
+        var chunkKeys = new HashSet<string>(items.Select(s => s.KeyName), Internal.Comparer);
 
         foreach (var item in items) {
             if (!ApplyItemAdd(item)) {
