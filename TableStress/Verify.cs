@@ -104,9 +104,8 @@ public static class Verify {
     }
 
     /// <summary>
-    /// Prüft die Änderungs-Historie gegen die Festplatte: Je Eintrag muss der
-    /// Ziel-Chunk die neueste Datei enthalten, bzw. er muss im Kopf-Snapshot
-    /// oder -Journal vorliegen (Kopf-Fragment).
+    /// Prüft die Änderungs-Historie gegen die Festplatte: Jeder Eintrag muss im
+    /// Kopf-Snapshot oder -Journal vorliegen; Chunks tragen keine Historie.
     /// </summary>
     private static void PruefeUndos(Table tbl, string phase) {
         if (tbl is not TableFileNew tfn) { return; }
@@ -116,20 +115,10 @@ public static class Verify {
         var datei = tfn.Filename;
         var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
 
-        // Zeilen mit Chunk-Wert → dedizierte Chunk-ID, ohne Chunk-Wert → der
-        // Haupt-Daten-Chunk "_" (die ChunkId-Extension normiert wie die
-        // Verteilung beim Speichern).
-        var rowChunk = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var row in tbl.Row) {
-            rowChunk[row.KeyName] = row.ChunkId();
-        }
-
         var entries = UndoEintraege(saveable.Undos);
         var disk = UndoFingerprintsVonDisk(basis);
 
         var ok = 0;
-        var falscherChunk = 0;
         var fehlt = 0;
         var gesamtSaetze = saveable.Undos.Count;
 
@@ -138,56 +127,20 @@ public static class Verify {
             if (meta is null) { continue; }
 
             var fp = Fingerprint(meta);
-            var ziel = UndoZiel(saveable, entry, rowChunk);
-
-            // Gelöschte Zeile: Der Eintrag darf noch im alten Chunk liegen —
-            // er zählt als ok, sobald er irgendwo vorliegt.
-            if (ziel is null) {
-                if (disk.Values.Any(set => set.Contains(fp))) {
-                    ok++;
-                } else {
-                    fehlt++;
-                    if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(gelöscht) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
-                }
-
-                continue;
-            }
 
             // Kopf-Fragment: Eintrag muss in Snapshot oder Journal vorliegen.
-            if (ziel is { Length: 0 }) {
-                if (disk.TryGetValue("*", out var head) && head.Contains(fp)) {
-                    ok++;
-                } else {
-                    fehlt++;
-                    if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(Kopf) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
-                }
-
-                continue;
-            }
-
-            if (disk.TryGetValue(ziel, out var set) && set.Contains(fp)) {
+            if (disk.TryGetValue("*", out var head) && head.Contains(fp)) {
                 ok++;
-                continue;
-            }
-
-            // Anderswo gefunden → falscher Chunk; sonst fehlt der Eintrag auf der Platte.
-            var woanders = disk.Any(kvp => kvp.Key != ziel && kvp.Value.Contains(fp));
-
-            if (woanders) {
-                falscherChunk++;
-                if (falscherChunk <= 10) { Write("UNDO-FALSCH", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
             } else {
                 fehlt++;
-                if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel={ziel} User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
+                if (fehlt <= 10) { Write("UNDO-FEHLT", $"Phase={phase} Ziel=(Kopf) User={meta.User} Zeit={meta.DateTimeUtc:HH:mm:ss.fff} Kommentar={meta.Comment}"); }
             }
         }
 
-        if (falscherChunk > 10) { Fehler($"Phase={phase}: weitere {falscherChunk - 10} Undo-Einträge im falschen Chunk (Details unterdrückt)"); }
         if (fehlt > 10) { Fehler($"Phase={phase}: weitere {fehlt - 10} Undo-Einträge fehlen auf der Festplatte (Details unterdrückt)"); }
-        if (falscherChunk > 0) { Fehler($"Phase={phase}: {falscherChunk} Undo-Einträge im falschen Chunk"); }
         if (fehlt > 0) { Fehler($"Phase={phase}: {fehlt} Undo-Einträge fehlen auf der Festplatte"); }
 
-        Write("UNDO", $"Phase={phase} Einträge={entries.Count} Sätze={gesamtSaetze} ImZiel={ok} FalscherChunk={falscherChunk} Fehlt={fehlt}");
+        Write("UNDO", $"Phase={phase} Einträge={entries.Count} Sätze={gesamtSaetze} ImKopf={ok} Fehlt={fehlt}");
     }
 
     /// <summary>
@@ -510,42 +463,6 @@ public static class Verify {
         result["*"] = head;
 
         return result;
-    }
-
-    /// <summary>
-    /// Ziel eines Undo-Eintrags: der Chunk des ersten Item-Kennens (ItemPath-Nav
-    /// oder ItemAdd-Blatt, analog zur Verteilung beim Speichern). Zeilen ohne
-    /// Chunk-Wert sind in rowChunk über ChunkId() dem Haupt-Daten-Chunk "_"
-    /// zugeordnet. Einträge ohne Item-Kenner laufen über die Chunk-Erkennung des
-    /// Saveables, ersatzweise ebenfalls in den Kopf. Liefert null, wenn der
-    /// Item-Kenner keiner aktuellen Zeile entspricht (gelöschte Zeile) — solche
-    /// Einträge dürfen noch im alten Chunk liegen.
-    /// </summary>
-    private static string? UndoZiel(SaveableFile saveable, List<FragmentRecord> entry, Dictionary<string, string> rowChunk) {
-        var hatItemKenner = false;
-
-        foreach (var r in entry) {
-            // Item-Kenner: Nav-Satz mit Schlüssel oder ItemAdd-Blatt mit „KeyName|TypeName“.
-            string? key;
-
-            if (r.TagType == FragmentTagType.ItemPath && r.DataType == FragmentDataType.String) {
-                key = r.StringContent;
-            } else if (r.TagType == FragmentTagType.ItemAdd && r.DataType == FragmentDataType.KeyNameType) {
-                key = r.KeyNameContent;
-            } else {
-                continue;
-            }
-
-            hatItemKenner = true;
-
-            if (key is not { Length: > 0 }) { continue; }
-
-            if (rowChunk.TryGetValue(key, out var id)) { return id; }
-
-            return null; // Gelöschte/ferne Zeile: Ziel nicht mehr rekonstruierbar
-        }
-
-        return hatItemKenner ? null : saveable.EntryChunkId(entry, rowChunk);
     }
 
     private static void VergleicheSnapshots(List<ZeilenStand> snap1, List<ZeilenStand> snap2) {

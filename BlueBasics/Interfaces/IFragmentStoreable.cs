@@ -18,8 +18,8 @@ public interface IFragmentStoreable {
     #region Properties
 
     /// <summary>
-    /// Maximale Anzahl Undo-Sätze je Undo-Block; im Chunk-Layout gilt der Wert
-    /// je Chunk. Darüber hinaus bleiben nur die neuesten.
+    /// Maximale Anzahl Undo-Sätze in der Änderungs-Historie; sie liegt komplett
+    /// im Kopf-Fragment. Darüber hinaus bleiben nur die neuesten.
     /// </summary>
     const int MaxUndos = 5000;
 

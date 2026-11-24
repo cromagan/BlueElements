@@ -1,12 +1,14 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-namespace BeCreativeCLI;
+namespace BlueBasics.Classes;
 
 /// <summary>
-/// Hält die geparsten Kommandozeilen-Argumente eines Befehls.
+/// Hält die geparsten Kommandozeilen-Argumente.
 /// Argumente ohne "--"-Präfix sind Positionsargumente, Argumente mit "--"-Präfix
 /// sind Optionen (mit Wert) oder Schalter (ohne Wert). Optionen dürfen wiederholt
 /// angegeben werden; alle Werte einer Option liefert AllOptions.
+/// Streng: Schalter und Optionen werden deklariert, Unbekanntes erzeugt einen ParseError.
+/// Los: Jedes "--"-Token ist eine Option oder ein Schalter, unbekannte Namen sind erlaubt.
 /// </summary>
 public class CliArgs {
 
@@ -22,11 +24,24 @@ public class CliArgs {
     #region Constructors
 
     /// <summary>
-    /// Parst die Argumente. Schalter (ohne Wert) müssen über <paramref name="flags" />,
-    /// Optionen mit Wert über <paramref name="options" /> bekannt gegeben werden.
-    /// Unbekannte "--"-Optionen erzeugen einen ParseError, statt still als Wert zu gelten.
+    /// Parst die Argumente im losen Modus: Ein "--"-Token mit folgendem Wert ist eine
+    /// Option, ohne folgendes Token ein Schalter. Unbekannte Namen sind erlaubt.
     /// </summary>
-    public CliArgs(IEnumerable<string> args, IEnumerable<string> flags, IEnumerable<string> options) {
+    public CliArgs(IEnumerable<string> args) : this(args, [], [], false) { }
+
+    /// <summary>
+    /// Parst die Argumente im strengen Modus. Schalter (ohne Wert) müssen über
+    /// <paramref name="flags" />, Optionen mit Wert über <paramref name="options" />
+    /// bekannt gegeben werden. Unbekannte "--"-Optionen erzeugen einen ParseError,
+    /// statt still als Wert zu gelten.
+    /// </summary>
+    public CliArgs(IEnumerable<string> args, IEnumerable<string> flags, IEnumerable<string> options) : this(args, flags, options, true) { }
+
+    /// <summary>
+    /// Parst die Argumente. Nur "--" kennzeichnet Optionen und Schalter,
+    /// alle anderen Tokens sind Positionsargumente.
+    /// </summary>
+    private CliArgs(IEnumerable<string> args, IEnumerable<string> flags, IEnumerable<string> options, bool strict) {
         var knownFlags = flags.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var knownOptions = options.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -52,24 +67,35 @@ public class CliArgs {
                 return;
             }
 
-            if (knownFlags.Contains(name)) {
-                _flags.Add(name);
-                continue;
-            }
+            if (strict) {
+                if (knownFlags.Contains(name)) {
+                    _flags.Add(name);
+                    continue;
+                }
 
-            if (!knownOptions.Contains(name)) {
-                ParseError = $"Unbekannte Option '{token}'.";
-                return;
-            }
+                if (!knownOptions.Contains(name)) {
+                    ParseError = $"Unbekannte Option '{token}'.";
+                    return;
+                }
 
-            if (i + 1 >= items.Count) {
-                ParseError = $"Der Option '{token}' fehlt ein Wert.";
-                return;
-            }
+                if (i + 1 >= items.Count) {
+                    ParseError = $"Der Option '{token}' fehlt ein Wert.";
+                    return;
+                }
 
-            i++;
-            _options[name] = items[i];
-            _allOptions.Add((name, items[i]));
+                i++;
+                _options[name] = items[i];
+                _allOptions.Add((name, items[i]));
+            } else {
+                // Lose: Ein Wert wird nur konsumiert, wenn er nicht selbst mit "--" beginnt.
+                if (i + 1 < items.Count && !items[i + 1].StartsWith("--", StringComparison.Ordinal)) {
+                    _options[name] = items[i + 1];
+                    _allOptions.Add((name, items[i + 1]));
+                    i++;
+                } else {
+                    _flags.Add(name);
+                }
+            }
         }
     }
 
@@ -116,6 +142,20 @@ public class CliArgs {
     /// Liefert den Wert einer Option oder null, wenn sie nicht angegeben wurde.
     /// </summary>
     public string? Option(string name) => _options.TryGetValue(name, out var value) ? value : null;
+
+    /// <summary>
+    /// Liefert alle Optionen als Dictionary: letzter Wert gewinnt, Schalter als leerer String.
+    /// </summary>
+    public Dictionary<string, string> ToDictionary() {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, value) in _allOptions) {
+            dict[name] = value;
+        }
+        foreach (var name in _flags) {
+            dict[name] = string.Empty;
+        }
+        return dict;
+    }
 
     #endregion
 }

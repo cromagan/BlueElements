@@ -318,8 +318,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// Änderungs-Historie als Fragment-Sätze (Basis-Tiefe 0): je Eintrag eine
     /// Navigationskette plus Blatt-Satz mit Meta. Eintragsgrenze ist der Satz mit Tiefe 0.
-    /// Beim Speichern wird je Ziel (Kopf oder Chunk) auf die neuesten
-    /// MaxUndos Sätze gekürzt.
+    /// Beim Speichern läuft sie komplett ins Kopf-Fragment und wird auf die
+    /// neuesten MaxUndos Sätze gekürzt.
     /// </summary>
     public List<FragmentRecord> Undos { get; } = [];
 
@@ -601,41 +601,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         _lastUsed[IHasChunkValueExtension.ChunkId(chunkValue)] = DateTime.UtcNow;
     }
 
-    /// <summary>
-    /// Nimmt einen kompletten Undo-Eintrag entgegen: Einträge des Chunk-Bereichs
-    /// wandern in die Änderungs-Historie und werden beim Speichern je Chunk-Wert
-    /// auf die Ziel-Chunks verteilt; alles andere schreibt das Kopf-Journal
-    /// sofort als Kopf-Fragment. Während des Einspielens fremder Inhalte werden
-    /// Chunk-Einträge still verworfen — diese Inhalte kommen über die Chunk-Dateien.
-    /// </summary>
-    public void LogUndoEntry(IReadOnlyList<FragmentRecord> entry) {
-        if (IsDisposed || Ending) { return; }
-        if (Develop.AllReadOnly) { return; }
-        if (InitialSavePending) { return; }
-        if (entry is not { Count: > 0 }) { return; }
-
-        if (!IsChunkSection(entry)) {
-            LogHeadUndoEntry(entry);
-            return;
-        }
-
-        // Bekanntes Item ohne Chunk-Wert: verhält sich identisch zum Kopf-Fragment.
-        var (ChunkIds, KnownKeys) = ChunkItemsIndex();
-        var key = EntryItemKey(entry);
-
-        if (key is { Length: > 0 } && KnownKeys.Contains(key) && !ChunkIds.ContainsKey(key)) {
-            LogHeadUndoEntry(entry);
-            return;
-        }
-
-        if (IsDataReloading) { return; }
-
-        lock (UndoLock) {
-            AddUndoEntry(entry);
-        }
-    }
-
-    /// <summary>
+     /// <summary>
     /// Disposed die Verwaltung: markiert sie als verworfen, trägt sie aus dem
     /// Watcher-Register aus und gibt die Inhalte frei.
     /// </summary>
@@ -1275,7 +1241,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// verbucht und samt Fingerabdruck in die Änderungs-Historie gebucht.
     /// Beim Laden, beim Einspielen fremder Fragmente und im Nur-Lese-Modus still.
     /// </summary>
-    private void LogHeadUndoEntry(IReadOnlyList<FragmentRecord> entry) {
+    public void LogUndoEntry(IReadOnlyList<FragmentRecord> entry) {
+        if (IsDataReloading) { return; }
+
         if (IsDisposed || Ending) { return; }
         if (Develop.AllReadOnly) { return; }
         if (InitialSavePending) { return; }
@@ -1822,13 +1790,18 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
-    /// Der Kopf-Snapshot trägt nur die Kopf-Bereiche: Der Chunk-Bereich wird auf
-    /// die Items ohne Chunk-Wert reduziert, Undo-Einträge mit Chunk-Ziel wandern
-    /// in die Chunk-Dateien.
+    /// Der Kopf-Snapshot trägt die komplette Änderungs-Historie; der Chunk-Bereich
+    /// wird auf die Items ohne Chunk-Wert reduziert.
     /// </summary>
     private List<byte> GenerateSnapshotContent() {
         var itemIds = ChunkItemsIndex().ChunkIds;
-        var source = GenerateContentToSave(TrimUndosPerTarget()).ToArray();
+
+        List<FragmentRecord> undos;
+        lock (UndoLock) {
+            undos = Undos.TrimUndos();
+        }
+
+        var source = GenerateContentToSave(undos).ToArray();
 
         return BuildHeadContent(source, itemIds);
     }
@@ -1919,12 +1892,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     #region Chunk-Ziel und Inhaltszerlegung
 
     /// <summary>
-    /// Liefert die Chunk-ID (lowercase), in die ein Undo-Eintrag gehört, oder
-    /// leer, wenn er als Kopf-Fragment läuft: Der Pfad des Eintrags
+    /// Liefert die Chunk-ID (lowercase), in die ein Undo-Eintrag gehören würde,
+    /// oder leer, wenn er zum Kopf gehört: Der Pfad des Eintrags
     /// (Empfänger-Typen der Sätze) muss den Chunk-Pfad treffen und der
-    /// Item-Kenner muss einen Chunk-Wert liefern; ohne erkennbaren Chunk-Wert
-    /// gilt der Eintrag als Kopf-Fragment. BuildHeadContent, BuildChunkContent
-    /// und LogUndoEntry verteilen damit identisch.
+    /// Item-Kenner muss einen Chunk-Wert liefern.
+    /// TODO: Unused
     /// </summary>
     public string EntryChunkId(IReadOnlyList<FragmentRecord> entry, Dictionary<string, string> itemIds) {
         if (!IsChunkSection(entry)) { return string.Empty; }
@@ -2014,49 +1986,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     private bool IsChunkArea(byte leafType) => ChunkPath is { Count: > 0 } && ChunkPath[0] == leafType;
 
     /// <summary>
-    /// Verteilt die Änderungs-Historie analog zur Ziel-Ermittlung auf Kopf und
-    /// Daten-Chunks — Ziel eines Eintrags ist wie beim Schreiben der Chunk des
-    /// erkannten Chunk-Werts, ohne Chunk-Wert der Kopf — und kürzt je Ziel auf
-    /// die neuesten MaxUndos Sätze. Geliefert wird die Union; BuildHeadContent
-    /// und BuildChunkContent verteilen sie beim Zerlegen identisch.
-    /// </summary>
-    private List<FragmentRecord> TrimUndosPerTarget() {
-        List<FragmentRecord> all;
-        lock (UndoLock) {
-            all = [.. Undos];
-        }
-
-        var itemIds = ChunkItemsIndex().ChunkIds;
-        var perTarget = new Dictionary<string, List<FragmentRecord>>(StringComparer.OrdinalIgnoreCase);
-
-        var entryStart = 0;
-        while (entryStart < all.Count) {
-            var entryEnd = entryStart + 1;
-            while (entryEnd < all.Count && all[entryEnd].Depth != 0) { entryEnd++; }
-
-            var target = EntryChunkId(all.GetRange(entryStart, entryEnd - entryStart), itemIds);
-
-            if (!perTarget.TryGetValue(target, out var list)) {
-                list = [];
-                perTarget[target] = list;
-            }
-
-            list.AddRange(all.GetRange(entryStart, entryEnd - entryStart));
-            entryStart = entryEnd;
-        }
-
-        List<FragmentRecord> result = [];
-        foreach (var chunk in perTarget.Values) { result.AddRange(chunk.TrimUndos()); }
-
-        return result;
-    }
-
-    /// <summary>
     /// Erzeugt den Kopf-Inhalt (Stempel + Kopf-Bereiche + Kopf-Historie +
-    /// Abschluss-Marker): Alle Bereiche laufen unverändert in den Kopf — nur der
-    /// Chunk-Bereich wird auf die Items ohne Chunk-Wert reduziert (Kopf-Verhalten)
-    /// und Undo-Einträge mit Chunk-Ziel werden ausgefiltert. Quelle ist der
-    /// vollständige Fragment-Baum des Speicherstands.
+    /// Abschluss-Marker): Alle Bereiche inklusive kompletter Änderungs-Historie
+    /// laufen unverändert in den Kopf — nur der Chunk-Bereich wird auf die Items
+    /// ohne Chunk-Wert reduziert. Quelle ist der vollständige Fragment-Baum
+    /// des Speicherstands.
     /// </summary>
     private List<byte> BuildHeadContent(byte[] source, Dictionary<string, string> itemIds) {
         var records = ParseRecords(source);
@@ -2080,19 +2014,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             }
 
             if (record.Depth > 0) { i++; continue; } // Satz außerhalb der Wurzel-Ebene — überspringen
-
-            // Undo-Eintrag: ohne Chunk-Ziel übernehmen, mit Ziel dem Chunk überlassen.
-            if (record.TagType == FragmentTagType.UndoHistory) {
-                var entryEnd = EntryEnd(records, i);
-                var entry = EntryRecords(records, i, entryEnd);
-
-                if (EntryChunkId(entry, itemIds) is not { Length: > 0 }) {
-                    result.AddRange(source[start..(entryEnd < records.Count ? records[entryEnd].Start : source.Length)]);
-                }
-
-                i = entryEnd;
-                continue;
-            }
 
             // Chunk-Bereich: auf die Items ohne Chunk-Wert reduzieren.
             if (IsChunkArea(record.LeafType) && i + 1 < records.Count && records[i + 1].Record.TagType == FragmentTagType.ItemList) {
@@ -2124,10 +2045,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
     /// <summary>
     /// Erzeugt den kompletten Inhalt des Chunks mit der angegebenen ID (Stempel +
-    /// Undo-Einträge des Chunks + der Chunk-Bereich mit den Items des Chunk-Werts
-    /// + Abschluss-Marker). Der Chunk-Bereich erhält einen Scoped Listen-Kopf
-    /// (ItemListChunk), dessen Einlesen nur den Bestand dieses Chunks angleicht —
-    /// leere verteilte Chunks räumen so ihren Altbestand selbst ab.
+    /// der Chunk-Bereich mit den Items des Chunk-Werts + Abschluss-Marker); die
+    /// Änderungs-Historie bleibt komplett im Kopf-Fragment. Der Chunk-Bereich
+    /// erhält einen Scoped Listen-Kopf (ItemListChunk), dessen Einlesen nur den
+    /// Bestand dieses Chunks angleicht — leere verteilte Chunks räumen so ihren
+    /// Altbestand selbst ab.
     /// </summary>
     private List<byte> BuildChunkContent(string chunkId, byte[] source, Dictionary<string, string> itemIds) {
         var records = ParseRecords(source);
@@ -2151,19 +2073,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             }
 
             if (record.Depth > 0) { i++; continue; } // Satz außerhalb der Wurzel-Ebene — überspringen
-
-            // Undo-Eintrag: Das Ziel liefert die Chunk-Erkennung des Eintrags-Pfades.
-            if (record.TagType == FragmentTagType.UndoHistory) {
-                var entryEnd = EntryEnd(records, i);
-                var entry = EntryRecords(records, i, entryEnd);
-
-                if (string.Equals(EntryChunkId(entry, itemIds), chunkId, StringComparison.OrdinalIgnoreCase)) {
-                    result.AddRange(source[start..(entryEnd < records.Count ? records[entryEnd].Start : source.Length)]);
-                }
-
-                i = entryEnd;
-                continue;
-            }
 
             // Chunk-Bereich: nur die Items dieses Chunks, mit Scoped Listen-Kopf.
             if (IsChunkArea(record.LeafType) && i + 1 < records.Count && records[i + 1].Record.TagType == FragmentTagType.ItemList) {
@@ -2236,18 +2145,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         while (end < records.Count && records[end].Record.Depth > 0) { end++; }
 
         return end;
-    }
-
-    /// <summary>
-    /// Liefert die Sätze des Eintrags an der angegebenen Position (ohne den
-    /// UndoHistory-Kopf).
-    /// </summary>
-    private static List<FragmentRecord> EntryRecords(List<(int Start, int End, FragmentRecord Record)> records, int i, int entryEnd) {
-        List<FragmentRecord> entry = [];
-
-        for (var k = i + 1; k < entryEnd; k++) { entry.Add(records[k].Record); }
-
-        return entry;
     }
 
     /// <summary>
@@ -2347,9 +2244,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             }
         }
 
-        // Vollständiger Fragment-Baum des Speicherstands; Quelle aller Chunk-Inhalte.
-        // Die Historie geht je Ziel-Chunk verteilt und gekürzt ein.
-        var source = GenerateContentToSave(TrimUndosPerTarget()).ToArray();
+        // Vollständiger Fragment-Baum des Speicherstands ohne Änderungs-Historie;
+        // Quelle aller Chunk-Inhalte — die Historie bleibt komplett im Kopf-Fragment.
+        var source = GenerateContentToSave([]).ToArray();
 
         if (x != LastChangeUtc) { return "Daten wurden während der Speicherung geändert."; }
 
