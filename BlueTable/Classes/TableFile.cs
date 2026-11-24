@@ -513,16 +513,20 @@ public class TableFile : Table {
     /// </summary>
     protected virtual int MinimumContentSize => 1200;
 
-    protected static string SaveFullFile(TableFile tbf) {
+    /// <summary>
+    /// Erzeugt den vollständigen Datei-Inhalt einer Tabelle und prüft Konsistenz
+    /// und Mindestgröße. Bei Erfolg liegt der Inhalt in Value.
+    /// </summary>
+    protected static OperationResult PrepareFullFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f is { Length: > 0 }) { return OperationResult.Failed(f); }
 
         var x = tbf.LastChange;
 
         // Alle Daten in einer einzigen Byte-Liste sammeln (.bdb ist nicht chunked).
         var content = tbf.GenerateContentToSave();
 
-        if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
+        if (x != tbf.LastChange) { return OperationResult.Failed("Tabelle wurde während der Speicherung geändert."); }
 
         // Die Mindestgrößen-Prüfung schützt vor korrupten Re-Saves (z.B. wenn
         // durch einen Fehler kaum Daten generiert werden). Beim initialen Save
@@ -530,9 +534,17 @@ public class TableFile : Table {
         // nicht zum Freeze führen — sonst wäre die neue Tabelle sofort blockiert.
         if (!tbf.InitialSavePending && content.Count < tbf.MinimumContentSize) {
             tbf.Freeze("Datei zu klein für Speicherung");
-            return "Datei zu klein für Speicherung.";
+            return OperationResult.Failed("Datei zu klein für Speicherung.");
         }
 
+        return new OperationResult(content);
+    }
+
+    /// <summary>
+    /// Schreibt den erzeugten Inhalt als Hauptdatei; legt den zugehörigen Chunk
+    /// bei Bedarf an. Liefert leer bei Erfolg, sonst den Fehlertext.
+    /// </summary>
+    protected static string WriteFullFile(TableFile tbf, List<byte> content) {
         if (Chunk.Get(tbf.Filename) is null) {
             if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
@@ -752,7 +764,12 @@ public class TableFile : Table {
 
     protected virtual string SaveInternal() {
         try {
-            var result = SaveFullFile(this);
+            var opr = PrepareFullFile(this);
+
+            if (opr.IsFailed) { return opr.FailedReason; }
+            if (opr.Value is not List<byte> content) { return OperationResult.FailedInternalError.FailedReason; }
+
+            var result = WriteFullFile(this, content);
 
             if (string.IsNullOrEmpty(result)) {
                 InitialSavePending = false;

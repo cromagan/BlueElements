@@ -871,7 +871,16 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         }
 
         // Sofortige Komplettierung statt des zeitgesteuerten Komplettstands.
-        var f = WriteNewSnapshot();
+        var opr = PrepareNewSnapshot();
+
+        if (opr.IsFailed) {
+            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            return;
+        }
+
+        if (opr.Value is not List<byte> content) { return; }
+
+        var f = WriteSnapshotFile(content);
 
         if (!string.IsNullOrEmpty(f)) {
             Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
@@ -1115,7 +1124,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (InitialSavePending) {
             EnsureHeadFileExists();
 
-            var f = WriteNewSnapshot();
+            var opr = PrepareNewSnapshot();
+
+            if (opr.IsFailed) { return opr.FailedReason; }
+            if (opr.Value is not List<byte> content) { return OperationResult.FailedInternalError.FailedReason; }
+
+            var f = WriteSnapshotFile(content);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             InitialSavePending = false;
@@ -1350,21 +1364,35 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         CleanupOldSnapshots(startTimeUtc);
 
         if (fragmentFiles is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster(true)) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
+            var opr = PrepareNewSnapshot();
 
-            var f = WriteNewSnapshot();
-
-            if (string.IsNullOrEmpty(f)) {
-                CloseWriter();
-                StartWriter();
-
-                MasterMe();
-
-                MasterNeeded = false;
-                OnInvalidateView();
-                _filesNotIncluded.Clear();
+            if (opr.IsFailed) {
+                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            } else if (opr.Value is not List<byte> content) {
+                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
+            } else if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= JournalToleranceSeconds) {
+                // Fremd-Einträge, die während dieses Lese-Zyklus geschrieben wurden,
+                // wären nach dem Schreiben älter als die Toleranz in ReadJournalFile
+                // und würden dauerhaft übersprungen. Der nächste Refresh-Zyklus
+                // liest die Journale erneut und Komplettiert dann.
+                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung von {KeyName} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
             } else {
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
+
+                var f = WriteSnapshotFile(content);
+
+                if (string.IsNullOrEmpty(f)) {
+                    CloseWriter();
+                    StartWriter();
+
+                    MasterMe();
+
+                    MasterNeeded = false;
+                    OnInvalidateView();
+                    _filesNotIncluded.Clear();
+                } else {
+                    Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+                }
             }
         }
 
@@ -1807,32 +1835,39 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
-    /// Legt einen neuen Kopf-Snapshot (Komplettstand) als neue Datei mit
-    /// UTC-Zeitstempel im Namen an; der Inhalt liefert GenerateSnapshotContent.
-    /// Die bisherigen Dateien bleiben unangetastet. Schreibfehler sind unkritisch:
-    /// Loader überspringen Snapshots ohne gültigen EOF-Marker. Liefert bei
-    /// Problemen die Fehlermeldung, sonst leer.
+    /// Erzeugt den Inhalt eines neuen Kopf-Snapshots und prüft Konsistenz und
+    /// Mindestgröße. Bei Erfolg liegt der Inhalt in Value.
     /// </summary>
-    private string WriteNewSnapshot() {
+    private OperationResult PrepareNewSnapshot() {
         var f = EditableError(false);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f is { Length: > 0 }) { return OperationResult.Failed(f); }
 
         var x = LastChangeUtc;
 
         var content = GenerateSnapshotContent();
 
-        if (x != LastChangeUtc) { return "Daten wurden während der Speicherung geändert."; }
+        if (x != LastChangeUtc) { return OperationResult.Failed("Daten wurden während der Speicherung geändert."); }
 
-        if (content.Count == 0) { return "Snapshot konnte nicht erzeugt werden."; }
+        if (content.Count == 0) { return OperationResult.Failed("Snapshot konnte nicht erzeugt werden."); }
 
         // Die Mindestgrößen-Prüfung schützt vor korrupten Snapshots. Beim initialen
         // Snapshot ist der Inhalt legitim klein und darf
         // nicht zum Freeze führen — sonst wäre das neue Objekt sofort blockiert.
         if (!InitialSavePending && content.Count < MinimumContentSize) {
             Freeze("Datei zu klein für Speicherung");
-            return "Datei zu klein für Speicherung.";
+            return OperationResult.Failed("Datei zu klein für Speicherung.");
         }
 
+        return new OperationResult(content);
+    }
+
+    /// <summary>
+    /// Schreibt den erzeugten Snapshot-Inhalt als neue Datei mit UTC-Zeitstempel
+    /// im Namen; die bisherigen Dateien bleiben unangetastet. Schreibfehler sind
+    /// unkritisch: Loader überspringen Snapshots ohne gültigen EOF-Marker.
+    /// Liefert bei Problemen die Fehlermeldung, sonst leer.
+    /// </summary>
+    private string WriteSnapshotFile(List<byte> content) {
         if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return "Verzeichnis konnte nicht erstellt werden."; }
 
         // UTC-Zeitstempel, Benutzer, Maschinen/Instanz-Hash.

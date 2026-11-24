@@ -32,6 +32,13 @@ public class TableFragments : TableFile {
     public static readonly int DoComplete = 60;
 
     /// <summary>
+    /// Wert in Sekunden. Toleranz zwischen dem Zeitstempel eines Fragment-Items und der
+    /// Speicherung der Hauptdatei; deckt Maschinen-Uhrabweichen ab. Ältere Items gelten
+    /// als bereits in der Hauptdatei enthalten und werden nicht erneut geladen.
+    /// </summary>
+    public static readonly int FragmentToleranceSeconds = 60;
+
+    /// <summary>
     /// Gibt das Suffix für Fragmentdateien zurück.
     /// </summary>
     public static readonly string SuffixOfFragments = "frg";
@@ -399,9 +406,27 @@ public class TableFragments : TableFile {
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
+            var opr = PrepareFullFile(this);
+
+            if (opr.IsFailed) {
+                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {opr.FailedReason}", 0);
+                return;
+            }
+
+            if (opr.Value is not List<byte> content) { return; }
+
+            // Fremd-Items, die während dieses Nachlade-Durchlaufs geschrieben wurden,
+            // wären nach dem Speichern älter als die Toleranz in GetLastChanges und
+            // würden dauerhaft übersprungen. Der nächste BeSureToBeUpToDate-Zyklus
+            // liest die Fragmente erneut und Komplettiert dann.
+            if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= FragmentToleranceSeconds) {
+                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} verschoben: Nachladen benötigte länger als {FragmentToleranceSeconds} Sekunden", 0);
+                return;
+            }
+
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
 
-            var f = SaveFullFile(this);
+            var f = WriteFullFile(this, content);
 
             if (!string.IsNullOrEmpty(f)) {
                 Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
@@ -486,7 +511,7 @@ public class TableFragments : TableFile {
                         // EventScript), ist also keine vollständige Verbuchungsgrundlage.
                         // Die Toleranz überbrückt das Zeitfenster zwischen dem Lesen der
                         // Fragmente und dem Speichern der Komplettierung.
-                        if (u.DateTimeUtc.AddSeconds(60) < LastSaveMainFileUtcDate) { continue; }
+                        if (u.DateTimeUtc.AddSeconds(FragmentToleranceSeconds) < LastSaveMainFileUtcDate) { continue; }
 
                         // Hash auf Basis der geparsten Werte berechnen (nicht auf der rohen Zeile),
                         // damit der Hash unabhängig vom Serialisationsformat ist und mit den aus
