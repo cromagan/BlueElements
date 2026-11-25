@@ -1073,12 +1073,21 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
         var count = 0;
         Parallel.ForEach(snapshot, thisFile => {
-            if (thisFile is TableFile tbf) {
-                var key = tbf.KeyName;
-                Develop.EndLog($"TableScriptCommand.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
-                Interlocked.Increment(ref count);
-                tbf.Save();
-                Develop.EndLog($"TableScriptCommand.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+            var key = thisFile.KeyName;
+
+            switch (thisFile) {
+                case TableFile tbf:
+                    Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    Interlocked.Increment(ref count);
+                    tbf.Save();
+                    Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    break;
+                case TableFileNew tfn:
+                    Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    Interlocked.Increment(ref count);
+                    _ = tfn.Saveable.Save();
+                    Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    break;
             }
         });
 

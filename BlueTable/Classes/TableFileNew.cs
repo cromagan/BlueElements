@@ -216,8 +216,10 @@ public class TableFileNew : Table {
     /// Fordert die Aktualisierung der Nachschlage-Systeme; anschließend folgt
     /// der Chunk-Pfad der aktuellen Chunk-Spalten-Lage — eine übernommene
     /// Änderung an der Chunk-Spalte (z. B. deren Entfernung) reorganisiert sofort.
+    /// Während des ersten Ladens wird nur der Pfad angepasst, nicht
+    /// reorganisiert — die Chunk-Ordner sind gerade die Datenquelle.
     /// </summary>
-    private void SaveableRefreshDataSystems(object? sender, System.EventArgs e) => SyncChunkPath(true);
+    private void SaveableRefreshDataSystems(object? sender, System.EventArgs e) => SyncChunkPath(Saveable.MainLoadDone);
 
     /// <summary>
     /// Meldet das Entfernen einer Spalte; der Chunk-Pfad folgt sofort der

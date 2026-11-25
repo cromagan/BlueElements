@@ -98,7 +98,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// Suffix der Chunk-Dateien.
     /// </summary>
-    private const string SuffixOfChunks = "tblc";
+    private const string SuffixOfChunks = "chk";
 
     /// <summary>
     /// Wert in Sekunden. Nach dieser Zeit soll der Fragment-Aufräumer beendet werden.
@@ -1871,9 +1871,18 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
             // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
-            // Aufräumarbeit ausliest; Namenskollisionen löst CreateNew über den
-            // nächsten Versuch mit neuem Sekunden-Stempel.
-            _myJournalFile = BaseChunkFolder().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
+            // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
+            // behaltene Journal aus derselben Sekunde) werden gemieden: Der
+            // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
+            // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
+            var stempel = DateTime.UtcNow;
+            var basis = BaseChunkFolder().NormalizePath() + wunschName + "-";
+            _myJournalFile = basis + stempel.ToString4() + "." + SuffixOfFragments;
+
+            while (IO.FileExists(_myJournalFile)) {
+                stempel = stempel.AddSeconds(1);
+                _myJournalFile = basis + stempel.ToString4() + "." + SuffixOfFragments;
+            }
 
             if (Develop.AllReadOnly) { return; }
 
@@ -1893,7 +1902,13 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 _writer?.Dispose();
                 _writer = null;
 
-                Develop.DebugPrint(ErrorType.Warning, "Journaldatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myJournalFile.FileNameWithSuffix(), ex);
+                // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
+                // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
+                // Versuch gelöst. Nur echte Fehler melden.
+                if (!IO.FileExists(_myJournalFile)) {
+                    Develop.DebugPrint(ErrorType.Warning, "Journaldatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myJournalFile.FileNameWithSuffix(), ex);
+                }
+
                 Pause(1, false);
             }
         }
@@ -2404,7 +2419,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         var x = LastChangeUtc;
         var timestamp = GenerateChunkTimestamp();
-        var itemIds = ChunkItemsIndex().ChunkIds;
 
         // Daten-Chunks ermitteln: alle Chunks mit aktuellem Item-Bestand plus
         // alle Chunks mit bestehendem Ordner — Letztere bekommen ohne Bestand
@@ -2437,6 +2451,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Chunk '{thisChunkId}' von '{KeyName}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
             }
         }
+
+        // Item-Index und vollständiger Fragment-Baum des Speicherstands — erst
+        // NACH dem Vorab-Laden: der Index ist sonst leer, und BuildChunkContent
+        // würde alle Items fallen lassen (leere Chunk-Dateien schreiben).
+        var itemIds = ChunkItemsIndex().ChunkIds;
 
         // Vollständiger Fragment-Baum des Speicherstands ohne Änderungs-Historie;
         // Quelle aller Chunk-Inhalte — die Historie bleibt komplett im Kopf-Fragment.

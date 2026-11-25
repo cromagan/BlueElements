@@ -690,9 +690,18 @@ public class TableFragments : TableFile {
         // bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
         for (var versuch = 1; versuch <= 5; versuch++) {
             // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
-            // Aufräumarbeit ausliest; Namenskollisionen löst CreateNew über den
-            // nächsten Versuch mit neuem Sekunden-Stempel.
-            _myFragmentsFilename = FragmengtsPath().NormalizePath() + wunschName + "-" + DateTime.UtcNow.ToString4() + "." + SuffixOfFragments;
+            // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
+            // behaltene Fragment aus derselben Sekunde) werden gemieden: Der
+            // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
+            // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
+            var stempel = DateTime.UtcNow;
+            var basis = FragmengtsPath().NormalizePath() + wunschName + "-";
+            _myFragmentsFilename = basis + stempel.ToString4() + "." + SuffixOfFragments;
+
+            while (IO.FileExists(_myFragmentsFilename)) {
+                stempel = stempel.AddSeconds(1);
+                _myFragmentsFilename = basis + stempel.ToString4() + "." + SuffixOfFragments;
+            }
 
             if (Develop.AllReadOnly) { return; }
 
@@ -717,7 +726,13 @@ public class TableFragments : TableFile {
                 _writer?.Dispose();
                 _writer = null;
 
-                Develop.DebugPrint(ErrorType.Warning, "Fragmentdatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myFragmentsFilename.FileNameWithSuffix(), ex);
+                // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
+                // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
+                // Versuch gelöst. Nur echte Fehler melden.
+                if (!IO.FileExists(_myFragmentsFilename)) {
+                    Develop.DebugPrint(ErrorType.Warning, "Fragmentdatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myFragmentsFilename.FileNameWithSuffix(), ex);
+                }
+
                 Pause(1, false);
             }
         }
