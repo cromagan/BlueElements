@@ -551,8 +551,18 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private OperationResult SaveTable() {
-        if (tbl is TableFileNew tfn) { return tfn.Save(); }
-        if (tbl is TableFile tf) { return tf.Save(); }
+        if (tbl is TableFileNew tfn) {
+            var r = tfn.Save();
+            tfn.Saveable.WaitDiskOperationFinished();
+            return r;
+        }
+
+        if (tbl is TableFile tf) {
+            var r = tf.Save();
+            tf.WaitDiskOperationFinished();
+            return r;
+        }
+
         return OperationResult.Success;
     }
 

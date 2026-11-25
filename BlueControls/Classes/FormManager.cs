@@ -47,15 +47,24 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     }
 
     /// <summary>
-    /// Speichert alle offenen Dateien auf die Festplatte: Stößt asynchron das
-    /// Speichern der BlockableFile-Instanzen an, speichert dann die Tabellen und
-    /// wartet schließlich, bis alle BlockableFile-Speichervorgänge abgeschlossen sind.
-    /// Zentrale Methode, um das Muster SaveAll(false) → Table.SaveAll() → SaveAll(true)
-    /// an einem Ort zu bündeln.
+    /// Speichert alle offenen Dateien auf die Festplatte — Fire-and-Forget:
+    /// Stößt das Speichern der BlockableFile-Instanzen und der Tabellen im
+    /// Hintergrund an und kehrt sofort zurück. Warten ist nur beim Beenden und
+    /// an kritischen Punkten nötig — dafür SaveAllFilesAndWait().
     /// </summary>
     public static void SaveAllFiles() {
         BlockableFile.SaveAll(false, ConnectedFormula.AllInstances());
         Table.SaveAll();
+    }
+
+    /// <summary>
+    /// Wie SaveAllFiles(), wartet aber auf alle angestoßenen Tabellen- und
+    /// BlockableFile-Speichervorgänge — für das Beenden und kritische Punkte.
+    /// </summary>
+    public static void SaveAllFilesAndWait() {
+        BlockableFile.SaveAll(false, ConnectedFormula.AllInstances());
+        Table.SaveAll();
+        Table.WaitAllSaved();
         BlockableFile.SaveAll(true, ConnectedFormula.AllInstances());
     }
 
@@ -63,9 +72,9 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         Develop.EndLog("SaveEnd: === START ===");
         Ending = true;
 
-        Develop.EndLog("SaveEnd: Vor SaveAllFiles()");
-        SaveAllFiles();
-        Develop.EndLog("SaveEnd: Nach SaveAllFiles()");
+        Develop.EndLog("SaveEnd: Vor SaveAllFilesAndWait()");
+        SaveAllFilesAndWait();
+        Develop.EndLog("SaveEnd: Nach SaveAllFilesAndWait()");
 
         Develop.EndLog("SaveEnd: Vor BlockableFile.RevokeWriteAccessAll()");
         BlockableFile.RevokeWriteAccessAll();

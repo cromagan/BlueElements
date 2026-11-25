@@ -191,6 +191,19 @@ internal static class Program {
 
             var opr = tbl is TableFileNew tfn ? tfn.Save() : (tbl as TableFile)?.Save() ?? OperationResult.Success;
 
+            // Hintergrund-Speicher-Task abschließen und dessen Ergebnis ableiten:
+            // Bleibt SaveRequired aktiv, konnten (Teil-)Daten nicht gesichert werden.
+            switch (tbl) {
+                case TableFileNew tfnw:
+                    tfnw.Saveable.WaitDiskOperationFinished();
+                    if (opr.IsSuccessful && tfnw.Saveable.SaveRequired) { opr = OperationResult.Failed("Speichern unvollständig: Es bleiben Änderungen ausständig"); }
+                    break;
+                case TableFile tfw:
+                    tfw.WaitDiskOperationFinished();
+                    if (opr.IsSuccessful && tfw.SaveRequired) { opr = OperationResult.Failed("Speichern unvollständig: Es bleiben Änderungen ausständig"); }
+                    break;
+            }
+
             if (opr.IsFailed) {
                 Console.Error.WriteLine("Speichern fehlgeschlagen: " + opr.FailedReason);
                 tbl.Dispose();

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
@@ -85,6 +86,13 @@ public class TableFragments : TableFile {
     private bool _masterNeeded;
     private string _myFragmentsFilename = string.Empty;
     private System.IO.StreamWriter? _writer;
+
+    /// <summary>
+    /// Serialisiert Journal-Schreibzugriffe (SaveInternal-Flush,
+    /// WriteValueToDiscOrServer) mit Writer-Wechseln (CloseWriter, StartWriter,
+    /// ContinueFragment).
+    /// </summary>
+    private readonly object _writerLock = new();
 
     #endregion
 
@@ -204,7 +212,9 @@ public class TableFragments : TableFile {
         CanDeleteWriter = false;
 
         var error = ContinueFragment(fragmentFilename, "- CONTINUED", out var writer);
-        _writer = writer;
+        lock (_writerLock) {
+            _writer = writer;
+        }
         return error;
     }
 
@@ -283,6 +293,10 @@ public class TableFragments : TableFile {
         if (IsDisposed) { return; }
 
         if (disposing) {
+            // Laufenende Hintergrund-Vorgänge (Speicher-Task, Komplettierung)
+            // abschließen, bevor der Writer geschlossen wird.
+            WaitDiskOperationFinished();
+
             // Master-Schaft abmelden, bevor der Writer geschlossen wird: Die
             // Freigabe landet in der bestehenden Fragmentdatei, statt beim
             // Abmelden (base.Dispose ruft UnMasterMe) eine neue, nie mit EOF
@@ -334,10 +348,9 @@ public class TableFragments : TableFile {
             return string.Empty;
         }
 
-        if (_writer is null) { return "Writer Fehler"; }
-
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { SaveRequired = false; return string.Empty; }
                 _writer.Flush();
             }
             SaveRequired = false;
@@ -357,13 +370,13 @@ public class TableFragments : TableFile {
 
         if (InitialSavePending) { return string.Empty; }
 
-        if (_writer is null) { StartWriter(); }
-        if (_writer is null) { return "Schreibmodus deaktiviert"; }
-
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
-
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { StartWriter(); }
+                if (_writer is null) { return "Schreibmodus deaktiviert"; }
+
+                var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
+
                 var line = l.ParseableItems().FinishParseable();
                 _writer.WriteLine(line);
 
@@ -393,21 +406,23 @@ public class TableFragments : TableFile {
     /// Schließt den aktuellen Writer und löscht die Fragmentdatei, falls sie keine permanenten Daten enthält.
     /// </summary>
     private void CloseWriter() {
-        var writerToClose = _writer;
-        if (writerToClose is not null) {
-            _writer = null;
+        lock (_writerLock) {
+            var writerToClose = _writer;
+            if (writerToClose is not null) {
+                _writer = null;
 
-            try {
-                writerToClose.WriteLine("- EOF");
-                writerToClose.Flush();
-            } catch { } finally {
                 try {
-                    writerToClose.Dispose();
-                } catch { }
-            }
+                    writerToClose.WriteLine("- EOF");
+                    writerToClose.Flush();
+                } catch { } finally {
+                    try {
+                        writerToClose.Dispose();
+                    } catch { }
+                }
 
-            if (CanDeleteWriter) {
-                IO.DeleteFile(_myFragmentsFilename, false);
+                if (CanDeleteWriter) {
+                    IO.DeleteFile(_myFragmentsFilename, false);
+                }
             }
         }
     }
@@ -434,44 +449,19 @@ public class TableFragments : TableFile {
                 return;
             }
 
-            var opr = PrepareFullFile(this);
-
-            if (opr.IsFailed) {
-                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {opr.FailedReason}", 0);
-                return;
+            // Komplettierung Fire-and-Forget im Hintergrund; gegen den Hintergrund-
+            // Speicher-Task über die Reserve-Semaphore serialisiert. Schlägt die
+            // Reservierung fehl, läuft gerade ein Speichervorgang — _masterNeeded
+            // bleibt aktiv und der nächste Update-Zyklus komplettiert erneut.
+            if (SaveSemaphore.Wait(0)) {
+                _ = Task.Run(() => {
+                    try {
+                        CompleteAsMaster(startTimeUtc);
+                    } finally {
+                        _ = SaveSemaphore.Release();
+                    }
+                });
             }
-
-            if (opr.Value is not List<byte> content) { return; }
-
-            // Fremd-Items, die während dieses Nachlade-Durchlaufs geschrieben wurden,
-            // wären nach dem Speichern älter als die Toleranz in GetLastChanges und
-            // würden dauerhaft übersprungen. Der nächste BeSureToBeUpToDate-Zyklus
-            // liest die Fragmente erneut und Komplettiert dann.
-            if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= FragmentToleranceSeconds) {
-                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} verschoben: Nachladen benötigte länger als {FragmentToleranceSeconds} Sekunden", 0);
-                return;
-            }
-
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
-
-            var f = WriteFullFile(this, content);
-
-            if (!string.IsNullOrEmpty(f)) {
-                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
-                return;
-            }
-
-            // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
-            _loadedMainFileUtcDate = LastSaveMainFileUtcDate;
-
-            CloseWriter();
-            StartWriter();
-
-            MasterMe();
-
-            _masterNeeded = false;
-            OnInvalidateView();
-            _changesNotIncluded.Clear();
         }
 
         #endregion
@@ -510,6 +500,65 @@ public class TableFragments : TableFile {
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Schreibt die neue Komplett-Tabelle im Hintergrund: Vollinhalt erzeugen
+    /// und schreiben, Fragment-Writer neu starten und den eigenen Basis-Stand
+    /// nachziehen. Toleranz-Prüfungen werden erneut ausgeführt, da zwischen
+    /// Anstoß und Ausführung Zeit vergehen kann.
+    /// </summary>
+    private void CompleteAsMaster(DateTime startTimeUtc) {
+        if (IsDisposed || Ending) { return; }
+
+        var opr = PrepareFullFile(this);
+
+        if (opr.IsFailed) {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {opr.FailedReason}", 0);
+            return;
+        }
+
+        if (opr.Value is not List<byte> content) { return; }
+
+        // Fremd-Items, die während dieses Nachlade-Durchlaufs geschrieben wurden,
+        // wären nach dem Speichern älter als die Toleranz in GetLastChanges und
+        // würden dauerhaft übersprungen. Der nächste BeSureToBeUpToDate-Zyklus
+        // liest die Fragmente erneut und Komplettiert dann.
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= FragmentToleranceSeconds) {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} verschoben: Nachladen benötigte länger als {FragmentToleranceSeconds} Sekunden", 0);
+            return;
+        }
+
+        // Fremd-Komplettierung in der Zwischenzeit? Deren absorbierte Items fehlen
+        // im Speicher — ein Komplett-Schreiben würde sie aus der Hauptdatei zurückrollen.
+        if (LastSaveMainFileUtcDate.Subtract(_loadedMainFileUtcDate).TotalSeconds > FragmentToleranceSeconds) {
+            Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Hauptdatei seit dem eigenen Lade-Stand ({_loadedMainFileUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}).");
+            UnMasterMe();
+            return;
+        }
+
+        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
+
+        var f = WriteFullFile(this, content);
+
+        if (!string.IsNullOrEmpty(f)) {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
+            return;
+        }
+
+        if (IsDisposed) { return; }
+
+        // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
+        _loadedMainFileUtcDate = LastSaveMainFileUtcDate;
+
+        CloseWriter();
+        StartWriter();
+
+        MasterMe();
+
+        _masterNeeded = false;
+        OnInvalidateView();
+        _changesNotIncluded.Clear();
     }
 
     /// <summary>
@@ -674,70 +723,72 @@ public class TableFragments : TableFile {
             return;
         }
 
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
-        CheckPath();
+        lock (_writerLock) {
+            if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
+            CheckPath();
 
-        // Der Benutzer gehört in den Namen: Jeder Benutzer schreibt sein eigenes
-        // Fragment, und mehrere Prozesse auf derselben Maschine kollidieren nicht
-        // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
-        // probiert die nächste Sekunde.
-        var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
+            // Der Benutzer gehört in den Namen: Jeder Benutzer schreibt sein eigenes
+            // Fragment, und mehrere Prozesse auf derselben Maschine kollidieren nicht
+            // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
+            // probiert die nächste Sekunde.
+            var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
-        if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
+            if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
-        // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleicher Sekundentick,
-        // gesperrte Datei) werden mit neuem Sekunden-Stempel erneut versucht; ein
-        // bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
-        for (var versuch = 1; versuch <= 5; versuch++) {
-            // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
-            // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
-            // behaltene Fragment aus derselben Sekunde) werden gemieden: Der
-            // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
-            // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
-            var stempel = DateTime.UtcNow;
-            var basis = FragmengtsPath().NormalizePath() + wunschName + "-";
-            _myFragmentsFilename = basis + stempel.ToString4() + "." + SuffixOfFragments;
-
-            while (IO.FileExists(_myFragmentsFilename)) {
-                stempel = stempel.AddSeconds(1);
+            // Begrenzte Wiederholungen statt Rekursion: Kollisionen (gleicher Sekundentick,
+            // gesperrte Datei) werden mit neuem Sekunden-Stempel erneut versucht; ein
+            // bleibender Fehler Freezt die Tabelle, statt den Stack aufzubrauchen.
+            for (var versuch = 1; versuch <= 5; versuch++) {
+                // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
+                // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
+                // behaltene Fragment aus derselben Sekunde) werden gemieden: Der
+                // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
+                // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
+                var stempel = DateTime.UtcNow;
+                var basis = FragmengtsPath().NormalizePath() + wunschName + "-";
                 _myFragmentsFilename = basis + stempel.ToString4() + "." + SuffixOfFragments;
-            }
 
-            if (Develop.AllReadOnly) { return; }
-
-            System.IO.FileStream? fileStream = null;
-            try {
-                fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write, System.IO.FileShare.Read);
-                _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
-                fileStream = null;
-
-                _writer.AutoFlush = true;
-                _writer.WriteLine("- Version " + TableVersion);
-                _writer.WriteLine("- Filename " + Filename);
-                _writer.WriteLine("- User " + UserName);
-
-                var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
-                _writer.WriteLine(l.ParseableItems().FinishParseable());
-                CanDeleteWriter = true;
-                _writer.Flush();
-                return;
-            } catch (Exception ex) {
-                fileStream?.Dispose();
-                _writer?.Dispose();
-                _writer = null;
-
-                // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
-                // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
-                // Versuch gelöst. Nur echte Fehler melden.
-                if (!IO.FileExists(_myFragmentsFilename)) {
-                    Develop.DebugPrint(ErrorType.Warning, "Fragmentdatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myFragmentsFilename.FileNameWithSuffix(), ex);
+                while (IO.FileExists(_myFragmentsFilename)) {
+                    stempel = stempel.AddSeconds(1);
+                    _myFragmentsFilename = basis + stempel.ToString4() + "." + SuffixOfFragments;
                 }
 
-                Pause(1, false);
-            }
-        }
+                if (Develop.AllReadOnly) { return; }
 
-        Freeze("Fragmentdatei konnte nicht geöffnet werden: " + _myFragmentsFilename);
+                System.IO.FileStream? fileStream = null;
+                try {
+                    fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+                    _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
+                    fileStream = null;
+
+                    _writer.AutoFlush = true;
+                    _writer.WriteLine("- Version " + TableVersion);
+                    _writer.WriteLine("- Filename " + Filename);
+                    _writer.WriteLine("- User " + UserName);
+
+                    var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+                    _writer.WriteLine(l.ParseableItems().FinishParseable());
+                    CanDeleteWriter = true;
+                    _writer.Flush();
+                    return;
+                } catch (Exception ex) {
+                    fileStream?.Dispose();
+                    _writer?.Dispose();
+                    _writer = null;
+
+                    // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
+                    // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
+                    // Versuch gelöst. Nur echte Fehler melden.
+                    if (!IO.FileExists(_myFragmentsFilename)) {
+                        Develop.DebugPrint(ErrorType.Warning, "Fragmentdatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myFragmentsFilename.FileNameWithSuffix(), ex);
+                    }
+
+                    Pause(1, false);
+                }
+            }
+
+            Freeze("Fragmentdatei konnte nicht geöffnet werden: " + _myFragmentsFilename);
+        }
     }
 
     #endregion

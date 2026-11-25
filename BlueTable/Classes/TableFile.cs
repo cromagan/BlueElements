@@ -3,6 +3,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -69,9 +70,35 @@ public class TableFile : Table {
     private static Timer? _tableUpdateTimer;
 
     /// <summary>
-    /// Semaphore zum Synchronisieren von Speichervorgängen.
+    /// Reserve-Semaphore der Speichervorgänge für abgeleitete Klassen
+    /// (z. B. die Komplettierung in TableFragments).
     /// </summary>
-    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+    protected SemaphoreSlim SaveSemaphore { get; } = new(1, 1);
+
+    /// <summary>
+    /// Hintergrund-Task des letzten Save-Aufrufs; Grundlage für IsSaving und
+    /// das Warten beim Beenden.
+    /// </summary>
+    private Task? _saveTask;
+
+    /// <summary>
+    /// Sperre um _saveTask: dedizierte Task-Erzeugung in Save und Warten über
+    /// WaitDiskOperationFinished.
+    /// </summary>
+    private readonly object _saveLock = new();
+
+    /// <summary>
+    /// Thread-Id des aktiven Hintergrund-Speicher-Tasks; -1, wenn keiner läuft.
+    /// Nur der speichernde Thread selbst darf während des Speicherns eigene
+    /// Editier-Prüfungen passieren.
+    /// </summary>
+    private volatile int _savingThreadId = -1;
+
+    /// <summary>
+    /// True, wenn gerade ein Hintergrund-Speicher-Task auf einem anderen Thread
+    /// läuft — zum Postponieren von Lade- und Aktualisierungs-Vorgängen.
+    /// </summary>
+    protected bool IsSaveRunningOnOtherThread => _savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId;
 
     private int _checkerTickCount = -5;
 
@@ -163,7 +190,10 @@ public class TableFile : Table {
     /// </summary>
     protected bool InitialSavePending { get; set; }
 
-    protected bool SaveRequired { get; set; }
+    /// <summary>
+    /// True, wenn noch ungespeicherte Änderungen ausständig sind.
+    /// </summary>
+    public bool SaveRequired { get; protected set; }
 
     #endregion
 
@@ -300,6 +330,10 @@ public class TableFile : Table {
     public override string IsGenericEditable(bool isloading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
+        // Während des Hintergrund-Speicherns: keine Skripte, Zell-Änderungen und
+        // Editoren; nur der speichernde Thread selbst läuft durch diese Prüfung.
+        if (IsSaveRunningOnOtherThread) { return "Tabelle wird gerade gespeichert."; }
+
         // Das ist eins super schnelle Prüfung, also vorziehen.
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
@@ -407,19 +441,27 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
+    /// <summary>
+    /// Stößt das Speichern als Fire-and-Forget-Hintergrund-Task an und kehrt
+    /// sofort zurück. Läuft bereits ein Speichervorgang, wird der Aufruf
+    /// verworfen — SaveRequired bleibt aktiv und der nächste Tick holt nach.
+    /// Fehler werden gemeldet, nicht an den Aufrufer zurückgegeben.
+    /// </summary>
     public OperationResult Save() {
         if (AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
         Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
-        try {
-            var result = SaveInternal();
-            OnInvalidateView();
-
-            if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
-        } catch (Exception ex) {
-            return OperationResult.Failed(ex);
+        lock (_saveLock) {
+            if (_saveTask is { IsCompleted: false }) { return OperationResult.Success; }
+            _saveTask = Task.Run(() => {
+                try {
+                    return SaveCore();
+                } catch (Exception ex) {
+                    return OperationResult.Failed(ex);
+                }
+            });
         }
 
         return OperationResult.Success;
@@ -433,9 +475,13 @@ public class TableFile : Table {
     public OperationResult Save(byte[] content) {
         if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
 
+        // Wiedereintritt aus dem eigenen Hintergrund-Speicher-Task (WriteFullFile):
+        // Die Reserve-Semaphore ist dort bereits reserviert und bleibt es auch.
+        var fromSaveCore = _savingThreadId == Environment.CurrentManagedThreadId;
+
         bool acquired = false;
         try {
-            acquired = _saveSemaphore.Wait(0);
+            acquired = fromSaveCore || SaveSemaphore.Wait(0);
             if (!acquired) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
         } catch (ObjectDisposedException) {
             return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
@@ -470,12 +516,61 @@ public class TableFile : Table {
 
             return result;
         } finally {
-            if (acquired) {
+            if (acquired && !fromSaveCore) {
                 try {
-                    _saveSemaphore.Release();
+                    SaveSemaphore.Release();
                 } catch { }
             }
         }
+    }
+
+
+    /// <summary>
+    /// Wartet auf das Ende eines laufenden Hintergrund-Speicher-Tasks —
+    /// für das Beenden und andere kritische Punkte.
+    /// </summary>
+    public void WaitDiskOperationFinished() {
+        Task? t;
+        lock (_saveLock) {
+            t = _saveTask;
+        }
+        if (t is { IsCompleted: false }) { _ = t.Wait(60000); }
+    }
+
+    /// <summary>
+    /// Eigentlicher Speicher-Ablauf im Hintergrund-Task. Mit der Reserve-
+    /// Semaphore gegen die Komplettierung serialisiert; Fehler werden gemeldet
+    /// und SaveRequired bleibt aktiv, damit ein erneuter Versuch nachholt.
+    /// Während des Ablaufs sind Skripte, Zell-Änderungen und Editoren der
+    /// eigenen Tabelle über IsGenericEditable blockiert.
+    /// </summary>
+    private OperationResult SaveCore() {
+        if (IsDisposed) { return OperationResult.Failed("Objekt ist bereits freigegeben"); }
+
+        if (!SaveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+
+        // Checker-Tick (Skripte) stoppen und fremde Threads über IsGenericEditable blockieren.
+        PauseTimer();
+        _savingThreadId = Environment.CurrentManagedThreadId;
+
+        try {
+            var result = SaveInternal();
+            OnInvalidateView();
+
+            if (!string.IsNullOrEmpty(result)) {
+                Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {result}", 0);
+                return OperationResult.Failed(result);
+            }
+        } catch (Exception ex) {
+            Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            return OperationResult.Failed(ex);
+        } finally {
+            _savingThreadId = -1;
+            ResumeTimer();
+            _ = SaveSemaphore.Release();
+        }
+
+        return OperationResult.Success;
     }
 
     /// <summary>
@@ -703,9 +798,24 @@ public class TableFile : Table {
         if (IsDisposed) { return; }
 
         if (disposing) {
-            if (SaveRequired && !IsFreezed) {
-                _ = SaveInternal();
-            }
+            // Laufenende Hintergrund-Vorgänge abschließen: Speicher-Task abwarten
+            // und die Reserve-Semaphore reservieren (Komplettierung), dann final
+            // sichern — erst danach wird die Semaphore freigegeben.
+            WaitDiskOperationFinished();
+
+            try {
+                if (SaveSemaphore.Wait(60000)) {
+                    try {
+                        if (SaveRequired && !IsFreezed) {
+                            _ = SaveInternal();
+                        }
+                    } finally {
+                        try {
+                            SaveSemaphore.Release();
+                        } catch { }
+                    }
+                }
+            } catch { }
 
             UnMasterMe();
 
@@ -713,11 +823,6 @@ public class TableFile : Table {
                 // Listen leeren
                 lock (_undoLock) {
                     Undo.Clear();
-                }
-
-                // Auf laufende Speichervorgänge warten, BEVOR die Semaphore disposed wird.
-                if (_saveSemaphore.Wait(30000)) {
-                    _saveSemaphore.Release();
                 }
             } catch { }
 
@@ -734,7 +839,7 @@ public class TableFile : Table {
             } catch { }
 
             try {
-                _saveSemaphore.Dispose();
+                SaveSemaphore.Dispose();
             } catch { }
         }
 

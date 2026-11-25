@@ -435,6 +435,10 @@ public class TableChunk : TableFile {
     }
 
     public override OperationResult BeSureRowIsLoaded(string chunkValue, bool trustProcessedFile) {
+        // Während des Hintergrund-Speicherns kein Einspielen — der nächste
+        // Zugriff lädt nach, sobald die Speicherung abgeschlossen ist.
+        if (IsSaveRunningOnOtherThread) { return OperationResult.FailedRetryable("Tabelle wird gerade gespeichert."); }
+
         var baseResult = base.BeSureRowIsLoaded(chunkValue, trustProcessedFile);
         if (baseResult.IsFailed) { return baseResult; }
 
@@ -459,6 +463,10 @@ public class TableChunk : TableFile {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
         if (IsDisposed || !DropMessages) { return true; }
         if (string.IsNullOrEmpty(Filename)) { return true; }
+
+        // Während des Hintergrund-Speicherns keine Chunks einspielen — der
+        // nächste Update-Tick holt nach, sobald die Speicherung abgeschlossen ist.
+        if (IsSaveRunningOnOtherThread) { return false; }
 
         // Reentrancy-Sperre: Der statische _tableUpdateTimer (alle 5 Min.) sowie
         // UI-Aktionen (Button-Klicks, Editoren) können BeSureToBeUpToDate zeitgleich
@@ -597,6 +605,10 @@ public class TableChunk : TableFile {
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
+        // Während des Hintergrund-Speicherns keine Chunks einspielen — der
+        // nächste Zugriff lädt nach, sobald die Speicherung abgeschlossen ist.
+        if (IsSaveRunningOnOtherThread) { return false; }
+
         var chunkFolder = BaseChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return true; }
 
@@ -634,25 +646,45 @@ public class TableChunk : TableFile {
     /// <summary>
     /// Lädt nach einer Änderung des Chunk-Typs alle Row-Chunks von der
     /// Festplatte nach, speichert alle Zeilen in die nun korrekten
-    /// Chunk-Ordner und löscht die verwaisten Chunk-Ordner.
+    /// Chunk-Ordner und löscht die verwaisten Chunk-Ordner. Läuft synchron —
+    /// der Aufrufer wartet auf das Ergebnis; ein laufender Hintergrund-
+    /// Speicher-Task wird dabei abgewartet.
     /// </summary>
     public override void ReorganizeChunks() {
         if (IsDisposed) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        if (!LoadTableRows(true, -1)) { return; }
+        // Gegen den Hintergrund-Speicher-Task serialisieren: Warten ist hier
+        // gewollt — der Aufrufer bekommt das Ergebnis der Neuverteilung.
+        var reserved = false;
+        try {
+            reserved = SaveSemaphore.Wait(30000);
+        } catch (ObjectDisposedException) { return; }
 
-        SaveRequired = true;
+        if (!reserved) {
+            Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Caption}' läuft weiterhin ein anderer Speichervorgang.", 0);
+            return;
+        }
 
-        // Die verwaisten Ordner dürfen erst weg, wenn alle Zeilen dauerhaft in
-        // den neuen Ordnern liegen. SaveInternal liefert auch bei durch eine
-        // Edit-Sperre übersprungenen Row-Chunks string.Empty — dann bleibt
-        // SaveRequired true und die alten Ordner als einzige Kopie bestehen.
-        SaveInternal();
+        try {
+            if (!LoadTableRows(true, -1)) { return; }
 
-        if (SaveRequired) { return; }
+            SaveRequired = true;
 
-        DeleteOrphanedChunkFolders();
+            // Die verwaisten Ordner dürfen erst weg, wenn alle Zeilen dauerhaft in
+            // den neuen Ordnern liegen. SaveInternal liefert auch bei durch eine
+            // Edit-Sperre übersprungenen Row-Chunks string.Empty — dann bleibt
+            // SaveRequired true und die alten Ordner als einzige Kopie bestehen.
+            SaveInternal();
+
+            if (SaveRequired) { return; }
+
+            DeleteOrphanedChunkFolders();
+        } finally {
+            try {
+                SaveSemaphore.Release();
+            } catch (ObjectDisposedException) { }
+        }
     }
 
     /// <summary>

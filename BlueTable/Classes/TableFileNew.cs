@@ -259,9 +259,10 @@ public class TableFileNew : Table {
     }
 
     /// <summary>
-    /// Speichert alle relevanten Dateien — Delegation an die Datei-Verwaltung.
-    /// Vorab läuft die Reparatur, damit auch der erste Speicherstand bereits im
-    /// reparierten Zustand vorliegt und Laden/Speichern denselben Inhalt erzeugen.
+    /// Stößt das Speichern aller relevanten Dateien Fire-and-Forget im
+    /// Hintergrund an — Delegation an die Datei-Verwaltung. Vorab läuft die
+    /// Reparatur, damit auch der erste Speicherstand bereits im reparierten
+    /// Zustand vorliegt und Laden/Speichern denselben Inhalt erzeugen.
     /// </summary>
     public OperationResult Save() {
         RepairAfterParse();

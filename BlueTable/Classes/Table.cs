@@ -13,7 +13,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueScript.Classes.Script;
 
@@ -1061,39 +1060,56 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     private static List<string> WithoutCliAdmin(IEnumerable<string> groups) =>
         [.. groups.Where(v => !v.Contains("#cli", StringComparison.OrdinalIgnoreCase) && !v.Contains("cli-", StringComparison.OrdinalIgnoreCase))];
 
+    /// <summary>
+    /// Stößt das Speichern aller Tabellen als Fire-and-Forget-Hintergrund-Tasks
+    /// an und kehrt sofort zurück. Warten ist nur beim Beenden nötig — dort über
+    /// WaitAllSaved().
+    /// </summary>
     public static void SaveAll() {
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen (Hintergrund)", 0);
 
         List<Table> snapshot;
         lock (AllFilesLocker) {
             snapshot = [.. LiveInstances.Values];
         }
 
-        Develop.EndLog($"TableScriptCommand.SaveAll: Start mit {snapshot.Count} Table(n)");
+        Develop.EndLog($"Table.SaveAll: Start mit {snapshot.Count} Table(n)");
 
         var count = 0;
-        Parallel.ForEach(snapshot, thisFile => {
-            var key = thisFile.KeyName;
-
+        foreach (var thisFile in snapshot) {
             switch (thisFile) {
                 case TableFile tbf:
-                    Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
-                    Interlocked.Increment(ref count);
-                    tbf.Save();
-                    Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    Develop.EndLog($"Table.SaveAll: Save '{tbf.KeyName}' angestoßen");
+                    if (tbf.Save().IsSuccessful) { count++; }
                     break;
                 case TableFileNew tfn:
-                    Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
-                    Interlocked.Increment(ref count);
-                    _ = tfn.Saveable.Save();
-                    Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
+                    Develop.EndLog($"Table.SaveAll: Save '{tfn.KeyName}' angestoßen");
+                    if (tfn.Saveable.Save().IsSuccessful) { count++; }
                     break;
             }
-        });
+        }
 
-        Develop.EndLog($"TableScriptCommand.SaveAll: Ende, {count} Table(n) gespeichert");
+        Develop.EndLog($"Table.SaveAll: {count} Speicher-Tasks angestoßen");
 
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"Speichern von {count} Tabellen angestoßen", 0);
+    }
+
+    /// <summary>
+    /// Wartet auf alle laufenden Tabellen-Speicher-Tasks — für das Beenden und
+    /// andere kritische Punkte.
+    /// </summary>
+    public static void WaitAllSaved() {
+        List<Table> snapshot;
+        lock (AllFilesLocker) {
+            snapshot = [.. LiveInstances.Values];
+        }
+
+        foreach (var thisFile in snapshot) {
+            switch (thisFile) {
+                case TableFile tbf: tbf.WaitDiskOperationFinished(); break;
+                case TableFileNew tfn: tfn.Saveable.WaitDiskOperationFinished(); break;
+            }
+        }
     }
 
     public static string UniqueKeyValue() {

@@ -3,6 +3,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueBasics.Classes;
 
@@ -230,6 +231,39 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Reentrancy-Sperre für den Chunk-Refresh: 0 = frei, 1 = läuft.
     /// </summary>
     private int _isRefreshingChunks;
+
+    /// <summary>
+    /// Serialisiert Save, Reorganize und Komplettierung je Instanz: Nur einer
+    /// dieser datenverändernden Vorgänge läuft gleichzeitig. Nicht blockierend
+    /// genutzt (Wait(0)) — Kollisionen werden übersprungen und später nachgeholt.
+    /// </summary>
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+
+    /// <summary>
+    /// Hintergrund-Task des letzten Save-Aufrufs; Grundlage für IsSaving und
+    /// das Warten beim Beenden.
+    /// </summary>
+    private Task? _saveTask;
+
+    /// <summary>
+    /// Sperre um _saveTask: dedizierte Task-Erzeugung in Save und Warten über
+    /// WaitDiskOperationFinished.
+    /// </summary>
+    private readonly object _saveLock = new();
+
+    /// <summary>
+    /// Serialisiert Journal-Schreibzugriffe (UnMasterMe, WriteMasterClaim,
+    /// LogUndoEntry, Flush) mit Writer-Wechseln (CloseWriter, StartWriter,
+    /// ContinueFragment).
+    /// </summary>
+    private readonly object _writerLock = new();
+
+    /// <summary>
+    /// Thread-Id des aktiven Hintergrund-Speicher-Tasks; -1, wenn keiner läuft.
+    /// Nur der speichernde Thread selbst darf während des Speicherns eigene
+    /// Editier-Prüfungen passieren (PrepareNewSnapshot, StartWriter).
+    /// </summary>
+    private volatile int _savingThreadId = -1;
 
     /// <summary>
     /// Zähler für aktive Änderungsprozesse zur Vermeidung von Race-Conditions.
@@ -660,6 +694,16 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
         if (!disposing) { return; }
 
+        // Laufende Hintergrund-Vorgänge abschließen, bevor Zustand und Writer
+        // freigegeben werden: Speicher-Task abwarten und die Reserve-Semaphore
+        // gegen Reorganize/Komplettierung reservieren.
+        WaitDiskOperationFinished();
+
+        var reserved = false;
+        try {
+            reserved = _saveSemaphore.Wait(30000);
+        } catch (ObjectDisposedException) { }
+
         IsDisposed = true;
         _ = Instances.TryRemove(this, out _);
 
@@ -676,6 +720,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         UnMasterMe();
 
         CloseWriter();
+
+        if (reserved) {
+            try {
+                _saveSemaphore.Release();
+            } catch (ObjectDisposedException) { }
+        }
     }
 
     /// <summary>
@@ -801,11 +851,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         IsMaster = false;
 
         if (Develop.AllReadOnly) { return; }
-        if (_writer is null) { StartWriter(); }
-        if (_writer is null) { return; }
 
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { StartWriter(); }
+                if (_writer is null) { return; }
+
                 _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterUser, "Unset: " + UserName);
                 _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterTimeUtc, DateTime.UtcNow.AddMinutes(-2 * MasterClaimMinutes));
                 _writer.Flush();
@@ -822,11 +873,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// </summary>
     private void WriteMasterClaim() {
         if (Develop.AllReadOnly) { return; }
-        if (_writer is null) { StartWriter(); }
-        if (_writer is null) { return; }
 
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { StartWriter(); }
+                if (_writer is null) { return; }
+
                 _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterUser, UserName);
                 _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterTimeUtc, DateTime.UtcNow);
                 _ = FragmentRecord.Append(_writer, 0, FragmentTagType.MasterApp, Develop.AppExe());
@@ -866,6 +918,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <param name="info">Zusatztext für die Diagnose-Ausgabe.</param>
     public bool EnsureDataLoaded(bool oldest, int count, string info) {
         if (IsDisposed || string.IsNullOrEmpty(Filename)) { return true; }
+
+        // Während des Hintergrund-Speicherns kein Einspielen von Chunks — nur
+        // der speichernde Thread selbst (Vorab-Laden in SaveChunks) darf laden.
+        if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return false; }
 
         var chunkFolder = BaseChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return true; }
@@ -944,9 +1000,38 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// mit Chunk-Spalte das Schreiben aller Daten-Chunks; ohne Chunk-Spalte
     /// werden alle Chunk-Ordner gelöscht. Vorab werden alle Daten-Chunks
     /// nachgeladen, damit keine nur in Chunk-Dateien liegende Zeile verloren
-    /// geht; mit fehlgeschlagenem Nachladen wird nichts verändert.
+    /// geht; mit fehlgeschlagenem Nachladen wird nichts verändert. Läuft
+    /// synchron — der Aufrufer wartet auf das Ergebnis. Ein laufender
+    /// Hintergrund-Speicher-Task wird dabei abgewartet.
     /// </summary>
     public void Reorganize() {
+        if (IsDisposed || Develop.AllReadOnly) { return; }
+
+        // Gegen Save und Komplettierung im Hintergrund serialisiert: Warten ist
+        // hier gewollt — der Aufrufer bekommt das Ergebnis der Neuverteilung.
+        var reserved = false;
+        try {
+            reserved = _saveSemaphore.Wait(60000);
+        } catch (ObjectDisposedException) { return; }
+
+        if (!reserved) {
+            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{KeyName}' läuft weiterhin ein anderer Speichervorgang.", 0);
+            return;
+        }
+
+        try {
+            ReorganizeCore();
+        } finally {
+            try {
+                _saveSemaphore.Release();
+            } catch (ObjectDisposedException) { }
+        }
+    }
+
+    /// <summary>
+    /// Eigentlicher Reorganize-Ablauf; nur unter der Reserve-Semaphore aufrufen.
+    /// </summary>
+    private void ReorganizeCore() {
         if (IsDisposed || Develop.AllReadOnly) { return; }
 
         // Fremde Snapshots nach dem eigenen Lade-Stand: Der Speicher kann deren
@@ -1000,6 +1085,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             return;
         }
 
+        if (IsDisposed) { return; }
+
         // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
         _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
 
@@ -1043,6 +1130,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// </summary>
     public string EditableError(bool isloading) {
         if (IsFreezed) { return FrozenReason; }
+
+        // Während des Hintergrund-Speicherns: keine Skripte, Zell-Änderungen und
+        // Editoren; nur der speichernde Thread selbst läuft durch diese Prüfung.
+        if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return "Tabelle wird gerade gespeichert."; }
 
         // Eine frische Erstanlage ist vollständig im Speicher; der erste Save()
         // erzeugt die Datei und setzt MainLoadDone.
@@ -1196,7 +1287,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     #region Speichern
 
     /// <summary>
-    /// Speichert die Daten, wenn der Stand geändert wurde.
+    /// Stößt das Speichern als Fire-and-Forget-Hintergrund-Task an und kehrt
+    /// sofort zurück. Läuft bereits ein Speichervorgang, wird der Aufruf
+    /// verworfen — SaveRequired bleibt aktiv und der nächste Tick holt nach.
+    /// Fehler werden gemeldet, nicht an den Aufrufer zurückgegeben.
     /// </summary>
     public OperationResult Save() {
         if (Develop.AllReadOnly) { return OperationResult.Success; }
@@ -1204,13 +1298,65 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         Develop.Message(ErrorType.Info, null, KeyName, ImageCode.Diskette, $"Speichere {KeyName}", 1);
 
+        lock (_saveLock) {
+            if (_saveTask is { IsCompleted: false }) { return OperationResult.Success; }
+            _saveTask = Task.Run(() => {
+                try {
+                    return SaveCore();
+                } catch (Exception ex) {
+                    return OperationResult.Failed(ex);
+                }
+            });
+        }
+
+        return OperationResult.Success;
+    }
+
+
+    /// <summary>
+    /// Wartet auf das Ende eines laufenden Hintergrund-Speicher-Tasks —
+    /// für das Beenden und andere kritische Punkte.
+    /// </summary>
+    public void WaitDiskOperationFinished() {
+        Task? t;
+        lock (_saveLock) {
+            t = _saveTask;
+        }
+        if (t is { IsCompleted: false }) { _ = t.Wait(60000); }
+    }
+
+    /// <summary>
+    /// Eigentlicher Speicher-Ablauf im Hintergrund-Task: Kopf-Teil und
+    /// Daten-Chunks schreiben. Mit Reserve-Semaphore gegen Reorganize und
+    /// Komplettierung serialisiert; Fehler werden gemeldet und SaveRequired
+    /// bleibt aktiv, damit ein erneuter Versuch die Daten nachholt. Während
+    /// des Ablaufs sind Skripte, Zell-Änderungen und Editoren der eigenen
+    /// Tabelle über EditableError blockiert.
+    /// </summary>
+    private OperationResult SaveCore() {
+        if (IsDisposed) { return OperationResult.Failed("Objekt ist bereits freigegeben"); }
+
+        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+
+        // Checker-Tick (Skripte) stoppen und fremde Threads über EditableError blockieren.
+        PauseTimer();
+        _savingThreadId = Environment.CurrentManagedThreadId;
+
         try {
             var result = SaveInternal();
             OnInvalidateView();
 
-            if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
+            if (!string.IsNullOrEmpty(result)) {
+                Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Speichern von {KeyName} fehlgeschlagen: {result}", 0);
+                return OperationResult.Failed(result);
+            }
         } catch (Exception ex) {
+            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Speichern von {KeyName} fehlgeschlagen: {ex.Message}", 0);
             return OperationResult.Failed(ex);
+        } finally {
+            _savingThreadId = -1;
+            ResumeTimer();
+            _ = _saveSemaphore.Release();
         }
 
         return OperationResult.Success;
@@ -1265,7 +1411,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         }
 
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { SaveRequired = false; return string.Empty; }
                 _writer.Flush();
             }
             SaveRequired = false;
@@ -1364,7 +1511,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Satz 254 (ContinueEOF) anhängen: Die Datei endet nicht mehr auf EOF,
         // daher wählt sie kein zweiter Prozess zur Fortführung.
         var error = ContinueFragmentFile(fragmentFilename, out var writer);
-        _writer = writer;
+        lock (_writerLock) {
+            _writer = writer;
+        }
         return error;
     }
 
@@ -1383,11 +1532,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (_doingChanges > 0) { return; }
         if (entry is not { Count: > 0 }) { return; }
 
-        if (_writer is null) { StartWriter(); }
-        if (_writer is null) { return; }
-
         try {
-            lock (_writer) {
+            lock (_writerLock) {
+                if (_writer is null) { StartWriter(); }
+                if (_writer is null) { return; }
+
                 using var ms = new MemoryStream();
 
                 var failedRecord = entry.FirstOrDefault(record => !record.Append(ms, record.Depth));
@@ -1444,21 +1593,23 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// permanenten Daten enthält. Abschließend wird der EOF-Satz geschrieben.
     /// </summary>
     private void CloseWriter() {
-        var writerToClose = _writer;
-        if (writerToClose is not null) {
-            _writer = null;
+        lock (_writerLock) {
+            var writerToClose = _writer;
+            if (writerToClose is not null) {
+                _writer = null;
 
-            try {
-                _ = FragmentRecord.Append(writerToClose, 0, FragmentTagType.Eof, string.Empty);
-                writerToClose.Flush();
-            } catch { } finally {
                 try {
-                    writerToClose.Dispose();
-                } catch { }
-            }
+                    _ = FragmentRecord.Append(writerToClose, 0, FragmentTagType.Eof, string.Empty);
+                    writerToClose.Flush();
+                } catch { } finally {
+                    try {
+                        writerToClose.Dispose();
+                    } catch { }
+                }
 
-            if (_canDeleteWriter) {
-                IO.DeleteFile(_myJournalFile, false);
+                if (_canDeleteWriter) {
+                    IO.DeleteFile(_myJournalFile, false);
+                }
             }
         }
     }
@@ -1492,38 +1643,18 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 return;
             }
 
-            var opr = PrepareNewSnapshot();
-
-            if (opr.IsFailed) {
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
-            } else if (opr.Value is not List<byte> content) {
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
-            } else if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= JournalToleranceSeconds) {
-                // Fremd-Einträge, die während dieses Lese-Zyklus geschrieben wurden,
-                // wären nach dem Schreiben älter als die Toleranz in ReadJournalFile
-                // und würden dauerhaft übersprungen. Der nächste Refresh-Zyklus
-                // liest die Journale erneut und Komplettiert dann.
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung von {KeyName} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
-            } else {
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
-
-                var f = WriteSnapshotFile(content);
-
-                if (string.IsNullOrEmpty(f)) {
-                    CloseWriter();
-                    StartWriter();
-
-                    MasterMe();
-
-                    // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
-                    _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
-
-                    MasterNeeded = false;
-                    OnInvalidateView();
-                    _filesNotIncluded.Clear();
-                } else {
-                    Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
-                }
+            // Komplettierung Fire-and-Forget im Hintergrund; gegen Save und
+            // Reorganize über die Reserve-Semaphore serialisiert. Schlägt die
+            // Reservierung fehl, läuft gerade ein anderer Vorgang — MasterNeeded
+            // bleibt aktiv und der nächste Refresh-Zyklus komplettiert erneut.
+            if (_saveSemaphore.Wait(0)) {
+                _ = Task.Run(() => {
+                    try {
+                        CompleteAsMaster(startTimeUtc);
+                    } finally {
+                        _ = _saveSemaphore.Release();
+                    }
+                });
             }
         }
 
@@ -1563,6 +1694,69 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Schreibt den Komplettstand im Hintergrund: Snapshot erzeugen und
+    /// schreiben, Journal neu starten und den eigenen Basis-Stand nachziehen.
+    /// Toleranz-Prüfungen werden erneut ausgeführt, da zwischen Anstoß und
+    /// Ausführung Zeit vergehen kann.
+    /// </summary>
+    private void CompleteAsMaster(DateTime startTimeUtc) {
+        if (IsDisposed || Ending) { return; }
+
+        var opr = PrepareNewSnapshot();
+
+        if (opr.IsFailed) {
+            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            return;
+        }
+
+        if (opr.Value is not List<byte> content) {
+            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
+            return;
+        }
+
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= JournalToleranceSeconds) {
+            // Fremd-Einträge, die während dieses Lese-Zyklus geschrieben wurden,
+            // wären nach dem Schreiben älter als die Toleranz in ReadJournalFile
+            // und würden dauerhaft übersprungen. Der nächste Refresh-Zyklus
+            // liest die Journale erneut und Komplettiert dann.
+            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung von {KeyName} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
+            return;
+        }
+
+        // Fremd-Komplettierung in der Zwischenzeit? Deren absorbierte Journal-
+        // Einträge fehlen im Speicher — ein Komplett-Schreiben würde sie aus
+        // dem Kopf-Stand zurückrollen.
+        if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
+            Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
+            UnMasterMe();
+            return;
+        }
+
+        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
+
+        var f = WriteSnapshotFile(content);
+
+        if (!string.IsNullOrEmpty(f)) {
+            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+            return;
+        }
+
+        if (IsDisposed) { return; }
+
+        CloseWriter();
+        StartWriter();
+
+        MasterMe();
+
+        // Die eigene Komplettierung ist der neue Basis-Stand des Speichers.
+        _loadedSnapshotUtcDate = LastSaveMainFileUtcDate;
+
+        MasterNeeded = false;
+        OnInvalidateView();
+        _filesNotIncluded.Clear();
     }
 
     /// <summary>
@@ -1855,61 +2049,63 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             return;
         }
 
-        // Begrenzte Wiederholungen statt Rekursion: Kollisionen werden mit neuem
-        // Sekunden-Stempel erneut versucht; ein bleibender Fehler Freezt das Objekt,
-        // statt den Stack aufzubrauchen.
-        for (var versuch = 1; versuch <= 5; versuch++) {
-            if (!string.IsNullOrEmpty(EditableError(false))) { return; }
-            CheckPath();
+        lock (_writerLock) {
+            // Begrenzte Wiederholungen statt Rekursion: Kollisionen werden mit neuem
+            // Sekunden-Stempel erneut versucht; ein bleibender Fehler Freezt das Objekt,
+            // statt den Stack aufzubrauchen.
+            for (var versuch = 1; versuch <= 5; versuch++) {
+                if (!string.IsNullOrEmpty(EditableError(false))) { return; }
+                CheckPath();
 
-            // Der Benutzer gehört in den Namen: Jeder Benutzer führt sein eigenes
-            // Journal, und mehrere Prozesse auf derselben Maschine kollidieren nicht
-            // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
-            // probiert die nächste Sekunde.
-            var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
+                // Der Benutzer gehört in den Namen: Jeder Benutzer führt sein eigenes
+                // Journal, und mehrere Prozesse auf derselben Maschine kollidieren nicht
+                // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
+                // probiert die nächste Sekunde.
+                var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
-            if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
+                if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
-            // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
-            // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
-            // behaltene Journal aus derselben Sekunde) werden gemieden: Der
-            // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
-            // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
-            var stempel = DateTime.UtcNow;
-            var basis = BaseChunkFolder().NormalizePath() + wunschName + "-";
-            _myJournalFile = basis + stempel.ToString4() + "." + SuffixOfFragments;
-
-            while (IO.FileExists(_myJournalFile)) {
-                stempel = stempel.AddSeconds(1);
+                // Der Name endet immer auf den 19-stelligen Zeitstempel, den die
+                // Aufräumarbeit ausliest. Belegte Namen (z. B. das eigene, eben
+                // behaltene Journal aus derselben Sekunde) werden gemieden: Der
+                // Sekunden-Stempel wird erhöht, bis der Name frei ist. CreateNew
+                // bleibt der atomare Schiedsrichter gegen Fremd-Zugriffe.
+                var stempel = DateTime.UtcNow;
+                var basis = BaseChunkFolder().NormalizePath() + wunschName + "-";
                 _myJournalFile = basis + stempel.ToString4() + "." + SuffixOfFragments;
-            }
 
-            if (Develop.AllReadOnly) { return; }
-
-            FileStream? fileStream = null;
-            try {
-                fileStream = new FileStream(_myJournalFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-                _writer = fileStream;
-                fileStream = null;
-
-                WriteJournalStartRecords(_writer);
-
-                _canDeleteWriter = true;
-                _writer.Flush();
-                return;
-            } catch (Exception ex) {
-                fileStream?.Dispose();
-                _writer?.Dispose();
-                _writer = null;
-
-                // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
-                // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
-                // Versuch gelöst. Nur echte Fehler melden.
-                if (!IO.FileExists(_myJournalFile)) {
-                    Develop.DebugPrint(ErrorType.Warning, "Journaldatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myJournalFile.FileNameWithSuffix(), ex);
+                while (IO.FileExists(_myJournalFile)) {
+                    stempel = stempel.AddSeconds(1);
+                    _myJournalFile = basis + stempel.ToString4() + "." + SuffixOfFragments;
                 }
 
-                Pause(1, false);
+                if (Develop.AllReadOnly) { return; }
+
+                FileStream? fileStream = null;
+                try {
+                    fileStream = new FileStream(_myJournalFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+                    _writer = fileStream;
+                    fileStream = null;
+
+                    WriteJournalStartRecords(_writer);
+
+                    _canDeleteWriter = true;
+                    _writer.Flush();
+                    return;
+                } catch (Exception ex) {
+                    fileStream?.Dispose();
+                    _writer?.Dispose();
+                    _writer = null;
+
+                    // Existiert die Zieldatei bereits, hat CreateNew die Namens-Kollision
+                    // (gleicher Sekunden-Stempel) erkannt — erwartet und wird vom nächsten
+                    // Versuch gelöst. Nur echte Fehler melden.
+                    if (!IO.FileExists(_myJournalFile)) {
+                        Develop.DebugPrint(ErrorType.Warning, "Journaldatei nicht offen (Versuch " + versuch.ToString1() + "): " + _myJournalFile.FileNameWithSuffix(), ex);
+                    }
+
+                    Pause(1, false);
+                }
             }
         }
 
@@ -2464,51 +2660,53 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (x != LastChangeUtc) { return "Daten wurden während der Speicherung geändert."; }
 
         // path → vollständiger Inhalt, fertig zum Schreiben
-        var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+        var chunkData = new ConcurrentDictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
         // chunkId (lowercase) → Hash des Voll-Inhalts, aktualisiert nach erfolgreichem Speichern
-        var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var newHashes = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         // chunkIds mit echten Änderungen (für EditLock Re-Check vor dem Schreiben)
-        var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        // true, wenn mindestens ein Daten-Chunk durch die Edit-Sperre oder einen
-        // Ladefehler blockiert wurde. In diesem Fall bleibt SaveRequired true, damit
-        // der nächste Speicherversuch die ungespeicherten Änderungen erneut versucht.
-        var chunksSkipped = false;
+        var changedChunkIds = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
+        // Anzahl der Chunks, die durch die Edit-Sperre oder einen Ladefehler
+        // blockiert wurden. In diesem Fall bleibt SaveRequired true, damit der
+        // nächste Speicherversuch die ungespeicherten Änderungen erneut versucht.
+        var chunksSkipped = 0;
 
-        foreach (var thisChunkId in dataChunkIds) {
+        // Aufbau und Hash je Chunk parallel: CPU-lastig (Baum-Schnitte, SHA256);
+        // Quelle (source) und Item-Index sind eingefroren und nur lesend genutzt.
+        Parallel.ForEach(dataChunkIds, thisChunkId => {
             var idLower = thisChunkId.ToLowerInvariant();
 
             if (loadFailedChunkIds.Contains(idLower)) {
-                chunksSkipped = true;
-                continue;
+                Interlocked.Increment(ref chunksSkipped);
+                return;
             }
 
             // Per-Chunk-Editierbarkeit: ist der Chunk durch einen anderen
             // Benutzer gesperrt, wird er übersprungen — die anderen Chunks
             // werden weiter gespeichert.
             if (CheckEditLock(idLower) is { Length: > 0 }) {
-                chunksSkipped = true;
-                continue;
+                Interlocked.Increment(ref chunksSkipped);
+                return;
             }
 
             // Vollständigen Inhalt aufbauen (inkl. Stempel und Abschluss-Marker)
             var fullContent = BuildChunkContent(idLower, source, itemIds);
-            if (fullContent.Count == 0) { continue; }
+            if (fullContent.Count == 0) { return; }
 
             var fullHash = Generic.GetSHA256HashString(ChunkCompareBasis([.. fullContent]));
             newHashes[idLower] = fullHash;
 
             // Unchanged-Check: bei identischem Inhalt keine neue Datei schreiben
-            if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) { continue; }
+            if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) { return; }
 
             chunkData[$"{GetChunkFolder(idLower)}{timestamp}.{SuffixOfChunks}"] = fullContent;
-            changedChunkIds.Add(idLower);
-        }
+            changedChunkIds[idLower] = default;
+        });
 
         // Re-Check: Es wird vorab kein Claim geschrieben, daher kann ein anderer
         // Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
         // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen
         // zu überschreiben. changedChunkIds enthält nur Chunks mit echten Änderungen.
-        foreach (var chunkId in changedChunkIds) {
+        foreach (var chunkId in changedChunkIds.Keys) {
             if (CheckEditLock(chunkId) is { Length: > 0 } lockCheck) {
                 Freeze(lockCheck);
                 return lockCheck;
@@ -2519,25 +2717,31 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
         Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks von '{KeyName}'", 2);
 
-        foreach (var kvp in chunkData) {
+        // Schreiben je Chunk parallel: eigenständige Ordner, write-once —
+        // keine gemeinsamen Ressourcen außer den Concurrent-Verwaltungen.
+        var writeError = (string?)null;
+        Parallel.ForEach(chunkData, kvp => {
             var path = kvp.Key;
 
             if (IO.CreateDirectory(path.FilePath()).IsFailed) {
                 Freeze($"Verzeichnis für '{path}' konnte nicht erstellt werden");
-                return $"Verzeichnis für '{path}' konnte nicht erstellt werden";
+                _ = Interlocked.CompareExchange(ref writeError, $"Verzeichnis für '{path}' konnte nicht erstellt werden", null);
+                return;
             }
 
             // Chunk-Dateien werden gezippt gespeichert
             var zipped = kvp.Value.ToArray().ZipIt();
             if (zipped is null || zipped.Length == 0) {
                 Freeze($"Komprimierung fehlgeschlagen für '{path}'");
-                return $"Komprimierung fehlgeschlagen für '{path}'";
+                _ = Interlocked.CompareExchange(ref writeError, $"Komprimierung fehlgeschlagen für '{path}'", null);
+                return;
             }
 
             var writeResult = IO.WriteAllBytes(path, zipped);
             if (writeResult.IsFailed) {
                 Freeze(writeResult.FailedReason);
-                return writeResult.FailedReason;
+                _ = Interlocked.CompareExchange(ref writeError, writeResult.FailedReason, null);
+                return;
             }
 
             // Nach dem Speichern: nur den Dateinamen tracken, Daten verwerfen
@@ -2546,7 +2750,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             _processedFile[chunkId] = path;
             _lastUsed[chunkId] = DateTime.UtcNow;
             CleanupOldChunkFiles(GetChunkFilesOrderedByTime(folder).ToArray());
-        }
+        });
+
+        if (writeError is { Length: > 0 }) { return writeError; }
 
         // Hashes nach erfolgreichem Speichern aktualisieren
         foreach (var kvp2 in newHashes) {
@@ -2554,7 +2760,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         }
 
         // SaveRequired nur aktiv halten, wenn Chunks ausständig blieben.
-        if (chunksSkipped) { SaveRequired = true; }
+        if (chunksSkipped != 0) { SaveRequired = true; }
 
         return string.Empty;
     }
