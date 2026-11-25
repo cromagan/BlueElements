@@ -120,7 +120,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.MaxTextLineLength = value;
     }
 
-    [DefaultValue(0)]
+    [DefaultValue(4000)]
     public int MaxTextLength {
         get => _textBox.MaxTextLength;
         set => _textBox.MaxTextLength = value;

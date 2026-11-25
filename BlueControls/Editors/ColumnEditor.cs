@@ -34,7 +34,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         InitializeComponent();
         _table = table;
 
-        cbxChunk.ItemAddRange(ItemsOf(typeof(ChunkType)));
         cbxRelationType.ItemAddRange(ItemsOf(typeof(RelationType)));
         cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
         cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
@@ -465,7 +464,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkIsKeyColumn.SetChecked(() => c.IsKeyColumn);
         chkRelation.SetChecked(() => c.Relationship_to_First);
         cbxRelationType.Set(((int)c.RelationType).ToString1(), () => c.RelationType);
-        cbxChunk.Set(((int)c.Value_for_Chunk).ToString1(), () => c.Value_for_Chunk);
         cbxRandLinks.Set(((int)c.LineStyleLeft).ToString1(), () => c.LineStyleLeft);
         cbxRandRechts.Set(((int)c.LineStyleRight).ToString1(), () => c.LineStyleRight);
         cbxAlign.Set(((int)c.Align).ToString1(), () => c.Align);
@@ -539,7 +537,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
         c.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
         c.RelationType = (RelationType)IntParse(cbxRelationType.Text);
-        c.Value_for_Chunk = (ChunkType)IntParse(cbxChunk.Text);
         c.MultiLine = chkMultiline.Checked;
         c.IsFirst = chkIsFirst.Checked;
         c.IsKeyColumn = chkIsKeyColumn.Checked;

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
+using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
@@ -45,6 +46,8 @@ namespace BlueControls.BlueTableDialogs {
             txbZeilenQuickInfo = new TextBoxSuggestions();
             txbSymbolFolder = new TextBox();
             capZeilenQuickInfo = new Caption();
+            capChunkSpalte = new Caption();
+            cbxChunkSpalte = new ComboBox();
             txbAssetFolder = new TextBox();
             capSymbolFolder = new Caption();
             txbStandardFormulaFile = new TextBox();
@@ -282,17 +285,17 @@ namespace BlueControls.BlueTableDialogs {
             GlobalTab.Name = "GlobalTab";
             GlobalTab.SelectedIndex = 0;
             GlobalTab.Size = new Size(1186, 707);
-            GlobalTab.TabDefault = null;
-            GlobalTab.TabDefaultOrder = null;
             GlobalTab.TabIndex = 21;
             GlobalTab.SelectedIndexChanged += GlobalTab_SelectedIndexChanged;
             // 
             // tabAllgemein
             // 
             tabAllgemein.BackColor = Color.FromArgb(255, 255, 255);
+            tabAllgemein.Controls.Add(cbxChunkSpalte);
             tabAllgemein.Controls.Add(txbZeilenQuickInfo);
             tabAllgemein.Controls.Add(txbSymbolFolder);
             tabAllgemein.Controls.Add(capZeilenQuickInfo);
+            tabAllgemein.Controls.Add(capChunkSpalte);
             tabAllgemein.Controls.Add(txbAssetFolder);
             tabAllgemein.Controls.Add(capSymbolFolder);
             tabAllgemein.Controls.Add(txbStandardFormulaFile);
@@ -324,9 +327,10 @@ namespace BlueControls.BlueTableDialogs {
             txbZeilenQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             txbZeilenQuickInfo.Cursor = Cursors.IBeam;
             txbZeilenQuickInfo.Location = new Point(8, 216);
+            txbZeilenQuickInfo.MaxTextLength = 4000;
             txbZeilenQuickInfo.MultiLine = true;
             txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            txbZeilenQuickInfo.Size = new Size(616, 152);
+            txbZeilenQuickInfo.Size = new Size(616, 104);
             txbZeilenQuickInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbSymbolFolder
@@ -346,6 +350,26 @@ namespace BlueControls.BlueTableDialogs {
             capZeilenQuickInfo.Name = "capZeilenQuickInfo";
             capZeilenQuickInfo.Size = new Size(152, 18);
             capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
+            // 
+            // capChunkSpalte
+            // 
+            capChunkSpalte.CausesValidation = false;
+            capChunkSpalte.Enabled = false;
+            capChunkSpalte.Location = new Point(8, 328);
+            capChunkSpalte.Name = "capChunkSpalte";
+            capChunkSpalte.Size = new Size(152, 18);
+            capChunkSpalte.Text = "Chunk-Spalte:";
+            // 
+            // cbxChunkSpalte
+            // 
+            cbxChunkSpalte.Cursor = Cursors.IBeam;
+            cbxChunkSpalte.DropDownStyle = DropDownMode.DropDownList;
+            cbxChunkSpalte.Enabled = false;
+            cbxChunkSpalte.Location = new Point(8, 344);
+            cbxChunkSpalte.Name = "cbxChunkSpalte";
+            cbxChunkSpalte.Size = new Size(616, 24);
+            cbxChunkSpalte.TabIndex = 59;
+            cbxChunkSpalte.TextChanged += cbxChunkSpalte_TextChanged;
             // 
             // txbAssetFolder
             // 
@@ -695,9 +719,9 @@ namespace BlueControls.BlueTableDialogs {
             tabUndo.Size = new Size(1178, 678);
             tabUndo.TabIndex = 6;
             tabUndo.Text = "Undo";
-            //
+            // 
             // fragmentUndo
-            //
+            // 
             fragmentUndo.Dock = DockStyle.Fill;
             fragmentUndo.Location = new Point(0, 0);
             fragmentUndo.Name = "fragmentUndo";
@@ -759,6 +783,8 @@ namespace BlueControls.BlueTableDialogs {
         private TabControl GlobalTab;
         private TextBoxSuggestions txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
+        private Caption capChunkSpalte;
+        private ComboBox cbxChunkSpalte;
         private TextBox txbAssetFolder;
         private Caption capSymbolFolder;
         private TextBox txbSymbolFolder;

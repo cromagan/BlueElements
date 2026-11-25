@@ -19,6 +19,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private bool _frmHeadEditorFormClosingIsin;
 
+    /// <summary>Übernommener Schlüssel der Chunk-Spalte (leer = 'Ohne').</summary>
+    private string _chunkSpalteAktuell = string.Empty;
+
     private bool _writeAccessLost;
 
     #endregion
@@ -102,6 +105,17 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         // Undo nur bei Tabellen im neuen Fragment-Format anbieten.
         if (tb is not TableFileNew) {
             GlobalTab.Controls.Remove(tabUndo);
+        }
+
+        // Chunk-Spalte nur bei Tabellen im Chunk-Format wählen; der Wechsel warnt vor den Folgen.
+        var isChunkTable = tb is TableChunk or TableFileNew;
+        capChunkSpalte.Enabled = isChunkTable;
+        cbxChunkSpalte.Enabled = isChunkTable;
+
+        if (isChunkTable) {
+            FillChunkSpalten(tb);
+            _chunkSpalteAktuell = tb.Column.ChunkValueColumn?.KeyName ?? string.Empty;
+            cbxChunkSpalte.Text = _chunkSpalteAktuell;
         }
 
         rowSortDefinitionEditor.InputItem = tb.SortDefinition;
@@ -325,6 +339,42 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tb.RepairAfterParse();
     }
 
+    private void cbxChunkSpalte_TextChanged(object sender, System.EventArgs e) {
+        if (Table is not { IsDisposed: false } tb || !Table.IsTableChunk(tb)) { return; }
+        if (cbxChunkSpalte.Text == _chunkSpalteAktuell) { return; }
+
+        if (Forms.MessageBox.Show(
+                "<b><u>Chunk-Spalte ändern?</u></b><br><br>"
+                + "Der Wechsel erfolgt zweistufig: Die bisherige Chunk-Spalte wird zuerst auf 'Ohne' gesetzt, wodurch alle Chunks aufgelöst und aufgeräumt werden. "
+                + "Erst danach wird die neue Chunk-Spalte gesetzt und alle Zeilen werden neu auf Chunks verteilt.<br><br>"
+                + "Die neue Chunk-Spalte wird automatisch angepasst: Mehrzeilig aus, Skript-Typ nur lesend, keine Verknüpfungen, keine Erst- oder Schlüsselspalte, kein Joker, nur einfacher Text-AutoFilter, bei Zeilenfiltern ignorieren, Inhalt speichern.",
+                ImageCode.Warnung, "Übernehmen", "Abbrechen") == 0) {
+            _chunkSpalteAktuell = cbxChunkSpalte.Text;
+            return;
+        }
+
+        // Abgebrochen: Die alte Auswahl wiederherstellen (die Rücksetzung löst kein erneutes Nachfragen aus).
+        cbxChunkSpalte.Text = _chunkSpalteAktuell;
+    }
+
+    /// <summary>
+    /// Füllt das Chunk-Spalten-Dropdown: 'Ohne' plus alle Spalten, die als
+    /// Chunk-Spalte dienen können. Die erste, verlinkte und System-Spalten
+    /// sind nicht wählbar; die aktuelle Chunk-Spalte bleibt im Angebot.
+    /// </summary>
+    private void FillChunkSpalten(Table tb) {
+        cbxChunkSpalte.ItemClear();
+        cbxChunkSpalte.ItemAdd(ItemOf("Ohne", string.Empty, null, false, true, string.Empty));
+
+        var chunkColumn = tb.Column.ChunkValueColumn;
+
+        foreach (var column in tb.Column) {
+            if (column is not { IsDisposed: false }) { continue; }
+            if (column != chunkColumn && (column.IsFirst || column.IsSystemColumn() || column.RelationType != RelationType.None)) { continue; }
+            cbxChunkSpalte.ItemAdd(ItemOf(column));
+        }
+    }
+
     private void GenerateInfoText() {
         if (IsDisposed || Table is not { IsDisposed: false } tbl) {
             capInfo.Text = "Tabellen-Fehler";
@@ -377,6 +427,13 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void WriteInfosBack() {
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
+
+        // Chunk-Spalte zweistufig wechseln: Erst die alte auf 'Ohne' setzen und
+        // aufräumen lassen, dann erst die gewählte Spalte übernehmen.
+        var chunkZiel = cbxChunkSpalte.Text is { Length: > 0 } chunkKey ? Table.Column[chunkKey] : null;
+        if (!ReferenceEquals(Table.Column.ChunkValueColumn, chunkZiel)) {
+            Table.SetChunkColumn(chunkZiel);
+        }
 
         //eventScriptEditor.WriteScriptBack();
         // GlobalShowPass wird nur bei TableFile zurückgeschrieben (siehe TableChunk.GenerateMainChunk).

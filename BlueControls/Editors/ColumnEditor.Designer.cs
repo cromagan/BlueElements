@@ -54,8 +54,6 @@ namespace BlueControls.BlueTableDialogs {
             capScriptType = new Caption();
             cbxAdditionalCheck = new ComboBox();
             capcbxAdditionalCheck = new Caption();
-            cbxChunk = new ComboBox();
-            capChunk = new Caption();
             chkMultiline = new Button();
             tabBearbeitung = new TabPage();
             grpAuswahlmenuOptionen = new GroupBox();
@@ -469,24 +467,6 @@ namespace BlueControls.BlueTableDialogs {
             capcbxAdditionalCheck.Name = "capcbxAdditionalCheck";
             capcbxAdditionalCheck.Size = new Size(216, 40);
             capcbxAdditionalCheck.Text = "Zusätzliche Prüfung, ob der eingegeben Wert konsitent ist zu:";
-            // 
-            // cbxChunk
-            // 
-            cbxChunk.Cursor = Cursors.IBeam;
-            cbxChunk.DropDownStyle = DropDownMode.DropDownList;
-            cbxChunk.Location = new Point(840, 8);
-            cbxChunk.Name = "cbxChunk";
-            cbxChunk.RegexCheck = null;
-            cbxChunk.Size = new Size(232, 24);
-            cbxChunk.TabIndex = 27;
-            // 
-            // capChunk
-            // 
-            capChunk.CausesValidation = false;
-            capChunk.Location = new Point(656, 8);
-            capChunk.Name = "capChunk";
-            capChunk.Size = new Size(184, 16);
-            capChunk.Text = "Werte zum Chunken benutzen:";
             // 
             // chkMultiline
             // 
@@ -1161,8 +1141,6 @@ namespace BlueControls.BlueTableDialogs {
             tabDatenFormat.Controls.Add(capcbxAdditionalCheck);
             tabDatenFormat.Controls.Add(cbxScriptType);
             tabDatenFormat.Controls.Add(capScriptType);
-            tabDatenFormat.Controls.Add(cbxChunk);
-            tabDatenFormat.Controls.Add(capChunk);
             tabDatenFormat.Controls.Add(chkMultiline);
             tabDatenFormat.Location = new Point(4, 25);
             tabDatenFormat.Name = "tabDatenFormat";
@@ -1488,13 +1466,11 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capAllowedChars;
         private TextBox txbAllowedChars;
         private Caption capImmerWerte;
-        private Caption capChunk;
         private Caption capAdminInfo;
         private TextBox txbAdminInfo;
         private Caption capQuickInfo;
         private Button btnOtherValuesToo;
         private ListBox lbxCellEditor;
-        private ComboBox cbxChunk;
         private TextBox txbTags;
         private TabControl tabControl;
         private TabPage tabAnzeige;

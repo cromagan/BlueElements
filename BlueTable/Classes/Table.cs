@@ -2371,6 +2371,30 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
     public virtual void ReorganizeChunks() { }
 
+    /// <summary>
+    /// Wählt die Chunk-Spalte zweistufig: Die bisherige Chunk-Spalte wird
+    /// zuerst auf 'Ohne' gesetzt, wodurch die Chunks aufgelöst und aufgeräumt
+    /// werden. Erst danach wird die neue Chunk-Spalte gewählt und die Zeilen
+    /// neu verteilt.
+    /// </summary>
+    public void SetChunkColumn(ColumnItem? column) {
+        if (IsDisposed || !IsTableChunk(this)) { return; }
+
+        var changed = false;
+
+        if (Column.ChunkValueColumn is { IsDisposed: false } old && old != column) {
+            old.Value_for_Chunk = ChunkType.None;
+            changed = true;
+        }
+
+        if (column is { IsDisposed: false } && column.Value_for_Chunk == ChunkType.None) {
+            column.Value_for_Chunk = ChunkType.ByName;
+            changed = true;
+        }
+
+        if (changed) { RepairAfterParse(); }
+    }
+
     public virtual void RepairAfterParse() {
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 

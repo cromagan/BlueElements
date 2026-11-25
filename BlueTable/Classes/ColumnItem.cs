@@ -1799,6 +1799,27 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
 
+        // Chunk-Spalte: Alles Zurücksetzen, was mit dem Chunking unvereinbar
+        // oder unnötig ist, damit gültige Chunk-Werte geliefert werden.
+        if (_value_for_Chunk != ChunkType.None) {
+            MultiLine = false;
+            IsFirst = false;
+            IsKeyColumn = false;
+            Relationship_to_First = false;
+            RelationType = RelationType.None;
+            LinkedTableTableName = string.Empty;
+            ColumnKeyOfLinkedTable = string.Empty;
+            _linkedCellFilter.Clear();
+            AutoFilterJoker = string.Empty;
+            IgnoreAtRowFilter = true;
+            FilterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled;
+            SaveContent = true;
+
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden) {
+                ScriptType = ScriptType.String_Readonly;
+            }
+        }
+
         if (MaxTextLength < MaxTextLineLength) { MaxTextLength = MaxTextLineLength; }
 
         // Bei einzeiligen Spalten Zeilenumbrüche automatisch verbieten
@@ -1820,9 +1841,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isFirst) { _minTextLength = 1; }
         }
 
-        // Ähnlichkeits-Gewichtung: First- und Unique-Spalten fließen nie in die
-        // Ähnlichkeits-Suche ein; Systemspalten setzt ResetSystemToDefault auf 0
-        if (_isFirst || tb.UniqueValues.Any(uvd => uvd.KeyColumns.Contains(this))) {
+        // Ähnlichkeits-Gewichtung: First-, Chunk- und Unique-Spalten fließen nie
+        // in die Ähnlichkeits-Suche ein; Systemspalten setzt ResetSystemToDefault auf 0
+        if (_isFirst || _value_for_Chunk != ChunkType.None || tb.UniqueValues.Any(uvd => uvd.KeyColumns.Contains(this))) {
             _similarityWeight = 0f;
         }
 
