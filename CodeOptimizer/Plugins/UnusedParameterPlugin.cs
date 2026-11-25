@@ -1,5 +1,8 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
+using System.Drawing;
+using System.Text.Json.Nodes;
+
 namespace CodeOptimizer.Plugins;
 
 /// <summary>
@@ -16,6 +19,13 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
 
     private const string MarkerPrefix = "// TODO: Unused: ";
 
+    private const int RowHeight = 27;
+
+    /// <summary>
+    /// True: Parameter gemäß Event-Handler-Muster (sender, e) werden nicht als unbenutzt markiert.
+    /// </summary>
+    private bool _skipEventHandlers = true;
+
     #endregion
 
     #region Properties
@@ -24,7 +34,7 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
 
     public override int Order => 70;
 
-    public override string QuickInfo => "Schreibt in Funktionen mit unbenutzten Parametern an erste Stelle 'TODO: Unused: Parametername'. Beachtet Überschreibungen und Interfaces: Die Signatur bleibt nicht anfassbar und wird nur markiert. Die Prüfung zählt reine Code-Vorkommen des Parameternamens im Funktionskörper (Strings und Kommentare zählen nicht).";
+    public override string QuickInfo => "Schreibt in Funktionen mit unbenutzten Parametern an erste Stelle 'TODO: Unused: Parametername'. Beachtet Überschreibungen und Interfaces: Die Signatur bleibt nicht anfassbar und wird nur markiert. Die Prüfung zählt reine Code-Vorkommen des Parameternamens im Funktionskörper (Strings und Kommentare zählen nicht). Event-Handler mit sender/e kann die Option ausnehmen.";
 
     public override ImageCode Symbol => ImageCode.Trichter;
 
@@ -95,12 +105,13 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
                 if (!member.HasBody || member.Parameters.Count == 0) { continue; }
                 if (HasMethodMarker(lines, member)) { continue; } // Member ist ohnehin als unbenutzt markiert
 
+                var skipEventParameters = _skipEventHandlers && IsEventHandler(member);
                 var trailingNames = new List<string>();
 
                 foreach (var parameter in member.Parameters) {
                     if (parameter == "_") { continue; }
 
-                    var used = BodyContains(visible, member, parameter);
+                    var used = BodyContains(visible, member, parameter) || (skipEventParameters && IsEventParameter(parameter));
                     var markers = MarkerLines(lines, member, parameter);
 
                     if (used) {
@@ -161,6 +172,32 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
         return report.ToString();
     }
 
+    public override List<GenericControl> GetOptions(int widthOfControl) {
+        var result = new List<GenericControl> {
+            new FlexiControl("Optionen:", widthOfControl, true),
+            new FlexiControl(QuickInfo, widthOfControl, false)
+        };
+
+        var btnSkip = new Button {
+            ButtonStyle = ButtonStyle.Yes_or_No,
+            Checked = _skipEventHandlers,
+            Size = new Size(widthOfControl, RowHeight),
+            Text = "Event-Handler ausnehmen (sender / e)"
+        };
+        btnSkip.Click += BtnSkip_Click;
+        result.Add(btnSkip);
+
+        return result;
+    }
+
+    public override JsonObject SaveSettings() {
+        var json = new JsonObject();
+        json.Set("SkipEventHandlers", _skipEventHandlers);
+        return json;
+    }
+
+    public override void LoadSettings(JsonObject settings) => _skipEventHandlers = settings.GetBool("SkipEventHandlers", true);
+
     /// <summary>
     /// True, wenn eine Zeile der Trivia des Members den Methoden-Marker 'TODO: Unused' trägt.
     /// </summary>
@@ -180,6 +217,16 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
         while (count < line.Length && line[count] == ' ') { count++; }
         return line[..count];
     }
+
+    /// <summary>
+    /// Liefert true, wenn die Signatur dem Event-Handler-Muster (sender, e) entspricht.
+    /// </summary>
+    private static bool IsEventHandler(CsMemberInfo member) => member.Parameters is ["sender", "e"];
+
+    /// <summary>
+    /// Liefert true, wenn der Parameter nach dem Event-Handler-Muster heißt (sender oder e).
+    /// </summary>
+    private static bool IsEventParameter(string parameter) => parameter is "sender" or "e";
 
     /// <summary>
     /// Liefert die Zeilen des Körpers, die einen vollständigen Marker für den Parameter enthalten.
@@ -231,6 +278,13 @@ public sealed partial class UnusedParameterPlugin : CodeOptimizerPlugin {
         if (!m.Success) { return []; }
 
         return [.. m.Groups[1].Value.Split(',').Select(n => n.Trim())];
+    }
+
+    private void BtnSkip_Click(object? sender, EventArgs e) {
+        if (sender is not Button btn) { return; }
+
+        _skipEventHandlers = btn.Checked;
+        OnOptionsChanged();
     }
 
     #endregion

@@ -27,7 +27,7 @@ Beim Start startet sich dieselbe exe zusätzlich als **Watchdog-Prozess** (`--wa
 
 1. Protokoll anlegen: Dateiname `Benutzer-Uhrzeit.txt` (z. B. `B7-14-05-09.txt`) im **Ordner der Tabelle**; Develop-Meldungen ab Warning laufen dorthin um. Die erste Protokollzeile (`DEBUGLOG`) nennt das Debug-Protokoll; es wird von Anfang an im **Verzeichnis des Stresstests** als `Trace-<Benutzer>-<Uhrzeit>.html` geführt.
 2. Tabelle laden (`Table.Get` + `BeSureToBeUpToDate`).
-3. 2-Sekunden-Timer: pro Tick eine Zufalls-Aktion (Wert 0-37). Master setzen und Komplettierung anstoßen sind nur in den **ersten 2 Minuten** erlaubt — danach laufen diese Ticks als Idle (wird protokolliert, ohne die Tabelle zu ändern).
+3. 2-Sekunden-Timer: pro Tick eine Zufalls-Aktion (Wert 0-49). Master setzen und Komplettierung anstoßen sind nur in den **ersten 2 Minuten** erlaubt — danach laufen diese Ticks als Idle (wird protokolliert, ohne die Tabelle zu ändern).
 4. Alle 15 Ticks: invalidierte Zeilen abarbeiten und speichern — so bleiben Änderungen auch bei einem Kill erhalten.
 5. Nach 10 Minuten reguläres Ende: speichern, Tabelle freigeben, ExitCode 0.
 
@@ -53,6 +53,14 @@ Beim Start startet sich dieselbe exe zusätzlich als **Watchdog-Prozess** (`--wa
 | 36 | In-Memory-Konsistenz: doppelte Zeilen-Keys, leere Chunk-Ids (nur mit Chunk-Spalte; ohne Chunk-Spalte sind leere Chunk-Ids korrekt), leere Spalten-Keys (ohne Änderung); protokolliert auch die Zahl der bekannten Chunk-Ids |
 | 37 | CSV-Export ausführen (Zeichen- und Zeilenzahl im Protokoll, ohne Änderung) |
 | 38-39 | Chunk-Wechsel: CHUNK-Zelle einer Zufallszeile auf einen anderen Pool-Wert setzen — die Zeile wandert beim Speichern in einen anderen Chunk-Ordner (ohne Chunk-Spalte: Idle-Meldung) |
+| 40 | Schreib-Stichprobe: Zelle ändern und die Schreib-Pipeline prüfen — der Wert muss beim Rücklesen angekommen sein; klassisches Format: der letzte Undo-Eintrag muss zur Änderung passen (Spalte, Zeile, Benutzer, Kommentar); Fragment-Format: `SaveRequired` muss aktiv sein |
+| 41 | Unique-Verletzung versuchen: Zwei Zeilen **desselben Chunks** werden auf denselben Wert einer Unique-Spalte gesetzt — die Änderung muss verweigert werden und den alten Wert erhalten; wird die Verletzung akzeptiert, ist das ein FEHLER |
+| 42-43 | Filter-Stichprobe: `CalculateFilteredRows` mit Istgleich auf den Wert einer Zufallszelle (mit Chunk-Filter, wenn eine Chunk-Spalte vorhanden ist); die Quellzeile muss im Ergebnis sein und kein Treffer darf den Filter verletzen |
+| 44 | Zeilen-Schub: vier Zeilen anlegen und sofort wieder löschen — die Journal-Sätze entstehen, ohne dass die Zeilen je einen gespeicherten Datenstand erreichen |
+| 45-46 | Komplette Zufallszeile zweimal lesen (Lesepfade mit kritischen Werten abrauchen; Zellen, die sich zwischen zwei Lesevorgängen ändern, sind ein FEHLER) |
+| 47 | Tabelle neu laden: speichern, freigeben, `Table.Get` + `LoadTableRows` mitten im Lauf; Zeilen-/Spaltenzahlen dürfen sich durch fremde Änderungen verschieben; nach dem Speichern darf `SaveRequired` nicht aktiv bleiben; scheitert das Neuladen dauerhaft, läuft der Restlauf ohne Aktionen weiter (ENDE mit ExitCode 1) |
+| 48 | Eigenes Stress-Script ausführen (`ExecuteScript`, produktiv, Fehler unterdrückt und als FEHLER protokolliert) |
+| 49 | Speicher-Stand: Managed Memory (mit erzwungener Sammlung), Working Set, Zeilen-/Spalten-/Script-Zahl — Leak-Beobachtung über mehrere Läufe |
 
 Laufzeit gesamt: **10 Minuten**.
 
@@ -64,7 +72,7 @@ Alle neuen Werte tragen den Benutzernamen (`B<n>-Zeit-Zufall`); Zeilen-Ersteller
 
 Jede Zeile: `Protokolldateiname|Uhrzeit|AKTION|Detail`
 
-Aktionen: `DEBUGLOG` (erste Zeile: Pfad des Debug-Protokolls im Verzeichnis des Stresstests), `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`, `SCRIPT`, `SCRIPT-WEG`, `SPALTE-NEU`, `SPALTE-WEG`, `SPALTE-META`, `ZELLE-SPEZIAL`, `ZEILE-DUP`, `CHUNK-WECHSEL`, `SORTIERUNG`, `DUPLIKATE`, `PRÜFUNG`, `CSV`, `DATENLADEN`, `SPEICHERN`, `MELDUNG` (Develop ab Warning), `FRAGMENTE` (Datei-Zähler der Chunk-Ordner vor dem Ende, nur bei TableFileNew — System-Ordner und Daten-Ordner je mit Datei-Zahl, darin ist die Chunk-Verteilung nachweisbar), `FEHLER`, `ENDE`, `WATCHDOG`.
+Aktionen: `DEBUGLOG` (erste Zeile: Pfad des Debug-Protokolls im Verzeichnis des Stresstests), `START`, `MASTER`, `KOMPLETTIERUNG`, `ZELLE`, `NEUEZEILE`, `LÖSCHEN`, `SCRIPT`, `SCRIPT-WEG`, `SCRIPT-AUS` (Skript-Ausführung), `SPALTE-NEU`, `SPALTE-WEG`, `SPALTE-META`, `ZELLE-SPEZIAL`, `ZEILE-DUP`, `CHUNK-WECHSEL`, `SORTIERUNG`, `DUPLIKATE`, `PRÜFUNG`, `CSV`, `DATENLADEN`, `SPEICHERN`, `SCHREIB` (Schreib-Pipeline-Stichprobe), `UNIQUE-NEG` (Unique-Verweigerung), `FILTER` (Filter-Engine), `ZEILEN-SCHUB` (anlegen+löschen im Rutsch), `ZEILE-LESEN` (Zeilenspiegel), `NEU-LADEN` (Reload-Rundtrip), `SPEICHERSTAND` (Speicher-Telemetrie), `MELDUNG` (Develop ab Warning), `FRAGMENTE` (Datei-Zähler der Chunk-Ordner vor dem Ende, nur bei TableFileNew — System-Ordner und Daten-Ordner je mit Datei-Zahl, darin ist die Chunk-Verteilung nachweisbar), `FEHLER`, `ENDE`, `WATCHDOG`.
 
 `FEHLER`-Zeilen enthalten Aktion, Exception-Typ, Meldung und `Develop.DiagStack()` — genug Kontext zur Reparatur, aber bewusst keine kompletten Stacktraces oder Zellinhalte.
 

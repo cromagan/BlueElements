@@ -674,7 +674,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         _lastUsed[IHasChunkValueExtension.ChunkId(chunkValue)] = DateTime.UtcNow;
     }
 
-     /// <summary>
+    /// <summary>
     /// Disposed die Verwaltung: markiert sie als verworfen, trägt sie aus dem
     /// Watcher-Register aus und gibt die Inhalte frei.
     /// </summary>

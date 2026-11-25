@@ -24,4 +24,12 @@ public enum StressAction {
     KonsistenzPruefen = 36,  // 36: In-Memory-Konsistenz prüfen
     CsvExportPruefen = 37,   // 37: CSV-Export ausführen
     ChunkWechsel = 38,       // 38-39: CHUNK-Zelle auf anderen Pool-Wert setzen
+    SchreibPruefung = 40,    // 40: Zelle ändern und Schreib-Pipeline prüfen (Rücklesen, Undo-Historie, SaveRequired)
+    UniqueVerletzung = 41,   // 41: Unique-Verletzung versuchen und Verweigerung erwarten
+    FilterPruefung = 42,     // 42-43: Filter-Engine nach dem Wert einer Zufallszelle suchen lassen
+    ZeilenSchub = 44,        // 44: Vier Zeilen anlegen und sofort wieder löschen
+    ZeileVollLesen = 45,     // 45-46: Komplette Zufallszeile zweimal lesen
+    TabelleNeuLaden = 47,    // 47: Speichern, freigeben und mitten im Lauf neu laden
+    ScriptAusfuehren = 48,   // 48: Eigenes Stress-Script ausführen
+    SpeicherStand = 49,      // 49: Managed Memory und Working Set protokollieren
 }

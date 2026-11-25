@@ -66,12 +66,14 @@ public sealed partial class OptimizerForm : Form {
             try {
                 report.AppendLine(plugin.Execute(rootPath));
             } catch (Exception ex) {
-                report.AppendLine("Fehler in Modul " + plugin.Name + ": " + ex.GetType().Name + ": " + ex.Message);
+                report.AppendLine("=== " + plugin.Name + " ===");
+                report.AppendLine("Fehler: " + ex.GetType().Name + ": " + ex.Message);
                 report.AppendLine(ex.StackTrace);
             }
         }
 
-        MessageBox.Show(report.ToString(), ImageCode.Information, "Fertig");
+        using var result = new ResultForm(report.ToString());
+        result.ShowDialog();
     }
 
     private List<CodeOptimizerPlugin> CheckedPlugins() {

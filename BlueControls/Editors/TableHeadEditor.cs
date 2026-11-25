@@ -19,7 +19,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private bool _frmHeadEditorFormClosingIsin;
 
-    /// <summary>Übernommener Schlüssel der Chunk-Spalte (leer = 'Ohne').</summary>
+    /// <summary>
+    /// Übernommener Schlüssel der Chunk-Spalte (leer = 'Ohne').
+    /// </summary>
     private string _chunkSpalteAktuell = string.Empty;
 
     private bool _writeAccessLost;

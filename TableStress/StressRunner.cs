@@ -51,6 +51,12 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
 
     private bool freezeReported;
 
+    /// <summary>
+    /// True, sobald ein NEU-LADEN die Tabelle nicht wiederherstellen konnte;
+    /// der Restlauf läuft dann ohne Aktionen weiter, um keine Flut zu erzeugen.
+    /// </summary>
+    private bool tabellenVerlust;
+
     private int scriptCount;
 
     private int spaltenCount;
@@ -109,6 +115,43 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         var gruppen = RowCollection.DuplicateGroups(tbl, [spalte], null, false).ToList();
 
         prot.Write("DUPLIKATE", $"Spalte={spalte.KeyName} Gruppen={gruppen.Count} Zeilen={gruppen.Sum(g => g.Count)}");
+    }
+
+    /// <summary>
+    /// Filter-Engine-Stichprobe: Sucht per Istgleich nach dem Wert einer Zufallszelle
+    /// (mit Chunk-Filter, wenn eine Chunk-Spalte vorhanden ist). Die Quellzeile muss
+    /// im Ergebnis sein und kein Treffer darf den Filter verletzen.
+    /// </summary>
+    private void ActionFilterPruefung() {
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("FILTER", "Keine Zeile vorhanden"); return; }
+
+        var chunkSpalte = ChunkSpalte();
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase) && c != chunkSpalte).ToArray();
+
+        if (columns.Length == 0) { prot.Write("FILTER", "Keine filterbare Spalte vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var column = columns[random.Next(columns.Length)];
+        var wert = row.CellGetString(column);
+        var zellFilter = new FilterItem(column, FilterType.Istgleich, wert);
+
+        // Ohne Chunk-Filter liefert die Engine bei Chunk-Tabellen bewusst ein leeres Ergebnis.
+        List<FilterItem> filter = chunkSpalte is { IsDisposed: false } cvc
+            ? [new FilterItem(cvc, FilterType.Istgleich, row.CellGetString(cvc)), zellFilter]
+            : [zellFilter];
+
+        var treffer = FilterCollection.CalculateFilteredRows(tbl, false, [.. filter]);
+        var fremde = treffer.Count(r => !r.MatchesTo(zellFilter));
+        var enthalten = treffer.Exists(r => r.KeyName.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase));
+        var quellePasst = row.MatchesTo(zellFilter);
+
+        if (fremde > 0) { prot.Write("FEHLER", $"FILTER {fremde} Treffer erfüllen den Filter nicht: Spalte={column.KeyName} Treffer={treffer.Count}"); }
+        if (quellePasst && !enthalten) { prot.Write("FEHLER", $"FILTER Quellzeile fehlt im Ergebnis: Key={row.KeyName} Spalte={column.KeyName} Treffer={treffer.Count}"); }
+        if (!quellePasst) { prot.Write("FEHLER", $"FILTER Quellzeile passt nicht auf den eigenen Wert: Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(wert)}"); }
+
+        prot.Write("FILTER", $"Spalte={column.KeyName} Wert={Logtext(wert)} Treffer={treffer.Count} QuelleEnthalten={(enthalten ? "ja" : "nein")} QuellePasst={(quellePasst ? "ja" : "NEIN")}");
     }
 
     private void ActionKomplettierung() {
@@ -174,26 +217,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionNeueZeile() {
-        // Muss-Spalten (Erstspalte, Chunk- und Unique-Spalten) per Istgleich-Filter setzen.
-        List<FilterItem> filter = [];
-        var chunkSpalte = ChunkSpalte();
-        var ordered = tbl.Column.ToList();
-
-        if (chunkSpalte is { IsDisposed: false } cvc) {
-            ordered.Remove(cvc);
-            ordered.Insert(0, cvc);
-        }
-
-        var uniqueColumns = tbl.Column.ColumnsUsedInUniqueDefinition();
-
-        foreach (var thisColumn in ordered) {
-            if (thisColumn is not { IsDisposed: false }) { continue; }
-            if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None || uniqueColumns.Contains(thisColumn)) {
-                filter.Add(new FilterItem(thisColumn, FilterType.Istgleich, MussWert(thisColumn, chunkSpalte)));
-            }
-        }
-
-        var opr = tbl.Row.GenerateAndAdd([.. filter], $"StressTest {user} Neue Zeile");
+        var opr = NeueMussZeile($"StressTest {user} Neue Zeile");
 
         if (opr.IsFailed || opr.Value is not RowItem row) {
             prot.Write("NEUEZEILE", "Fehlgeschlagen: " + opr.FailedReason);
@@ -204,7 +228,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     /// <summary>
-    /// Bildet den Zufallswert 0-39 auf die Aktion ab.
+    /// Bildet den Zufallswert 0-49 auf die Aktion ab.
     /// </summary>
     private static StressAction ActionOf(int value) {
         switch (value) {
@@ -225,8 +249,113 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             case 35: return StressAction.ScriptLoeschen;
             case 36: return StressAction.KonsistenzPruefen;
             case 37: return StressAction.CsvExportPruefen;
-            default: return StressAction.ChunkWechsel;
+            case <= 39: return StressAction.ChunkWechsel;
+            case 40: return StressAction.SchreibPruefung;
+            case 41: return StressAction.UniqueVerletzung;
+            case <= 43: return StressAction.FilterPruefung;
+            case 44: return StressAction.ZeilenSchub;
+            case <= 46: return StressAction.ZeileVollLesen;
+            case 47: return StressAction.TabelleNeuLaden;
+            case 48: return StressAction.ScriptAusfuehren;
+            default: return StressAction.SpeicherStand;
         }
+    }
+
+    /// <summary>
+    /// Schreib-Pipeline-Stichprobe: Ändert eine Zelle und prüft, dass der Wert
+    /// ankommt und die Änderung registriert wird — klassisches Format über den
+    /// letzten Undo-Eintrag, Fragment-Format über SaveRequired und Undo-Sätze.
+    /// </summary>
+    private void ActionSchreibPruefung() {
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("SCHREIB", "Keine Zeile vorhanden"); return; }
+
+        var chunkSpalte = ChunkSpalte();
+
+        // Systemspalten (SYS_) sind nie beschreibbar; die Chunk-Spalte hat eigene Aktionen.
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false } && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase) && c != chunkSpalte).ToArray();
+
+        if (columns.Length == 0) { prot.Write("SCHREIB", "Keine bearbeitbare Spalte vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var column = columns[random.Next(columns.Length)];
+        var vorher = row.CellGetString(column);
+        var kommentar = $"StressTest {user} Schreib-Stichprobe";
+        var failed = row.CellSet(column, RandomValue(), kommentar);
+
+        if (failed is { Length: > 0 }) {
+            prot.Write("SCHREIB", $"Key={row.KeyName} Spalte={column.KeyName} verweigert: {Logtext(failed)}");
+            return;
+        }
+
+        // Der gelesene Wert muss sich durch den Schreibzugriff ändern.
+        var nachher = row.CellGetString(column);
+        var angekommen = !string.Equals(nachher, vorher, StringComparison.Ordinal);
+
+        switch (tbl) {
+            case TableFile tf: {
+                var item = tf.Undo.Count > 0 ? tf.Undo[^1] : null;
+                var geloggt = item is not null
+                    && item.ColName.Equals(column.KeyName, StringComparison.OrdinalIgnoreCase)
+                    && item.RowKey.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase)
+                    && item.Comment == kommentar
+                    && string.Equals(item.User, user, StringComparison.OrdinalIgnoreCase);
+
+                string historie;
+
+                if (geloggt) {
+                    historie = "ok";
+                } else if (item is null) {
+                    historie = "FEHLER: Historie leer";
+                } else {
+                    historie = "FEHLER: " + Logtext(item.ColName + "/" + item.RowKey);
+                }
+
+                prot.Write("SCHREIB", $"Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(nachher)} {(angekommen ? "übernommen" : "FEHLER: Wert unverändert")} UndoHistorie={historie}");
+
+                if (!angekommen) { prot.Write("FEHLER", $"SCHREIB Zellwert kam nicht an: Key={row.KeyName} Spalte={column.KeyName}"); }
+                if (!geloggt) { prot.Write("FEHLER", $"SCHREIB letzter Undo-Eintrag passt nicht zur Änderung: Key={row.KeyName} Spalte={column.KeyName}"); }
+                break;
+            }
+            case TableFileNew tfn: {
+                // Im Fragment-Format muss der Schreibzugriff den Persistenz-Bedarf setzen;
+                // die Zahl der Undo-Sätze dient als Beobachtungsgröße.
+                var saveRequired = tfn.Saveable.SaveRequired;
+
+                prot.Write("SCHREIB", $"Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(nachher)} {(angekommen ? "übernommen" : "FEHLER: Wert unverändert")} SaveRequired={saveRequired} UndoSaetze={tfn.Saveable.Undos.Count}");
+
+                if (!angekommen) { prot.Write("FEHLER", $"SCHREIB Zellwert kam nicht an: Key={row.KeyName} Spalte={column.KeyName}"); }
+                if (!saveRequired) { prot.Write("FEHLER", $"SCHREIB SaveRequired nach Zelländerung false: Key={row.KeyName} Spalte={column.KeyName}"); }
+                break;
+            }
+            default: {
+                prot.Write("SCHREIB", $"Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(nachher)} {(angekommen ? "übernommen" : "FEHLER: Wert unverändert")}");
+
+                if (!angekommen) { prot.Write("FEHLER", $"SCHREIB Zellwert kam nicht an: Key={row.KeyName} Spalte={column.KeyName}"); }
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Führt das neueste eigene Stress-Script aus: Die Skript-Engine läuft sonst
+    /// im ganzen Stresstest nie echt; ein fehlgeschlagener Durchlauf wird sichtbar.
+    /// </summary>
+    private void ActionScriptAusfuehren() {
+        var praefix = $"Stress_{user}_";
+        var eigene = tbl.EventScript.Where(s => s.KeyName.StartsWith(praefix, StringComparison.Ordinal)).ToList();
+
+        if (eigene.Count == 0) { prot.Write("SCRIPT-AUS", "Kein eigenes Script vorhanden"); return; }
+
+        var script = eigene[^1];
+        var f = tbl.ExecuteScript(script, true, null, null, false, false, true, null);
+
+        prot.Write("SCRIPT-AUS", f.Failed
+            ? $"Name={script.KeyName} FEHLER: {Logtext(f.FailedReason)}"
+            : $"Name={script.KeyName} ok (Break={f.BreakFired} Return={f.ReturnFired})");
+
+        if (f.Failed) { prot.Write("FEHLER", $"SCRIPT-AUS Ausführung fehlgeschlagen: Name={script.KeyName}"); }
     }
 
     private void ActionScriptErstellen() {
@@ -334,6 +463,138 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     /// <summary>
+    /// Speicher-Telemetrie: Managed Memory (mit erzwungener Sammlung) und Working
+    /// Set je Zeilen-/Spaltenzahl — macht wachsende Lecks über mehrere Läufe sichtbar.
+    /// </summary>
+    private void ActionSpeicherStand() {
+        var managed = GC.GetTotalMemory(true);
+        var workingSet = Environment.WorkingSet;
+
+        prot.Write("SPEICHERSTAND", $"Managed={managed} WorkingSet={workingSet} Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count} Scripte={tbl.EventScript.Count} Ticks={tickCount}");
+    }
+
+    /// <summary>
+    /// Schwergewichtiger Rundtrip: speichern, Tabelle freigeben, neu laden — der
+    /// Reload läuft mitten im Lauf, während andere Benutzer weiterschreiben.
+    /// Zeilen- und Spaltenzahlen dürfen sich durch fremde Änderungen verschieben.
+    /// </summary>
+    private void ActionTabelleNeuLaden() {
+        string datei;
+
+        switch (tbl) {
+            case TableFileNew tfnDatei: datei = tfnDatei.Filename; break;
+            case TableFile tfDatei: datei = tfDatei.Filename; break;
+            default: datei = string.Empty; break;
+        }
+
+        if (datei is not { Length: > 0 }) { prot.Write("NEU-LADEN", "Kein Dateiname — übersprungen"); return; }
+
+        FlushChanges("vor Neuladen");
+
+        switch (tbl) {
+            case TableFileNew tfn when tfn.Saveable.SaveRequired:
+                prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFileNew)");
+                break;
+            case TableFile tf when tf.SaveRequired:
+                prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFile)");
+                break;
+        }
+
+        var zeilenVorher = tbl.Row.Count;
+        var spaltenVorher = tbl.Column.Count;
+        var masterVorher = tbl.TemporaryTableMasterUser;
+
+        tbl.Dispose();
+        Thread.Sleep(1500);
+
+        var neu = Table.Get(datei);
+
+        if (neu is not { IsDisposed: false }) {
+            Thread.Sleep(3000);
+            neu = Table.Get(datei);
+        }
+
+        if (neu is not { IsDisposed: false }) {
+            tabellenVerlust = true;
+            prot.Write("FEHLER", $"NEU-LADEN Tabelle nach dem Freigeben nicht ladbar: {datei} — Aktionen ausgesetzt");
+            return;
+        }
+
+        tbl = neu;
+        freezeReported = false;
+
+        if (!tbl.BeSureToBeUpToDate(false)) { prot.Write("FEHLER", $"NEU-LADEN {tbl.KeyName} konnte nicht auf den aktuellen Stand gebracht werden"); }
+
+        var geladen = tbl.LoadTableRows(false, -1);
+
+        prot.Write("NEU-LADEN", $"{(geladen ? "ok" : "FEHLER: Nachladen fehlgeschlagen")} Zeilen {zeilenVorher}→{tbl.Row.Count} Spalten {spaltenVorher}→{tbl.Column.Count} Master {masterVorher}→{tbl.TemporaryTableMasterUser}");
+
+        if (!geladen) { prot.Write("FEHLER", "NEU-LADEN LoadTableRows fehlgeschlagen"); }
+    }
+
+    /// <summary>
+    /// Negativ-Test zur Unique-Durchsetzung: Zwei Zeilen desselben Chunks werden
+    /// auf denselben Wert einer Unique-Spalte gesetzt — die zweite Änderung muss
+    /// verweigert werden und den alten Wert erhalten (Unique gilt je Chunk).
+    /// </summary>
+    private void ActionUniqueVerletzung() {
+        var chunkSpalte = ChunkSpalte();
+        var uniqueColumns = tbl.Column.ColumnsUsedInUniqueDefinition()
+            .Where(c => c is { IsDisposed: false } && c != chunkSpalte && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (uniqueColumns.Count == 0) { prot.Write("UNIQUE-NEG", "Keine Unique-Spalte vorhanden"); return; }
+
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length < 2) { prot.Write("UNIQUE-NEG", "Zu wenig Zeilen"); return; }
+
+        // Zwei verschiedene Zeilen im selben Chunk suchen: Nur dann kollidiert die
+        // Ziel-Änderung mit der Quelle über die ganze Unique-Definition.
+        RowItem? quelle = null;
+        RowItem? ziel = null;
+
+        for (var versuch = 0; versuch < 6 && ziel is null; versuch++) {
+            var a = rows[random.Next(rows.Length)];
+            var b = rows[random.Next(rows.Length)];
+
+            if (a.KeyName.Equals(b.KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
+            if (chunkSpalte is { IsDisposed: false } && !string.Equals(a.CellGetString(chunkSpalte), b.CellGetString(chunkSpalte), StringComparison.OrdinalIgnoreCase)) { continue; }
+
+            quelle = a;
+            ziel = b;
+        }
+
+        if (quelle is null || ziel is null) { prot.Write("UNIQUE-NEG", "Keine Zeilenkombination im selben Chunk gefunden"); return; }
+
+        var spalte = uniqueColumns[random.Next(uniqueColumns.Count)];
+        var zielWert = ziel.CellGetString(spalte);
+        var quellWert = quelle.CellGetString(spalte);
+
+        if (string.Equals(zielWert, quellWert, StringComparison.Ordinal)) { prot.Write("UNIQUE-NEG", $"Spalte={spalte.KeyName} Quelle und Ziel tragen denselben Wert — Stichprobe übersprungen"); return; }
+
+        var failed = ziel.CellSet(spalte, quellWert, $"StressTest {user} Unique-Verletzung");
+
+        if (failed is { Length: > 0 }) {
+            var erhalten = string.Equals(ziel.CellGetString(spalte), zielWert, StringComparison.Ordinal);
+
+            prot.Write("UNIQUE-NEG", $"Key={ziel.KeyName} Quelle={quelle.KeyName} Spalte={spalte.KeyName} verweigert ({Logtext(failed)}){(erhalten ? ", alter Wert erhalten" : string.Empty)}");
+
+            if (!erhalten) { prot.Write("FEHLER", $"UNIQUE-NEG Verweigerung hat den alten Wert nicht erhalten: Key={ziel.KeyName} Spalte={spalte.KeyName}"); }
+            return;
+        }
+
+        // Nicht verweigert: Eine vollständige Kollision (alle Unique-Spalten, gleicher Chunk) darf nicht durchgehen.
+        var kollision = uniqueColumns.TrueForAll(c => string.Equals(ziel.CellGetString(c), quelle.CellGetString(c), StringComparison.OrdinalIgnoreCase));
+
+        if (kollision) {
+            prot.Write("FEHLER", $"UNIQUE-NEG Verletzung akzeptiert: Key={ziel.KeyName} Quelle={quelle.KeyName} Spalten={string.Join(",", uniqueColumns.Select(c => c.KeyName))}");
+        } else {
+            prot.Write("UNIQUE-NEG", $"Key={ziel.KeyName} Spalte={spalte.KeyName} geändert — Definition kollidiert nicht vollständig, ok");
+        }
+    }
+
+    /// <summary>
     /// Legt eine Zeile mit den Werten einer Zufallszeile an; Unique-Spalten erhalten neue Zufallswerte.
     /// </summary>
     private void ActionZeileDuplizieren() {
@@ -394,6 +655,65 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         prot.Write("LÖSCHEN", opr.IsFailed ? $"Key={row.KeyName} FEHLER: {opr.FailedReason}" : $"Key={row.KeyName} ok");
     }
 
+    /// <summary>
+    /// Legt in einem Rutsch vier Zeilen an und löscht sie sofort wieder: übt das
+    /// schnelle Anlegen und Löschen vor dem periodischen Speichern ab — die Sätze
+    /// landen im Journal, ohne dass die Zeilen je einen Datenstand erreichen.
+    /// </summary>
+    private void ActionZeilenSchub() {
+        List<RowItem> angelegt = [];
+
+        for (var i = 0; i < 4; i++) {
+            var opr = NeueMussZeile($"StressTest {user} Zeilen-Schub {i + 1}");
+
+            if (opr.IsFailed || opr.Value is not RowItem row) {
+                prot.Write("ZEILEN-SCHUB", $"Anlegen {i + 1} fehlgeschlagen: {Logtext(opr.FailedReason)} BereitsAngelegt={angelegt.Count}");
+                break;
+            }
+
+            angelegt.Add(row);
+        }
+
+        var gelöscht = 0;
+
+        foreach (var row in angelegt) {
+            var opr = RowCollection.Remove(row, $"StressTest {user} Zeilen-Schub löschen");
+
+            if (opr.IsFailed) {
+                prot.Write("FEHLER", $"ZEILEN-SCHUB Löschen fehlgeschlagen: Key={row.KeyName} {opr.FailedReason}");
+                continue;
+            }
+
+            gelöscht++;
+        }
+
+        prot.Write("ZEILEN-SCHUB", $"Angelegt={angelegt.Count} Gelöscht={gelöscht} Keys={string.Join(",", angelegt.Select(r => r.KeyName))}");
+    }
+
+    /// <summary>
+    /// Liest alle Zellen einer Zufallszeile zweimal: raucht die Lesepfade über die
+    /// kritischen Werte ab und prüft, dass der Datenstand beim Lesen stabil bleibt.
+    /// </summary>
+    private void ActionZeileVollLesen() {
+        var rows = tbl.Row.ToArray();
+
+        if (rows.Length == 0) { prot.Write("ZEILE-LESEN", "Keine Zeile vorhanden"); return; }
+
+        var row = rows[random.Next(rows.Length)];
+        var columns = tbl.Column.Where(c => c is { IsDisposed: false }).ToList();
+
+        if (columns.Count == 0) { prot.Write("ZEILE-LESEN", "Keine Spalte vorhanden"); return; }
+
+        var erst = columns.ToDictionary(c => c.KeyName, c => row.CellGetString(c), StringComparer.OrdinalIgnoreCase);
+        var zweit = columns.ToDictionary(c => c.KeyName, c => row.CellGetString(c), StringComparer.OrdinalIgnoreCase);
+        var instabil = erst.Count(kv => !string.Equals(zweit[kv.Key], kv.Value, StringComparison.Ordinal));
+        var längste = erst.OrderByDescending(kv => kv.Value.Length).First();
+
+        if (instabil > 0) { prot.Write("FEHLER", $"ZEILE-LESEN {instabil} Zellen ändern sich beim erneuten Lesen: Key={row.KeyName}"); }
+
+        prot.Write("ZEILE-LESEN", $"Key={row.KeyName} ChunkId={row.ChunkId()} Zellen={erst.Count} Zeichen={erst.Sum(kv => kv.Value.Length)} Längste={längste.Key}={längste.Value.Length} Instabil={instabil}");
+    }
+
     private void ActionZelleAendern() {
         var rows = tbl.Row.ToArray();
         if (rows.Length == 0) { prot.Write("ZELLE", "Keine Zeile vorhanden"); return; }
@@ -436,13 +756,21 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void DoRandomAction() {
+        if (tabellenVerlust) {
+            tickCount++;
+
+            // Herzschlag ohne Aktionen: Der Lauf bleibt beobachtbar, ohne die verlorene Tabelle zu berühren.
+            if (tickCount % 15 == 0) { prot.Write("MELDUNG", "Tabelle nach NEU-LADEN verloren — Restlauf ohne Aktionen"); }
+            return;
+        }
+
         if (!freezeReported && tbl.IsFreezed) {
             freezeReported = true;
             prot.Write("FEHLER", $"Tabelle eingefroren: {tbl.FreezedReason}");
         }
 
         tickCount++;
-        var value = random.Next(0, 40);
+        var value = random.Next(0, 50);
         var action = ActionOf(value);
 
         try {
@@ -465,6 +793,14 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
                 case StressAction.KonsistenzPruefen: ActionKonsistenzPruefen(); break;
                 case StressAction.CsvExportPruefen: ActionCsvExportPruefen(); break;
                 case StressAction.ChunkWechsel: ActionChunkWechsel(); break;
+                case StressAction.SchreibPruefung: ActionSchreibPruefung(); break;
+                case StressAction.UniqueVerletzung: ActionUniqueVerletzung(); break;
+                case StressAction.FilterPruefung: ActionFilterPruefung(); break;
+                case StressAction.ZeilenSchub: ActionZeilenSchub(); break;
+                case StressAction.ZeileVollLesen: ActionZeileVollLesen(); break;
+                case StressAction.TabelleNeuLaden: ActionTabelleNeuLaden(); break;
+                case StressAction.ScriptAusfuehren: ActionScriptAusfuehren(); break;
+                case StressAction.SpeicherStand: ActionSpeicherStand(); break;
                 default: prot.Write("UNBEKANNT", "Zufallswert " + value); break;
             }
         } catch (Exception ex) {
@@ -476,6 +812,11 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private int Finish() {
+        if (tabellenVerlust) {
+            prot.Write("ENDE", $"Tabelle verloren (NEU-LADEN) — Ticks={tickCount} Ende nach {runTime.TotalMinutes:0} Minuten");
+            return 1;
+        }
+
         FlushChanges("Programmende");
         WriteFragmentStatistik();
         prot.Write("ENDE", $"Zeilen={tbl.Row.Count} Spalten={tbl.Column.Count} Scripte={tbl.EventScript.Count} Ticks={tickCount} reguläres Ende nach {runTime.TotalMinutes:0} Minuten");
@@ -515,6 +856,33 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// Pool-Wert, alles andere einen Zufallswert mit Benutzer-Stempel.
     /// </summary>
     private string MussWert(ColumnItem column, ColumnItem? chunkSpalte) => column == chunkSpalte ? ZufallsChunk() : RandomValue();
+
+    /// <summary>
+    /// Legt eine Zeile an und füllt die Muss-Spalten (Erstspalte, Chunk- und
+    /// Unique-Spalten) per Istgleich-Filter; die Chunk-Spalte wird vor den
+    /// Unique-Spalten geprüft. Rückgabe ist das Ergebnis mit der neuen Zeile.
+    /// </summary>
+    private OperationResult NeueMussZeile(string kommentar) {
+        var chunkSpalte = ChunkSpalte();
+        var ordered = tbl.Column.ToList();
+
+        if (chunkSpalte is { IsDisposed: false } cvc) {
+            ordered.Remove(cvc);
+            ordered.Insert(0, cvc);
+        }
+
+        var uniqueColumns = tbl.Column.ColumnsUsedInUniqueDefinition();
+        List<FilterItem> filter = [];
+
+        foreach (var thisColumn in ordered) {
+            if (thisColumn is not { IsDisposed: false }) { continue; }
+            if (thisColumn.IsFirst || thisColumn.Value_for_Chunk != ChunkType.None || uniqueColumns.Contains(thisColumn)) {
+                filter.Add(new FilterItem(thisColumn, FilterType.Istgleich, MussWert(thisColumn, chunkSpalte)));
+            }
+        }
+
+        return tbl.Row.GenerateAndAdd([.. filter], kommentar);
+    }
 
     /// <summary>
     /// Zufälliger Chunk-Pool-Wert, möglichst verschieden vom bisherigen Wert.
