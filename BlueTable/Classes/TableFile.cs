@@ -398,11 +398,17 @@ public class TableFile : Table {
         try {
             OnLoading();
 
+            // Beim Laden dürfen Zell-Setzungen keine Change-Events feuern;
+            // ResumeEvents löst am Ende einmalig den Sammel-Refresh aus.
+            SuppressEvents();
+
             LoadMainData();
 
             BeSureToBeUpToDate(true);
 
             MainChunkLoadDone = true;
+
+            ResumeEvents();
 
             RepairAfterParse();
 
@@ -767,7 +773,7 @@ public class TableFile : Table {
         if (!SaveRequired || !LogUndo || !string.IsNullOrEmpty(IsGenericEditable(false))) {
             _checkerTickCount = 0;
             return;
-        }        
+        }
         _checkerTickCount++;
         _checkerTickCount = Math.Min(_checkerTickCount, 5000);
 
