@@ -551,6 +551,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             _symbolFolderTemp = null;
             if (ChangeData(TableDataType.SymbolFolder, null, _symbolFolder, value) is { Length: > 0 }) { return; }
             OnFragmentChanged(new FragmentChangedEventArgs(this, TableFragmentType.SymbolFolder, value));
+            GetSymbolFolder();
             Cell.InvalidateAllSizes();
         }
     }
@@ -2356,11 +2357,21 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     }
 
     /// <summary>
-    /// Macht den Symbol-Ordner für QuickImage verfügbar, sodass <Imagecode=Name> eigene PNG-Dateien auflösen kann.
+    /// Baut die QuickImage-Suchpfade komplett neu auf: Liste leeren und alle
+    /// geladenen Tabellen mit ihrem Symbol-Ordner registrieren.
     /// </summary>
-    public void RegisterSymbolFolder() {
-        var p = SymbolFolderWhole();
-        if (!string.IsNullOrEmpty(p)) { QuickImage.RegisterSearchPath(p); }
+    public static void GetSymbolFolder() {
+        QuickImage.ResetSearchPaths();
+        List<Table> snapshot;
+        lock (AllFilesLocker) {
+            snapshot = [.. LiveInstances.Values];
+        }
+        foreach (var tb in snapshot) {
+            if (tb is { IsDisposed: false, MainChunkLoadDone: true }) {
+                var p = tb.SymbolFolderWhole();
+                if (!string.IsNullOrEmpty(p)) { QuickImage.RegisterSearchPath(p); }
+            }
+        }
     }
 
     /// <summary>
@@ -2446,6 +2457,10 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
         // Spaltenanordnungen reparieren: verwaiste Einträge entfernen,
         // Ansicht 0 erhält alle Spalten, mindestens zwei Ansichten sicherstellen.
         RepairArrangements();
+
+        // Symbol-Pfade für QuickImage neu registrieren; der Guard oben stellt sicher,
+        // dass erst nach dem kompletten Laden registriert wird.
+        GetSymbolFolder();
     }
 
     /// <summary>
@@ -2969,7 +2984,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableDataType.SymbolFolder:
                 _symbolFolder = value;
-                RegisterSymbolFolder();
+                _symbolFolderTemp = null;
                 break;
 
             case TableDataType.StandardFormulaFile:
@@ -3625,7 +3640,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
 
             case TableFragmentType.SymbolFolder:
                 _symbolFolder = record.StringContent;
-                RegisterSymbolFolder();
+                _symbolFolderTemp = null;
                 break;
 
             case TableFragmentType.RowQuickInfo:

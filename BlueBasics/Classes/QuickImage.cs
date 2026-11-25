@@ -273,6 +273,15 @@ public sealed class QuickImage : IReadableText, IEditable {
     }
 
     /// <summary>
+    /// Leert alle registrierten Suchpfade; die Symbol-Liste wird beim nächsten Zugriff neu gebildet.
+    /// </summary>
+    public static void ResetSearchPaths() {
+        lock (_searchPathsLock) {
+            SearchPaths.Clear();
+        }
+    }
+
+    /// <summary>
     /// Liefert die Namen aller PNG-Symboldateien aus den registrierten Suchpfaden (ohne Dateiendung).
     /// </summary>
     public static List<string> UserSymbols() {
