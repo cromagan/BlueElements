@@ -774,31 +774,6 @@ public static class IO {
     }
 
     /// <summary>
-    /// Liest den UTC-LastWriteTime eines Verzeichnisses. Auf Windows aktualisiert
-    /// das Dateisystem diesen Zeitstempel bei jeder Datei-Erstellung/Löschung/
-    /// Umbenennung innerhalb des Ordners (nicht rekursiv).
-    /// </summary>
-    /// <param name="affectingFiles">Liste mit dem zu prüfenden Verzeichnis.</param>
-    /// <param name="args">Keine.</param>
-    /// <returns>OperationResult mit DateTime (UTC) als Value bei Erfolg.</returns>
-    public static OperationResult TryGetFolderWriteTimeUtc(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
-
-        if (string.IsNullOrWhiteSpace(directory)) { return OperationResult.Failed("Kein Verzeichnis angegeben"); }
-
-        try {
-            var di = new DirectoryInfo(directory);
-            return new(di.LastWriteTimeUtc);
-        } catch (UnauthorizedAccessException ex) {
-            return OperationResult.Failed(ex);
-        } catch (DirectoryNotFoundException ex) {
-            return OperationResult.Failed(ex);
-        } catch (Exception ex) {
-            return OperationResult.FailedRetryable(ex);
-        }
-    }
-
-    /// <summary>
     /// Speichert alle Bytes in eine Datei (Overload ohne abortIfFailed)
     /// </summary>
     /// <param name="filename">Zieldatei</param>
