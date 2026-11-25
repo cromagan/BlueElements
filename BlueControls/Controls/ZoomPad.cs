@@ -488,7 +488,15 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var oldSliderYVisible = SliderY.Visible;
         var oldSliderXVisible = SliderX.Visible;
 
-        SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < 0 && freiraumBoth.Y < 0;
+        if (oldSliderYVisible) {
+            // Hysterese: Die aktuellen Bounds sind im schmaleren Layout MIT Slider
+            // berechnet. Der Slider bleibt daher, solange nicht nachweislich ist,
+            // dass der Inhalt auch in voller Breite passt — sonst würde das
+            // Ausblenden sofort wieder das Einblenden auslösen (Flackern).
+            SliderY.Visible = SlideAndZoomAllowed && (freiraumNoSliders.Y < 0 || !FitsWithoutSliderY());
+        } else {
+            SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < 0;
+        }
         SliderX.Visible = ShowSliderX && SlideAndZoomAllowed &&
                          (SliderY.Visible ? freiraumBoth.X < 0 : freiraumNoSliders.X < 0);
 
@@ -539,6 +547,23 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                 SliderY.Value = -val;
             }
         }
+    }
+
+    /// <summary>
+    /// Prüft, ob der Inhalt vertikal auch bei voller Control-Breite Platz hätte.
+    /// Berechnet das Layout dazu temporär ohne Y-Slider.
+    /// </summary>
+    /// <returns></returns>
+    private bool FitsWithoutSliderY() {
+        var visible = SliderY.Visible;
+        SliderY.Visible = false;
+        CanvasMaxBounds = RectangleF.Empty;
+        var bounds = CanvasMaxBounds;
+        var fits = CollectionPadItem.FreiraumControl(bounds, Size, Zoom).Y >= 0;
+        SliderY.Visible = visible;
+        CanvasMaxBounds = RectangleF.Empty;
+        _ = CanvasMaxBounds; // Layout MIT Slider sofort wiederherstellen
+        return fits;
     }
 
     private void ScrollAnimatorTick() {
