@@ -1,4 +1,4 @@
-# FragmentDump.ps1 — parst eine Fragment-Datei (.tblc/.tbls/.tblf, gezippt oder unkomprimiert)
+# FragmentDump.ps1 — parst eine Fragment-Datei (.chk/.snp/.frg oder Legacy .tblc/.tbls/.tblf, gezippt oder unkomprimiert)
 # und gibt je Satz: Pos, Depth, ValueId/Tag, DataType, Content-Kurztext, Meta.
 # usage: FragmentDump.ps1 -Datei <pfad> [-NurKopf 50]
 param(

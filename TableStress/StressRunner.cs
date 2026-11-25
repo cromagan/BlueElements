@@ -963,8 +963,16 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         if (!Directory.Exists(basis)) { return; }
 
         var kopfDateien = Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly);
-        var snaps = kopfDateien.Count(f => f.ToLowerInvariant().EndsWith(".tbls", StringComparison.Ordinal));
-        var journale = kopfDateien.Count(f => f.ToLowerInvariant().EndsWith(".tblf", StringComparison.Ordinal));
+        var snaps = 0;
+        var journale = 0;
+
+        // Kopf-Snapshots und -Journale in beiden Formaten zählen: neu (.snp/.frg) und Legacy (.tbls/.tblf).
+        foreach (var f in kopfDateien) {
+            switch (f.FileSuffix().ToLowerInvariant()) {
+                case "snp" or "tbls": snaps++; break;
+                case "frg" or "tblf": journale++; break;
+            }
+        }
 
         var (zeilenOrdnerGesamt, zeilenOrdnerLeer, systemOrdner, datenOrdner) = OrdnerStatistik(basis);
 

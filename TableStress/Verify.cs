@@ -26,6 +26,21 @@ public static class Verify {
 
     private static int _meldungCount;
 
+    /// <summary>
+    /// Suffixe der Kopf-Snapshots: neues Format (.snp) und Legacy (.tbls).
+    /// </summary>
+    private static readonly string[] SnapshotSuffixe = ["snp", "tbls"];
+
+    /// <summary>
+    /// Suffixe der Kopf-Journale: neues Format (.frg) und Legacy (.tblf).
+    /// </summary>
+    private static readonly string[] JournalSuffixe = ["frg", "tblf"];
+
+    /// <summary>
+    /// Suffixe der Chunk-Dateien: neues Format (.chk) und Legacy (.tblc).
+    /// </summary>
+    private static readonly string[] ChunkSuffixe = ["chk", "tblc"];
+
     #endregion
 
     #region Methods
@@ -105,7 +120,8 @@ public static class Verify {
 
     /// <summary>
     /// Prüft die Änderungs-Historie gegen die Festplatte: Jeder Eintrag muss im
-    /// Kopf-Snapshot oder -Journal vorliegen; Chunks tragen keine Historie.
+    /// Kopf-Snapshot oder -Journal vorliegen — im Legacy-Layout alternativ in den
+    /// Chunk-Dateien des Ziel-Chunks.
     /// </summary>
     private static void PruefeUndos(Table tbl, string phase) {
         if (tbl is not TableFileNew tfn) { return; }
@@ -118,6 +134,11 @@ public static class Verify {
         var entries = UndoEintraege(saveable.Undos);
         var disk = UndoFingerprintsVonDisk(basis);
 
+        // Die Historie kann im Kopf (Kopf-Snapshot/Journal) oder — Legacy-Layout —
+        // je Chunk-Ordner liegen; der Eintrag muss irgendwo auf der Platte sein.
+        var alle = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var set in disk.Values) { alle.UnionWith(set); }
+
         var ok = 0;
         var fehlt = 0;
         var gesamtSaetze = saveable.Undos.Count;
@@ -128,8 +149,7 @@ public static class Verify {
 
             var fp = Fingerprint(meta);
 
-            // Kopf-Fragment: Eintrag muss in Snapshot oder Journal vorliegen.
-            if (disk.TryGetValue("*", out var head) && head.Contains(fp)) {
+            if (alle.Contains(fp)) {
                 ok++;
             } else {
                 fehlt++;
@@ -216,17 +236,28 @@ public static class Verify {
             Warnung($"Leere Daten-Ordner={leereDatenOrdner.Count} (Marker/Nachläufer, Aufräumarbeit durch DeleteOrphanedChunkFolders) Beispiele={beispiele}");
         }
 
-        // Snapshots (.tbls) und Journale (.tblf) liegen im Arbeitsverzeichnis und
-        // werden ebenso auf Name und Abschluss geprüft.
+        // Kopf-Dateien (Snapshots und Journale, neues Format und Legacy) liegen im
+        // Arbeitsverzeichnis und werden ebenso auf Name und Abschluss geprüft.
+        // Das eigene, während des Laufs offene Journal bleibt außen vor.
+        var eigenesJournalMuster = datei.FileNameWithoutSuffix().ToUpperInvariant() + "-" + Generic.UserName + "-";
         var loseDateien = Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly);
+        var kopfNeu = 0;
+        var kopfLegacy = 0;
 
         foreach (var f in loseDateien) {
+            if (f.FileNameWithoutSuffix().StartsWith(eigenesJournalMuster, StringComparison.OrdinalIgnoreCase)) { continue; }
+
             var suffix = f.FileSuffix().ToLowerInvariant();
 
-            if (suffix is "tbls" or "tblf") {
-                // Snapshots (.tbls) tragen den ISO-Zeitstempel; Journal-Dateien (.tblf)
-                // sind benutzerbezogen benannt und werden nur auf Abschluss geprüft.
-                if (suffix == "tbls" && ParseChunkFileDate(f) is null) { Fehler($"Snapshot-Name ohne gültigen Zeitstempel: {f}"); }
+            if (SnapshotSuffixe.Contains(suffix) || JournalSuffixe.Contains(suffix)) {
+                var istSnapshot = SnapshotSuffixe.Contains(suffix);
+                var istNeu = suffix is "snp" or "frg";
+
+                if (istNeu) { kopfNeu++; } else { kopfLegacy++; }
+
+                // Snapshots tragen den Zeitstempel; Journal-Dateien sind
+                // benutzerbezogen benannt und werden nur auf Abschluss geprüft.
+                if (istSnapshot && ParseChunkFileDate(f) is null) { Fehler($"Snapshot-Name ohne gültigen Zeitstempel: {f}"); }
 
                 if (IO.ReadAllBytes(f, 5).Value is not byte[] rawF || rawF.Length == 0) {
                     Fehler($"Datei nicht lesbar: {f}");
@@ -235,7 +266,15 @@ public static class Verify {
 
                 var contentF = rawF.IsZipped() ? rawF.UnzipIt() : rawF;
                 if (contentF is not { Length: > 0 } || !FragmentRecord.HasValidEofMarker(contentF)) {
-                    Fehler($"Inhalt unvollständig (kein EOF-Marker): {f}");
+                    // Ein Journal ohne EOF ist der normale Zustand nach einem hart
+                    // beendeten Prozess (Kill/Absturz): Der Inhalt bleibt lesbar und
+                    // wird eingebunden. Ein unvollständiger Snapshot dagegen ist ein
+                    // echter Fehler.
+                    if (istSnapshot) {
+                        Fehler($"Snapshot unvollständig (kein EOF-Marker): {f}");
+                    } else {
+                        Warnung($"Journal ohne EOF-Marker (Sitzung nicht sauber beendet): {f}");
+                    }
                 }
 
                 continue;
@@ -244,8 +283,15 @@ public static class Verify {
             Warnung("Unerwartete Datei im Arbeitsverzeichnis: " + f);
         }
 
-        Write("VERZEICHNIS", $"SystemOrdner={systemOrdner} DatenOrdner={datenOrdner} LeereDatenOrdner={leereDatenOrdner.Count} Dateien={dateiGesamt + loseDateien.Length} Basis={basis}");
+        Write("VERZEICHNIS", $"SystemOrdner={systemOrdner} DatenOrdner={datenOrdner} LeereDatenOrdner={leereDatenOrdner.Count} Dateien={dateiGesamt + loseDateien.Length} KopfNeu={kopfNeu} KopfLegacy={kopfLegacy} Basis={basis}");
     }
+
+    /// <summary>
+    /// Zahl der Chunk-Dateien (neues Format und Legacy) im Ordner; -1, wenn der Ordner fehlt.
+    /// </summary>
+    private static int ChunkDateiZahl(string ordner) => Directory.Exists(ordner)
+        ? Directory.GetFiles(ordner, "*", SearchOption.TopDirectoryOnly).Count(f => ChunkSuffixe.Contains(f.FileSuffix().ToLowerInvariant()))
+        : -1;
 
     /// <summary>
     /// Prüft je Zeile mit Chunk-Wert, dass ihr Ziel-Chunk-Ordner auf der Festplatte
@@ -281,7 +327,7 @@ public static class Verify {
             var id = row.ChunkId();
             var folder = basis + id + "\\";
 
-            if (!Directory.Exists(folder) || Directory.GetFiles(folder, "*.tblc", SearchOption.TopDirectoryOnly).Length == 0) {
+            if (ChunkDateiZahl(folder) == 0) {
                 ohneOrdner++;
                 if (ohneOrdner <= 20) { Fehler($"Zeile {row.KeyName} (Chunk '{row.ChunkValue}' → '{id}') hat keine Chunk-Dateien"); }
             }
@@ -297,7 +343,7 @@ public static class Verify {
 
         foreach (var gruppe in tbl.Row.GroupBy(r => r.ChunkId(), StringComparer.OrdinalIgnoreCase).OrderBy(g => g.Key, StringComparer.Ordinal)) {
             var ordner = basis + gruppe.Key + "\\";
-            var dateien = Directory.Exists(ordner) ? Directory.GetFiles(ordner, "*.tblc", SearchOption.TopDirectoryOnly).Length : -1;
+            var dateien = ChunkDateiZahl(ordner);
             verteilung.Add($"{gruppe.Key}={gruppe.Count()}/{dateien}");
         }
 
@@ -349,6 +395,15 @@ public static class Verify {
 
             PruefeVerzeichnis(tbl);
             PruefeZeilenZuChunks(tbl);
+
+            // Ohne geladene Spalten gibt es keinen prüfbaren Stand: Ein Save würde
+            // einen leeren Snapshot schreiben und den Inhalt auf der Platte überdecken.
+            if (tbl.Column.Count == 0) {
+                tbl.Dispose();
+                Write("ENDE", $"FEHLER={_fehler} WARNUNGEN={_warnungen} MELDUNGEN={_meldungCount} Bericht={reportPath}");
+                return _fehler == 0 ? 0 : 1;
+            }
+
             PruefeUndos(tbl, "LADEN");
 
             // Speichern-Laden-Rundtrip: Stand sichern, freigeben, neu laden, vergleichen.
@@ -433,7 +488,7 @@ public static class Verify {
 
     /// <summary>
     /// Liest alle Meta-Fingerabdrücke der Fragment-Dateien: je Chunk-Ordner die
-    /// Union aller .tblc (der Ordner hält je Benutzer eine write-once Datei),
+    /// Union aller Chunk-Dateien (der Ordner hält je Benutzer eine write-once Datei),
     /// zusätzlich die Kopf-Dateien (Snapshots/Journale) unter "*".
     /// </summary>
     private static Dictionary<string, HashSet<string>> UndoFingerprintsVonDisk(string basis) {
@@ -443,7 +498,9 @@ public static class Verify {
             var id = dir.TrimEnd(Path.DirectorySeparatorChar).FileNameWithSuffix().ToLowerInvariant();
             var set = new HashSet<string>(StringComparer.Ordinal);
 
-            foreach (var file in Directory.GetFiles(dir, "*.tblc", SearchOption.TopDirectoryOnly)) {
+            foreach (var file in Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly)) {
+                if (!ChunkSuffixe.Contains(file.FileSuffix().ToLowerInvariant())) { continue; }
+
                 foreach (var r in MetaSaetzeVonDatei(file)) { set.Add(Fingerprint(r)); }
             }
 
@@ -455,7 +512,7 @@ public static class Verify {
 
         foreach (var f in Directory.GetFiles(basis, "*", SearchOption.TopDirectoryOnly)) {
             var suffix = f.FileSuffix().ToLowerInvariant();
-            if (suffix is not ("tbls" or "tblf")) { continue; }
+            if (!SnapshotSuffixe.Contains(suffix) && !JournalSuffixe.Contains(suffix)) { continue; }
 
             foreach (var r in MetaSaetzeVonDatei(f)) { head.Add(Fingerprint(r)); }
         }

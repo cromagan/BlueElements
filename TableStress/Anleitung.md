@@ -91,7 +91,7 @@ Aktionen: `DEBUGLOG` (erste Zeile: Pfad des Debug-Protokolls im Verzeichnis des 
 - `Watchdog.cs` — eigener Prozess derselben exe
 - `StressAction.cs` — Enum der Aktionen
 - `Verify.cs` — Prüf-Lauf ohne Änderungen: Verzeichnis-, Chunk-, Undo-, Speicher-/Lade-Rundtrip- und Reload-Prüfung
-- `FragmentDump.ps1` — parst eine Fragment-Datei (.tblc/.tbls/.tblf) und listet die Sätze
+- `FragmentDump.ps1` — parst eine Fragment-Datei (.chk/.snp/.frg oder Legacy .tblc/.tbls/.tblf) und listet die Sätze
 - `ProtokollAuswertung.ps1` — fasst Stress-Protokolle zusammen (FEHLER, Warnungen, Aktionen, FRAGMENTE)
 
 ## Prüf-Lauf (--verify)
@@ -115,7 +115,10 @@ im Ordner der Tabelle. ExitCodes: 0 = keine FEHLER, 1 = FEHLER, 2 = Argumente,
 Entscheidungen aus bisherigen Läufen — nicht neu diskutieren, sondern beachten:
 
 - Die `_000`-Prüfung in den `StartWriter`-Routinen (BlueBasics/BlueTable) **muss bleiben**: Ein Zähler-Anhang macht den Namen unbrauchbar, weil die Aufräumarbeit den Zeitstempel aus den letzten 19 Zeichen des Namens liest. Namen mit `_000` führen bewusst zum Freeze mit klarer Ursache.
-- Undo-Einträge für Zeilen **ohne Chunk-Wert liegen im Haupt-Daten-Chunk `_`**, nicht im Kopf: `ChunkId()` normiert den leeren Chunk-Wert zu `_`, und die SaveableFile-Verteilung nutzt genau diese IDs. Die Kopf-Snapshots/Journale halten nur die Nicht-Chunk-Bereiche. Prüfungen auf Undo-Historie müssen deshalb je Chunk-Ordner die Union **aller** `.tblc` lesen (der Ordner hält je Benutzer eine write-once Datei), nicht nur die neueste.
+- Undo-Einträge für Zeilen **ohne Chunk-Wert liegen im Haupt-Daten-Chunk `_`**, nicht im Kopf: `ChunkId()` normiert den leeren Chunk-Wert zu `_`, und die SaveableFile-Verteilung nutzt genau diese IDs. Die Kopf-Snapshots/Journale halten nur die Nicht-Chunk-Bereiche. Prüfungen auf Undo-Historie müssen deshalb je Chunk-Ordner die Union **aller** Chunk-Dateien lesen (`.chk` neues Format, `.tblc` Legacy; der Ordner hält je Benutzer eine write-once Datei), nicht nur die neueste.
+- TableStress prüft **beide Fragment-Layouts**: neues Format (`.snp`/`.frg`/`.chk`) und Legacy (`.tbls`/`.tblf`/`.tblc`) — je Datei erkannt, nicht je Tabelle.
+- **Legacy-Chunks (.tblc) sind Sitzungs-Journale**: Der Bestand eines Chunk-Ordners ergibt sich aus der Union aller Dateien von der ältesten zur neuesten — niemals nur die neueste Datei lesen. Das neue Format (.chk) schreibt je Datei den vollständigen Chunk; die Reihenfolge endet dort ebenfalls auf dem neuesten Stand.
+- **Verify speichert nur bei lesbarem Stand**: Eine Tabelle ohne geladene Spalten wird nicht gesichert — ein Save würde einen leeren Snapshot schreiben und den Inhalt auf der Platte überdecken.
 - **Die Chunk-Spalte ist zugleich Unique-Spalte:** `UniqueValueDefinition.Repair()` nimmt sie per `ColumnsIncludingChunk` in jede Unique-Definition auf (Unique gilt je Chunk). Code, der Muss-Spalten füllt, muss die Chunk-Spalte deshalb **vor** den Unique-Spalten prüfen — sonst erhält sie Zufallswerte statt Pool-Werte (sichtbar an Einzel-Chunks wie `b0_174747`).
 
 ## WICHTIG

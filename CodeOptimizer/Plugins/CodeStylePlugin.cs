@@ -4,7 +4,8 @@ namespace CodeOptimizer.Plugins;
 
 /// <summary>
 /// Führt die Code-Stil-Transformationen aus: leere Klammern, einzeilige If-Rückgaben,
-/// is-null-Muster, Summary-Tags und Doc-Kommentar-Einzug.
+/// is-null-Muster, redundante ToLower/ToUpper-Ketten, Groß/Klein-unabhängige String-Vergleiche,
+/// Summary-Tags und Doc-Kommentar-Einzug.
 /// </summary>
 public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
@@ -21,13 +22,43 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
     private const string DisposableTypes = "Table|RowItem|ColumnItem|GenericControl|RowCollection|ColumnCollection|FilterCollection|ColumnViewCollection|CellCollection|ColumnViewItem|ConnectedFormula|AbstractPadItem|AbstractListItem|BlueFont|ExtText|PointM|ExtChar|ScriptDescription|FlexiStrategyBase|CachedFile|BlockableFile|PictureView|QuickPicSelector|Row|Column|Filter";
 
+    /// <summary>
+    /// ToLower/ToUpper-Aufruf in beliebiger Schreibweise.
+    /// </summary>
+    private const string CaseFoldCall = @"\.(?:ToLowerInvariant|ToLower|ToUpperInvariant|ToUpper)\(\)";
+
+    /// <summary>
+    /// Optionales .Trim() zwischen Fold und Vergleich, als erfassbare Gruppe.
+    /// </summary>
+    private const string TrimCapture = @"((?:\s*\.\s*Trim\(\))?)";
+
+    /// <summary>
+    /// Einfacher Empfänger: Punktkette mit optionalen Indexern und Null-Conditional-Zeichen.
+    /// </summary>
+    private const string SimpleReceiver = @"(?:[\w.\[\]]+\??\.)*[\w.\[\]]+\??";
+
+    /// <summary>
+    /// String-Literal, normal oder verbatim.
+    /// </summary>
+    private const string StringLiteral = @"(?:@""(?:[^""\r\n]|"""")*"")|(?:""(?:[^""\\\r\n]|\\.)*"")";
+
+    /// <summary>
+    /// String-Methoden, die case-insensitive über StringComparison arbeiten dürfen.
+    /// </summary>
+    private const string ComparisonMethods = @"(?:LastIndexOf|IndexOf|Equals|EndsWith|StartsWith|Contains)";
+
+    /// <summary>
+    /// Operand eines Groß/Klein-Vergleichs: Literal oder einfacher Empfänger, keine Schlüsselwort-Operanden.
+    /// </summary>
+    private const string CompareOperand = @"((?:" + StringLiteral + @")|(?!null\b|true\b|false\b)" + SimpleReceiver + @")";
+
     #endregion
 
     #region Properties
 
     public override string Name => "Code-Stil";
     public override ImageCode Symbol => ImageCode.Zahnrad;
-    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, Summary-Tags und Doc-Kommentar-Einzug.";
+    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, ToLower/ToUpper-Ketten, Groß/Klein-Vergleiche, Summary-Tags und Doc-Kommentar-Einzug.";
     public override int Order => 30;
 
     #endregion
@@ -47,6 +78,9 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         var summaryOpen = 0;
         var summaryClose = 0;
         var docIndent = 0;
+        var foldChain = 0;
+        var eqFold = 0;
+        var eqFoldRev = 0;
         var totalFiles = 0;
         var skipped = new List<string>();
 
@@ -128,6 +162,24 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             content = DocIndentRegex().Replace(content, m => CsSanitizer.ContainsString(kinds, m.Index, m.Length) ? m.Value : FixDocIndent(m));
             var c10 = content != prev;
 
+            // 11. Redundante ToLower/ToUpper-Kette vor EndsWith/StartsWith/Contains/IndexOf/Equals -> StringComparison.OrdinalIgnoreCase
+            prev = content;
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = CaseFoldChainRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldChain(m) : m.Value);
+            var c11 = content != prev;
+
+            // 12. x.ToLowerInvariant() == "text" -> string.Equals(x, "text", StringComparison.OrdinalIgnoreCase)
+            prev = content;
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = CaseFoldCompareRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldCompare(m) : m.Value);
+            var c12 = content != prev;
+
+            // 13. "text" == x.ToLowerInvariant() -> string.Equals(x, "text", StringComparison.OrdinalIgnoreCase)
+            prev = content;
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = CaseFoldCompareReversedRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldCompareReversed(m) : m.Value);
+            var c13 = content != prev;
+
             if (c1) { braces++; }
             if (c3) { ifOneLine++; }
             if (c4) { parenSpace++; }
@@ -140,6 +192,9 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             if (c9a) { summaryOpen++; }
             if (c9b) { summaryClose++; }
             if (c10) { docIndent++; }
+            if (c11) { foldChain++; }
+            if (c12) { eqFold++; }
+            if (c13) { eqFoldRev++; }
 
             if (content == original) { continue; }
 
@@ -160,6 +215,9 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"Disposable is {{ }}:         {disp}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Summary-Tags aufgetrennt:   {summaryOpen + summaryClose}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Doc-Einzug korrigiert:      {docIndent}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"ToLower/ToUpper-Ketten:     {foldChain}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"x == \"text\" -> string.Equals: {eqFold}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"\"text\" == x -> string.Equals: {eqFoldRev}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Dateien geändert:           {totalFiles}");
         AppendSkipped(report, skipped);
         return report.ToString();
@@ -205,6 +263,38 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         return string.Join("\r\n", lines);
     }
 
+    /// <summary>
+    /// Baut den Ersatz für eine ToLower/ToUpper-Kette vor einer Vergleichsmethode.
+    /// </summary>
+    private static string FoldChain(Match m) => m.Groups[1].Value + "." + m.Groups[2].Value + "(" + m.Groups[3].Value + ", StringComparison.OrdinalIgnoreCase)";
+
+    /// <summary>
+    /// Baut den Ersatz für x.ToLowerInvariant() == "text".
+    /// </summary>
+    private static string FoldCompare(Match m) => (m.Groups[3].Value == "!=" ? "!" : "") + "string.Equals(" + m.Groups[1].Value + (m.Groups[2].Success ? ".Trim()" : "") + ", " + m.Groups[4].Value + ", StringComparison.OrdinalIgnoreCase)";
+
+    /// <summary>
+    /// Baut den Ersatz für "text" == x.ToLowerInvariant().
+    /// </summary>
+    private static string FoldCompareReversed(Match m) => (m.Groups[2].Value == "!=" ? "!" : "") + "string.Equals(" + m.Groups[3].Value + (m.Groups[4].Success ? ".Trim()" : "") + ", " + m.Groups[1].Value + ", StringComparison.OrdinalIgnoreCase)";
+
+    /// <summary>
+    /// Prüft, dass ein Treffer mit eingebettetem String-Literal in echtem Code beginnt und endet und keine Kommentare enthält.
+    /// </summary>
+    private static bool IsCodeWithLiteral(string kinds, Match m) {
+        var firstQuote = m.Value.IndexOf('"');
+        if (firstQuote < 0) { return CsSanitizer.IsPureCode(kinds, m.Index, m.Length); }
+
+        var lastQuote = m.Value.LastIndexOf('"');
+        if (!CsSanitizer.IsPureCode(kinds, m.Index, firstQuote) || !CsSanitizer.IsPureCode(kinds, m.Index + lastQuote + 1, m.Length - lastQuote - 1)) { return false; }
+
+        for (var i = firstQuote; i <= lastQuote; i++) {
+            if (kinds[m.Index + i] == CsSanitizer.KindComment) { return false; }
+        }
+
+        return true;
+    }
+
     [GeneratedRegex(@"(\r?\n[ \t]*)?\{[ \t]*\r?\n(?:[ \t]*\r?\n)*[ \t]*\}")]
     private static partial Regex EmptyBracesRegex();
 
@@ -243,6 +333,15 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
     [GeneratedRegex(@"(?m)^[ \t]*///[^\r\n]*(?:\r?\n[ \t]*///[^\r\n]*)*(?=\r?\n([ \t]*)\S)")]
     private static partial Regex DocIndentRegex();
+
+    [GeneratedRegex(CaseFoldCall + TrimCapture + @"\s*\.\s*(" + ComparisonMethods + @")\(\s*(" + StringLiteral + @")\s*(?:,\s*StringComparison\.\w+)?\s*\)")]
+    private static partial Regex CaseFoldChainRegex();
+
+    [GeneratedRegex(@"(?<!\.)(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"\s*(==|!=)\s*" + CompareOperand + @"(?![ \t]*[.+(?])")]
+    private static partial Regex CaseFoldCompareRegex();
+
+    [GeneratedRegex(@"(?<!\+\s*)(" + StringLiteral + @")\s*(==|!=)\s*(?<!\.)(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"(?![ \t]*[.+(?])")]
+    private static partial Regex CaseFoldCompareReversedRegex();
 
     #endregion
 }

@@ -72,7 +72,7 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
         var existing = ExistingOrThis(script);
 
         // Neu: als Aufnahme melden
-        if (existing is null) { return Add(script); }
+        if (existing is null) { return AddNew(script); }
 
         // Unverändert und nicht die beobachtete Instanz selbst: kein Journal-Eintrag
         if (!ReferenceEquals(existing, script) && existing.ParseableItems().FinishParseable() == script.ParseableItems().FinishParseable()) { return true; }
@@ -84,7 +84,17 @@ public sealed class TableScriptCollection : KeyedItemCollection<TableScriptDescr
 
         // Umbenennung: Entfernung unter dem alten und Aufnahme unter dem neuen Namen
         _ = Remove(existing.KeyName);
-        return Add(script);
+        return AddNew(script);
+    }
+
+    /// <summary>
+    /// Nimmt ein neues Skript auf: Erst der leere ItemAdd-Kopf, dann die Werte über die
+    /// Setter — nur so tragen die Property-Blätter (Skript-Text, Auslöser, ...) den
+    /// Journal-Eintrag; ein vorgefülltes Item würde nur den Kopf ohne Inhalt journale.
+    /// </summary>
+    private bool AddNew(TableScriptDescription script) {
+        var neu = new TableScriptDescription(Table, script.KeyName, string.Empty);
+        return Add(neu) && neu.Update(script) is { Length: 0 };
     }
 
     /// <summary>
