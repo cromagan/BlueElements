@@ -488,10 +488,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// nicht aus LastWriteTimeUtc — der Zeitstempel im Namen ist der alleinige
     /// Vergleich für Aktualität (robust gegen Kopieren/Archivieren).
     /// </summary>
-    public DateTime LastSaveMainFileUtcDate { get =>
+    public DateTime LastSaveMainFileUtcDate {
+        get =>
         field == DateTime.MinValue
             ? new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            : field; private set; } = DateTime.MinValue;
+            : field; private set;
+    } = DateTime.MinValue;
 
     /// <summary>
     /// True, wenn der geladene Kopf-Datenstand höchstens eine Minute alt ist.
@@ -1136,8 +1138,10 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Kurzes Speichern wird statt einer Ablehnung begrenzt abgewartet — eine
         // Abweisung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
         if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) {
-            for (var warte = 0; warte < 50 && _savingThreadId != -1; warte++) { Thread.Sleep(200); }
-
+            for (var warte = 0; warte < 50 && _savingThreadId != -1; warte++) {
+                Develop.Message(ErrorType.Info, this, "Speicher", ImageCode.Auge, "Warte auf Speicherzugriff", 0);
+                Thread.Sleep(200);
+            }
             if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return "Tabelle wird gerade gespeichert."; }
         }
 

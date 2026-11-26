@@ -320,7 +320,7 @@ public class TableFile : Table {
             }
         }
 
-        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {"btb", "bdb", "nbdb", "mbdb", "tblh" };
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "btb", "bdb", "nbdb", "mbdb", "tblh" };
         return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
@@ -335,7 +335,10 @@ public class TableFile : Table {
         // Kurzes Speichern wird statt einer Ablehnung begrenzt abgewartet — eine
         // Ablehnung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
         if (IsSaveRunningOnOtherThread) {
-            for (var wait = 0; wait < 50 && IsSaveRunningOnOtherThread; wait++) { Thread.Sleep(200); }
+            for (var wait = 0; wait < 50 && IsSaveRunningOnOtherThread; wait++) {
+                Develop.Message(ErrorType.Info, this, "Speicher", ImageCode.Auge, "Warte auf Speicherzugriff", 0);
+                Thread.Sleep(200);
+            }
 
             if (IsSaveRunningOnOtherThread) { return "Tabelle wird gerade gespeichert."; }
         }
