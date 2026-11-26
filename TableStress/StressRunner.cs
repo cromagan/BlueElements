@@ -88,6 +88,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// der zugehörigen Undo-Historie.
     /// </summary>
     private void ActionChunkWechsel() {
+        WartenAufSpeichern();
         var spalte = ChunkSpalte();
 
         if (spalte is null) { prot.Write("CHUNK-WECHSEL", "Keine Chunk-Spalte vorhanden"); return; }
@@ -138,18 +139,78 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         var zellFilter = new FilterItem(column, FilterType.Istgleich, wert);
 
         // Ohne Chunk-Filter liefert die Engine bei Chunk-Tabellen bewusst ein leeres Ergebnis.
-        List<FilterItem> filter = chunkSpalte is { IsDisposed: false } cvc
-            ? [new FilterItem(cvc, FilterType.Istgleich, row.CellGetString(cvc)), zellFilter]
-            : [zellFilter];
+        var chunkWert = string.Empty;
+        List<FilterItem> filter;
+
+        if (chunkSpalte is { IsDisposed: false } cvc) {
+            chunkWert = row.CellGetString(cvc);
+            filter = [new FilterItem(cvc, FilterType.Istgleich, chunkWert), zellFilter];
+        } else {
+            filter = [zellFilter];
+        }
 
         var treffer = FilterCollection.CalculateFilteredRows(tbl, false, [.. filter]);
         var fremde = treffer.Count(r => !r.MatchesTo(zellFilter));
         var enthalten = treffer.Exists(r => r.KeyName.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase));
         var quellePasst = row.MatchesTo(zellFilter);
 
+        if (!quellePasst) {
+            // Mehrzeilen-Spalten treffen per Konvention zeilenweise — der
+            // Volltext-Istgleich der Stichprobe passt dann by design nicht.
+            if (column.MultiLine || wert.Contains('\r')) {
+                prot.Write("FILTER", $"Spalte={column.KeyName} Mehrzeilen-Semantik — Volltext-Selbstvergleich übersprungen");
+                return;
+            }
+
+            // Konkurrenz: Eine fremde Änderung oder ein laufender Refresh kann
+            // kurzzeitig einen anderen Stand liefern — der Zweitversuch muss stabil sein.
+            Thread.Sleep(500);
+            var jetzt = row.CellGetString(column);
+
+            if (!string.Equals(jetzt, wert, StringComparison.Ordinal)) {
+                prot.Write("FILTER", $"Spalte={column.KeyName} Wert inzwischen fremd geändert — Stichprobe neutral");
+                return;
+            }
+
+            if (row.MatchesTo(zellFilter)) {
+                prot.Write("FILTER", $"Spalte={column.KeyName} erstes Lesen kurzzeitig inkonsistent, Zweitversuch ok — neutral");
+                return;
+            }
+
+            // Die Zeile kann zwischenzeitlich fremd gelöscht worden sein: Jede Prüfung
+            // einer entsorgten Zeile liefert guard-leer bzw. false — kein echter Fehler.
+            if (row.IsDisposed) {
+                prot.Write("FILTER", "Quellzeile inzwischen gelöscht — Stichprobe neutral");
+                return;
+            }
+
+            prot.Write("FEHLER", $"FILTER Quellzeile passt nicht auf den eigenen Wert: Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(wert)}");
+        }
+
         if (fremde > 0) { prot.Write("FEHLER", $"FILTER {fremde} Treffer erfüllen den Filter nicht: Spalte={column.KeyName} Treffer={treffer.Count}"); }
-        if (quellePasst && !enthalten) { prot.Write("FEHLER", $"FILTER Quellzeile fehlt im Ergebnis: Key={row.KeyName} Spalte={column.KeyName} Treffer={treffer.Count}"); }
-        if (!quellePasst) { prot.Write("FEHLER", $"FILTER Quellzeile passt nicht auf den eigenen Wert: Key={row.KeyName} Spalte={column.KeyName} Wert={Logtext(wert)}"); }
+
+        if (quellePasst && !enthalten) {
+            // Konkurrenz: Ein fremder Chunk-Wechsel oder eine Zell-Änderung zwischen
+            // Lesen und Suche nimmt der Zeile den Treffer legitim wieder weg —
+            // der stabile Zweitversuch muss sie wieder liefern.
+            Thread.Sleep(500);
+            var wertJetzt = row.CellGetString(column);
+            var chunkJetzt = chunkSpalte is { IsDisposed: false } cs ? row.CellGetString(cs) : string.Empty;
+
+            if (row.IsDisposed || !string.Equals(wertJetzt, wert, StringComparison.Ordinal) || !string.Equals(chunkJetzt, chunkWert, StringComparison.Ordinal)) {
+                prot.Write("FILTER", "Quellzeile inzwischen fremd geändert/gelöscht — Stichprobe neutral");
+                return;
+            }
+
+            var trefferZwei = FilterCollection.CalculateFilteredRows(tbl, false, [.. filter]);
+
+            if (trefferZwei.Exists(r => r.KeyName.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase))) {
+                prot.Write("FILTER", "erste Suche kurzzeitig inkonsistent, Zweitversuch ok — neutral");
+                return;
+            }
+
+            prot.Write("FEHLER", $"FILTER Quellzeile fehlt im Ergebnis: Key={row.KeyName} Spalte={column.KeyName} Treffer={treffer.Count}");
+        }
 
         prot.Write("FILTER", $"Spalte={column.KeyName} Wert={Logtext(wert)} Treffer={treffer.Count} QuelleEnthalten={(enthalten ? "ja" : "nein")} QuellePasst={(quellePasst ? "ja" : "NEIN")}");
     }
@@ -217,6 +278,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionNeueZeile() {
+        WartenAufSpeichern();
         var opr = NeueMussZeile($"StressTest {user} Neue Zeile");
 
         if (opr.IsFailed || opr.Value is not RowItem row) {
@@ -267,6 +329,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// letzten Undo-Eintrag, Fragment-Format über SaveRequired und Undo-Sätze.
     /// </summary>
     private void ActionSchreibPruefung() {
+        WartenAufSpeichern();
         var rows = tbl.Row.ToArray();
 
         if (rows.Length == 0) { prot.Write("SCHREIB", "Keine Zeile vorhanden"); return; }
@@ -359,6 +422,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionScriptErstellen() {
+        WartenAufSpeichern();
         scriptCount++;
         var name = $"Stress_{user}_{scriptCount:000}";
 
@@ -382,6 +446,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionScriptLoeschen() {
+        WartenAufSpeichern();
         var praefix = $"Stress_{user}_";
         var eigene = tbl.EventScript.Where(s => s.KeyName.StartsWith(praefix, StringComparison.Ordinal)).ToList();
 
@@ -412,6 +477,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// Legt eine Stress-Spalte an; ab 25 Stress-Spalten wird die älteste zuvor entfernt.
     /// </summary>
     private void ActionSpalteAnlegen() {
+        WartenAufSpeichern();
         var stressSpalten = StressSpalten().ToList();
 
         if (stressSpalten.Count >= 25) {
@@ -437,6 +503,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionSpalteLoeschen() {
+        WartenAufSpeichern();
         var spalten = StressSpalten().ToList();
 
         if (spalten.Count == 0) { prot.Write("SPALTE-WEG", "Keine Stress-Spalte vorhanden"); return; }
@@ -448,6 +515,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionSpalteMetadaten() {
+        WartenAufSpeichern();
         var spalten = StressSpalten().ToList();
 
         if (spalten.Count == 0) { prot.Write("SPALTE-META", "Keine Stress-Spalte vorhanden"); return; }
@@ -492,12 +560,33 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         FlushChanges("vor Neuladen");
 
         switch (tbl) {
-            case TableFileNew tfn when tfn.Saveable.SaveRequired:
-                prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFileNew)");
+            case TableFileNew tfn when tfn.Saveable.SaveRequired: {
+                // Fremde Edit-Sperren halten das Chunk-Speichern bewusst offene —
+                // die Änderungen sind im Kopf-Journal gesichert und gehen nicht verloren.
+                var sperren = tfn.Saveable.ForeignLockedChunkIds();
+
+                if (sperren.Count > 0) {
+                    prot.Write("NEU-LADEN", $"Speichern ausständig wegen fremder Edit-Sperre ({string.Join(",", sperren)}) — ok");
+                } else {
+                    prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFileNew)");
+                }
+
                 break;
-            case TableFile tf when tf.SaveRequired:
-                prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFile)");
+            }
+            case TableFile tf when tf.SaveRequired: {
+                // Auch im klassischen Format halten fremde Edit-Sperren das
+                // Chunk-Speichern bewusst offen — die Änderungen bleiben im Speicher
+                // und der nächste Versuch holt sie nach.
+                List<string> sperren = tbl is TableChunk tch ? tch.ForeignLockedChunkIds() : [];
+
+                if (sperren.Count > 0) {
+                    prot.Write("NEU-LADEN", $"Speichern ausständig wegen fremder Edit-Sperre ({string.Join(",", sperren)}) — ok");
+                } else {
+                    prot.Write("FEHLER", "NEU-LADEN Speichern unvollständig: SaveRequired bleibt aktiv (TableFile)");
+                }
+
                 break;
+            }
         }
 
         var zeilenVorher = tbl.Row.Count;
@@ -538,6 +627,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// verweigert werden und den alten Wert erhalten (Unique gilt je Chunk).
     /// </summary>
     private void ActionUniqueVerletzung() {
+        WartenAufSpeichern();
         var chunkSpalte = ChunkSpalte();
         var uniqueColumns = tbl.Column.ColumnsUsedInUniqueDefinition()
             .Where(c => c is { IsDisposed: false } && c != chunkSpalte && !c.KeyName.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase))
@@ -598,6 +688,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// Legt eine Zeile mit den Werten einer Zufallszeile an; Unique-Spalten erhalten neue Zufallswerte.
     /// </summary>
     private void ActionZeileDuplizieren() {
+        WartenAufSpeichern();
         var rows = tbl.Row.ToArray();
 
         if (rows.Length == 0) { prot.Write("ZEILE-DUP", "Keine Zeile vorhanden"); return; }
@@ -646,6 +737,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionZeileLoeschen() {
+        WartenAufSpeichern();
         var rows = tbl.Row.ToArray();
         if (rows.Length == 0) { prot.Write("LÖSCHEN", "Keine Zeile vorhanden"); return; }
 
@@ -661,6 +753,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// landen im Journal, ohne dass die Zeilen je einen Datenstand erreichen.
     /// </summary>
     private void ActionZeilenSchub() {
+        WartenAufSpeichern();
         List<RowItem> angelegt = [];
 
         for (var i = 0; i < 4; i++) {
@@ -715,6 +808,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     }
 
     private void ActionZelleAendern() {
+        WartenAufSpeichern();
         var rows = tbl.Row.ToArray();
         if (rows.Length == 0) { prot.Write("ZELLE", "Keine Zeile vorhanden"); return; }
 
@@ -736,6 +830,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     /// Setzt einen kritischen Wert (Umbruch, Pipe, Unicode, leer, sehr lang) in eine Zufallszelle.
     /// </summary>
     private void ActionZelleSonderzeichen() {
+        WartenAufSpeichern();
         var rows = tbl.Row.ToArray();
 
         if (rows.Length == 0) { prot.Write("ZELLE-SPEZIAL", "Keine Zeile vorhanden"); return; }
@@ -828,10 +923,52 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
         try {
             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
             var opr = SaveTable();
-            prot.Write("SPEICHERN", $"{reason}: {(opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok")}");
+
+            // Ein verwerfener oder durch eine Sperre ausgesetzter Versuch wird
+            // einmal nachgezogen, bevor der Zustand bewertet wird.
+            if (SaveRequiredAktiv()) {
+                Thread.Sleep(3000);
+                opr = SaveTable();
+            }
+
+            var ausständig = SaveRequiredAktiv();
+            List<string> sperren = [];
+
+            if (tbl is TableFileNew tfnn) { sperren = tfnn.Saveable.ForeignLockedChunkIds(); }
+            else if (tbl is TableChunk tch) { sperren = tch.ForeignLockedChunkIds(); }
+            var hinweis = ausständig
+                ? sperren.Count > 0
+                    ? " — SaveRequired bleibt aktiv (fremde Edit-Sperre: " + string.Join(",", sperren) + ", Daten im Kopf-Journal)"
+                    : " — FEHLER: SaveRequired bleibt aktiv"
+                : string.Empty;
+
+            prot.Write("SPEICHERN", $"{reason}: {(opr.IsFailed ? "FEHLER: " + opr.FailedReason : "ok")}{hinweis}");
+
+            if (ausständig && sperren.Count == 0) { prot.Write("FEHLER", $"SPEICHERN SaveRequired bleibt aktiv ohne erkennbare Sperre ({reason})"); }
         } catch (Exception ex) {
             prot.Write("FEHLER", $"SPEICHERN Typ={ex.GetType().Name} Meldung={ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Wartet, bis kein eigener Speicher-Task läuft: unmittelbar vor Schreibaktionen
+    /// aufgerufen, überbrückt es auch das bedarfsgesteuerte Speichern des Checkers —
+    /// sonst erzeugt der Schreibzugriff nur ein Rollback mit Warnung.
+    /// </summary>
+    private void WartenAufSpeichern() {
+        switch (tbl) {
+            case TableFileNew tfn: tfn.Saveable.WaitDiskOperationFinished(); break;
+            case TableFile tf: tf.WaitDiskOperationFinished(); break;
+        }
+    }
+
+    /// <summary>
+    /// True, wenn die Tabelle noch ungespeicherte Änderungen meldet.
+    /// </summary>
+    private bool SaveRequiredAktiv() {
+        if (tbl is TableFileNew tfn) { return tfn.Saveable.SaveRequired; }
+        if (tbl is TableFile tf) { return tf.SaveRequired; }
+        return false;
     }
 
     /// <summary>

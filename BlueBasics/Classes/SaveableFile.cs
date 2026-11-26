@@ -1133,7 +1133,13 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         // Während des Hintergrund-Speicherns: keine Skripte, Zell-Änderungen und
         // Editoren; nur der speichernde Thread selbst läuft durch diese Prüfung.
-        if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return "Tabelle wird gerade gespeichert."; }
+        // Kurzes Speichern wird statt einer Ablehnung begrenzt abgewartet — eine
+        // Abweisung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
+        if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) {
+            for (var warte = 0; warte < 50 && _savingThreadId != -1; warte++) { Thread.Sleep(200); }
+
+            if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return "Tabelle wird gerade gespeichert."; }
+        }
 
         // Eine frische Erstanlage ist vollständig im Speicher; der erste Save()
         // erzeugt die Datei und setzt MainLoadDone.
@@ -1299,7 +1305,22 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         Develop.Message(ErrorType.Info, null, KeyName, ImageCode.Diskette, $"Speichere {KeyName}", 1);
 
         lock (_saveLock) {
-            if (_saveTask is { IsCompleted: false }) { return OperationResult.Success; }
+            if (_saveTask is { IsCompleted: false }) {
+                // Es läuft bereits ein Speichervorgang: einen Folge-Task anhängen,
+                // der danach den dann aktuellen Stand nachzieht — so deckt
+                // WaitDiskOperationFinished auch die neuesten Änderungen ab.
+                var vorgänger = _saveTask;
+                _saveTask = Task.Run(async () => {
+                    await vorgänger;
+                    try {
+                        return SaveCore();
+                    } catch (Exception ex) {
+                        return OperationResult.Failed(ex);
+                    }
+                });
+                return OperationResult.Success;
+            }
+
             _saveTask = Task.Run(() => {
                 try {
                     return SaveCore();
@@ -2704,12 +2725,15 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         // Re-Check: Es wird vorab kein Claim geschrieben, daher kann ein anderer
         // Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
-        // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen
-        // zu überschreiben. changedChunkIds enthält nur Chunks mit echten Änderungen.
+        // Der betroffene Chunk wird wie im Vorab-Check übersprungen und nicht
+        // geschrieben — sein Write-once-Bestand bleibt fremd aktuell, die eigenen
+        // Änderungen bleiben im Kopf-Journal und der nächste Versuch holt nach.
+        // Ein Freeze wäre hier falsch: Die Sperre ist zeitlich begrenzt.
         foreach (var chunkId in changedChunkIds.Keys) {
-            if (CheckEditLock(chunkId) is { Length: > 0 } lockCheck) {
-                Freeze(lockCheck);
-                return lockCheck;
+            if (CheckEditLock(chunkId) is { Length: > 0 }) {
+                chunksSkipped++;
+                _ = chunkData.TryRemove($"{GetChunkFolder(chunkId)}{timestamp}.{SuffixOfChunks}", out _);
+                _ = newHashes.TryRemove(chunkId, out _);
             }
         }
 

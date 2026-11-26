@@ -925,27 +925,24 @@ public class TableChunk : TableFile {
 
             // Re-Check: Es wird vorab kein Claim geschrieben, daher kann ein anderer
             // Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
-            // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen zu
-            // überschreiben. changedChunkIds enthält nur Chunks mit echten inhaltlichen Änderungen.
+            // Der betroffene Chunk wird wie im Vorab-Check übersprungen und nicht
+            // geschrieben — sein Write-once-Bestand bleibt fremd aktuell, die eigenen
+            // Änderungen bleiben im Speicher und der nächste Versuch holt nach.
+            // Ein Freeze wäre falsch: Die Sperre ist zeitlich begrenzt.
             foreach (var chunkId in changedChunkIds) {
-                var lockCheck = CheckEditLock(chunkId);
-                if (!string.IsNullOrEmpty(lockCheck)) {
-                    // Spezialfall: Bestimmte System-Chunks führen NICHT zum Freeze.
-                    // Hier werden die Änderungen einfach verworfen (Chunk wird nicht geschrieben).
-                    if (string.Equals(chunkId, Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(chunkId, Chunk_UnknownData, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(chunkId, Chunk_Master, StringComparison.OrdinalIgnoreCase)) {
-                        // Entferne den Pfad aus chunkData, damit er nicht geschrieben wird
-                        var folderPrefix = GetChunkFolder(chunkId);
-                        var keysToRemove = chunkData.Keys.Where(k => k.StartsWith(folderPrefix, StringComparison.OrdinalIgnoreCase)).ToList();
-                        foreach (var key in keysToRemove) { chunkData.Remove(key); }
-                        continue;
-                    }
+                if (string.IsNullOrEmpty(CheckEditLock(chunkId))) { continue; }
 
-                    Freeze(lockCheck);
-                    return lockCheck;
+                var folderPrefix = GetChunkFolder(chunkId);
+                List<string> keysToRemove = [];
+
+                foreach (var key in chunkData.Keys) {
+                    if (key.StartsWith(folderPrefix, StringComparison.OrdinalIgnoreCase)) { keysToRemove.Add(key); }
                 }
+
+                foreach (var key in keysToRemove) { chunkData.Remove(key); }
+                _ = newHashes.Remove(chunkId);
+
+                if (IsRowChunk(chunkId)) { rowChunksSkipped = true; }
             }
 
             // Direkt auf Festplatte schreiben.

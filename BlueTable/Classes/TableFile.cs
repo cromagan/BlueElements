@@ -332,7 +332,13 @@ public class TableFile : Table {
 
         // Während des Hintergrund-Speicherns: keine Skripte, Zell-Änderungen und
         // Editoren; nur der speichernde Thread selbst läuft durch diese Prüfung.
-        if (IsSaveRunningOnOtherThread) { return "Tabelle wird gerade gespeichert."; }
+        // Kurzes Speichern wird statt einer Ablehnung begrenzt abgewartet — eine
+        // Ablehnung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
+        if (IsSaveRunningOnOtherThread) {
+            for (var wait = 0; wait < 50 && IsSaveRunningOnOtherThread; wait++) { Thread.Sleep(200); }
+
+            if (IsSaveRunningOnOtherThread) { return "Tabelle wird gerade gespeichert."; }
+        }
 
         // Das ist eins super schnelle Prüfung, also vorziehen.
         var f = base.IsGenericEditable(isloading);
@@ -460,7 +466,22 @@ public class TableFile : Table {
         Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         lock (_saveLock) {
-            if (_saveTask is { IsCompleted: false }) { return OperationResult.Success; }
+            if (_saveTask is { IsCompleted: false }) {
+                // Es läuft bereits ein Speichervorgang: einen Folge-Task anhängen,
+                // der danach den dann aktuellen Stand nachzieht — so deckt
+                // WaitDiskOperationFinished auch die neuesten Änderungen ab.
+                var vorgänger = _saveTask;
+                _saveTask = Task.Run(async () => {
+                    await vorgänger;
+                    try {
+                        return SaveCore();
+                    } catch (Exception ex) {
+                        return OperationResult.Failed(ex);
+                    }
+                });
+                return OperationResult.Success;
+            }
+
             _saveTask = Task.Run(() => {
                 try {
                     return SaveCore();
@@ -561,6 +582,15 @@ public class TableFile : Table {
 
         try {
             var result = SaveInternal();
+
+            // Fremdänderungen während der Chunk-Generierung sind ein vorübergehender
+            // Zustand: einmal kurz warten und erneut versuchen, statt zu warnen und
+            // dem Checker-Tick die Nachhol-Arbeit zu überlassen.
+            if (!string.IsNullOrEmpty(result) && result.StartsWith("Tabelle wurde während der", StringComparison.Ordinal)) {
+                Thread.Sleep(2000);
+                result = SaveInternal();
+            }
+
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) {

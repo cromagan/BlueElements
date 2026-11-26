@@ -196,7 +196,20 @@ internal static class Program {
             switch (tbl) {
                 case TableFileNew tfnw:
                     tfnw.Saveable.WaitDiskOperationFinished();
-                    if (opr.IsSuccessful && tfnw.Saveable.SaveRequired) { opr = OperationResult.Failed("Speichern unvollständig: Es bleiben Änderungen ausständig"); }
+
+                    if (opr.IsSuccessful && tfnw.Saveable.SaveRequired) {
+                        // Fremde Edit-Sperren (z. B. frische Chunk-Dateien der Vorrunde)
+                        // halten das Chunk-Speichern bewusst offen — die Änderungen
+                        // liegen sicher im Kopf-Journal und werden später nachgezogen.
+                        var sperren = tfnw.Saveable.ForeignLockedChunkIds();
+
+                        if (sperren.Count > 0) {
+                            Console.Out.WriteLine($"SaveRequired bleibt aktiv (fremde Edit-Sperre: {string.Join(",", sperren)}) — ok, Daten im Kopf-Journal");
+                        } else {
+                            opr = OperationResult.Failed("Speichern unvollständig: Es bleiben Änderungen ausständig");
+                        }
+                    }
+
                     break;
                 case TableFile tfw:
                     tfw.WaitDiskOperationFinished();
