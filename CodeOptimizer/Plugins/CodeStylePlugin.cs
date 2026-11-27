@@ -5,7 +5,7 @@ namespace CodeOptimizer.Plugins;
 /// <summary>
 /// Führt die Code-Stil-Transformationen aus: leere Klammern, einzeilige If-Rückgaben,
 /// is-null-Muster, redundante ToLower/ToUpper-Ketten, Groß/Klein-unabhängige String-Vergleiche,
-/// Summary-Tags, Doc-Kommentar-Einzug, Substring zu Range-Syntax, null-sichere Equals,
+/// Summary-Tags, Doc-Kommentar-Einzug, null-sichere Equals,
 /// Format-Strings zu Numeral/Date-Extensions, File.ReadAllText zu IO.ReadAllText
 /// und If-Null-Zuweisungen zu Null-Conditional-Zuweisungen.
 /// </summary>
@@ -70,11 +70,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     private const string CompareOperand = @"((?:" + StringLiteral + @")|(?!null\b|true\b|false\b)" + SimpleReceiver + @")";
 
     /// <summary>
-    /// Argument eines Substring-Aufrufs: ohne Komma, Klammern und Zeilenumbrüche, damit verschachtelte Aufrufe unangetastet bleiben.
-    /// </summary>
-    private const string SubstringArg = @"[^\r\n(),]+";
-
-    /// <summary>
     /// Zuordnung exakter Zahlen-Format-Strings zu NumeralExtensions-Methoden.
     /// </summary>
     private static readonly Dictionary<string, string> NumeralFormatMap = new() {
@@ -111,7 +106,7 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
     public override string Name => "Code-Stil";
     public override ImageCode Symbol => ImageCode.Zahnrad;
-    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, ToLower/ToUpper-Ketten, Groß/Klein-Vergleiche, Summary-Tags, Doc-Kommentar-Einzug, Substring zu Range, null-sichere Equals, Format-Strings zu Extensions, File.ReadAllText zu IO und If-Null-Zuweisungen zu ?.";
+    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, ToLower/ToUpper-Ketten, Groß/Klein-Vergleiche, Summary-Tags, Doc-Kommentar-Einzug, null-sichere Equals, Format-Strings zu Extensions, File.ReadAllText zu IO und If-Null-Zuweisungen zu ?.";
     public override int Order => 30;
 
     #endregion
@@ -134,7 +129,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         var foldChain = 0;
         var eqFold = 0;
         var eqFoldRev = 0;
-        var substr = 0;
         var eqInst = 0;
         var fmtExt = 0;
         var readIo = 0;
@@ -238,11 +232,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             content = CaseFoldCompareReversedRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldCompareReversed(m) : m.Value);
             var c13 = content != prev;
 
-            // 14. .Substring(a, b) -> Range-Syntax
-            prev = content;
-            content = CsSanitizer.ReplaceInCode(content, SubstringRegex(), FoldSubstring);
-            var c14 = content != prev;
-
             // 15. x.Equals(y, StringComparison.X) -> string.Equals(x, y, StringComparison.X)
             prev = content;
             content = CsSanitizer.ReplaceInCode(content, InstanceEqualsRegex(), FoldInstanceEquals);
@@ -284,7 +273,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             if (c11) { foldChain++; }
             if (c12) { eqFold++; }
             if (c13) { eqFoldRev++; }
-            if (c14) { substr++; }
             if (c15) { eqInst++; }
             if (c16) { fmtExt++; }
             if (c17) { readIo++; }
@@ -312,7 +300,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"ToLower/ToUpper-Ketten:     {foldChain}");
         report.AppendLine(CultureInfo.InvariantCulture, $"x == \"text\" -> string.Equals: {eqFold}");
         report.AppendLine(CultureInfo.InvariantCulture, $"\"text\" == x -> string.Equals: {eqFoldRev}");
-        report.AppendLine(CultureInfo.InvariantCulture, $"Substring -> Range:         {substr}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Equals -> string.Equals:    {eqInst}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Format -> Extensions:       {fmtExt}");
         report.AppendLine(CultureInfo.InvariantCulture, $"File.ReadAllText -> IO:     {readIo}");
@@ -392,20 +379,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         }
 
         return (m.Groups[2].Value == "!=" ? "!" : "") + "string.Equals(" + receiver + ", " + m.Groups[1].Value + ", StringComparison.OrdinalIgnoreCase)";
-    }
-
-    /// <summary>
-    /// Baut die Range-Syntax für einen Substring-Aufruf.
-    /// </summary>
-    private static string FoldSubstring(Match m) {
-        var start = m.Groups[1].Value.Trim();
-        var length = m.Groups[2].Success ? m.Groups[2].Value.Trim() : string.Empty;
-
-        if (length is not { Length: > 0 }) { return start == "0" ? "[..]" : "[" + start + "..]"; }
-
-        if (start == "0") { return "[.." + length + "]"; }
-
-        return "[" + start + "..(" + start + " + " + length + ")]";
     }
 
     /// <summary>
@@ -521,9 +494,6 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
     [GeneratedRegex(@"(?<!\+\s*)(" + StringLiteral + @")\s*(==|!=)\s*(?<![\w.\[\]\^])(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"(?![ \t]*[.+(?])")]
     private static partial Regex CaseFoldCompareReversedRegex();
-
-    [GeneratedRegex(@"\.Substring\(\s*(" + SubstringArg + @")(?:\s*,\s*(" + SubstringArg + @"))?\s*\)")]
-    private static partial Regex SubstringRegex();
 
     [GeneratedRegex(@"(?<![\w.\[\]\^])\b(" + SimpleReceiver + @")\.Equals\(\s*((?:" + StringLiteral + @")|(?:" + SimpleReceiver + @"))\s*,\s*StringComparison\.(\w+)\s*\)")]
     private static partial Regex InstanceEqualsRegex();
