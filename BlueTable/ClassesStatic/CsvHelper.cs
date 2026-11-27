@@ -99,7 +99,7 @@ public static class CsvHelper {
         var f = table.IsGenericEditable(false);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, $"Abbruch, {f}", 0);
+            Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, $"Abbruch, {f}");
             return $"Abbruch, {f}";
         }
 
@@ -120,7 +120,7 @@ public static class CsvHelper {
         }
 
         if (zeil.Count == 0) {
-            Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, keine Zeilen zum Importieren erkannt.", 0);
+            Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, keine Zeilen zum Importieren erkannt.");
             return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
@@ -133,7 +133,7 @@ public static class CsvHelper {
 
         for (var spaltNo = 0; spaltNo < zeil[0].Count; spaltNo++) {
             if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, leerer Spaltenname.", 0);
+                Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, leerer Spaltenname.");
                 return "Abbruch,<br>leerer Spaltenname.";
             }
             zeil[0][spaltNo] = BlueBasics.Classes.Formats.SystemNameFormat.MakeValid(zeil[0][spaltNo]);
@@ -141,7 +141,7 @@ public static class CsvHelper {
             var col = table.Column[zeil[0][spaltNo]];
             if (col is null) {
                 if (!ColumnItem.IsValidColumnKey(zeil[0][spaltNo])) {
-                    Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, ungültiger Spaltenname.", 0);
+                    Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, ungültiger Spaltenname.");
                     return "Abbruch,<br>ungültiger Spaltenname.";
                 }
 
@@ -150,7 +150,7 @@ public static class CsvHelper {
             }
 
             if (col is null) {
-                Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, Spaltenfehler.", 0);
+                Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, Spaltenfehler.");
                 return "Abbruch,<br>Spaltenfehler.";
             }
 
@@ -185,7 +185,7 @@ public static class CsvHelper {
                 if (!string.IsNullOrEmpty(cv) && !dictVorhanden.ContainsKey(cv)) {
                     dictVorhanden.Add(cv, thisR);
                 } else {
-                    Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, vorhandene Zeilen der Tabelle '" + table.Caption + "' sind nicht eindeutig.", 0);
+                    Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, vorhandene Zeilen der Tabelle '" + table.Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }
@@ -206,7 +206,7 @@ public static class CsvHelper {
             var maxColCount = Math.Min(thisD.Value.Count, columns.Count);
 
             if (maxColCount == 0) {
-                Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, Leere Zeile im Import.", 0);
+                Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, Leere Zeile im Import.");
                 return "Abbruch, Leere Zeile im Import.";
             }
 
@@ -222,7 +222,7 @@ public static class CsvHelper {
             }
 
             if (row is null) {
-                Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, Import-Fehler.", 0);
+                Develop.Message(ErrorType.Warning, table, ImageCode.Tabelle, "Abbruch, Import-Fehler.");
                 return "Abbruch, Import-Fehler.";
             }
 
@@ -239,7 +239,7 @@ public static class CsvHelper {
             #region Speichern und Ausgabe
 
             if (progressSw.Elapsed.TotalSeconds > 4.5) {
-                Develop.Message(ErrorType.Info, table, table.Caption, ImageCode.Tabelle, $"Import: Zeile {no} von {zeil.Count}", 0);
+                Develop.Message(ErrorType.Info, table, ImageCode.Tabelle, $"Import: Zeile {no} von {zeil.Count}");
                 progressSw.Restart();
             }
 
@@ -248,7 +248,7 @@ public static class CsvHelper {
 
         #endregion
 
-        Develop.Message(ErrorType.Info, table, table.Caption, ImageCode.Tabelle, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.", 0);
+        Develop.Message(ErrorType.Info, table, ImageCode.Tabelle, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
     }
 

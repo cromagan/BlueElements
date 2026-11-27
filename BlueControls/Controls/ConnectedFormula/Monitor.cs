@@ -101,7 +101,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     /// <summary>
     /// Handler für Develop.Message - prüft ob die Referenz der überwachten Row entspricht
     /// </summary>
-    private void OnDevelopMessage(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+    private void OnDevelopMessage(ErrorType type, object? reference, ImageCode symbol, string message) {
         message = "[" + DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + "] " + message;
 
         // Nur Meldungen verarbeiten, die sich auf die überwachte Row beziehen
@@ -115,10 +115,6 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
             return;
         }
 
-        if (category == Develop.MonitorMessage) {
-            _lastRow_DropMessage(type, symbol, message);
-            return;
-        }
     }
 
     #endregion

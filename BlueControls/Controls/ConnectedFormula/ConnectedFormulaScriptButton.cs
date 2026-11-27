@@ -116,7 +116,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
             #endregion
         } else {
-            Develop.Message(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, $"Fehler: {t.ProtocolText}", 0);
+            Develop.Message(ErrorType.DevelopInfo, null, BlueBasics.Enums.ImageCode.Kritisch, $"Fehler: {t.ProtocolText}");
             Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 

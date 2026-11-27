@@ -89,7 +89,7 @@ public class InvalidatedRowsManager {
         // Prüfe, ob die Zeile bereits als verarbeitet markiert ist
         if (_invalidatedRows.ContainsKey(rowItem.KeyName)) { return false; }
 
-        Develop.Message(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}", 0);
+        Develop.Message(ErrorType.Info, this, ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}");
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
@@ -109,7 +109,7 @@ public class InvalidatedRowsManager {
         }
         try {
             if (!_invalidatedRows.IsEmpty) {
-                Develop.Message(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
+                Develop.Message(ErrorType.Info, this, ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab");
             } else {
                 //Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
                 return;
@@ -125,12 +125,12 @@ public class InvalidatedRowsManager {
             do {
                 if (RowCollection.AllowProcessingAborts) {
                     if (processingStart.ElapsedMilliseconds > 60 * 1000) {
-                        Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                        Develop.Message(ErrorType.DevelopInfo, this, ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend");
                         break;
                     }
 
                     if (Develop.GetUserIdleSeconds() < 1) {
-                        Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                        Develop.Message(ErrorType.DevelopInfo, this, ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend");
                         break;
                     }
                 }
@@ -145,7 +145,7 @@ public class InvalidatedRowsManager {
                 var keysToProcess = _invalidatedRows.Keys.Where(k => !deferredKeys.Contains(k)).ToList();
                 if (keysToProcess.Count == 0) {
                     if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
-                        Develop.Message(ErrorType.DevelopInfo, mr, mrtb.Caption, ImageCode.Zeile, $"Alle Einträge abgearbeitet", 0);
+                        Develop.Message(ErrorType.DevelopInfo, mr, ImageCode.Zeile, $"Alle Einträge abgearbeitet");
                     }
                     break;
                 }
@@ -155,7 +155,7 @@ public class InvalidatedRowsManager {
 
                 // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
                 if (newEntries > 0) {
-                    Develop.Message(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern, $"{newEntries} neue Einträge zum Abarbeiten", 0);
+                    Develop.Message(ErrorType.Info, this, ImageCode.Stern, $"{newEntries} neue Einträge zum Abarbeiten");
                 }
 
                 // Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
@@ -166,7 +166,7 @@ public class InvalidatedRowsManager {
                     if (_invalidatedRows.TryGetValue(key, out var rowx) && rowx?.Table is { IsDisposed: false } tbl) {
                         var f = tbl.ExternalAbortScriptReasonExtended();
                         if (!string.IsNullOrEmpty(f)) {
-                            Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}", 0);
+                            Develop.Message(ErrorType.DevelopInfo, this, ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}");
                             return;
                         }
                     }
@@ -191,9 +191,9 @@ public class InvalidatedRowsManager {
                 Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
             } while (true);
 
-            Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig", 0);
+            Develop.Message(ErrorType.DevelopInfo, this, ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig");
         } catch (Exception ex) {
-            Develop.Message(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen: {ex.ToString()}", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen: {ex.ToString()}");
         } finally {
             // Verarbeitung beenden, egal was passiert
             lock (_processingLock) {
@@ -228,20 +228,20 @@ public class InvalidatedRowsManager {
 
         if (!extendedAllowed && row.NeedsRowInitialization()) {
             if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
-                Develop.Message(ErrorType.Info, mr, mrtb.Caption, ImageCode.Zeile, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} abbruch, benötigt Initialisierung", 0);
+                Develop.Message(ErrorType.Info, mr, ImageCode.Zeile, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} abbruch, benötigt Initialisierung");
             }
             return false;
         }
 
         if (!row.NeedsRowUpdate()) {
             if (masterRow is { IsDisposed: false } mr2 && mr2.Table is { IsDisposed: false } mrtb2 && mrtb2.DropMessages) {
-                Develop.Message(ErrorType.Info, mr2, mrtb2.Caption, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} bereits aktuell", 0);
+                Develop.Message(ErrorType.Info, mr2, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.ReadableText()} bereits aktuell");
             }
             return true;
         }
 
         if (masterRow is { IsDisposed: false } mr3 && mr3.Table is { IsDisposed: false } mrtb3 && mrtb3.DropMessages) {
-            Develop.Message(ErrorType.Info, mr3, mrtb3.Caption, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {tb.Caption} / {row.ReadableText()}", 0);
+            Develop.Message(ErrorType.Info, mr3, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {tb.Caption} / {row.ReadableText()}");
         }
 
         DoUpdateRow?.Invoke(masterRow, row, extendedAllowed);

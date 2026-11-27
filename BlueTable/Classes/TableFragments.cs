@@ -177,7 +177,7 @@ public class TableFragments : TableFile {
                 }
             }
 
-            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
+            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'"); }
 
             // Zeitstempel VOR dem Lesen der Fragmente erfassen.
             // Wird als endTimeUtc an InjectData übergeben und dort als _isInCache gesetzt.
@@ -493,7 +493,7 @@ public class TableFragments : TableFile {
                 if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
-                        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
+                        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                         IO.DeleteFile(thisf, 0, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
@@ -514,7 +514,7 @@ public class TableFragments : TableFile {
         var opr = PrepareFullFile(this);
 
         if (opr.IsFailed) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {opr.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {opr.FailedReason}");
             return;
         }
 
@@ -525,7 +525,7 @@ public class TableFragments : TableFile {
         // würden dauerhaft übersprungen. Der nächste BeSureToBeUpToDate-Zyklus
         // liest die Fragmente erneut und Komplettiert dann.
         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds >= FragmentToleranceSeconds) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} verschoben: Nachladen benötigte länger als {FragmentToleranceSeconds} Sekunden", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung von {Caption} verschoben: Nachladen benötigte länger als {FragmentToleranceSeconds} Sekunden");
             return;
         }
 
@@ -537,12 +537,12 @@ public class TableFragments : TableFile {
             return;
         }
 
-        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
+        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
         var f = WriteFullFile(this, content);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
             return;
         }
 

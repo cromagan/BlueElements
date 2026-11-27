@@ -66,7 +66,7 @@ public partial class FormWithStatusBar : Form {
     /// <summary>
     /// Statischer Handler der an alle FormWithStatusBar-Instanzen weiterleitet
     /// </summary>
-    public static void UpdateStatusBar(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+    public static void UpdateStatusBar(ErrorType type, object? reference, ImageCode symbol, string message) {
         message = "[" + DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + "] " + message;
 
         List<FormWithStatusBar> l = [.. _formsWithStatusBar];

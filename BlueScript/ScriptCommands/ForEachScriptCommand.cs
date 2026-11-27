@@ -55,7 +55,7 @@ internal class ForEachScriptCommand : ScriptCommand {
             scx = CallByFilenameScriptCommand.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.Line - 1, infos.Subname, addme, null, "ForEach");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
-            Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
+            Develop.Message(ErrorType.Info, null, ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})");
         }
 
         if (scx is null) {

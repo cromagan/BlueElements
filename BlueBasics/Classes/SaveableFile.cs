@@ -944,7 +944,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         } catch (ObjectDisposedException) { return; }
 
         if (!reserved) {
-            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Filename}' läuft weiterhin ein anderer Speichervorgang.", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Filename}' läuft weiterhin ein anderer Speichervorgang.");
             return;
         }
 
@@ -966,14 +966,14 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         // Fremde Snapshots nach dem eigenen Lade-Stand: Der Speicher kann deren
         // absorbierte Journal-Einträge fehlen — erst neu laden, dann neu verteilen.
         if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
-            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, "Reorganize abgebrochen: Der Kopf-Stand von '" + Filename + "' wurde seit dem eigenen Laden fremd komplementiert. Tabelle neu laden.", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, "Reorganize abgebrochen: Der Kopf-Stand von '" + Filename + "' wurde seit dem eigenen Laden fremd komplementiert. Tabelle neu laden.");
             return;
         }
 
         var chunkFolder = BaseChunkFolder();
 
         if (IO.DirectoryExists(chunkFolder) && !EnsureDataLoaded(true, -1, string.Empty)) {
-            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, "Reorganize abgebrochen: Nicht alle Chunks von '" + Filename + "' konnten geladen werden.", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, "Reorganize abgebrochen: Nicht alle Chunks von '" + Filename + "' konnten geladen werden.");
             return;
         }
 
@@ -992,7 +992,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             var chunkError = SaveChunks();
 
             if (!string.IsNullOrEmpty(chunkError)) {
-                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Reorganize abgebrochen: Chunks von '{Filename}' konnten nicht gespeichert werden: {chunkError}", 0);
+                Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Reorganize abgebrochen: Chunks von '{Filename}' konnten nicht gespeichert werden: {chunkError}");
                 return;
             }
         }
@@ -1001,7 +1001,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         var opr = PrepareNewSnapshot();
 
         if (opr.IsFailed) {
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}");
             return;
         }
 
@@ -1010,7 +1010,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         var f = WriteSnapshotFile(content);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}");
             return;
         }
 
@@ -1077,7 +1077,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         // Abweisung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
         if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) {
             for (var warte = 0; warte < 50 && _savingThreadId != -1; warte++) {
-                Develop.Message(ErrorType.Info, this, "Speicher", ImageCode.Auge, "Warte auf Speicherzugriff", 0);
+                Develop.Message(ErrorType.Info, this, ImageCode.Auge, "Warte auf Speicherzugriff");
                 Thread.Sleep(200);
             }
             if (_savingThreadId != -1 && _savingThreadId != Environment.CurrentManagedThreadId) { return "Tabelle wird gerade gespeichert."; }
@@ -1235,7 +1235,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         if (Develop.AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
-        Develop.Message(ErrorType.Info, null, Filename, ImageCode.Diskette, $"Speichere {Filename}", 1);
+        Develop.Message(ErrorType.Info, null, ImageCode.Diskette, $"Speichere {Filename}");
 
         lock (_saveLock) {
             if (_saveTask is { IsCompleted: false }) {
@@ -1301,11 +1301,11 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) {
-                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {result}", 0);
+                Develop.Message(ErrorType.Warning, this, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {result}");
                 return OperationResult.Failed(result);
             }
         } catch (Exception ex) {
-            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {ex.Message}", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {ex.Message}");
             return OperationResult.Failed(ex);
         } finally {
             _savingThreadId = -1;
@@ -1425,7 +1425,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
 
         if (firstTime) { _isInCache = LastSaveMainFileUtcDate; }
 
-        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Lade Fragmente von '" + Filename + "'", 0); }
+        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Lade Fragmente von '" + Filename + "'"); }
 
         // Zeitstempel VOR dem Lesen der Fragmente erfassen.
         // Wird als readStartedUtc an InjectData übergeben und dort als _isInCache
@@ -1641,7 +1641,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
                 if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
-                        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
+                        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                         IO.DeleteFile(thisf, 0, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
@@ -1662,12 +1662,12 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         var opr = PrepareNewSnapshot();
 
         if (opr.IsFailed) {
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}");
             return;
         }
 
         if (opr.Value is not List<byte> content) {
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}");
             return;
         }
 
@@ -1676,7 +1676,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             // wären nach dem Schreiben älter als die Toleranz in ReadJournalFile
             // und würden dauerhaft übersprungen. Der nächste Refresh-Zyklus
             // liest die Journale erneut und Komplettiert dann.
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung von {Filename} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung von {Filename} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden");
             return;
         }
 
@@ -1689,12 +1689,12 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             return;
         }
 
-        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + Filename, 0);
+        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + Filename);
 
         var f = WriteSnapshotFile(content);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}");
             return;
         }
 
@@ -2124,7 +2124,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
 
             var fileDate = ExtractDateFromFileName(thisf);
             if (!fileDate.HasValue || fileDate.Value < threshold) {
-                Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Räume alten Snapshot auf: " + thisf.FileNameWithSuffix(), 0);
+                Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Räume alten Snapshot auf: " + thisf.FileNameWithSuffix());
                 try { IO.DeleteFile(thisf, false); } catch { }
             }
 
@@ -2213,7 +2213,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
         _mySnapshotFile = path;
         LastSaveMainFileUtcDate = DateTime.UtcNow;
 
-        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Neuer Komplettstand: " + path.FileNameWithSuffix(), 1);
+        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Neuer Komplettstand: " + path.FileNameWithSuffix());
 
         return string.Empty;
     }
@@ -2547,7 +2547,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
 
             if (loadResult.IsFailed) {
                 loadFailedChunkIds.Add(thisChunkId);
-                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Chunk '{thisChunkId}' von '{Filename}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
+                Develop.Message(ErrorType.Warning, this, ImageCode.Diskette, $"Chunk '{thisChunkId}' von '{Filename}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}");
             }
         }
 
@@ -2621,7 +2621,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
 
         // Direkt auf Festplatte schreiben.
         // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
-        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks von '{Filename}'", 2);
+        Develop.Message(ErrorType.Info, this, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks von '{Filename}'");
 
         // Schreiben je Chunk parallel: eigenständige Ordner, write-once —
         // keine gemeinsamen Ressourcen außer den Concurrent-Verwaltungen.
@@ -2910,7 +2910,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
     /// aktualisiert das Tracking (verarbeitete Datei, Hashes, alte Dateien).
     /// </summary>
     private OperationResult LoadChunkFile(string chunkId, string newestFile, string[] chunkFiles) {
-        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{Filename}'", 1);
+        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{Filename}'");
 
         if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
             return OperationResult.Failed($"Chunk '{chunkId}' konnte nicht gelesen werden");
@@ -3083,9 +3083,9 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
             OnLoaded(true);
 
-            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Laden abgeschlossen: {fileNameToLoad.FileNameWithSuffix()}", 0); }
+            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Laden abgeschlossen: {fileNameToLoad.FileNameWithSuffix()}"); }
         } catch (Exception ex) {
-            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Laden von '{Filename}' fehlgeschlagen: {ex.Message}", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Laden von '{Filename}' fehlgeschlagen: {ex.Message}");
             Freeze("Laden fehlgeschlagen: " + ex.Message);
             MainLoadDone = true;
         } finally {
@@ -3261,7 +3261,7 @@ public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
             try {
                 instance.CheckerTick();
             } catch (Exception ex) {
-                Develop.Message(ErrorType.Warning, instance, instance.Filename, ImageCode.Tabelle, $"CheckerTick fehlgeschlagen: {ex.GetType().Name} {ex.Message} Aufrufstack={Develop.DiagStack()}", 0);
+                Develop.Message(ErrorType.Warning, instance, ImageCode.Tabelle, $"CheckerTick fehlgeschlagen: {ex.GetType().Name} {ex.Message} Aufrufstack={Develop.DiagStack()}");
             }
         }
     }

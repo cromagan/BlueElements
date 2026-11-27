@@ -440,7 +440,7 @@ public static class IO {
             if (stopw.ElapsedMilliseconds > 3000) {
                 var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
                 var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
-                Develop.Message(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {result.FailedReason}", 0);
+                Develop.Message(ErrorType.Info, null, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {result.FailedReason}");
                 stopw = Stopwatch.StartNew();
             }
 
@@ -668,7 +668,7 @@ public static class IO {
             // Vergleich auf Zeitstempel/Existenz (BlueBasics Logik)
             var nf = GetFileInfo(newFile, false, 0.01f);
             var sf = GetFileInfo(sourceFile, false, 5);
-            Develop.Message(ErrorType.Info, null, "Datei synchronisieren", ImageCode.Datei, $"Synchronisiere {t} von {sourceFiles.Length}: {newFile.FileNameWithoutSuffix()}", 0);
+            Develop.Message(ErrorType.Info, null, ImageCode.Datei, $"Synchronisiere {t} von {sourceFiles.Length}: {newFile.FileNameWithoutSuffix()}");
             Develop.DoEvents();
 
             if (sf is not null && (nf is null ||

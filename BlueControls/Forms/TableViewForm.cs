@@ -382,7 +382,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
 
         if (!maybeok) {
-            Message(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, $"Lade Tabelle {tablename}", 0);
+            Message(ErrorType.Info, null, ImageCode.Tabelle, $"Lade Tabelle {tablename}");
         }
 
         #endregion

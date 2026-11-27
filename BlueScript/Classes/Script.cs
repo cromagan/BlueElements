@@ -239,14 +239,14 @@ public class Script {
         var pos = 0;
         var line = lineadd + 1;
 
-        Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
+        Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain} START");
 
         var t = Stopwatch.StartNew();
         var syntaxErrors = new List<string>();
 
         do {
             if (pos >= normalizedScriptText.Length) {
-                Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
+                Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)");
 
                 if (syntaxErrors.Count > 0) {
                     return new ScriptEndedFeedback(varCol, subname, line, true, false, false, string.Join("\r\n", syntaxErrors), null);
@@ -267,7 +267,7 @@ public class Script {
                     // hat scx bereits die korrekte innere Zeile — diese hat Vorrang
                     // vor der Zeile des äußeren Befehls (z.B. des if-Schlüsselworts).
                     var errorLine = scx.Line > 0 ? scx.Line : line;
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}");
                     return new ScriptEndedFeedback(varCol, subname, errorLine, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
                 }
 
@@ -275,18 +275,18 @@ public class Script {
 
                 // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
                 if (pos <= previousPos) {
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position");
                     return new ScriptEndedFeedback(varCol, subname, line, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);
                 }
 
                 line = normalizedScriptText.CountChar('¶', pos) + 1 + lineadd;
                 if (scx.BreakFired) {
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK");
                     return new ScriptEndedFeedback(varCol, subname, line, false, true, false, string.Empty, null);
                 }
 
                 if (scx.ReturnFired) {
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN");
                     return new ScriptEndedFeedback(varCol, subname, line, false, false, true, string.Empty, scx.ReturnValue);
                 }
             }
@@ -296,7 +296,7 @@ public class Script {
                 var f = abort?.Invoke() ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(f)) {
-                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}");
                     return new ScriptEndedFeedback(varCol, subname, line, false, false, false, f, null);
                 }
             }

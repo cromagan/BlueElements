@@ -476,12 +476,12 @@ public class TableChunk : TableFile {
         // Netzwerken stapeln sich weitere Timer-Ticks und verschärfen den Effekt
         // bis zum scheinbaren Einfrieren.
         if (Interlocked.CompareExchange(ref _isRefreshingChunks, 1, 0) != 0) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Aktualisierung von '{KeyName}' läuft bereits — übersprungen, um eine Überlagerung zu vermeiden", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Aktualisierung von '{KeyName}' läuft bereits — übersprungen, um eine Überlagerung zu vermeiden");
             return true;
         }
 
         try {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
+            Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'");
 
             if (firstTime) {
                 if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
@@ -501,7 +501,7 @@ public class TableChunk : TableFile {
                 if (!firstTime) {
                     var result = LoadChunkWithChunkId(Chunk_MainData, false);
                     if (result.IsFailed) {
-                        Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}", 0);
+                        Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Haupt-Chunk von '{KeyName}' konnte nicht geladen werden: {result.FailedReason}");
                         return false;
                     }
                     loaded = result.Value is true;
@@ -662,7 +662,7 @@ public class TableChunk : TableFile {
         } catch (ObjectDisposedException) { return; }
 
         if (!reserved) {
-            Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Caption}' läuft weiterhin ein anderer Speichervorgang.", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Caption}' läuft weiterhin ein anderer Speichervorgang.");
             return;
         }
 
@@ -910,7 +910,7 @@ public class TableChunk : TableFile {
 
                     if (loadResult.IsFailed) {
                         rowChunksSkipped = true;
-                        Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Chunk '{thisChunkId}' von '{Caption}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
+                        Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Chunk '{thisChunkId}' von '{Caption}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}");
                         continue;
                     }
                 }
@@ -947,7 +947,7 @@ public class TableChunk : TableFile {
 
             // Direkt auf Festplatte schreiben.
             // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
-            Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'", 2);
+            Develop.Message(ErrorType.Info, null, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'");
 
             foreach (var kvp in chunkData) {
                 var path = kvp.Key;
@@ -1283,7 +1283,7 @@ public class TableChunk : TableFile {
         }
 
         // Raw bytes direkt von der Festplatte lesen
-        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{KeyName}'", 1);
+        Develop.Message(ErrorType.Info, this, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{KeyName}'");
 
         if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht gelesen werden");

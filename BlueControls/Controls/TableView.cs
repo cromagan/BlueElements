@@ -1764,7 +1764,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var all = rows.Count;
         var c = 0;
         while (rows.Count > 0) {
-            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].ReadableText()}", 0);
+            Develop.Message(ErrorType.Info, tb, ImageCode.Skript, $"{info}: {rows[0].ReadableText()}");
 
             _pg?.Update(c++);
             Develop.DoEvents();

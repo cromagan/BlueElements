@@ -365,7 +365,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
             // daher werden Subname/Line des Feedbacks in diesem Pfad nie benötigt.
             var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, scp.ScriptName, 0);
             if (scx.Failed) {
-                Develop.Message(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
+                Develop.Message(BlueBasics.Enums.ErrorType.DevelopInfo, null, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason);
                 return new GetEndFeedback(scx.FailedReason, scx.NeedsScriptFix);
             }
 

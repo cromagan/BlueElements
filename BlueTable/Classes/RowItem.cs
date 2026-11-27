@@ -508,7 +508,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
         // Frisch erstellte, bereits invalidierte Zeile nicht erneut stempeln
         var currentState = CellGetStringCore(srs);
         if (string.IsNullOrEmpty(currentState)) {
-            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
+            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert"); }
             return;
         }
 
@@ -517,7 +517,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
 
         // Eine bereits komplett invalidierte Zeile nicht auf "nur Neuberechnung" herunterstufen
         if (newState == currentState) {
-            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
+            if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert"); }
             return;
         }
 
@@ -535,7 +535,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
         // Erst stempeln, dann einreihen — der Manager prüft den Status über NeedsRowUpdate()
         RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
+        if (changeFlags.HasFlag(ChangeFlags.LogUndo) && tb.DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert"); }
     }
 
     string IEditable.IsNowEditable() {
@@ -834,7 +834,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})", 0); }
+            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, ImageCode.Zeile, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})"); }
 
             if (extendedAllowed) {
                 // Immer entfernen, um endlos Berechungen zu verhindern
@@ -1592,7 +1592,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasChunkValue, 
         if (Table is not { IsDisposed: false } tb) { return null; }
 
         if (tb.Column[columnKey] is not { IsDisposed: false } column) {
-            Develop.Message(ErrorType.Warning, this, columnKey, ImageCode.Tabelle, $"Zelle konnte nicht zugeordnet werden: Spalte '{columnKey}' fehlt (Spalten im Ziel: {tb.Column.Count})", 0);
+            Develop.Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Zelle konnte nicht zugeordnet werden: Spalte '{columnKey}' fehlt (Spalten im Ziel: {tb.Column.Count})");
             return null;
         }
 

@@ -39,7 +39,7 @@ public static class Develop {
 
     #region Delegates
 
-    public delegate void MessageDelegate(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent);
+    public delegate void MessageDelegate(ErrorType type, object? reference, ImageCode symbol, string message);
 
     #endregion
 
@@ -64,7 +64,6 @@ public static class Develop {
     /// </summary>
     public static bool ExtendedEndLog { get; set; }
 
-    public static string MonitorMessage { get; set; } = "Monitor-Message";
 
     /// <summary>
     /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in StartService.
@@ -217,12 +216,12 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
-                        MessageDG?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
+                        MessageDG?.Invoke(type, null,  ImageCode.Information, message);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
-                        MessageDG?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
+                        MessageDG?.Invoke(type, null,  ImageCode.Warnung, message);
 
                         if (IsHostRunning()) { Debugger.Break(); }
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
@@ -230,7 +229,7 @@ public static class Develop {
                         break;
 
                     case ErrorType.Error:
-                        MessageDG?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
+                        MessageDG?.Invoke(type, null,  ImageCode.Kritisch, message);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -238,7 +237,7 @@ public static class Develop {
                         break;
 
                     default:
-                        MessageDG?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
+                        MessageDG?.Invoke(type, null,  ImageCode.Sonne, message);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
                         break;
@@ -440,7 +439,7 @@ public static class Develop {
 
     public static bool IsHostRunning() => Debugger.IsAttached;
 
-    public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) => MessageDG?.Invoke(type, reference, category, symbol, message, indent);
+    public static void Message(ErrorType type, object? reference, ImageCode symbol, string message) => MessageDG?.Invoke(type, reference, symbol, message);
 
     public static void StartService() {
         if (ServiceStarted) { return; }

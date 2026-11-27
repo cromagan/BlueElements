@@ -365,7 +365,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
         }
 
         if (tasks.Count > 0) {
-            Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
+            Message(ErrorType.Info, null, ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte");
 
             if (mustWait) {
                 EndLog($"BlockableFile.SaveAll(true): Warte auf {tasks.Count} Task(s) (max 60s)");
@@ -376,7 +376,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
                     EndLog("BlockableFile.SaveAll(true): Task.WaitAll hat Exception geworfen");
                 }
 
-                Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+                Message(ErrorType.Info, null, ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert");
             }
         } else {
             EndLog("BlockableFile.SaveAll: keine anstehenden Tasks");
@@ -611,7 +611,7 @@ public abstract class BlockableFile : LiveInstanceCache<BlockableFile>, IDisposa
                 return OperationResult.Failed(f);
             }
 
-            Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
+            Message(ErrorType.DevelopInfo, this, ImageCode.Diskette, $"Speichere {ReadableText()}");
 
             byte[]? contentToWrite;
             string savedContentHash;

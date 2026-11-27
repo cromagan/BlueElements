@@ -173,7 +173,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.ReadableText(), 0);
+        Develop.Message(ErrorType.Info, tb, ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.ReadableText());
     }
 
     /// <summary>
@@ -693,7 +693,7 @@ public sealed class RowCollection : KeyedItemCollection<RowItem>, IHasTable {
             nRow.CellSet(sortCol, maxIndex + 1, "SortIndex neue Zeile");
         }
 
-        Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.ReadableText()}", 0);
+        Develop.Message(ErrorType.DevelopInfo, tb, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.ReadableText()}");
 
         tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f);
 

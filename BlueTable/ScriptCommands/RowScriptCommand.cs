@@ -77,7 +77,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
             }
         }
 
-        Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\RowScriptCommand-Befehl: {fic.ReadableText()}", scp.Stufe);
+        Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\RowScriptCommand-Befehl: {fic.ReadableText()}");
 
         RowItem? newrow = null;
 
@@ -112,7 +112,7 @@ public class RowScriptCommand : TableGenericScriptCommand {
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false); }
                 r.InvalidateRowState(null, coment, DateTime.UtcNow, UserName, ChangeFlags.LogUndo);
             } else {
-                Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
+                Develop.Message(ErrorType.DevelopInfo, null, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.ReadableText()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.");
             }
         } else {
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false);

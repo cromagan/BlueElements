@@ -24,7 +24,7 @@ public class SoftMessageScriptCommand : TableGenericScriptCommand {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp) {
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
 
-        Develop.Message(ErrorType.Info, MyTable(scp), "Skript", ImageCode.Tabelle, txt, 0);
+        Develop.Message(ErrorType.Info, MyTable(scp), ImageCode.Tabelle, txt);
 
         return DoItFeedback.Null();
     }

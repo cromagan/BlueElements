@@ -341,7 +341,7 @@ public class TableFile : Table {
         // Ablehnung erzeugt beim Aufrufer nur Rollback und Wiederholungsaufwand.
         if (IsSaveRunningOnOtherThread) {
             for (var wait = 0; wait < 50 && IsSaveRunningOnOtherThread; wait++) {
-                Develop.Message(ErrorType.Info, this, "Speicher", ImageCode.Auge, "Warte auf Speicherzugriff", 0);
+                Develop.Message(ErrorType.Info, this, ImageCode.Auge, "Warte auf Speicherzugriff");
                 Thread.Sleep(200);
             }
 
@@ -398,7 +398,7 @@ public class TableFile : Table {
 
         if (!FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
-            if (!IsDisposed && DropMessages) { Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
+            if (!IsDisposed && DropMessages) { Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}"); }
             return;
         }
 
@@ -435,13 +435,13 @@ public class TableFile : Table {
 
             CreateWatcher();
 
-            if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
+            if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen"); }
         } catch (Exception ex) {
             // Schlägt das Laden fehl (z.B. Netzwerk-/IO-Fehler, Parser-Exception),
             // MUSS MainChunkLoadDone trotzdem gesetzt werden — sonst hängen alle
             // WaitInitialDone-Aufrufe anderer Threads bis zum 120-s-Timeout.
             // Freeze markiert die Tabelle als unbrauchbar, IsFreezed löst WaitInitialDone zusätzlich aus.
-            Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Laden der Tabelle {KeyName} fehlgeschlagen: {ex.Message}");
             Freeze("Laden der Tabelle fehlgeschlagen: " + ex.Message);
             MainChunkLoadDone = true;
         } finally {
@@ -471,7 +471,7 @@ public class TableFile : Table {
         if (AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
-        Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
+        Message(ErrorType.Info, null, ImageCode.Diskette, $"Speichere Tabelle {KeyName}");
 
         lock (_saveLock) {
             if (_saveTask is { IsCompleted: false }) {
@@ -535,7 +535,7 @@ public class TableFile : Table {
                 return OperationResult.Failed("Kein gültiger EOF-Marker");
             }
 
-            Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {KeyName}", 0);
+            Message(ErrorType.DevelopInfo, this, ImageCode.Diskette, $"Speichere {KeyName}");
 
             var contentToWrite = content.ZipIt() ?? [];
             if (contentToWrite.Length == 0) {
@@ -602,11 +602,11 @@ public class TableFile : Table {
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) {
-                Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {result}", 0);
+                Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {result}");
                 return OperationResult.Failed(result);
             }
         } catch (Exception ex) {
-            Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            Message(ErrorType.Warning, this, ImageCode.Tabelle, $"Speichern von {KeyName} fehlgeschlagen: {ex.Message}");
             return OperationResult.Failed(ex);
         } finally {
             _savingThreadId = -1;
