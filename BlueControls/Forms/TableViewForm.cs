@@ -236,7 +236,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         foreach (var thisT in tbcTableSelector.TabPages) {
             if (thisT is TabPage { Tag: List<object?> s } tp && s[0] is string ci) {
-                if (ci.Equals(tablename, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(ci, tablename, StringComparison.OrdinalIgnoreCase)) {
                     return tp;
                 }
             }
@@ -378,7 +378,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         var maybeok = false;
         foreach (var thisTb in Table.AllInstances()) {
-            if (thisTb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
+            if (string.Equals(thisTb.KeyName, tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
         if (!maybeok) {

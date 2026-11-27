@@ -20,7 +20,7 @@ public sealed class InternetExplorerWindowPlugin : WindowPlugin {
     public override List<string> CaptureDocuments(IntPtr handle) =>
         ShellWindowReader.LocationsOf(handle).Where(url => !url.StartsWith("file://", StringComparison.OrdinalIgnoreCase)).ToList();
 
-    public override bool IsResponsibleFor(string className, string processName) => className == "IEFrame";
+    public override bool IsResponsibleFor(string className) => className == "IEFrame";
 
     #endregion
 }

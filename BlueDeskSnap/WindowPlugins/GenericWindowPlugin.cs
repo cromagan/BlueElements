@@ -19,7 +19,7 @@ public sealed class GenericWindowPlugin : WindowPlugin {
 
     public override List<string> CaptureDocuments(IntPtr handle) => [];
 
-    public override bool IsResponsibleFor(string className, string processName) => true;
+    public override bool IsResponsibleFor(string className) => true;
 
     #endregion
 }

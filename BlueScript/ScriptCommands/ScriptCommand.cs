@@ -88,7 +88,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
     /// eines Fehlers über AllMethods anhand des Befehlsnamens ermittelt.
     /// </remarks>
     public static string? CheckArgumentCount(string command, List<string>? attributes, int argCount, LastArgMinCountTypeScriptCommand lastArgMinCount) {
-        string GetSyntax() => AllMethods.Instances.FirstOrDefault(m => m.Command.Equals(command, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
+        string GetSyntax() => AllMethods.Instances.FirstOrDefault(m => string.Equals(m.Command, command, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
 
         if (argCount == 0) {
             return attributes is { Count: > 0 }
@@ -515,7 +515,7 @@ public abstract class ScriptCommand : IReadableTextWithKey {
                         // Nur wenn der Befehl den gesamten Ausdruck abdeckt, kann er der Verursacher sein.
                         // Andernfalls stammt das Problem aus einem Teilausdruck (z.B. 'Exists(x) && b=8').
                         if (string.IsNullOrEmpty(f.FailedReason) && f.ContinueOrErrorPosition >= attributes[n].Length) {
-                            if (command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
+                            if (string.Equals(command, VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
                                 return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
                             }
 

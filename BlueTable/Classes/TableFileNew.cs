@@ -13,8 +13,8 @@ namespace BlueTable.Classes;
 /// SaveableFile-Instanz delegiert (Kopf-Fragment-Journal mit Komplettierung
 /// und Chunk-Verteilung). Der Chunk-Pfad der Verwaltung folgt der Chunk-Spalte:
 /// Nur mit gesetzter Chunk-Spalte verteilen sich die Zeilen je Chunk-Wert,
-/// ohne läuft alles im Kopf-Fragment. Die Layout-ClassId steht im Layout-Kopf der
-/// Kopf-Datei und bestimmt beim Standard-Loader die erzeugte Verwaltung.
+/// ohne läuft alles im Kopf-Fragment. Der Loader prüft den Layout-Kopf der
+/// Kopf-Datei, bevor die Verwaltung erzeugt wird.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFileNew : Table {

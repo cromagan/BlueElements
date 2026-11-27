@@ -49,7 +49,7 @@ public partial class RegionPlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            var content = File.ReadAllText(file);
+            var content = IO.ReadAllText(file);
             var result = ReorganizeFile(content, out var types, out var removed, out var added);
 
             if (result is null || result == content) { continue; }

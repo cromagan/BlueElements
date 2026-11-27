@@ -30,7 +30,7 @@ public sealed class CsMemberInfo {
     public required int BodyStart { get; init; }
 
     /// <summary>
-    /// Die Region-Kategorie des Members ("Methods" oder "Constructors").
+    /// Die Region-Kategorie des Members ("Methods", "Constructors" oder "Delegates").
     /// </summary>
     public required string Category { get; init; }
 
@@ -82,6 +82,16 @@ public sealed class CsMemberInfo {
     /// Der Deklarationsname; leer bei Operatoren, da diese keinen aufrufbaren Namen haben.
     /// </summary>
     public required string Name { get; init; }
+
+    /// <summary>
+    /// Spalte der öffnenden Klammer der Parameterliste; -1 ohne Parameterklammern.
+    /// </summary>
+    public required int ParamOpenColumn { get; init; }
+
+    /// <summary>
+    /// Zeile der öffnenden Klammer der Parameterliste; -1 ohne Parameterklammern.
+    /// </summary>
+    public required int ParamOpenLine { get; init; }
 
     /// <summary>
     /// Spalte der schließenden Klammer der Parameterliste; -1 ohne Parameterklammern.

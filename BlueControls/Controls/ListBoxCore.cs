@@ -389,7 +389,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     public void Remove(string keyName) {
         if (string.IsNullOrEmpty(keyName)) { return; }
-        _item.Where(i => i.KeyName.Equals(keyName, StringComparison.OrdinalIgnoreCase))
+        _item.Where(i => string.Equals(i.KeyName, keyName, StringComparison.OrdinalIgnoreCase))
              .ToList().ForEach(RemoveAndUnRegister);
         ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }

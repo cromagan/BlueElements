@@ -39,7 +39,7 @@ public class LicenseHeaderPlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            var content = File.ReadAllText(file).TrimStart('\uFEFF');
+            var content = IO.ReadAllText(file).TrimStart('\uFEFF');
 
             // Leere Dateien bleiben leer
             if (content.Length == 0) { continue; }

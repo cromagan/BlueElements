@@ -921,7 +921,7 @@ public class TableChunk : TableFile {
                 ]);
             }
 
-            if (x != LastChange) { return "Tabelle wurde während der Chunk-Generierung geändert"; }
+            if (x != LastChange) { return ChangeDuringSave; }
 
             // Re-Check: Es wird vorab kein Claim geschrieben, daher kann ein anderer
             // Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.

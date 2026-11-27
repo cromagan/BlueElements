@@ -38,7 +38,7 @@ internal class VlChar : Char {
 
     public override string PlainText() => string.Empty;
 
-    internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
+    internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth) {
         var h = Font is null ? 16f : Font.CharHeight;
         PosCanvas = new PointF(startX, startY);
         SetSize(new SizeF(0, h));

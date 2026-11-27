@@ -255,7 +255,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
         if (clickedColumn.ButtonImage is not null) {
             if (IsMouseOverHeadButton(clickedColumn, tableView, e)) {
-                clickedColumn.HeadButtonClick(ca.Table, tableView);
+                clickedColumn.HeadButtonClick(tableView);
             }
             return;
         }
@@ -422,7 +422,7 @@ public sealed class ColumnsHeadTableElement : TableElement {
 
         var newCaption = value.Replace("\r\n", "\r").Trim();
         if (!string.IsNullOrEmpty(newCaption)) {
-            var namesMatch = col.Caption.Equals(col.KeyName, StringComparison.OrdinalIgnoreCase);
+            var namesMatch = string.Equals(col.Caption, col.KeyName, StringComparison.OrdinalIgnoreCase);
             col.Caption = newCaption;
             if (namesMatch) {
                 var newKey = newCaption.ReduceToChars(AllowedCharsVariableName).ToUpperInvariant();

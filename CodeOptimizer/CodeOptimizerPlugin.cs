@@ -66,7 +66,7 @@ public abstract class CodeOptimizerPlugin : IComparable<CodeOptimizerPlugin>, IR
     /// Liefert die Optionen des Plugins als Controls, die übereinander gestapelt werden.
     /// Standard: keine Optionen.
     /// </summary>
-    public virtual List<GenericControl> GetOptions(int widthOfControl) => [];
+    public virtual List<GenericControl> GetOptions(int widthOfControl) => []; 
 
     /// <summary>
     /// Liefert die aktuellen Einstellungen des Plugins als JSON.

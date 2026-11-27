@@ -49,11 +49,11 @@ public abstract class WindowPlugin : IComparable<WindowPlugin>, IHasKeyName {
     /// <summary>
     /// Liefert das Plugin mit der kleinsten Priority, das für den Fenstertyp zuständig ist.
     /// </summary>
-    public static WindowPlugin FindFor(string className, string processName) {
+    public static WindowPlugin FindFor(string className) {
         WindowPlugin? best = null;
 
         foreach (var plugin in AllPlugins.Instances) {
-            if (!plugin.IsResponsibleFor(className, processName)) { continue; }
+            if (!plugin.IsResponsibleFor(className)) { continue; }
 
             if (best is null || plugin.Priority < best.Priority) { best = plugin; }
         }
@@ -64,7 +64,7 @@ public abstract class WindowPlugin : IComparable<WindowPlugin>, IHasKeyName {
     /// <summary>
     /// True, wenn dieses Plugin für das Fenstersignal (Klasse/Prozess) zuständig ist.
     /// </summary>
-    public abstract bool IsResponsibleFor(string className, string processName);
+    public abstract bool IsResponsibleFor(string className);
 
     /// <summary>
     /// Öffnet die gesicherten Dokumente neu. Standard: per Shell-Zuordnung (Explorer öffnet Ordner, Browser öffnet URLs).

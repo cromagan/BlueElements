@@ -253,7 +253,7 @@ public abstract class CliCommand : IHasKeyName {
             using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             while (FragmentRecord.TryReadNext(stream) is { } record) {
-                if (record.IsFileTag && record.TagType == FragmentTagType.SaveUser) { return record.StringContent.Equals(user, StringComparison.OrdinalIgnoreCase); }
+                if (record.IsFileTag && record.TagType == FragmentTagType.SaveUser) { return string.Equals(record.StringContent, user, StringComparison.OrdinalIgnoreCase); }
 
                 // Kopf-Ende: Erster Daten-Satz
                 if (!record.IsFileTag) { return false; }
@@ -380,21 +380,19 @@ public abstract class CliCommand : IHasKeyName {
             return null;
         }
 
-        // Fragment-Tabellen (.btb) halten die Zeilen lazy: Ohne Nachladen sehen
-        // alle Befehle nur den Kopfstand (0 Zeilen).
-        if (tbl is TableFileNew) {
-            if (!tbl.LoadTableRows(false, -1)) {
-                Console.Error.WriteLine("Tabelle '" + tbl.KeyName + ": Die Zeilen konnten nicht geladen werden.");
-                tbl.Dispose();
-                return null;
-            }
-
-            // Chunk-Tabellen erzwingen ohne PowerEdit einen Chunk-Filter
-            // (CalculateFilteredRows und RowItem.MatchesTo). Die CLI lädt bewusst
-            // alle Zeilen und adressiert sie als Batch — deshalb öffnet sie das
-            // zeitlich begrenzte, rein instanzlokale PowerEdit-Fenster.
-            tbl.PowerEdit = true;
+        // Zeilen sind bei allen Formaten lazy: Ohne Nachladen sehen alle Befehle
+        // nur den Kopfstand (0 Zeilen).
+        if (!tbl.LoadTableRows(false, -1)) {
+            Console.Error.WriteLine("Tabelle '" + tbl.KeyName + ": Die Zeilen konnten nicht geladen werden.");
+            tbl.Dispose();
+            return null;
         }
+
+        // Chunk-Tabellen erzwingen ohne PowerEdit einen Chunk-Filter
+        // (CalculateFilteredRows und RowItem.MatchesTo). Die CLI lädt bewusst
+        // alle Zeilen und adressiert sie als Batch — deshalb öffnet sie das
+        // zeitlich begrenzte, rein instanzlokale PowerEdit-Fenster.
+        tbl.PowerEdit = true;
 
         return tbl;
     }

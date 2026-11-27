@@ -47,7 +47,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     public string FileName {
         get;
         set {
-            if (value.Equals(field, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (string.Equals(value, field, StringComparison.OrdinalIgnoreCase)) { return; }
 
             field = value;
 

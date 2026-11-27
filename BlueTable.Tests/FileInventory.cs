@@ -144,7 +144,7 @@ public static class FileInventory {
             using var zip = new ZipArchive(ms, ZipArchiveMode.Update, true);
             var entry = zip.GetEntry("Main.bin");
 
-            if (entry is not null) { entry.LastWriteTime = FixedZipDate; }
+            entry?.LastWriteTime = FixedZipDate;
         } catch {
             return null;
         }

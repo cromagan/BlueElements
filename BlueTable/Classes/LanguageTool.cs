@@ -104,7 +104,7 @@ public static class LanguageTool {
         }
 
         txt = sb.ToString();
-        return style is ShortenStyle.Replaced or ShortenStyle.HTML || originalText.Equals(txt, StringComparison.Ordinal)
+        return style is ShortenStyle.Replaced or ShortenStyle.HTML || string.Equals(originalText, txt, StringComparison.Ordinal)
             ? txt
             : $"{originalText} ({txt})";
     }

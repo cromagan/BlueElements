@@ -65,7 +65,7 @@ public static class CliRights {
     /// Repariert gegebene Rechte-Texte: Groß-/Kleinschreibung wird kanonisiert, unbekannte Texte fallen weg.
     /// </summary>
     public static List<string> Repair(IEnumerable<string> rights) => [.. rights
-        .Select(v => AllRights.FirstOrDefault(r => r.Equals(v, StringComparison.OrdinalIgnoreCase)))
+        .Select(v => AllRights.FirstOrDefault(r => string.Equals(r, v, StringComparison.OrdinalIgnoreCase)))
         .OfType<string>()];
 
     #endregion

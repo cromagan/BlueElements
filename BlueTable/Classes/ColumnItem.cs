@@ -898,7 +898,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         set {
             if (IsDisposed) { return; }
             value = value.ToUpperInvariant();
-            if (value.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (string.Equals(value, _keyName, StringComparison.OrdinalIgnoreCase)) { return; }
 
             if (!ColumNameAllowed(value)) {
                 Develop.DebugPrint("Spaltenname nicht erlaubt: " + _keyName);
@@ -1525,7 +1525,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public bool ColumNameAllowed(string nameToTest) {
         if (!IsValidColumnKey(nameToTest)) { return false; }
 
-        if (nameToTest.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (string.Equals(nameToTest, _keyName, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (Table?.Column[nameToTest] is not null) { return false; }
 
         return true;

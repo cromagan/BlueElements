@@ -16,7 +16,7 @@ public class InputFormatConverter : TypeConverter {
     public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value) {
         if (value is string StringVal) {
             foreach (var format in Format.AllFormats.Instances) {
-                if (format.KeyName.Equals(StringVal, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(format.KeyName, StringVal, StringComparison.OrdinalIgnoreCase)) {
                     return format;
                 }
             }
@@ -29,7 +29,7 @@ public class InputFormatConverter : TypeConverter {
     public override object ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType) {
         if (destinationType == typeof(string) && value is IInputFormat inputFormat) {
             foreach (var format in Format.AllFormats.Instances) {
-                if (inputFormat is IReadableTextWithKey key && format.KeyName.Equals(key.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                if (inputFormat is IReadableTextWithKey key && string.Equals(format.KeyName, key.KeyName, StringComparison.OrdinalIgnoreCase)) {
                     return format.KeyName;
                 }
             }

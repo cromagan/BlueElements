@@ -252,7 +252,7 @@ public class TableCreateCliCommand : CliCommand {
     /// Löst einen Format-Key (z. B. TextOneLine) zur Spaltenformat-Instanz auf.
     /// </summary>
     private static ColumnFormat? FormatOf(string formatKey) =>
-                    ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName.Equals(formatKey, StringComparison.OrdinalIgnoreCase));
+                    ColumnFormat.AllFormats.Instances.FirstOrDefault(f => string.Equals(f.KeyName, formatKey, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Notiz aus dem Vorlagen-Pool, teils mit Zufallstext-Anhang; gelegentlich leer.

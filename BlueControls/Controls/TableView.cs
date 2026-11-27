@@ -1471,11 +1471,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         OnPinnedChanged();
     }
 
-    /// <summary>
-    /// Setzt die temporäre Sortierung zurück.
-    /// </summary>
-    public void ResetSortDefinition() => SortDefinitionTemporary = null;
-
     public void ResetView() {
         CancelSmoothScroll();
         _pendingSmoothScroll = false;

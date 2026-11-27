@@ -113,10 +113,10 @@ public sealed partial class EasyText : GenericControlReciver, IHasFieldVariable,
     internal string FormatKey {
         get;
         set {
-            if (value.Equals(field, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (string.Equals(value, field, StringComparison.OrdinalIgnoreCase)) { return; }
             field = value;
 
-            if (Format.AllFormats.Instances.FirstOrDefault(thisF => thisF.KeyName.Equals(field, StringComparison.OrdinalIgnoreCase)) is not { } f) { return; }
+            if (Format.AllFormats.Instances.FirstOrDefault(thisF => string.Equals(thisF.KeyName, field, StringComparison.OrdinalIgnoreCase)) is not { } f) { return; }
 
             txbText.AllowedChars = f.AllowedChars;
             txbText.ForbiddenChars = f.ForbiddenChars;

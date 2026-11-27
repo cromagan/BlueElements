@@ -1,7 +1,5 @@
 ﻿// Licensed under MIT; see License.md for disclaimer, details, and extended user conditions.
 
-using BlueBasics.ClassesStatic;
-
 namespace BeCreativeCLI.CliCommands;
 
 /// <summary>

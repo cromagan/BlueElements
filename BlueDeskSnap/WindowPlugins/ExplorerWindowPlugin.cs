@@ -31,7 +31,7 @@ public sealed class ExplorerWindowPlugin : WindowPlugin {
         return result;
     }
 
-    public override bool IsResponsibleFor(string className, string processName) => className is "CabinetWClass" or "ExploreWClass";
+    public override bool IsResponsibleFor(string className) => className is "CabinetWClass" or "ExploreWClass";
 
     #endregion
 }

@@ -9,7 +9,7 @@ namespace BlueBasics.Classes;
 
 /// <summary>
 /// Datei-Verwaltung für das Fragment-Format: Die Kopf-Datei trägt die Verwaltung
-/// selbst als Fragment-Baum mit der Layout-ClassId im Blatt-Satz. Die Daten liegen
+/// selbst als Fragment-Baum. Die Daten liegen
 /// im Arbeitsunterordner gleichen Namens ohne Suffix: Der Kopf-Stand als
 /// Zeitstempel-Snapshot (write-once) plus Fragment-Journal je Benutzer, die Daten
 /// mit Chunk-Wert zusätzlich als unveränderliche Chunk-Dateien je Chunk-Ordner.
@@ -27,47 +27,9 @@ namespace BlueBasics.Classes;
 /// jeder Eintrag ein Kopf-Fragment — der gesamte Inhalt wird im Kopf geführt.
 /// </para>
 /// </summary>
-public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, IHasKeyName, IFragmentStoreable {
-
-    #region Enums
-
-    /// <summary>
-    /// Empfänger-Typen der Kopf-Datei im Fragment-Format; nur der Verwaltung selbst bekannt.
-    /// Gültige Werte: 1–199 (0 ist reserviert, ≥ 200 sind systemeigene Tags).
-    /// </summary>
-    public enum SaveableFileFragmentType : byte {
-        LayoutClassId = 1
-    }
-
-    #endregion
+public sealed class SaveableFile : IDisposableExtended, IFragmentStoreable {
 
     #region Layout
-
-    /// <summary>
-    /// ClassId des Datei-Layouts; steht im Layout-Kopf der Kopf-Datei und bestimmt
-    /// beim Laden die erzeugte Verwaltung.
-    /// </summary>
-    public static string ClassId => "ChunkFragment";
-
-    /// <summary>
-    /// Die ClassId des Layouts als Instanz-Zugriff.
-    /// </summary>
-    public string MyClassId => ClassId;
-
-    /// <summary>
-    /// Anzeigename des Datei-Layouts für Auswahldialoge.
-    /// </summary>
-    public string ReadableText() => "Chunk-Fragment-Journal";
-
-    /// <summary>
-    /// Symbol zum Anzeigename; die Verwaltung hat kein eigenes Symbol.
-    /// </summary>
-    public QuickImage? SymbolForReadableText() => null;
-
-    /// <summary>
-    /// Kurzinfo des Datei-Layouts für Auswahldialoge.
-    /// </summary>
-    public string QuickInfo => "Kopf-Fragmente als Journal mit Komplettierung; Daten mit Chunk-Wert liegen als unveränderliche Chunk-Dateien im Arbeitsunterordner und werden bei Bedarf geladen.";
 
     /// <summary>
     /// Wert in Sekunden. Eine Chunk-Datei, die jünger ist, blockiert andere Benutzer.
@@ -78,12 +40,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     #endregion
 
     #region Fields
-
-    /// <summary>
-    /// Alle Datei-Verwaltungen über alle geladenen Assemblies; Instanzen ohne
-    /// Datei-Bezug, erzeugt über den parameterlosen Konstruktor.
-    /// </summary>
-    public static readonly AssemblyAwareCache<SaveableFile> AllFileSaveTypes = new();
 
     /// <summary>
     /// Wert in Stunden. Chunk-Dateien, die älter sind, werden gelöscht
@@ -349,12 +305,6 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     #region Constructors
 
     /// <summary>
-    /// Erstellt eine Instanz ohne Datei-Bezug (Aufzählung der Datei-Verwaltungen);
-    /// sie ist nicht im Live-Bestand registriert und wird vom Watcher nicht betickt.
-    /// </summary>
-    public SaveableFile() { }
-
-    /// <summary>
     /// Erstellt die Verwaltung; das besitzende Objekt wird über Bind() zugeordnet,
     /// sobald sein Konstruktor die Instanz übernommen hat.
     /// </summary>
@@ -422,14 +372,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// Dateiname der Hauptdatei (mit Pfad).
     /// </summary>
-    public string Filename { get; protected set; } = string.Empty;
-
-    /// <summary>
-    /// Logischer Name des Objekts; abgeleitet aus dem Dateinamen und Basis
-    /// für Journal- und Meldungs-Namen. Ohne Datei-Bezug die ClassId — darüber
-    /// führt AllFileSaveTypes die Layout-Instanz.
-    /// </summary>
-    public string KeyName => Filename is { Length: > 0 } ? Filename.FileNameWithoutSuffix() : ClassId;
+    public string Filename { get; private set; } = string.Empty;
 
     /// <summary>
     /// True, wenn Meldungen ausgegeben werden sollen.
@@ -459,7 +402,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// True, wenn der initiale Ladevorgang abgeschlossen ist (auch im Fehlerfall).
     /// </summary>
-    public bool MainLoadDone { get; protected set; }
+    public bool MainLoadDone { get; private set; }
 
     /// <summary>
     /// True, wenn das Objekt verworfen wurde.
@@ -481,7 +424,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// True, wenn anstehende Änderungen aktuell gespeichert werden dürfen.
     /// </summary>
-    public virtual bool MaySaveNow => !IsFreezed && !Ending;
+    public bool MaySaveNow => !IsFreezed && !Ending;
 
     /// <summary>
     /// UTC-Zeitpunkt des neuesten Kopf-Snapshots. Aus dem Dateinamen ermittelt,
@@ -517,7 +460,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// True, wenn die letzte Komplettierung zu lange zurückliegt.
     /// </summary>
-    public bool MasterNeeded { get; protected set; }
+    public bool MasterNeeded { get; private set; }
 
     /// <summary>
     /// Multi-User-Zugriff ist über das Fragment-Journal möglich: Jeder Benutzer
@@ -592,32 +535,16 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     public string Update(IFragmentStoreable source) => "Verwaltung hat keine übernehmbaren Inhalte";
 
     /// <summary>
-    /// Verständlicher Name eines Kopf-Satzes der Verwaltung; bei unbekannten Werten dessen Zahl.
+    /// Die Verwaltung hat keine eigenen Blatt-Sätze; ihre Identität trägt der
+    /// Typ-Satz des Standard-Kopfes. Kopf-Blöcke bestehen daher nur aus Tags.
     /// </summary>
-    public static string GetNameOf(byte leafType) => ((SaveableFileFragmentType)leafType).ToString();
+    public bool SerializeCore(Stream stream, int depth) => true;
 
     /// <summary>
-    /// Schreibt den Kopf-Block: den Blatt-Satz mit der Layout-ClassId.
-    /// </summary>
-    public bool SerializeCore(Stream stream, int depth) => FragmentRecord.Append(stream, depth, SaveableFileFragmentType.LayoutClassId, ClassId);
-
-    /// <summary>
-    /// Verarbeitet den Kopf-Block; die Layout-ClassId muss dieser Verwaltung entsprechen,
+    /// Verarbeitet den Kopf-Block; die Verwaltung hat keine eigenen Blatt-Sätze,
     /// unbekannte Blatt-Typen werden übersprungen.
     /// </summary>
-    public bool DeserializeThis(Stream stream, FragmentRecord record) {
-        switch ((SaveableFileFragmentType)record.LeafType) {
-            case SaveableFileFragmentType.LayoutClassId:
-                if (!string.Equals(record.StringContent, ClassId, StringComparison.OrdinalIgnoreCase)) { return false; }
-                break;
-
-            default:
-                // Unbekannter Blatt-Typ — Satz überspringen
-                break;
-        }
-
-        return true;
-    }
+    public bool DeserializeThis(Stream stream, FragmentRecord record) => true;
 
     /// <summary>
     /// Die Verwaltung hat keinen Event-Bestand.
@@ -692,7 +619,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// geschriebenen Sätze in dieselbe, sauber mit EOF abgeschlossene
     /// Fragment-Datei landen und kein Stream-Handle offen bleibt.
     /// </summary>
-    protected virtual void Dispose(bool disposing) {
+    private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
         if (!disposing) { return; }
 
@@ -777,7 +704,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Verbucht einen kompletten Undo-Eintrag samt Fingerabdruck; einen bereits
     /// bekannten Fingerabdruck verwirft sie. Läuft im UndoLock.
     /// </summary>
-    protected void AddUndoEntry(IReadOnlyList<FragmentRecord> entry) {
+    private void AddUndoEntry(IReadOnlyList<FragmentRecord> entry) {
         if (!_undoEntryHashes.Add(UndoEntryHash(entry))) { return; }
 
         Undos.AddRange(entry);
@@ -818,19 +745,19 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Ladevorgang. Läuft bereits ein Ladevorgang derselben Datei, liefert die
     /// Methode false, und der Aufrufer bricht still ab.
     /// </summary>
-    public virtual bool AllowLoad(string filename) => FilesInLoad.TryAdd(filename.ToUpperInvariant(), default);
+    public bool AllowLoad(string filename) => FilesInLoad.TryAdd(filename.ToUpperInvariant(), default);
 
     /// <summary>
     /// True, wenn diese Instanz temporärer Master werden darf: Datenstand frisch,
     /// nicht eingefroren und kein fremder Meister-Anspruch aktiv.
     /// </summary>
-    public virtual bool AmITemporaryMaster(bool updateAllowed) => DataFreshEnough && !IsFreezed && ForeignMasterAllowsUs();
+    public bool AmITemporaryMaster() => DataFreshEnough && !IsFreezed && ForeignMasterAllowsUs();
 
     /// <summary>
     /// Setzt den Master-Stempel dieser Instanz und trägt den Anspruch als
     /// Steuer-Sätze ins Journal, damit andere Prozesse ihn erkennen.
     /// </summary>
-    public virtual void MasterMe() {
+    public void MasterMe() {
         IsMaster = true;
         MasterSinceUtc = DateTime.UtcNow;
         WriteMasterClaim();
@@ -840,8 +767,8 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Versucht, diese Instanz zum Master zu machen, wenn sie es noch nicht ist
     /// und die Daten aktuell genug sind.
     /// </summary>
-    public virtual void TryToSetMeTemporaryMaster() {
-        if (!IsMaster && AmITemporaryMaster(false)) { MasterMe(); }
+    public void TryToSetMeTemporaryMaster() {
+        if (!IsMaster && AmITemporaryMaster()) { MasterMe(); }
     }
 
     /// <summary>
@@ -864,7 +791,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 _writer.Flush();
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, "Meister-Freigabe nicht geschrieben: " + KeyName, ex);
+            Develop.DebugPrint(ErrorType.Warning, "Meister-Freigabe nicht geschrieben: " + Filename, ex);
         }
     }
 
@@ -889,7 +816,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 _writer.Flush();
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, "Meister-Anspruch nicht geschrieben: " + KeyName, ex);
+            Develop.DebugPrint(ErrorType.Warning, "Meister-Anspruch nicht geschrieben: " + Filename, ex);
         }
     }
 
@@ -1017,7 +944,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         } catch (ObjectDisposedException) { return; }
 
         if (!reserved) {
-            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{KeyName}' läuft weiterhin ein anderer Speichervorgang.", 0);
+            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Reorganize abgebrochen: Auf '{Filename}' läuft weiterhin ein anderer Speichervorgang.", 0);
             return;
         }
 
@@ -1039,14 +966,14 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Fremde Snapshots nach dem eigenen Lade-Stand: Der Speicher kann deren
         // absorbierte Journal-Einträge fehlen — erst neu laden, dann neu verteilen.
         if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
-            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, "Reorganize abgebrochen: Der Kopf-Stand von '" + KeyName + "' wurde seit dem eigenen Laden fremd komplementiert. Tabelle neu laden.", 0);
+            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, "Reorganize abgebrochen: Der Kopf-Stand von '" + Filename + "' wurde seit dem eigenen Laden fremd komplementiert. Tabelle neu laden.", 0);
             return;
         }
 
         var chunkFolder = BaseChunkFolder();
 
         if (IO.DirectoryExists(chunkFolder) && !EnsureDataLoaded(true, -1, string.Empty)) {
-            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, "Reorganize abgebrochen: Nicht alle Chunks von '" + KeyName + "' konnten geladen werden.", 0);
+            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, "Reorganize abgebrochen: Nicht alle Chunks von '" + Filename + "' konnten geladen werden.", 0);
             return;
         }
 
@@ -1065,7 +992,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             var chunkError = SaveChunks();
 
             if (!string.IsNullOrEmpty(chunkError)) {
-                Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, $"Reorganize abgebrochen: Chunks von '{KeyName}' konnten nicht gespeichert werden: {chunkError}", 0);
+                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Reorganize abgebrochen: Chunks von '{Filename}' konnten nicht gespeichert werden: {chunkError}", 0);
                 return;
             }
         }
@@ -1074,7 +1001,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         var opr = PrepareNewSnapshot();
 
         if (opr.IsFailed) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
             return;
         }
 
@@ -1083,7 +1010,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         var f = WriteSnapshotFile(content);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
             return;
         }
 
@@ -1109,13 +1036,24 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
-    /// Löscht alle Chunk-Ordner und verwirft deren Verarbeitungs-Stempel.
+    /// Suffix der Legacy-Row-Chunk-Dateien. Ordner mit solchen Dateien sind die
+    /// Quelle einer laufenden Legacy-Konvertierung und räumt das Legacy-Format selbst auf.
+    /// </summary>
+    private const string SuffixOfLegacyChunks = "tblc";
+
+    /// <summary>
+    /// Löscht alle Chunk-Ordner und verwirft deren Verarbeitungs-Stempel. Ordner,
+    /// die noch Legacy-Chunk-Dateien (.tblc) enthalten, bleiben vollständig
+    /// stehen — der Speicher teilt sich im Konvertier-Fall mit der Legacy-Tabelle.
     /// </summary>
     private void RemoveAllChunkFolders(string chunkFolder) {
         if (!IO.DirectoryExists(chunkFolder)) { return; }
 
         foreach (var subDir in IO.GetDirectories(chunkFolder)) {
             var chunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+
+            // Gemischte Ordner einer laufenden Legacy-Konvertierung nicht anfassen.
+            if (Array.Exists(IO.GetFiles(subDir), f => string.Equals(f.FileSuffix(), SuffixOfLegacyChunks, StringComparison.OrdinalIgnoreCase))) { continue; }
 
             IO.DeleteDir(subDir, false);
             _processedFile.TryRemove(chunkId, out _);
@@ -1166,7 +1104,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Erzeuger-Stempel und Format-Version aus den Kopf-Sätzen erfasst; eine
     /// abweichende Format-Version bricht ab.
     /// </summary>
-    protected bool ParseMainContent(Stream stream) {
+    private bool ParseMainContent(Stream stream) {
         if (!ReadCreationStamp(stream)) { return false; }
 
         return Owner.Deserialize(stream, 0);
@@ -1180,7 +1118,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// beim ersten Speichern wird gestempelt, danach bleibt der Stempel der
     /// geladenen Datei erhalten.
     /// </summary>
-    protected List<byte> GenerateContentToSave(List<FragmentRecord> undos) {
+    private List<byte> GenerateContentToSave(List<FragmentRecord> undos) {
         using var ms = new MemoryStream();
 
         _ = FragmentRecord.Append(ms, 0, FragmentTagType.CreateUser, _createUser is { Length: > 0 } u ? u : UserName);
@@ -1233,12 +1171,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
-    /// Stellt sicher, dass die Kopf-Datei existiert und den Layout-Kopf mit der
-    /// Layout-ClassId trägt. Fehlt sie oder ist sie leer (abgebrochene
+    /// Stellt sicher, dass die Kopf-Datei existiert und einen gültigen
+    /// Layout-Kopf trägt. Fehlt sie oder ist sie leer (abgebrochene
     /// Erstanlage), wird sie neu geschrieben; ein abweichender Inhalt bleibt
     /// unangetastet und führt beim Laden zu einer klaren Fehlermeldung.
     /// </summary>
-    protected void EnsureHeadFileExists() {
+    private void EnsureHeadFileExists() {
         if (Filename is not { Length: > 0 }) { return; }
         if (IO.FileExists(Filename) && IO.ReadAllBytes(Filename, 5).Value is byte[] { Length: > 0 }) { return; }
 
@@ -1247,8 +1185,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
     /// <summary>
     /// Schreibt die Kopf-Datei: Diese Verwaltung serialisiert sich als Fragment-Baum
-    /// (Standard-Kopf mit Typ-Satz, darunter der Blatt-Satz mit der Layout-ClassId).
-    /// Ein bestehender Inhalt wird überschrieben.
+    /// (Standard-Kopf mit Typ-Satz). Ein bestehender Inhalt wird überschrieben.
     /// </summary>
     public void WriteHeadFile() {
         if (Filename is not { Length: > 0 }) { throw Develop.DebugError("Dateiname für die Kopf-Datei fehlt."); }
@@ -1262,35 +1199,27 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     }
 
     /// <summary>
-    /// Liest die Layout-ClassId aus dem Blatt-Satz der Kopf-Datei. False bei
-    /// fehlender, leerer oder ungültiger Datei. Läuft bewusst ohne Instanz:
-    /// Die ClassId bestimmt erst, welche Verwaltung erzeugt wird.
+    /// True, wenn die Kopf-Datei ein gültiger Fragment-Baum mit aktuellem
+    /// Format-Stempel ist. False bei fehlender, leerer oder ungültiger Datei und
+    /// bei fremden Format-Versionen. Läuft bewusst ohne Instanz: die Gültigkeit
+    /// entscheidet, ob die Datei überhaupt geladen wird.
     /// </summary>
-    public static bool TryReadHeadClassId(string filename, out string classId) {
-        classId = string.Empty;
-
+    public static bool HasValidHead(string filename) {
         if (filename is not { Length: > 0 }) { return false; }
         if (IO.ReadAllBytes(filename, 5).Value is not byte[] bytes || bytes.Length == 0) { return false; }
 
         using var ms = new MemoryStream(bytes);
 
         while (FragmentRecord.TryReadNext(ms) is { } record) {
-            if (record.IsTag) { continue; } // Kopf- und Steuer-Sätze überspringen
+            if (!record.IsFileTag) { return false; } // Daten-Sätze gehören nicht in die Kopf-Datei
 
-            if ((SaveableFileFragmentType)record.LeafType != SaveableFileFragmentType.LayoutClassId) { return false; }
-
-            classId = record.StringContent;
-            return classId is { Length: > 0 };
+            if (record.TagType == FragmentTagType.SerializerVersion) {
+                return string.Equals(record.StringContent, FragmentRecord.SerializerVersionCurrent, StringComparison.Ordinal);
+            }
         }
 
         return false;
     }
-
-    /// <summary>
-    /// True, wenn die Kopf-Datei einen gültigen Layout-Kopf trägt; Bestände vor
-    /// dem Kopf-Datei-Muster liefern false.
-    /// </summary>
-    protected static bool HasHeadClassId(string filename) => TryReadHeadClassId(filename, out _);
 
     #endregion
 
@@ -1306,7 +1235,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         if (Develop.AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
-        Develop.Message(ErrorType.Info, null, KeyName, ImageCode.Diskette, $"Speichere {KeyName}", 1);
+        Develop.Message(ErrorType.Info, null, Filename, ImageCode.Diskette, $"Speichere {Filename}", 1);
 
         lock (_saveLock) {
             if (_saveTask is { IsCompleted: false }) {
@@ -1372,11 +1301,11 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) {
-                Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Speichern von {KeyName} fehlgeschlagen: {result}", 0);
+                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {result}", 0);
                 return OperationResult.Failed(result);
             }
         } catch (Exception ex) {
-            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Speichern von {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Speichern von {Filename} fehlgeschlagen: {ex.Message}", 0);
             return OperationResult.Failed(ex);
         } finally {
             _savingThreadId = -1;
@@ -1496,7 +1425,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         if (firstTime) { _isInCache = LastSaveMainFileUtcDate; }
 
-        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
+        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Lade Fragmente von '" + Filename + "'", 0); }
 
         // Zeitstempel VOR dem Lesen der Fragmente erfassen.
         // Wird als readStartedUtc an InjectData übergeben und dort als _isInCache
@@ -1505,7 +1434,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
         var readStartedUtc = DateTime.UtcNow;
 
-        var fragmentFiles = IO.GetFiles(BaseChunkFolder(), KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments, SearchOption.TopDirectoryOnly).ToList();
+        var fragmentFiles = IO.GetFiles(BaseChunkFolder(), Filename.FileNameWithoutSuffix().ToUpperInvariant() + "-*." + SuffixOfFragments, SearchOption.TopDirectoryOnly).ToList();
         fragmentFiles.Remove(_myJournalFile);
 
         var undoRecords = GetLastChanges(fragmentFiles);
@@ -1658,12 +1587,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Fragmente gelesen wurden.
         CleanupOldSnapshots(startTimeUtc);
 
-        if (fragmentFiles is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster(true)) {
+        if (fragmentFiles is { Count: >= 1 } && MasterNeeded && AmITemporaryMaster()) {
             // Fremde Snapshots nach dem eigenen Lade-Stand: Deren absorbierte Journal-
             // Einträge wurden hier per Toleranz übersprungen und fehlen im Speicher.
             // Ein Komplett-Schreiben würde sie aus dem Kopf-Stand zurückrollen.
             if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
-                Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
+                Develop.Diagnose("Fragment-Komplettierung", $"Von {Filename} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
                 UnMasterMe();
                 return;
             }
@@ -1712,7 +1641,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
-                        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
+                        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
                         IO.DeleteFile(thisf, 0, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
@@ -1733,12 +1662,12 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         var opr = PrepareNewSnapshot();
 
         if (opr.IsFailed) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {opr.FailedReason}", 0);
             return;
         }
 
         if (opr.Value is not List<byte> content) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {OperationResult.FailedInternalError.FailedReason}", 0);
             return;
         }
 
@@ -1747,7 +1676,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             // wären nach dem Schreiben älter als die Toleranz in ReadJournalFile
             // und würden dauerhaft übersprungen. Der nächste Refresh-Zyklus
             // liest die Journale erneut und Komplettiert dann.
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung von {KeyName} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung von {Filename} verschoben: Nachladen benötigte länger als {JournalToleranceSeconds} Sekunden", 0);
             return;
         }
 
@@ -1755,17 +1684,17 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         // Einträge fehlen im Speicher — ein Komplett-Schreiben würde sie aus
         // dem Kopf-Stand zurückrollen.
         if (!InitialSavePending && LastSaveMainFileUtcDate.Subtract(_loadedSnapshotUtcDate).TotalSeconds > JournalToleranceSeconds) {
-            Develop.Diagnose("Fragment-Komplettierung", $"Von {KeyName} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
+            Develop.Diagnose("Fragment-Komplettierung", $"Von {Filename} verschoben: Kopf-Stand seit dem eigenen Lade-Stand ({_loadedSnapshotUtcDate.ToString5()}) fremd komplementiert ({LastSaveMainFileUtcDate.ToString5()}). Stack: {Develop.DiagStack()}");
             UnMasterMe();
             return;
         }
 
-        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + KeyName, 0);
+        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Erstelle neuen Komplettstand: " + Filename, 0);
 
         var f = WriteSnapshotFile(content);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
+            Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Komplettierung fehlgeschlagen: {f}", 0);
             return;
         }
 
@@ -2058,7 +1987,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             // Kein Wiederholen per Rekursion: Ein bleibender Fehler würde den Stack
             // aufbrauchen (Stack-Overflow-Meldung und Stillstand). Der nächste
             // BeSureToBeUpToDate-Aufruf versucht das Einspielen erneut.
-            Develop.DebugPrint(ErrorType.Warning, "InjectData fehlgeschlagen: " + KeyName, ex);
+            Develop.DebugPrint(ErrorType.Warning, "InjectData fehlgeschlagen: " + Filename, ex);
             return OperationResult.Failed("Fehler beim Einspielen der Fragmente: " + ex.Message);
         }
 
@@ -2086,7 +2015,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
                 // Journal, und mehrere Prozesse auf derselben Maschine kollidieren nicht
                 // mehr. CreateNew entscheidet atomar, wem die Datei gehört; der Verlierer
                 // probiert die nächste Sekunde.
-                var wunschName = (KeyName + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
+                var wunschName = (Filename.FileNameWithoutSuffix() + "-" + UserName + "-" + Environment.MachineName).ReduceToChars(Char_Numerals + " _+-#" + Char_Buchstaben + Char_Buchstaben.ToUpperInvariant());
 
                 if (wunschName.Length > 60) { wunschName = wunschName[..60]; } // Platz für Zeitstempel lassen
 
@@ -2195,7 +2124,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
             var fileDate = ExtractDateFromFileName(thisf);
             if (!fileDate.HasValue || fileDate.Value < threshold) {
-                Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Räume alten Snapshot auf: " + thisf.FileNameWithSuffix(), 0);
+                Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Räume alten Snapshot auf: " + thisf.FileNameWithSuffix(), 0);
                 try { IO.DeleteFile(thisf, false); } catch { }
             }
 
@@ -2284,7 +2213,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
         _mySnapshotFile = path;
         LastSaveMainFileUtcDate = DateTime.UtcNow;
 
-        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, "Neuer Komplettstand: " + path.FileNameWithSuffix(), 1);
+        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, "Neuer Komplettstand: " + path.FileNameWithSuffix(), 1);
 
         return string.Empty;
     }
@@ -2321,58 +2250,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
     #region Chunk-Ziel und Inhaltszerlegung
 
-    /// <summary>
-    /// Liefert die Chunk-ID (lowercase), in die ein Undo-Eintrag gehören würde,
-    /// oder leer, wenn er zum Kopf gehört: Der Pfad des Eintrags
-    /// (Empfänger-Typen der Sätze) muss den Chunk-Pfad treffen und der
-    /// Item-Kenner muss einen Chunk-Wert liefern.
-    /// TODO: Unused
-    /// </summary>
-    public string EntryChunkId(IReadOnlyList<FragmentRecord> entry, Dictionary<string, string> itemIds) {
-        if (!IsChunkSection(entry)) { return string.Empty; }
-
-        if (EntryItemKey(entry) is not { Length: > 0 } key) { return string.Empty; }
-
-        return itemIds.TryGetValue(key, out var byItem) ? byItem : string.Empty;
-    }
-
-    /// <summary>
-    /// True, wenn der Pfad des Eintrags (Empfänger-Typen der Sätze) den
-    /// Chunk-Pfad trifft.
-    /// </summary>
-    private bool IsChunkSection(IReadOnlyList<FragmentRecord> entry) {
-        if (ChunkPath is not { Count: > 0 }) { return false; }
-
-        List<byte> path = [];
-
-        foreach (var record in entry) {
-            if (record.LeafType > 0) { path.Add(record.LeafType); }
-        }
-
-        if (path.Count < ChunkPath.Count) { return false; }
-
-        for (var i = 0; i < ChunkPath.Count; i++) {
-            if (path[i] != ChunkPath[i]) { return false; }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Liefert den Item-Kenner des Eintrags: den Schlüssel des ersten ItemPath-
-    /// Nav-Satzes (Wert-Änderungen, Entfernungen) bzw. des ersten ItemAdd-Blattes
-    /// (Aufnahmen ohne Nav-Satz); leer ohne Kenner.
-    /// </summary>
-    private static string EntryItemKey(IReadOnlyList<FragmentRecord> entry) {
-        foreach (var record in entry) {
-            if (record.TagType == FragmentTagType.ItemPath && record.DataType == FragmentDataType.String) { return record.StringContent; }
-
-            if (record.TagType == FragmentTagType.ItemAdd && record.DataType == FragmentDataType.KeyNameType) { return record.KeyNameContent; }
-        }
-
-        return string.Empty;
-    }
-
+    
     /// <summary>
     /// Index der Chunk-Items: Schlüssel → Chunk-ID (lowercase, nur Items mit
     /// Chunk-Wert) und die Menge aller bekannten Schlüssel.
@@ -2669,7 +2547,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
             if (loadResult.IsFailed) {
                 loadFailedChunkIds.Add(thisChunkId);
-                Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Diskette, $"Chunk '{thisChunkId}' von '{KeyName}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
+                Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Diskette, $"Chunk '{thisChunkId}' von '{Filename}' konnte nicht geladen werden — Speicherung übersprungen: {loadResult.FailedReason}", 0);
             }
         }
 
@@ -2743,7 +2621,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         // Direkt auf Festplatte schreiben.
         // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
-        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks von '{KeyName}'", 2);
+        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks von '{Filename}'", 2);
 
         // Schreiben je Chunk parallel: eigenständige Ordner, write-once —
         // keine gemeinsamen Ressourcen außer den Concurrent-Verwaltungen.
@@ -3032,7 +2910,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// aktualisiert das Tracking (verarbeitete Datei, Hashes, alte Dateien).
     /// </summary>
     private OperationResult LoadChunkFile(string chunkId, string newestFile, string[] chunkFiles) {
-        Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{KeyName}'", 1);
+        Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{Filename}'", 1);
 
         if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
             return OperationResult.Failed($"Chunk '{chunkId}' konnte nicht gelesen werden");
@@ -3134,7 +3012,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// </summary>
     /// <param name="info">Datei-Info, z. B. Dateiname oder Bereichsname.</param>
     /// <param name="freeze">Optionaler Freeze-Grund nach dem Laden.</param>
-    public virtual void LoadFromFile(string info, string freeze) {
+    public void LoadFromFile(string info, string freeze) {
         if (!PrepareLoad(info, out var fileNameToLoad)) { return; }
 
         Filename = fileNameToLoad;
@@ -3143,7 +3021,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
 
         // Einheitliche Regel: Eine Kopf-Datei mit Inhalt, aber ohne gültigen
         // Layout-Kopf (Bestand vor dem Kopf-Datei-Muster), wird nicht geraten.
-        if (!HasHeadClassId(Filename)) {
+        if (!HasValidHead(Filename)) {
             Freeze("Kopf-Datei ohne gültigen Layout-Kopf (alter Bestand oder beschädigt): " + Filename.FileNameWithSuffix());
             MainLoadDone = true;
             _ = FilesInLoad.TryRemove(fileNameToLoad.ToUpperInvariant(), out _);
@@ -3159,7 +3037,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// OwnerClass ab: Ist das besitzende Objekt verworfen, wird still abgebrochen.
     /// Liefert false, wenn der Aufruf damit abgeschlossen ist.
     /// </summary>
-    protected bool PrepareLoad(string info, out string fileNameToLoad) {
+    private bool PrepareLoad(string info, out string fileNameToLoad) {
         fileNameToLoad = string.Empty;
 
         if (IsDisposed) { return false; }
@@ -3188,7 +3066,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Standard-Ablauf nach dem Setzen des Dateinamens: lädt die Kopf-Daten über
     /// LoadMainDataCore, vollzieht die Lebenszyklus-Schritte und meldet das Ergebnis.
     /// </summary>
-    protected void LoadCore(string fileNameToLoad, string freeze) {
+    private void LoadCore(string fileNameToLoad, string freeze) {
         PauseTimer();
 
         try {
@@ -3205,9 +3083,9 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
             OnLoaded(true);
 
-            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, KeyName, ImageCode.Tabelle, $"Laden abgeschlossen: {fileNameToLoad.FileNameWithSuffix()}", 0); }
+            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Filename, ImageCode.Tabelle, $"Laden abgeschlossen: {fileNameToLoad.FileNameWithSuffix()}", 0); }
         } catch (Exception ex) {
-            Develop.Message(ErrorType.Warning, this, KeyName, ImageCode.Tabelle, $"Laden von '{KeyName}' fehlgeschlagen: {ex.Message}", 0);
+            Develop.Message(ErrorType.Warning, this, Filename, ImageCode.Tabelle, $"Laden von '{Filename}' fehlgeschlagen: {ex.Message}", 0);
             Freeze("Laden fehlgeschlagen: " + ex.Message);
             MainLoadDone = true;
         } finally {
@@ -3321,23 +3199,23 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// Setzt den Reentrancy-Zähler für Lade- und Speichervorgänge; der
     /// statische Watcher überspringt die Instanz solange.
     /// </summary>
-    protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);
+    private void PauseTimer() => Interlocked.Increment(ref _timerPaused);
 
     /// <summary>
     /// Gibt den Reentrancy-Zähler für Lade- und Speichervorgänge frei.
     /// </summary>
-    protected void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
+    private void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
 
     /// <summary>
     /// Setzt den Zähler für kritische Daten-Einspielungen; in diesem Fenster
     /// führen Ansichten keine endgültigen Entfernungen in ihren Einträgen durch.
     /// </summary>
-    protected void PauseDataReload() => Interlocked.Increment(ref _dataReloadPaused);
+    private void PauseDataReload() => Interlocked.Increment(ref _dataReloadPaused);
 
     /// <summary>
     /// Gibt den Zähler für kritische Daten-Einspielungen frei.
     /// </summary>
-    protected void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
+    private void ResumeDataReload() => Interlocked.Decrement(ref _dataReloadPaused);
 
     /// <summary>
     /// Löst das Disposed-Ereignis aus.
@@ -3347,22 +3225,22 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
     /// <summary>
     /// Löst das Loading-Ereignis aus.
     /// </summary>
-    protected virtual void OnLoading() => Loading?.Invoke(this, System.EventArgs.Empty);
+    private void OnLoading() => Loading?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Löst das Loaded-Ereignis aus.
     /// </summary>
-    protected virtual void OnLoaded(bool isFirst) => Loaded?.Invoke(this, new SaveableFileLoadedEventArgs(isFirst));
+    private void OnLoaded(bool isFirst) => Loaded?.Invoke(this, new SaveableFileLoadedEventArgs(isFirst));
 
     /// <summary>
     /// Löst das InvalidateView-Ereignis aus.
     /// </summary>
-    protected virtual void OnInvalidateView() => InvalidateView?.Invoke(this, System.EventArgs.Empty);
+    private void OnInvalidateView() => InvalidateView?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Löst das RefreshDataSystems-Ereignis aus.
     /// </summary>
-    protected virtual void OnRefreshDataSystems() => RefreshDataSystems?.Invoke(this, System.EventArgs.Empty);
+    private void OnRefreshDataSystems() => RefreshDataSystems?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Tick des statischen Watchers: trägt verworfene Instanzen aus und ruft
@@ -3383,7 +3261,7 @@ public class SaveableFile : IDisposableExtended, IReadableText, IHasQuickInfo, I
             try {
                 instance.CheckerTick();
             } catch (Exception ex) {
-                Develop.Message(ErrorType.Warning, instance, instance.KeyName, ImageCode.Tabelle, $"CheckerTick fehlgeschlagen: {ex.GetType().Name} {ex.Message} Aufrufstack={Develop.DiagStack()}", 0);
+                Develop.Message(ErrorType.Warning, instance, instance.Filename, ImageCode.Tabelle, $"CheckerTick fehlgeschlagen: {ex.GetType().Name} {ex.Message} Aufrufstack={Develop.DiagStack()}", 0);
             }
         }
     }

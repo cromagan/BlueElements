@@ -40,7 +40,7 @@ public class TableAddColumnCliCommand : CliCommand {
         }
 
         var formatKey = args.Option("format") ?? "TextOneLine";
-        var format = ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName.Equals(formatKey, StringComparison.OrdinalIgnoreCase));
+        var format = ColumnFormat.AllFormats.Instances.FirstOrDefault(f => string.Equals(f.KeyName, formatKey, StringComparison.OrdinalIgnoreCase));
 
         if (format is null) {
             Console.Error.WriteLine("Unbekanntes Format: '" + formatKey + "'. Gültige Formate: " + string.Join(", ", ColumnFormat.AllFormats.Instances.Select(f => f.KeyName).OrderBy(f => f)));

@@ -3,9 +3,9 @@
 namespace CodeOptimizer.Classes;
 
 /// <summary>
-/// Findet textbasiert die Methoden- und Konstruktoren oberster Typdeklarationen und liefert je Member
-/// Signatur, Parameter, Körperbereich und Modifikatoren. Kommentare und String-Inhalte werden über
-/// CsSanitizer ausgeblendet, damit Treffer ausschließlich reinen Code betreffen.
+/// Findet textbasiert die Methoden-, Konstruktoren- und Delegat-Deklarationen oberster Typdeklarationen und
+/// liefert je Member Signatur, Parameter, Körperbereich und Modifikatoren. Kommentare und String-Inhalte
+/// werden über CsSanitizer ausgeblendet, damit Treffer ausschließlich reinen Code betreffen.
 /// Verschachtelte Typen und Member unter #if/#endif werden konservativ übersprungen.
 /// </summary>
 public static partial class CsCodeScan {
@@ -96,6 +96,8 @@ public static partial class CsCodeScan {
             EndLine = end,
             BodyOpenLine = bodyOpenLine,
             BodyOpenColumn = bodyOpenColumn,
+            ParamOpenLine = paramOpenLine,
+            ParamOpenColumn = paramOpenColumn,
             ParamCloseLine = paramCloseLine,
             ParamCloseColumn = paramCloseColumn,
             BodyStart = bodyStart,
@@ -190,7 +192,7 @@ public static partial class CsCodeScan {
             var header = string.Join(" ", clean.GetRange(i, end - i + 1));
             var category = Classify(header, typeName);
 
-            if (category is "Methods" or "Constructors") {
+            if (category is "Methods" or "Constructors" or "Delegates") {
                 result.Add(BuildMember(file, clean, i, end, triviaStart < 0 ? i : triviaStart, category, typeName, typeIsInterface));
             }
 
@@ -243,6 +245,106 @@ public static partial class CsCodeScan {
         return depths;
     }
 
+    /// <summary>
+    /// Liefert je Typname den einfachen Namen der ersten Basis (Basis-Klasse oder Interface); Typen ohne Basis fehlen.
+    /// </summary>
+    public static Dictionary<string, string> BaseTypes(List<string> clean) {
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        var i = 0;
+
+        while (i < clean.Count) {
+            var open = TypeOpenBrace(i, clean);
+
+            if (open < i) { i++; continue; }
+
+            var header = string.Join(" ", clean.GetRange(i, open - i + 1));
+            var type = TypeName(clean[i]);
+
+            if (type is { Length: > 0 }) {
+                var baseName = BaseNameOf(header);
+
+                if (baseName is { Length: > 0 }) { result.TryAdd(type, baseName); }
+            }
+
+            i = open + 1;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Liefert die Start-Offsets je Zeile eines Dokument-Texts.
+    /// </summary>
+    public static int[] LineOffsets(string content) {
+        var result = new List<int> { 0 };
+
+        for (var i = 0; i < content.Length; i++) {
+            if (content[i] == '\n') { result.Add(i + 1); }
+        }
+
+        return [.. result];
+    }
+
+    /// <summary>
+    /// Liefert den Parameternamen eines Parameterlisten-Segments; Standardwerte werden abgeschnitten.
+    /// </summary>
+    public static string ParamNameOf(string segment) => LastIdentifier(CutDefaultValue(segment));
+
+    /// <summary>
+    /// Zerlegt die Parameterliste zwischen Öffnungs- und Schlussposition (Dokument-Text-Koordinaten) in Segmente
+    /// (je Parameter) und die Trenner dazwischen (Komma samt Leerraum und Kommentar). Nur Code-Kommas auf
+    /// Klammer-Tiefe null trennen; String- und Kommentar-Inhalte stören nicht.
+    /// </summary>
+    public static (List<(int Start, int End)> Segments, List<(int Start, int End)> Separators) ParamSpans(string content, string kinds, int openPos, int closePos) {
+        var segments = new List<(int Start, int End)>();
+        var separators = new List<(int Start, int End)>();
+        var paren = 0;
+        var angle = 0;
+        var segStart = -1;
+        var sepStart = -1;
+
+        for (var i = openPos + 1; i < closePos; i++) {
+            if (kinds[i] != CsSanitizer.KindCode) { continue; }
+
+            var c = content[i];
+
+            if (c == ',' && paren == 0 && angle == 0) {
+                segments.Add((segStart < 0 ? i : segStart, i));
+                sepStart = i;
+                segStart = -1;
+                continue;
+            }
+
+            switch (c) {
+                case '(':
+                    paren++;
+                    break;
+                case ')':
+                    paren--;
+                    break;
+                case '<':
+                    angle++;
+                    break;
+                case '>' when angle > 0:
+                    angle--;
+                    break;
+            }
+
+            if (segStart < 0) {
+                segStart = i;
+
+                if (sepStart >= 0) {
+                    separators.Add((sepStart, i));
+                    sepStart = -2;
+                }
+            }
+        }
+
+        if (segStart >= 0) { segments.Add((segStart, closePos)); }
+
+        return (segments, separators);
+    }
+
     private static int FindTypeClose(int[] depths, List<string> clean, int open, int bodyDepth) {
         for (var j = open + 1; j < clean.Count; j++) {
             if (depths[j] == bodyDepth - 1 && clean[j].Trim() == "}") { return j; }
@@ -269,8 +371,7 @@ public static partial class CsCodeScan {
     /// <summary>
     /// Liefert den Inhalt der Klammjergruppe als Text (mehrzeilig mit Leerzeichen verbunden).
     /// </summary>
-    private static string GroupText(List<string> clean, int openLine, int openColumn, int closeLine, int closeColumn) {
-        if (openLine == closeLine) { return clean[openLine][(openColumn + 1)..closeColumn]; }
+    private static string GroupText(List<string> clean, int openLine, int openColumn, int closeLine, int closeColumn) {        if (openLine == closeLine) { return clean[openLine][(openColumn + 1)..closeColumn]; }
 
         var sb = new StringBuilder(clean[openLine][(openColumn + 1)..]);
 
@@ -278,6 +379,36 @@ public static partial class CsCodeScan {
 
         sb.Append(' ').Append(clean[closeLine][..closeColumn]);
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Liefert den einfachen Namen der ersten Basis aus einem Typkopf; ohne Basis oder bei Constraint-Kolon ein leerer String.
+    /// </summary>
+    private static string BaseNameOf(string header) {
+        var typeMatch = TypeNameRegex().Match(header);
+
+        if (!typeMatch.Success) { return string.Empty; }
+
+        var colon = header.IndexOf(':', typeMatch.Index + typeMatch.Length);
+        var brace = header.IndexOf('{', typeMatch.Index + typeMatch.Length);
+
+        if (colon < 0 || (brace >= 0 && brace < colon)) { return string.Empty; }
+
+        var list = brace >= 0 ? header[(colon + 1)..brace] : header[(colon + 1)..];
+        var where = list.IndexOf(" where ", StringComparison.Ordinal);
+
+        if (where >= 0) { list = list[..where]; }
+
+        var first = list.Split(',')[0].Trim();
+        var generic = first.IndexOf('<');
+
+        if (generic >= 0) { first = first[..generic].Trim(); }
+
+        if (first is "class" or "struct" or "new" or "record" || first.Length == 0) { return string.Empty; }
+
+        var dot = first.LastIndexOf('.');
+
+        return dot >= 0 ? first[(dot + 1)..] : first;
     }
 
     /// <summary>
@@ -378,6 +509,35 @@ public static partial class CsCodeScan {
     }
 
     /// <summary>
+    /// Liefert den Member samt zugehöriger Implementierungs-Kette (Override, Interface, partiell, implizit).
+    /// Diese Member müssen bei Signatur-Änderungen oder Löschungen gemeinsam behandelt werden. Gebundene Member
+    /// (Override, explizite Implementierung, partiell) gehören immer zur Kette; Interfaces und implizite
+    /// Implementierungen nur bei gleicher Parameterzahl, da Parameternamen abweichen dürfen.
+    /// </summary>
+    public static List<CsMemberInfo> ImplementationChain(CsMemberInfo member, Dictionary<string, List<CsMemberInfo>> methodsByName, HashSet<string> interfaceNames) {
+        List<CsMemberInfo> result = [member];
+        var spreads = member.TypeIsInterface || member.IsVirtual || member.IsAbstract || interfaceNames.Contains(member.Name);
+
+        if (!spreads) { return result; }
+
+        var count = member.Parameters.Count;
+
+        foreach (var other in methodsByName.GetValueOrDefault(member.Name) ?? []) {
+            if (ReferenceEquals(other, member) || result.Contains(other)) { continue; }
+
+            var bound = other.IsOverride || other.IsExplicitImplementation || other.IsPartial;
+            var sameShape = other.Parameters.Count == count;
+            var isImpl = bound
+                || (other.TypeIsInterface && sameShape)
+                || (!other.TypeIsInterface && !other.IsStatic && other.IsPublic && sameShape);
+
+            if (isImpl) { result.Add(other); }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Liefert das letzte Wortzeichen-Wort vor dem ermittelten Token.
     /// </summary>
     private static string NameBefore(string pre) {
@@ -419,7 +579,7 @@ public static partial class CsCodeScan {
         parts.Add(current.ToString());
 
         foreach (var part in parts) {
-            var name = LastIdentifier(CutDefaultValue(part));
+            var name = ParamNameOf(part);
 
             if (name is { Length: > 0 } && !ParameterKeywords.Contains(name)) { result.Add(name); }
         }
@@ -473,7 +633,7 @@ public static partial class CsCodeScan {
     /// Liest eine Datei und liefert die Zeilen sowie die bereinigten Zeilen (Kommentare und Strings geleert).
     /// </summary>
     public static (List<string> Lines, List<string> Clean) Load(string file) {
-        var lines = File.ReadAllText(file).Split(["\r\n", "\n"], StringSplitOptions.None).ToList();
+        var lines = IO.ReadAllText(file).Split(["\r\n", "\n"], StringSplitOptions.None).ToList();
         return (lines, new CsSanitizer().SanitizeLines(lines));
     }
 

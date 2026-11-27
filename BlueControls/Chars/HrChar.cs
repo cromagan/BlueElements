@@ -41,7 +41,7 @@ internal class HrChar : Char {
 
     public override string PlainText() => "\r\n";
 
-    internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
+    internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth) {
         var h = Font is null ? 8f : Font.CharHeight;
         var w = maxWidth > startX ? maxWidth - startX : 0;
         PosCanvas = new PointF(startX, startY);

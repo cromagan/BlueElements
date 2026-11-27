@@ -51,7 +51,7 @@ public class ReplacePlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            var content = File.ReadAllText(file);
+            var content = IO.ReadAllText(file);
             string newContent;
             int replacements;
 

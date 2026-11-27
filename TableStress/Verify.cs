@@ -175,10 +175,10 @@ public static class Verify {
 
         if (!IO.FileExists(datei)) {
             Fehler("Kopf-Datei fehlt: " + datei);
-        } else if (!SaveableFile.TryReadHeadClassId(datei, out var layout)) {
+        } else if (!SaveableFile.HasValidHead(datei)) {
             Fehler("Kopf-Datei ohne gültigen Layout-Kopf: " + datei);
         } else {
-            Write("LAYOUT", layout);
+            Write("LAYOUT", "OK");
         }
 
         var basis = datei.FilePath() + datei.FileNameWithoutSuffix() + "\\";
@@ -222,6 +222,16 @@ public static class Verify {
                 }
 
                 var content = raw.IsZipped() ? raw.UnzipIt() : raw;
+
+                // Legacy-Chunks (.tblc) sind Sitzungs-Journale: Der Bestand des Ordners
+                // ergibt sich aus der Union aller Dateien — ein EOF-Marker ist dort
+                // nicht vorgesehen und darf nicht als Fehler gelten.
+                if (f.FileSuffix().Equals("tblc", StringComparison.OrdinalIgnoreCase)) {
+                    if (content is not { Length: > 0 }) { Fehler($"Inhalt leer: {f}"); }
+
+                    continue;
+                }
+
                 if (content is not { Length: > 0 } || !FragmentRecord.HasValidEofMarker(content)) {
                     Fehler($"Inhalt unvollständig (kein EOF-Marker): {f}");
                 }

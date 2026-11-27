@@ -61,27 +61,6 @@ public sealed class CsSanitizer {
         return result;
     }
 
-    // TODO: Unused
-    /// <summary>
-    /// Bereinigt einen zusammenhängenden Textabschnitt und behält exakt die Zeichenanzahl bei (Positionen bleiben gültig).
-    /// </summary>
-    public string SanitizeText(string text) {
-        var sb = new StringBuilder(text.Length);
-        var start = 0;
-
-        while (start < text.Length) {
-            var nl = text.IndexOf('\n', start);
-            var end = nl < 0 ? text.Length : nl + 1;
-            SanitizeInto(sb, null, text[start..end]);
-
-            if (state == StLineComment) { state = StCode; }
-
-            start = end;
-        }
-
-        return sb.ToString();
-    }
-
     /// <summary>
     /// Liefert je Eingabezeichen die Art (KindCode, KindString oder KindComment); die Indizes entsprechen dem Originaltext.
     /// </summary>
@@ -142,6 +121,31 @@ public sealed class CsSanitizer {
     public static bool ContainsString(string kinds, int start, int length) {
         if (start < 0 || start + length > kinds.Length) { return true; }
         return kinds.AsSpan(start, length).IndexOf(KindString) >= 0;
+    }
+
+    /// <summary>
+    /// Ersetzt Regex-Treffer, aber nur wenn der Treffer komplett in Code liegt (nicht in Strings, Interpolationen oder Kommentaren).
+    /// </summary>
+    public static string ReplaceInCode(string content, Regex regex, Func<Match, string> toReplacement) {
+        var kinds = new CsSanitizer().SanitizeKinds(content);
+        return regex.Replace(content, m => CsSanitizer.IsPureCode(kinds, m.Index, m.Length) ? toReplacement(m) : m.Value);
+    }
+
+    /// <summary>
+    /// Prüft, dass ein Treffer mit eingebettetem String-Literal in echtem Code beginnt und endet und keine Kommentare enthält.
+    /// </summary>
+    public static bool IsCodeWithLiteral(string kinds, Match m) {
+        var firstQuote = m.Value.IndexOf('"');
+        if (firstQuote < 0) { return IsPureCode(kinds, m.Index, m.Length); }
+
+        var lastQuote = m.Value.LastIndexOf('"');
+        if (!IsPureCode(kinds, m.Index, firstQuote) || !IsPureCode(kinds, m.Index + lastQuote + 1, m.Length - lastQuote - 1)) { return false; }
+
+        for (var i = firstQuote; i <= lastQuote; i++) {
+            if (kinds[m.Index + i] == KindComment) { return false; }
+        }
+
+        return true;
     }
 
     private void SanitizeInto(StringBuilder? sb, StringBuilder? kinds, string line) {

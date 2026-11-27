@@ -24,7 +24,7 @@ public static class TestSetup {
     #region Methods
 
     [AssemblyInitialize]
-    public static void AssemblyInit(TestContext context) {
+    public static void AssemblyInit() {
         RunId = DateTime.UtcNow.ToString("HHmmssfff", CultureInfo.InvariantCulture);
         Develop.StartService();
         Develop.TraceLogging_End();

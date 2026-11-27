@@ -177,7 +177,7 @@ public abstract class Char : IDisposableExtended {
         return BlueFont.Get(fontName, size, bold, italic, underline, strikeOut, colorMain, colorOutline, colorBack);
     }
 
-    internal virtual (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
+    internal virtual (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth) {
         PosCanvas = new PointF(startX, startY);
         var s = CalculateSizeCanvas();
         _size = s;

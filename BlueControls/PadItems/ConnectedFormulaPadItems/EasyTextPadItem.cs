@@ -104,7 +104,7 @@ public class EasyTextPadItem : ReciverPadItem, IItemToControl, IAutosizable, IHa
 
         set {
             if (IsDisposed) { return; }
-            if (value.Equals(field, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (string.Equals(value, field, StringComparison.OrdinalIgnoreCase)) { return; }
             field = value;
             OnPropertyChanged();
         }
@@ -170,7 +170,7 @@ public class EasyTextPadItem : ReciverPadItem, IItemToControl, IAutosizable, IHa
 
         if (FormatKey is not { Length: > 0 }) { return "Format fehlt."; }
 
-        if (Format.AllFormats.Instances.FirstOrDefault(thisF => thisF.KeyName.Equals(FormatKey, StringComparison.OrdinalIgnoreCase)) is null) { return "Format unbekannt."; }
+        if (Format.AllFormats.Instances.FirstOrDefault(thisF => string.Equals(thisF.KeyName, FormatKey, StringComparison.OrdinalIgnoreCase)) is null) { return "Format unbekannt."; }
 
         return string.Empty;
     }

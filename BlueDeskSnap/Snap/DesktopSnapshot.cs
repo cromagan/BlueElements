@@ -41,7 +41,7 @@ public static class DesktopSnapshot {
 
             try {
                 var processName = ProcessNameOf(window.Prid);
-                var plugin = WindowPlugin.FindFor(window.Klasse, processName);
+                var plugin = WindowPlugin.FindFor(window.Klasse);
 
                 var info = new WindowInfo {
                     Title = window.MainWindowTitle,
@@ -167,7 +167,7 @@ public static class DesktopSnapshot {
             IntPtr handle;
 
             if (info.Documents is { Count: > 0 }) {
-                WindowPlugin.FindFor(info.ClassName, info.ProcessName).RestoreDocuments(info.Documents);
+                WindowPlugin.FindFor(info.ClassName).RestoreDocuments(info.Documents);
                 handle = WaitForWindow(info, processNames, busyHandles);
             } else {
                 Develop.Diagnose("Snap", "Restore: improvisiere Fenster: " + info.ProcessName + " | " + info.Title);

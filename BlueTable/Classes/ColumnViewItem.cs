@@ -251,7 +251,7 @@ public class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IN
     /// Führt die Aktion des Kopf-Buttons aus. Die Basis öffnet über den Host
     /// den Spalten-Editor der zugeordneten Spalte.
     /// </summary>
-    public virtual void HeadButtonClick(Table? table, IColumnHeadButtonHost host) {
+    public virtual void HeadButtonClick(IColumnHeadButtonHost host) {
         if (Column is { IsDisposed: false }) { host.EditColumn(Column); }
     }
 

@@ -5,7 +5,9 @@ namespace CodeOptimizer.Plugins;
 /// <summary>
 /// Führt die Code-Stil-Transformationen aus: leere Klammern, einzeilige If-Rückgaben,
 /// is-null-Muster, redundante ToLower/ToUpper-Ketten, Groß/Klein-unabhängige String-Vergleiche,
-/// Summary-Tags und Doc-Kommentar-Einzug.
+/// Summary-Tags, Doc-Kommentar-Einzug, Substring zu Range-Syntax, null-sichere Equals,
+/// Format-Strings zu Numeral/Date-Extensions, File.ReadAllText zu IO.ReadAllText
+/// und If-Null-Zuweisungen zu Null-Conditional-Zuweisungen.
 /// </summary>
 public partial class CodeStylePlugin : CodeOptimizerPlugin {
 
@@ -30,12 +32,27 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     /// <summary>
     /// Optionales .Trim() zwischen Fold und Vergleich, als erfassbare Gruppe.
     /// </summary>
-    private const string TrimCapture = @"((?:\s*\.\s*Trim\(\))?)";
+    private const string TrimCapture = @"(?:(\s*\.\s*Trim\(\)))?";
 
     /// <summary>
     /// Einfacher Empfänger: Punktkette mit optionalen Indexern und Null-Conditional-Zeichen.
     /// </summary>
     private const string SimpleReceiver = @"(?:[\w.\[\]]+\??\.)*[\w.\[\]]+\??";
+
+    /// <summary>
+    /// Empfänger ohne Indexer und ohne Null-Conditional, damit die Null-Prüfung sicher durch ?. ersetzt werden darf.
+    /// </summary>
+    private const string PlainReceiver = @"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*";
+
+    /// <summary>
+    /// If (x is not null) { x.M = v; } einzeilig als Null-Conditional-Zuweisung.
+    /// </summary>
+    private const string NullAssignLinePattern = @"\bif\s*\(\s*(" + PlainReceiver + @")\s+is\s+not\s+null\s*\)\s*\{[ \t]*\1\.(" + PlainReceiver + @")\s*(?<![+*/%&|^<>!=?-])=\s*([^;{}\r\n]+);[ \t]*\}(?![ \t]*(?:\r?\n[ \t]*)?else\b)";
+
+    /// <summary>
+    /// If (x is not null) { x.M = v; } mehrzeilig als Null-Conditional-Zuweisung.
+    /// </summary>
+    private const string NullAssignBlockPattern = @"\bif\s*\(\s*(" + PlainReceiver + @")\s+is\s+not\s+null\s*\)\s*\{\s*\r?\n[ \t]*\1\.(" + PlainReceiver + @")\s*(?<![+*/%&|^<>!=?-])=\s*([^;{}\r\n]+);[ \t]*\r?\n[ \t]*\}(?![ \t]*(?:\r?\n[ \t]*)?else\b)";
 
     /// <summary>
     /// String-Literal, normal oder verbatim.
@@ -52,13 +69,49 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     /// </summary>
     private const string CompareOperand = @"((?:" + StringLiteral + @")|(?!null\b|true\b|false\b)" + SimpleReceiver + @")";
 
+    /// <summary>
+    /// Argument eines Substring-Aufrufs: ohne Komma, Klammern und Zeilenumbrüche, damit verschachtelte Aufrufe unangetastet bleiben.
+    /// </summary>
+    private const string SubstringArg = @"[^\r\n(),]+";
+
+    /// <summary>
+    /// Zuordnung exakter Zahlen-Format-Strings zu NumeralExtensions-Methoden.
+    /// </summary>
+    private static readonly Dictionary<string, string> NumeralFormatMap = new() {
+        ["0"] = "ToString1",
+        ["0.#"] = "ToString1_1",
+        ["0.##"] = "ToString1_2",
+        ["0.###"] = "ToString1_3",
+        ["0.#####"] = "ToString1_5",
+        ["00"] = "ToString2",
+        ["000"] = "ToString3",
+        ["0000"] = "ToString4",
+        ["00000"] = "ToString5",
+        ["0000000"] = "ToString7",
+        ["0000000000"] = "ToString10",
+        ["0000000000.###"] = "ToString10_3"
+    };
+
+    /// <summary>
+    /// Zuordnung exakter Datums-Format-Strings zu DateExtensions-Methoden.
+    /// </summary>
+    private static readonly Dictionary<string, string> DateFormatMap = new() {
+        ["yyyy/MM/dd HH:mm:ss.fff"] = "ToString1",
+        ["yyyy/MM/dd"] = "ToString3",
+        ["yyyy-MM-dd_HH-mm-ss"] = "ToString4",
+        ["dd.MM.yyyy HH:mm:ss"] = "ToString5",
+        ["dd.MM.yyyy"] = "ToString6",
+        ["dd.MM.yyyy HH:mm:ss.fff"] = "ToString7",
+        ["yyyy-MM-dd HH:mm:ss.fff"] = "ToString9"
+    };
+
     #endregion
 
     #region Properties
 
     public override string Name => "Code-Stil";
     public override ImageCode Symbol => ImageCode.Zahnrad;
-    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, ToLower/ToUpper-Ketten, Groß/Klein-Vergleiche, Summary-Tags und Doc-Kommentar-Einzug.";
+    public override string QuickInfo => "Wendet die Code-Stil-Regeln an: leere Klammern, einzeilige If-Rückgaben, is-null-Muster, ToLower/ToUpper-Ketten, Groß/Klein-Vergleiche, Summary-Tags, Doc-Kommentar-Einzug, Substring zu Range, null-sichere Equals, Format-Strings zu Extensions, File.ReadAllText zu IO und If-Null-Zuweisungen zu ?.";
     public override int Order => 30;
 
     #endregion
@@ -81,6 +134,11 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         var foldChain = 0;
         var eqFold = 0;
         var eqFoldRev = 0;
+        var substr = 0;
+        var eqInst = 0;
+        var fmtExt = 0;
+        var readIo = 0;
+        var nullAssign = 0;
         var totalFiles = 0;
         var skipped = new List<string>();
 
@@ -91,57 +149,57 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
                 continue;
             }
 
-            var content = File.ReadAllText(file);
+            var content = IO.ReadAllText(file);
             var original = content;
 
             // 1. Leere Klammern über zwei Zeilen -> eine Zeile
             var prev = content;
-            content = ReplaceInCode(content, EmptyBracesRegex(), CollapseEmptyBraces);
+            content = CsSanitizer.ReplaceInCode(content, EmptyBracesRegex(), CollapseEmptyBraces);
             var c1 = content != prev;
 
             // 3. Einfaches return;/return true;/return false;/continue;/break; in If ohne Klammern -> If() { ...; }
             prev = content;
-            content = ReplaceInCode(content, IfSimpleStatementRegex(), AddBracesToSimpleStatement);
+            content = CsSanitizer.ReplaceInCode(content, IfSimpleStatementRegex(), AddBracesToSimpleStatement);
             var c3 = content != prev;
 
             // 3b. If-Block mit nur einer einfachen Anweisung -> eine Zeile
             prev = content;
-            content = ReplaceInCode(content, IfSimpleStatementBlockRegex(), AddBracesToSimpleStatement);
+            content = CsSanitizer.ReplaceInCode(content, IfSimpleStatementBlockRegex(), AddBracesToSimpleStatement);
             c3 = c3 || content != prev;
 
             // 4. Leerzeichen nach ( bei Methodenaufrufen entfernen
             prev = content;
-            content = ReplaceInCode(content, ParenSpaceRegex(), RemoveParenSpace);
+            content = CsSanitizer.ReplaceInCode(content, ParenSpaceRegex(), RemoveParenSpace);
             var c4 = content != prev;
 
             // 5. is not null -> is not null
             prev = content;
-            content = ReplaceInCode(content, NotNullRegex(), static _ => " is not null");
+            content = CsSanitizer.ReplaceInCode(content, NotNullRegex(), static _ => " is not null");
             var c5 = content != prev;
 
             // 6. is null -> is null
             prev = content;
-            content = ReplaceInCode(content, NullEqualsRegex(), static _ => " is null");
+            content = CsSanitizer.ReplaceInCode(content, NullEqualsRegex(), static _ => " is null");
             var c6 = content != prev;
 
             // 7a. (Disposable) is not { } -> is not { IsDisposed: false }
             prev = content;
-            content = ReplaceInCode(content, DisposableNotBraceRegex(), static m => m.Result("$1 is not { IsDisposed: false }"));
+            content = CsSanitizer.ReplaceInCode(content, DisposableNotBraceRegex(), static m => m.Result("$1 is not { IsDisposed: false }"));
             var c7a = content != prev;
 
             // 7b. (Disposable) is { } -> is { IsDisposed: false }
             prev = content;
-            content = ReplaceInCode(content, DisposableBraceRegex(), static m => m.Result("$1 is { IsDisposed: false }"));
+            content = CsSanitizer.ReplaceInCode(content, DisposableBraceRegex(), static m => m.Result("$1 is { IsDisposed: false }"));
             var c7b = content != prev;
 
             // 7. is not { } -> is null (nur vor ) & |)
             prev = content;
-            content = ReplaceInCode(content, IsNotBraceRegex(), static _ => "is null");
+            content = CsSanitizer.ReplaceInCode(content, IsNotBraceRegex(), static _ => "is null");
             var c7 = content != prev;
 
             // 8. is { } -> is not null (nur vor ) & |)
             prev = content;
-            content = ReplaceInCode(content, IsBraceRegex(), static _ => "is not null");
+            content = CsSanitizer.ReplaceInCode(content, IsBraceRegex(), static _ => "is not null");
             var c8 = content != prev;
 
             // 9a. /// <summary> mit Text -> Tag in eigene Zeile
@@ -165,20 +223,51 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             // 11. Redundante ToLower/ToUpper-Kette vor EndsWith/StartsWith/Contains/IndexOf/Equals -> StringComparison.OrdinalIgnoreCase
             prev = content;
             kinds = new CsSanitizer().SanitizeKinds(content);
-            content = CaseFoldChainRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldChain(m) : m.Value);
+            content = CaseFoldChainRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldChain(m) : m.Value);
             var c11 = content != prev;
 
             // 12. x.ToLowerInvariant() == "text" -> string.Equals(x, "text", StringComparison.OrdinalIgnoreCase)
             prev = content;
             kinds = new CsSanitizer().SanitizeKinds(content);
-            content = CaseFoldCompareRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldCompare(m) : m.Value);
+            content = CaseFoldCompareRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldCompare(m) : m.Value);
             var c12 = content != prev;
 
             // 13. "text" == x.ToLowerInvariant() -> string.Equals(x, "text", StringComparison.OrdinalIgnoreCase)
             prev = content;
             kinds = new CsSanitizer().SanitizeKinds(content);
-            content = CaseFoldCompareReversedRegex().Replace(content, m => IsCodeWithLiteral(kinds, m) ? FoldCompareReversed(m) : m.Value);
+            content = CaseFoldCompareReversedRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldCompareReversed(m) : m.Value);
             var c13 = content != prev;
+
+            // 14. .Substring(a, b) -> Range-Syntax
+            prev = content;
+            content = CsSanitizer.ReplaceInCode(content, SubstringRegex(), FoldSubstring);
+            var c14 = content != prev;
+
+            // 15. x.Equals(y, StringComparison.X) -> string.Equals(x, y, StringComparison.X)
+            prev = content;
+            content = CsSanitizer.ReplaceInCode(content, InstanceEqualsRegex(), FoldInstanceEquals);
+            var c15 = content != prev;
+
+            // 16. .ToString("format") -> Numeral/Date-Extensions; in den Definitions-Dateien selbst nicht anwenden
+            prev = content;
+            if (!DefinesFormatExtensions(file)) {
+                content = CsSanitizer.ReplaceInCode(content, ToStringFormatRegex(), FoldToStringFormat);
+            }
+            var c16 = content != prev;
+
+            // 17. File.ReadAllText -> IO.ReadAllText (Retry + Cache); in IO.cs selbst nicht anwenden
+            prev = content;
+            if (Path.GetFileName(file) is not "IO.cs") {
+                content = CsSanitizer.ReplaceInCode(content, IoReadTextRegex(), static _ => "IO.ReadAllText(");
+            }
+            var c17 = content != prev;
+
+            // 18. If (x is not null) { x.M = v; } -> x?.M = v; (Null-Conditional-Zuweisung)
+            prev = content;
+            kinds = new CsSanitizer().SanitizeKinds(content);
+            content = NullAssignLineRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldNullAssign(m) : m.Value);
+            content = NullAssignBlockRegex().Replace(content, m => CsSanitizer.IsCodeWithLiteral(kinds, m) ? FoldNullAssign(m) : m.Value);
+            var c18 = content != prev;
 
             if (c1) { braces++; }
             if (c3) { ifOneLine++; }
@@ -195,6 +284,11 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
             if (c11) { foldChain++; }
             if (c12) { eqFold++; }
             if (c13) { eqFoldRev++; }
+            if (c14) { substr++; }
+            if (c15) { eqInst++; }
+            if (c16) { fmtExt++; }
+            if (c17) { readIo++; }
+            if (c18) { nullAssign++; }
 
             if (content == original) { continue; }
 
@@ -218,17 +312,14 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
         report.AppendLine(CultureInfo.InvariantCulture, $"ToLower/ToUpper-Ketten:     {foldChain}");
         report.AppendLine(CultureInfo.InvariantCulture, $"x == \"text\" -> string.Equals: {eqFold}");
         report.AppendLine(CultureInfo.InvariantCulture, $"\"text\" == x -> string.Equals: {eqFoldRev}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"Substring -> Range:         {substr}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"Equals -> string.Equals:    {eqInst}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"Format -> Extensions:       {fmtExt}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"File.ReadAllText -> IO:     {readIo}");
+        report.AppendLine(CultureInfo.InvariantCulture, $"If-Zuweisung -> ?.:         {nullAssign}");
         report.AppendLine(CultureInfo.InvariantCulture, $"Dateien geändert:           {totalFiles}");
         AppendSkipped(report, skipped);
         return report.ToString();
-    }
-
-    /// <summary>
-    /// Ersetzt Regex-Treffer, aber nur wenn der Treffer komplett in Code liegt (nicht in Strings, Interpolationen oder Kommentaren).
-    /// </summary>
-    private static string ReplaceInCode(string content, Regex regex, Func<Match, string> toReplacement) {
-        var kinds = new CsSanitizer().SanitizeKinds(content);
-        return regex.Replace(content, m => CsSanitizer.IsPureCode(kinds, m.Index, m.Length) ? toReplacement(m) : m.Value);
     }
 
     private static string CollapseEmptyBraces(Match m) => m.Groups[1].Success ? " { }" : "{ }";
@@ -271,29 +362,117 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     /// <summary>
     /// Baut den Ersatz für x.ToLowerInvariant() == "text".
     /// </summary>
-    private static string FoldCompare(Match m) => (m.Groups[3].Value == "!=" ? "!" : "") + "string.Equals(" + m.Groups[1].Value + (m.Groups[2].Success ? ".Trim()" : "") + ", " + m.Groups[4].Value + ", StringComparison.OrdinalIgnoreCase)";
+    private static string FoldCompare(Match m) {
+        var receiver = m.Groups[1].Value;
+
+        if (!IsCompleteReceiver(receiver)) { return m.Value; }
+
+        if (receiver.EndsWith('?')) {
+            // Das Null-Conditional bleibt nur vor einem folgenden .Trim() erhalten; string.Equals selbst ist null-sicher
+            receiver = receiver[..^1] + (m.Groups[2].Success ? "?.Trim()" : string.Empty);
+        } else if (m.Groups[2].Success) {
+            receiver += ".Trim()";
+        }
+
+        return (m.Groups[3].Value == "!=" ? "!" : "") + "string.Equals(" + receiver + ", " + m.Groups[4].Value + ", StringComparison.OrdinalIgnoreCase)";
+    }
 
     /// <summary>
     /// Baut den Ersatz für "text" == x.ToLowerInvariant().
     /// </summary>
-    private static string FoldCompareReversed(Match m) => (m.Groups[2].Value == "!=" ? "!" : "") + "string.Equals(" + m.Groups[3].Value + (m.Groups[4].Success ? ".Trim()" : "") + ", " + m.Groups[1].Value + ", StringComparison.OrdinalIgnoreCase)";
+    private static string FoldCompareReversed(Match m) {
+        var receiver = m.Groups[3].Value;
 
-    /// <summary>
-    /// Prüft, dass ein Treffer mit eingebettetem String-Literal in echtem Code beginnt und endet und keine Kommentare enthält.
-    /// </summary>
-    private static bool IsCodeWithLiteral(string kinds, Match m) {
-        var firstQuote = m.Value.IndexOf('"');
-        if (firstQuote < 0) { return CsSanitizer.IsPureCode(kinds, m.Index, m.Length); }
+        if (!IsCompleteReceiver(receiver)) { return m.Value; }
 
-        var lastQuote = m.Value.LastIndexOf('"');
-        if (!CsSanitizer.IsPureCode(kinds, m.Index, firstQuote) || !CsSanitizer.IsPureCode(kinds, m.Index + lastQuote + 1, m.Length - lastQuote - 1)) { return false; }
-
-        for (var i = firstQuote; i <= lastQuote; i++) {
-            if (kinds[m.Index + i] == CsSanitizer.KindComment) { return false; }
+        if (receiver.EndsWith('?')) {
+            receiver = receiver[..^1] + (m.Groups[4].Success ? "?.Trim()" : string.Empty);
+        } else if (m.Groups[4].Success) {
+            receiver += ".Trim()";
         }
 
-        return true;
+        return (m.Groups[2].Value == "!=" ? "!" : "") + "string.Equals(" + receiver + ", " + m.Groups[1].Value + ", StringComparison.OrdinalIgnoreCase)";
     }
+
+    /// <summary>
+    /// Baut die Range-Syntax für einen Substring-Aufruf.
+    /// </summary>
+    private static string FoldSubstring(Match m) {
+        var start = m.Groups[1].Value.Trim();
+        var length = m.Groups[2].Success ? m.Groups[2].Value.Trim() : string.Empty;
+
+        if (length is not { Length: > 0 }) { return start == "0" ? "[..]" : "[" + start + "..]"; }
+
+        if (start == "0") { return "[.." + length + "]"; }
+
+        return "[" + start + "..(" + start + " + " + length + ")]";
+    }
+
+    /// <summary>
+    /// Prüft, dass ein erfasster Empfänger ein vollständiger Ausdruck ist und kein Fragment eines größeren Ausdrucks.
+    /// </summary>
+    private static bool IsCompleteReceiver(string receiver) {
+        if (!char.IsLetter(receiver[0]) && receiver[0] != '_') { return false; }
+
+        var depth = 0;
+        foreach (var c in receiver) {
+            if (c == '[') { depth++; }
+            if (c == ']') { depth--; }
+        }
+        return depth == 0;
+    }
+
+    /// <summary>
+    /// Baut den Ersatz für x.Equals(y, StringComparison.X); der statische Aufruf ist zusätzlich null-sicher.
+    /// </summary>
+    private static string FoldInstanceEquals(Match m) {
+        var receiver = m.Groups[1].Value;
+
+        if (!IsCompleteReceiver(receiver)) { return m.Value; }
+
+        // Statische Equals-Aufrufe nicht erneut umschreiben
+        if (receiver is "string" or "StringComparison") { return m.Value; }
+
+        // Das Null-Conditional entfällt, da string.Equals null verträglich ist
+        if (receiver.EndsWith('?')) { receiver = receiver[..^1]; }
+
+        return "string.Equals(" + receiver + ", " + m.Groups[2].Value + ", StringComparison." + m.Groups[3].Value + ")";
+    }
+
+    /// <summary>
+    /// Baut den Ersatz für If (x is not null) { x.M = v; } als Null-Conditional-Zuweisung.
+    /// </summary>
+    private static string FoldNullAssign(Match m) => m.Groups[1].Value + "?." + m.Groups[2].Value + " = " + m.Groups[3].Value.TrimEnd() + ";";
+
+    /// <summary>
+    /// Baut den Ersatz für .ToString("format"), wenn das Format exakt in einer Mapping-Tabelle steht.
+    /// </summary>
+    private static string FoldToStringFormat(Match m) {
+        var receiver = m.Groups[1].Value;
+        var format = m.Groups[2].Value;
+        var invariant = m.Groups[3].Success;
+
+        if (!IsCompleteReceiver(receiver)) { return m.Value; }
+
+        // Null-Conditional-Empfänger bleiben stehen, da die Extensions nicht null-verträglich sind
+        if (receiver.EndsWith('?')) { return m.Value; }
+
+        // Ohne InvariantCulture nur Formate ohne kulturabhängige Separatoren (Datum: / und :, Zahl: .)
+        if (DateFormatMap.TryGetValue(format, out var dateMethod) && (invariant || (!format.Contains('/') && !format.Contains(':')))) {
+            return receiver + "." + dateMethod + "()";
+        }
+
+        if (NumeralFormatMap.TryGetValue(format, out var numeralMethod) && (invariant || !format.Contains('.'))) {
+            return receiver + "." + numeralMethod + "()";
+        }
+
+        return m.Value;
+    }
+
+    /// <summary>
+    /// Liefert true für die Definitions-Dateien der Numeral- und Date-Extensions, damit deren Format-Strings nicht auf sich selbst abgebildet werden.
+    /// </summary>
+    private static bool DefinesFormatExtensions(string file) => file.EndsWith("NumeralExtensions.cs", StringComparison.OrdinalIgnoreCase) || file.EndsWith("DateExtensions.cs", StringComparison.OrdinalIgnoreCase);
 
     [GeneratedRegex(@"(\r?\n[ \t]*)?\{[ \t]*\r?\n(?:[ \t]*\r?\n)*[ \t]*\}")]
     private static partial Regex EmptyBracesRegex();
@@ -337,11 +516,29 @@ public partial class CodeStylePlugin : CodeOptimizerPlugin {
     [GeneratedRegex(CaseFoldCall + TrimCapture + @"\s*\.\s*(" + ComparisonMethods + @")\(\s*(" + StringLiteral + @")\s*(?:,\s*StringComparison\.\w+)?\s*\)")]
     private static partial Regex CaseFoldChainRegex();
 
-    [GeneratedRegex(@"(?<!\.)(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"\s*(==|!=)\s*" + CompareOperand + @"(?![ \t]*[.+(?])")]
+    [GeneratedRegex(@"(?<![\w.\[\]\^])(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"\s*(==|!=)\s*" + CompareOperand + @"(?![ \t]*[.+(?])")]
     private static partial Regex CaseFoldCompareRegex();
 
-    [GeneratedRegex(@"(?<!\+\s*)(" + StringLiteral + @")\s*(==|!=)\s*(?<!\.)(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"(?![ \t]*[.+(?])")]
+    [GeneratedRegex(@"(?<!\+\s*)(" + StringLiteral + @")\s*(==|!=)\s*(?<![\w.\[\]\^])(?<!\+\s*)\b(" + SimpleReceiver + @")" + CaseFoldCall + TrimCapture + @"(?![ \t]*[.+(?])")]
     private static partial Regex CaseFoldCompareReversedRegex();
+
+    [GeneratedRegex(@"\.Substring\(\s*(" + SubstringArg + @")(?:\s*,\s*(" + SubstringArg + @"))?\s*\)")]
+    private static partial Regex SubstringRegex();
+
+    [GeneratedRegex(@"(?<![\w.\[\]\^])\b(" + SimpleReceiver + @")\.Equals\(\s*((?:" + StringLiteral + @")|(?:" + SimpleReceiver + @"))\s*,\s*StringComparison\.(\w+)\s*\)")]
+    private static partial Regex InstanceEqualsRegex();
+
+    [GeneratedRegex(@"(?<![\w.\[\]\^])\b(" + SimpleReceiver + @")\.ToString\(\s*""([^""\r\n]+)""\s*(?:,\s*(CultureInfo\.InvariantCulture)\s*)?\)")]
+    private static partial Regex ToStringFormatRegex();
+
+    [GeneratedRegex(@"(?<!\.)\bFile\.ReadAllText\(")]
+    private static partial Regex IoReadTextRegex();
+
+    [GeneratedRegex(NullAssignLinePattern)]
+    private static partial Regex NullAssignLineRegex();
+
+    [GeneratedRegex(NullAssignBlockPattern)]
+    private static partial Regex NullAssignBlockRegex();
 
     #endregion
 }

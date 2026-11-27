@@ -24,7 +24,9 @@ public class TableFileRoundtripTests : RoundtripTestBase {
 
     protected override bool StripFragmentHead => false;
 
-    /// <summary>Legacy-Format: Der Laden-Repair entfernt verwaiste Ansichtseinträge gelöschter Spalten einmalig.</summary>
+    /// <summary>
+    /// Legacy-Format: Der Laden-Repair entfernt verwaiste Ansichtseinträge gelöschter Spalten einmalig.
+    /// </summary>
     protected override bool FirstRoundtripMayRepair => true;
 
     #endregion

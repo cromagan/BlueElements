@@ -112,10 +112,7 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
     /// Typbezeichner der Zeile: Der Kette-Schluss wird über die Vorfahren benannt
     /// (empfangender Zahlraum) bzw. als roher Wert.
     /// </summary>
-    private static string TypeText(ReadOnlySpan<FragmentRecord> path, bool tableRoot, string layoutTypeName) {
-        // Kopf-Datei: Nur das Layout-Blatt gehört der Verwaltung.
-        if (!tableRoot) { return SaveableFile.GetNameOf(path[^1].LeafType); }
-
+    private static string TypeText(ReadOnlySpan<FragmentRecord> path, string layoutTypeName) {
         // Objekt-Raum der verwalteten Datei: Nur Tabellen-Pfade erhalten echte
         // Typ-Namen, fremde Zahlräume zeigen die Zahl.
         return layoutTypeName.Contains(nameof(Table), StringComparison.OrdinalIgnoreCase)
@@ -230,13 +227,10 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
             tb.Row.Clear(string.Empty);
 
             // Kette der Sätze: Die Vorfahren bestimmen den Zahlraum der Typ-Spalte,
-            // der Schluss ist der gerade benannte Satz. Kopf-Dateien beginnen mit
-            // dem Layout-Blatt, Journal- und Chunk-Dateien direkt im
-            // Tabellen-Raum.
+            // der Schluss ist der gerade benannte Satz. Kopf-Dateien tragen nur
+            // Tags, Journal- und Chunk-Dateien beginnen direkt im Tabellen-Raum.
             List<FragmentRecord> path = [];
-            var tableRoot = true;
             var layoutTypeName = string.Empty;
-            var rootChecked = false;
 
             for (var i = 0; i < _records.Count; i++) {
                 var record = _records[i];
@@ -257,15 +251,9 @@ public sealed partial class FragmentEditor : UserControl, IIsEditor {
 
                     typeText = record.TagType.ToString();
                 } else {
-                    if (!rootChecked) {
-                        // Erster Daten-Satz: Das Layout-Blatt mit bekannter Layout-ClassId kennzeichnet eine Kopf-Datei.
-                        rootChecked = true;
-                        tableRoot = record.LeafType != (byte)SaveableFile.SaveableFileFragmentType.LayoutClassId || SaveableFile.AllFileSaveTypes[record.StringContent] is null;
-                    }
-
                     // Daten-Sätze schließen die Kette ab und werden aus ihr benannt.
                     path.Add(record);
-                    typeText = TypeText(CollectionsMarshal.AsSpan(path), tableRoot, layoutTypeName);
+                    typeText = TypeText(CollectionsMarshal.AsSpan(path), layoutTypeName);
                 }
 
                 r.CellSet("Tiefe", record.Depth, string.Empty);

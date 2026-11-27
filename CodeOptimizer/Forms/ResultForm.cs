@@ -53,6 +53,18 @@ public sealed partial class ResultForm : Form {
         tb.Column.GenerateAndAdd("Art", "Art", null, string.Empty);
         tb.Column.GenerateAndAdd("Meldung", "Meldung", null, string.Empty);
 
+        // Row.GenerateAndAdd braucht eine definierte Erstspalte; RepairAfterParse füllt den Zeiger Column.First.
+        if (tb.Column["Modul"] is { IsDisposed: false } modulColumn) {
+            modulColumn.IsFirst = true;
+        }
+        tb.RepairAfterParse();
+
+        // Ansichten aufbauen: Ansicht 0 erhält alle Spalten, die Standard-Ansicht wird gefüllt —
+        // eine leere Standard-Ansicht zeigt die TableView als „Ansicht nicht definiert“.
+        var arrangements = tb.RepairedArrangements();
+        arrangements[1].ShowAllColumns();
+        tb.ColumnArrangements = arrangements.AsReadOnly();
+
         var module = "Allgemein";
 
         foreach (var line in report.Split(["\r\n", "\n"], StringSplitOptions.RemoveEmptyEntries)) {

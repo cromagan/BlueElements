@@ -74,7 +74,7 @@ public class TableRoundtripCliCommand : CliCommand {
         var keep = args.Flag("keep");
 
         try {
-            CheckLayout(failures, testDir, rows, SaveableFile.ClassId);
+            CheckLayout(failures, testDir, rows);
         } finally {
             if (keep) {
                 Out(string.Empty);
@@ -101,44 +101,39 @@ public class TableRoundtripCliCommand : CliCommand {
     }
 
     /// <summary>
-    /// Führt alle Prüfungen für ein Datei-Layout aus.
+    /// Führt alle Prüfungen des Layouts aus.
     /// </summary>
-    private static void CheckLayout(List<string> failures, string testDir, int rows, string classId) {
+    private static void CheckLayout(List<string> failures, string testDir, int rows) {
         Out(string.Empty);
-        Out("=== Layout: " + classId + " ===");
+        Out("=== Layout: " + nameof(SaveableFile) + " ===");
 
-        var dir = Path.Combine(testDir, classId.ToLowerInvariant());
+        var dir = Path.Combine(testDir, nameof(SaveableFile).ToLowerInvariant());
         _ = CreateDirectory(dir);
 
         var head = Path.Combine(dir, "rta.btb");
         var headCopy = Path.Combine(dir, "rtc.btb");
 
         // Phase 1: Anlegen, füllen, speichern.
-        if (!CreateFilled(failures, classId, head, rows)) { return; }
+        if (!CreateFilled(failures, head, rows)) { return; }
 
-        var rawBefore = ReadDataRaw(failures, classId, head, true);
+        var rawBefore = ReadDataRaw(failures, head, true);
         var inventoryBefore = InventoryOf(dir, "rta");
 
         // Phase 2: Laden, ohne Änderung erneut speichern — Bytes müssen gleich sein (bis auf Zip-Datum).
-        CheckResaveIdentity(failures, classId, head, dir, rawBefore, inventoryBefore);
+        CheckResaveIdentity(failures, head, rawBefore, inventoryBefore);
 
         // Phase 3: Kopie über eine frische Instanz — Inhalt muss bestimmt sein (Erzeuger-Stempel ausgenommen).
-        CheckCopyInstance(failures, classId, head, headCopy, rawBefore);
+        CheckCopyInstance(failures, head, headCopy, rawBefore);
 
         // Phase 4: Ändern, speichern, erneut laden — Werte müssen erhalten sein.
-        CheckModify(failures, classId, head);
+        CheckModify(failures, head);
     }
 
     /// <summary>
     /// Legt eine Testtabelle an, füllt Spalten und Zeilen und speichert.
     /// </summary>
-    private static bool CreateFilled(List<string> failures, string classId, string head, int rows) {
-        var saveable = ParseableItem.NewByTypeName<SaveableFile>(classId, head);
-
-        if (saveable is null) {
-            Fail(failures, classId, "Anlegen", "Layout-ClassId nicht auflösbar: " + classId);
-            return false;
-        }
+    private static bool CreateFilled(List<string> failures, string head, int rows) {
+        var saveable = new SaveableFile(head);
 
         TableFileNew? tbl = null;
 
@@ -146,26 +141,26 @@ public class TableRoundtripCliCommand : CliCommand {
             tbl = new TableFileNew(head, null, saveable);
             saveable.WriteHeadFile();
 
-            if (!FillTable(failures, classId, tbl, rows)) { return false; }
+            if (!FillTable(failures, tbl, rows)) { return false; }
 
             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
             var opr = tbl.Save();
 
             if (opr.IsFailed) {
-                Fail(failures, classId, "Erstes Speichern", opr.FailedReason ?? "Unbekannter Fehler");
+                Fail(failures, "Erstes Speichern", opr.FailedReason ?? "Unbekannter Fehler");
                 return false;
             }
 
             if (saveable.IsFreezed) {
-                Fail(failures, classId, "Erstes Speichern", "eingefroren: " + saveable.FrozenReason);
+                Fail(failures, "Erstes Speichern", "eingefroren: " + saveable.FrozenReason);
                 return false;
             }
 
             Out("  [OK] Angelegt und gespeichert (" + rows.ToString1() + " Zeilen)");
             return true;
         } catch (Exception ex) {
-            Fail(failures, classId, "Anlegen", ex.Message);
+            Fail(failures, "Anlegen", ex.Message);
             return false;
         } finally {
             tbl?.Dispose();
@@ -178,13 +173,8 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Lädt eine bestehende .btb-Datei über eine frische Verwaltung (gleicher Pfad
     /// wie Table.CreateInstance).
     /// </summary>
-    private static TableFileNew? LoadExisting(List<string> failures, string classId, string head) {
-        var saveable = ParseableItem.NewByTypeName<SaveableFile>(classId, head);
-
-        if (saveable is null) {
-            Fail(failures, classId, "Laden", "Layout-ClassId nicht auflösbar: " + classId);
-            return null;
-        }
+    private static TableFileNew? LoadExisting(List<string> failures, string head) {
+        var saveable = new SaveableFile(head);
 
         TableFileNew? tbl = null;
 
@@ -193,7 +183,7 @@ public class TableRoundtripCliCommand : CliCommand {
             tbl.LoadFromFile(head, string.Empty);
 
             if (saveable.IsFreezed) {
-                Fail(failures, classId, "Laden", "eingefroren: " + saveable.FrozenReason);
+                Fail(failures, "Laden", "eingefroren: " + saveable.FrozenReason);
                 tbl.Dispose();
                 return null;
             }
@@ -204,7 +194,7 @@ public class TableRoundtripCliCommand : CliCommand {
 
             return tbl;
         } catch (Exception ex) {
-            Fail(failures, classId, "Laden", ex.Message);
+            Fail(failures, "Laden", ex.Message);
             tbl?.Dispose();
 
             if (tbl is null) { saveable.Dispose(); }
@@ -218,11 +208,11 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Chunk-Spalte sorgt dafür, dass die Zeilen je Chunk-Wert auf Daten-Chunks
     /// verteilt werden.
     /// </summary>
-    private static bool FillTable(List<string> failures, string classId, TableFileNew tbl, int rows) {
+    private static bool FillTable(List<string> failures,TableFileNew tbl, int rows) {
         var format = ColumnFormat.AllFormats.Instances.FirstOrDefault(f => f.KeyName.Equals("TextOneLine", StringComparison.OrdinalIgnoreCase));
 
         if (format is null) {
-            Fail(failures, classId, "Spalten anlegen", "Format 'TextOneLine' nicht gefunden.");
+            Fail(failures, "Spalten anlegen", "Format 'TextOneLine' nicht gefunden.");
             return false;
         }
 
@@ -231,7 +221,7 @@ public class TableRoundtripCliCommand : CliCommand {
         var c3 = tbl.Column.GenerateAndAdd("notiz", "Notiz", format, string.Empty);
 
         if (c1 is null || c2 is null || c3 is null) {
-            Fail(failures, classId, "Spalten anlegen", "Spalten konnten nicht angelegt werden.");
+            Fail(failures, "Spalten anlegen", "Spalten konnten nicht angelegt werden.");
             return false;
         }
 
@@ -241,7 +231,7 @@ public class TableRoundtripCliCommand : CliCommand {
             cvc.Value_for_Chunk = ChunkType.ByName;
             tbl.Column.GetSystems();
         } else {
-            Fail(failures, classId, "Spalten anlegen", "Chunk-Spalte konnte nicht angelegt werden.");
+            Fail(failures, "Spalten anlegen", "Chunk-Spalte konnte nicht angelegt werden.");
             return false;
         }
 
@@ -255,7 +245,7 @@ public class TableRoundtripCliCommand : CliCommand {
             var opr = tbl.Row.GenerateAndAdd([.. filters], "bcr table-roundtrip");
 
             if (opr.IsFailed || opr.Value is not RowItem row) {
-                Fail(failures, classId, "Zeile anlegen", "Zeile " + i.ToString1() + ": " + opr.FailedReason);
+                Fail(failures, "Zeile anlegen", "Zeile " + i.ToString1() + ": " + opr.FailedReason);
                 return false;
             }
 
@@ -263,12 +253,12 @@ public class TableRoundtripCliCommand : CliCommand {
             var e3 = row.CellSet(c3, "ÄÖÜäöüß " + i.ToString1(), "bcr table-roundtrip");
 
             if (e2 is { Length: > 0 }) {
-                Fail(failures, classId, "Zelle setzen", "menge, Zeile " + i.ToString1() + ": " + e2);
+                Fail(failures, "Zelle setzen", "menge, Zeile " + i.ToString1() + ": " + e2);
                 return false;
             }
 
             if (e3 is { Length: > 0 }) {
-                Fail(failures, classId, "Zelle setzen", "notiz, Zeile " + i.ToString1() + ": " + e3);
+                Fail(failures, "Zelle setzen", "notiz, Zeile " + i.ToString1() + ": " + e3);
                 return false;
             }
         }
@@ -281,8 +271,8 @@ public class TableRoundtripCliCommand : CliCommand {
     /// geschrieben werden (kein offener Writer, unveränderte Chunks); die
     /// bestehenden Dateien bleiben unverändert.
     /// </summary>
-    private static void CheckResaveIdentity(List<string> failures, string classId, string head, string dir, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
-        var tbl = LoadExisting(failures, classId, head);
+    private static void CheckResaveIdentity(List<string> failures, string head, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
+        var tbl = LoadExisting(failures, head);
 
         if (tbl is not { Saveable: { } saveable }) { return; }
 
@@ -292,11 +282,11 @@ public class TableRoundtripCliCommand : CliCommand {
             var opr = tbl.Save();
 
             if (opr.IsFailed) {
-                Fail(failures, classId, "Zweit-Speicherung", opr.FailedReason ?? "Unbekannter Fehler");
+                Fail(failures, "Zweit-Speicherung", opr.FailedReason ?? "Unbekannter Fehler");
                 return;
             }
 
-            CheckResaveChunk(failures, classId, head, rawBefore, inventoryBefore);
+            CheckResaveChunk(failures, head, rawBefore, inventoryBefore);
         } finally {
             tbl.Dispose();
         }
@@ -387,17 +377,17 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Zweit-Speicherung: Chunks werden write-once nur bei echten Änderungen neu
     /// abgelegt; die jüngsten Nutzdaten müssen dem ersten Stand entsprechen.
     /// </summary>
-    private static void CheckResaveChunk(List<string> failures, string classId, string head, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
-        var rawAfter = ReadDataRaw(failures, classId, head, true);
+    private static void CheckResaveChunk(List<string> failures, string head, Dictionary<string, byte[]> rawBefore, Dictionary<string, byte[]> inventoryBefore) {
+        var rawAfter = ReadDataRaw(failures, head, true);
 
         foreach (var kvp in rawBefore) {
             if (!rawAfter.TryGetValue(kvp.Key, out var after)) {
-                Fail(failures, classId, "Zweit-Speicherung", "Chunk fehlt nach Zweit-Speicherung: " + kvp.Key);
+                Fail(failures, "Zweit-Speicherung", "Chunk fehlt nach Zweit-Speicherung: " + kvp.Key);
                 continue;
             }
 
             if (!WithoutHeadRecords(PayloadOf(kvp.Value)).SequenceEqual(WithoutHeadRecords(PayloadOf(after)))) {
-                Fail(failures, classId, "Zweit-Speicherung", "Chunk-Inhalt geändert: " + kvp.Key);
+                Fail(failures, "Zweit-Speicherung", "Chunk-Inhalt geändert: " + kvp.Key);
                 GenerateDiffReport(WithoutHeadRecords(PayloadOf(kvp.Value)), WithoutHeadRecords(PayloadOf(after)));
             }
         }
@@ -406,7 +396,7 @@ public class TableRoundtripCliCommand : CliCommand {
 
         // Write-once: Alle ersten Dateien müssen noch vorhanden sein; neue
         // Zeitstempel-Dateien sind beim erneuten Schreiben legitim.
-        CheckInventoryUnchanged(failures, classId, "Zweit-Speicherung", inventoryBefore, InventoryOf(head.FilePath(), "rta"), [], true);
+        CheckInventoryUnchanged(failures, "Zweit-Speicherung", inventoryBefore, InventoryOf(head.FilePath(), "rta"), [], true);
     }
 
     /// <summary>
@@ -414,18 +404,12 @@ public class TableRoundtripCliCommand : CliCommand {
     /// bestimmt sein; nur der Erzeuger-Stempel (CreateUser/CreateTimeUtc) darf
     /// abweichen.
     /// </summary>
-    private static void CheckCopyInstance(List<string> failures, string classId, string head, string headCopy, Dictionary<string, byte[]> rawBefore) {
-        var source = LoadExisting(failures, classId, head);
+    private static void CheckCopyInstance(List<string> failures, string head, string headCopy, Dictionary<string, byte[]> rawBefore) {
+        var source = LoadExisting(failures, head);
 
         if (source is null) { return; }
 
-        var copySaveable = ParseableItem.NewByTypeName<SaveableFile>(classId, headCopy);
-
-        if (copySaveable is null) {
-            Fail(failures, classId, "Kopie", "Layout-ClassId nicht auflösbar: " + classId);
-            source.Dispose();
-            return;
-        }
+        var copySaveable = new SaveableFile(headCopy);
 
         TableFileNew? copy = null;
 
@@ -436,20 +420,20 @@ public class TableRoundtripCliCommand : CliCommand {
             var opr = copy.Save();
 
             if (opr.IsFailed) {
-                Fail(failures, classId, "Kopie", opr.FailedReason ?? "Unbekannter Fehler");
+                Fail(failures, "Kopie", opr.FailedReason ?? "Unbekannter Fehler");
                 return;
             }
 
-            var rawCopy = ReadDataRaw(failures, classId, headCopy, true);
+            var rawCopy = ReadDataRaw(failures, headCopy, true);
 
             if (rawBefore.Count != rawCopy.Count) {
-                Fail(failures, classId, "Kopie", "Datenbestand weicht ab: " + rawBefore.Count.ToString1() + " vs " + rawCopy.Count.ToString1() + " Bereiche.");
+                Fail(failures, "Kopie", "Datenbestand weicht ab: " + rawBefore.Count.ToString1() + " vs " + rawCopy.Count.ToString1() + " Bereiche.");
                 return;
             }
 
             foreach (var kvp in rawBefore) {
                 if (!rawCopy.TryGetValue(kvp.Key, out var copyRaw)) {
-                    Fail(failures, classId, "Kopie", "Bereich fehlt in der Kopie: " + kvp.Key);
+                    Fail(failures, "Kopie", "Bereich fehlt in der Kopie: " + kvp.Key);
                     continue;
                 }
 
@@ -457,14 +441,14 @@ public class TableRoundtripCliCommand : CliCommand {
                 var copyPayload = WithoutHeadRecords(PayloadOf(copyRaw));
 
                 if (!original.SequenceEqual(copyPayload)) {
-                    Fail(failures, classId, "Kopie", "Bereich unterscheidet sich (System-Kopf ausgenommen): " + kvp.Key);
+                    Fail(failures, "Kopie", "Bereich unterscheidet sich (System-Kopf ausgenommen): " + kvp.Key);
                     GenerateDiffReport(original, copyPayload);
                 }
             }
 
             Out("  [OK] Kopie inhaltlich identisch (" + rawBefore.Count.ToString1() + " Bereiche)");
         } catch (Exception ex) {
-            Fail(failures, classId, "Kopie", ex.Message);
+            Fail(failures, "Kopie", ex.Message);
         } finally {
             copy?.Dispose();
 
@@ -491,8 +475,8 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Phase 4: Zelle ändern, speichern, erneut laden — der neue Wert muss
     /// vorhanden sein, ein Nachbarwert unverändert.
     /// </summary>
-    private static void CheckModify(List<string> failures, string classId, string head) {
-        var tbl = LoadExisting(failures, classId, head);
+    private static void CheckModify(List<string> failures, string head) {
+        var tbl = LoadExisting(failures, head);
 
         if (tbl is null) { return; }
 
@@ -505,14 +489,14 @@ public class TableRoundtripCliCommand : CliCommand {
             var c3 = tbl.Column["notiz"];
 
             if (c1 is null || c2 is null || c3 is null) {
-                Fail(failures, classId, "Ändern", "Spalten nach Laden nicht gefunden.");
+                Fail(failures, "Ändern", "Spalten nach Laden nicht gefunden.");
                 return;
             }
 
             var row = tbl.Row[ZeilenFilter(tbl, c1)];
 
             if (row is not { IsDisposed: false }) {
-                Fail(failures, classId, "Ändern", "Zeile 'wert1' nicht gefunden.");
+                Fail(failures, "Ändern", "Zeile 'wert1' nicht gefunden.");
                 return;
             }
 
@@ -522,7 +506,7 @@ public class TableRoundtripCliCommand : CliCommand {
             var failed = row.CellSet(c2, "4711", "bcr table-roundtrip");
 
             if (failed is { Length: > 0 }) {
-                Fail(failures, classId, "Ändern", "menge: " + failed);
+                Fail(failures, "Ändern", "menge: " + failed);
                 return;
             }
 
@@ -531,27 +515,27 @@ public class TableRoundtripCliCommand : CliCommand {
             var opr = tbl.Save();
 
             if (opr.IsFailed) {
-                Fail(failures, classId, "Ändern/Speichern", opr.FailedReason ?? "Unbekannter Fehler");
+                Fail(failures, "Ändern/Speichern", opr.FailedReason ?? "Unbekannter Fehler");
                 return;
             }
 
             Out("  [OK] Änderung gespeichert");
         } catch (Exception ex) {
-            Fail(failures, classId, "Ändern", ex.Message);
+            Fail(failures, "Ändern", ex.Message);
         } finally {
             tbl.Dispose();
         }
 
         if (rowKey is not { Length: > 0 }) { return; }
 
-        VerifyModifyReload(failures, classId, head, rowKey, notizBefore);
+        VerifyModifyReload(failures, head, rowKey, notizBefore);
     }
 
     /// <summary>
     /// Lädt die Tabelle nach der Änderung erneut und prüft die Werte.
     /// </summary>
-    private static void VerifyModifyReload(List<string> failures, string classId, string head, string rowKey, string notizBefore) {
-        var tbl = LoadExisting(failures, classId, head);
+    private static void VerifyModifyReload(List<string> failures, string head, string rowKey, string notizBefore) {
+        var tbl = LoadExisting(failures, head);
 
         if (tbl is null) { return; }
 
@@ -561,26 +545,26 @@ public class TableRoundtripCliCommand : CliCommand {
             var c3 = tbl.Column["notiz"];
 
             if (c1 is null || c2 is null || c3 is null) {
-                Fail(failures, classId, "Ändern/Nachladen", "Spalten nach Nachladen nicht gefunden.");
+                Fail(failures, "Ändern/Nachladen", "Spalten nach Nachladen nicht gefunden.");
                 return;
             }
 
             var row = tbl.Row[ZeilenFilter(tbl, c1)];
 
             if (row is not { IsDisposed: false }) {
-                Fail(failures, classId, "Ändern/Nachladen", "Zeile nach Nachladen nicht gefunden.");
+                Fail(failures, "Ändern/Nachladen", "Zeile nach Nachladen nicht gefunden.");
                 return;
             }
 
             if (!string.Equals(row.KeyName, rowKey, StringComparison.Ordinal)) {
-                Fail(failures, classId, "Ändern/Nachladen", "Zeilen-Identität geändert: " + row.KeyName + " (vorher " + rowKey + ")");
+                Fail(failures, "Ändern/Nachladen", "Zeilen-Identität geändert: " + row.KeyName + " (vorher " + rowKey + ")");
             }
 
             var mengeExpected = c2.AutoCorrect("4711", true);
             var mengeStored = row.CellGetStringCore(c2);
 
             if (!string.Equals(mengeStored, mengeExpected, StringComparison.Ordinal)) {
-                Fail(failures, classId, "Ändern/Nachladen", "menge='" + mengeStored + "', erwartet '" + mengeExpected + "'");
+                Fail(failures, "Ändern/Nachladen", "menge='" + mengeStored + "', erwartet '" + mengeExpected + "'");
             } else {
                 Out("  [OK] Änderung nach Nachladen vorhanden");
             }
@@ -588,7 +572,7 @@ public class TableRoundtripCliCommand : CliCommand {
             var notizStored = row.CellGetStringCore(c3);
 
             if (!string.Equals(notizStored, notizBefore, StringComparison.Ordinal)) {
-                Fail(failures, classId, "Ändern/Nachladen", "notiz geändert ohne Schreibzugriff: '" + notizStored + "' (vorher '" + notizBefore + "')");
+                Fail(failures, "Ändern/Nachladen", "notiz geändert ohne Schreibzugriff: '" + notizStored + "' (vorher '" + notizBefore + "')");
             } else {
                 Out("  [OK] Nachbarzelle unverändert");
             }
@@ -605,13 +589,13 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Liest die Roh-Bytes der Datendateien: der jüngste Kopf-Snapshot plus die
     /// jüngste Datei je Chunk-Ordner. Key ist der Bereichsname ('snapshot', Chunk-Id).
     /// </summary>
-    private static Dictionary<string, byte[]> ReadDataRaw(List<string> failures, string classId, string head, bool ignoreMaster) {
+    private static Dictionary<string, byte[]> ReadDataRaw(List<string> failures, string head, bool ignoreMaster) {
         var result = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
         var folder = head.FilePath() + head.FileNameWithoutSuffix() + "\\";
 
-        var snapshot = NewestFileOf(failures, classId, folder, "*.tbls");
+        var snapshot = NewestFileOf(failures, folder, "*.tbls");
         if (snapshot is not null) {
-            var snapBytes = ReadRaw(failures, classId, snapshot);
+            var snapBytes = ReadRaw(failures, snapshot);
             if (snapBytes is { Length: > 0 }) { result.Add("snapshot", snapBytes); }
         }
 
@@ -621,10 +605,10 @@ public class TableRoundtripCliCommand : CliCommand {
 
                 if (ignoreMaster && string.Equals(chunkId, TableChunk.Chunk_Master, StringComparison.OrdinalIgnoreCase)) { continue; }
 
-                var chunkFile = NewestFileOf(failures, classId, sub, "*.tblc");
+                var chunkFile = NewestFileOf(failures, sub, "*.tblc");
                 if (chunkFile is null) { continue; }
 
-                var chunkBytes = ReadRaw(failures, classId, chunkFile);
+                var chunkBytes = ReadRaw(failures, chunkFile);
                 if (chunkBytes is { Length: > 0 }) { result.Add(chunkId, chunkBytes); }
             }
         }
@@ -635,11 +619,11 @@ public class TableRoundtripCliCommand : CliCommand {
     /// <summary>
     /// Liest eine Datei als Roh-Bytes.
     /// </summary>
-    private static byte[]? ReadRaw(List<string> failures, string classId, string file) {
+    private static byte[]? ReadRaw(List<string> failures, string file) {
         if (ReadAllBytes(file, 5).Value is not byte[] raw) { return null; }
 
         if (raw is not { Length: > 0 }) {
-            Fail(failures, classId, "Lesen", "Datei nicht lesbar: " + file);
+            Fail(failures, "Lesen", "Datei nicht lesbar: " + file);
             return null;
         }
 
@@ -661,9 +645,9 @@ public class TableRoundtripCliCommand : CliCommand {
     /// tragen vorne einen UTC-Zeitstempel, deshalb entspricht die lexikografische
     /// Ordnung der zeitlichen.
     /// </summary>
-    private static string? NewestFileOf(List<string> failures, string classId, string folder, string searchPattern) {
+    private static string? NewestFileOf(List<string> failures, string folder, string searchPattern) {
         if (!DirectoryExists(folder)) {
-            Fail(failures, classId, "Lesen", "Ordner fehlt: " + folder);
+            Fail(failures, "Lesen", "Ordner fehlt: " + folder);
             return null;
         }
 
@@ -702,18 +686,18 @@ public class TableRoundtripCliCommand : CliCommand {
     /// Dateien sind Fehler; zusätzlich erlaubte neue Dateien oder komplett neue
     /// Dateien (Write-once-Layouts) werden ignoriert.
     /// </summary>
-    private static void CheckInventoryUnchanged(List<string> failures, string classId, string checkName, Dictionary<string, byte[]> expected, Dictionary<string, byte[]> actual, HashSet<string> allowedExtra, bool allowAnyNewFiles) {
+    private static void CheckInventoryUnchanged(List<string> failures, string checkName, Dictionary<string, byte[]> expected, Dictionary<string, byte[]> actual, HashSet<string> allowedExtra, bool allowAnyNewFiles) {
         var problems = 0;
 
         foreach (var kvp in expected) {
             if (!actual.TryGetValue(kvp.Key, out var bytes)) {
-                Fail(failures, classId, checkName, "Datei verschwunden: " + kvp.Key);
+                Fail(failures, checkName, "Datei verschwunden: " + kvp.Key);
                 problems++;
                 continue;
             }
 
             if (!kvp.Value.SequenceEqual(bytes)) {
-                Fail(failures, classId, checkName, "Datei verändert: " + kvp.Key);
+                Fail(failures, checkName, "Datei verändert: " + kvp.Key);
                 problems++;
             }
         }
@@ -721,7 +705,7 @@ public class TableRoundtripCliCommand : CliCommand {
         if (!allowAnyNewFiles) {
             foreach (var key in actual.Keys) {
                 if (!expected.ContainsKey(key) && !allowedExtra.Contains(key)) {
-                    Fail(failures, classId, checkName, "Unerwartete neue Datei: " + key);
+                    Fail(failures, checkName, "Unerwartete neue Datei: " + key);
                     problems++;
                 }
             }
@@ -768,7 +752,7 @@ public class TableRoundtripCliCommand : CliCommand {
             using var zip = new ZipArchive(ms, ZipArchiveMode.Update, true);
             var entry = zip.GetEntry("Main.bin");
 
-            if (entry is not null) { entry.LastWriteTime = FixedZipDate; }
+            entry?.LastWriteTime = FixedZipDate;
         } catch {
             return null;
         }
@@ -776,8 +760,8 @@ public class TableRoundtripCliCommand : CliCommand {
         return ms.ToArray();
     }
 
-    private static void Fail(List<string> failures, string classId, string check, string detail) {
-        failures.Add(classId + " / " + check + ": " + detail);
+    private static void Fail(List<string> failures, string check, string detail) {
+        failures.Add(check + ": " + detail);
         Out("  [FAIL] " + check + " — " + detail);
     }
 

@@ -18,8 +18,7 @@ namespace BlueBasics.Classes;
 /// Alle Ableitungen nutzen dieselben reservierten Pfad-/Blatt-Typen
 /// (FragmentTagType, Werte ab 200); die Bytes sind je Rolle fest vergeben.
 /// Journal-Nav-Sätze (ItemPath mit Schlüssel-Content) wendet die Klasse granular
-/// auf den benannten Eintrag an (ApplySubItem); unbekannte Sätze gehen an
-/// DeserializeOther.
+/// auf den benannten Eintrag an (ApplySubItem); unbekannte Sätze werden übersprungen.
 /// Alle Calls sind threadsicher: Die Ablage ist ein ConcurrentDictionary, zusammengesetzte
 /// Schreiboperationen und Dispose sind über einen Lock bzw. ein Interlocked-Flag abgesichert.
 /// </summary>
@@ -533,7 +532,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// Schlüssel) wenden den Block eine Ebene tiefer granular auf den benannten
     /// Eintrag an, ItemList liest die ganze Liste; Add- und Remove-Blätter
     /// stammen aus Journal-Fragmenten, nie aus der Voll-Speicherung (das Add-Blatt
-    /// trägt „KeyName|TypeName“); alles andere geht an DeserializeOther.
+    /// trägt „KeyName|TypeName“); alles andere wird übersprungen.
     /// </summary>
     public virtual bool DeserializeThis(Stream stream, FragmentRecord record) {
         if (IsDisposed) {
@@ -603,7 +602,8 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
             return removeOk;
         }
 
-        return DeserializeOther(stream, record);
+        // Übrige (unbekannte) Satz-Typen überspringen.
+        return true;
     }
 
     /// <summary>
@@ -611,7 +611,7 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
     /// (Blatt-Inhalt bzw. Nav-Schlüssel), typeName der Typ-Anteil. Die Basis
     /// übernimmt nichts; Ableitungen erzeugen das Item idempotent.
     /// </summary>
-    protected virtual bool ApplyItemAdd(string keyName, string typeName) => true;
+    protected virtual bool ApplyItemAdd(string keyName, string typeName) => true; // TODO: Unused: keyName, typeName
 
     /// <summary>
     /// Übernimmt ein deserialisiertes Item aus einem Journal-Add-Blatt: fehlt der
@@ -751,11 +751,6 @@ public abstract class KeyedItemCollection<TItem> : IEnumerable<TItem>, IFragment
 
         return ok;
     }
-
-    /// <summary>
-    /// Verarbeitet übrige Satz-Typen (Navigation, Unbekanntes); true = Satz übersprungen.
-    /// </summary>
-    protected virtual bool DeserializeOther(Stream stream, FragmentRecord record) => true;
 
     #endregion
 }

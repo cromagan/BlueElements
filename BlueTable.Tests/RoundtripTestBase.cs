@@ -14,28 +14,44 @@ public abstract class RoundtripTestBase {
 
     #region Properties
 
-    /// <summary>Anzeigename des Layouts für Ordner und Meldungen.</summary>
+    /// <summary>
+    /// Anzeigename des Layouts für Ordner und Meldungen.
+    /// </summary>
     protected abstract string LayoutName { get; }
 
-    /// <summary>Datei-Suffix der Hauptdatei.</summary>
+    /// <summary>
+    /// Datei-Suffix der Hauptdatei.
+    /// </summary>
     protected abstract string Suffix { get; }
 
-    /// <summary>True: Das Befüllen legt eine Chunk-Spalte an und verteilt die Zeilen auf Chunk-Werte.</summary>
+    /// <summary>
+    /// True: Das Befüllen legt eine Chunk-Spalte an und verteilt die Zeilen auf Chunk-Werte.
+    /// </summary>
     protected abstract bool WithChunkColumn { get; }
 
-    /// <summary>Suffixe der write-once-Datenbereiche; ohne Angabe wird nur die Hauptdatei verglichen.</summary>
+    /// <summary>
+    /// Suffixe der write-once-Datenbereiche; ohne Angabe wird nur die Hauptdatei verglichen.
+    /// </summary>
     protected abstract string[] AreaFileSuffixes { get; }
 
-    /// <summary>Datei-Suffixe, die der Vergleich ignoriert (Sitzungs-Journale).</summary>
+    /// <summary>
+    /// Datei-Suffixe, die der Vergleich ignoriert (Sitzungs-Journale).
+    /// </summary>
     protected abstract string[] IgnoredFileSuffixes { get; }
 
-    /// <summary>Ordner-Marker, deren Inhalt der Vergleich ignoriert (z. B. Master-Verwaltung).</summary>
+    /// <summary>
+    /// Ordner-Marker, deren Inhalt der Vergleich ignoriert (z. B. Master-Verwaltung).
+    /// </summary>
     protected abstract string[] IgnoredFolderMarkers { get; }
 
-    /// <summary>True: Fragment-Kopf-Sätze (Erzeuger-/Speicher-Stempel) werden vor dem Vergleich abgetrennt.</summary>
+    /// <summary>
+    /// True: Fragment-Kopf-Sätze (Erzeuger-/Speicher-Stempel) werden vor dem Vergleich abgetrennt.
+    /// </summary>
     protected abstract bool StripFragmentHead { get; }
 
-    /// <summary>Anzahl der Zeilen der Test-Tabelle.</summary>
+    /// <summary>
+    /// Anzahl der Zeilen der Test-Tabelle.
+    /// </summary>
     protected virtual int RowCount => 6;
 
     /// <summary>

@@ -597,7 +597,7 @@ public partial class ScriptEditor : EditorEasy, IContextMenu, INotifyPropertyCha
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
             foreach (var thisc in ScriptCommand.AllMethods.Instances) {
-                if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(thisc.Command, e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText(true);
                     return;

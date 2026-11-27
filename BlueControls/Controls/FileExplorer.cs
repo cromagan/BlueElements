@@ -275,7 +275,7 @@ public sealed partial class FileExplorer : GenericControlReciver   //UserControl
         if (string.IsNullOrEmpty(DirectoryMin)) {
             btnZurück.Enabled = Enabled && pfadexists;
         } else {
-            if (Directory.Equals(DirectoryMin, StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(Directory, DirectoryMin, StringComparison.OrdinalIgnoreCase)) {
                 btnZurück.Enabled = false;
             } else {
                 btnZurück.Enabled = Enabled && pfadexists;

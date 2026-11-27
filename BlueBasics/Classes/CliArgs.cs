@@ -126,7 +126,7 @@ public class CliArgs {
     /// <summary>
     /// Liefert alle Werte einer mehrfach angegebenen Option in Reihenfolge (z. B. --set A=1 --set B=2).
     /// </summary>
-    public List<string> AllOptions(string name) => [.. _allOptions.Where(o => o.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Select(o => o.Value)];
+    public List<string> AllOptions(string name) => [.. _allOptions.Where(o => string.Equals(o.Name, name, StringComparison.OrdinalIgnoreCase)).Select(o => o.Value)];
 
     /// <summary>
     /// Prüft, ob ein Schalter (Wert-lose Option) gesetzt ist.

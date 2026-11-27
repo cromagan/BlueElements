@@ -17,6 +17,11 @@ public class TableFile : Table {
     public static readonly string Chunk_MainData = "_MainData";
 
     /// <summary>
+    /// Meldung, wenn die Tabelle während der Speicherung geändert wurde.
+    /// </summary>
+    public const string ChangeDuringSave = "Tabelle wurde während der Speicherung geändert.";
+
+    /// <summary>
     /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
     /// </summary>
     public static readonly int MasterBlockedMax = 180;
@@ -589,7 +594,7 @@ public class TableFile : Table {
             // Fremdänderungen während der Chunk-Generierung sind ein vorübergehender
             // Zustand: einmal kurz warten und erneut versuchen, statt zu warnen und
             // dem Checker-Tick die Nachhol-Arbeit zu überlassen.
-            if (!string.IsNullOrEmpty(result) && result.StartsWith("Tabelle wurde während der", StringComparison.Ordinal)) {
+            if (result == ChangeDuringSave) {
                 Thread.Sleep(2000);
                 result = SaveInternal();
             }
@@ -660,7 +665,7 @@ public class TableFile : Table {
         // Alle Daten in einer einzigen Byte-Liste sammeln (.bdb ist nicht chunked).
         var content = tbf.GenerateContentToSave();
 
-        if (x != tbf.LastChange) { return OperationResult.Failed("Tabelle wurde während der Speicherung geändert."); }
+        if (x != tbf.LastChange) { return OperationResult.Failed(ChangeDuringSave); }
 
         // Die Mindestgrößen-Prüfung schützt vor korrupten Re-Saves (z.B. wenn
         // durch einen Fehler kaum Daten generiert werden). Beim initialen Save

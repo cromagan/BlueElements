@@ -204,7 +204,7 @@ public static class ScriptPreCheck {
     private static void ProcessMatchedMethod(ScriptCommand thisC, CanDoFeedback f, ScriptPreCheckResult result, Dictionary<string, List<ScriptCommand>> lookup, List<ScriptCommand> emptyStartScriptCommand, string context, int line, string text, int lineOffset) {
         // var-Deklaration: Variablennamen sammeln — KEINE Attribut-Prüfung,
         // da var VariablenBerechnung nutzt, nicht SplitAttributeToVars.
-        if (thisC.Command.Equals(VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(thisC.Command, VarScriptCommand.CommandText, StringComparison.OrdinalIgnoreCase)) {
             var varName = ExtractVarName(f.AttributText);
             if (varName is { Length: > 0 } && ScriptVariable.IsValidName(varName)) {
                 result.VariableNames.Add(varName);

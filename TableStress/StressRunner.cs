@@ -151,7 +151,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
 
         var treffer = FilterCollection.CalculateFilteredRows(tbl, false, [.. filter]);
         var fremde = treffer.Count(r => !r.MatchesTo(zellFilter));
-        var enthalten = treffer.Exists(r => r.KeyName.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase));
+        var enthalten = treffer.Exists(r => string.Equals(r.KeyName, row.KeyName, StringComparison.OrdinalIgnoreCase));
         var quellePasst = row.MatchesTo(zellFilter);
 
         if (!quellePasst) {
@@ -204,7 +204,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
 
             var trefferZwei = FilterCollection.CalculateFilteredRows(tbl, false, [.. filter]);
 
-            if (trefferZwei.Exists(r => r.KeyName.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase))) {
+            if (trefferZwei.Exists(r => string.Equals(r.KeyName, row.KeyName, StringComparison.OrdinalIgnoreCase))) {
                 prot.Write("FILTER", "erste Suche kurzzeitig inkonsistent, Zweitversuch ok — neutral");
                 return;
             }
@@ -360,8 +360,8 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             case TableFile tf: {
                 var item = tf.Undo.Count > 0 ? tf.Undo[^1] : null;
                 var geloggt = item is not null
-                    && item.ColName.Equals(column.KeyName, StringComparison.OrdinalIgnoreCase)
-                    && item.RowKey.Equals(row.KeyName, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(item.ColName, column.KeyName, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(item.RowKey, row.KeyName, StringComparison.OrdinalIgnoreCase)
                     && item.Comment == kommentar
                     && string.Equals(item.User, user, StringComparison.OrdinalIgnoreCase);
 
@@ -648,7 +648,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
             var a = rows[random.Next(rows.Length)];
             var b = rows[random.Next(rows.Length)];
 
-            if (a.KeyName.Equals(b.KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
+            if (string.Equals(a.KeyName, b.KeyName, StringComparison.OrdinalIgnoreCase)) { continue; }
             if (chunkSpalte is { IsDisposed: false } && !string.Equals(a.CellGetString(chunkSpalte), b.CellGetString(chunkSpalte), StringComparison.OrdinalIgnoreCase)) { continue; }
 
             quelle = a;
@@ -1027,7 +1027,7 @@ public sealed class StressRunner(Table tbl, StressProtocol prot, string user) {
     private string ZufallsChunk(string bisher) {
         var neu = ChunkWerte[random.Next(ChunkWerte.Length)];
 
-        if (neu.Equals(bisher, StringComparison.OrdinalIgnoreCase)) { neu = ChunkWerte[(Array.IndexOf(ChunkWerte, neu) + 1) % ChunkWerte.Length]; }
+        if (string.Equals(neu, bisher, StringComparison.OrdinalIgnoreCase)) { neu = ChunkWerte[(Array.IndexOf(ChunkWerte, neu) + 1) % ChunkWerte.Length]; }
 
         return neu;
     }

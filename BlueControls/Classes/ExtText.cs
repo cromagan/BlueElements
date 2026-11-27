@@ -492,7 +492,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 }
             }
 
-            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth, storedX, lineSpacing);
+            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth);
 
             if (!ch.IsSpace()) {
                 maxRight = Math.Max(maxRight, mr);

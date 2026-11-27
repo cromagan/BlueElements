@@ -27,7 +27,7 @@ public sealed class BrowserWindowPlugin : WindowPlugin {
         return result;
     }
 
-    public override bool IsResponsibleFor(string className, string processName) => className == "Chrome_WidgetWin_1";
+    public override bool IsResponsibleFor(string className) => className == "Chrome_WidgetWin_1";
 
     /// <summary>
     /// Sucht das erste Eingabefeld, dessen Wert wie eine Adresse aussieht - die Adressleiste heißt je nach Sprache anders.

@@ -189,7 +189,7 @@ public class ImageAndTextRenderer : Renderer {
     /// Erzeugt den Renderer einer Spalte mit ihren Einstellungen; null bei anderem Renderer oder unlesbaren Einstellungen.
     /// </summary>
     public static ImageAndTextRenderer? Of(ColumnItem column) {
-        if (!column.DefaultRenderer.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) { return null; }
+        if (!string.Equals(column.DefaultRenderer, ClassId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var r = new ImageAndTextRenderer();
 

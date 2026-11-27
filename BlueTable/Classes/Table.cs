@@ -792,9 +792,7 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
     /// </summary>
     public static OperationResult Create(string targetPath, Table? source) {
         if (targetPath.FileSuffix().Equals(TableFileNew.SuffixMainFile, StringComparison.OrdinalIgnoreCase)) {
-            if (ParseableItem.NewByTypeName<SaveableFile>(SaveableFile.ClassId, targetPath) is not { } saveable) {
-                return OperationResult.Failed("Unbekanntes Datei-Layout: " + SaveableFile.ClassId);
-            }
+            var saveable = new SaveableFile(targetPath);
 
             var tbl = new TableFileNew(targetPath, source, saveable);
             saveable.WriteHeadFile();
@@ -3115,23 +3113,18 @@ public class Table : LiveInstanceCache<Table>, ICreateByKey<Table>, IDisposableE
             var f = thisfolder + key;
 
             // Neues Fragment-Format vor den klassischen Formaten prüfen:
-            // TableFileNew ist keine TableFile-Ableitung; das Datei-Layout
-            // steht im Layout-Kopf der Kopf-Datei und erzeugt die passende
-            // SaveableFile-Verwaltung. Bestände ohne Layout-Kopf (leere
-            // Head-Dummies und Komplettstände vor dem Kopf-Datei-Muster)
+            // TableFileNew ist keine TableFile-Ableitung; die Kopf-Datei muss
+            // ein gültiger Fragment-Baum sein. Bestände ohne gültigen Layout-Kopf
+            // (leere Head-Dummies und Komplettstände vor dem Kopf-Datei-Muster)
             // werden bewusst nicht mehr geraten.
             var fsFragment = f + "." + TableFileNew.SuffixMainFile;
 
             if (FileExists(fsFragment)) {
-                if (!SaveableFile.TryReadHeadClassId(fsFragment, out var layoutClassId)) {
+                if (!SaveableFile.HasValidHead(fsFragment)) {
                     throw new InvalidDataException("Die Kopf-Datei '" + fsFragment + "' trägt keinen gültigen Layout-Kopf (alter Bestand oder beschädigt) und kann nicht geladen werden.");
                 }
 
-                if (ParseableItem.NewByTypeName<SaveableFile>(layoutClassId, fsFragment) is not { } saveable) {
-                    throw new InvalidDataException("Das Datei-Layout '" + layoutClassId + "' wird von dieser Version nicht unterstützt: " + fsFragment);
-                }
-
-                var tfn = new TableFileNew(key, saveable);
+                var tfn = new TableFileNew(key, new SaveableFile(fsFragment));
                 LoadingOnThisThread.Push(tfn);
                 try {
                     tfn.LoadFromFile(fsFragment, string.Empty);

@@ -20,10 +20,5 @@ public interface IColumnHeadButtonHost {
     /// </summary>
     void InvalidateCurrentArrangement();
 
-    /// <summary>
-    /// Setzt die temporäre Sortierung zurück.
-    /// </summary>
-    void ResetSortDefinition();
-
     #endregion
 }

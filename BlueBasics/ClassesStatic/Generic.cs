@@ -445,7 +445,7 @@ public static class Generic {
         foreach (var t in GetEnumerableOfType<T>()) {
             if (t.GetProperty("ClassId", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                     ?.GetValue(null, null) is string cid
-                && cid.Equals(classId, StringComparison.OrdinalIgnoreCase)) {
+                && string.Equals(cid, classId, StringComparison.OrdinalIgnoreCase)) {
                 return t;
             }
         }
